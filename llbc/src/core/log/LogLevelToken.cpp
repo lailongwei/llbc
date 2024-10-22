@@ -19,25 +19,16 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogLevel.h"
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogLevelToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogLevelToken::LLBC_LogLevelToken()
-{
-}
-
-LLBC_LogLevelToken::~LLBC_LogLevelToken()
-{
-}
-
-int LLBC_LogLevelToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogLevelToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -50,13 +41,12 @@ int LLBC_LogLevelToken::GetType() const
 
 void LLBC_LogLevelToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
-    formattedData.append(LLBC_LogLevel::GetLevelDesc(data.level));
+    const int index = static_cast<int>(formattedData.size());
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    const LLBC_CString &lvStr = LLBC_LogLevel::GetLevelStr(data.level);
+    formattedData.append(lvStr.c_str(), lvStr.size());
+
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

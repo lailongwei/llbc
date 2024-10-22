@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COMM_PY_SERVICE_H__
-#define __PYLLBC_COMM_PY_SERVICE_H__
+#pragma once
 
 #include "pyllbc/common/Common.h"
 #include "pyllbc/core/Core.h"
@@ -37,22 +36,12 @@ class LLBC_HIDDEN pyllbc_Service
 {
 public:
     /**
-     * The codec policy enumeration.
-     */
-    enum Codec
-    {
-        JsonCodec,
-        BinaryCodec 
-    };
-
-public:
-    /**
      * Parameter constructor.
-     * @param[in] type  - the service type, see enumeration: SvcType.
-     * @param[in] name  - the service name.
-     * @param[in] pySvc - the python layer service instance(borrow instance).
+     * @param[in] name                     - the service name.
+     * @param[in] useNormalProtocolFactory - use normal protocol facroty or raw protocol factory.
+     * @param[in] pySvc                    - the python layer service instance(borrow instance).
      */
-    pyllbc_Service(LLBC_IService::Type type, const LLBC_String &name, PyObject *pySvc);
+    pyllbc_Service(const LLBC_String &name, bool useNormalProtocolFactory, PyObject *pySvc);
     /**
      * Destructor.
      */
@@ -66,10 +55,10 @@ public:
     int GetId() const;
 
     /**
-     * Get the python service type.
-     * @return SvcType - the service type enumeration.
+     * Get the service name.
+     * @return const LLBC_String & - the service name.
      */
-    LLBC_IService::Type GetType() const;
+    const LLBC_String &GetName() const;
 
     /**
      * Get python service.
@@ -105,20 +94,6 @@ public:
 
 public:
     /**
-     * Get service codec strategy(default is Json).
-     * @return  Codec - the codec.
-     */
-    Codec GetCodec() const;
-
-    /**
-     * Set service codec strategy(default is Json).
-     * @param[in] codec - the codec.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int SetCodec(Codec codec);
-
-public:
-    /**
      * Startup the service as client.
      * @param[in] pollerCount - the poller count.
      * @return int - return 0 if success, otherwise return -1.
@@ -141,7 +116,7 @@ public:
      * Register comp.
      * @param[in] comp - the comp instance(normal, not steal reference).
      *      comp methods(all methods are optional):
-     *          oninitialize(self, ev): service initialize handler.
+     *          oninit(self, ev): service initialize handler.
      *              ev.svc: service object.
      *          ondestroy(self, ev): service destroy handler.
      *              ev.svc: service object.
@@ -187,7 +162,7 @@ public:
      *              ev.opcode: packet opcode.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RegisterComponent(PyObject *comp);
+    int AddComponent(PyObject *comp);
 
     /**
      * Register comp from library.
@@ -197,19 +172,19 @@ public:
      * @param[out] comp    - the created comp(new reference).
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RegisterComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp);
+    int AddComponent(const LLBC_String &compName, const LLBC_String &libPath, PyObject *compCls, PyObject *&comp);
 
     /**
-     * Register codec(only available in CODEC_BINARY).
-     * @param[in] opcode - the opcode.
-     * @param[in] codec  - the codec class(not steal reference, normal).
-     *                     constraints:
-     *                      raw types(None, byte, bool, int, long, float, bytearray, buffer, str, unicode) or exist flowwow methods's cls:
-     *                          encode(self, stream): Encode data to stream.
-     *                          decode(self, stream): Decode data from stream.
+     * Register coder factory.
+     * @param[in] opcode  - the opcode.
+     * @param[in] decoder - the decoder(callable obj, not steal reference, normal).
+     *                      constraints:
+     *                       raw types(None, byte, bool, int, long, float, bytearray, buffer, str, unicode) or exist follow methods's cls:
+     *                           encode(self, stream): Encode data to stream.
+     *                           decode(self, stream): Decode data from stream.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RegisterCodec(int opcode, PyObject *codec);
+    int AddDecoder(int opcode, PyObject *decoder);
 
 public:
     /**
@@ -279,7 +254,7 @@ public:
      * @param[in] status     - the status code, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, PyObject *data, int status=0);
+    int Multicast(const LLBC_SessionIds &sessionIds, int opcode, PyObject *data, int status=0);
 
     /**
      * Broadcast data.
@@ -375,11 +350,46 @@ public:
 
 private:
     /**
-     * Create llbc layer service object.
-     * @param[in] svcType - the service type.
-     * @param[in] svcName - the service name.
+     * data receive handler.
+     * @param[in] packet - packet.
      */
-    void CreateLLBCService(LLBC_IService::Type svcType, const LLBC_String &svcName);
+    virtual void OnDataReceived(LLBC_Packet &packet);
+
+    /**
+     * The data pre-receive handler.
+     * @param[in] packet - packet.
+     * @return bool - the return value, if return false, will remove this session.
+     */
+    virtual bool OnDataPreReceived(LLBC_Packet &packet);
+
+#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+    /**
+     * The data unify pre-receive handler.
+     * @param[in] packet - packet.
+     * @return bool - the return value, if return zero, will remove this session.
+     */
+    virtual bool OnDataUnifyPreReceived(LLBC_Packet &packet);
+#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
+
+    /**
+     * Build python layer packet object according to LLBC_Packet object reference.
+     * @param[in] packet - the core library packet object reference.
+     * @return PyObject * - the python layer packet object, if error occurred, return nullptr.
+     */
+    PyObject *BuildPyPacket(const LLBC_Packet &packet);
+
+    /**
+     * Delete the python layer packet.
+     */
+    void DeletePyPacket(void *pyPacket);
+    
+private:
+    /**
+     * Create llbc layer service object.
+     * @param[in] svcName                  - the service name.
+     * @param[in] useNormalProtocolFactory - use normal protocol facroty or raw protocol factory.
+     */
+    void CreateLLBCService(const LLBC_String &svcName, bool useNormalProtocolFactory);
 
     /**
      * After stop method, use to purge all python type data.
@@ -402,6 +412,14 @@ private:
      */
     int SerializePyObj2Stream(PyObject *pyObj, LLBC_Stream &stream);
 
+#if PYLLBC_CFG_PACKET_REUSE
+    /**
+     * Create reuse python layer packet object.
+     * @return PyObject * - the python layer reuse packet(new reference).
+     */
+    PyObject *CreateReusePyPacket();
+#endif // PYLLBC_CFG_PACKET_REUSE
+
 private:
     /**
      * The additional event constructor.
@@ -423,28 +441,32 @@ private:
     friend class pyllbc_Component;
 
 private:
-    LLBC_IService *_llbcSvc;
-    LLBC_IService::Type _llbcSvcType;
+    LLBC_Service *_llbcSvc;
     LLBC_String _llbcSvcName;
+    bool _useNormalProtocolFactory;
 
     PyObject *_pySvc;
 
     bool _inMainloop;
 
-    pyllbc_Component *_cppComp;
-    typedef std::vector<PyObject *> _Comps;
-    _Comps _comps;
-
-    typedef std::map<int, pyllbc_PacketHandler *> _PacketHandlers;
-    _PacketHandlers _handlers;
-    _PacketHandlers _preHandlers;
+    std::map<int, pyllbc_PacketHandler *>  _handlers;
+    std::map<int, pyllbc_PacketHandler *>  _preHandlers;
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     pyllbc_PacketHandler *_unifyPreHandler;
 #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
-    Codec _codec;
-    typedef std::map<int, PyObject *> _Codecs;
-    _Codecs _codecs;
+    PyObject *_pyPacketCls;
+#if PYLLBC_CFG_PACKET_REUSE
+    PyObject *_pyReusePacket;
+    PyObject *_pyPacketReuseMeth;
+#endif // PYLLBC_CFG_PACKET_REUSE
+    PyObject *_pyNullCObj;
+    PyObject *_pyPacketCreateArgs;
+
+    PyObject *_pyStream;
+    pyllbc_Stream *_nativeStream;
+
+    std::map<int, PyObject *> _decoders;
     bool _suppressedCoderNotFoundWarning;
 
     static PyObject *_pyEvCls;
@@ -462,10 +484,6 @@ private:
     bool _stoping;
 
 private:
-    PyObject *_keyCObj;
-
     static PyObject *_streamCls;
     static pyllbc_ErrorHooker *_errHooker;
 };
-
-#endif // !__PYLLBC_COMM_PY_SERVICE_H__

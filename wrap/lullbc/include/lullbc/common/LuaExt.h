@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LULLBC_COM_LUAEXT_H__
-#define __LULLBC_COM_LUAEXT_H__
+#pragma once
 
 #include "lullbc/common/LibHeader.h"
 
@@ -37,4 +36,4 @@
  #define lua_objlen(l, i)    lua_rawlen(l, (i))
 #endif
 
-#endif // !__LULLBC_COM_LUAEXT_H__
+

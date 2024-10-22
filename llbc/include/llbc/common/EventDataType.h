@@ -19,13 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_EVENT_DATA_TYPE_H__
-#define __LLBC_COM_EVENT_DATA_TYPE_H__
+#pragma once
 
-#include "llbc/common/PFConfig.h"
-
-#include "llbc/common/Macro.h"
-#include "llbc/common/StringDataType.h"
+#include "llbc/common/BasicDataType.h"
 
 __LLBC_NS_BEGIN
 
@@ -33,8 +29,5 @@ __LLBC_NS_BEGIN
  * \brief The event deleg stub data type encapsulation.
  */
 typedef uint64 LLBC_ListenerStub;
-#define LLBC_INVALID_LISTENER_STUB  0
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COM_EVENT_DATA_TYPE_H__

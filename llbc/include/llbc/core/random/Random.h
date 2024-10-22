@@ -19,12 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_RANDOM_RANDOM_H__
-#define __LLBC_CORE_RANDOM_RANDOM_H__
+#pragma once
 
 #include "llbc/common/Common.h"
-
-#include "llbc/core/random/mtrandom.h"
 
 __LLBC_NS_BEGIN
 
@@ -62,6 +59,17 @@ public:
     int Rand(int begin, int end);
 
     /**
+     * Generate a random index based on the weight values of the input weights.
+     * @return int - the random index of the weights[0, weights.size()).
+     */
+    template <typename _Weights>
+    typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
+                            LLBC_IsTemplSpec<_Weights, std::list>::value ||
+                            LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
+                            std::is_array<_Weights>::value, int>::type
+    Rand(const _Weights &weights);
+
+    /**
      * Generate a floating point number N such that: 0 <= N < 1.
      * @return int - the random floating point number N.
      */
@@ -80,8 +88,17 @@ public:
     template <typename _RandomAccessIter>
     _RandomAccessIter Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end);
 
+    /**
+     * Reorders the elements in the given range [begin, end) such that each possible permutation 
+     * of those elements has equal probability of appearance.
+     * @param[in] begin - begin iterator.
+     * @param[in] end   - end iterator.
+     */
+    template <typename _RandomAccessIter>
+    void Shuffle(const _RandomAccessIter &begin, const _RandomAccessIter &end);
+
 private:
-    mtrandom _mtRand;
+    std::mt19937 _mtRand;
 };
 
 /**
@@ -96,6 +113,6 @@ LLBC_EXPORT bool LLBC_BoolJudge();
 
 __LLBC_NS_END
 
-#include "llbc/core/random/RandomImpl.h"
+#include "llbc/core/random/RandomInl.h"
 
-#endif // !__LLBC_CORE_RANDOM_RANDOM_H__
+

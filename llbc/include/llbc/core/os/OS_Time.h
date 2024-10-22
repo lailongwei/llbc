@@ -19,12 +19,20 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_OS_TIME_H__
-#define __LLBC_CORE_OS_OS_TIME_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
+
+/**
+ * The LLBC_RdTsc() support macro define.
+ */
+#if (LLBC_TARGET_PROCESSOR_X86_64 || LLBC_TARGET_PROCESSOR_X86)
+ #define LLBC_SUPPORT_RDTSC 1
+#else // Non x86 and x86_64
+ #define LLBC_SUPPORT_RDTSC 0
+#endif // x86 or x86_64
 
 /**
  * Set timezone.
@@ -39,7 +47,7 @@ LLBC_EXPORT void LLBC_TZSet();
 LLBC_EXPORT int LLBC_GetTimezone();
 
 /**
- * Makesure given year is leap year or not.
+ * Make sure given year is leap year or not.
  * @param[in] year - the given year.
  * @return bool - return true if is leap year, otherwise return false.
  */
@@ -66,14 +74,14 @@ int LLBC_GetMonthSpanDays(int year, int month);
  * @return sint64 - current time, in milli-seconds since midnight(0:0:0), 
  *                  January 1, 1970, coordinated universal time(UTC).
  */
-sint64 LLBC_GetMilliSeconds();
+sint64 LLBC_GetMilliseconds();
 
 /**
  * Get the current time as micro-seconds.
  * @return sint64 - current time, in micro-seconds since midnight(0:0:0),
  *                  January 1, 1970, coordinated universal time(UTC).
  */
-sint64 LLBC_GetMicroSeconds();
+sint64 LLBC_GetMicroseconds();
 
 /**
  * Retrieves the number of milliseconds that have elapsed since the system was started, up to 49.7 days.
@@ -106,14 +114,14 @@ void LLBC_WinFileTime2TimeSpec(const FILETIME &fileTime, timespec &ts);
  * @param[in] fileTime - the filetime.
  * @return sint64 - the converted time, in milliseconds.
  */
-sint64 LLBC_WinFileTime2MilliSeconds(const FILETIME &fileTime);
+sint64 LLBC_WinFileTime2Milliseconds(const FILETIME &fileTime);
 
 /**
  * Convert filetime to microseconds.
  * @param[in] fileTime - the filetime.
  * @return sint64 - the converted time, in microseconds.
  */
-sint64 LLBC_WinFileTime2MicroSeconds(const FILETIME &fileTime);
+sint64 LLBC_WinFileTime2Microseconds(const FILETIME &fileTime);
 
 /**
  * Convert timespec to filetime.
@@ -127,14 +135,14 @@ void LLBC_WinTimeSpec2FileTime(const timespec &ts, FILETIME &fileTime);
  * @param[in] milliSeconds - the milliseconds.
  * @param[out] fileTime    - the filetime.
  */
-void LLBC_WinMilliSeconds2FileTime(sint64 milliSeconds, FILETIME &fileTime);
+void LLBC_WinMilliseconds2FileTime(sint64 milliSeconds, FILETIME &fileTime);
 
 /**
  * Convert microseconds to filetime.
  * @param[in] microSeconds - the microseconds.
  * @param[out] fileTime    - the filetime.
  */
-void LLBC_WinMicroSeconds2FileTime(sint64 microSeconds, FILETIME &fileTime);
+void LLBC_WinMicroseconds2FileTime(sint64 microSeconds, FILETIME &fileTime);
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 /**
@@ -163,6 +171,6 @@ __LLBC_NS_END
  #endif // LLBC_CFG_OS_IMPL_GETTIMEOFDAY
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
-#include "llbc/core/os/OS_TimeImpl.h"
+#include "llbc/core/os/OS_TimeInl.h"
 
-#endif // !__LLBC_CORE_OS_OS_TIME_H__
+

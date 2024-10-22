@@ -12,12 +12,13 @@ TEST_PORT = 17788
 
 
 class ClientComp(object):
-    def oninitialize(self, ev):
+    def oninit(self, ev):
         ev.svc.asyncconn(TEST_IP, TEST_PORT)
 
     def onsessioncreate(self, ev):
-        print 'Client session create, id: {}, send data: '.format(ev.session_id)
-        ev.svc.send(session_id=ev.session_id, data='hello', opcode=TEST_REQ)
+        data = 'hello'
+        print 'Client session create, id: {}, send data: {}'.format(ev.session_id, data)
+        ev.svc.send(session_id=ev.session_id, data=data, opcode=TEST_REQ)
 
     def onsessiondestroy(self, ev):
         print 'Client session destroy, id: {}'.format(ev.session_id)
@@ -28,25 +29,35 @@ class ClientComp(object):
 
 class ClientPacketHandler(object):
     def __call__(self, packet):
-        print 'Client recv packet: {}'.format(packet.data)
-        packet.svc.send(session_id=packet.session_id, data=packet.data, opcode=TEST_REQ)
+        payload = packet.data
+        data = payload.unpackstr()
+        payload.rpos = 0
+        print 'Client recv packet: {}'.format(data)
+        packet.svc.send(session_id=packet.session_id, data=data, opcode=TEST_REQ)
 
 
 class ClientPacketPreHandler(object):
     def __call__(self, packet):
-        print 'Client prev-recv packet: {}'.format(packet.data)
+        payload = packet.data
+        data = packet.unpackstr()
+        payload.rpos = 0
+        print 'Client prev-recv packet: {}'.format(data)
         return True
 
 
 class ClientPacketUnifyPreHandler(object):
     def __call__(self, packet):
-        print 'Client unify prev-recv packet: {}'.format(packet.data)
+        payload = packet.data
+        data = payload.unpackstr()
+        payload.rpos = 0
+        print 'Client unify prev-recv packet: {}(len:{}), stream.rpos:{}, stream.wpos:{}, stream.cap:{}'.format(
+            data, data.__len__(), payload.rpos, payload.wpos, payload.cap)
         return True
 
 
 class ServerComp(object):
     def onsessioncreate(self, ev):
-        print 'Server session create, id: {}, send data: '.format(ev.session_id)
+        print 'Server session create, id: {}'.format(ev.session_id)
 
     def onsessiondestroy(self, ev):
         print 'Server session destroy, id: {}'.format(ev.session_id)
@@ -54,10 +65,11 @@ class ServerComp(object):
 
 class ServerPacketHandler(object):
     def __call__(self, packet):
-        print 'Server recv packet: {}'.format(packet.data)
+        data = packet.data.unpackstr()
+        print 'Server recv packet: {}'.format(data)
 
         sleep(1)
-        packet.svc.send(session_id=packet.session_id, data=packet.data, opcode=TEST_RES)
+        packet.svc.send(session_id=packet.session_id, data=data, opcode=TEST_RES)
 
 
 class ServerPacketPreHandler(object):
@@ -83,7 +95,10 @@ class ServerPacketUnifyPreHandler(object):
         self._times = 0
 
     def __call__(self, packet):
-        print 'Server unify pre-recv packet: {}'.format(packet.data)
+        payload = packet.data
+        data = payload.unpackstr()
+        payload.rpos = 0
+        print 'Server unify prev-recv packet: {}'.format(data)
         self._times += 1
         if self._times == self._RECV_TIMES_LIMIT:
             print 'Server recv times >= {}, will remove this session'.format(self._RECV_TIMES_LIMIT)
@@ -99,11 +114,8 @@ class MultiSvcTest(TestCase):
         client = Service('multisvc_test_client')
         server = Service('multisvc_test_server')
 
-        client.codec = Service.CODEC_JSON
-        server.codec = Service.CODEC_JSON
-
-        client.registercomp(ClientComp())
-        server.registercomp(ServerComp())
+        client.addcomp(ClientComp())
+        server.addcomp(ServerComp())
 
         client.subscribe(TEST_RES, ClientPacketHandler())
         server.subscribe(TEST_REQ, ServerPacketHandler())

@@ -19,23 +19,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_OS_HEADER_H__
-#define __LLBC_COM_OS_HEADER_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
 // OS header files.
 #if LLBC_TARGET_PLATFORM_WIN32
- #ifndef WIN32_LEAN_AND_MEAN
-  #define WIN32_LEAN_AND_MEAN
- #endif
-
- #ifndef WINVER
-  #define WINVER 0x600
- #endif
-
- #include <Windows.h>
- #include <Winsock2.h>
+ #include <Winsock2.h> // Has been included Windows.h.
  #include <Mswsock.h>
  #include <Ws2tcpip.h>
  #include <process.h>
@@ -48,24 +38,15 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/timeb.h>
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
- #include <fcntl.h>
  #include <netinet/in.h>
- #include <netinet/tcp.h>
  #include <pthread.h>
- #include <libgen.h>
  #include <sys/time.h>
- #include <sys/ioctl.h>
  #include <sys/socket.h>
- #include <sys/syscall.h>
  #include <netdb.h>
- #include <dirent.h>
  #include <semaphore.h>
  #include <arpa/inet.h>
- #include <dlfcn.h>
- #include <execinfo.h>
 
  #if LLBC_TARGET_PLATFORM_LINUX
   #include <sys/epoll.h>
@@ -94,18 +75,16 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <errno.h>
-#include <signal.h>
 #include <time.h>
+#include <math.h>
+#include <random>
 #if LLBC_TARGET_PLATFORM_NON_WIN32
  #include <unistd.h>
 #endif
 
 // C++ standard header files.
-#include <cstddef>
 #include <iostream>
 #include <sstream>
-#include <fstream>
-#include <iomanip>
 #include <memory>
 #include <vector>
 #include <list>
@@ -113,35 +92,21 @@
 #include <deque>
 #include <stack>
 #include <array>
+#include <tuple>
 #include <map>
 #include <unordered_map>
 #include <set>
 #include <unordered_set>
 #include <algorithm>
-#include <limits.h>
+#include <climits>
 #include <functional>
+#include <utility>
 
 // RTTI support header files.
 #include <typeinfo>
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-#include <cxxabi.h>
-#endif
-
-// UUID lib header file.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-#include <uuid/uuid.h>
-#endif
-
-// iconv lib header file.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-#include <iconv.h>
-#endif
+#include <type_traits>
 
 // Enable posix support, if in WIN32 platform.
 #if LLBC_TARGET_PLATFORM_WIN32
- #ifndef _POSIX_
-  #define _POSIX_
- #endif // !_POSIX_
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
-#endif // !__LLBC_COM_OS_HEADER_H__

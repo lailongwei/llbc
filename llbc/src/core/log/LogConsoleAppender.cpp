@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Console.h"
 
@@ -87,10 +87,22 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     if (logLevel < GetLogLevel())
         return LLBC_OK;
 
-    FILE * const out = logLevel >= _LogLevel::Warn ? stderr : stdout;
+    FILE *out = nullptr;
+    if (logLevel >= _LogLevel::Warn)
+    {
+        out = stderr;
+        #if !LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE
+        LLBC_FlushFile(stdout);
+        #endif
+    }
+    else
+    {
+        out = stdout;
+    }
 
-    LLBC_String formattedData;
-    chain->Format(data, formattedData);
+    LLBC_String &logFmtBuf = GetLogFormatBuf();
+    logFmtBuf.clear();
+    chain->Format(data, logFmtBuf);
 
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_LockGuard colorLock(_colorLock);
@@ -103,7 +115,7 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
         LLBC_SetConsoleColor(out, DetermineLogTextColor(logLevel));
     }
 
-    LLBC_FilePrint(out, "%s", formattedData.c_str());
+    LLBC_FilePrint(out, "%s", logFmtBuf.c_str());
 
 #if LLBC_CFG_LOG_DIRECT_FLUSH_TO_CONSOLE
     if (logLevel < _LogLevel::Warn) 
@@ -121,14 +133,11 @@ int LLBC_LogConsoleAppender::DetermineLogTextColor(int logLv)
     typedef LLBC_ConsoleColor _CC;
 
     if (logLv == _LogLevel::Warn)
-        return _CC::Bg_Black | _CC::Fg_Yellow | _CC::Highlight_Fg;
-    else if (logLv == _LogLevel::Error ||
-        logLv == _LogLevel::Fatal)
-        return _CC::Bg_Black | _CC::Fg_Red | _CC::Highlight_Fg;
+        return _CC::Bg_Default | _CC::Fg_Yellow | _CC::Highlight_Fg;
+    else if (logLv == _LogLevel::Error || logLv == _LogLevel::Fatal)
+        return _CC::Bg_Default | _CC::Fg_Red | _CC::Highlight_Fg;
     else
         return _CC::Bg_Default | _CC::Fg_Default;
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

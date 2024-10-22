@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LULLBC_COM_LIB_HEADER_H__
-#define __LULLBC_COM_LIB_HEADER_H__
+#pragma once
 
 /* Include lua header files */
 #ifdef __cplusplus
@@ -38,4 +37,4 @@ extern "C"
 #include "llbc.h"
 using namespace llbc;
 
-#endif // !__LULLBC_COM_LIB_HEADER_H__
+

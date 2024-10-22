@@ -34,7 +34,7 @@ int TestCase_Core_OS_Symbol::Run(int argc, char *argv[])
 {
     std::cout <<"core/os/symbol test: " <<std::endl;
 
-    LLBC_PrintLine("Call functions: Foo1->Foo2->Foo3->Goo1->Goo2->Goo3");
+    LLBC_PrintLn("Call functions: Foo1->Foo2->Foo3->Goo1->Goo2->Goo3");
     Foo1();
 
     fprintf(stdout, "Press any key to continue ... ...\n");
@@ -68,6 +68,7 @@ void TestCase_Core_OS_Symbol::Goo2()
     int a = 3;
     int b = 4;
     a += b;
+    LLBC_Print("a:%d, b:%d\n", a, b);
     Goo3();
 }
 
@@ -78,15 +79,15 @@ void TestCase_Core_OS_Symbol::Goo3()
 
 void TestCase_Core_OS_Symbol::PrintBackTrace()
 {
-    LLBC_CPUTime begTime = LLBC_CPUTime::Current();
+    LLBC_Stopwatch sw;
 
     #if LLBC_CFG_OS_IMPL_SYMBOL
     LLBC_String backTrace = LLBC_CaptureStackBackTrace(1);
     LLBC_Print("Stack BackTrace:\n%s\n", backTrace.c_str());
     #else
-    LLBC_PrintLine("Not implement Symbol function(Try enable LLBC_CFG_OS_IMPL_SYMBOL option and rebuild llbc library to enable Symbol function)");
+    LLBC_PrintLn("Not implement Symbol function(Try enable LLBC_CFG_OS_IMPL_SYMBOL option and rebuild llbc library to enable Symbol function)");
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
-    LLBC_CPUTime usedTime = LLBC_CPUTime::Current() - begTime;
-    LLBC_PrintLine("Capture stack backtrace used time(ms):%s", usedTime.ToString().c_str());
+    sw.Stop();
+    LLBC_PrintLn("Capture stack backtrace used time(ms):%s", sw.ToString().c_str());
 }

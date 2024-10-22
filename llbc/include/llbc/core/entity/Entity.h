@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_ENTITY_ENTITY_H__
-#define __LLBC_CORE_ENTITY_ENTITY_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/variant/Variant.h"
 
@@ -226,6 +223,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/entity/EntityImpl.h"
+#include "llbc/core/entity/EntityInl.h"
 
-#endif // !__LLBC_CORE_ENTITY_ENTITY_H__
+

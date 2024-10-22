@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/PFConfig.h"
 
@@ -37,7 +36,7 @@
  #pragma warning(disable: 4996)
 #endif // Win32
 
-std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a)
 {
     LLBC_NS LLBC_String str;
     str.format("%s:%d", a.GetIpAsString().c_str(), a.GetPort());
@@ -51,25 +50,25 @@ LLBC_SockAddr_IN::LLBC_SockAddr_IN(uint16 addrFamily, const char *ip, uint16 por
 {
     _addrFamily = addrFamily;
 
-    _ip = ::inet_addr(ip);
+    _ip = inet_addr(ip);
     _port = htons(port);
 
-    ::memset(_zero, 0, sizeof(_zero));
+    memset(_zero, 0, sizeof(_zero));
 }
 
 LLBC_SockAddr_IN::LLBC_SockAddr_IN(const char *ip, uint16 port)
 {
     _addrFamily = AF_INET;
 
-    _ip = ::inet_addr(ip);
+    _ip = inet_addr(ip);
     _port = htons(port);
 
-    ::memset(_zero, 0, sizeof(_zero));
+    memset(_zero, 0, sizeof(_zero));
 }
 
 LLBC_SockAddr_IN::LLBC_SockAddr_IN(const LLBC_SockAddr_IN &right)
 {
-    ::memcpy(this, &right, sizeof(LLBC_SockAddr_IN));
+    memcpy(this, &right, sizeof(LLBC_SockAddr_IN));
 }
 
 LLBC_SockAddr_IN::~LLBC_SockAddr_IN()
@@ -89,7 +88,7 @@ struct sockaddr_in LLBC_SockAddr_IN::ToOSDataType() const
 #endif
     addr.sin_port = _port;
 
-    ::memcpy(addr.sin_zero, _zero, sizeof(addr.sin_zero));
+    memcpy(addr.sin_zero, _zero, sizeof(addr.sin_zero));
 
     return addr;
 }
@@ -111,8 +110,8 @@ int LLBC_SockAddr_IN::FromOSDataType(const struct sockaddr_in *sockaddr)
 #endif
     _port = sockaddr->sin_port;
 
-    ::memset(_zero, 0, sizeof(_zero));
-    ::memcpy(_zero, sockaddr->sin_zero, sizeof(sockaddr->sin_zero));
+    memset(_zero, 0, sizeof(_zero));
+    memcpy(_zero, sockaddr->sin_zero, sizeof(sockaddr->sin_zero));
 
     return LLBC_OK;
 }
@@ -148,7 +147,7 @@ int LLBC_SockAddr_IN::SetAddressFamily(uint16 family)
 LLBC_String LLBC_SockAddr_IN::GetIpAsString() const
 {
     struct in_addr addr = GetIpAsINAddr();
-    return ::inet_ntoa(addr);
+    return inet_ntoa(addr);
 }
 
 int LLBC_SockAddr_IN::GetIpAsNumber() const
@@ -181,7 +180,7 @@ void LLBC_SockAddr_IN::SetIp(const LLBC_String &ip)
         return;
     }
 
-    _ip = ::inet_addr(ip.c_str());
+    _ip = inet_addr(ip.c_str());
 }
 
 void LLBC_SockAddr_IN::SetIp(int ip)
@@ -232,7 +231,7 @@ int LLBC_SockAddr_IN::GetPaddingBuf(void *buf, size_t &len)
     }
 
     len = sizeof(_zero);
-    ::memcpy(buf, _zero, len);
+    memcpy(buf, _zero, len);
 
     return LLBC_OK;
 }
@@ -245,14 +244,14 @@ int LLBC_SockAddr_IN::SetPaddingBuf(const char *buf, size_t len)
         return LLBC_FAILED;
     }
 
-    ::memcpy(_zero, buf, sizeof(_zero));
+    memcpy(_zero, buf, sizeof(_zero));
 
     return LLBC_OK;
 }
 
 void LLBC_SockAddr_IN::ZeroPaddingBuf()
 {
-    ::memset(_zero, 0, sizeof(_zero));
+    memset(_zero, 0, sizeof(_zero));
 }
 
 LLBC_String LLBC_SockAddr_IN::ToString() const
@@ -263,13 +262,13 @@ LLBC_String LLBC_SockAddr_IN::ToString() const
     return desc;
 }
 
-LLBC_SockAddr_IN &LLBC_SockAddr_IN::operator =(const LLBC_SockAddr_IN &right)
+LLBC_SockAddr_IN &LLBC_SockAddr_IN::operator=(const LLBC_SockAddr_IN &right)
 {
-    ::memcpy(this, &right, sizeof(LLBC_SockAddr_IN));
+    memcpy(this, &right, sizeof(LLBC_SockAddr_IN));
     return *this;
 }
 
-bool LLBC_SockAddr_IN::operator ==(const LLBC_SockAddr_IN &right) const
+bool LLBC_SockAddr_IN::operator==(const LLBC_SockAddr_IN &right) const
 {
     if (this == &right)
         return true;
@@ -287,13 +286,12 @@ LLBC_Overlapped::LLBC_Overlapped()
 , data(nullptr)
 {
 #if LLBC_TARGET_PLATFORM_WIN32
-    ::memset(this, 0, sizeof(OVERLAPPED));
+    memset(this, 0, sizeof(OVERLAPPED));
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
 LLBC_OverlappedGroup::LLBC_OverlappedGroup()
 : _sock(LLBC_INVALID_SOCKET_HANDLE)
-, _ols()
 
 , _delDataProc(nullptr)
 {
@@ -329,7 +327,7 @@ void LLBC_OverlappedGroup::DeleteOverlapped(LLBC_POverlapped ol)
     ASSERT(iter != _ols.end() && "LLBC_OverlappedGroup::DeleteOverlapped(): not found overlapped!");
 
     ClearOverlappedMembers(ol);
-    LLBC_Delete(ol);
+    delete ol;
 
     _ols.erase(iter);
 }
@@ -341,7 +339,7 @@ void LLBC_OverlappedGroup::DeleteAllOverlappeds()
     {
         LLBC_POverlapped ol = *iter;
         ClearOverlappedMembers(ol);
-        LLBC_Delete(ol);
+        delete ol;
     }
 
     _ols.clear();
@@ -357,9 +355,9 @@ void LLBC_OverlappedGroup::ClearOverlappedMembers(LLBC_POverlapped ol)
     if (ol->acceptSock != LLBC_INVALID_SOCKET_HANDLE)
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        ::close(ol->acceptSock);
+        close(ol->acceptSock);
 #else // LLBC_TARGET_PLATFORM_NON_WIN32
-        ::closesocket(ol->acceptSock);
+        closesocket(ol->acceptSock);
 #endif // LLBC_TARGET_PLATFORM_WIN32
         ol->acceptSock = LLBC_INVALID_SOCKET_HANDLE;
     }
@@ -377,5 +375,3 @@ __LLBC_NS_END
 #if LLBC_TARGET_PLATFORM_WIN32
  #pragma warning(pop)
 #endif // Win32
-
-#include "llbc/common/AfterIncl.h"

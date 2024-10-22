@@ -46,18 +46,11 @@ void pyllbc_AddCommObjs()
     pyllbc_Module *topMod = pyllbc_s_TopModule;
 
     // Create llbc.codec module.
-    pyllbc_Module *codecMod = LLBC_New(pyllbc_Module, "codec", topMod);
+    pyllbc_Module *codecMod = new pyllbc_Module("codec", topMod);
     codecMod->AddMethod(methods.encode);
     codecMod->AddMethod(methods.decode);
 
     pyllbc_Module *inlMod = pyllbc_InlModule;
-    // Add service types to inl module.
-    inlMod->AddObject("SVC_TYPE_NORMAL", LLBC_IService::Normal);
-    inlMod->AddObject("SVC_TYPE_RAW", LLBC_IService::Raw);
-    inlMod->AddObject("SVC_TYPE_CUSTOM", LLBC_IService::Custom);
-    // Add codec strategies to inl module.
-    inlMod->AddObject("SVC_CODEC_JSON", pyllbc_Service::JsonCodec);
-    inlMod->AddObject("SVC_CODEC_BINARY", pyllbc_Service::BinaryCodec);
     // Add FPS limit value to inl module.
     inlMod->AddObject("SVC_MIN_FPS", LLBC_CFG_COMM_MIN_SERVICE_FPS);
     inlMod->AddObject("SVC_MAX_FPS", LLBC_CFG_COMM_MAX_SERVICE_FPS);
@@ -93,17 +86,15 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.NewService);
     inlMod->AddMethod(methods.DelService);
     inlMod->AddMethod(methods.GetServiceId);
-    inlMod->AddMethod(methods.GetServiceType);
-    inlMod->AddMethod(methods.GetServiceTypeStr);
     inlMod->AddMethod(methods.GetServiceFPS);
     inlMod->AddMethod(methods.SetServiceFPS);
     inlMod->AddMethod(methods.GetServiceFrameInterval);
     inlMod->AddMethod(methods.SuppressServiceCoderNotFoundWarning);
     inlMod->AddMethod(methods.StartService);
     inlMod->AddMethod(methods.StopService);
-    inlMod->AddMethod(methods.RegisterComponent);
-    inlMod->AddMethod(methods.RegisterLibComponent);
-    inlMod->AddMethod(methods.RegisterCodec);
+    inlMod->AddMethod(methods.AddComponent);
+    inlMod->AddMethod(methods.AddLibComponent);
+    inlMod->AddMethod(methods.AddDecoder);
     inlMod->AddMethod(methods.Listen);
     inlMod->AddMethod(methods.Connect);
     inlMod->AddMethod(methods.AsyncConn);
@@ -115,8 +106,6 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.Subscribe);
     inlMod->AddMethod(methods.PreSubscribe);
     inlMod->AddMethod(methods.UnifyPreSubscribe);
-    inlMod->AddMethod(methods.GetServiceCodec);
-    inlMod->AddMethod(methods.SetServiceCodec);
     inlMod->AddMethod(methods.SubscribeEvent);
     inlMod->AddMethod(methods.UnsubscribeEventById);
     inlMod->AddMethod(methods.UnsubscribeEventByStub);
@@ -133,7 +122,7 @@ void pyllbc_AddCommObjs()
     topMod->AddMethod(methods.o2j);
 
     // Create protocol sub module.
-    pyllbc_Module *protoMod = LLBC_New(pyllbc_Module, "Protocol", topMod);
+    pyllbc_Module *protoMod = new pyllbc_Module("Protocol", topMod);
     // Add layer enumerations to protocol module.
     protoMod->AddObject("PACK_LAYER", LLBC_ProtocolLayer::PackLayer);
     protoMod->AddObject("COMPRESS_LAYER", LLBC_ProtocolLayer::CompressLayer);

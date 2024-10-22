@@ -73,7 +73,7 @@ namespace llbc
 
         static public uint LLBC_ERROR_FORMAT                 = 0xc0000013;
 
-        static public uint LLBC_ERROR_TIMEOUT                = 0xc0000014;
+        static public uint LLBC_ERROR_TIMEOUTED              = 0xc0000014;
 
         static public uint LLBC_ERROR_BUSY                   = 0xc0000015;
 
@@ -126,6 +126,8 @@ namespace llbc
         static public uint LLBC_ERROR_SESSION_SND_BUF_LIMIT  = 0xc000002d;
 
         static public uint LLBC_ERROR_NOT_SUPPORT            = 0xc000002e;
+
+        static public uint LLBC_ERROR_CANCELLED              = 0xc000002f;
 
     }
 }

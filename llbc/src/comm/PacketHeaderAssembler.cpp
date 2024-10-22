@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/PacketHeaderAssembler.h"
@@ -38,7 +37,7 @@ LLBC_PacketHeaderAssembler::LLBC_PacketHeaderAssembler(size_t headerLen)
 
 LLBC_PacketHeaderAssembler::~LLBC_PacketHeaderAssembler()
 {
-    LLBC_Free(_header);
+    free(_header);
 }
 
 bool LLBC_PacketHeaderAssembler::Assemble(const void *data, size_t len ,size_t &used)
@@ -50,7 +49,7 @@ bool LLBC_PacketHeaderAssembler::Assemble(const void *data, size_t len ,size_t &
     size_t needSize = _headerLen - _curRecved;
     if (len >= needSize)
     {
-        ::memcpy(_header + _curRecved, data, needSize);
+        memcpy(_header + _curRecved, data, needSize);
         _curRecved = _headerLen;
 
         used = needSize;
@@ -59,7 +58,7 @@ bool LLBC_PacketHeaderAssembler::Assemble(const void *data, size_t len ,size_t &
     }
     else
     {
-        ::memcpy(_header + _curRecved, data, len);
+        memcpy(_header + _curRecved, data, len);
         _curRecved += len;
 
         used = len;
@@ -78,30 +77,22 @@ void LLBC_PacketHeaderAssembler::SetToPacket(LLBC_Packet &packet) const
     uint32 len = *reinterpret_cast<uint32 *>(_header);
     sint32 opcode = *reinterpret_cast<sint32 *>(_header + 4);
     uint16 status = *reinterpret_cast<uint16 *>(_header + 8);
-    int senderServiceId = *reinterpret_cast<int *>(_header + 10);
-    int recverServiceId = *reinterpret_cast<int *>(_header + 14);
-    uint16 flags = *reinterpret_cast<uint16 *>(_header + 18);
-    sint64 extData1 = *reinterpret_cast<sint64 *>(_header + 20);
+    uint16 flags = *reinterpret_cast<uint16 *>(_header + 10);
+    sint64 extData1 = *reinterpret_cast<sint64 *>(_header + 12);
 
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-    LLBC_Net2Host(len);
-    LLBC_Net2Host(opcode);
-    LLBC_Net2Host(status);
-    LLBC_Net2Host(senderServiceId);
-    LLBC_Net2Host(recverServiceId);
-    LLBC_Net2Host(flags);
-    LLBC_Net2Host(extData1);
+    len = LLBC_Net2Host(len);
+    opcode = LLBC_Net2Host(opcode);
+    status = LLBC_Net2Host(status);
+    flags = LLBC_Net2Host(flags);
+    extData1 = LLBC_Net2Host(extData1);
 #endif
 
     packet.SetLength(len);
     packet.SetOpcode(opcode);
     packet.SetStatus(status);
-    packet.SetSenderServiceId(senderServiceId);
-    packet.SetRecverServiceId(recverServiceId);
     packet.SetFlags(flags);
     packet.SetExtData1(extData1);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

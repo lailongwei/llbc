@@ -25,22 +25,22 @@
 namespace
 {
 
-class EchoServerComp : public LLBC_IComponent
+class EchoServerComp : public LLBC_Component
 {
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInit(bool &initFinished)
     {
-        // ÏûÏ¢×¢²á, ÒòechoÊµÏÖÎªÁ÷Ê½Ğ­ÒéÊµÏÖ, opcodeÎª0
-        LLBC_IService *svc = GetService();
+        // æ¶ˆæ¯æ³¨å†Œ, å› echoå®ç°ä¸ºæµå¼åè®®å®ç°, opcodeä¸º0
+        LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoServerComp::_OnPkt);
 
         return true;
     }
 
-    virtual bool OnStart()
+    virtual bool OnStart(bool &startFinished)
     {
-        // Ö´ĞĞ¶Ë¿Ú¼àÌı
-        LLBC_IService *svc = GetService();
+        // æ‰§è¡Œç«¯å£ç›‘å¬
+        LLBC_Service *svc = GetService();
         int sId = svc->Listen("0.0.0.0", 9527);
         if (sId == 0)
         {
@@ -48,47 +48,88 @@ public:
             return false;
         }
 
-        // ´òÓ¡Æô¶¯ÏûÏ¢
+        // æ‰“å°å¯åŠ¨æ¶ˆæ¯
         std::cout << "Echo server component started, listening on 0.0.0.0:9527, session Id:" << sId << std::endl;
 
         return true;
     }
 
-    virtual void OnStop()
+    virtual void OnStop(bool &stopFinished)
     {
-
-        // ´òÓ¡½«¹Ø±ÕÏûÏ¢
+        // æ‰“å°å°†å…³é—­æ¶ˆæ¯
         std::cout << "Echo server component will stop" << std::endl;
     }
 
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    {
+        switch(event)
+        {
+            case LLBC_ComponentEventType::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEventType::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            default: break;
+        }
+    }
+
 private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    {
+        if (!sessionInfo.IsListenSession())
+            std::cout << "Session[sId:" << sessionInfo.GetSessionId()
+                      << ", addr:" << sessionInfo.GetPeerAddr() << "]: <create>" << std::endl;
+    }
+
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    {
+        if (!destroyInfo.GetSessionInfo().IsListenSession())
+        {
+            auto &sessionInfo = destroyInfo.GetSessionInfo();
+            std::cout << "Session[sId:" << sessionInfo.GetSessionId()
+                      << ", addr:" << sessionInfo.GetPeerAddr() << "]: <destroy, reason:"
+                      << destroyInfo.GetReason() << ">" << std::endl;
+        }
+    }
+
     void _OnPkt(LLBC_Packet &pkt)
     {
         // Log
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "Session[sId:" << pkt.GetSessionId() << ", addr:" << pkt.GetPeerAddr() << "]: " << msg << std::endl;
 
-        // »ØÏÔ
-        svc->Send(pkt.GetSessionId(), pkt.GetPayload(), pkt.GetPayloadLength());
+        // å›æ˜¾
+        svc->Send(pkt.GetSessionId(), 0, pkt.GetPayload(), pkt.GetPayloadLength());
     }
 };
 
-class EchoClientComp : public LLBC_IComponent
+class EchoClientComp : public LLBC_Component
 {
 public:
-    virtual bool OnInitialize()
+    EchoClientComp()
+    : _sId(0)
+    {}
+    virtual ~EchoClientComp() = default;
+
+public:
+    virtual bool OnInit(bool &initFinished)
     {
-        // Í¬EchoServerComp, ¶©ÔÄ
-        LLBC_IService *svc = GetService();
+        // åŒEchoServerComp, è®¢é˜…
+        LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoClientComp::_OnPkt);
 
         return true;
     }
 
-    virtual bool OnStart()
+    virtual bool OnStart(bool &startFinished)
     {
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         _sId = svc->Connect("127.0.0.1", 9527);
         if (_sId == 0)
         {
@@ -105,7 +146,7 @@ public:
         return true;
     }
 
-    virtual void OnStop()
+    virtual void OnStop(bool &stopFinished)
     {
         std::cout << "Echo client comp will stop" << std::endl;
     }
@@ -113,17 +154,17 @@ public:
 private:
     void _OnPkt(LLBC_Packet &pkt)
     {
-        // ´òÓ¡»ØÏÔ
+        // æ‰“å°å›æ˜¾
         const char *msg = reinterpret_cast<const char *>(pkt.GetPayload());
         std::cout << "[Echo]" << msg << std::endl;
 
-        // ½ÓÊÜĞÂÊäÈë
+        // æ¥å—æ–°è¾“å…¥
         _AcceptInput();
     }
 
     bool _AcceptInput(bool inStart = false)
     {
-        // ÊäÈë
+        // è¾“å…¥
         std::string input;
         while (input.empty())
         {
@@ -138,9 +179,9 @@ private:
             }
         }
 
-        // ·¢ËÍ
-        LLBC_IService *svc = GetService();
-        svc->Send(_sId, input.data(), input.size() + 1);
+        // å‘é€
+        LLBC_Service *svc = GetService();
+        svc->Send(_sId, 0, input.data(), input.size() + 1);
 
         return true;
     }
@@ -163,7 +204,7 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
 {
     std::cout <<"Echo test:" <<std::endl;
 
-    // Ñ¡ÔñÆô¶¯·½Ê½
+    // é€‰æ‹©å¯åŠ¨æ–¹å¼
     std::cout << "Start echo as server(Y/[N])?";
 
     bool asServer;
@@ -172,12 +213,12 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
     choice = choice.strip().toupper();
     asServer = choice == "Y" || choice == "YES";
 
-    // ´´½¨&Æô¶¯service
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Raw);
+    // åˆ›å»º&å¯åŠ¨service
+    LLBC_Service *svc = LLBC_Service::Create("EchoSvc", new LLBC_RawProtocolFactory);
     if (asServer)
-        svc->RegisterComponent(new EchoServerComp);
+        svc->AddComponent(new EchoServerComp);
     else
-        svc->RegisterComponent(new EchoClientComp);
+        svc->AddComponent(new EchoClientComp);
 
     if (svc->Start() != LLBC_OK)
     {
@@ -186,10 +227,19 @@ int TestCase_Comm_Echo::Run(int argc, char *argv[])
         return LLBC_FAILED;
     }
 
-    // waitµ±Ç°service½áÊø
-    svc->Wait();
+    // if is client, wait service, otherwise press any key to exit test case(server).
+    if (asServer)
+    {
+        std::cout <<"Press any key to exit..." <<std::endl;
+        getchar();
+        getchar();
+    }
+    else
+    {
+        svc->Wait();
+    }
 
-    // É¾³ıservice
+    // åˆ é™¤service
     delete svc;
 
     return LLBC_OK;

@@ -19,13 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_SERVICE_EVENT_H__
-#define __LLBC_COMM_SERVICE_EVENT_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
-
-#include "llbc/comm/IComponent.h"
 
 __LLBC_NS_BEGIN
 
@@ -42,7 +38,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The service event type enumeration.
  */
-class LLBC_HIDDEN LLBC_SvcEvType
+class LLBC_HIDDEN LLBC_ServiceEventType
 {
 public:
     enum
@@ -58,6 +54,7 @@ public:
         UnsubscribeEv,
         FireEv,
 
+        AppPhaseEv,
         AppCfgReloaded,
 
         End
@@ -71,8 +68,8 @@ struct LLBC_HIDDEN LLBC_ServiceEvent
 {
     int type;
 
-    LLBC_ServiceEvent(int type);
-    virtual ~LLBC_ServiceEvent();
+    LLBC_ServiceEvent(int evType);
+    virtual ~LLBC_ServiceEvent() = default;
 };
 
 /**
@@ -88,7 +85,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_SessionCreate : public LLBC_ServiceEvent
     LLBC_SocketHandle handle;
 
     LLBC_SvcEv_SessionCreate();
-    virtual ~LLBC_SvcEv_SessionCreate();
 };
 
 /**
@@ -120,11 +116,10 @@ struct LLBC_HIDDEN LLBC_SvcEv_AsyncConn : public LLBC_ServiceEvent
     LLBC_SockAddr_IN peer;
 
     LLBC_SvcEv_AsyncConn();
-    virtual ~LLBC_SvcEv_AsyncConn();
 };
 
 /**
- * \brief The data-arrival event structure enapsulation.
+ * \brief The data-arrival event structure encapsulation.
  */
 struct LLBC_HIDDEN LLBC_SvcEv_DataArrival : public LLBC_ServiceEvent
 {
@@ -147,7 +142,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_ProtoReport : public LLBC_ServiceEvent
     LLBC_String report;
 
     LLBC_SvcEv_ProtoReport();
-    virtual ~LLBC_SvcEv_ProtoReport();
 };
 
 /**
@@ -173,7 +167,6 @@ struct LLBC_HIDDEN LLBC_SvcEv_UnsubscribeEv : public LLBC_ServiceEvent
     LLBC_ListenerStub stub;
 
     LLBC_SvcEv_UnsubscribeEv();
-    virtual ~LLBC_SvcEv_UnsubscribeEv();
 };
 
 /**
@@ -189,15 +182,28 @@ struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
 };
 
 /**
+ * \brief The application phase event structure encapsulation.
+ */
+struct LLBC_HIDDEN LLBC_SvcEv_AppPhaseEv : public LLBC_ServiceEvent
+{
+    bool earlyStart;
+    bool startFail;
+    bool startFinish;
+    bool earlyStop;
+
+    LLBC_SvcEv_AppPhaseEv();
+};
+
+/**
  * \brief The application config reloaded event structure encapsulation.
  */
 struct LLBC_HIDDEN LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
 {
-    bool iniReloaded;
-    bool propReloaded;
+    int cfgType;
+    LLBC_Property propCfg;
+    LLBC_Variant nonPropCfg;
 
     LLBC_SvcEv_AppCfgReloadedEv();
-    virtual ~LLBC_SvcEv_AppCfgReloadedEv();
 };
 
 /**
@@ -232,8 +238,8 @@ public:
      * Build async-connect result event.
      */
     static LLBC_MessageBlock *BuildAsyncConnResultEv(int sessionId,
-                                                     bool conneted, 
-                                                     const LLBC_String &reason, 
+                                                     bool connected,
+                                                     const LLBC_String &reason,
                                                      const LLBC_SockAddr_IN &peer);
 
     /**
@@ -270,9 +276,19 @@ public:
                                                const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
 
     /**
-     * Build application config reloaded event.
+     * Build application phase event.
      */
-    static LLBC_MessageBlock *BuildAppCfgReloadedEv(bool iniReloaded, bool propReloaded);
+    static LLBC_MessageBlock *BuildAppPhaseEv(bool earlyStart,
+                                              bool startFail,
+                                              bool startFinish,
+                                              bool earlyStop);
+
+    /**
+     * Build application config reload event.
+     */
+    static LLBC_MessageBlock *BuildAppCfgReloadEv(int cfgType,
+                                                  const LLBC_Property &propCfg,
+                                                  const LLBC_Variant &nonPropCfg);
 
 public:
     /**
@@ -283,4 +299,6 @@ public:
 
 __LLBC_NS_END
 
-#endif // __LLBC_COMM_SERVICE_EVENT_H__
+#include "llbc/comm/ServiceEventInl.h"
+
+

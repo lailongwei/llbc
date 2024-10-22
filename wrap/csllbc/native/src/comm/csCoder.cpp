@@ -46,6 +46,13 @@ csllbc_Coder::PacketDecodeDelegates *csllbc_Coder::GetDecodeDelegates()
     return _decodeDelegs;
 }
 
+void csllbc_Coder::Reuse()
+{
+    _packetId = 0;
+    _encodeDeleg = nullptr;
+    _decodeDelegs = nullptr;
+}
+
 bool csllbc_Coder::Encode(LLBC_Packet &packet)
 {
     // Call csharp managed encode delegate to encode data.
@@ -61,7 +68,7 @@ bool csllbc_Coder::Encode(LLBC_Packet &packet)
         if (data)
         {
             packet.SetCodecError(LLBC_String(reinterpret_cast<char *>(data), errMsgLen));
-            LLBC_Free(data);
+            free(data);
         }
 
         return false;
@@ -71,7 +78,7 @@ bool csllbc_Coder::Encode(LLBC_Packet &packet)
     if (data)
     {
         packet.Write(data, encodedLen);
-        LLBC_Free(data);
+        free(data);
     }
 
     return true;
@@ -80,7 +87,8 @@ bool csllbc_Coder::Encode(LLBC_Packet &packet)
 bool csllbc_Coder::Decode(LLBC_Packet &packet)
 {
     int errMsgLen;
-    _decodeDelegs = csllbc_Service::GetPacketDecodeDelegates(packet.GetSenderServiceId());
+    // TODO: tempory impl
+    _decodeDelegs = csllbc_Service::GetPacketDecodeDelegates(0);
     void *decodeRet = (*_decodeDelegs->decodeDeleg)(packet.GetSessionId(),
                                                     packet.GetOpcode(),
                                                     packet.GetPayload(),
@@ -91,12 +99,12 @@ bool csllbc_Coder::Decode(LLBC_Packet &packet)
         return true;
 
     packet.SetCodecError(LLBC_String(reinterpret_cast<char *>(decodeRet), errMsgLen));
-    LLBC_Free(decodeRet);
+    free(decodeRet);
 
     return false;
 }
 
-LLBC_ICoder *csllbc_CoderFactory::Create() const
+LLBC_Coder *csllbc_CoderFactory::Create() const
 {
-    return LLBC_New(csllbc_Coder);
+    return new csllbc_Coder;
 }

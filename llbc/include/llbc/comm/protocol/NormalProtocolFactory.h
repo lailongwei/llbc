@@ -19,11 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_NORMAL_PROTOCOL_FACTORY_H__
-#define __LLBC_COMM_NORMAL_PROTOCOL_FACTORY_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#pragma once
 
 #include "llbc/comm/protocol/IProtocolFactory.h"
 
@@ -32,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The llbc library normal protocol factory encapsulation.
  */
-class LLBC_HIDDEN LLBC_NormalProtocolFactory : public LLBC_IProtocolFactory
+class LLBC_EXPORT LLBC_NormalProtocolFactory : public LLBC_IProtocolFactory
 {
 public:
     /**
@@ -43,5 +39,3 @@ public:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_NORMAL_PROTOCOL_FACTORY_H__

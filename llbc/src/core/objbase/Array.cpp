@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/Config.h"
 
@@ -89,8 +89,7 @@ LLBC_Array::Iter LLBC_Array::Insert(LLBC_Array::Iter n0, LLBC_Array::Obj *o)
     if (_size == _capacity)
         Recapacity(MAX(1, _size * 2));
 
-    LLBC_MemCpy(_objs + n0._idx + 1, 
-        _objs + n0._idx, (_size - n0._idx) * sizeof(Obj *));
+    memmove(_objs + n0._idx + 1, _objs + n0._idx, (_size - n0._idx) * sizeof(Obj *));
 
     _objs[n0._idx] = o;
     _objs[n0._idx]->Retain();
@@ -122,7 +121,8 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, Obj *o)
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
     }
-    if (!(n0 >= Begin() && n0 < End()))
+
+    if (n0 < Begin() || n0 >= End())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
@@ -148,8 +148,8 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
     }
-    if (!(n0 >= Begin() && n0 <= End()) ||
-        !(n1 >= Begin() && n1 <= End()))
+    if (n0 < Begin() || n0 > End() ||
+        n1 < Begin() || n1 > End())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
@@ -165,8 +165,8 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
     }
 
     difference_type shift = other._size - (n1._idx - n0._idx);
-    LLBC_MemCpy(_objs + n1._idx + shift, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
-    LLBC_MemCpy(_objs + n0._idx, other._objs, other._size * sizeof(Obj *));
+    memmove(_objs + n1._idx + shift, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
+    memmove(_objs + n0._idx, other._objs, other._size * sizeof(Obj *));
     for (difference_type i = n0._idx; i < n0._idx + other._size; ++i)
         _objs[i]->Retain();
 
@@ -177,10 +177,10 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
 
 LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
 {
-    size_type erasedCount = 0;
     if (UNLIKELY(o == nullptr))
-        return erasedCount;
+        return 0;
 
+    size_type erasedCount = 0;
     for (difference_type i = _size - 1; i >= 0; --i)
     {
         if (_objs[i] == o)
@@ -191,7 +191,7 @@ LLBC_Array::size_type LLBC_Array::Erase(LLBC_Array::Obj *o, bool releaseObj)
                 ++erasedCount;
             }
 
-            LLBC_MemCpy(_objs + i, _objs + i + 1, _size - (i + 1) * sizeof(Obj *));
+            memmove(_objs + i, _objs + i + 1, (_size - (i + 1)) * sizeof(Obj *));
             _objs[--_size] = nullptr;
         }
     }
@@ -222,8 +222,9 @@ LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::Iter n0, LLBC_Array::Iter n1)
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
     }
-    if (!(n0 >= Begin() && n0 < End()) ||
-        !(n1 >= Begin() && n1 <= End()))
+
+    if (n0 < Begin() || n0 >= End() ||
+        n1 < Begin() || n1 > End())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();
@@ -232,8 +233,8 @@ LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::Iter n0, LLBC_Array::Iter n1)
     for (difference_type i = n0._idx; i < n1._idx; ++i)
         _objs[i]->Release();
 
-    LLBC_MemCpy(_objs + n0._idx, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
-    LLBC_MemSet(_objs + _size - (n1._idx - n0._idx), 0, (n1._idx - n0._idx) * sizeof(Obj *));
+    memmove(_objs + n0._idx, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
+    memset(_objs + _size - (n1._idx - n0._idx), 0, (n1._idx - n0._idx) * sizeof(Obj *));
 
     _size -= (n1._idx - n0._idx);
 
@@ -385,17 +386,17 @@ LLBC_Array::ConstObj *LLBC_Array::ObjectAtIndex(difference_type off) const
 
 LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
 {
-    Obj *o = nullptr;
 
     int errNo = LLBC_GetLastError();
     int subErrNo = LLBC_GetSubErrorNo();
 
-    LLBC_Array *arr = LLBC_New(LLBC_Array);
+    Obj *obj;
+    LLBC_Array *arr = new LLBC_Array;
     IndexSet::const_iterator iter = indexs.begin();
     for (; iter != indexs.end(); ++iter)
     {
-        if ((o = ObjectAtIndex(*iter)))
-            arr->PushBack(o);
+        if ((obj = ObjectAtIndex(*iter)))
+            arr->PushBack(obj);
     }
 
     LLBC_SetLastError(errNo);
@@ -404,18 +405,18 @@ LLBC_Array *LLBC_Array::ObjectsAtIndexs(const LLBC_Array::IndexSet &indexs)
     return arr;
 }
 
-LLBC_Array::Obj *&LLBC_Array::operator [](LLBC_Array::difference_type off)
+LLBC_Array::Obj *&LLBC_Array::operator[](LLBC_Array::difference_type off)
 {
     ASSERT((off >= 0 && off < _size) && 
-        "LLBC_Array::operator [] method subscript invalid!");
+        "LLBC_Array::operator[] method subscript invalid!");
 
     return _objs[off];
 }
 
-LLBC_Array::ConstObj *LLBC_Array::operator [](LLBC_Array::difference_type off) const
+LLBC_Array::ConstObj *LLBC_Array::operator[](LLBC_Array::difference_type off) const
 {
     ASSERT((off >= 0 && off < _size) && 
-        "LLBC_Array::operator [] method subscript invalid!");
+        "LLBC_Array::operator[] method subscript invalid!");
 
     return _objs[off];
 }
@@ -430,7 +431,7 @@ void LLBC_Array::SetObjectFactory(LLBC_ObjectFactory *factory)
 
 LLBC_Object *LLBC_Array::Clone() const
 {
-    LLBC_Array *clone = LLBC_New(LLBC_Array);
+    LLBC_Array *clone = new LLBC_Array;
 
     // Clone object factory.
     if (_objFactory)
@@ -463,7 +464,7 @@ void LLBC_Array::Serialize(LLBC_Stream &s) const
         s <<*it;
 }
 
-bool LLBC_Array::DeSerialize(LLBC_Stream &s)
+bool LLBC_Array::Deserialize(LLBC_Stream &s)
 {
     if (UNLIKELY(!_objFactory))
         return false;
@@ -501,11 +502,9 @@ void LLBC_Array::Recapacity(size_type cap)
         return;
 
     _objs = reinterpret_cast<Obj **>(realloc(_objs, cap * sizeof(Obj *)));
-    LLBC_MemSet(_objs + _capacity, 0, (cap - _capacity) * sizeof(Obj *));
+    memset(_objs + _capacity, 0, (cap - _capacity) * sizeof(Obj *));
 
     _capacity = cap;
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

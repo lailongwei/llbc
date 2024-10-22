@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Epoll.h"
 
@@ -30,7 +30,7 @@ __LLBC_NS_BEGIN
 
 LLBC_Handle LLBC_EpollCreate(int size)
 {
-    LLBC_Handle handle = ::epoll_create(size);
+    LLBC_Handle handle = epoll_create(size);
     if (handle == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
@@ -42,7 +42,7 @@ LLBC_Handle LLBC_EpollCreate(int size)
 
 int LLBC_EpollCtl(LLBC_Handle epfd, int op, int fd, LLBC_EpollEvent *event)
 {
-    if (::epoll_ctl(epfd, op, fd, event) == -1)
+    if (epoll_ctl(epfd, op, fd, event) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
@@ -64,7 +64,7 @@ int LLBC_EpollWait(LLBC_Handle epfd, LLBC_EpollEvent *events, int maxEvents, int
 
 int LLBC_EpollClose(LLBC_Handle epfd)
 {
-    if (::close(epfd) != 0)
+    if (close(epfd) != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
@@ -76,5 +76,3 @@ int LLBC_EpollClose(LLBC_Handle epfd)
 #endif // LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

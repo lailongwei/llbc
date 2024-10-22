@@ -19,11 +19,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_CORE_UTILS__UTIL_STRING_H__
-#define __CSLLBC_CORE_UTILS__UTIL_STRING_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Utils_String_HashString(const char *str, int strLen);
 
-#endif // !__CSLLBC_CORE_UTILS__UTIL_STRING_H__
+

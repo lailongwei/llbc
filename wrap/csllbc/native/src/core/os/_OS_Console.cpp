@@ -34,7 +34,7 @@ void csllbc_Console_Trace(const char *value, int valueLen)
     if (valueLen < 128)
     {
         char nativeValue[128];
-        ::memcpy(nativeValue, value, valueLen);
+        memcpy(nativeValue, value, valueLen);
         nativeValue[valueLen] = '\0';
 
         trace("%s", nativeValue);
@@ -42,11 +42,11 @@ void csllbc_Console_Trace(const char *value, int valueLen)
     else
     {
         char *nativeValue = LLBC_Malloc(char, valueLen + 1);
-        ::memcpy(nativeValue, value, valueLen);
+        memcpy(nativeValue, value, valueLen);
 
         nativeValue[valueLen] = '\0';
         trace("%s", nativeValue);
-        LLBC_Free(nativeValue);
+        free(nativeValue);
     }
 #endif // LLBC_DEBUG
 }
@@ -68,7 +68,7 @@ void csllbc_Console_SafePrint(bool toStdout, bool newLine, const char *value, in
     {
         char nativeValue[128];
         if (valueLen > 0)
-            ::memcpy(nativeValue, value, valueLen);
+            memcpy(nativeValue, value, valueLen);
 
         nativeValue[valueLen] = '\0';
         LLBC_FilePrint(file, fmtter, nativeValue);
@@ -76,11 +76,11 @@ void csllbc_Console_SafePrint(bool toStdout, bool newLine, const char *value, in
     else
     {
         char *nativeValue = LLBC_Malloc(char, valueLen + 1);
-        ::memcpy(nativeValue, value, valueLen);
+        memcpy(nativeValue, value, valueLen);
 
         nativeValue[valueLen] = '\0';
         LLBC_FilePrint(file, fmtter, nativeValue);
-        LLBC_Free(nativeValue);
+        free(nativeValue);
     }
 }
 

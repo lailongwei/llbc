@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/Core.h"
 
@@ -34,8 +34,6 @@ int __LLBC_CoreStartup()
         return LLBC_FAILED;
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
-    // Initialize Variant Type->StrDesc dictionary.
-    LLBC_VariantType::InitType2StrDict();
     // Initialize Variant number to number string repr fast access table.
     LLBC_Variant::InitNumber2StrFastAccessTable();
 
@@ -45,60 +43,71 @@ int __LLBC_CoreStartup()
 
     // Set timezone.
     LLBC_TZSet();
-
     // initialize performance frequency.
-    LLBC_CPUTime::InitFrequency();
-
-    // Set entry thread object pool.
-    if (LLBC_ThreadObjectPoolManager::CreateEntryThreadObjectPools() != LLBC_OK)
-        return LLBC_FAILED;
-
+    LLBC_Stopwatch::InitFrequency();
     // Set entry thread timer scheduler.
-    if (LLBC_TimerScheduler::CreateEntryThreadScheduler() != LLBC_OK)
-        return LLBC_FAILED;
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    tls->coreTls.timerScheduler = new LLBC_TimerScheduler;
 
     // Set random seed.
-    LLBC_SeedRand(static_cast<int>(::time(nullptr)));
+    LLBC_SeedRand(static_cast<int>(time(nullptr)));
 
     // Initialize network library.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
     if (tls->coreTls.needInitWinSock)
         LLBC_StartupNetLibrary();
 
-    // Supported object-pool reflection types assert.
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_LogData>());
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_MessageBlock>());
-    // Add all framework internal implemented object pool factories.
-    LLBC_IObjectPool::RegisterPoolInstFactory(new LLBC_MessageBlockObjectPoolInstFactory());
+    // Create entry thread auto-release pool stack.
+    tls->objbaseTls.poolStack = new LLBC_AutoReleasePoolStack;
+    new LLBC_NS LLBC_AutoReleasePool;
+
+    // Initialize thread-spec object pool.
+    if (LLBC_ThreadSpecObjPool::Initialize() != LLBC_OK)
+        return LLBC_FAILED;
 
     return LLBC_OK;
 }
 
 void __LLBC_CoreCleanup()
 {
+    // Finalize logger manager.
+    LLBC_LoggerMgrSingleton->Finalize();
+
+    // Purge auto-release pool stack.
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    if (tls->objbaseTls.poolStack)
+        reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack)->Purge();
+
+    // Finalize thread-spec object pool.
+    LLBC_ThreadSpecObjPool::Finalize();
+
+    // Destroy entry thread auto-release pool stack.
+    if (tls->objbaseTls.poolStack)
+    {
+        delete reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack);
+        tls->objbaseTls.poolStack = nullptr;
+    }
+
+    // Cleanup network library.
+    if (tls->coreTls.needInitWinSock)
+        LLBC_CleanupNetLibrary();
+
     // Destroy entry thread timer scheduler.
-    (void)LLBC_TimerScheduler::DestroyEntryThreadScheduler();
+    if (tls->coreTls.timerScheduler)
+    {
+        delete reinterpret_cast<LLBC_TimerScheduler *>(tls->coreTls.timerScheduler);
+        tls->coreTls.timerScheduler = nullptr;
+    }
 
     // Destroy main bundle.
     LLBC_Bundle::DestroyMainBundle();
 
-    // Finalize logger manager.
-    LLBC_LoggerManagerSingleton->Finalize();
-
-    // Cleanup network library.
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (tls->coreTls.needInitWinSock)
-        LLBC_CleanupNetLibrary();
-
-    // Destroy entry thread object pool.
-    (void)LLBC_ThreadObjectPoolManager::DestroyEntryThreadObjectPools();
-    // Destroy all object pool instance factories.
-    LLBC_IObjectPool::DestroyAllPoolInstFactories();
-
     // Destroy Variant number to number string repr fast access table.
     LLBC_Variant::DestroyNumber2StrFastAccessTable();
+
+    // Cleanup Symbol(if enabled).
+    #if LLBC_CFG_OS_IMPL_SYMBOL
+    (void)LLBC_CleanupSymbol();
+    #endif // LLBC_CFG_OS_IMPL_SYMBOL
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

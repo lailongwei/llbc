@@ -32,10 +32,10 @@ static struct
 static LLBC_SimpleLock __g_outLock;
 static const long __g_waiterThreadCount = 5;
 
-static int WaiterThreadProc(void *arg)
+static void WaiterThreadProc(void *arg)
 {
     long threadIndex;
-    ::memcpy(&threadIndex, &arg, sizeof(long));
+    memcpy(&threadIndex, &arg, sizeof(long));
 
     __g_outLock.Lock();
     std::cout <<"I'm waiter thread " <<threadIndex <<std::endl;
@@ -56,7 +56,7 @@ static int WaiterThreadProc(void *arg)
         {
             if(__g_testData.cv.TimedWait(__g_testData.lock, 510) != LLBC_OK)
             {
-                if(LLBC_GetLastError() != LLBC_ERROR_TIMEOUT)
+                if(LLBC_GetLastError() != LLBC_ERROR_TIMEOUTED)
                 {
                     __g_outLock.Lock();
                     std::cout <<"thread [" <<threadIndex 
@@ -86,11 +86,9 @@ static int WaiterThreadProc(void *arg)
             break;
         }
     }
-
-    return 0;
 }
 
-static int SignalerThreadProc(void *arg)
+static void SignalerThreadProc(void *arg)
 {
     LLBC_Sleep(1000);
 
@@ -140,8 +138,6 @@ static int SignalerThreadProc(void *arg)
     __g_outLock.Lock();
     std::cout <<"Signaler thread exit." <<std::endl;
     __g_outLock.Unlock();
-
-    return 0;
 }
 
 TestCase_Core_Thread_CV::TestCase_Core_Thread_CV()
@@ -161,13 +157,13 @@ int TestCase_Core_Thread_CV::Run(int argc, char *argv[])
     for(long i = 0; i < __g_waiterThreadCount; ++i)
     {
         void *threadArg = nullptr;
-        ::memcpy(&threadArg, &i, sizeof(long));
-        LLBC_CreateThread(&waiters[i], &WaiterThreadProc, threadArg);
+        memcpy(&threadArg, &i, sizeof(long));
+        LLBC_CreateThread(&WaiterThreadProc, threadArg, &waiters[i]);
     }
 
     // Create signaler.
     LLBC_NativeThreadHandle signaler = LLBC_INVALID_NATIVE_THREAD_HANDLE;
-    LLBC_CreateThread(&signaler, &SignalerThreadProc, nullptr);
+    LLBC_CreateThread(&SignalerThreadProc, nullptr, &signaler);
 
     // Join signaler.
     LLBC_JoinThread(signaler);

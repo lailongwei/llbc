@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_VARIANT_VARIANT_ARITHMETIC_H__
-#define __LLBC_CORE_VARIANT_VARIANT_ARITHMETIC_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -31,7 +30,7 @@ __LLBC_NS_END
 __LLBC_NS_BEGIN
 
 /**
- * \brief LLBC Variant arithmetic util class encpasulation.
+ * \brief LLBC Variant arithmetic util class encapsulation.
  *        just support bool/[su]int8/[su]int16/[su]int32/[su]int64/float/double type variant object.
  */
 class LLBC_EXPORT LLBC_VariantArithmetic
@@ -46,6 +45,7 @@ public:
         VT_ARITHMETIC_SUB = 1,
         VT_ARITHMETIC_MUL = 2,
         VT_ARITHMETIC_DIV = 3,
+        VT_ARITHMETIC_MOD = 4,
 
         VT_ARITHMETIC_END
     };
@@ -86,8 +86,8 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/variant/VariantArithmeticImpl.h"
+#include "llbc/core/variant/VariantArithmeticInl.h"
 
-#endif // !__LLBC_CORE_VARIANT_VARIANT_ARITHMETIC_H__
+
 
  

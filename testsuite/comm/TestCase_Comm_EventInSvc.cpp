@@ -34,6 +34,7 @@ public:
     {
         TEST_EV_ID1 = 1,
         TEST_EV_ID2 = 2,
+        TEST_EV_ID3 = 3,
     };
 
 public:
@@ -51,11 +52,12 @@ public:
     LLBC_String data;
 };
 
-class EventTestComp : public LLBC_IComponent
+class EventTestComp : public LLBC_Component
 {
 public:
     EventTestComp()
-    : _handleTimes(0)
+    : LLBC_Component()
+    , _handleTimes(0)
     , _staticHandleTimes(0)
     , _ev1HandlerStub()
     , _ev1StaticHandlerStub()
@@ -63,35 +65,39 @@ public:
     }
 
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_ThreadManager::Sleep(1000);
+        LLBC_Sleep(1000);
 
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         _ev1HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, this, &EventTestComp::HandleEvent);
         _ev1StaticHandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, &EventTestComp::HandleEvent_Static);
+        _ev3HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID3, this, &EventTestComp::HandleEvent3);
 
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
         std::cout <<"Service destroy..." <<std::endl;
     }
 
     virtual void OnUpdate()
     {
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
 
-        TestEvent *ev = LLBC_New(TestEvent, TestEvent::TEST_EV_ID1);
+        TestEvent *ev = new TestEvent(TestEvent::TEST_EV_ID1);
         ev->comp = this;
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
-
         svc->FireEvent(ev);
 
-        ev = LLBC_New(TestEvent, TestEvent::TEST_EV_ID2);
+        ev = new TestEvent(TestEvent::TEST_EV_ID2);
         ev->data.format("Hello, I'm event data[id:%d]", ev->GetId());
         svc->FireEvent(ev);
+
+        svc->BeginFireEvent(TestEvent::TEST_EV_ID3)
+            .SetParam("aa", 10086)
+            .Fire();
     }
 
 public:
@@ -101,7 +107,7 @@ public:
         std::cout <<"handle event(class member method), data: " <<ev.data <<std::endl;
 
         ++_handleTimes;
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         if (_handleTimes == 5)
             svc->SubscribeEvent(TestEvent::TEST_EV_ID2, this, &EventTestComp::HandleEvent);
         else if (_handleTimes == 10)
@@ -117,9 +123,16 @@ public:
 
         EventTestComp *comp = ev.comp;
         ++comp->_staticHandleTimes;
-        LLBC_IService *svc = comp->GetService();
+        LLBC_Service *svc = comp->GetService();
         if (comp->_staticHandleTimes == 1000)
             svc->UnsubscribeEvent(comp->_ev1StaticHandlerStub);
+    }
+
+    void HandleEvent3(LLBC_Event &_)
+    {
+        TestEvent &ev = static_cast<TestEvent &>(_);
+        std::cout << "handle event 3, data: " << ev.GetParam("aa") << std::endl;
+        GetService()->UnsubscribeEvent(_ev3HandlerStub); 
     }
 
 private:
@@ -128,6 +141,7 @@ private:
 
     LLBC_ListenerStub _ev1HandlerStub;
     LLBC_ListenerStub _ev1StaticHandlerStub;
+    LLBC_ListenerStub _ev3HandlerStub;
 };
 
 }
@@ -145,14 +159,14 @@ int TestCase_Comm_EventInSvc::Run(int argc, char *argv[])
     std::cout <<"Core/Event component testcase..." <<std::endl;
 
     // We create a service to test.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "EventTest");
-    svc->RegisterComponent(LLBC_New(EventTestComp));
+    LLBC_Service *svc = LLBC_Service::Create("EventTest");
+    svc->AddComponent<EventTestComp>();
     svc->Start();
 
     std::cout <<"Press any key to continue..." <<std::endl;
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return LLBC_OK;
 }

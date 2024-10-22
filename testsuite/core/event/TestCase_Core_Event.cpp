@@ -34,15 +34,7 @@ namespace
         };
     };
 
-    static LLBC_EventManager evMgr;
-}
-
-TestCase_Core_Event::TestCase_Core_Event()
-{
-}
-
-TestCase_Core_Event::~TestCase_Core_Event()
-{
+    static LLBC_EventMgr evMgr;
 }
 
 int TestCase_Core_Event::Run(int argc, char *argv[])
@@ -56,7 +48,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     _ev1TooStub = evMgr.AddListener(EventIds::Event1, this, &TestCase_Core_Event::OnEvent1Too);
 
     // Build event.
-    LLBC_Event *ev = LLBC_New(LLBC_Event, EventIds::Event1);
+    auto ev = new LLBC_Event(EventIds::Event1);
     // Attach int key indexed params.
     ev->SetParam(0, 1);
     ev->SetParam(1, true);
@@ -72,10 +64,10 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     evMgr.Fire(ev);
 
     std::cout <<"Fire Event2" <<std::endl;
-    evMgr.Fire(LLBC_New(LLBC_Event, EventIds::Event2));
+    evMgr.Fire(new LLBC_Event(EventIds::Event2));
 
     std::cout <<"Fire Event1" <<std::endl;
-    evMgr.Fire(LLBC_New(LLBC_Event, EventIds::Event1));
+    evMgr.Fire(new LLBC_Event(EventIds::Event1));
 
     std::cout <<"Test chain call event fire" <<std::endl;
     evMgr.AddListener(EventIds::Event3, [this](LLBC_Event &ev){
@@ -91,7 +83,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
     evMgr.BeginFire(EventIds::Event3);
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;
@@ -123,24 +115,10 @@ void TestCase_Core_Event::OnEvent2(LLBC_Event &ev)
 
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
-    std::cout <<"- Event " <<ev.GetId() <<" const char * indexed params:" <<std::endl;
-    const std::map<LLBC_CString, LLBC_Variant> &cstrKeyParams = ev.GetConstantStrKeyParams();
-    for (std::map<LLBC_CString, LLBC_Variant>::const_iterator cstrKeyIt = cstrKeyParams.begin();
-         cstrKeyIt != cstrKeyParams.end();
-         ++cstrKeyIt)
-        std::cout <<"  - " <<cstrKeyIt->first <<": " <<cstrKeyIt->second <<std::endl;
-
-    std::cout <<"- Event " <<ev.GetId() <<" int indexed params:" <<std::endl;
-    const std::map<int, LLBC_Variant> &intKeyParams = ev.GetIntKeyParams();
-    for (std::map<int, LLBC_Variant>::const_iterator intKeyIt = intKeyParams.begin();
-         intKeyIt != intKeyParams.end();
-         ++intKeyIt)
-        std::cout <<"  - " <<intKeyIt->first <<": " <<intKeyIt->second <<std::endl;
-
-    std::cout <<"- Event " <<ev.GetId() <<" LLBC_String indexed params:" <<std::endl;
-    const std::map<LLBC_String, LLBC_Variant> &strKeyParams = ev.GetStrKeyParams();
-    for (std::map<LLBC_String, LLBC_Variant>::const_iterator strKeyIt = strKeyParams.begin();
-         strKeyIt != strKeyParams.end();
-         ++strKeyIt)
-        std::cout <<"  - " <<strKeyIt->first <<": " <<strKeyIt->second <<std::endl;
+    std::cout <<"- Event " <<ev.GetId() <<" indexed params:" <<std::endl;
+    const auto &params = ev.GetParams();
+    for(const auto &[key, value] : params)
+    {
+        std::cout <<"  - " <<key <<": " <<value <<std::endl;
+    }
 }

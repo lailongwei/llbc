@@ -19,25 +19,86 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_BASE_LOG_APPENDER_H__
-#define __LLBC_CORE_LOG_BASE_LOG_APPENDER_H__
+#pragma once
 
 #include "llbc/common/Common.h"
-
-#include "llbc/core/log/ILogAppender.h"
 
 __LLBC_NS_BEGIN
 
 /**
+ * Pre-declare some classes.
+ */
+struct LLBC_LogData;
+class LLBC_LogTokenChain;
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
+ * The log appender type class encapsulation.
+ */
+class LLBC_LogAppenderType
+{
+public:
+    /**
+     * The type enumerations.
+     */
+    enum
+    {
+        Begin,
+
+        Console = Begin,        // console type appender.
+        File,                   // file type appender.
+        Network,                // network type appender.
+
+        End
+    };
+
+    /**
+     * Check givin appender type is valid or not.
+     * @return bool - reutrn true if valid, otherwise return false.
+     */
+    static constexpr bool IsValid(int appenderType) { return appenderType >= Begin && appenderType < End; }
+};
+
+/**
+ * The log apender init information structure encapsulation.
+ */
+struct LLBC_LogAppenderInitInfo
+{
+    int logLevel;                   // log level.
+    LLBC_String pattern;            // output pattern.
+    bool colourfulOutput;           // colourful output flag.
+
+    LLBC_String filePath;           // log file path, used in File type appender.
+    LLBC_String fileSuffix;         // log file suffix name, used in File type appender.
+    int fileRollingMode;            // file rolling mode flag, used in File type appender.
+    sint64 maxFileSize;             // max log file size, int bytes, used in File type appender.
+    int maxBackupIndex;             // max backup index, used in File type appender.
+    int fileBufferSize;             // file buffer size, used in File type appender.
+    bool lazyCreateLogFile;         // logfile create option, used in File type appender
+
+    LLBC_String ip;                 // Ip address, used in Network type appender.
+    uint16 port;                    // port, used in Network type appender.
+};
+
+/**
  * \brief The basic log appender class encapsulation.
  */
-class LLBC_BaseLogAppender : public LLBC_ILogAppender
+class LLBC_HIDDEN LLBC_BaseLogAppender
 {
 public:
     LLBC_BaseLogAppender();
     virtual ~LLBC_BaseLogAppender();
 
 public:
+    /**
+     * Get log appender type, see LLBC_LogAppenderType.
+     * @return int - log appender type.
+     */
+    virtual int GetType() const = 0;
+
     /**
      * Initialize the log appender.
      * @param[in] initInfo - log appender initialize info structure.
@@ -50,33 +111,50 @@ public:
      */
     virtual void Finalize();
 
+    /**
+     * Output log data.
+     * @param[in] data - log data.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Output(const LLBC_LogData &data) = 0;
+
 protected:
     /**
      * Get log level.
      * @return int - the log level.
      */
-    virtual int GetLogLevel() const;
+    int GetLogLevel() const;
 
-protected:
+    /**
+     * Set log level.
+     * @param[in] logLevel - the log level, End means disable appender output.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int SetLogLevel(int logLevel);
 
     /**
      * Get current appender's token chain.
      * @return LLBC_LogTokenChain * - the log token chain.
      */
-    virtual LLBC_LogTokenChain *GetTokenChain() const;
+    LLBC_LogTokenChain *GetTokenChain() const;
 
-protected:
     /**
      * Get next appender.
-     * @return LLBC_ILogAppender * - next log appender.
+     * @return LLBC_BaseLogAppender * - next log appender.
      */
-    virtual LLBC_ILogAppender *GetAppenderNext() const;
+    LLBC_BaseLogAppender *GetAppenderNext() const;
 
     /**
      * Set next appender.
      * @param[in] appender - next log appender.
      */
-    virtual void SetAppenderNext(LLBC_ILogAppender *appender);
+    void SetAppenderNext(LLBC_BaseLogAppender *appender);
+
+    /**
+     * Get log formatter buffer.
+     * @return LLBC_String & - log format buffer.
+     */
+    LLBC_String &GetLogFormatBuf();
 
 protected:
     /**
@@ -85,14 +163,24 @@ protected:
     virtual void Flush();
 
 private:
-    int _level;
+    /**
+     * Friend class: LLBC_Logger.
+     * Call method(s):
+     * - GetAppenderNext()
+     * - SetAppenderNext()
+     */
+    friend class LLBC_Logger;
 
+private:
+    volatile int _logLevel;
     LLBC_LogTokenChain *_chain;
-    LLBC_ILogAppender *_next;
+    LLBC_BaseLogAppender *_next;
+
+    LLBC_String _logFmtBuf;
 };
 
 __LLBC_NS_END
 
-#include "llbc/core/log/BaseLogAppenderImpl.h"
+#include "llbc/core/log/BaseLogAppenderInl.h"
 
-#endif // !__LLBC_CORE_LOG_BASE_LOG_APPENDER_H__
+

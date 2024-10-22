@@ -19,17 +19,15 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_PACKET_H__
-#define __LLBC_COMM_PACKET_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 /**
  * Pre-declare some classes.
  */
 __LLBC_NS_BEGIN
-class LLBC_ICoder;
+class LLBC_Coder;
 class LLBC_Session;
 __LLBC_NS_END
 
@@ -55,28 +53,6 @@ public:
      * @param[in] length - the packet length.
      */
     void SetLength(size_t length);
-
-    /**
-     * Get sender service Id.
-     * @return int - sender service Id.
-     */
-    int GetSenderServiceId() const;
-    /**
-     * Set sender service Id.
-     * @param[in] senderServiceId - sender service Id.
-     */
-    void SetSenderServiceId(int senderServiceId);
-
-    /**
-     * Get receiver service Id.
-     * @return int - receiver service Id.
-     */
-    int GetRecverServiceId() const;
-    /**
-     * Set receiver service Id.
-     * @param[in] recverServiceId - receiver service Id.
-     */
-    void SetRecverServiceId(int recverServiceId);
 
     /**
      * Get session Id.
@@ -146,50 +122,36 @@ public:
      */
     void SetStatus(int status);
 
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    /**
-     * Get the status describe.
-     * @return const LLBC_String & - the status describe.
-     */
-    const LLBC_String &GetStatusDesc() const;
-
-    /**
-     * Set the status describe.
-     * @param[in] desc - the status describe.
-     */
-    void SetStatusDesc(const LLBC_String &desc);
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
-
 public:
     /**
      * Get packet flags.
-     * @return int - the packet flags.
+     * @return uint32 - the packet flags.
      */
-    int GetFlags() const;
+    uint32 GetFlags() const;
     /**
      * Set packet flags.
      * @param[in] flags - the packet falgs.
      */
-    void SetFlags(int flags);
+    void SetFlags(uint32 flags);
 
     /**
      * Check this packet already set specified flags or not.
      * @param[in] flags - the packet flags.
      * @return bool - return true if has specified flags, otherwise return return false.
      */
-    bool HasFlags(int flags) const;
+    bool HasFlags(uint32 flags) const;
 
     /**
      * Add flags to packet.
      * @param[in] flags - the packet flags.
      */
-    void AddFlags(int flags);
+    void AddFlags(uint32 flags);
 
     /**
      * Remove flags from packet.
      * @param[in] flags - the packet flags.
      */
-    void RemoveFlags(int flags);
+    void RemoveFlags(uint32 flags);
 
 public:
     /**
@@ -230,17 +192,9 @@ public:
      * @param[in] sessionId - session Id.
      * @param[in] opcode    - the opcode.
      * @param[in] status    - the status code.
+	 * @param[in] flags     - the flags.
      */
-    void SetHeader(int sessionId, int opcode, int status);
-    void SetHeader(int svcId, int sessionId, int opcode, int status);
-
-    /**
-     * Set packet header.
-     * @param[in] packet - packet.
-     * @param[in] opcode - the opcode.
-     * @param[in] status - the status code.
-     */
-    void SetHeader(const LLBC_Packet &packet, int opcode, int status);
+    void SetHeader(int sessionId, int opcode, int status = 0, uint32 flags = 0u);
 
 public:
     /**
@@ -257,9 +211,10 @@ public:
 
     /**
      * Get mutable payload(message block object pointer).
+     * @param[in] ensureCap - ensure payload capacity.
      * @return LLBC_MessageBlock * - the mutable payload.
      */
-    LLBC_MessageBlock *GetMutablePayload();
+    LLBC_MessageBlock *GetMutablePayload(size_t ensureCap = 0);
 
     /**
      * Detach payload.
@@ -286,29 +241,20 @@ public:
 
 public:
     /**
-     * Object-Pool reflection support: Mark pool object.
-     */
-    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object-Pool reflection support: Get pool instance.
-     */
-    LLBC_IObjectPoolInst *GetPoolInst();
-
-    /**
-     * Object-Pool reflection support, get user-defined per-block units number.
-     */
-    size_t GetPoolInstPerBlockUnitsNum();
-
-    /**
-     * Object-Pool reflection support: pool instance create event callback.
-     */
-    void OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object-Pool reflection support: Clear message block, this operation will clear read&write position information.
+     * Object-Pool reuse support.
      */
     void Clear();
+
+    /**
+     * Object-Pool reflection support.
+     */
+    LLBC_TypedObjPool<LLBC_Packet> *GetTypedObjPool() const;
+    void SetTypedObjPool(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool);
+
+    /**
+     * Object-Pool event handler: typed object pool created.
+     */
+    void OnTypedObjPoolCreated(LLBC_ObjPool *objPool);
 
 public:
     /**
@@ -365,7 +311,7 @@ public:
     /**
      * Raw data type write methods.
      * @param[in] val - will write to packet's object.
-     * @return int - return 0 if success, otherwise retrun -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int Write(bool val);
     int Write(sint8 val);
@@ -426,20 +372,20 @@ public:
      * stream output operations.
      */
     template <typename _Ty>
-    LLBC_Packet &operator <<(const _Ty &val);
+    LLBC_Packet &operator<<(const _Ty &val);
 
     /**
      * Stream input operations.
      */
     template <typename _Ty>
-    LLBC_Packet &operator >>(_Ty &val);
+    LLBC_Packet &operator>>(_Ty &val);
 
 public:
     /**
      * Get encoder.
-     * @return LLBC_ICoder * - encoder.
+     * @return LLBC_Coder * - encoder.
      */
-    LLBC_ICoder *GetEncoder() const;
+    LLBC_Coder *GetEncoder() const;
     template <typename CoderType>
     CoderType *GetEncoder() const;
 
@@ -447,19 +393,19 @@ public:
      * Set encoder.
      * @param[in] encoder - encoder.
      */
-    void SetEncoder(LLBC_ICoder *encoder);
+    void SetEncoder(LLBC_Coder *encoder);
 
     /**
      * Give up encoder.
-     * @return LLBC_ICoder * - the already give up encoder object pointer.
+     * @return LLBC_Coder * - the already give up encoder object pointer.
      */
-    LLBC_ICoder *GiveUpEncoder();
+    LLBC_Coder *GiveUpEncoder();
 
     /**
      * Get decoder.
-     * @return LLBC_ICoder * - decoder.
+     * @return LLBC_Coder * - decoder.
      */
-    LLBC_ICoder *GetDecoder() const;
+    LLBC_Coder *GetDecoder() const;
     template <typename CoderType>
     CoderType *GetDecoder() const;
 
@@ -467,13 +413,13 @@ public:
      * Set decoder.
      * @param[in] decoder - decoder.
      */
-    void SetDecoder(LLBC_ICoder *decoder);
+    void SetDecoder(LLBC_Coder *decoder);
 
     /**
      * Give up decoder.
-     * @return[in] LLBC_ICoder * - the already give up decoder object pointer.
+     * @return[in] LLBC_Coder * - the already give up decoder object pointer.
      */
-    LLBC_ICoder *GiveUpDecoder();
+    LLBC_Coder *GiveUpDecoder();
 
     /**
      * Encode packet data.
@@ -486,10 +432,10 @@ public:
     bool Decode();
 
     /**
-     * Giveup the message block.
-     * @return LLBC_MessageBlock * - message block.
+     * Giveup payload.
+     * @return LLBC_MessageBlock * - payload.
      */
-    LLBC_MessageBlock *GiveUp();
+    LLBC_MessageBlock *GiveUpPayload();
 
 public:
     /**
@@ -523,6 +469,13 @@ public:
      */
     void SetCodecError(const LLBC_String &codecErr);
 
+public:
+    /**
+     * Get packet string representation.
+     * @return LLBC_String - the packet string representation.
+     */
+    LLBC_String ToString() const;
+
 private:
     /**
      * Read raw type data from packet.
@@ -542,14 +495,6 @@ private:
 
 private:
     /**
-     * Check and create payload(if payload not exist).
-     * @param[in] initSize - the messageBlock init size(if need create, will use this parameter).
-     * @return LLBC_MessageBlock *& - the payload pointer reference.
-     */
-    LLBC_MessageBlock *&CheckAndCreatePayload(size_t initSize);
-
-private:
-    /**
      * Cleanup the pre-handle result data.
      */
     void CleanupPreHandleResult();
@@ -564,23 +509,18 @@ private:
 
     int _sessionId;
     int _acceptSessionId;
-    int _senderSvcId;
-    int _recverSvcId;
     LLBC_SockAddr_IN _localAddr;
     LLBC_SockAddr_IN _peerAddr;
 
     int _opcode;
     int _status;
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    LLBC_String *_statusDesc;
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    int _flags;
+    uint32 _flags;
     sint64 _extData1;
     sint64 _extData2;
     sint64 _extData3;
 
-    LLBC_ICoder *_encoder;
-    LLBC_ICoder *_decoder;
+    LLBC_Coder *_encoder;
+    LLBC_Coder *_decoder;
     LLBC_String *_codecError;
 
     void *_preHandleResult;
@@ -589,12 +529,16 @@ private:
     LLBC_MessageBlock *_payload;
     LLBC_Delegate<void(LLBC_MessageBlock *)> _payloadDeleteDeleg;
 
-    LLBC_IObjectPoolInst *_selfPoolInst;
-    LLBC_IObjectPoolInst *_msgBlockPoolInst;
+    LLBC_TypedObjPool<LLBC_Packet> *_typedObjPool;
 };
 
 __LLBC_NS_END
 
-#include "llbc/comm/PacketImpl.h"
+/**
+ * Stream output operator support. 
+ */
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Packet &packet);
 
-#endif // !__LLBC_COMM_PACKET_H__
+#include "llbc/comm/PacketInl.h"
+
+

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_OS_CONSOLE_H__
-#define __LLBC_CORE_OS_OS_CONSOLE_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -34,7 +33,7 @@ class LLBC_EXPORT LLBC_ConsoleColor
 public:
     enum
     {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+        #if LLBC_TARGET_PLATFORM_NON_WIN32
         Fg_Black = 8,
         Fg_Red = 4,
         Fg_Green = 2,
@@ -58,7 +57,7 @@ public:
 
         Fg_Default = 0,
         Bg_Default = 0
-#else // LLBC_TARGET_PLATFORM_WIN32
+        #else // LLBC_TARGET_PLATFORM_WIN32
         Fg_Black  = 0,
         Fg_Red    = FOREGROUND_RED,
         Fg_Green  = FOREGROUND_GREEN,
@@ -82,7 +81,7 @@ public:
 
         Fg_Default = Fg_White,
         Bg_Default = Bg_Black
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+        #endif // LLBC_TARGET_PLATFORM_NON_WIN32
     };
 };
 
@@ -109,15 +108,18 @@ LLBC_EXPORT int LLBC_SetConsoleColor(FILE *file, int color);
  * @param[in] ...     - option arguments.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...);
+LLBC_EXPORT int __LLBC_FilePrint(bool newline,
+                                 FILE *file,
+                                 const char *fmt,
+                                 ...) LLBC_STRING_FORMAT_CHECK(3, 4);;
 
 #define LLBC_Print(fmt, ...) \
     LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__)
-#define LLBC_PrintLine(fmt, ...) \
+#define LLBC_PrintLn(fmt, ...) \
     LLBC_NS __LLBC_FilePrint(true, stdout, fmt, ##__VA_ARGS__)
 #define LLBC_FilePrint(file, fmt, ...) \
     LLBC_NS __LLBC_FilePrint(false, file, fmt, ##__VA_ARGS__)
-#define LLBC_FilePrintLine(file, fmt, ...) \
+#define LLBC_FilePrintLn(file, fmt, ...) \
     LLBC_NS __LLBC_FilePrint(true, file, fmt, ##__VA_ARGS__)
 
 /**
@@ -128,5 +130,3 @@ LLBC_EXPORT int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 LLBC_EXPORT int LLBC_FlushFile(FILE *file);
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_OS_OS_CONSOLE_H__

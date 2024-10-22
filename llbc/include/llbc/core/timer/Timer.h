@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_TIMER_TIMER_H__
-#define __LLBC_CORE_TIMER_TIMER_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/time/TimeSpan.h"
 #include "llbc/core/utils/Util_Delegate.h"
@@ -66,15 +63,15 @@ public:
 public:
     /**
      * Get due time.
-     * @return uint64 - due time.
+     * @return LLBC_TimeSpan - due time.
      */
-    uint64 GetDueTime() const;
+    LLBC_TimeSpan GetDueTime() const;
 
     /**
      * Get timer period.
-     * @return uint64 - timer period.
+     * @return LLBC_TimeSpan - timer period.
      */
-    uint64 GetPeriod() const;
+    LLBC_TimeSpan GetPeriod() const;
 
     /**
      * Get timer Id.
@@ -83,16 +80,51 @@ public:
     LLBC_TimerId GetTimerId() const;
 
     /**
+     * Get timeout times.
+     * @return sint64 - timeout times.
+     */
+    sint64 GetTimeoutTimes() const;
+
+public:
+    /**
+     * Get timeout handler.
+     * @return LLBC_Delegate<void(LLBC_Timer *)> & - timeout handler.
+     */
+    const LLBC_Delegate<void(LLBC_Timer *)> &GetTimeoutHandler() const;
+
+    /**
      * Set timeout handler.
      * @param[in] timeoutDeleg - the timeout delegate.
      */
     void SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg);
 
     /**
+     * @brief Set timeout handler(obj method).
+     * @param obj    - the object.
+     * @param method - the object method.
+     */
+    template <typename ObjType>
+    void SetTimeoutHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *));
+
+    /**
+     * Get cancel handler.
+     * @return LLBC_Delegate<void(LLBC_Timer *)> & - cancel handler.
+     */
+     const LLBC_Delegate<void(LLBC_Timer *)> &GetCancelHandler() const;
+
+    /**
      * Set cancel handler.
      * @param[in] cancelDeleg - the cancel delegate.
      */
     void SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg);
+
+    /**
+     * @brief Set cancel handler(obj method).
+     * @param obj    - the object.
+     * @param method - the object method.
+     */
+    template <typename ObjType>
+    void SetCancelHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *));
 
 public:
     /**
@@ -151,7 +183,7 @@ public:
      * Get timer string representation.
      * @return LLBC_String - the timer string representation.
      */
-    LLBC_String ToString() const;
+    virtual LLBC_String ToString() const;
 
 private:
     /**
@@ -173,6 +205,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/timer/TimerImpl.h"
+#include "llbc/core/timer/TimerInl.h"
 
-#endif // !__LLBC_CORE_TIMER_TIMER_H__
+

@@ -27,7 +27,7 @@ namespace
 
 const int OPCODE = 0;
 
-class TestComp : public LLBC_IComponent
+class TestComp : public LLBC_Component
 {
 public:
     TestComp()
@@ -39,65 +39,99 @@ public:
     }
 
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("Service create!");
+        LLBC_PrintLn("Service create!");
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("Service destroy!");
+        LLBC_PrintLn("Service destroy!");
     }
 
-public:
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
     {
-        LLBC_PrintLine("Session Create: %s", sessionInfo.ToString().c_str());
-    }
-
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
-    {
-        LLBC_PrintLine("Session Destroy, info: %s", destroyInfo.ToString().c_str());
-    }
-
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
-    {
-        LLBC_PrintLine("Async-Conn result: %s", result.ToString().c_str());
-    }
-
-    virtual void OnUnHandledPacket(const LLBC_Packet &packet)
-    {
-        LLBC_PrintLine("Unhandled packet, sessionId: %d, opcode: %d, payloadLen: %ld",
-            packet.GetSessionId(), packet.GetOpcode(), packet.GetPayloadLength());
-    }
-
-    virtual void OnProtoReport(const LLBC_ProtoReport &report)
-    {
-        LLBC_PrintLine("Proto report: %s", report.ToString().c_str());
+        switch(event)
+        {
+            case LLBC_ComponentEventType::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEventType::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            case LLBC_ComponentEventType::AsyncConnResult:
+            {
+                OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+                break;
+            }
+            case LLBC_ComponentEventType::UnHandledPacket:
+            {
+                OnUnHandledPacket(*evArgs.AsPtr<LLBC_Packet>());
+                break;
+            }
+            case LLBC_ComponentEventType::ProtoReport:
+            {
+                OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+                break;
+            }
+            default: break;
+        }
     }
 
 public:
     void OnDataArrival(LLBC_Packet &packet)
     {
         if ((_packets += 1) % 1000 == 0)
-            LLBC_PrintLine("[%s]Received %ld packets!", LLBC_Time::Now().ToString().c_str(), _packets);
+            LLBC_PrintLn("[%s]Received %ld packets!", LLBC_Time::Now().ToString().c_str(), _packets);
 
         _recvBytes += packet.GetPayloadLength();
         uint64 recv100MB = _recvBytes / (100 * 1024 * 1024);
         if (recv100MB > _prevRecv100MB)
         {
-            LLBC_PrintLine("[%s]Received %llu MB data!", LLBC_Time::Now().ToString().c_str(), _recvBytes / (1024 * 1024));
+            LLBC_PrintLn("[%s]Received %llu MB data!", LLBC_Time::Now().ToString().c_str(), _recvBytes / (1024 * 1024));
             _prevRecv100MB = recv100MB;
         }
 
-        // LLBC_Packet *resPacket = LLBC_New(LLBC_Packet);
-        LLBC_Packet *resPacket = GetService()->GetPacketObjectPool().GetObject();
-        resPacket->SetHeader(packet, OPCODE, 0);
+        // LLBC_Packet *resPacket = new LLBC_Packet;
+        LLBC_Packet *resPacket = GetService()->GetThreadSafeObjPool().Acquire<LLBC_Packet>();
+        resPacket->SetHeader(packet.GetSessionId(), OPCODE, 0);
         resPacket->Write(packet.GetPayload(), packet.GetPayloadLength());
 
         GetService()->Send(resPacket);
     }
+
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    {
+        LLBC_PrintLn("Session Create: %s", sessionInfo.ToString().c_str());
+    }
+
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    {
+        LLBC_PrintLn("Session Destroy, info: %s", destroyInfo.ToString().c_str());
+    }
+
+    void OnAsyncConnResult(const LLBC_AsyncConnResult &result)
+    {
+        LLBC_PrintLn("Async-Conn result: %s", result.ToString().c_str());
+    }
+
+    void OnUnHandledPacket(const LLBC_Packet &packet)
+    {
+        LLBC_PrintLn("Unhandled packet, sessionId: %d, opcode: %d, payloadLen: %ld",
+            packet.GetSessionId(), packet.GetOpcode(), packet.GetPayloadLength());
+    }
+
+    void OnProtoReport(const LLBC_ProtoReport &report)
+    {
+        LLBC_PrintLn("Proto report: %s", report.ToString().c_str());
+    }
+
 
 private:
     uint64 _recvBytes;
@@ -118,10 +152,10 @@ TestCase_Comm_Svc::~TestCase_Comm_Svc()
 
 int TestCase_Comm_Svc::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Server/Client test:");
+    LLBC_PrintLn("Server/Client test:");
     if (argc < 5)
     {
-        LLBC_PrintLine("argument error, eg: ./a [client/server] [normal/raw] ip port");
+        LLBC_PrintLn("argument error, eg: ./a [client/server] [normal/raw] ip port");
         return -1;
     }
 
@@ -129,17 +163,19 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     const char *ip = argv[3];
     const int port = LLBC_Str2Int32(argv[4]);
     const bool asClient = LLBC_String(argv[1]) == "client" ? true : false;
-    LLBC_IService::Type svcType = 
-        LLBC_String(argv[2]) == "normal" ? LLBC_IService::Normal : LLBC_IService::Raw;
-
-    LLBC_PrintLine("Will start %s type service, service type: %s",
+    LLBC_IProtocolFactory *protoFactory;
+    if (LLBC_String(argv[2]) == "normal")
+        protoFactory = new LLBC_NormalProtocolFactory;
+    else
+        protoFactory = new LLBC_RawProtocolFactory;
+    LLBC_PrintLn("Will start %s type service, service type: %s",
         asClient ? "CLIENT" : "SERVER",
-        svcType == LLBC_IService::Normal ? "Normal" : "Raw");
+        LLBC_String(argv[2]) == "normal" ? "Normal" : "Raw");
 
     // Create service
-    LLBC_IService *svc = LLBC_IService::Create(svcType, "SvcTest");
-    TestComp *comp = LLBC_New(TestComp);
-    svc->RegisterComponent(comp);
+    LLBC_Service *svc = LLBC_Service::Create("SvcTest", protoFactory);
+    TestComp *comp = new TestComp;
+    svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
     svc->SuppressCoderNotFoundWarning();
     svc->Start(8);
@@ -150,12 +186,12 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     // sessionOpts.SetSockRecvBufSize(1 * 1024 * 1024);
     if (!asClient)
     {
-        LLBC_PrintLine("Will listening in %s:%d", ip, port);
+        LLBC_PrintLn("Will listening in %s:%d", ip, port);
         int sessionId = svc->Listen(ip, port, nullptr, sessionOpts);
         if (sessionId == 0)
         {
-            LLBC_PrintLine("Create session failed, reason: %s", LLBC_FormatLastError());
-            LLBC_Delete(svc);
+            LLBC_PrintLn("Create session failed, reason: %s", LLBC_FormatLastError());
+            delete svc;
 
             return -1;
         }
@@ -170,32 +206,32 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         else
             clientCount = 200;
 
-        LLBC_PrintLine("Create %d clients to test", clientCount);
+        LLBC_PrintLn("Create %d clients to test", clientCount);
         for (int i = 0; i < clientCount; ++i)
         {
             int sessionId = svc->Connect(ip, port, -1, nullptr, sessionOpts);
             if (sessionId == 0)
             {
-                LLBC_PrintLine("Connect to %s:%d failed, err:%s", ip, port, LLBC_FormatLastError());
+                LLBC_PrintLn("Connect to %s:%d failed, err:%s", ip, port, LLBC_FormatLastError());
                 continue;
             }
 
             const int dataSize = 512 * 1024;
             char *data = LLBC_Malloc(char, dataSize);
-            ::memset(data, 1, dataSize);
+            memset(data, 1, dataSize);
 
-            // LLBC_Packet *packet = LLBC_New(LLBC_Packet);
-            LLBC_Packet *packet = svc->GetPacketObjectPool().GetObject();
+            // LLBC_Packet *packet = new LLBC_Packet;
+            LLBC_Packet *packet = svc->GetThreadSafeObjPool().Acquire<LLBC_Packet>();
             packet->SetHeader(sessionId, OPCODE, 0);
             packet->Write(data, dataSize);
 
-            LLBC_Free(data);
+            free(data);
 
             svc->Send(packet);
 
             // Test unhandled packet(unsubscribe opcode).
-            // LLBC_Packet *unhandledPacket = LLBC_New(LLBC_Packet);
-            LLBC_Packet *unhandledPacket = svc->GetPacketObjectPool().GetObject();
+            // LLBC_Packet *unhandledPacket = new LLBC_Packet;
+            LLBC_Packet *unhandledPacket = svc->GetThreadSafeObjPool().Acquire<LLBC_Packet>();
             unhandledPacket->SetHeader(sessionId, OPCODE + 10000, 0);
             unhandledPacket->Write("Hello World", 12);
 
@@ -203,10 +239,10 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
         }
     }
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return 0;
 }

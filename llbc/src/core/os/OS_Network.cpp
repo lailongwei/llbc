@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Network.h"
 
@@ -31,7 +31,7 @@ int LLBC_GetAddrInfo(const char *nodename,
                      const struct addrinfo *hints,
                      struct addrinfo **res)
 {
-    int ret = ::getaddrinfo(nodename, servname, hints, res);
+    int ret = getaddrinfo(nodename, servname, hints, res);
     if (ret != 0)
     {
         LLBC_SetLastError(LLBC_ERROR_GAI);
@@ -45,9 +45,7 @@ int LLBC_GetAddrInfo(const char *nodename,
 
 void LLBC_FreeAddrInfo(struct addrinfo *ai)
 {
-    ::freeaddrinfo(ai);
+    freeaddrinfo(ai);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_LIB_TLS_INL_H__
-#define __LLBC_COM_LIB_TLS_INL_H__
-
-#include "llbc/common/PFConfig.h"
+#pragma once
 
 #include "llbc/common/Macro.h"
 #include "llbc/common/Config.h"
@@ -36,12 +33,14 @@ __LLBC_NS_BEGIN
 struct LLBC_EXPORT __LLBC_LibTls
 {
     /* Common-Module TLS value. */
-    struct  
+    struct
     {
         /* error, sub-error, and error describe character pointer. */
         int errNo;
         int subErrNo;
         char errDesc[__LLBC_ERROR_DESC_SIZE];
+        char customErrDesc[__LLBC_ERROR_DESC_SIZE];
+        char clibErrFmtBuf[__LLBC_CLIB_ERROR_FORMAT_BUF_SIZE];
         char rtti[__LLBC_RTTI_BUF_SIZE];
     } commonTls;
 
@@ -56,15 +55,17 @@ struct LLBC_EXPORT __LLBC_LibTls
         /* need init WinSock library, only available when entryThread is true */
         bool needInitWinSock;
 
-        /* logger format buffer */
+        /* logger format buffer(used for vsnprintf()) */
         char loggerFmtBuf[LLBC_CFG_LOG_FORMAT_BUF_SIZE + 1];
 
-        /* thread id/handle. */
-        LLBC_Handle threadHandle;
         /* native thread id, can use to OS dependency APIs. */
         LLBC_ThreadId threadId;
+        /* thread id/handle. */
+        LLBC_Handle threadHandle;
         /* native thread handle, can use to OS dependency APIs. */
         LLBC_NativeThreadHandle nativeThreadHandle;
+        /* thread group handle. */
+        LLBC_Handle threadGroupHandle;
 
         /* Task pointer. */
         void *task;
@@ -73,8 +74,8 @@ struct LLBC_EXPORT __LLBC_LibTls
         void *timerScheduler;
 
         /* ObjectPool pointers. */
-        void *safetyObjectPool;
-        void *unsafetyObjectPool;
+        void *safeObjPool;
+        void *unsafeObjPool;
 
         /* symbol about data. */
         #if LLBC_CFG_OS_IMPL_SYMBOL
@@ -94,22 +95,27 @@ struct LLBC_EXPORT __LLBC_LibTls
     } coreTls;
 
     /* ObjBase-Module TLS valus. */
-    struct 
+    struct
     {
         /* Auto-Release pool stack. */
         void *poolStack;
     } objbaseTls;
 
     /* Communication-Module TLS value. */
-    struct  
+    struct
     {
         /* Services pointer. */
-        void *services[LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT + 1];
+        void *services[LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT];
     } commTls;
 
     __LLBC_LibTls();
     ~__LLBC_LibTls();
 };
+
+/**
+ * The entry-thread lib tls variable.
+ */
+extern LLBC_EXPORT __LLBC_LibTls *__LLBC_EntryThreadLibTls;
 
 /**
  * The Lib TLS handle create function.
@@ -128,11 +134,14 @@ LLBC_HIDDEN void __LLBC_DestroyLibTls();
 LLBC_EXPORT __LLBC_LibTls *__LLBC_GetLibTls();
 
 /**
+ * Get entry-thread lib TLS value.
+ * @return __LLBC_LibTls * - entry-thread lib TLS value pointer.
+ */
+LLBC_EXPORT __LLBC_LibTls *__LLBC_GetEntryThreadLibTls();
+
+/**
  * Reset lib TLS value.
  */
 void __LLBC_ResetLibTls();
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COM_LIB_TLS_INL_H__
-

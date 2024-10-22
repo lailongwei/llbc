@@ -34,6 +34,7 @@ int TestCase_Core_Algo_RingBuffer::Run(int argc, char *argv[])
     std::cout << "core/algo/RingBuffer test:" << std::endl;
 
     DoBasicTest();
+    DoFrontTailTest();
     DoPerfTest();
 
     std::cout << "Press any key to continue..." << std::endl;
@@ -51,10 +52,10 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
         std::cout << "- is empty: " << rb.IsEmpty() << ", is full: " << rb.IsFull() << std::endl;
 
         std::cout << "- push some elems..." << std::endl;
-        for (int i = 0; i != rb.GetCapacity() / 2; ++i)
+        for (size_t i = 0; i != rb.GetCapacity() / 2; ++i)
         {
             std::cout << "  - push: " << i << std::endl;
-            rb.Push(i);
+            rb.Push(static_cast<int>(i));
         }
         std::cout << "- after push, is empty: " << rb.IsEmpty() << ", is full: " << rb.IsFull() << std::endl;
 
@@ -77,7 +78,7 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
     std::cout << "- random push/pop test: " << std::endl;
     {
         LLBC_RingBuffer<int> rb;
-        LLBC_Random rand(static_cast<int>(LLBC_Time::NowTimeStamp()));
+        LLBC_Random rand(static_cast<int>(time(nullptr)));
         for (int i = 0; i <100; ++i)
         {
             int pushTimes = rand.Rand(2, 1000);
@@ -119,26 +120,60 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
     }
 }
 
+void TestCase_Core_Algo_RingBuffer::DoFrontTailTest()
+{
+    std::cout << "Front/Tail test:" << std::endl;
+
+    LLBC_RingBuffer<int> rb(100);
+
+    std::cout << "- Push 10 elements..." << std::endl;
+    for (int i = 0; i < 10; ++i)
+        rb.Push(i + 1);
+    std::cout << "- Get front element: " << rb.Front() << std::endl;
+    std::cout << "- Get tail element: " << rb.Tail() << std::endl;
+
+    std::cout << "- Pop 5 elements..." << std::endl;
+    for (int i = 0; i < 5; ++i)
+        rb.Pop();
+    std::cout << "- Get front element: " << rb.Front() << std::endl;
+    std::cout << "- Get tail element: " << rb.Tail() << std::endl;
+
+    std::cout << "Front/Tail test end" << std::endl;
+}
+
 void TestCase_Core_Algo_RingBuffer::DoPerfTest()
 {
-    std::cout << "Performance test:" << std::endl;
-
 #if LLBC_DEBUG
-    const int testTimes = 10000;
+    static constexpr size_t testTimes = 10000;
 #else
-    const int testTimes = 1000000;
+    static constexpr size_t testTimes = 1000000;
 #endif
 
-    LLBC_RingBuffer<int> rb(512);
-    sint64 begTestTime = LLBC_GetMicroSeconds();
-    for (int i = 0; i < testTimes; ++i)
+    std::cout << "Performance test, test times(push + pop):" << testTimes << std::endl;
+
+    static constexpr size_t rbCap = 512;
+    const sint64 begTestTime = LLBC_GetMicroseconds();
+
+    LLBC_RingBuffer<int> rb(rbCap);
+    for (int i = 0; i < static_cast<int>(testTimes); ++i)
     {
-        for (int j = 0; j < 512; ++j)
+        for (size_t j = 0; j < rbCap; j += 4)
+        {
             rb.Push(i);
-        for (int j = 0; j < 512; ++j)
-            rb.Pop();
+            rb.Push(i);
+            rb.Push(i);
+            rb.Push(i);
+
+            (void)rb.Pop();
+            (void)rb.Pop();
+            (void)rb.Pop();
+            (void)rb.Pop();
+        }
     }
-    sint64 usedTime = LLBC_GetMicroSeconds() - begTestTime;
-    std::cout << "- test finished, used time(micro-seconds): " << usedTime << std::endl;
+
+    const sint64 usedTime = LLBC_GetMicroseconds() - begTestTime;
+    std::cout << "- test finished, used time:" << usedTime
+              << "us, per time cost:" << usedTime / static_cast<double>(testTimes * rb.GetCapacity() * 2) << "us"
+              << std::endl;
 }
 

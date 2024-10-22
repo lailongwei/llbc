@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-@file   lu_prebuild.py
-@author lailongwei
-@date   2017/7/14
-@brief:
-        
+ lullbc预编译脚本
 """
-import sys
 
-from c import Cfg
+from os import path as op
+
+from com.log import Log
+from com.cfg import cfg
+from com.defs import ProjType
 from lu_script_integrator import LuScriptIntegrator
 from native_method_collector import LuNativeMethodCollector as LuNMC
 
 
 def main():
     # 收集所有lua native methods并进行整合
-    code_path = Cfg.getcodepath()
-    LuNMC(code_path, classname_base='', filename_base=Cfg.getprojname().capitalize()).build()
-
-    # 读取当前编译是否处于debug模式
-    debug = not (len(sys.argv) < 3 or sys.argv[2].upper() != 'DEBUG')
-    print 'Build in {0} mode...'.format(debug and 'Debug' or 'Release')
+    Log.i('Collect lua native methods...')
+    src_path = op.join(cfg.lullbc_proj_path, 'src')
+    LuNMC(src_path,
+          classname_base='',
+          filename_base=ProjType.lullbc.capitalize()).build()
+    Log.i('Done!')
 
     # 整合所有lua脚本
-    print 'Integrate lua scripts...'
-    LuScriptIntegrator(debug).build()
+    Log.i('Integrate lua script...')
+    LuScriptIntegrator().build()
 
-    print 'Done!'
+    Log.i('Done!')
+
 
 if __name__ == '__main__':
     main()

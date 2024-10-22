@@ -46,7 +46,7 @@ LULLBC_LUA_METH int _lullbc_Timer_New(lua_State *l)
     // Create userdata(sizeof(lullbc_Timer)), and set metatable: { __gc }
     void *timerBuf = lua_newuserdata(l, sizeof(lullbc_Timer));
     // Explicit call lullbc_Timer constructor
-    lullbc_Timer *timer = new (timerBuf) lullbc_Timer(l);
+    new (timerBuf) lullbc_Timer(l);
 
     // Set metatable.
     if (UNLIKELY(luaL_newmetatable(l, "lullbc_Timer.__Del_LuTimer") == 1))
@@ -82,7 +82,7 @@ LULLBC_LUA_METH int _lullbc_Timer_IsScheduling(lua_State *l)
 LULLBC_LUA_METH int _lullbc_Timer_GetDueTime(lua_State *l)
 {
     lullbc_Timer *timer = __Get_LuTimer(l);
-    lua_pushnumber(l, timer->GetDueTime() / 1000.0);
+    lua_pushnumber(l, timer->GetDueTime().GetTotalMillis() / 1000.0);
 
     return 1;
 }
@@ -91,7 +91,7 @@ LULLBC_LUA_METH int _lullbc_Timer_GetDueTime(lua_State *l)
 LULLBC_LUA_METH int _lullbc_Timer_GetPeriod(lua_State *l)
 {
     lullbc_Timer *timer = __Get_LuTimer(l);
-    lua_pushnumber(l, timer->GetPeriod() / 1000.0);
+    lua_pushnumber(l, timer->GetPeriod().GetTotalMillis() / 1000.0);
 
     return 1;
 }
@@ -106,9 +106,9 @@ LULLBC_LUA_METH int _lullbc_Timer_Schedule(lua_State *l)
     if (UNLIKELY(!lua_isnumber(l, -1)))
         lullbc_SetError(l, "period except number type");
 
-    const LLBC_TimeSpan dueTime = LLBC_TimeSpan::FromMilliSeconds(
+    const LLBC_TimeSpan dueTime = LLBC_TimeSpan::FromMillis(
         static_cast<sint64>(static_cast<double>(lua_tonumber(l, -2)) * 1000));
-    const LLBC_TimeSpan period = LLBC_TimeSpan::FromMilliSeconds(
+    const LLBC_TimeSpan period = LLBC_TimeSpan::FromMillis(
         static_cast<sint64>(static_cast<double>(lua_tonumber(l, -1)) * 1000));
 
     // Schedule timer

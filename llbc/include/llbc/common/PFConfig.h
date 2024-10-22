@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_PF_CONFIG_H__
-#define __LLBC_COM_PF_CONFIG_H__
+#pragma once
 
 // ==================================================================================
 // Platform specific macros pre-define.
@@ -78,7 +77,7 @@
 #endif
 
 // Mac platform recognize.
-#if !LLBC_TARGET_PLATFORM && TARGET_OS_MAC
+#if !LLBC_TARGET_PLATFORM && defined(__APPLE__)
 #undef LLBC_TARGET_PLATFORM
 #define LLBC_TARGET_PLATFORM LLBC_PLATFORM_MAC
 #endif
@@ -249,5 +248,5 @@
  #error "Cannot recognize the target processor; are you targeting an unsuported processor?"
 #endif // LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_X86
 
-#endif // !__LLBC_COM_PF_CONFIG_H__
+
 

@@ -44,11 +44,7 @@ void pyllbc_AddCoreMethods()
 
     // core/file
     pyllbc_Module *top = pyllbc_TopModule;
-    top->AddMethod(methods.GetModuleFileName);
-    top->AddMethod("get_module_filename",
-                   methods.GetModuleFileName.ml_meth,
-                   methods.GetModuleFileName.ml_flags,
-                   methods.GetModuleFileName.ml_doc);
+    top->AddMethod(methods.GetModuleFilePath);
 
     // core/bundle
     inl->AddMethod(methods.NewBundle);
@@ -74,7 +70,7 @@ void pyllbc_AddCoreMethods()
     inl->AddMethod(methods.Property_FromFile);
     inl->AddMethod(methods.Property_ToContent);
     inl->AddMethod(methods.Property_ToFile);
-    inl->AddMethod(methods.Property_GetPropertyCount);
+    inl->AddMethod(methods.Property_GetPropertiesCount);
     inl->AddMethod(methods.Property_GetPropertyNames);
     inl->AddMethod(methods.Property_GetValue);
     inl->AddMethod(methods.Property_SetValue);
@@ -87,6 +83,7 @@ void pyllbc_AddCoreMethods()
 
     // core/log
     inl->AddMethod(methods.InitLoggerMgr);
+    inl->AddMethod(methods.UnInitLoggerMgr);
     inl->AddMethod(methods.LogMsg);
 
     // core/utils

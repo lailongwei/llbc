@@ -19,11 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_EPOLL_POLLER_H__
-#define __LLBC_COMM_EPOLL_POLLER_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#pragma once
 
 #include "llbc/comm/BasePoller.h"
 
@@ -43,7 +39,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The Epoll poller class encapsulation.
  */
-class LLBC_HIDDEN LLBC_EpollPoller : public LLBC_BasePoller
+class LLBC_HIDDEN LLBC_EpollPoller final : public LLBC_BasePoller
 {
 public:
     LLBC_EpollPoller();
@@ -55,6 +51,11 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Start();
+
+    /**
+     * Stop poller.
+     */
+    virtual void Stop();
 
     /**
      * Task startup method.
@@ -125,5 +126,5 @@ __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
 
-#endif // !__LLBC_COMM_EPOLL_POLLER_H__
+
 

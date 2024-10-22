@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc.h"
 
@@ -35,25 +35,25 @@ __LLBC_NS_BEGIN
 int LLBC_Startup(bool initWinSock)
 {
     // ReEntry judge.
-    if(LLBC_INTERNAL_NS __llbc_inited)
+    if (LLBC_INTERNAL_NS __llbc_inited)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
     }
 
     // Init common module.
-    if(__LLBC_CommonStartup() != LLBC_OK)
+    if (__LLBC_CommonStartup() != LLBC_OK)
         return LLBC_FAILED;
 
     // Set some init parameters.
     __LLBC_GetLibTls()->coreTls.needInitWinSock = initWinSock;
 
     // Init core module.
-    if(__LLBC_CoreStartup() != LLBC_OK)
+    if (__LLBC_CoreStartup() != LLBC_OK)
         return LLBC_FAILED;
 
-    // Init communication module
-    if(__LLBC_CommStartup() != LLBC_OK)
+    // Init communication module.
+    if (__LLBC_CommStartup() != LLBC_OK)
         return LLBC_FAILED;
 
     LLBC_INTERNAL_NS __llbc_inited = true;
@@ -63,13 +63,11 @@ int LLBC_Startup(bool initWinSock)
 
 int LLBC_Cleanup()
 {
-    if(!LLBC_INTERNAL_NS __llbc_inited)
-    {
+    if (!LLBC_INTERNAL_NS __llbc_inited)
         return LLBC_FAILED;
-    }
 
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if(!tls->coreTls.entryThread)
+    if (!tls->coreTls.entryThread)
     {
         LLBC_SetLastError(LLBC_ERROR_ACCESS_DENY);
         return LLBC_FAILED;
@@ -87,5 +85,3 @@ int LLBC_Cleanup()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

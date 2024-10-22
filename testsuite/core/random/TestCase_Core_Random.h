@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_RANDOM_H__
-#define __LLBC_TEST_CASE_CORE_RANDOM_H__
+#pragma once
 
 #include "llbc.h"
 using namespace llbc;
@@ -37,6 +36,10 @@ public:
 private:
     void Exec_RandInt_end_Test(int end, int times);
     void Exec_RandInt_begin_end_Test(int begin, int end, int times);
+    template <typename _Weights>
+    typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
+                            LLBC_IsTemplSpec<_Weights, std::list>::value ||
+                            LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
+                            std::is_array<_Weights>::value, void>::type
+    Exec_RandInt_array_Test(const _Weights &weights, int times);
 };
-
-#endif // !__LLBC_TEST_CASE_CORE_RANDOM_H__

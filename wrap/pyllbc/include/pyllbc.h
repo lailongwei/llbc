@@ -19,14 +19,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_H__
-#define __PYLLBC_H__
+#pragma once
 
 #include "pyllbc/common/Common.h"
 #include "pyllbc/testcase/TestCase.h"
 #include "pyllbc/core/Core.h"
 #include "pyllbc/comm/Comm.h"
-#include "pyllbc/application/Application.h"
+#include "pyllbc/app/App.h"
 
 /**
  * pyllbc library initialize function, call by python interpreter.
@@ -37,4 +36,4 @@
  PYLLBC_MOD_INIT_FUNC void initllbc_debug();
 #endif // not define LLBC_DEBUG
 
-#endif // !__PYLLBC_H__
+

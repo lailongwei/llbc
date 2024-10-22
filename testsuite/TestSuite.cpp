@@ -34,7 +34,7 @@
         LLBC_SetConsoleColor(stdout, color);                         \
         LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
         LLBC_SetConsoleColor(stdout, olcClr);                        \
-        LLBC_NS __LLBC_FilePrint(true, stdout, "");                  \
+        LLBC_NS __LLBC_FilePrint(false, stdout, "\n");               \
     } while (0);
 
 #define __ClearInputBuf()                           \
@@ -48,7 +48,8 @@
 
 int TestSuite_Main(int argc, char* argv[])
 {
-    ::llbc::LLBC_Startup();
+    LLBC_Startup();
+    LLBC_HandleCrash();
     __TraitsLoop<__TEST_CASE_COUNT>::Generate();
 
     while (true)
@@ -61,12 +62,12 @@ int TestSuite_Main(int argc, char* argv[])
             if (testcaseName == nullptr || testcaseFactory == nullptr)
                 continue;
 
-            LLBC_PrintLine("%d: %s", i + 1, testcaseName);
+            LLBC_PrintLn("%d: %s", i + 1, testcaseName);
         }
         __PrintLineC(LLBC_NS LLBC_ConsoleColor::Bg_Green, __DEPARATION_CHARACTER);
 
         int idx = -1;
-        LLBC_Print("Please select testcase (0-exit): ", __TEST_CASE_COUNT);
+        LLBC_Print("Please select testcase (0-exit): ");
 
         char inputBuf[8192];
         if (fgets(inputBuf, sizeof(inputBuf), stdin) == nullptr)
@@ -112,12 +113,14 @@ int TestSuite_Main(int argc, char* argv[])
             testArgv[i] = inputs[i].c_str();
 
         int testCaseRet = test->Run(testArgc, const_cast<char **>(testArgv));
-        LLBC_Free(testArgv);
-        LLBC_Delete(test);
+        free(testArgv);
+        delete test;
 
         if (testCaseRet != LLBC_OK)
         {
-            __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "%s run failed, retCode:%d, press any key to continue...", testcaseName, testCaseRet);
+            __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red,
+                         "%s run failed, retCode:%d, press any key to continue...",
+                         testcaseName, testCaseRet);
             getchar();
         }
     }

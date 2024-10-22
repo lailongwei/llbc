@@ -19,15 +19,15 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
+#include "llbc/core/os/OS_Time.h"
 #include "llbc/core/os/OS_Console.h"
-#include "llbc/core/objectpool/Common.h"
+#include "llbc/core/objpool/ThreadSpecObjPool.h"
 
-#include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/Logger.h"
-#include "llbc/core/log/LoggerManager.h"
+#include "llbc/core/log/LoggerMgr.h"
 
 #include "llbc/core/log/LogJsonMsg.h"
 
@@ -37,63 +37,52 @@
 
 __LLBC_NS_BEGIN
 
-namespace
-{
-    typedef LLBC_NS LLBC_LogLevel _LV;
-}
-
-LLBC_LogJsonMsg::LLBC_LogJsonMsg(const char *loggerName,
+LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger *logger,
                                  const char *tag,
                                  int lv,
                                  const char *file,
                                  int line,
                                  const char *func)
-: _loggerMgrInited(LLBC_LoggerManagerSingleton->IsInited())
-
-, _logger(nullptr)
+: _logger(logger)
 , _tag(tag)
 , _lv(lv)
 , _file(file)
 , _line(line)
 , _func(func)
 
-, _doc(*LLBC_GetObjectFromUnsafetyPool<LLBC_Json::Document>())
+, _doc(*LLBC_ThreadSpecObjPool::UnsafeAcquire<LLBC_Json::Document>())
 {
     _doc.SetObject();
-    if (_loggerMgrInited)
-    {
-        if (!loggerName)
-            _logger = LLBC_LoggerManagerSingleton->GetRootLogger();
-        else
-            _logger = LLBC_LoggerManagerSingleton->GetLogger(loggerName);
-    }
 }
 
 LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
 {
-    LLBC_ReleaseObjectToUnsafetyPool(&_doc);
+    LLBC_ThreadSpecObjPool::UnsafeRelease(&_doc);
 }
 
 void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
 {
-    // Logger not found process.
-    if (_loggerMgrInited && !_logger)
-        return;
     // Log level judge.
-    if (_logger && _lv < _logger->GetLogLevel())
+    if (LIKELY(_logger) &&
+        _lv < _logger->GetLogLevel())
         return;
 
     // Format.
     va_list va;
     va_start(va, fmt);
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-    int len = ::vsnprintf(libTls->coreTls.loggerFmtBuf,
-                          sizeof(libTls->coreTls.loggerFmtBuf),
-                          fmt,
-                          va);
+    int len = vsnprintf(libTls->coreTls.loggerFmtBuf,
+                        sizeof(libTls->coreTls.loggerFmtBuf),
+                        fmt,
+                        va);
     va_end(va);
     if (UNLIKELY(len < 0))
         return;
+
+    // Add time.
+    const sint64 now = LLBC_GetMicroseconds();
+    if (LIKELY(_logger) && _logger->IsAddTimestampInJsonLog())
+        this->Add("timestamp", now);
 
     // Doc add string with not copy.
     _doc.AddMember("msg", LLBC_JsonValue(libTls->coreTls.loggerFmtBuf, len).Move(), _doc.GetAllocator());
@@ -104,15 +93,18 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     _doc.Accept(writer);
 
     // Output json log.
-    if (UNLIKELY(!_loggerMgrInited))
-        LLBC_LoggerManagerSingleton->UnInitOutput(_lv, buffer.GetString());
+    if (LIKELY(_logger))
+        _logger->NonFormatOutput(_lv,
+                                 _tag,
+                                 _file,
+                                 _line,
+                                 _func,
+                                 now,
+                                 buffer.GetString(),
+                                 buffer.GetLength());
     else
-        _logger->NonFormatOutput(_lv, _tag, _file, _line, _func, buffer.GetString(), buffer.GetLength());
-
-    // Delete self.
-    LLBC_Delete(this);
+        LLBC_LoggerMgrSingleton->UnInitOutput(
+            _lv, _tag, nullptr, 0, nullptr, "%s", buffer.GetString());
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

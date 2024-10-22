@@ -5,7 +5,6 @@
  */
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/iconv/iconv.h"
 
@@ -2047,5 +2046,3 @@ main(int argc, char **argv)
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_WIN32
-
-#include "llbc/common/AfterIncl.h"

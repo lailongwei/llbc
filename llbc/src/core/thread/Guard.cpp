@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/thread/ILock.h"
 
@@ -63,5 +62,3 @@ LLBC_LockGuard::~LLBC_LockGuard()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -19,30 +19,31 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_STREAM_H__
-#define __LLBC_COM_STREAM_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
 #include "llbc/common/Macro.h"
 #include "llbc/common/BasicDataType.h"
+#include "llbc/common/StringDataType.h"
+#include "llbc/common/TemplateDeduction.h"
 
 /** Some stream helper macros define **/
-/*  DeSerialize/Read about macros define  */
+/*  Deserialize/Read about macros define  */
 // Begin read macro define, use to simple begin read object.
 #define LLBC_STREAM_BEGIN_READ(stream, failRetType, failRetVal) \
     do {                                                        \
         failRetType __r_failRet = (failRetVal);                 \
         LLBC_NAMESPACE LLBC_Stream &__r_stream = (stream)       \
 
-// DeSerialize macro define.
+// Deserialize macro define.
 #define LLBC_STREAM_READ(field)                                 \
     if (!__r_stream.Read(field)) {                              \
         return __r_failRet;                                     \
     }                                                           \
 
 #define LLBC_STREAM_READ_BUF(buf, len)                          \
-    if (!__r_stream.ReadBuffer(buf, len)) {                     \
+    if (!__r_stream.Read(buf, len)) {                           \
         return __r_failRet;                                     \
     }                                                           \
 
@@ -79,11 +80,7 @@
     __w_stream.Write(field)                                     \
 
 #define LLBC_STREAM_WRITE_BUF(buf, len)                         \
-    __w_stream.WriteBuffer(buf, len)                            \
-
-// Fill macro define ,use to fill some null bytes to stream.
-#define LLBC_STREAM_FILL(size)                                  \
-    __w_stream.Fill(size)                                       \
+    __w_stream.Write(buf, len)                                  \
 
 // End write macro define, use to stop stream write.
 #define LLBC_STREAM_END_WRITE()                                 \
@@ -99,12 +96,23 @@
 __LLBC_NS_BEGIN
 
 /**
+ * Pre-declare some classes.
+ */
+class LLBC_Stream;
+template <typename Obj>
+class LLBC_TypedObjPool;
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
+/**
  * \brief Stream class encapsulation, support serialize/deserialize operations.
  */
-class LLBC_Stream
+class LLBC_Stream final
 {
 public:
-    static const size_t npos = -1;
+    static constexpr size_t npos = (std::numeric_limits<size_t>::max)();
 
 public:
     /**
@@ -113,36 +121,37 @@ public:
     LLBC_Stream();
 
     /**
-     * Copy constructor.
+     * Parameter constructor, constructor will allocate cap bytes in stream.
+     * @param[in] cap - buffer cap, in bytes.
      */
-    LLBC_Stream(const LLBC_Stream &rhs);
+    explicit LLBC_Stream(size_t cap);
+
+    /**
+     * Move constructor.
+     */
+    LLBC_Stream(LLBC_Stream &&rhs);
 
     /**
      * Copy right side stream, and can determine attach attribute, if
      * use true, like wrap behavior, you can in the new stream object
      * to do any operations.
      */
-    LLBC_Stream(const LLBC_Stream &rhs, bool attach);
-
-    /**
-     * Parameter constructor, constructor will allocate size bytes in stream.
-     * @param[in] size - buffer size, in bytes.
-     */
-    explicit LLBC_Stream(size_t size);
+    LLBC_Stream(const LLBC_Stream &rhs, bool attach = false);
 
     /**
      * Parameter constructor, will copy or attach external buffer.
      * @param[in] buf    - external buffer pointer, not null.
-     * @param[in] len    - indicate buffer size, in bytes, must greater than 0.
+     * @param[in] size   - indicate buffer size, in bytes, must greater than 0.
      * @param[in] attach - attach flag, if true, stream object will attach external buffer, default is true.
      */
-    LLBC_Stream(void *buf, size_t len, bool attach = true);
+    LLBC_Stream(void *buf, size_t size, bool attach = true);
 
     /**
      * Destructor, if stream buffer is allocate by itself, will delete.
      */
     ~LLBC_Stream();
 
+public:
     /**
      * Attach another stream.
      * @param[in] rhs - another stream object.
@@ -151,23 +160,10 @@ public:
 
     /**
      * Attach external buffer.
-     * @param[in] buf - external buffer pointer, not null.
-     * @param[in] len - indicate external buffer size, in bytes, must greater or equal than 0.
+     * @param[in] buf  - external buffer pointer, not null.
+     * @param[in] size - indicate external buffer size, in bytes, must greater than or equal to 0.
      */
-    void Attach(void *buf, size_t len);
-
-    /**
-     * stream assign operation.
-     * @param[in] rhs - another stream object.
-     */
-    void Assign(const LLBC_Stream &rhs);
-
-    /**
-     * Buffer assign operation.
-     * @param[in] buf - buffer.
-     * @param[in] len - buffer size.
-     */
-    void Assign(void *buf, size_t len);
+    void Attach(void *buf, size_t size);
 
     /**
      * Detach the external buffer, if the buffer is external buffer.
@@ -185,8 +181,28 @@ public:
      * Set stream's buffer attach attribute.
      * @param[in] attach - attach flag.
      */
-    void SetAttachAttr(bool attach);
+    void SetAttach(bool attach);
 
+    /**
+     * stream assign operation.
+     * @param[in] rhs - another stream object.
+     */
+    void Assign(const LLBC_Stream &rhs);
+
+    /**
+     * Buffer assign operation.
+     * @param[in] buf  - buffer.
+     * @param[in] size - buffer size.
+     */
+    void Assign(void *buf, size_t size);
+
+    /**
+     * Swap two stream objects.
+     * @param[in/out] another - another stream.
+     */
+    void Swap(LLBC_Stream &another);
+
+public:
     /**
      * Get endian type.
      * @return int - endian type.
@@ -200,110 +216,389 @@ public:
     void SetEndian(int endian);
 
     /**
-     * Swap two stream objects.
-     * @param[in/out] another - another stream.
+     * Get stream READ position.
+     * @return size_t - READ position.
      */
-    void Swap(LLBC_Stream &another);
+    size_t GetReadPos() const;
 
     /**
-     * Get current buffer R/W position.
-     * @return uint32 - current R/W position.
+     * Get stream WRITE position.
+     * @return size_t - WRITE position.
      */
-    size_t GetPos() const;
+    size_t GetWritePos() const;
 
     /**
-     * Set current buffer R/W position.
-     * @param[in] pos - new position, must less equal than buffer size.
+     * Set stream READ position.
+     * @param[in] readPos - new READ position, must be <= WRITE pos.
+     * @return bool - return true if success, otherwise return false.
      */
-    void SetPos(size_t pos);
+    bool SetReadPos(size_t readPos);
 
     /**
-     * Skip the buffer R/W position.
-     * @param[in] size - will skip's size, in bytes.
-     * @return bool    - return true if skip operation successed, otherwise return false.
+     * Set stream WRITE position.
+     * @param[in] writePos - new WRITE position, must be <= stream capacity.
+     * @return bool - return true if success, otherwise return false.
      */
-    bool Skip(long size);
+    bool SetWritePos(size_t writePos);
 
     /**
-     * Fill stream buffer, use '\0' to fill.
-     * @param[in] size - the will fill buffer size, in bytes.
+     * Skip the buffer READ position.
+     * @param[in] skipSize - will skip's size, in bytes.
+     * @return bool - return true if success, otherwise return false.
      */
-    void Fill(size_t size);
+    bool SkipRead(sint64 skipSize);
 
     /**
-     * Get current stream buffer size.
-     * @return size_t - the stream buffer size, in bytes.
+     * Skip the buffer WRITE position.
+     * @param[in] skipSize - will skip's size, in bytes.
+     * @return bool - return true if success, otherwise return false.
      */
-    size_t GetSize() const;
+    bool SkipWrite(sint64 skipSize);
 
     /**
-     * @brief Get available buffer size.
-     * 
-     * @return size_t - available size.
+     * Get stream capacity.
+     * @return size_t - the stream buffer capacity, in bytes.
      */
-    size_t GetAvailableSize() const;
+    size_t GetCap() const;
 
     /**
-     * Get current buffer pointer.
-     * @return void * - current buffer pointer.
+     * Get readable size.
+     * @return size_t - the readable size, in bytes.
      */
-    void *GetBuf() const;
+    size_t GetReadableSize() const;
 
     /**
-     * Get buffer pointer start with position.
-     * @return void * - buffer pointer.
+     * Get writable size.
+     * @return size_t - the writable size, in bytes.
      */
-    void *GetBufStartWithPos() const;
+    size_t GetWritableSize() const;
 
+    /**
+     * Get current buffer(mutable).
+     * @return T * - current buffer pointer.
+     */
+    template <typename T = void>
+    T *GetBuf();
+    /**
+     * Get current buffer(const).
+     * @return const T * - current buffer pointer.
+     */
+    template <typename T = void>
+    const T *GetBuf() const;
+
+    /**
+     * Get buffer start with READ position(mutable).
+     * @return T * - buffer pointer.
+     */
+    template <typename T = void>
+    T *GetBufStartWithReadPos();
+    /**
+     * Get buffer start with READ position(const).
+     * @return const T * - buffer pointer.
+     */
+    template <typename T = void>
+    const T *GetBufStartWithReadPos() const;
+
+    /**
+     * Get buffer start with WRITE position(mutable).
+     * @return const T * - buffer pointer.
+     */
+    template <typename T = void>
+    T *GetBufStartWithWritePos();
+    /**
+     * Get buffer pointer start with WRITE position.
+     * @return const T * - buffer pointer.
+     */
+    template <typename T = void>
+    const T *GetBufStartWithWritePos() const;
+
+public:
     /**
      * Insert buffer to current string.
      * Note: 1. performance warning.
      *       2. Do not try to insert data to attach attribute's stream.
-     * @param[in] pos - stream insert position, if pos > this->pos, will auto adjust to this->pos.
-     * @param[in] buf - will insert buffer.
-     * @param[in] len - buffer length.
+     * @param[in] pos  - stream insert position, if pos > this->pos, will auto adjust to this->pos.
+     * @param[in] buf  - will insert buffer.
+     * @param[in] size - buffer size.
      */
-    void Insert(size_t pos, const void *buf, size_t len);
+    void Insert(size_t pos, const void *buf, size_t size);
+
+    /**
+     * Erase specific range stream buffer.
+     * @param[in] n0 - begin erase pos.
+     * @param[in] n1 - end erase pos, if is npos, will erase [n0, end).
+     */
+    void Erase(size_t n0, size_t n1);
 
     /**
      * Replace stream's buffer.
      * Note: 1. Performance warning.
      *       2. Do not try to replace attach attribute's stream.
-     * @param[in] n0  - stream begin position.
-     * @param[in] n1  - stream end position.
-     * @param[in] buf - buffer.
-     * @param[in] len - buffer length.
+     * @param[in] n0   - stream begin position.
+     * @param[in] n1   - stream end position, if is npos, will replace [n0, end) range stream buffer.
+     * @param[in] buf  - buffer.
+     * @param[in] size - buffer size.
      */
-    void Replace(size_t n0, size_t n1, const void *buf, size_t len);
+    void Replace(size_t n0, size_t n1, const void *buf, size_t size);
 
+public:
     /**
      * Read buffer data from stream.
      * @param[out] buf  - buffer pointer.
      * @param[in]  size - require read size, in bytes.
      * @return bool - return true if successed, otherwise return false.
      */
-    bool ReadBuffer(void *buf, size_t size);
+    bool Read(void *buf, size_t size);
 
     /**
      * Write buffer data to stream.
-     * @param[in] buf - buffer pointer.
-     * @param[in] len - buffer size, in bytes.
+     * @param[in] buf  - buffer pointer.
+     * @param[in] size - buffer size, in bytes.
      */
-    void WriteBuffer(const void *buf, size_t len);
+    void Write(const void *buf, size_t size);
 
 public:
     /**
-     * Read template function, will automatch function to read, if this class
-     * exist DeSerialize method, will call DeSerialize method to read, otherwise
-     * use ReadBuffer(&obj, sizeof(obj)).
-     * @param[out] obj - will deserialize's object.
-     * @return bool - return true if successed, otherwise return false.
+     * Read object from stream.
+     * @return Obj - the object value.
      */
     template <typename T>
-    bool Read(T &obj)
+    T Read();
+
+    /**
+     * Read arithmetic/enumeration type object from stream.
+     * @param[out] obj - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_arithmetic<T>::value ||
+                            std::is_enum<T>::value, bool>::type
+    Read(T &obj);
+
+    /**
+     * Forbid string pointer read operation.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                                std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value,
+                            bool>::type
+    Read(T &obj);
+
+    /**
+     * Read void pointer from stream.
+     * @param[out] voidPtr - the void pointer.
+     * @return bool - return 0 if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                                std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
+                            bool>::type
+    Read(T &voidPtr);
+
+    /**
+     * Read non string pointer from stream.
+     * @param[out] ptr - the non string pointer.
+     * @return bool - return 0 if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                                !std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value &&
+                                !std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
+                            bool>::type
+    Read(T &ptr);
+
+    /**
+     * Read char array from stream.
+     * @param[out] arr - char array.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<std::is_arithmetic<T>::value &&
+                                std::is_same<T, char>::value,
+                            bool>::type
+    Read(T(&arr)[_ArrLen]);
+
+    /**
+     * Read uint8/bool array from stream.
+     * @param[out] arr - uint8/bool array.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<std::is_arithmetic<T>::value &&
+                                (std::is_same<T, uint8>::value ||
+                                 std::is_same<T, bool>::value),
+                            bool>::type
+    Read(T(&arr)[_ArrLen]);
+
+    /**
+     * Read non sint8/uint8/bool arithmetic array or enumeration array from stream.
+     * @param[out] arr - arithmetic/enumeration array.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<(std::is_arithmetic<T>::value &&
+                             (!std::is_same<T, char>::value &&
+                              !std::is_same<T, uint8>::value &&
+                              !std::is_same<T, bool>::value)) ||
+                                std::is_enum<T>::value,
+                            bool>::type
+    Read(T(&arr)[_ArrLen]);
+
+    /**
+     * Read non arithmetic array and non enumeration array from stream.
+     * @param[out] arr - array.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<!std::is_arithmetic<T>::value &&
+                            !std::is_enum<T>::value, bool>::type
+    Read(T(&arr)[_ArrLen]);
+
+    /**
+     * Read std::basic_string template spec type object from stream.
+     * @param[out] str - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                                LLBC_IsTemplSpec<T, LLBC_BasicString>::value,
+                            bool>::type
+    Read(T &str);
+
+    /**
+     * Read std::vector/std::list/std::deque template spec type object from stream.
+     * @param[out] container - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::vector>::value ||
+                                LLBC_IsTemplSpec<T, std::list>::value ||
+                                LLBC_IsTemplSpec<T, std::deque>::value,
+                            bool>::type
+    Read(T &container);
+
+    /**
+     * Read std::queue/std::stack template spec type object from stream.
+     * @param[out] container - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::queue>::value ||
+                                LLBC_IsTemplSpec<T, std::stack>::value,
+                            bool>::type
+    Read(T &container);
+
+    /**
+     * Read std::set/std::unordered_set template spec type object from stream.
+     * @param[out] container - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::set>::value ||
+                                LLBC_IsTemplSpec<T, std::unordered_set>::value,
+                            bool>::type
+    Read(T &container);
+
+    /**
+     * Read std::map/std::unordered_map template spec type object from stream.
+     * @param[out] container - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::map>::value ||
+                                LLBC_IsTemplSpec<T, std::unordered_map>::value,
+                            bool>::type
+    Read(T &container);
+
+private:
+    /**
+     * \brief std::array reader template define.
+     */
+    template <size_t N>
+    struct __LLBC_STLArrayReader
     {
-        return ReadImpl<T>(obj, 0);
-    }
+        template <typename Arr>
+        static bool Read(Arr &arr, LLBC_NS LLBC_Stream &stream)
+        {
+            if (UNLIKELY(!stream.Read(arr[N - 1])))
+                return false;
+    
+            return __LLBC_STLArrayReader<N - 1>::Read(arr, stream);
+        }
+    };
+
+public:
+    /**
+     * Read std::array template spec type object from stream.
+     * @param[out] arr - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, bool>::type
+    Read(T &arr);
+
+private:
+    /**
+     * \brief std::tuple reader template define.
+     */
+    template <size_t N>
+    struct __LLBC_TupleReader
+    {
+        template <typename Tup>
+        static bool Read(Tup &tup, LLBC_NS LLBC_Stream &stream)
+        {
+            if (UNLIKELY(!stream.Read(std::get<N - 1>(tup))))
+                return false;
+
+            return __LLBC_TupleReader<N - 1>::Read(tup, stream);
+        }
+    };
+
+public:
+    /**
+     * Read std::tuple template spec type object from stream.
+     * @param[out] tup - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, bool>::type
+    Read(T &tup);
+
+    /**
+     * Read std::pair template spec type object from stream.
+     * @param[out] p - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::pair>::value, bool>::type
+    Read(T &p);
+
+    /**
+     * Read object from stream.
+     * @param[out] obj - already read object.
+     * @return bool - return true if success, otherwise return false.
+     */
+    template <typename T>
+    typename std::enable_if<!std::is_arithmetic<T>::value &&
+                                !std::is_enum<T>::value &&
+                                !std::is_pointer<T>::value &&
+                                !std::is_array<T>::value &&
+                                !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                                  LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
+                                !LLBC_IsTemplSpec<T, std::vector>::value &&
+                                !LLBC_IsTemplSpec<T, std::list>::value &&
+                                !LLBC_IsTemplSpec<T, std::deque>::value &&
+                                !LLBC_IsTemplSpec<T, std::queue>::value &&
+                                !LLBC_IsTemplSpec<T, std::stack>::value &&
+                                !LLBC_IsTemplSpec<T, std::set>::value &&
+                                !LLBC_IsTemplSpec<T, std::unordered_set>::value &&
+                                !LLBC_IsTemplSpec<T, std::map>::value &&
+                                !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
+                                !LLBC_IsSTLArraySpec<T, std::array>::value &&
+                                !LLBC_IsTemplSpec<T, std::tuple>::value &&
+                                !LLBC_IsTemplSpec<T, std::pair>::value,
+                            bool>::type
+    Read(T &obj);
 
 private:
     /**
@@ -312,10 +607,27 @@ private:
     template <typename T, bool (T::*)(LLBC_Stream &)>
     struct upper_camel_case_deserializable_type;
     template <typename T>
-    bool ReadImpl(T &obj, upper_camel_case_deserializable_type<T, &T::DeSerialize> *)
-    {
-        return obj.DeSerialize(*this);
-    }
+    bool ReadImpl(T &obj, upper_camel_case_deserializable_type<T, &T::DeSerialize> *);
+
+    /**
+     * Try adapt T::Deserialize.
+     */
+    template <typename T>
+    bool ReadImpl(T &obj, upper_camel_case_deserializable_type<T, &T::Deserialize> *);
+
+    /**
+     * Try adapt T::DeSer.
+     */
+    template <typename T, bool (T::*)(LLBC_Stream &)>
+    struct upper_camel_case_short_deserializable_type;
+    template <typename T>
+    bool ReadImpl(T &obj, upper_camel_case_short_deserializable_type<T, &T::DeSer> *);
+
+    /**
+     * Try adapt T::Deser.
+     */
+    template <typename T>
+    bool ReadImpl(T &obj, upper_camel_case_short_deserializable_type<T, &T::Deser> *);
 
     /**
      * Try adapt T::deserialize.
@@ -323,145 +635,238 @@ private:
     template <typename T, bool (T::*)(LLBC_Stream &)>
     struct lower_camel_case_deserializable_type;
     template <typename T>
-    bool ReadImpl(T &obj, lower_camel_case_deserializable_type<T, &T::deserialize> *)
-    {
-        return obj.deserialize(*this);
-    }
+    bool ReadImpl(T &obj, lower_camel_case_deserializable_type<T, &T::deserialize> *);
 
     /**
-     * Try adapt T::ParseFrommArray(protobuf message obj).
+     * Try adapt T::deser.
+     */
+    template <typename T, bool (T::*)(LLBC_Stream &)>
+    struct lower_camel_case_short_deserializable_type;
+    template <typename T>
+    bool ReadImpl(T &obj, lower_camel_case_short_deserializable_type<T, &T::deser> *);
+
+    /**
+     * Try adapt protobuf2 mesage object.
      */
     template <typename T, bool (T::*)() const, int (T::*)() const>
-    class protobuf_type;
+    class protobuf2_type;
     template <typename T>
-    bool ReadImpl(T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
-    {
-        uint32 pbDataSize;
-        if (UNLIKELY(Read(pbDataSize) == false))
-            return false;
-
-        bool ret = obj.ParseFromArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(pbDataSize));
-        if (!ret)
-            return false;
-
-        _pos += pbDataSize;
-        return true;
-    }
+    bool ReadImpl(T &obj, protobuf2_type<T, &T::IsInitialized, &T::ByteSize> *);
 
     /**
-     * Try adapt STL unsorted unary container(std::list/std::vector/std::deque/...).
+     * Try adapt protobuf3 mesage object.
      */
-    template <typename T, 
-              void (T::*)(const typename T::value_type &),
-              void (T::*)(typename T::size_type)>
-    struct stl_unsorted_unary_container;
+    template <typename T, bool (T::*)() const, size_t (T::*)() const>
+    class protobuf3_type;
     template <typename T>
-    bool ReadImpl(T &obj, stl_unsorted_unary_container<T, &T::push_back, &T::resize> *)
-    {
-        uint32 count;
-        if (!Read(count))
-            return false;
-
-        obj.clear();
-        if (count == 0)
-            return true;
-
-        typename T::value_type val;
-        for (uint32 i = 0; i < count; ++i)
-        {
-            if (!Read(val))
-                return false;
-
-            obj.emplace_back(val);
-        }
-
-        return true;
-    }
-
-    /**
-     * Try adapt STL sorted unary container(std::set/std::unordered_set/...).
-     */
-    template <typename T>
-    typename std::enable_if<std::is_same<typename T::key_type,
-                                         typename T::value_type>::value,
-                            bool>::type
-    ReadImpl(T &obj, T *)
-    {
-        uint32 count;
-        if (!Read(count))
-            return false;
-
-        obj.clear();
-        if (count == 0)
-            return true;
-
-        typename T::key_type key;
-        for (uint32 i = 0; i < count; ++i)
-        {
-            if (!Read(key))
-                return false;
-
-            obj.emplace(key);
-        }
-
-        return true;
-    }
-
-    /**
-     * Try adapt STL binary container.
-     */
-    template <typename T>
-    typename std::enable_if<std::is_same<typename T::value_type,
-                                         std::pair<const typename T::key_type, typename T::mapped_type>>::value,
-                            bool>::type
-    ReadImpl(T &obj, T *)
-    {
-        uint32 count;
-        if (!Read(count))
-            return false;
-
-        obj.clear();
-        if (count == 0)
-            return true;
-
-        typename T::key_type key;
-        typename T::mapped_type mapped;
-        for (uint32 i = 0; i < count; ++i)
-        {
-            if (!Read(key) ||
-                !Read(mapped))
-                return false;
-
-            obj.emplace(key, mapped);
-        }
-
-        return true;
-    }
+    bool ReadImpl(T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *);
 
     /**
      * Final Read implement: memcpy obj memory.
      */
     template <typename T>
-    bool ReadImpl(T &obj, ...)
-    {
-        if (_size >= _pos + sizeof(T))
-            return ReadBuffer(&obj, sizeof(T));
-
-        return false;
-    }
+    bool ReadImpl(T &obj, ...);
 
 public:
     /**
-     * Write template function, will automatch functio to write, if
-     * this class exist Serialize method, will call Serialize method
-     * to write, else use WriteBuffer(&obj, sizeof(obj)).
-     * @param[in] obj - will serialize's object(can be set to any type's object).
+     * Write arithmetic type object to stream.
+     * @param[in] obj - the will write object.
      */
     template <typename T>
-    void Write(const T &obj)
+    typename std::enable_if<std::is_arithmetic<T>::value ||
+                                std::is_enum<T>::value,
+                            void>::type
+    Write(const T &obj);
+
+    /**
+     * Write string pointer to stream.
+     * @param[in] str - the string pointer.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                                std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value,
+                            void>::type
+    Write(const T &str);
+
+    /**
+     * Write void pointer to stream.
+     * @param[in] voidPtr - the void pointer.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                                std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
+                            void>::type
+    Write(const T &voidPtr);
+
+    /**
+     * Write non string pointer to stream.
+     * @param[in] ptr - the non string pointer.
+     */
+    template <typename T>
+    typename std::enable_if<std::is_pointer<T>::value &&
+                                !std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value &&
+                                !std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
+                            void>::type
+    Write(const T &ptr);
+
+    /**
+     * Write char array to stream.
+     * @param[in] arr - the char arithmetic array.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<std::is_arithmetic<T>::value &&
+                                std::is_same<T, char>::value,
+                            void>::type
+    Write(const T(&arr)[_ArrLen]);
+
+    /**
+     * Write uint8/bool array to stream.
+     * @param[in] arr - the uint8/bool arithmetic array.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<std::is_arithmetic<T>::value &&
+                                (std::is_same<T, uint8>::value ||
+                                 std::is_same<T, bool>::value),
+                            void>::type
+    Write(const T(&arr)[_ArrLen]);
+
+    /**
+     * Write non-char arithmetic array to stream.
+     * @param[in] arr - the non-char arithmetic array.
+     */
+    template <typename T, size_t _ArrLen>
+    typename std::enable_if<(std::is_arithmetic<T>::value &&
+                             (!std::is_same<T, char>::value &&
+                              !std::is_same<T, uint8>::value &&
+                              !std::is_same<T, bool>::value)) ||
+                                !std::is_arithmetic<T>::value,
+                            void>::type
+    Write(const T(&arr)[_ArrLen]);
+
+    /**
+     * Write std::basic_string template spec type object to stream.
+     * @param[in] str - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                                LLBC_IsTemplSpec<T, LLBC_BasicString>::value,
+                            void>::type
+    Write(const T &str);
+
+    /**
+     * Write std::vector/std::list/std::deque/std::set/std::stack template spec type object to stream.
+     * @param[in] container - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::vector>::value ||
+                                LLBC_IsTemplSpec<T, std::list>::value ||
+                                LLBC_IsTemplSpec<T, std::deque>::value ||
+                                LLBC_IsTemplSpec<T, std::set>::value ||
+                                LLBC_IsTemplSpec<T, std::unordered_set>::value,
+                            void>::type
+    Write(const T &container);
+
+    /**
+     * !!! Forbid std::queue/std::stack template spec type object write !!!.
+     * @param[in] container - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::queue>::value ||
+                                LLBC_IsTemplSpec<T, std::stack>::value,
+                            void>::type
+    Write(const T &container);
+
+    /**
+     * Write std::map/std::unordered_map template spec type object to stream.
+     * @param[in] container - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::map>::value ||
+                                LLBC_IsTemplSpec<T, std::unordered_map>::value,
+                            void>::type
+    Write(const T &container);
+
+private:
+    /**
+     * \brief std::array writer template define.
+     */
+    template <size_t N>
+    struct __LLBC_STLArrayWriter
     {
-        WriteImpl<T>(obj, 0);
-    }
+        template <typename Arr>
+        static void Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
+        {
+            stream.Write(arr[N - 1]);
+            __LLBC_STLArrayWriter<N - 1>::Write(arr, stream);
+        }
+    };
+
+public:
+    /**
+     * Write std::array template spec type object to stream.
+     * @param[in] arr - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, void>::type
+    Write(const T &arr);
+
+private:
+    /**
+     * \brief std::tuple writer template define.
+     */
+    template <size_t N>
+    struct __LLBC_TupleWriter
+    {
+        template <typename Tup>
+        static void Write(const Tup &tup, LLBC_Stream &stream)
+        {
+            stream.Write(std::get<N - 1>(tup));
+            __LLBC_TupleWriter<N - 1>::Write(tup, stream);
+        }
+    };
+
+public:
+    /**
+     * Write std::tuple template spec type object to stream.
+     * @param[in] tup - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, void>::type
+    Write(const T &tup);
+
+    /**
+     * Write std::pair template spec type object to stream.
+     * @param[in] p - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<LLBC_IsTemplSpec<T, std::pair>::value, void>::type
+    Write(const T &p);
+
+    /**
+     * Write object to stream.
+     * @param[in] obj - the will write object.
+     */
+    template <typename T>
+    typename std::enable_if<!std::is_arithmetic<T>::value &&
+                                !std::is_enum<T>::value &&
+                                !std::is_pointer<T>::value &&
+                                !std::is_array<T>::value &&
+                                !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                                  LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
+                                !LLBC_IsTemplSpec<T, std::vector>::value &&
+                                !LLBC_IsTemplSpec<T, std::list>::value &&
+                                !LLBC_IsTemplSpec<T, std::deque>::value &&
+                                !LLBC_IsTemplSpec<T, std::queue>::value &&
+                                !LLBC_IsTemplSpec<T, std::stack>::value &&
+                                !LLBC_IsTemplSpec<T, std::set>::value &&
+                                !LLBC_IsTemplSpec<T, std::unordered_set>::value &&
+                                !LLBC_IsTemplSpec<T, std::map>::value &&
+                                !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
+                                !LLBC_IsTemplSpec<T, std::tuple>::value &&
+                                !LLBC_IsSTLArraySpec<T, std::array>::value &&
+                                !LLBC_IsTemplSpec<T, std::pair>::value,
+                            void>::type
+    Write(const T &obj);
 
 private:
     /**
@@ -470,10 +875,15 @@ private:
     template <typename T, void (T::*)(LLBC_Stream &) const>
     struct upper_camel_case_serializable_type;
     template <typename T>
-    void WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *)
-    {
-        obj.Serialize(*this);
-    }
+    void WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *);
+
+    /**
+     * Try adapt T::Ser.
+     */
+    template <typename T, void (T::*)(LLBC_Stream &) const>
+    struct upper_camel_case_short_serializable_type;
+    template <typename T>
+    void WriteImpl(const T &obj, upper_camel_case_short_serializable_type<T, &T::Ser> *);
 
     /**
      * Try adapt T::serialize.
@@ -481,79 +891,33 @@ private:
     template <typename T, void (T::*)(LLBC_Stream &) const>
     struct lower_camel_case_serializable_type;
     template <typename T>
-    void WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *)
-    {
-        obj.serialize(*this);
-    }
-    /**
-     * Try adapt T::SerializeToArray(protobuf message object).
-     */
-    template <typename T>
-    void WriteImpl(const T &obj, protobuf_type<T, &T::IsInitialized, &T::ByteSize> *)
-    {
-        // Check initialized first.
-        obj.CheckInitialized();
-
-        // Resize Stream.
-        size_t needSize = static_cast<size_t>(obj.ByteSize());
-        if ((_size - _pos) < needSize + sizeof(uint32))
-            Resize(_size + (needSize + sizeof(uint32)));
-
-        Write(static_cast<uint32>(needSize));
-        obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _pos, static_cast<int>(needSize));
-        _pos += needSize;
-    }
+    void WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *);
 
     /**
-     * Try adapt STL unsorted unary container(std::list/std::vector/std::deque/...).
+     * Try adapt T::ser.
      */
+    template <typename T, void (T::*)(LLBC_Stream &) const>
+    struct lower_camel_case_short_serializable_type;
     template <typename T>
-    void WriteImpl(const T &obj, stl_unsorted_unary_container<T, &T::push_back, &T::resize> *)
-    {
-        Write(static_cast<uint32>(obj.size()));
-        for (typename T::const_iterator it = obj.begin(); it != obj.end(); ++it)
-            Write(*it);
-    }
+    void WriteImpl(const T &obj, lower_camel_case_short_serializable_type<T, &T::ser> *);
 
     /**
-     * Try adapt STL sorted unary container(std::set, std::unordered_set/...).
+     * Try adapt protobuf2 message object.
      */
     template <typename T>
-    typename std::enable_if<std::is_same<typename T::key_type,
-                                         typename T::value_type>::value,
-                            void>::type
-    WriteImpl(const T &obj, T *)
-    {
-        Write(static_cast<uint32>(obj.size()));
-        for (typename T::const_iterator it = obj.begin(); it != obj.end(); ++it)
-            Write(*it);
-    }
+    void WriteImpl(const T &obj, protobuf2_type<T, &T::IsInitialized, &T::ByteSize> *);
 
     /**
-     * Try adapt STL binary container(std::map/std::unordered_map/...).
+     * Try adapt protobuf3 message object.
      */
     template <typename T>
-    typename std::enable_if<std::is_same<typename T::value_type,
-                                         std::pair<const typename T::key_type, typename T::mapped_type> >::value,
-                            void>::type
-    WriteImpl(const T &obj, T *)
-    {
-        Write(static_cast<uint32>(obj.size()));
-        for (typename T::const_iterator it = obj.begin(); it != obj.end(); ++it)
-        {
-            Write(it->first);
-            Write(it->second);
-        }
-    }
+    void WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *);
 
     /**
      * Final write implement: memcpy obj memory.
      */
     template <typename T>
-    void WriteImpl(const T &obj, ...)
-    {
-        WriteBuffer(&obj, sizeof(obj));
-    }
+    void WriteImpl(const T &obj, ...);
 
 public:
     /**
@@ -562,43 +926,29 @@ public:
      * @return bool - return true if successed, otherwise return false.
      */
     template <typename T>
-    bool Peek(T &obj)
-    {
-        size_t oldPos = _pos;
-        bool ret = Read(obj);
-        SetPos(oldPos);
-
-        return ret;
-    }
+    bool Peek(T &obj);
 
     /**
      * Stream input overlapped functions define.
      * @param[out] val - value reference.
      */
     template<typename T>
-    LLBC_Stream &operator >>(T &val)
-    {
-        Read(val);
-        return *this;
-    }
+    LLBC_Stream &operator>>(T &val);
 
     /**
      * Stream output overlapped functions define.
      * @param[in] val - const value reference.
      */
     template<typename T>
-    LLBC_Stream &operator <<(const T &val)
-    {
-        Write(val);
-        return *this;
-    }
+    LLBC_Stream &operator<<(const T &val);
 
 public:
     /**
-     * Resize stream object.
-     * @param[in] newSize - new size, must greater than current size.
+     * Recapacity stream.
+     * @param[in] newCap - new capacity, must greater than current capacity.
+     * @return bool - return 0 if success, otherwise return false.
      */
-    void Resize(size_t newSize);
+    bool Recap(size_t newCap);
 
     /**
      * Clear stream.
@@ -607,81 +957,49 @@ public:
 
 public:
     /**
-     * Raw data type read/write support.
-     * Note: All this raw data type read/write API support endian type flag.
+     * Object-Pool reflection support.
      */
-    bool ReadBool(bool &value);
-    bool ReadSInt8(sint8 &value);
-    bool ReadUInt8(uint8 &value);
-    bool ReadSInt16(sint16 &value);
-    bool ReadUInt16(uint16 &value);
-    bool ReadSInt32(sint32 &value);
-    bool ReadUInt32(uint32 &value);
-    bool ReadSInt64(sint64 &value);
-    bool ReadUInt64(uint64 &value);
-    bool ReadLong(long &value);
-    bool ReadULong(ulong &value);
-    bool ReadFloat(float &value);
-    bool ReadDouble(double &value);
-    bool ReadPtr(void *&value);
+    LLBC_TypedObjPool<LLBC_Stream> *GetTypedObjPool() const;
+    void SetTypedObjPool(LLBC_TypedObjPool<LLBC_Stream> *typedObjPool);
 
-    bool ReadBool_2(bool failRet = false);
-    sint8 ReadSInt8_2(sint8 failRet = 0);
-    uint8 ReadUInt8_2(uint8 failRet = 0);
-    sint16 ReadSInt16_2(sint16 failRet = 0);
-    uint16 ReadUInt16_2(uint16 failRet = 0);
-    sint32 ReadSInt32_2(sint32 failRet = 0);
-    uint32 ReadUInt32_2(uint32 failRet = 0);
-    sint64 ReadSInt64_2(sint64 failRet = 0);
-    uint64 ReadUInt64_2(uint64 failRet = 0);
-    long ReadLong_2(long failRet = 0);
-    ulong ReadULong_2(ulong failRet = 0);
-    float ReadFloat_2(float failRet = 0.0f);
-    double ReadDouble_2(double failRet = 0.0);
-    void *ReadPtr_2(void *failRet = nullptr);
-
-    void WriteBool(bool value);
-    void WriteSInt8(sint8 value);
-    void WriteUInt8(uint8 value);
-    void WriteSint16(sint16 value);
-    void WriteUInt16(uint16 value);
-    void WriteSInt32(sint32 value);
-    void WriteUInt32(uint32 value);
-    void WriteSInt64(sint64 value);
-    void WriteUInt64(uint64 value);
-    void WriteLong(long value);
-    void WriteULong(ulong value);
-    void WriteFloat(float value);
-    void WriteDouble(double value);
-    void WritePtr(const void *value);
+    /**
+     * Get stream string representation.
+     * @return LLBC_String - the stream string representation.
+     */
+    LLBC_String ToString() const;
 
 public:
-    LLBC_Stream &operator =(const LLBC_Stream &rhs);
+    /**
+     * Copy assignment.
+     */
+    LLBC_Stream &operator=(const LLBC_Stream &rhs);
+
+    /**
+     * Move assignment.
+     */
+    LLBC_Stream &operator=(LLBC_Stream &&rhs);
 
 private:
-    void AutoResize(size_t needSize);
-
-    template <typename T>
-    bool ReadRawType(T &value);
-    
-    template <typename T>
-    void WriteRawType(const T &value);
-
-    bool OverlappedCheck(const void *another, size_t len);
+    bool ReserveWritableSize(size_t writableSize);
 
 private:
-    void *_buf;
-    size_t _pos;
-    size_t _size;
+    sint8 *_buf;
+    size_t _readPos;
+    size_t _writePos;
+    size_t _cap;
 
     int _endian;
-
     bool _attach;
+
+    LLBC_TypedObjPool<LLBC_Stream> *_typedObjPool;
 };
 
 __LLBC_NS_END
 
-#include "llbc/common/StreamImpl.h"
-#include "llbc/common/StreamSpecImpl.h"
+/**
+ * Stream output operator support. 
+ */
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Stream &stream);
 
-#endif // !__LLBC_COM_STREAM_H__
+#include "llbc/common/StreamInl.h"
+

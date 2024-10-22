@@ -20,10 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Bundle.h"
-#include "llbc/core/utils/Util_Text.h"
+#include "llbc/core/file/Directory.h"
 
 #include "llbc/core/bundle/Bundle.h"
 
@@ -37,9 +36,6 @@ __LLBC_NS_BEGIN
 
 LLBC_Bundle::LLBC_Bundle()
 : _bundle(LLBC_INVALID_BUNDLE_HANDLE)
-
-, _bundleName()
-, _bundlePath()
 {
 }
 
@@ -56,7 +52,7 @@ int LLBC_Bundle::CreateMainBundle()
         return LLBC_FAILED;
     }
     
-    LLBC_INTERNAL_NS __g_mainBundle = LLBC_New(LLBC_Bundle);
+    LLBC_INTERNAL_NS __g_mainBundle = new LLBC_Bundle;
     return (LLBC_INTERNAL_NS __g_mainBundle)->Initialize("");
 }
 
@@ -82,7 +78,7 @@ int LLBC_Bundle::Initialize(const LLBC_String &path)
         return LLBC_FAILED;
 
     _bundlePath = LLBC_GetBundlePath(_bundle);
-    _bundleName = LLBC_BaseName(_bundlePath, true);
+    _bundleName = LLBC_Directory::BaseName(_bundlePath);
 
     return LLBC_OK;
 }
@@ -148,5 +144,3 @@ LLBC_String LLBC_Bundle::GetResPath(const LLBC_String &name, const LLBC_String &
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

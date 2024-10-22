@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"
@@ -29,7 +28,7 @@
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/EpollPoller.h"
 #include "llbc/comm/PollerMonitor.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
 
@@ -53,7 +52,7 @@ LLBC_EpollPoller::~LLBC_EpollPoller()
 
 int LLBC_EpollPoller::Start()
 {
-    if (_started)
+    if (GetTaskState() != LLBC_TaskState::NotActivated)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
@@ -80,19 +79,23 @@ int LLBC_EpollPoller::Start()
         return LLBC_FAILED;
     }
 
-    _started = true;
     return LLBC_OK;
+}
+
+void LLBC_EpollPoller::Stop()
+{
+    if (!IsActivated() || _stopping)
+        return;
+
+    StopMonitor();
+
+    LLBC_BasePoller::Stop();
 }
 
 void LLBC_EpollPoller::Svc()
 {
-    while (!_started)
-        LLBC_Sleep(20);
-
     while (!_stopping)
-    {
         HandleQueuedEvents(20);
-    }
 }
 
 void LLBC_EpollPoller::Cleanup()
@@ -112,7 +115,7 @@ void LLBC_EpollPoller::HandleEv_AddSock(LLBC_PollerEvent &ev)
 
 void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 {
-    LLBC_Socket *sock = LLBC_New(LLBC_Socket);
+    LLBC_Socket *sock = new LLBC_Socket;
     const LLBC_SocketHandle handle = sock->Handle();
 
     sock->SetNonBlocking();
@@ -148,7 +151,7 @@ void LLBC_EpollPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
         const LLBC_String &reason = LLBC_FormatLastError();
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(ev.sessionId, false, reason, ev.peerAddr));
 
-        LLBC_Delete(sock);
+        delete sock;
         LLBC_XDelete(ev.sessionOpts);
     }
 }
@@ -200,11 +203,11 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             LLBC_SessionCloseInfo *closeInfo;
             if (sock->GetPendingError(sockErr) != LLBC_OK)
             {
-                closeInfo = LLBC_New(LLBC_SessionCloseInfo);
+                closeInfo = new LLBC_SessionCloseInfo;
             }
             else
             {
-                closeInfo = LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
+                closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, sockErr);
             }
 
             session->OnClose(closeInfo);
@@ -226,7 +229,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             if (epev.events & EPOLLOUT)
             {
                 // Maybe in session removed while calling OnRecv() method.
-                if ((epev.events & EPOLLIN) && 
+                if ((epev.events & EPOLLIN) &&
                         UNLIKELY(_sessions.find(sessionId) == _sessions.end()))
                     continue;
 
@@ -235,7 +238,7 @@ void LLBC_EpollPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
        }
     }
 
-    LLBC_Free(ev.un.monitorEv);
+    free(ev.un.monitorEv);
 }
 
 void LLBC_EpollPoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
@@ -291,7 +294,7 @@ void LLBC_EpollPoller::RemoveSession(LLBC_Session *session)
 int LLBC_EpollPoller::StartupMonitor()
 {
     const LLBC_Delegate<void()> deleg(this, &LLBC_EpollPoller::MonitorSvc);
-    _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
+    _monitor = new LLBC_PollerMonitor(deleg);
     if (_monitor->Start() != LLBC_OK)
     {
         LLBC_XDelete(_monitor);
@@ -380,5 +383,3 @@ void LLBC_EpollPoller::Accept(LLBC_Session *session)
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-
-#include "llbc/common/AfterIncl.h"

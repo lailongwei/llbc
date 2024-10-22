@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_TOKEN_CHAIN_H__
-#define __LLBC_CORE_LOG_LOG_TOKEN_CHAIN_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -30,7 +29,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 struct LLBC_LogData;
-class LLBC_ILogToken;
+class LLBC_BaseLogToken;
 
 __LLBC_NS_END
 
@@ -70,12 +69,10 @@ private:
      * Append log token.
      * @param[in] token - the log token.
      */
-    void AppendToken(LLBC_ILogToken *token);
+    void AppendToken(LLBC_BaseLogToken *token);
 
 private:
-    LLBC_ILogToken *_head;
+    LLBC_BaseLogToken *_head;
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_LOG_LOG_TOKEN_CHAIN_H__

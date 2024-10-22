@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_FILE_FILE_H__
-#define __LLBC_CORE_FILE_FILE_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -74,9 +73,13 @@ class LLBC_EXPORT LLBC_FileBufferMode
 public:
     enum
     {
-        NoBuf = _IONBF,   // No buffer is used, all file read/write operation will direct synchronous to store device.
-        LineBuf = _IOLBF, // For some systems, this provides line buffering. However, for Win32, the behavior is the same as NoBuf - Full Buffering.
-        FullBuf = _IOFBF, // Full buffering; that is, buffer is used as the buffer and size is used as the size of the buffer. If buffer is nullptr, an automatically allocated buffer size bytes long is used.
+        NoBuf = _IONBF,   // No buffer is used, all file read/write operation
+                          // will direct synchronous to store device.
+        LineBuf = _IOLBF, // For some systems, this provides line buffering. However,
+                          // for Win32, the behavior is the same as NoBuf - Full Buffering.
+        FullBuf = _IOFBF, // Full buffering; that is, buffer is used as the buffer and
+                          // size is used as the size of the buffer. If buffer is nullptr,
+                          // an automatically allocated buffer size bytes long is used.
     };
 };
 
@@ -102,12 +105,11 @@ class LLBC_FileNewLineFormat
 public:
     enum
     {
-        LineFeed,                 // LF, character is: \n, Linux/Unix OS used.
-        CarriageReturn,           // CR, character is: \r, Mac OS used.
-        CarriageReturn_LineFeed,  // CRLF, characters are: \r\n, Windows OS used.
+        LineFeed,                // LF, character is: \n, Linux/Unix OS used.
+        CarriageReturn_LineFeed, // CRLF, characters are: \r\n, Windows OS used.
 
-        UnixStyle = LineFeed,     // Alias for LineFeed enumeration.
-        MacStyle = CarriageReturn,// Alias for CarriageReturn.
+        UnixStyle = LineFeed,    // Alias for LineFeed enumeration.
+        MacStyle = LineFeed,     // Alias for CarriageReturn.
         WindowsStyle = CarriageReturn_LineFeed, // Alias for CarriageReturn-LineFeed.
 
         AutoMatch, // Auto match, it means if you use llbc library in Windows, will use CRLF, and so on...
@@ -229,9 +231,9 @@ public:
 public:
     /**
      * Get file size.
-     * @return long - the file size, if failed, return -1.
+     * @return sint64 - the file size, if failed, return -1.
      */
-    long GetFileSize() const;
+    sint64 GetFileSize() const;
 
     /**
      * Move the file pointer to a specified location.
@@ -239,33 +241,33 @@ public:
      * @param[in] offset     - number of bytes from origin.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Seek(int seekOrigin, long offset);
+    int Seek(int seekOrigin, sint64 offset);
 
     /**
      * Get file position.
-     * @return long - the file position, if failed, return -1.
+     * @return sint64 - the file position, if failed, return -1.
      */
-    long GetFilePosition() const;
+    sint64 GetFilePosition() const;
 
     /**
      * Set file position.
      * @param[in] position - the new file position.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetFilePosition(long position);
+    int SetFilePosition(sint64 position);
 
     /**
      * Offset file position.
      * @param[in] offset - the file offset.
-     * @return long - the new file position.
+     * @return sint64 - the new file position.
      */
-    long OffsetFilePosition(long offset);
+    sint64 OffsetFilePosition(sint64 offset);
 
     /**
      * Get file readable size.
-     * @return long - the file readable size.
+     * @return sint64 - the file readable size.
      */
-    long GetReadableSize() const;
+    sint64 GetReadableSize() const;
 
 public:
     /**
@@ -288,9 +290,17 @@ public:
     
     /**
      * Read oneline data to LLBC_String object.
-     * @return LLBC_String - the line data, if failed, LLBC_GetLastError() return value is non-zero.
+     * @return LLBC_String - the line data, if failed, LLBC_GetLastError() return value is non LLBC_ERROR_SUCCESS,
+     *                       otherwise, LLBC_GetLastError() return LLBC_ERROR_SUCCESS.
      */
     LLBC_String ReadLine();
+
+    /**
+     * Read lines from the file.
+     * @return LLBC_Strings - line list, if failed, LLBC_GetLastError() return value is non LLBC_ERROR_SUCCESS,
+     *                        otherwise, LLBC_GetLastError() return LLBC_ERROR_SUCCESS.
+     */
+    LLBC_Strings ReadLines();
 
     /**
      * Read data to end.
@@ -305,11 +315,11 @@ public:
      * File bytes read method.
      * @param[in] buf  - storage location for data.
      * @param[in] size - buffer size in bytes.
-     * @return long - actually read size, if -1, read failed, else if 0 < actuallyRead < size, 
-     *                it means truncated(LLBC_GetLastError() will return LLBC_ERROR_TRUNCATED),
-     *                otherwise success.
+     * @return sint64 - actually read size, if -1, read failed, else if 0 < actuallyRead < size, 
+     *                  it means truncated(LLBC_GetLastError() will return LLBC_ERROR_TRUNCATED),
+     *                  otherwise success.
      */
-    long Read(void *buf, size_t size);
+    sint64 Read(void *buf, size_t size);
 
 public:
     /**
@@ -332,28 +342,37 @@ public:
     int Write(const float &floatVal);
     int Write(const double &doubleVal);
     int Write(const ldouble &ldoubleVal);
-    int Write(const LLBC_String &str);
-    int Write(const LLBC_WString &wstr);
-    int Write(const std::string &str);
-    int Write(const std::wstring &wstr);
+    int Write(const char *cstr);
+    template <typename StrType>
+    typename std::enable_if<LLBC_IsTemplSpec<StrType, std::basic_string>::value ||
+                            LLBC_IsTemplSpec<StrType, LLBC_BasicString>::value ||
+                            LLBC_IsTemplSpec<StrType, LLBC_BasicCString>::value, int>::type
+    Write(const StrType &str);
 
     /**
      * Write line data.
      * @param[in] line          - the line content.
      * @param[in] newLineFormat - the new line format, default is AutoMatch. 
-     * @return int - actually written size, in bytes, if write failed, return -1,
-     *               else if 0 < actuallyWrote < size, it means truncated, otherwise success.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    long WriteLine(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
+    int WriteLine(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
+
+    /**
+     * Write lines to file.
+     * @param[in] lines         - the lines.
+     * @param[in] newLineFormat - the new line format, default is auto match.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int WriteLines(const LLBC_Strings &lines, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
 
     /**
      * File bytes write method.
      * @param[in] buf  - pointer to data to be written.
      * @param[in] size - buffer size in bytes.
-     * @return int - actually written size, in bytes, if write failed, return -1,
-     *               else if 0 < actuallyWrote < size, it means truncated, otherwise success.
+     * @return sint64 - actually written size, in bytes, if write failed, return -1,
+     *                  else if 0 < actuallyWrote < size, it means truncated, otherwise success.
      */
-    long Write(const void *buf, size_t size);
+    sint64 Write(const void *buf, size_t size);
 
     /**
      * Flush file.
@@ -390,8 +409,8 @@ public:
      * @param[in] lastModifyTime       - the last modify time, if nullptr, will update to now.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int TouchFile(const LLBC_String &filePath, 
-                         bool updateLastAccessTime = true, 
+    static int TouchFile(const LLBC_String &filePath,
+                         bool updateLastAccessTime = true,
                          const timespec *lastAccessTime = nullptr,
                          bool updateLastModifyTime = true,
                          const timespec *lastModifyTime = nullptr);
@@ -401,7 +420,8 @@ public:
      * Copy file.
      * @param[in] srcFilePath  - the source file path.
      * @param[in] destFilePath - the destination file path.
-     * @param[in] overlapped   - if the new file already exists, the function overrides the existing file and succeeds, otherwise failed.
+     * @param[in] overlapped   - if the new file already exists, the function overrides
+     *                           the existing file and succeeds, otherwise failed.
      *                           default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
@@ -446,12 +466,11 @@ private:
 private:
     int _mode;
     LLBC_String _path;
-
     LLBC_FileHandle _handle;
 };
 
 __LLBC_NS_END
 
-#include "llbc/core/file/FileImpl.h"
+#include "llbc/core/file/FileInl.h"
 
-#endif // !__LLBC_CORE_FILE_FILE_H__
+

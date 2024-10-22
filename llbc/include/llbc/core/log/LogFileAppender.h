@@ -19,11 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_FILE_APPENDER_H__
-#define __LLBC_CORE_LOG_LOG_FILE_APPENDER_H__
+#pragma once
 
-#include "llbc/common/Common.h"
-
+#include "llbc/core/file/File.h"
 #include "llbc/core/log/BaseLogAppender.h"
 
 __LLBC_NS_BEGIN
@@ -40,20 +38,20 @@ __LLBC_NS_BEGIN
 /**
  * \brief File log appender class encapsulation.
  */
-class LLBC_LogFileAppender : public LLBC_BaseLogAppender
+class LLBC_HIDDEN LLBC_LogFileAppender : public LLBC_BaseLogAppender
 {
     typedef LLBC_BaseLogAppender _Base;
 
 public:
     LLBC_LogFileAppender();
-    virtual ~LLBC_LogFileAppender();
+    ~LLBC_LogFileAppender() override;
 
 public:
     /**
      * Get log appender type, see LLBC_LogAppenderType.
      * @return int - log appender type.
      */
-    virtual int GetType() const;
+    int GetType() const override;
 
 public:
     /**
@@ -61,49 +59,49 @@ public:
      * @param[in] initInfo - log appender initialize info structure.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(const LLBC_LogAppenderInitInfo &initInfo);
+    int Initialize(const LLBC_LogAppenderInitInfo &initInfo) override;
 
     /**
      * Finalize the appender.
      */
-    virtual void Finalize();
+    void Finalize() override;
 
     /**
      * Output log data.
      * @param[in] data - log data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Output(const LLBC_LogData &data);
+    int Output(const LLBC_LogData &data) override;
 
 protected:
     /**
      * Flush method.
      */
-    virtual void Flush();
+    void Flush() override;
 
 private:
     /**
      * Check and update log file.
-     * @param[in] now 
+     * @param[in] now - now time, in micro-seconds.
      */
     void CheckAndUpdateLogFile(sint64 now);
 
     /**
-     * Build log file name.
-     * @now                - now time.
-     * @return LLBC_String - the log file name.
+     * Build log file path.
+     * @now                - now time, in micro-seconds.
+     * @return LLBC_String - the log file path.
      */
-    LLBC_String BuildLogFileName(sint64 now) const;
+    LLBC_String BuildLogFilePath(sint64 now) const;
 
     /**
      * Check is need reopen file or not.
-     * @param[in] now     - now time.
-     * @param[out] clear  - the clear flag, if true, means when reopen file, must clear file content.
-     * @param[out] backup - the backup flag, if true, means must backup log files.
-     *                      about backup, see BackupFiles() method.
+     * @param[in] newFilePath - the new file path.
+     * @param[out] backup     - the backup flag, if true, means must backup log files.
+     *                          about backup, see BackupFiles() method.
+     * @param[out] clear      - the clear flag, if true, means when reopen file, must clear file content.
      * @return bool - need reopen if true, otherwise return false.
      */
-    bool IsNeedReOpenFile(sint64 now, const LLBC_String &newFileName, bool &clear, bool &backup) const;
+    bool IsNeedReOpenFile(const LLBC_String &newFilePath, bool &backup, bool &clear) const;
 
     /**
      * ReOpen the log file.
@@ -116,7 +114,7 @@ private:
     /**
      * Backup all log files.
      */
-    void BackupFiles() const;
+    void BackupFiles();
 
     /**
      * Update log file buffer info(included buffer mode and buffer size).
@@ -129,25 +127,22 @@ private:
     int GetBackupFilesCount(const LLBC_String &logFileName) const;
 
 private:
-    LLBC_String _filePath;
+    LLBC_String _fileDir;
+    LLBC_String _fileBasePath;
     LLBC_String _fileSuffix;
 
     int _fileBufferSize;
-    bool _isDailyRolling;
+    int _fileRollingMode;
 
-    long _maxFileSize;
+    sint64 _maxFileSize;
     int _maxBackupIndex;
 
 private:
-    LLBC_String _fileName;
+    LLBC_File _file;
+    sint64 _fileSize;
 
-    LLBC_File *_file;
-    long _fileSize;
-
-    sint64 _nonFlushLogCount;
-    sint64 _logfileLastCheckTime;
+    sint64 _notFlushLogCount;
+    sint64 _logFileLastCheckTime;
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_LOG_LOG_FILE_APPENDER_H__

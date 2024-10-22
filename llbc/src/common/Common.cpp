@@ -19,8 +19,12 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+ #include <sys/syscall.h>
+#endif // Linux or Android
 
 #include "llbc/common/Common.h"
 
@@ -38,7 +42,8 @@ int __LLBC_CommonStartup()
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     tls->coreTls.llbcThread = true;
     tls->coreTls.entryThread = true;
-    tls->coreTls.threadHandle = LLBC_INVALID_HANDLE;
+    tls->coreTls.threadHandle = LLBC_CFG_THREAD_ENTRY_THREAD_HANDLE;
+    tls->coreTls.threadGroupHandle = LLBC_CFG_THREAD_ENTRY_THREAD_GROUP_HANDLE;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     tls->coreTls.threadId = ::GetCurrentThreadId();
@@ -61,14 +66,17 @@ int __LLBC_CommonStartup()
                       DUPLICATE_SAME_ACCESS);
 #endif // LLBC_TARGET_PLATFRM_NON_WIN32
 
-    // Set endian type constant.
-    LLBC_MachineEndian = LLBC_GetMachineEndianType();
+    // Set entry-thread lib tls variable.
+    __LLBC_EntryThreadLibTls = tls;
 
     return LLBC_OK;
 }
 
 void __LLBC_CommonCleanup()
 {
+    // Reset holded entry-thread lib tls variable.
+    __LLBC_EntryThreadLibTls = nullptr;
+
     // Reset entry thread tls info.
 #if LLBC_TARGET_PLATFORM_WIN32
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
@@ -85,5 +93,3 @@ void __LLBC_CommonCleanup()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

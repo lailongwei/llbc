@@ -19,83 +19,79 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
-#include "llbc/core/objectpool/IObjectPoolInst.h"
+#include "llbc/common/Export.h"
+
+#include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/log/LogData.h"
 
 __LLBC_NS_BEGIN
+// Note: Some data members don't need init.
 LLBC_LogData::LLBC_LogData()
-: logger(nullptr)
-, loggerName(nullptr)
+// : logger(nullptr)
 
-, msg(nullptr)
+: msg(nullptr)
 , msgLen(0)
 , msgCap(0)
 
-, level(-1)
-, logTime(0)
+// , level(-1)
+// , logTime(0)
 
-, others(nullptr)
-, othersCap(0)
-, fileBeg(0)
 , fileLen(0)
-, tagBeg(0)
+, funcLen(0)
 , tagLen(0)
 
-, line(0)
+// , line(0)
 
-, threadId(LLBC_INVALID_NATIVE_THREAD_ID)
+// , threadId(LLBC_INVALID_NATIVE_THREAD_ID)
 
-, _poolInst(nullptr)
+, _typedObjPool(nullptr)
 {
 }
 
 LLBC_LogData::~LLBC_LogData()
 {
     if (msg)
-        LLBC_Free(msg);
-    if (others)
-        LLBC_Free(others);
+        free(msg);
 }
 
-void LLBC_LogData::Clear()
+void LLBC_LogData::Reuse()
 {
-    logger = nullptr;
-    loggerName = nullptr;
+    // Notes:
+    // - Some data members don't need reset.
+    // - Free msg buf, if cap too large.
+
+    // logger = nullptr;
 
     msgLen = 0;
+    if (msgCap >= MAX(1024, (LLBC_CFG_LOG_FORMAT_BUF_SIZE * 7 / 8)))
+    {
+        free(msg);
+        msg = nullptr;
+        msgCap = 0;
+    }
 
-    level = -1;
-    logTime = 0;
+    // level = -1;
+    // logTime = 0;
 
-    tagBeg = 0;
-    tagLen = 0; 
-
-    fileBeg = 0;
     fileLen = 0;
-    tagBeg = 0;
-    tagLen = 0;
-    funcBeg = 0;
     funcLen = 0;
+    tagLen = 0;
 
-    line = 0;
+    // line = 0;
 
-    threadId = LLBC_INVALID_NATIVE_THREAD_ID;
+    // threadId = LLBC_INVALID_NATIVE_THREAD_ID;
 }
 
-void LLBC_LogData::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
+LLBC_TypedObjPool<LLBC_LogData> *LLBC_LogData::GetTypedObjPool() const
 {
-    _poolInst = &poolInst;
+    return _typedObjPool;
 }
 
-LLBC_IObjectPoolInst *LLBC_LogData::GetPoolInst()
+void LLBC_LogData::SetTypedObjPool(LLBC_TypedObjPool<LLBC_LogData> *typedObjPool)
 {
-    return _poolInst;
+    _typedObjPool = typedObjPool;
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -24,40 +24,40 @@
 
 namespace
 {
-    class TestComp : public LLBC_IComponent
+    class TestComp : public LLBC_Component
     {
     public:
         TestComp()
-        : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
+        : LLBC_Component()
         {
         }
 
-        virtual bool OnStart()
+        virtual bool OnStart(bool &startFinished)
         {
             _updateTimes = 0;
             _beginUpdateTime = 0;
-            LLBC_PrintLine("Service %s start", GetService()->GetName().c_str());
+            LLBC_PrintLn("Service %s start", GetService()->GetName().c_str());
 
             return true;
         }
 
-        virtual void OnStop()
+        virtual void OnStop(bool &stopFinished)
         {
-            LLBC_PrintLine("Service %s stop", GetService()->GetName().c_str());
+            LLBC_PrintLn("Service %s stop", GetService()->GetName().c_str());
         }
 
         virtual void OnUpdate()
         {
             if (_updateTimes == 0)
-                _beginUpdateTime = LLBC_GetMilliSeconds();
+                _beginUpdateTime = LLBC_GetMilliseconds();
 
             ++_updateTimes;
             if (_updateTimes % 1000000 == 0)
             {
-                double elapsed = static_cast<double>(LLBC_GetMilliSeconds() - _beginUpdateTime);
+                double elapsed = static_cast<double>(LLBC_GetMilliseconds() - _beginUpdateTime);
                 double updateSpeed = _updateTimes / elapsed;
 
-                LLBC_PrintLine("Elapsed time: %f, updateSpeed(per ms): %.3f", elapsed, updateSpeed);
+                LLBC_PrintLn("Elapsed time: %f, updateSpeed(per ms): %.3f", elapsed, updateSpeed);
             }
         }
 
@@ -77,18 +77,18 @@ TestCase_Comm_SvcFps::~TestCase_Comm_SvcFps()
 
 int TestCase_Comm_SvcFps::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Service FPS test:");
+    LLBC_PrintLn("Service FPS test:");
 
-    LLBC_IService *fpsTestSvc = LLBC_IService::Create(LLBC_IService::Normal, "FPSTestService");
-    fpsTestSvc->RegisterComponent(LLBC_New(TestComp));
+    LLBC_Service *fpsTestSvc = LLBC_Service::Create("FPSTestService");
+    fpsTestSvc->AddComponent(new TestComp);
     fpsTestSvc->SetFPS(LLBC_INFINITE);
 
     fpsTestSvc->Start();
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(fpsTestSvc);
+    delete fpsTestSvc;
 
     return LLBC_OK;
 }

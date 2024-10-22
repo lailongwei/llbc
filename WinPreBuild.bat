@@ -13,6 +13,7 @@ echo    vs2013
 echo    vs2015
 echo    vs2017
 echo    vs2019
+echo    vs2022
 set /p choose=Please input:
 
 cd tools\premake && premake5_windows.exe %choose%
@@ -24,7 +25,7 @@ if errorlevel 1 (
 ) else (
     echo Succcess to generate Visual Studio solution and project files
     echo Solution file path: build/%choose%/llbc_%choose%.sln
-   if "%1"=="" (
+    if "%1"=="" (
         explorer ..\..\build\%choose%
     )
     if "%1"=="1" (

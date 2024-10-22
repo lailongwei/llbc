@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COMM_PY_COMPONENT_H__
-#define __PYLLBC_COMM_PY_COMPONENT_H__
+#pragma once
 
 #include "pyllbc/common/Common.h"
 #include "pyllbc/core/Core.h"
@@ -30,14 +29,15 @@ class pyllbc_Service;
 /**
  * \brief The pyllbc comp class encapsulation.
  */
-class LLBC_HIDDEN pyllbc_Component : public LLBC_IComponent
+class LLBC_HIDDEN pyllbc_Component : public LLBC_Component
 {
 public:
     /**
      * Constructor.
-     * @param[in] svc - adapted to python c++ wrapped service.
+     * @param[in] svc    - adapted to python c++ wrapped service.
+     * @param[in] pyComp - adapted to python component.
      */
-    pyllbc_Component(pyllbc_Service *svc);
+    pyllbc_Component(pyllbc_Service *svc, PyObject *pyComp);
 
     /**
      * Destructor.
@@ -46,24 +46,30 @@ public:
 
 public:
     /**
+     * Get python comp.
+     * @return PyObject * - python component.
+     */
+    const PyObject *GetPyComp() const { return _pyComp; }
+public:
+    /**
      * When service start and not not init comp before, will call then event handler function.
      */
-    virtual bool OnInitialize();
+    virtual bool OnInit(bool &initFinished);
 
     /**
      * When service destroy, will call this event handler function.
      */
-    virtual void OnDestroy();
+    virtual void OnDestroy(bool &destroyFinished);
 
     /**
      * When service start, will call this event handler function.
      */
-    virtual bool OnStart();
+    virtual bool OnStart(bool &startFinished);
 
     /**
      * When service stop, will call this event handler function.
      */
-    virtual void OnStop();
+    virtual void OnStop(bool &stopFinished);
 
 public:
     /**
@@ -73,140 +79,86 @@ public:
 
     /**
      * Idle event handler.
-     * @param[in] idleTime - idle time, in milliseconds.
+     * @param[in] idleTime - idle time.
      */
-    virtual void OnIdle(int idleTime);
+    virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
-public:
+    /**
+     * Process components' events.
+     * @param[in] evIndex
+     * @param[in] evArgs
+     */
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
+
+private:
     /**
      * When new session create, will call this event handler.
      * @param[in] sessionInfo - the session info.
      */
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
 
     /**
      * When session destroy, will call this event handler.
      * @param[in] destroyInfo - the session destroy information.
      */
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
 
     /**
      * When asynchronous connect result, will call this event handler.
      * @param[in] result - the async-conn result info.
      */
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
+    void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
 
     /**
      * When protocol stack reported, will call this event handler.
      * @param[in] report - the protocol report info.
      */
-    virtual void OnProtoReport(const LLBC_ProtoReport &report);
+    void OnProtoReport(const LLBC_ProtoReport &report);
 
     /**
      * When service receive a unhandled packet, will call this event handler.
      * @param[in] opcode - the opcode.
      */
-    virtual void OnUnHandledPacket(const LLBC_Packet &packet);
-
-public:
-    /**
-     * data receive handler.
-     * @param[in] packet - packet.
-     */
-    virtual void OnDataReceived(LLBC_Packet &packet);
-
-    /**
-     * The data pre-receive handler.
-     * @param[in] packet - packet.
-     * @return bool - the return value, if return false, will remove this session.
-     */
-    virtual bool OnDataPreReceived(LLBC_Packet &packet);
-
-#if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-    /**
-     * The data unify pre-receive handler.
-     * @param[in] packet - packet.
-     * @return bool - the return value, if return zero, will remove this session.
-     */
-    virtual bool OnDataUnifyPreReceived(LLBC_Packet &packet);
-#endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
-
-    /**
-     * Build python layer packet object according to LLBC_Packet object reference.
-     * @param[in] packet - the core library packet object reference.
-     * @return PyObject * - the python layer packet object, if error occurred, return nullptr.
-     */
-    PyObject *BuildPyPacket(const LLBC_Packet &packet);
-
-    /**
-     * Delete the python layer packet.
-     */
-    void DeletePyPacket(void *pyPacket);
+    void OnUnHandledPacket(const LLBC_Packet &packet);
 
 private:
     /**
      * Call python layer comp method.
-     * @param[in] meth     - method name, not steal reference, normal.
-     * @param[in] ev       - call event object, steal reference.
-     * @param[in] decRefEv - decref event.
-     * @return bool - return true if call success(no error occurred), otherwise error occurred(error info has been correctly).
+     * @param[in] meth          - method name, not steal reference, normal.
+     * @param[in] ev            - call event object, steal reference.
+     * @param[in] decRefEv      - decref event.
+     * @param[in] isRetRequired - Whether a return value is required.
+     * @return PyObject *       - return python return value if isRetRequired is True and call success(no error occurred),
+     *                            otherwise return nullptr if error occurred(error info has been correctly processed).
      */
-    bool CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv);
-
-    #if PYLLBC_CFG_PACKET_REUSE
+    PyObject *CallComponentMeth(PyObject *meth, PyObject *ev, bool decRefEv, bool isRetRequired);
     /**
-     * Create reuse python layer packet object.
-     * @return PyObject * - the python layer reuse packet(new reference).
+     * Parse finished param from pyRet.
+     * @param[in] pyRet     - python method return object, steal reference.
+     * @param[out] finished - parsed param.
+     * @return bool         - return value.
      */
-    PyObject *CreateReusePyPacket();
-    #endif // PYLLBC_CFG_PACKET_REUSE
+    static bool ParsePythonRet(PyObject *pyRet, bool &finished);
 
 private:
     pyllbc_Service *_svc;
     PyObject *_pySvc;
+    PyObject *_pyComp;
 
-    const LLBC_IService::Type _svcType;
-
-    PyObject *_methOnInitialize;
-    PyObject *_methOnDestroy;
-    PyObject *_methOnStart;
-    PyObject *_methOnStop;
-    PyObject *_methOnUpdate;
-    PyObject *_methOnIdle;
-    PyObject *_methOnSessionCreate;
-    PyObject *_methOnSessionDestroy;
-    PyObject *_methOnAsyncConnResult;
-    PyObject *_methOnProtoReport;
-    PyObject *_methOnUnHandledPacket;
-
-    PyObject *_keySVC;
-    PyObject *_keyIp;
-    PyObject *_keyPort;
-    PyObject *_keySessionId;
-    PyObject *_keyOpcode;
-    PyObject *_keyData;
-    PyObject *_keyStatus;
-    PyObject *_keyReason;
-    PyObject *_keyConnected;
-    PyObject *_keyIdleTime;
-    PyObject *_keyInlIdleTime;
-    PyObject *_keyCObj;
-
-    PyObject *_pyPacketCls;
-    #if PYLLBC_CFG_PACKET_REUSE
-    PyObject *_pyReusePacket;
-    PyObject *_pyPacketReuseMeth;
-    #endif // PYLLBC_CFG_PACKET_REUSE
-    PyObject *_pyNullCObj;
-    PyObject *_pyPacketCreateArgs;
-
-    PyObject *_pyStream;
-    pyllbc_Stream *_nativeStream;
+    PyObject *_pyOnInitMeth;
+    PyObject *_pyOnDestroyMeth;
+    PyObject *_pyOnStartMeth;
+    PyObject *_pyOnStopMeth;
+    PyObject *_pyOnUpdateMeth;
+    PyObject *_pyOnIdleMeth;
+    PyObject *_pyOnSessionCreateMeth;
+    PyObject *_pyOnSessionDestroyMeth;
+    PyObject *_pyOnAsyncConnResultMeth;
+    PyObject *_pyOnProtoReportMeth;
+    PyObject *_pyOnUnHandledPacketMeth;
 
     PyObject *_holdedOnIdleEv;
     PyObject *_holdedOnUpdateEv;
 
     PyObject *_compEvCallArgs;
 };
-
-#endif // !__PYLLBC_COMM_PY_COMPONENT_H__

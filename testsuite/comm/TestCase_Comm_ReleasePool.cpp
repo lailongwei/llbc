@@ -30,27 +30,27 @@ class TestObj : public LLBC_Object
 public:
     TestObj()
     {
-        LLBC_PrintLine("TestObj construct: %p", this);
+        LLBC_PrintLn("TestObj construct: %p", this);
     }
 
     virtual ~TestObj()
     {
-        LLBC_PrintLine("TestObj destruct: %p", this);
+        LLBC_PrintLn("TestObj destruct: %p", this);
     }
 };
 
-class MyComp : public LLBC_IComponent
+class MyComp : public LLBC_Component
 {
 public:
     MyComp() {  }
     virtual ~MyComp() {  }
 
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("MyComp initialize ...");
+        LLBC_PrintLn("MyComp initialize ...");
 
-        TestObj *obj = LLBC_New(TestObj);
+        TestObj *obj = new TestObj;
         obj->AutoRelease();
 
         obj->Retain();
@@ -62,20 +62,20 @@ public:
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("MyComp destroy...");
+        LLBC_PrintLn("MyComp destroy...");
     }
 
     virtual void OnUpdate()
     {
         // Create new release pool.
-        LLBC_AutoReleasePool *pool = LLBC_New(LLBC_AutoReleasePool);
+        LLBC_AutoReleasePool *pool = new LLBC_AutoReleasePool;
 
-        LLBC_Object *obj = LLBC_New(TestObj);
+        LLBC_Object *obj = new TestObj;
         obj->AutoRelease();
 
-        LLBC_Delete(pool);
+        delete pool;
     }
 };
 
@@ -91,17 +91,17 @@ TestCase_Comm_ReleasePool::~TestCase_Comm_ReleasePool()
 
 int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("ReleasePool test:");
+    LLBC_PrintLn("ReleasePool test:");
 
     // Create service.
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "ReleasePoolTest");
-    svc->RegisterComponent(LLBC_New(MyComp));
+    LLBC_Service *svc = LLBC_Service::Create("ReleasePoolTest");
+    svc->AddComponent(new MyComp);
     svc->Start();
 
     std::cout <<"press any key to continue ..." <<std::endl;
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return 0;
 }

@@ -19,54 +19,160 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
-#include "llbc/core/utils/Util_Text.h"
+#include "llbc/common/Export.h"
 
 #include "llbc/core/time/TimeSpan.h"
 #include "llbc/core/time/Time.h"
 
 __LLBC_NS_BEGIN
 
-
 const LLBC_TimeSpan LLBC_TimeSpan::zero = LLBC_TimeSpan::FromSeconds(0);
 const LLBC_TimeSpan LLBC_TimeSpan::oneSec = LLBC_TimeSpan::FromSeconds(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneMillisec = LLBC_TimeSpan::FromMillis(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneMicrosec = LLBC_TimeSpan::FromMicros(1);
 const LLBC_TimeSpan LLBC_TimeSpan::oneMin = LLBC_TimeSpan::FromMinutes(1);
 const LLBC_TimeSpan LLBC_TimeSpan::oneHour = LLBC_TimeSpan::FromHours(1);
 const LLBC_TimeSpan LLBC_TimeSpan::oneDay = LLBC_TimeSpan::FromDays(1);
+const LLBC_TimeSpan LLBC_TimeSpan::oneWeek = LLBC_TimeSpan::FromDays(7);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneSec = LLBC_TimeSpan::FromSeconds(-1);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneMillisec = LLBC_TimeSpan::FromMillis(-1);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneMicrosec = LLBC_TimeSpan::FromMicros(-1);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneMin = LLBC_TimeSpan::FromMinutes(-1);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneHour = LLBC_TimeSpan::FromHours(-1);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneDay = LLBC_TimeSpan::FromDays(-1);
+const LLBC_TimeSpan LLBC_TimeSpan::negOneWeek = LLBC_TimeSpan::FromDays(-7);
 
-LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &span)
+#define __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(partStr, partLen, spanFactor) \
+    if (UNLIKELY(partLen >= sizeof(numFmtBuf)))                             \
+    {                                                                       \
+        _span = 0;                                                          \
+        return;                                                             \
+    }                                                                       \
+                                                                            \
+    if (LIKELY(partLen > 0))                                                \
+    {                                                                       \
+        memcpy(numFmtBuf, partStr, partLen);                                \
+        numFmtBuf[partLen] = '\0';                                          \
+        _span += atoi(numFmtBuf) * spanFactor;                              \
+    }                                                                       \
+
+LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
+: _span(0)
 {
-   // Add day part span.
-    LLBC_String strippedSpan = span.strip();
-    size_t dayIdx = strippedSpan.find(' ');
-    if (dayIdx != LLBC_String::npos)
+    // Time span string format:
+    // - [DD ][[HH:]MM:]SS[.micro_sec]
+    //
+    // eg:
+    //                   DD       HH       MM   SS   micro_sec
+    // 03 =>                                     3 +     0      seconds
+    // 02:03 =>                           2*60 + 3 +     0      seconds
+    // 01:02:03 =>               1*3600 + 2*60 + 3 +     0      seconds
+    // 8 01:02:03 =>   8*86400 + 1*3600 + 2*60 + 3 +     0      seconds
+    // 8 01:02:03.4 => 8*86400 + 1*3600 + 2*60 + 3 + 4*0.000001 seconds
+
+    // Argument check.
+    if (UNLIKELY(!spanStr || spanStrLen == 0))
+        return;
+
+    // Remove leading whitespace characters.
+    const char *origSpanStr = spanStr;
+    while (*spanStr != '\0')
     {
-        _span = atoll(strippedSpan.substr(0, dayIdx).c_str()) * LLBC_Time::NumOfMicroSecondsPerDay;
-        strippedSpan = strippedSpan.substr(dayIdx + 1);
+        if (LIKELY(!LLBC_IsSpace(*spanStr)))
+            break;
+        ++spanStr;
+    }
+
+    if (*spanStr == '\0')
+        return;
+    spanStrLen -= static_cast<size_t>(spanStr - origSpanStr);
+
+    // Remove trailing whitespace characters.
+    const char *spanStrEnd = spanStr + spanStrLen - 1;
+    while (spanStrEnd != spanStr && LLBC_IsSpace(*spanStrEnd))
+        --spanStrEnd;
+    ++spanStrEnd;
+
+    // Parse time span string.
+    // - Parse <DD> part.
+    char numFmtBuf[12];
+    const char *dayPartEnd = spanStr;
+    while (++dayPartEnd != spanStrEnd)
+        LLBC_BreakIf(LLBC_IsSpace(*dayPartEnd));
+    if (dayPartEnd != spanStrEnd)
+    {
+        size_t dayPartLen = static_cast<size_t>(dayPartEnd - spanStr);
+        __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(spanStr, dayPartLen, LLBC_TimeConst::numOfMicrosPerDay);
+
+        spanStr = dayPartEnd + 1;
+        while (*spanStr != '\0')
+        {
+            if (LIKELY(!LLBC_IsSpace(*spanStr)))
+                break;
+            ++spanStr;
+        }
+    }
+
+    // - Search all colons pos.
+    size_t colonSize = 0;
+    const char *colonPoses[2]{nullptr, nullptr};
+    const char *strIt = spanStr;
+    while (strIt != spanStrEnd)
+    {
+        if (*strIt == ':')
+        {
+            colonPoses[colonSize++] = strIt;
+            if (colonSize == 2)
+                break;
+        }
+
+        ++strIt;
+    }
+
+    // - Parse <HH:MM> part.
+    const char *secPart;
+    if (colonSize == 2)
+    {
+        size_t partLen = static_cast<size_t>(colonPoses[0] - spanStr);
+        __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(spanStr, partLen, LLBC_TimeConst::numOfMicrosPerHour);
+
+        partLen = static_cast<size_t>(colonPoses[1] - colonPoses[0] - 1);
+        __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(colonPoses[0] + 1, partLen, LLBC_TimeConst::numOfMicrosPerMinute);
+
+        secPart = colonPoses[1] + 1;
+    }
+    else if (colonSize == 1)
+    {
+        size_t partLen = static_cast<size_t>(colonPoses[0] - spanStr);
+        __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(spanStr, partLen, LLBC_TimeConst::numOfMicrosPerMinute);
+
+        secPart = colonPoses[0] + 1;
     }
     else
     {
-        _span = 0;
+        secPart = spanStr;
     }
 
-    // Split by ':', fetch hour/minute/second/micro-second parts.
-    LLBC_Strings hmsParts = strippedSpan.strip().split(':');
-    const LLBC_String &secSpan = hmsParts[hmsParts.size() - 1];
-    if (hmsParts.size() >= 2)
+    // - Parse <SS.micro_sec> part.
+    const char *dotPos = secPart;
+    while (dotPos != spanStrEnd)
     {
-        _span += atoll(hmsParts[hmsParts.size() - 2].c_str()) * LLBC_Time::NumOfMicroSecondsPerMinute;
-        if (hmsParts.size() >= 3)
-            _span += atoll(hmsParts[hmsParts.size() - 3].c_str()) * LLBC_Time::NumOfMicroSecondsPerHour;
+        if (*dotPos == '.')
+            break;
+        ++dotPos;
     }
 
-    LLBC_Strings secParts = secSpan.strip().split('.', 1);
-    _span += atoll(secParts[0].c_str()) * LLBC_Time::NumOfMicroSecondsPerSecond;
-    if (secParts.size() == 2)
-        _span += atoll(secParts[1].c_str()) * LLBC_Time::NumOfMicroSecondsPerMilliSecond;
+    const char *secPartEnd = dotPos != spanStrEnd ? dotPos : spanStrEnd;
+    size_t secPartLen = static_cast<size_t>(secPartEnd - secPart);
+    __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(secPart, secPartLen, LLBC_TimeConst::numOfMicrosPerSecond);
+    if (dotPos != spanStrEnd)
+    {
+        const size_t microPartLen = spanStrEnd - dotPos - 1;
+        __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(dotPos + 1, microPartLen, 1);
+    }
 }
 
-__LLBC_NS_END
+#undef __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN
 
-#include "llbc/common/AfterIncl.h"
+__LLBC_NS_END

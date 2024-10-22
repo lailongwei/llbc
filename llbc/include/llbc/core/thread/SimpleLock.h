@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_SIMPLE_LOCK_H__
-#define __LLBC_CORE_THREAD_SIMPLE_LOCK_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/thread/ILock.h"
 
@@ -76,5 +73,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_THREAD_SIMPLE_LOCK_H__

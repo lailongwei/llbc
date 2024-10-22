@@ -58,39 +58,6 @@ namespace
         std::cout <<"\targ3: " <<arg3 <<std::endl;
         std::cout <<"\targ4: " <<arg4 <<std::endl;
     }
-
-    void Func_Foo_5(int arg1, int arg2, int arg3, int arg4, int arg5)
-    {
-        std::cout <<"Func_Foo_5() called" <<std::endl;
-        std::cout <<"\targ1: " <<arg1 <<std::endl;
-        std::cout <<"\targ2: " <<arg2 <<std::endl;
-        std::cout <<"\targ3: " <<arg3 <<std::endl;
-        std::cout <<"\targ4: " <<arg4 <<std::endl;
-        std::cout <<"\targ5: " <<arg5 <<std::endl;
-    }
-
-    void Func_Foo_6(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
-    {
-        std::cout <<"Func_Foo_6() called" <<std::endl;
-        std::cout <<"\targ1: " <<arg1 <<std::endl;
-        std::cout <<"\targ2: " <<arg2 <<std::endl;
-        std::cout <<"\targ3: " <<arg3 <<std::endl;
-        std::cout <<"\targ4: " <<arg4 <<std::endl;
-        std::cout <<"\targ5: " <<arg5 <<std::endl;
-        std::cout <<"\targ6: " <<arg6 <<std::endl;
-    }
-
-    void Func_Foo_7(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)
-    {
-        std::cout <<"Func_Foo_7() called" <<std::endl;
-        std::cout <<"\targ1: " <<arg1 <<std::endl;
-        std::cout <<"\targ2: " <<arg2 <<std::endl;
-        std::cout <<"\targ3: " <<arg3 <<std::endl;
-        std::cout <<"\targ4: " <<arg4 <<std::endl;
-        std::cout <<"\targ5: " <<arg5 <<std::endl;
-        std::cout <<"\targ6: " <<arg6 <<std::endl;
-        std::cout <<"\targ7: " <<arg7 <<std::endl;
-    }
 }
 
 TestCase_Core_Utils_Delegate::TestCase_Core_Utils_Delegate()
@@ -104,9 +71,6 @@ TestCase_Core_Utils_Delegate::~TestCase_Core_Utils_Delegate()
 int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
 {
     typedef TestCase_Core_Utils_Delegate DelegObj;
-
-    int arg1 = 1, arg2 = 2, arg3 = 3;
-    int arg4 = 4, arg5 = 5, arg6 = 6, arg7 = 7;
 
     std::cout <<"Delegate test:" <<std::endl;
     LLBC_Delegate<void()> func0(&Func_Foo_0);
@@ -136,6 +100,7 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
     std::cout <<"strSizeMeth valid?:" <<!!strSizeMeth <<std::endl;
 
     LLBC_Delegate<void()> nullDeleg = nullptr;
+    nullDeleg = nullptr;
     std::cout <<"nullDeleg valid?:" <<!!nullDeleg <<std::endl;
     nullDeleg = &Func_Foo_0;
     if (nullDeleg)
@@ -168,6 +133,12 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
         std::cout << "lambda function void() called()!" << std::endl;
     };
     func0();
+
+    // Move to func0Too
+    auto func0Too = std::move(func0);
+    func0Too();
+    std::cout << "After func0 move to func0Too, func0 valid?:"
+        << !!func0 << ", func0Too valid?:" << !!func0Too << std::endl;
 
     nullDeleg = nullptr;
     std::cout <<"set nullDeleg to nullptr, valid?:" <<!!nullDeleg <<std::endl;

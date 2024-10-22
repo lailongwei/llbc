@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_MACRO_H__
-#define __LLBC_COM_MACRO_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
@@ -48,7 +47,9 @@
     }                            \
 
 // llbc library error describe buffer size.
-#define __LLBC_ERROR_DESC_SIZE    2048
+#define __LLBC_ERROR_DESC_SIZE            2048
+// llbc clib error format buffer size.
+#define __LLBC_CLIB_ERROR_FORMAT_BUF_SIZE 1024
 
 // Debug macro define.
 #ifdef DEBUG
@@ -162,8 +163,13 @@
  #endif
 #elif LLBC_TARGET_PLATFORM_WIN32
  #ifndef LLBC_EXPORT
-  #define LLBC_EXPORTING 0
-  #define LLBC_EXPORT __declspec(dllimport)
+   #ifdef LLBC_LINK_STATIC_LIBRARY
+    #define LLBC_EXPORTING 0
+    #define LLBC_EXPORT
+   #else
+    #define LLBC_EXPORTING 1
+    #define LLBC_EXPORT  __declspec(dllimport)
+   #endif
  #endif
 #elif LLBC_TARGET_PLATFORM_IPHONE
  #ifndef LLBC_EXPORT
@@ -199,11 +205,15 @@
 #define register
 #endif
 
-// Disable assignments of objects.
-#define LLBC_DISABLE_ASSIGNMENT(name)               \
-private:                                            \
-    name(const name &) = delete;                    \
-    name &operator =(const name &) = delete         \
+// Disable assignments of object.
+#define LLBC_DISABLE_ASSIGNMENT(name)      \
+    name(const name &) = delete;           \
+    name &operator=(const name &) = delete \
+
+// Disable move assignments of object.
+#define LLBC_DISABLE_MOVE_ASSIGNMENT(name) \
+    name(name &&) = delete;                \
+    name &operator=(name &&) = delete      \
 
 // Thread local macro define.
 #if LLBC_TARGET_PLATFORM_LINUX
@@ -248,74 +258,46 @@ private:                                            \
 // Defer macro define.
 
 /* Memory operations macros. */
-// allocate/reallocate/free.
-#define LLBC_Malloc(type, size)             (reinterpret_cast<type *>(::malloc(size)))
-#define LLBC_Calloc(type, size)             (reinterpret_cast<type *>(::calloc(size, 1)))
-#define LLBC_Realloc(type, memblock, size)  (reinterpret_cast<type *>(::realloc((memblock), (size))))
-#define LLBC_Free(memblock)                 (::free(memblock))
+// allocate/reallocate/free/delete/recycle.
+#define LLBC_Malloc(type, sizeInBytes)            (reinterpret_cast<type *>(malloc(sizeInBytes)))
+#define LLBC_Calloc(type, sizeInBytes)            (reinterpret_cast<type *>(calloc(sizeInBytes, 1)))
+#define LLBC_Realloc(type, memblock, sizeInBytes) (reinterpret_cast<type *>(realloc((memblock), (sizeInBytes))))
 #define LLBC_XFree(memblock)        \
     do {                            \
         if (LIKELY(memblock)) {     \
-            LLBC_Free(memblock);    \
+            free(memblock);         \
             (memblock) = nullptr;   \
         }                           \
-    } while(0)                      \
+    } while(false)                  \
 
-// new/delete.
-#define LLBC_New(cls, ...)                  (new cls(__VA_ARGS__))
-#define LLBC_News(cls, size)                (new cls[size])
-#define LLBC_Delete(objptr)                 (delete (objptr))
 #define LLBC_XDelete(objptr)        \
     do {                            \
         if (LIKELY(objptr)) {       \
-            LLBC_Delete(objptr);    \
+            delete (objptr);        \
             (objptr) = nullptr;     \
         }                           \
     } while (0)                     \
 
-#define LLBC_Deletes(objsptr)               (delete [](objsptr))
 #define LLBC_XDeletes(objsptr)      \
     do {                            \
         if (LIKELY(objsptr)) {      \
-            LLBC_Deletes(objsptr);  \
+            delete[] (objsptr);     \
             objsptr = nullptr;      \
         }                           \
-    } while(0)                      \
+    } while(false)                  \
 
-#define LLBC_Recycle(objptr)                LLBC_NS LLBC_PoolObjectReflection::Recycle(objptr)
-#define LLBC_XRecycle(objptr)               LLBC_NS LLBC_PoolObjectReflection::RecycleX(objptr)
+#define LLBC_Recycle(objptr)                LLBC_NS LLBC_ObjReflector::Recycle(objptr)
+#define LLBC_XRecycle(objptr)               LLBC_NS LLBC_ObjReflector::RecycleX(objptr)
 
-// memory set.
-#define LLBC_MemSet(dst, c, count)          (::memset(dst, c, count))
-// memory copy.
-#define LLBC_MemCpy(dst, src, s)                                    \
-    do {                                                            \
-        size_t ___s = static_cast<size_t>(s);                       \
-        char *___dst = reinterpret_cast<char *>(dst);               \
-        const char *___src = reinterpret_cast<const char *>(src);   \
-        if (UNLIKELY(!___dst || !___src || ___s <= 0))              \
-        {                                                           \
-            break;                                                  \
-        }                                                           \
-                                                                    \
-        if (___dst + ___s <= ___src || ___dst >= ___src + ___s)     \
-        {                                                           \
-            memcpy(___dst, ___src, ___s);                           \
-        }                                                           \
-        else                                                        \
-        {                                                           \
-            char *buf = reinterpret_cast<                           \
-                char *>(malloc(___s));                              \
-            memcpy(buf, ___src, ___s);                              \
-            memcpy(___dst, buf, ___s);                              \
-            free(buf);                                              \
-        }                                                           \
-    } while (0)                                                     \
+/**
+ * Whitespace check.
+ */
+#define LLBC_IsSpace(ch) (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n' || ch == '\v' || ch == '\f')
 
 /**
  * Format argument.
  * @param[in] fmt  - the format string.
- * @param[out] buf - the formatted string, must call LLBC_Free to free memory.
+ * @param[out] buf - the formatted string, must call free() to free memory.
  *                   if failed, this macro set retStr value to nullptr and set last error.
  * @param[out] len - the formatted string length, in bytes, not including tailing character.
  *                   this macro always filled the tailing character.
@@ -330,7 +312,10 @@ private:                                            \
                                                                     \
         va_list ___llbc_macro_inl_argfmt_ap;                        \
         va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
-        int ___llbc_macro_inl_argfmt_vsnp_len = ::vsnprintf(nullptr, 0, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        int ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf(nullptr,  \
+                                                          0,        \
+                                                          (fmt),    \
+                                                          ___llbc_macro_inl_argfmt_ap); \
         va_end(___llbc_macro_inl_argfmt_ap);                        \
         if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
             buf = nullptr; len = 0;                                 \
@@ -340,10 +325,13 @@ private:                                            \
                                                                     \
         buf = LLBC_Malloc(char, ___llbc_macro_inl_argfmt_vsnp_len + 1); \
         va_start(___llbc_macro_inl_argfmt_ap, fmt);                 \
-        ___llbc_macro_inl_argfmt_vsnp_len = ::vsnprintf((buf), ___llbc_macro_inl_argfmt_vsnp_len + 1, (fmt), ___llbc_macro_inl_argfmt_ap); \
+        ___llbc_macro_inl_argfmt_vsnp_len = vsnprintf((buf),        \
+                                                      ___llbc_macro_inl_argfmt_vsnp_len + 1, \
+                                                      (fmt),        \
+                                                      ___llbc_macro_inl_argfmt_ap); \
         va_end(___llbc_macro_inl_argfmt_ap);                        \
         if (___llbc_macro_inl_argfmt_vsnp_len < 0) {                \
-            LLBC_Free(buf);                                         \
+            free(buf);                                              \
             buf = nullptr; len = 0;                                 \
             LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);             \
             break;                                                  \
@@ -351,13 +339,13 @@ private:                                            \
                                                                     \
         len = static_cast<std::remove_reference<decltype(len)>::type>(___llbc_macro_inl_argfmt_vsnp_len); \
         buf[len] = '\0';                                            \
-    } while(0)                                                      \
+    } while(false)                                                  \
 
 /**
  * RTTI support.
  */
 // Define rtti buffer size.
- #define __LLBC_RTTI_BUF_SIZE    512
+ #define __LLBC_RTTI_BUF_SIZE    (32 * 1024)
 
 /**
  * Component generic call method convenience macros define.
@@ -388,4 +376,37 @@ private:                                            \
  */
 #define LLBC_Defer(behav) LLBC_NS LLBC_InvokeGuard LLBC_Concat(__invokeGuard__, __LINE__)([&]() { behav; })
 
-#endif // !__LLBC_COM_MACRO_H__
+/**
+ * Some condition judge helper macros.
+ */
+#define LLBC_Foreach(cont, behav)                                   \
+    { for (auto &item : (cont)) { behav; } }                        \
+
+#define LLBC_DoIf(cond, behav)                                      \
+    { if ((cond)) { behav; } }                                      \
+
+#define LLBC_ContinueIf(cond)                                       \
+    { if ((cond)) continue; }                                       \
+
+#define LLBC_BreakIf(cond)                                          \
+    { if ((cond)) break; }                                          \
+
+#define LLBC_SetErrAndBreakIf(cond, err)                            \
+    { if ((cond)) { LLBC_NS LLBC_SetLastError(err); break; } }      \
+
+#define LLBC_ReturnIf(cond, ret)                                    \
+    { if ((cond)) { return ret; } }                                 \
+
+#define LLBC_SetErrAndReturnIf(cond, err, ret)                      \
+    { if ((cond)) { LLBC_NS LLBC_SetLastError(err); return ret; } } \
+
+#define LLBC_ExitIf(cond, exitCode)                                 \
+    { if ((cond)) exit(static_cast<int>(exitCode)); }               \
+
+#define LLBC_DoIfNot(cond, behav) LLBC_DoIf(!(cond), behav)
+#define LLBC_ContinueIfNot(cond) LLBC_ContinueIf(!(cond))
+#define LLBC_BreakIfNot(cond, behav) LLBC_BreakIf(!(cond))
+#define LLBC_SetErrAndBreakIfNot(cond, err) LLBC_SetErrAndBreakIf(!(cond), err)
+#define LLBC_ReturnIfNot(cond, ret) LLBC_ReturnIf(!(cond), ret)
+#define LLBC_SetErrAndReturnIfNot(cond, err, ret) LLBC_SetErrAndReturnIf(!(cond), err, ret)
+#define LLBC_ExitIfNot(cond, exitCode) LLBC_ExitIf(!(cond), exitCode)

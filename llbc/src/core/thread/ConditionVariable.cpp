@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/thread/ILock.h"
 #include "llbc/core/thread/ConditionVariable.h"
@@ -102,7 +102,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     struct timeval tvStart, tvEnd;
     struct timespec ts;
 
-    ::gettimeofday(&tvStart, nullptr);
+    gettimeofday(&tvStart, nullptr);
     tvEnd = tvStart;
     tvEnd.tv_sec += milliSeconds / 1000;
     tvEnd.tv_usec += (milliSeconds % 1000) * 1000;
@@ -117,7 +117,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
         errno = errNo;
         if (errNo == ETIMEDOUT)
         {
-            LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+            LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
         }
         else
         {
@@ -145,7 +145,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     bool successed = (waitRet == WAIT_OBJECT_0) ? true : false;
     if (!successed)
     {
-        LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+        LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
     }
 
     AfterWait(lock);
@@ -252,5 +252,3 @@ void LLBC_ConditionVariable::AfterWait(LLBC_ILock &lock)
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

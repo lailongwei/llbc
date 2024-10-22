@@ -9,26 +9,27 @@
 *.so
 *.tmp
 .*.swp
-
 .DS_Store
 
-.vscode*
+.vscode/
+.idea/
 
 iOSBuild/*.xcodeproj/xcuserdata/
 iOSBuild/*.xcodeproj/project.xcworkspace/xcuserdata/
 
-output/
 build/
+output/
 
-llbc/lib/
-llbc/linux/
+# wrap/lullbc
+wrap/lullbc/script/llbc.lua
+wrap/lullbc/src/_LullbcMethods.h
 
-testsuite/bin/
-testsuite/linux/
-
-wrap/pyllbc/lib/
-wrap/pyllbc/linux/
+# wrap/pyllbc
+wrap/pyllbc/src/pyllbc_scripts.h
+wrap/pyllbc/src/common/_CommonMethods.h
+wrap/pyllbc/src/core/_CoreMethods.h
+wrap/pyllbc/src/comm/_CommMethods.h
+wrap/pyllbc/src/app/_AppMethods.h
+wrap/pyllbc/src/testcase/_TestcaseMethods.h
 
 !.gitignore
-
-llbc.lua

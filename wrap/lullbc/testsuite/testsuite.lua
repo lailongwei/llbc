@@ -17,10 +17,10 @@ local TestCase_Com_ObjectOriented = require 'common.testcase_com_object_oriented
 local TestCase_Core_Log = require 'core.log.testcase_core_log'
 local TestCase_Core_Timer = require 'core.timer.testcase_core_timer'
 local TestCase_Core_Thread = require 'core.thread.testcase_core_thread'
-local TestCase_Core_Helper_GUID= require 'core.helper.testcase_core_helper_guid'
-local TestCase_Core_Utils_Util_Func = require 'core.utils.testcase_core_utils_util_func'
-local TestCase_Core_Utils_Util_Table = require 'core.utils.testcase_core_utils_util_table'
-local TestCase_Core_Utils_Util_String = require 'core.utils.testcase_core_utils_util_string'
+local TestCase_Core_Util_GUID= require 'core.utils.testcase_core_util_guid'
+local TestCase_Core_Utils_Util_Func = require 'core.utils.testcase_core_util_func'
+local TestCase_Core_Utils_Util_Table = require 'core.utils.testcase_core_util_table'
+local TestCase_Core_Utils_Util_String = require 'core.utils.testcase_core_util_string'
 -- Import all communication module testcases.
 -- ... ...
 
@@ -37,10 +37,10 @@ local function Main(...)
     -- TestCase_Core_Log.run(...)
     -- TestCase_Core_Timer.run(...)
     -- TestCase_Core_Thread.run()
-    -- TestCase_Core_Helper_GUID.run(...)
-    -- TestCase_Core_Utils_Util_Func.run(...)
-    -- TestCase_Core_Utils_Util_Table.run(...)
-    -- TestCase_Core_Utils_Util_String.run(...)
+    -- TestCase_Core_Util_GUID.run(...)
+    -- TestCase_Core_Util_Func.run(...)
+    -- TestCase_Core_Util_Table.run(...)
+    -- TestCase_Core_Util_String.run(...)
 
     -- All communication module testcases...
     -- ... ...

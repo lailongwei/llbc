@@ -163,12 +163,8 @@ class pyllbcService(object):
     __metaclass__ = pyllbcServiceMetaCls
 
     # service type define.
-    NORMAL = llbc.inl.SVC_TYPE_NORMAL # Normalize type service.
-    RAW = llbc.inl.SVC_TYPE_RAW # Raw type service.
-
-    # service codec strategies define.
-    CODEC_JSON = llbc.inl.SVC_CODEC_JSON
-    CODEC_BINARY = llbc.inl.SVC_CODEC_BINARY
+    NORMAL = 1 # Normal type service.
+    RAW = 2 # Raw type service.
 
     # FPS limit values define.
     MIN_FPS = llbc.inl.SVC_MIN_FPS
@@ -192,7 +188,7 @@ class pyllbcService(object):
     _frame_exc_handler = None
     # ----------------------------------------------------------------------
 
-    def __init__(self, svcname, svctype=llbc.inl.SVC_TYPE_NORMAL):
+    def __init__(self, svcname, svctype=NORMAL):
         """
         Create new service
         :param svctype: the service type, see service type enumeration.
@@ -213,7 +209,7 @@ class pyllbcService(object):
         self._svctype = svctype
 
         self._addsvc(self)
-        self._c_obj = llbc.inl.NewService(self, svctype, svcname)
+        self._c_obj = llbc.inl.NewService(self, svcname, self._svctype == self.NORMAL)
         self._svcid = llbc.inl.GetServiceId(self._c_obj)
 
         self._encoders = {}
@@ -252,7 +248,7 @@ class pyllbcService(object):
 
     @property
     def typestr(self):
-        return llbc.inl.GetServiceTypeStr(self._svctype)
+        return 'NORMAL' if self._svctype == self.NORMAL else 'RAW'
 
     @property
     def id(self):
@@ -280,14 +276,6 @@ class pyllbcService(object):
     @property
     def frameinterval(self):
         return self._frameinterval
-
-    @property
-    def codec(self):
-        return llbc.inl.GetServiceCodec(self._c_obj)
-
-    @codec.setter
-    def codec(self, c):
-        llbc.inl.SetServiceCodec(self._c_obj, c)
 
     @property
     def comps(self):
@@ -457,18 +445,22 @@ class pyllbcService(object):
     def scheduling(self):
         return self.__class__.scheduling
 
-    def registercomp(self, comp, libpath='', libcomp_cls=None):
+    def addcomp(self, comp, libpath='', libcomp_cls=None):
         """
-        Register component.
+        Add component.
             component methods(all methods are optional):
-                oninitialize(self, ev): service initialize handler.
+                oninit(self, ev): service initialize handler.
                     ev.svc: service object.
+                    @return: hasFinished(bool) or None, default is True
                 ondestroy(self, ev): service destroy handler.
                     ev.svc: service object.
+                    @return: hasFinished(bool) or None, default is True
                 onstart(self, ev): service start handler.
                     ev.svc: service object.
+                    @return: hasFinished(bool) or None, default is True
                 onstop(self, ev): service stop handler.
                     ev.svc: service object.
+                    @return: hasFinished(bool) or None, default is True
                 onupdate(self, ev): service per-frame update handler.
                     ev.svc: service object.
                 onidle(self, ev): service per-frame idle handler.
@@ -524,12 +516,13 @@ class pyllbcService(object):
             if isinstance(comp, unicode):
                 comp = comp.encode('utf8')
 
-            comp = llbc.inl.RegisterLibComponent(self._c_obj, comp, libpath, libcomp_cls)
+            comp = llbc.inl.AddLibComponent(self._c_obj, comp, libpath, libcomp_cls)
         else:
-            llbc.inl.RegisterComponent(self._c_obj, comp)
+            llbc.inl.AddComponent(self._c_obj, comp)
 
         # add some common members
-        comp.svc = self
+        comp.__svc = weakref.ref(self)
+        comp.__class__.svc = property(lambda _self : _self.__svc())
 
         # update comp dict
         self._comps.update({comp.__class__: comp})
@@ -542,9 +535,9 @@ class pyllbcService(object):
         """
         return self._comps.get(cls)
 
-    def registerencoder(self, opcode, encoder):
+    def addencoder(self, opcode, encoder):
         """
-        Register specific opcode's encoder(only available in CODEC_BINARY codec mode).
+        Add specific opcode's encoder.
         """
         if not hasattr(encoder, 'encode') or not callable(encoder.encode):
             raise llbc.error('invalid encoder, opcode: {}, encoder: {}'.format(opcode, encoder))
@@ -553,14 +546,14 @@ class pyllbcService(object):
 
         self._encoders.update({encoder:opcode})
 
-    def registerdecoder(self, opcode, coder):
+    def adddecoder(self, opcode, coder):
         """
-        Register specific opcode's decoder(only available in CODEC_BINARY codec mode).
+        Add specific opcode's decoder.
         Note: must raw types(eg:int, long, float, str, bytearray, unicode...) or exist follow methods' class:
               decode(self, stream): decode data from stream.
         """
 
-        llbc.inl.RegisterCodec(self._c_obj, opcode, coder)
+        llbc.inl.AddDecoder(self._c_obj, opcode, coder)
 
     def listen(self, ip, port):
         """
@@ -602,8 +595,7 @@ class pyllbcService(object):
         Send data to specific session
         """
         cls = self.__class__
-        svc_type = self._svctype
-        if svc_type == cls.NORMAL:
+        if self._svctype == cls.NORMAL:
             if opcode is None:
                 opcode = self._encoders.get(data.__class__)
                 if opcode is None:

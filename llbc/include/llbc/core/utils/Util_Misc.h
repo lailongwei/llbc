@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_UTILS_UTIL_MISC_H__
-#define __LLBC_CORE_UTILS_UTIL_MISC_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/variant/Variant.h"
 
@@ -84,8 +81,8 @@ public:
     /**
      * Subscript operations support.
      */
-    const LLBC_Variant &operator [](size_t index) const;
-    const LLBC_Variant &operator [](const LLBC_String &key) const;
+    const LLBC_Variant &operator[](size_t index) const;
+    const LLBC_Variant &operator[](const LLBC_String &key) const;
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_StartArgs);
 
@@ -100,5 +97,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_UTILS_UTIL_MISC_H__

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_DATA_H__
-#define __LLBC_CORE_LOG_LOG_DATA_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -30,7 +29,8 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Logger;
-class LLBC_IObjectPoolInst;
+template <typename Obj>
+class LLBC_TypedObjPool;
 
 __LLBC_NS_END
 
@@ -42,7 +42,6 @@ __LLBC_NS_BEGIN
 struct LLBC_EXPORT LLBC_LogData
 {
     LLBC_Logger *logger;    // Log data owner logger.
-    const char *loggerName; // Logger name.
 
     char *msg;              // Log message.
     int msgLen;             // message length.
@@ -51,16 +50,14 @@ struct LLBC_EXPORT LLBC_LogData
     int level;              // Log level.
     sint64 logTime;         // Log time.
 
-    char *others;           // Other infos[file, tag, func].
-    uint32 othersCap;       // Others data size.
-    uint32 fileBeg;         // File begin.
-    uint32 fileLen;         // Log source file name length.
-    uint32 tagBeg;          // Tag begin.
-    uint32 tagLen;          // Tag length.
-    uint32 funcBeg;         // Function begin.
-    uint32 funcLen;         // Function length.
+    char file[128];         // File
+    int fileLen;            // File length
+    char func[48];          // Func
+    int funcLen;            // Func length
+    char tag[32];           // Tag
+    int tagLen;             // Tag length
 
-    long line;              // Log source file line number.
+    int line;               // Log source file line number.
 
     LLBC_ThreadId threadId; // Log native thread Id.
 
@@ -73,27 +70,17 @@ public:
 
 public:
     /**
-     * Object pool support method.
+     * Object pool support methods.
      */
-    void Clear();
-
-    /**
-     * Object pool support method.
-     */
-    void MarkPoolObject(LLBC_IObjectPoolInst &poolInst);
-
-    /**
-     * Object pool support method.
-     */
-    LLBC_IObjectPoolInst *GetPoolInst();
+    void Reuse();
+    LLBC_TypedObjPool<LLBC_LogData> *GetTypedObjPool() const;
+    void SetTypedObjPool(LLBC_TypedObjPool<LLBC_LogData> *typedObjPool);
 
     // Disable log data assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_LogData);
 
 private:
-    LLBC_IObjectPoolInst *_poolInst;
+    LLBC_TypedObjPool<LLBC_LogData> *_typedObjPool;
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_LOG_LOG_DATA_H__

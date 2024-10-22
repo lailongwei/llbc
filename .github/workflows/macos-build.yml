@@ -1,0 +1,42 @@
+name: MacOS build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  macos-build:
+    name: MacOS build job
+    runs-on: macOS-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      
+      - name: Check out repository code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+        
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+        
+      - name: Compile core lib code
+        run: |
+          make core_lib config=debug64 -j4
+          make core_lib config=release64 -j4
+        
+      - name: Compile test code
+        run: |
+          make test config=release64 -j4
+
+      - name: Build all target by cmake
+        run: |
+          mkdir cmake_build
+          cd cmake_build
+          cmake ..
+          make -j4
+        
+      - run: echo "🍏 This job's status is ${{ job.status }}."

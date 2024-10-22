@@ -19,8 +19,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <cxxabi.h>
+ #include <execinfo.h>
+#endif
 
 #include "llbc/core/os/OS_Symbol.h"
 
@@ -43,12 +48,27 @@ int LLBC_InitSymbol()
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
+int LLBC_CleanupSymbol()
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    if (::SymCleanup(GetCurrentProcess()) != TRUE)
+    {
+        LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+#else // Non-Win32
+    return LLBC_OK;
+#endif // LLBC_TARGET_PLATFORM_WIN32
+}
+
 LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
 {
     LLBC_String backTrace;
 
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-    if (captureFrames == LLBC_INFINITE)
+    if (captureFrames == static_cast<size_t>(LLBC_INFINITE))
         captureFrames = LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES;
     else
         captureFrames = MIN(captureFrames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
@@ -83,8 +103,8 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
             backTrace.append(1, '\n');
     }
 #else // Non-Win32
-    const int frames = ::backtrace(stack, captureFrames + skipFrames);
-    char **strs = ::backtrace_symbols(stack, frames);
+    const int frames = backtrace(stack, captureFrames + skipFrames);
+    char **strs = backtrace_symbols(stack, frames);
     if (LIKELY(strs))
     {
         for (int i = skipFrames; i < frames; ++i)
@@ -143,5 +163,3 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
 #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

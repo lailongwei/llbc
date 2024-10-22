@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"
@@ -29,7 +28,7 @@
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/IocpPoller.h"
 #include "llbc/comm/PollerMonitor.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 
@@ -53,7 +52,7 @@ LLBC_IocpPoller::~LLBC_IocpPoller()
 
 int LLBC_IocpPoller::Start()
 {
-    if (_started)
+    if (GetTaskState() != LLBC_TaskState::NotActivated)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
@@ -80,23 +79,27 @@ int LLBC_IocpPoller::Start()
         return LLBC_FAILED;
     }
 
-    _started = true;
     return LLBC_OK;
+}
+
+void LLBC_IocpPoller::Stop()
+{
+    if (!IsActivated() || _stopping)
+        return;
+
+    StopMonitor();
+
+    LLBC_BasePoller::Stop();
 }
 
 void LLBC_IocpPoller::Svc()
 {
-    while (!_started)
-        LLBC_Sleep(20);
-
     while (!_stopping)
         HandleQueuedEvents(20);
 }
 
 void LLBC_IocpPoller::Cleanup()
 {
-    StopMonitor();
-
     LLBC_CloseIocp(_iocp);
     _iocp = LLBC_INVALID_IOCP_HANDLE;
 
@@ -121,27 +124,27 @@ void LLBC_IocpPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
             break;
         }
 
-        LLBC_Socket *socket = LLBC_New(LLBC_Socket, handle);
+        LLBC_Socket *socket = new LLBC_Socket(handle);
 
         socket->SetNonBlocking();
         socket->SetPollerType(LLBC_PollerType::IocpPoller);
         if (socket->AttachToIocp(_iocp) != LLBC_OK)
         {
-            LLBC_Delete(socket);
+            delete socket;
 
             succeed = false;
             reason = LLBC_FormatLastError();
             break;
         }
 
-        LLBC_POverlapped ol = LLBC_New(LLBC_Overlapped);
+        LLBC_POverlapped ol = new LLBC_Overlapped;
         ol->opcode = LLBC_OverlappedOpcode::Connect;
         ol->sock = handle;
         if (socket->ConnectEx(ev.peerAddr, ol) != LLBC_OK &&
                 LLBC_GetLastError() != LLBC_ERROR_PENDING)
         {
-            LLBC_Delete(ol);
-            LLBC_Delete(socket);
+            delete ol;
+            delete socket;
 
             succeed = false;
             reason = LLBC_FormatLastError();
@@ -191,7 +194,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
     off += sizeof(int);
     int subErrNo = *reinterpret_cast<int *>(ev.un.monitorEv + off);
 
-    LLBC_Free(ev.un.monitorEv);
+    free(ev.un.monitorEv);
 
     if (HandleConnecting(waitRet, ol, errNo, subErrNo))
         return;
@@ -203,7 +206,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
             LLBC_CloseSocket(ol->acceptSock);
         if (ol->data)
             LLBC_Recycle(reinterpret_cast<LLBC_MessageBlock *>(ol->data));
-        LLBC_Delete(ol);
+        delete ol;
 
         return;
     }
@@ -211,7 +214,7 @@ void LLBC_IocpPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
     LLBC_Session *session = it->second;
     if (waitRet == LLBC_FAILED)
     {
-        session->OnClose(ol, LLBC_New(LLBC_SessionCloseInfo, errNo, subErrNo));
+        session->OnClose(ol, new LLBC_SessionCloseInfo(errNo, subErrNo));
     }
     else
     {
@@ -251,7 +254,7 @@ void LLBC_IocpPoller::RemoveSession(LLBC_Session *session)
 int LLBC_IocpPoller::StartupMonitor()
 {
     const LLBC_Delegate<void()> deleg(this, &LLBC_IocpPoller::MonitorSvc);
-    _monitor = LLBC_New(LLBC_PollerMonitor, deleg);
+    _monitor = new LLBC_PollerMonitor(deleg);
     if (_monitor->Start() != LLBC_OK)
     {
         LLBC_XDelete(_monitor);
@@ -279,7 +282,7 @@ void LLBC_IocpPoller::MonitorSvc()
                                              20);
 
     int errNo = LLBC_ERROR_SUCCESS, subErrNo = 0;
-    if (ret != LLBC_FAILED || LLBC_GetLastError() != LLBC_ERROR_TIMEOUT)
+    if (ret != LLBC_FAILED || LLBC_GetLastError() != LLBC_ERROR_TIMEOUTED)
     {
         if (ret != LLBC_OK)
         {
@@ -316,7 +319,7 @@ bool LLBC_IocpPoller::HandleConnecting(int waitRet, LLBC_POverlapped ol, int err
     {
         _svc->Push(LLBC_SvcEvUtil::BuildAsyncConnResultEv(
                 asyncInfo.sessionId, false, LLBC_StrErrorEx(errNo, subErrNo), asyncInfo.peerAddr));
-        LLBC_Delete(asyncInfo.socket);
+        delete asyncInfo.socket;
     }
 
     _connecting.erase(it);
@@ -327,7 +330,7 @@ void LLBC_IocpPoller::Accept(LLBC_Session *session, LLBC_POverlapped ol)
 {
     // Create accepted socket and set some options.
     LLBC_Socket *sock = session->GetSocket();
-    LLBC_Socket *newSock = LLBC_New(LLBC_Socket, ol->acceptSock);
+    LLBC_Socket *newSock = new LLBC_Socket(ol->acceptSock);
     newSock->SetNonBlocking();
     newSock->SetOption(SOL_SOCKET,
                        SO_UPDATE_ACCEPT_CONTEXT,
@@ -350,5 +353,3 @@ void LLBC_IocpPoller::Accept(LLBC_Session *session, LLBC_POverlapped ol)
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_WIN32
-
-#include "llbc/common/AfterIncl.h"

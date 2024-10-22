@@ -19,11 +19,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
-#include "llbc/core/objectpool/ObjectPool.h"
-#include "llbc/core/objectpool/PoolObjectReflection.h"
+#include "llbc/common/Export.h"
+
+#include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/thread/MessageBlock.h"
 #include "llbc/core/thread/MessageBuffer.h"
@@ -134,7 +133,7 @@ int LLBC_MessageBuffer::Write(const char *buf, size_t len)
     }
 
     // Execute normal write(create new block and append to message buffer).
-    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, len);
+    LLBC_MessageBlock *block = new LLBC_MessageBlock(len);
     block->Write(buf, len);
     if (UNLIKELY(Append(block) != LLBC_OK))
     {
@@ -287,10 +286,9 @@ void LLBC_MessageBuffer::Cleanup()
     if (!_head)
         return;
 
-    LLBC_MessageBlock *block = nullptr;
     while (_head)
     {
-        block = _head;
+        LLBC_MessageBlock *block = _head;
         _head = _head->GetNext();
         LLBC_Recycle(block);
     }
@@ -313,5 +311,3 @@ void LLBC_MessageBuffer::DeleteFirstBlock()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

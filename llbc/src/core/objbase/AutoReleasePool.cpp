@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/Config.h"
 
@@ -36,7 +36,7 @@ LLBC_AutoReleasePool::LLBC_AutoReleasePool()
 {
     typedef LLBC_AutoReleasePoolStack _Stack;
 
-    _arr = LLBC_New(LLBC_Array);
+    _arr = new LLBC_Array;
 
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     _Stack *stack = reinterpret_cast<_Stack *>(tls->objbaseTls.poolStack);
@@ -134,5 +134,3 @@ LLBC_Object *LLBC_AutoReleasePool::Clone() const
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

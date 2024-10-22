@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_THREAD_GROUP_DESC_H__
-#define __LLBC_CORE_THREAD_THREAD_GROUP_DESC_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -42,7 +41,7 @@ class LLBC_ThreadGroupDescriptor
 {
 public:
     LLBC_ThreadGroupDescriptor();
-    ~LLBC_ThreadGroupDescriptor();
+    ~LLBC_ThreadGroupDescriptor() = default;
 
 public:
     /**
@@ -52,50 +51,38 @@ public:
     LLBC_Handle GetGroupHandle() const;
 
     /**
-     * Set the thread group handle.
-     * @param[in] handle - group handle.
+     * Set the thread group groupHandle.
+     * @param[in] groupHandle - thread group handle..
      */
-    void SetGroupHandle(LLBC_Handle handle);
-
-    /**
-     * Get the next thread group descriptor.
-     * @return LLBC_ThreadGroupDescriptor * - next thread group descriptor.
-     */
-    LLBC_ThreadGroupDescriptor *GetGroupNext() const;
-
-    /**
-     * Set the next thread group descriptor.
-     * @param[in] next - the next thread group descriptor.
-     */
-    void SetGroupNext(LLBC_ThreadGroupDescriptor *next);
+    void SetGroupHandle(LLBC_Handle groupHandle);
 
 public:
     /**
      * Add thread descriptor to group.
-     * @param[in] desc - thread descriptor.
+     * @param[in] threadDesc - thread descriptor.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AddToGroup(LLBC_ThreadDescriptor *desc);
+    int AddToGroup(LLBC_ThreadDescriptor *threadDesc);
 
     /**
      * Check given thread handle's thread descriptor in group.
-     * @param[in] bool - thread handle.
+     * @param[in] threadHandle - thread handle.
      * @return bool - return true if in group, otherwise not in group.
      */
     bool IsInGroup(LLBC_Handle threadHandle) const;
 
     /**
      * Remove thread descriptor from group.
-     * @param[in] thread handle.
+     * @param[in] threadHandle handle.
      * @return int - return 0 if success, otherwise return -1.
      */
     int RemoveFromGroup(LLBC_Handle threadHandle);
 
     /**
-     * Get this task group thread count.
-     * @return uint32 - thread count.
+     * Get this task group threads count.
+     * @return size_t - thread count.
      */
-    uint32 GetThreadCount() const;
+    size_t GetThreadsCount() const;
 
 public:
     /**
@@ -106,10 +93,17 @@ public:
     LLBC_ThreadDescriptor *FindThreadDescriptor(LLBC_Handle threadHandle) const;
 
     /**
-     * Find the group's first thread descriptor.
-     * @return LLBC_ThreadDescriptor * - the first thread descriptor.
+     * Get all thread descriptors.
+     * @return const std::unordered_map<LLBC_Handle, LLBC_ThreadDescriptor *> & - the thread descriptors set.
      */
-    LLBC_ThreadDescriptor *FindFirstThreadDescriptor() const;
+    const std::unordered_map<LLBC_Handle, LLBC_ThreadDescriptor *> &
+    GetAllThreadDescriptors() const;
+
+    /**
+     * Collect all thread handles.
+     * @param[in] threadHandles - the thread ahandles list.
+     */
+    void CollectAllThreadHandles(std::vector<LLBC_Handle> &threadHandles) const;
 
     /**
      * Disable assignment.
@@ -118,11 +112,9 @@ public:
 
 private:
     LLBC_Handle _groupHandle;
-    LLBC_ThreadGroupDescriptor *_nextGroup;
-
-    LLBC_ThreadDescriptor *_firstThreadDesc;
+    std::unordered_map<LLBC_Handle, LLBC_ThreadDescriptor *> _hldr2Threads;
 };
 
 __LLBC_NS_END
 
-#endif // !__LLBC_CORE_THREAD_THREAD_GROUP_DESC_H__
+#include "llbc/core/thread/ThreadGroupDescriptorInl.h"

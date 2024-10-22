@@ -26,7 +26,10 @@ LULLBC_LUA_METH int _lullbc_GetVersionInfo(lua_State *l)
     if (lua_gettop(l) > 0)
         verbose = lua_toboolean(l, 1) != 0;
 
-    const LLBC_String verInfo = LLBC_GetVersionInfo(verbose);
+    LLBC_String verInfo = LLBC_GetVersionInfo(verbose);
+    const size_t insertPos = verbose ? verInfo.find('\n') - 1 : verInfo.length() - 1;
+    verInfo.insert(insertPos, LLBC_String().format(", lua ver:%s.%s", LUA_VERSION_MAJOR, LUA_VERSION_MINOR));
+
     lua_pushlstring(l, verInfo.c_str(), verInfo.length());
 
     return 1;

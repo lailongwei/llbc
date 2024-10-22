@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COMM_CSCOMPONENT_H__
-#define __CSLLBC_COMM_CSCOMPONENT_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -28,7 +27,7 @@
 /**
  * \brief The csharp wrap service comp encapsulation.
  */
-class CSLLBC_HIDDEN csllbc_Component : public LLBC_IComponent
+class CSLLBC_HIDDEN csllbc_Component : public LLBC_Component
 {
     typedef csllbc_Delegates _D;
 
@@ -52,23 +51,24 @@ public:
     /**
      * All comp event handlers.
      */
-    virtual bool OnInitialize();
-    virtual void OnDestroy();
+    virtual bool OnInit(bool &initFinished);
+    virtual void OnDestroy(bool &destroyFinished);
 
-    virtual bool OnStart();
-    virtual void OnStop();
+    virtual bool OnStart(bool &startFinished);
+    virtual void OnStop(bool &stopFinished);
 
     virtual void OnUpdate();
-    virtual void OnIdle(int idleTime);
+    virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
-public:
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
-    virtual void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
 
-public:
-    virtual void OnProtoReport(const LLBC_ProtoReport &report);
-    virtual void OnUnHandledPacket(const LLBC_Packet &packet);
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo);
+    void OnAsyncConnResult(const LLBC_AsyncConnResult &result);
+
+    void OnProtoReport(const LLBC_ProtoReport &report);
+    void OnUnHandledPacket(const LLBC_Packet &packet);
 
 private:
     LLBC_DISABLE_ASSIGNMENT(csllbc_Component);
@@ -90,4 +90,4 @@ private:
     _D::Deleg_Comp_OnUnHandledPacket _unHandledPacketDeleg;
 };
 
-#endif // !__CSLLBC_COMM_CSCOMPONENT_H__
+

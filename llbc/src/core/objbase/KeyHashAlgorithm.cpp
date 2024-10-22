@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/Config.h"
 
@@ -29,20 +29,6 @@
 #include "llbc/core/objbase/KeyHashAlgorithm.h"
 
 __LLBC_NS_BEGIN
-
-__LLBC_Hash::__LLBC_Hash()
-: _bkdrHash()
-, _djbHash()
-, _sdbmHash()
-, _rsHash()
-, _jsHash()
-, _pjHash()
-, _elfHash()
-, _apHash()
-{}
-
-__LLBC_Hash::~__LLBC_Hash()
-{}
 
 uint32 __LLBC_Hash::operator()(int algo, const void *bytes, size_t size)
 {
@@ -72,7 +58,7 @@ uint32 __LLBC_Hash::_BKDRHash::operator()(const void * buf, size_t size) const
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash = hash * seed + str[i];
     }
@@ -85,7 +71,7 @@ uint32 __LLBC_Hash::_DJBHash::operator()(const void *buf, size_t size) const
     uint32 hash = 5381;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         // Equivalent to: hash = hash[i - 1] * 33 + str[i]
         hash += (hash << 5) + str[i];
@@ -99,7 +85,7 @@ uint32 __LLBC_Hash::_SDBMHash::operator() (const void *buf, size_t size) const
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         // Equivalent to: hash = 65599 * hash + (*buf ++);
         hash = str[i] + (hash << 6) + (hash << 16) - hash;
@@ -115,7 +101,7 @@ uint32 __LLBC_Hash::_RSHash::operator()(const void *buf, size_t size) const
     uint32 hash = 0;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash = hash * a + (str[i]);
         a *= b;
@@ -129,7 +115,7 @@ uint32 __LLBC_Hash::_JSHash::operator()(const void *buf, size_t size) const
     uint32 hash = 1315423911;
 
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash ^= ((hash << 5) + str[i] + (hash >> 2));
     }
@@ -144,11 +130,10 @@ uint32 __LLBC_Hash::_PJHash::operator()(const void *buf, size_t size) const
     static const uint32 oneEighth = bitsInUInt32 / 8;
     static const uint32 highBits = 0xffffffff << (bitsInUInt32 - oneEighth);
 
+    uint32 test;
     uint32 hash = 0;
-    uint32 test = 0;
-
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash = (hash << oneEighth) + str[i];
         if((test = hash & highBits) != 0)
@@ -162,17 +147,16 @@ uint32 __LLBC_Hash::_PJHash::operator()(const void *buf, size_t size) const
 
 uint32 __LLBC_Hash::_ELFHash::operator()(const void *buf, size_t size) const
 {
-    uint32 x = 0;
+    uint32 test;
     uint32 hash = 0;
-
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         hash = (hash << 4) + str[i];
-        if((x = hash & 0xF0000000L) != 0)
+        if((test = hash & 0xF0000000L) != 0)
         {
-            hash ^= (x >> 24);
-            hash &= ~x;
+            hash ^= (test >> 24);
+            hash &= ~test;
         }
     }
 
@@ -182,9 +166,8 @@ uint32 __LLBC_Hash::_ELFHash::operator()(const void *buf, size_t size) const
 uint32 __LLBC_Hash::_APHash::operator()(const void *buf, size_t size) const
 {
     uint32 hash = 0;
-
     const uint8 *str = reinterpret_cast<const uint8 *>(buf);
-    for(size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         if((i & 1) == 0)
         {
@@ -200,5 +183,3 @@ uint32 __LLBC_Hash::_APHash::operator()(const void *buf, size_t size) const
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

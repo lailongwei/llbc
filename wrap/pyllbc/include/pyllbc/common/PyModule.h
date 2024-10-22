@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_PY_MODULE_H__
-#define __PYLLBC_COM_PY_MODULE_H__
+#pragma once
 
 #include "pyllbc/common/LibHeader.h"
 #include "pyllbc/common/MethodTable.h"
@@ -159,4 +158,4 @@ private:
 #include "pyllbc/common/TopModule.h"
 #include "pyllbc/common/InlModule.h"
 
-#endif // !__PYLLBC_COM_PY_MODULE_H__
+

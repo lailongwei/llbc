@@ -64,14 +64,13 @@ public:
     }
 };
 
-
 LLBC_EXTERN_C PyObject *_pyllbc_NewTestCase(PyObject *self, PyObject *args)
 {
     char *tcName;
     if (!PyArg_ParseTuple(args, "s", &tcName))
         return nullptr;
 
-    pyllbc_TestCase *tc = LLBC_New(pyllbc_TestCase);
+    pyllbc_TestCase *tc = new pyllbc_TestCase;
     tc->SetName(tcName);
 
     return Py_BuildValue("l", tc);
@@ -83,7 +82,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelTestCase(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &tc))
         return nullptr;
 
-    LLBC_Delete(tc);
+    delete tc;
 
     Py_RETURN_NONE;
 }
@@ -117,8 +116,8 @@ LLBC_EXTERN_C PyObject *_pyllbc_RunTestCase(PyObject *self, PyObject *args)
         return nullptr;
 
     char *tcArgs[2] = {nullptr, nullptr};
-    tcArgs[0] = const_cast<char *>(LLBC_Num2Str(self).c_str());
-    tcArgs[1] = const_cast<char *>(LLBC_Num2Str(argObj).c_str());
+    tcArgs[0] = const_cast<char *>(LLBC_NumToStr(self).c_str());
+    tcArgs[1] = const_cast<char *>(LLBC_NumToStr(argObj).c_str());
 
     return Py_BuildValue("i", tc->Run(2, tcArgs));
 }

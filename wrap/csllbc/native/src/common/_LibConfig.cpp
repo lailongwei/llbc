@@ -32,18 +32,18 @@ int csllbc_LibConfig_DefaultBacklogSize()
 
 int csllbc_LibConfig_Log_RootLoggerName(sint64 name, int nameLen)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_ROOT_LOGGER_NAME), nameLen);
-    LLBC_MemCpy(reinterpret_cast<char *>(name), LLBC_CFG_LOG_ROOT_LOGGER_NAME, writable);
+    const size_t writable = MIN(strlen(LLBC_CFG_LOG_ROOT_LOGGER_NAME), static_cast<size_t>(nameLen));
+    memcpy(reinterpret_cast<char *>(name), LLBC_CFG_LOG_ROOT_LOGGER_NAME, writable);
 
-    return writable;
+    return static_cast<int>(writable);
 }
 
 int csllbc_LibConfig_Log_DefaultNotConfigOptionUse(sint64 notConfigUse, int len)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE), len);
-    LLBC_MemCpy(reinterpret_cast<char *>(notConfigUse), LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE, writable);
+    const size_t writable = MIN(strlen(LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE), static_cast<size_t>(len));
+    memcpy(reinterpret_cast<char *>(notConfigUse), LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE, writable);
 
-    return writable;
+    return static_cast<int>(writable);
 }
 
 int csllbc_LibConfig_Log_DefaultLogLevel()
@@ -68,8 +68,8 @@ int csllbc_LibConfig_Log_DefaultLogToConsole()
 
 int csllbc_LibConfig_Log_DefaultConsoleLogPattern(sint64 pattern, int patternLen)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN), patternLen);
-    LLBC_MemCpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN, writable);
+    const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN)), patternLen);
+    memcpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN, writable);
 
     return writable;
 }
@@ -86,20 +86,25 @@ int csllbc_LibConfig_Log_IsDefaultLogToFile()
 
 int csllbc_LibConfig_Log_DefaultFileLogPattern(sint64 pattern, int patternLen)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN), patternLen);
-    LLBC_MemCpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN, writable);
+    const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN)), patternLen);
+    memcpy(reinterpret_cast<char *>(pattern), LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN, writable);
 
     return writable;
 }
 
-int csllbc_LibConfig_Log_IsDefaultEnabledDailyMode()
+int csllbc_LibConfig_Log_DefaultFileRollingMode()
 {
-    return LLBC_CFG_LOG_DEFAULT_DAILY_MODE;
+    return LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
 }
 
-sint64 csllbc_LibConfig_Log_MaxFileSize()
+sint64 csllbc_LibConfig_Log_MaxFileSizeLimit()
 {
-    return LLBC_CFG_LOG_MAX_FILE_SIZE;
+    return LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT;
+}
+
+sint64 csllbc_LibConfig_Log_DefaultMaxFileSize()
+{
+    return LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
 }
 
 int csllbc_LibConfig_Log_MaxBackupIndex()
@@ -172,11 +177,6 @@ int csllbc_LibConfig_Comm_MaxServiceFPS()
     return LLBC_CFG_COMM_MAX_SERVICE_FPS;
 }
 
-int csllbc_LibConfig_Comm_IsEnabledSamplerSupport()
-{
-    return LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT;
-}
-
 int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount()
 {
     return LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
@@ -187,11 +187,6 @@ int csllbc_LibConfig_Comm_IsEnabledStatusHandler()
     return LLBC_CFG_COMM_ENABLE_STATUS_HANDLER;
 }
 
-int csllbc_LibConfig_Comm_IsEnabledStatusDesc()
-{
-    return LLBC_CFG_COMM_ENABLE_STATUS_DESC;
-}
-
 int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe()
 {
     return LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE;
@@ -199,8 +194,8 @@ int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe()
 
 int csllbc_LibConfig_Comm_PollerModel(sint64 model, int modelLen)
 {
-    const int writable = MIN(LLBC_StrLenA(LLBC_CFG_COMM_POLLER_MODEL), modelLen);
-    LLBC_MemCpy(reinterpret_cast<char *>(model), LLBC_CFG_COMM_POLLER_MODEL, writable);
+    const int writable = MIN(static_cast<int>(strlen(LLBC_CFG_COMM_POLLER_MODEL)), modelLen);
+    memcpy(reinterpret_cast<char *>(model), LLBC_CFG_COMM_POLLER_MODEL, writable);
 
     return writable;
 }

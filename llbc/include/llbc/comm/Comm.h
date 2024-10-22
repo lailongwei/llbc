@@ -19,25 +19,23 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_COMM_H__
-#define __LLBC_COMM_COMM_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#pragma once
 
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/Packet.h"
-#include "llbc/comm/ICoder.h"
-#include "llbc/comm/IComponent.h"
+#include "llbc/comm/Coder.h"
+#include "llbc/comm/Component.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/BasePoller.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
+#include "llbc/comm/ServiceEventFirer.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/ProtoReportLevel.h"
-#include "llbc/comm/protocol/IProtocolFactory.h"
+#include "llbc/comm/protocol/RawProtocolFactory.h"
+#include "llbc/comm/protocol/NormalProtocolFactory.h"
 #include "llbc/comm/protocol/RawProtocol.h"
 #include "llbc/comm/protocol/PacketProtocol.h"
 #include "llbc/comm/protocol/CompressProtocol.h"
@@ -61,6 +59,3 @@ LLBC_HIDDEN int __LLBC_CommStartup();
 LLBC_HIDDEN void __LLBC_CommCleanup();
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_COMM_H__
-

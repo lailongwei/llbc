@@ -31,21 +31,21 @@ class LLBC_Concat(__ClassNamePart1, __ClassNamePart2)
 public:
     void LLBC_Concat(__MethodNamePart1, __MethodNamePart2)()
     {
-        LLBC_PrintLine("%s called, __FUNCTION__:%s", LLBC_ConcatStr(__MethodNamePart1, __MethodNamePart2), __FUNCTION__);
+        LLBC_PrintLn("%s called, __FUNCTION__:%s", LLBC_ConcatStr(__MethodNamePart1, __MethodNamePart2), __FUNCTION__);
     }
 };
 
 int TestCase_Com_ConcatMacro::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Concat macro test:");
+    LLBC_PrintLn("Concat macro test:");
 
     // Create class object.
     LLBC_Concat(__ClassNamePart1, __ClassNamePart2) obj;
-    LLBC_PrintLine("Class name(rtti):%s", LLBC_GetTypeName(obj));
-    LLBC_PrintLine("Call concat name method(inner use LLBC_ConcatStr to format string):");
+    LLBC_PrintLn("Class name(rtti):%s", LLBC_GetTypeName(obj));
+    LLBC_PrintLn("Call concat name method(inner use LLBC_ConcatStr to format string):");
     obj.LLBC_Concat(__MethodNamePart1, __MethodNamePart2)();
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     return 0;

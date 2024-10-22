@@ -21,9 +21,8 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
-#include "llbc/comm/ICoder.h"
+#include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
@@ -44,11 +43,6 @@ LLBC_CodecProtocol::~LLBC_CodecProtocol()
 int LLBC_CodecProtocol::GetLayer() const
 {
     return LLBC_ProtocolLayer::CodecLayer;
-}
-
-int LLBC_CodecProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
 }
 
 int LLBC_CodecProtocol::Send(void *in, void *&out, bool &removeSession)
@@ -92,11 +86,13 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
     Coders::const_iterator it = _coders->find(packet->GetOpcode());
     if (it != _coders->end())
     {
-        LLBC_ICoder *coder = it->second->Create();
+        LLBC_Coder *coder = it->second->Create();
         if (UNLIKELY(!coder->Decode(*packet)))
         {
             LLBC_String reportMsg = LLBC_String().format(
-                    "Decode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
+                "Decode packet failed, opcode: %d, payloadLen: %ld",
+                packet->GetOpcode(),
+                packet->GetPayloadLength());
 
             const LLBC_String &codecErr = packet->GetCodecError();
             if (!codecErr.empty())
@@ -122,7 +118,9 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
     else if (!_stack->GetIsSuppressedCoderNotFoundWarning())
     {
         const LLBC_String reportMsg = LLBC_String().format(
-            "Coder not found, decode packet failed, opcode: %d, payloadLen: %ld", packet->GetOpcode(), packet->GetPayloadLength());
+            "Coder not found, decode packet failed, opcode: %d, payloadLen: %ld",
+            packet->GetOpcode(),
+            packet->GetPayloadLength());
         _stack->Report(packet->GetSessionId(),
                        packet->GetOpcode(),
                        this,
@@ -142,5 +140,3 @@ int LLBC_CodecProtocol::Recv(void *in, void *&out, bool &removeSession)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

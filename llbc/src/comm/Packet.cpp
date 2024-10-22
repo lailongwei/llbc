@@ -21,17 +21,9 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
-#include "llbc/comm/ICoder.h"
+#include "llbc/comm/Coder.h"
 #include "llbc/comm/Packet.h"
-
-__LLBC_INTERNAL_NS_BEGIN
-
-static const LLBC_NS LLBC_String __g_dftStatusDesc;
-static const char *__g_msgBlockTypeName = typeid(LLBC_NS LLBC_MessageBlock).name();
-
-__LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
@@ -40,14 +32,9 @@ LLBC_Packet::LLBC_Packet()
 
 , _sessionId(0)
 , _acceptSessionId(0)
-, _senderSvcId(0)
-, _recverSvcId(0)
 
 , _opcode(0)
 , _status(0)
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-, _statusDesc(nullptr)
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 , _flags(0)
 , _extData1(0)
 , _extData2(0)
@@ -61,8 +48,7 @@ LLBC_Packet::LLBC_Packet()
 
 , _payload(nullptr)
 
-, _selfPoolInst(nullptr)
-, _msgBlockPoolInst(nullptr)
+, _typedObjPool(nullptr)
 {
 }
 
@@ -75,51 +61,11 @@ LLBC_Packet::~LLBC_Packet()
     LLBC_XRecycle(_encoder);
     LLBC_XRecycle(_decoder);
     LLBC_XDelete(_codecError);
-
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    LLBC_XDelete(_statusDesc);
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 }
-
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-const LLBC_String &LLBC_Packet::GetStatusDesc() const
-{
-    return (_statusDesc) ? *_statusDesc : LLBC_INL_NS __g_dftStatusDesc;
-}
-
-void LLBC_Packet::SetStatusDesc(const LLBC_String &desc)
-{
-    if (_statusDesc)
-        _statusDesc->assign(desc.data(), desc.size());
-    else
-        _statusDesc = LLBC_New(LLBC_String, desc.data(), desc.size());
-}
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
 
 void LLBC_Packet::SetPayloadDeleteDeleg(const LLBC_Delegate<void(LLBC_MessageBlock *)> &deleg)
 {
     _payloadDeleteDeleg = deleg;
-}
-
-void LLBC_Packet::MarkPoolObject(LLBC_IObjectPoolInst &poolInst)
-{
-    _selfPoolInst = &poolInst;
-    _msgBlockPoolInst = poolInst.GetIObjectPool()->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
-}
-
-size_t LLBC_Packet::GetPoolInstPerBlockUnitsNum()
-{
-    return LLBC_CFG_CORE_OBJECT_POOL_PACKET_UNITS_NUMBER;
-}
-
-void LLBC_Packet::OnPoolInstCreate(LLBC_IObjectPoolInst &poolInst)
-{
-    // Set delete order.
-    LLBC_IObjectPool *objPool = poolInst.GetIObjectPool();
-    objPool->AcquireOrderedDeletePoolInst(typeid(LLBC_Packet).name(), LLBC_INL_NS __g_msgBlockTypeName);
-
-    // Force create dependented pool instances(MessageBlock/...)
-    (void)objPool->GetIPoolInst(LLBC_INL_NS __g_msgBlockTypeName);
 }
 
 void LLBC_Packet::Clear()
@@ -134,10 +80,10 @@ void LLBC_Packet::Clear()
         }
         else
         {
-            LLBC_IObjectPoolInst *payloadPoolInst = _payload->GetPoolInst();
-            if (payloadPoolInst)
+            LLBC_TypedObjPool<LLBC_MessageBlock> *payloadObjPool = _payload->GetTypedObjPool();
+            if (payloadObjPool)
             {
-                payloadPoolInst->Release(_payload);
+                payloadObjPool->Release(_payload);
                 _payload = nullptr;
             }
             else
@@ -155,17 +101,11 @@ void LLBC_Packet::Clear()
     _length = 0;
     _sessionId = 0;
     _acceptSessionId = 0;
-    _senderSvcId = 0;
-    _recverSvcId = 0;
     _localAddr.SetIp(0); _localAddr.SetPort(0);
     _peerAddr.SetIp(0); _peerAddr.SetPort(0);
 
     _opcode = 0;
     _status = 0;
-#if LLBC_CFG_COMM_ENABLE_STATUS_DESC
-    if (_statusDesc)
-        _statusDesc->clear();
-#endif // LLBC_CFG_COMM_ENABLE_STATUS_DESC
     _flags = 0;
     _extData1 = 0;
     _extData2 = 0;
@@ -178,12 +118,28 @@ void LLBC_Packet::Clear()
     CleanupPreHandleResult();
 }
 
-LLBC_ICoder *LLBC_Packet::GetEncoder() const
+LLBC_TypedObjPool<LLBC_Packet> *LLBC_Packet::GetTypedObjPool() const
+{
+    return _typedObjPool;
+}
+
+void LLBC_Packet::SetTypedObjPool(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool)
+{
+    _typedObjPool = typedObjPool;
+}
+
+void LLBC_Packet::OnTypedObjPoolCreated(LLBC_ObjPool *objPool)
+{
+    // Set delete order: LLBC_Packet <- LLBC_MessageBlock.
+    objPool->EnsureDeletionBefore<LLBC_Packet, LLBC_MessageBlock>();
+}
+
+LLBC_Coder *LLBC_Packet::GetEncoder() const
 {
     return _encoder;
 }
 
-void LLBC_Packet::SetEncoder(LLBC_ICoder *encoder)
+void LLBC_Packet::SetEncoder(LLBC_Coder *encoder)
 {
     if (UNLIKELY(encoder == _encoder))
         return;
@@ -192,20 +148,20 @@ void LLBC_Packet::SetEncoder(LLBC_ICoder *encoder)
     _encoder = encoder;
 }
 
-LLBC_ICoder *LLBC_Packet::GiveUpEncoder()
+LLBC_Coder *LLBC_Packet::GiveUpEncoder()
 {
-    LLBC_ICoder *encoder = _encoder;
+    LLBC_Coder *encoder = _encoder;
     _encoder = nullptr;
 
     return encoder;
 }
 
-LLBC_ICoder *LLBC_Packet::GetDecoder() const
+LLBC_Coder *LLBC_Packet::GetDecoder() const
 {
     return _decoder;
 }
 
-void LLBC_Packet::SetDecoder(LLBC_ICoder *decoder)
+void LLBC_Packet::SetDecoder(LLBC_Coder *decoder)
 {
     if (UNLIKELY(decoder == _decoder))
         return;
@@ -214,9 +170,9 @@ void LLBC_Packet::SetDecoder(LLBC_ICoder *decoder)
     _decoder = decoder;
 }
 
-LLBC_ICoder *LLBC_Packet::GiveUpDecoder()
+LLBC_Coder *LLBC_Packet::GiveUpDecoder()
 {
-    LLBC_ICoder *decoder = _decoder;
+    LLBC_Coder *decoder = _decoder;
     _decoder = nullptr;
 
     return decoder;
@@ -226,8 +182,8 @@ bool LLBC_Packet::Encode()
 {
     if (_encoder)
     {
-        if (!_payload && _msgBlockPoolInst)
-            _payload = reinterpret_cast<LLBC_MessageBlock *>(_msgBlockPoolInst->Get());
+        if (!_payload && _typedObjPool)
+            _payload = _typedObjPool->GetObjPool()->Acquire<LLBC_MessageBlock>();
 
         if (!_encoder->Encode(*this))
             return false;
@@ -246,7 +202,7 @@ bool LLBC_Packet::Decode()
     return true;
 }
 
-LLBC_MessageBlock *LLBC_Packet::GiveUp()
+LLBC_MessageBlock *LLBC_Packet::GiveUpPayload()
 {
     Encode();
     if (!_payload)
@@ -279,9 +235,18 @@ const LLBC_String &LLBC_Packet::GetCodecError() const
 void LLBC_Packet::SetCodecError(const LLBC_String &codecErr)
 {
     if (_codecError)
-        LLBC_Delete(_codecError);
+        delete _codecError;
 
-    _codecError = LLBC_New(LLBC_String, codecErr.c_str(), codecErr.length());
+    _codecError = new LLBC_String(codecErr.c_str(), codecErr.length());
+}
+
+LLBC_String LLBC_Packet::ToString() const
+{
+    return LLBC_String().format(
+        "Packet[sid:%d, acceptSid:%d, opcode:%d, st:%d, "
+        "payload:(read_pos:%lu, write_pos:%lu)]",
+        _sessionId, _acceptSessionId, _opcode, _status,
+        _payload ? _payload->GetReadPos() : 0lu, _payload ? _payload->GetWritePos() : 0lu);
 }
 
 void LLBC_Packet::CleanupPreHandleResult()
@@ -317,5 +282,3 @@ void LLBC_Packet::CleanupPayload()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

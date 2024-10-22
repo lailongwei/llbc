@@ -33,10 +33,10 @@ static __LLBC_SemTestType *__g_testVal;
 
 static LLBC_SimpleLock __g_outLock;
 
-static int WaiterThreadProc(void *arg)
+static void WaiterThreadProc(void *arg)
 {
     int threadIndex = 0;
-    ::memcpy(&threadIndex, &arg, sizeof(int));
+    memcpy(&threadIndex, &arg, sizeof(int));
 
     __g_testVal->sem.Wait();
     __g_outLock.Lock();
@@ -65,11 +65,9 @@ static int WaiterThreadProc(void *arg)
     __g_outLock.Lock();
     std::cout <<"waiter " <<threadIndex <<" exit" <<std::endl;
     __g_outLock.Unlock();
-
-    return 0;
 }
 
-static int SignalerThreadProc(void *arg)
+static void SignalerThreadProc(void *arg)
 {
     LLBC_Sleep(1000);
 
@@ -100,8 +98,6 @@ static int SignalerThreadProc(void *arg)
     __g_outLock.Lock();
     std::cout <<"signaler exit" <<std::endl;
     __g_outLock.Unlock();
-
-    return 0;
 }
 
 TestCase_Core_Thread_Semaphore::TestCase_Core_Thread_Semaphore()
@@ -117,7 +113,7 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     std::cout <<"core/thread/semaphore test: " <<std::endl;
 
     // Create test value structure.
-    __g_testVal = LLBC_New(__LLBC_SemTestType);
+    __g_testVal = new __LLBC_SemTestType;
     __g_testVal->value = 0;
 
     // Create waiters.
@@ -125,13 +121,13 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     for(long i = 0; i < __g_waitersCount; ++i)
     {
         void *threadArg = nullptr;
-        ::memcpy(&threadArg, &i, sizeof(long));
-        LLBC_CreateThread(&waiters[i], &WaiterThreadProc, threadArg);
+        memcpy(&threadArg, &i, sizeof(long));
+        LLBC_CreateThread(&WaiterThreadProc, threadArg, &waiters[i]);
     }
 
     // Create signaler.
     LLBC_NativeThreadHandle signaler = LLBC_INVALID_NATIVE_THREAD_HANDLE;
-    LLBC_CreateThread(&signaler, &SignalerThreadProc, nullptr);
+    LLBC_CreateThread(&SignalerThreadProc, nullptr, &signaler);
 
     // Join signaler.
     LLBC_JoinThread(signaler);
@@ -146,7 +142,7 @@ int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
     getchar();
 
     // Delete test value structure.
-    LLBC_Delete(__g_testVal);
+    delete __g_testVal;
 
     return 0;
 }

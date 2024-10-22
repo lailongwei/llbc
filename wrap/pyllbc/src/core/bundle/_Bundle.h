@@ -23,7 +23,7 @@
 
 LLBC_EXTERN_C PyObject *_pyllbc_NewBundle(PyObject *self, PyObject *args)
 {
-    LLBC_Bundle *b = LLBC_New(LLBC_Bundle);
+    LLBC_Bundle *b = new LLBC_Bundle;
     return Py_BuildValue("l", b);
 }
 
@@ -33,7 +33,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelBundle(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "l", &bundlePtr))
         return nullptr;
 
-    LLBC_Delete(bundlePtr);
+    delete bundlePtr;
 
     Py_RETURN_NONE;
 }
@@ -41,7 +41,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelBundle(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_GetMainBundle(PyObject *self, PyObject *args)
 {
     const LLBC_Bundle *b = LLBC_Bundle::GetMainBundle();
-    return PyLong_FromLong(reinterpret_cast<long>(b));
+    return PyLong_FromLongLong(reinterpret_cast<sint64>(b));
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_GetBundlePath(PyObject *self, PyObject *args)

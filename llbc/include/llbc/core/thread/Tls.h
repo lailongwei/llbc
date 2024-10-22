@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_TLS_H__
-#define __LLBC_CORE_THREAD_TLS_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -61,25 +60,25 @@ public:
      * Get value associated with the tls.
      * @return ValueType * - value pointer.
      */
-    ValueType *operator ->();
+    ValueType *operator->();
 
     /**
      * Get value associated with the tls.
      * @return ValueType * - value pointer.
      */
-    const ValueType *operator ->() const;
+    const ValueType *operator->() const;
 
     /**
      * Get value associated with the tls.
      * @return ValueType & - value reference.
      */
-    ValueType &operator *();
+    ValueType &operator*();
 
     /**
      * Get value associated with the tls.
      * @return const ValueType & - const value reference.
      */
-    const ValueType &operator *() const;
+    const ValueType &operator*() const;
 
     /**
      * Get value associated with the tls.
@@ -114,6 +113,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/TlsImpl.h"
+#include "llbc/core/thread/TlsInl.h"
 
-#endif // !__LLBC_CORE_THREAD_TLS_H__
+

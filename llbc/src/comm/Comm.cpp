@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Comm.h"
 
@@ -29,17 +28,12 @@ __LLBC_NS_BEGIN
 
 int __LLBC_CommStartup()
 {
-    // Supported object-pool reflection types assert.
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_ICoder>());
-    ASSERT(LLBC_PoolObjectReflection::IsSupportedPoolObjectReflection<LLBC_Packet>());
-
     return LLBC_OK;
 }
 
 void __LLBC_CommCleanup()
 {
+    LLBC_ServiceMgrSingleton->StopAll();
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -27,25 +27,31 @@
 #include "pyllbc/common/PackLemmaCompiler.h"
 #include "pyllbc/common/PyStream.h"
 
-namespace
-{
-    typedef pyllbc_Stream This;
-}
-
-PyObject *pyllbc_Stream::_methEncode = nullptr;
-PyObject *pyllbc_Stream::_methDecode = nullptr;
-
+PyObject *pyllbc_Stream::_serMeths[6]{};
+PyObject *pyllbc_Stream::_deserMeths[8]{};
 PyObject *pyllbc_Stream::_keyDict = nullptr;
 PyObject *pyllbc_Stream::_keySlots = nullptr;
 
-pyllbc_Stream::pyllbc_Stream(PyObject *pyStream, size_t size)
-: _stream(size)
+pyllbc_Stream::pyllbc_Stream(PyObject *pyStream, size_t cap)
+: _stream(cap)
 , _pyStream(pyStream)
 {
-    if (UNLIKELY(!_methEncode))
+    // TODO: Will unify initialize these attr keys
+    if (UNLIKELY(!_serMeths[0]))
     {
-        _methEncode = PyString_FromString("encode");
-        _methDecode = PyString_FromString("decode");
+        int idx = 0;
+        for (auto &meth :
+             { "ser", "Ser",
+               "serialize", "Serialize",
+               "encode", "Encode" })
+            _serMeths[idx++] = PyString_FromString(meth);
+
+        idx = 0;
+        for (auto &meth :
+             { "deser", "Deser", "DeSer",
+               "deserialize", "Deserialize", "DeSerialize",
+               "decode", "Decode" })
+            _deserMeths[idx++] = PyString_FromString(meth);
 
         _keyDict = PyString_FromString("__dict__");
         _keySlots = PyString_FromString("__slots__");
@@ -56,86 +62,9 @@ pyllbc_Stream::~pyllbc_Stream()
 {
 }
 
-int pyllbc_Stream::GetEndian() const
-{
-    return _stream.GetEndian();
-}
-
-int pyllbc_Stream::SetEndian(int endian)
-{
-    if (!LLBC_Endian::IsValid(endian))
-    {
-        pyllbc_SetError("Invalid endian value", LLBC_ERROR_INVALID);
-        return LLBC_FAILED;
-    }
-
-    _stream.SetEndian(endian);
-
-    return LLBC_OK;
-}
-
-size_t pyllbc_Stream::GetPos() const
-{
-    return _stream.GetPos();
-}
-
-int pyllbc_Stream::SetPos(size_t pos)
-{
-    if (pos > _stream.GetSize())
-    {
-        pyllbc_SetError("pos out of range", LLBC_ERROR_LIMIT);
-        return LLBC_FAILED;
-    }
-
-    _stream.SetPos(pos);
-
-    return LLBC_OK;
-}
-
-size_t pyllbc_Stream::GetSize() const
-{
-    return _stream.GetSize();
-}
-
-int pyllbc_Stream::SetSize(size_t size)
-{
-    if (_stream.IsAttach())
-    {
-        pyllbc_SetError("could not set attach buffer stream size(attached buffer maybe from pyllbc native library or other native libraries)", LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
-    }
-
-    if (size <= _stream.GetSize())
-    {
-         pyllbc_SetError("stream new size must greater than old size", LLBC_ERROR_LIMIT);
-         return LLBC_FAILED;
-    }
-
-    _stream.Resize(size);
-
-    return LLBC_OK;
-}
-
-LLBC_Stream &pyllbc_Stream::GetLLBCStream()
-{
-    return _stream;
-}
-
-const LLBC_Stream &pyllbc_Stream::GetLLBCStream() const
-{
-    return _stream;
-}
-
-PyObject *pyllbc_Stream::GetPyObj()
-{
-    Py_INCREF(_pyStream);
-    return _pyStream;
-}
-
 PyObject *pyllbc_Stream::GetRaw()
 {
-    return PyString_FromStringAndSize(reinterpret_cast<
-        const char *>(_stream.GetBuf()), _stream.GetPos());
+    return PyString_FromStringAndSize(_stream.GetBuf<char>(), _stream.GetWritePos());
 }
 
 int pyllbc_Stream::SetRaw(PyObject *raw)
@@ -174,8 +103,8 @@ int pyllbc_Stream::SetRaw(PyObject *raw)
         return LLBC_FAILED;
     }
 
-    _stream.SetPos(0);
-    _stream.WriteBuffer(buf, len);
+    _stream.SetWritePos(0);
+    _stream.Write(buf, len);
 
     return LLBC_OK;
 }
@@ -225,37 +154,41 @@ PyObject *pyllbc_Stream::Read(PyObject *cls)
         break;
     }
 
-    if (!PyObject_HasAttr(cls, _methDecode))
+    for (auto &meth : _deserMeths)
     {
-        pyllbc_SetError("will decode class not exist 'decode' method", LLBC_ERROR_NOT_FOUND);
-        return nullptr;
+        if (!PyObject_HasAttr(cls, meth))
+            continue;
+
+        PyObject *obj = PyObject_CallObject(cls, nullptr);
+        if (!obj)
+        {
+            PyObject *pyClsStr = PyObject_Str(cls);
+            const LLBC_String clsStr = PyString_AS_STRING(pyClsStr);
+            Py_DECREF(pyClsStr);
+    
+            LLBC_String addiMsg;
+            pyllbc_TransferPyError(addiMsg.format(
+                "When create class[%s] instance in Stream.unpack() method", clsStr.c_str()));
+            return nullptr;
+        }
+    
+        PyObject *rtn = PyObject_CallMethodObjArgs(obj, meth, _pyStream, nullptr);
+        if (!rtn)
+        {
+            pyllbc_TransferPyError();
+            Py_DECREF(obj);
+    
+            return nullptr;
+        }
+    
+        Py_DECREF(rtn);
+
+        return obj;
     }
 
-    PyObject *obj = PyObject_CallObject(cls, nullptr);
-    if (!obj)
-    {
-        PyObject *pyClsStr = PyObject_Str(cls);
-        const LLBC_String clsStr = PyString_AS_STRING(pyClsStr);
-        Py_DECREF(pyClsStr);
+    pyllbc_SetError("will deser class not exist 'deser' like methods", LLBC_ERROR_NOT_FOUND);
 
-        LLBC_String addiMsg;
-        pyllbc_TransferPyError(addiMsg.format(
-            "When create class[%s] instance in Stream.unpack() method", clsStr.c_str()));
-        return nullptr;
-    }
-
-    PyObject *rtn = PyObject_CallMethodObjArgs(obj, _methDecode, _pyStream, nullptr);
-    if (!rtn)
-    {
-        pyllbc_TransferPyError();
-        Py_DECREF(obj);
-
-        return nullptr;
-    }
-
-    Py_DECREF(rtn);
-
-    return obj;
+    return nullptr;
 }
 
 PyObject *pyllbc_Stream::ReadNone()
@@ -323,7 +256,7 @@ PyObject *pyllbc_Stream::ReadInt64()
         return nullptr;
     }
 
-    return Py_BuildValue("L", val);
+    return PyLong_FromLongLong(val);
 }
 
 PyObject *pyllbc_Stream::ReadFloat()
@@ -350,98 +283,91 @@ PyObject *pyllbc_Stream::ReadDouble()
     return PyFloat_FromDouble(val);
 }
 
-
-PyObject *pyllbc_Stream::ReadPyInt()
-{
-    return ReadInt64();
-}
-
-PyObject *pyllbc_Stream::ReadPyLong()
-{
-    return ReadInt64();
-}
-
 PyObject *pyllbc_Stream::ReadStr()
 {
-    if (UNLIKELY(_stream.GetPos() == _stream.GetSize()))
+    const size_t rpos = _stream.GetReadPos();
+	const size_t wpos = _stream.GetWritePos();
+    if (UNLIKELY(rpos >= wpos))
         return PyString_FromStringAndSize("", 0);
 
-    LLBC_String val;
-    if (!_stream.Read(val))
+    const char *buf = _stream.GetBuf<char>();
+    for (size_t i = rpos; i != wpos; ++i)
     {
-        pyllbc_SetError("not enough bytes to decode 'str'", LLBC_ERROR_LIMIT);
-        return nullptr;
+        if (buf[i] == '\0')
+        {
+            const auto len = i - rpos;
+            PyObject *pyStr = PyString_FromStringAndSize(buf + rpos, len);
+            _stream.SkipRead(static_cast<long>(len + 1));
+
+            return pyStr;
+        }
     }
 
-    return PyString_FromStringAndSize(val.data(), val.size());
+    PyObject *pyStr = PyString_FromStringAndSize(buf + rpos, wpos - rpos);
+    _stream.SetReadPos(wpos);
+
+    return pyStr;
 }
 
 PyObject *pyllbc_Stream::ReadStr2()
 {
-    int len;
+    uint32 len;
     if (!_stream.Read(len))
     {
         pyllbc_SetError("not enough bytes to decode 'str' len part", LLBC_ERROR_LIMIT);
         return nullptr;
     }
 
-    if (static_cast<int>(_stream.GetSize() - _stream.GetPos()) < len)
+    if (static_cast<uint32>(_stream.GetReadableSize()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'str'", LLBC_ERROR_LIMIT);
         return nullptr;
     }
 
-    PyObject *pyStr = PyString_FromStringAndSize(
-        reinterpret_cast<const char *>(_stream.GetBufStartWithPos()), len);
-    _stream.Skip(len);
-
-    return pyStr;
-}
-
-PyObject *pyllbc_Stream::ReadStr3()
-{
-    PyObject *pyStr = PyString_FromStringAndSize(
-        reinterpret_cast<const char *>(_stream.GetBufStartWithPos()), _stream.GetSize() - _stream.GetPos());
-    _stream.SetPos(_stream.GetSize());
+    PyObject *pyStr = PyString_FromStringAndSize(_stream.GetBufStartWithReadPos<char>(), len);
+    _stream.SkipRead(len);
 
     return pyStr;
 }
 
 PyObject *pyllbc_Stream::ReadUnicode()
 {
-    LLBC_String val;
-    if (!_stream.Read(val))
+    uint32 len;
+    if (!_stream.Read(len))
+    {
+        pyllbc_SetError("not enough bytes to decode 'unicode' len part", LLBC_ERROR_LIMIT);
+        return nullptr;
+    }
+
+    if (static_cast<uint32>(_stream.GetReadableSize()) < len)
     {
         pyllbc_SetError("not enough bytes to decode 'unicode'", LLBC_ERROR_LIMIT);
         return nullptr;
     }
 
-    return PyUnicode_FromStringAndSize(val.data(), val.size());
+    PyObject *pyUni = PyUnicode_FromStringAndSize(_stream.GetBufStartWithReadPos<char>(), len);
+    _stream.SkipRead(len);
+
+    return pyUni;
 }
 
 PyObject *pyllbc_Stream::ReadByteArray()
 {
-    static const char *errStr = "not enough bytes to decode 'bytearray'";
-
-    sint32 len;
+    uint32 len;
     if (!_stream.Read(len))
     {
-        pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
+        pyllbc_SetError("not enough bytes to decode 'byte array' len part", LLBC_ERROR_LIMIT);
         return nullptr;
     }
 
-    char *buf = LLBC_Malloc(char, len);
-    if (!_stream.ReadBuffer(buf, len))
+    if (static_cast<uint32>(_stream.GetReadableSize()) < len)
     {
-        pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
-        LLBC_Free(buf);
-
+        pyllbc_SetError("not enough bytes to decode 'byte array'", LLBC_ERROR_LIMIT);
         return nullptr;
     }
 
-    PyObject *pyVal = 
-        PyByteArray_FromStringAndSize(buf, len);
-    LLBC_Free(buf);
+    PyObject *pyVal = PyByteArray_FromStringAndSize(_stream.GetBufStartWithReadPos<char>(), len);
+    _stream.SkipRead(len);
 
     return pyVal;
 }
@@ -474,7 +400,7 @@ PyObject *pyllbc_Stream::ReadBuffer()
         return nullptr;
     }
 
-    if (!_stream.ReadBuffer(buf, bufLen))
+    if (!_stream.Read(buf, static_cast<size_t>(bufLen)))
     {
         pyllbc_SetError(errStr, LLBC_ERROR_LIMIT);
 
@@ -543,7 +469,75 @@ int pyllbc_Stream::Write(PyObject *obj)
         break;
     }
 
-    return WriteInst(obj);
+    // Write user defined obj.
+    // 1) Search serialize methods.
+    for (auto &meth : _serMeths)
+    {
+        if (PyObject_HasAttr(obj, meth))
+        {
+            PyObject *rtn = PyObject_CallMethodObjArgs(obj, meth, _pyStream, nullptr);
+            if (!rtn)
+            {
+                pyllbc_TransferPyError();
+                return LLBC_FAILED;
+            }
+
+            Py_DECREF(rtn);
+
+            return LLBC_OK;
+        }
+    }
+
+    // 2) Use __dict__.
+    PyObject *dict = PyObject_GetAttr(obj, _keyDict);
+    if (dict)
+    {
+        const int rtn = WriteDict(dict);
+        Py_DECREF(dict);
+
+        return rtn;
+    }
+
+    // 3) Use __slots__.
+    PyObject *slots = PyObject_GetAttr(obj, _keySlots);
+    if (!slots)
+    {
+        pyllbc_SetError("could not write object", PYLLBC_ERROR_COMMON);
+        return LLBC_FAILED;
+    }
+
+    std::vector<std::pair<PyObject *, PyObject *> > kws;
+
+    const Py_ssize_t len = PySequence_Size(slots);
+    for (Py_ssize_t i = 0; i < len; ++i)
+    {
+        PyObject *slotItem = PySequence_ITEM(slots, i);
+        PyObject *slotVal = PyObject_GetAttr(obj, slotItem);
+        if (slotVal)
+            kws.push_back(std::make_pair(slotItem, slotVal));
+        else
+            Py_DECREF(slotItem);
+    }
+
+    int rtn = LLBC_OK;
+    _stream.Write(static_cast<sint32>(kws.size()));
+    for (size_t i = 0; i < kws.size(); ++i)
+    {
+        if ((rtn = Write(kws[i].first)) != LLBC_OK)
+            break;
+        if ((rtn = Write(kws[i].second)) != LLBC_OK)
+            break;
+    }
+
+    for (size_t i = 0; i < kws.size(); ++i)
+    {
+        Py_DECREF(kws[i].first);
+        Py_DECREF(kws[i].second);
+    }
+
+    Py_DECREF(slots);
+
+    return rtn;
 }
 
 int pyllbc_Stream::WriteNone(PyObject *val)
@@ -569,7 +563,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
             return LLBC_FAILED;
         }
 
-        _stream.WriteBuffer(str, 1);
+        _stream.Write(str, 1);
 
         return LLBC_OK;
     }
@@ -589,7 +583,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
             return LLBC_FAILED;
         }
 
-        _stream.WriteBuffer(buf, 1);
+        _stream.Write(buf, 1);
 
         return LLBC_OK;
     }
@@ -610,7 +604,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
             return LLBC_FAILED;
         }
 
-        _stream.WriteBuffer(buffer.buf, 1);
+        _stream.Write(buffer.buf, 1);
         PyBuffer_Release(&buffer);
 
         return LLBC_OK;
@@ -618,7 +612,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
     else if (pyllbc_TypeDetector::IsBool(val))
     {
         const bool boolVal = !!PyObject_IsTrue(val);
-        _stream.WriteBool(boolVal);
+        _stream.Write(boolVal);
 
         return LLBC_OK;
     }
@@ -626,7 +620,7 @@ int pyllbc_Stream::WriteByte(PyObject *val)
         pyllbc_TypeDetector::IsLong(val))
     {
         const long longVal = PyLong_AsLong(val);
-        _stream.WriteBuffer(&longVal, 1);
+        _stream.Write(&longVal, 1);
 
         return LLBC_OK;
     }
@@ -713,16 +707,6 @@ int pyllbc_Stream::WriteDouble(PyObject *val)
     return LLBC_OK;
 }
 
-int pyllbc_Stream::WritePyInt(PyObject *val)
-{
-    return WriteInt64(val);
-}
-
-int pyllbc_Stream::WritePyLong(PyObject *val)
-{
-    return WriteInt64(val);
-}
-
 int pyllbc_Stream::WriteStr(PyObject *val)
 {
     char *str;
@@ -733,8 +717,9 @@ int pyllbc_Stream::WriteStr(PyObject *val)
         return LLBC_FAILED;
     }
 
-    _stream.WriteBuffer(str, static_cast<size_t>(len));
-    _stream.WriteBuffer("\0", 1);
+    if (str && len > 0)
+        _stream.Write(str, len);
+    _stream.Write('\0');
 
     return LLBC_OK;
 }
@@ -749,23 +734,8 @@ int pyllbc_Stream::WriteStr2(PyObject *val)
         return LLBC_FAILED;
     }
 
-    _stream.Write(static_cast<int>(len));
-    _stream.WriteBuffer(str, len);
-
-    return LLBC_OK;
-}
-
-int pyllbc_Stream::WriteStr3(PyObject *val)
-{
-    char *str;
-    Py_ssize_t len;
-    if (PyString_AsStringAndSize(val, &str, &len) == -1)
-    {
-        pyllbc_TransferPyError();
-        return LLBC_FAILED;
-    }
-
-    _stream.WriteBuffer(str, static_cast<size_t>(len));
+    _stream.Write(static_cast<uint32>(len));
+    _stream.Write(str, len);
 
     return LLBC_OK;
 }
@@ -779,7 +749,7 @@ int pyllbc_Stream::WriteUnicode(PyObject *val)
         return LLBC_FAILED;
     }
 
-    const int rtn = WriteStr(str);
+    const int rtn = WriteStr2(str);
     Py_DECREF(str);
 
     return rtn;
@@ -792,7 +762,7 @@ int pyllbc_Stream::WriteByteArray(PyObject *val)
 
     _stream.Write(static_cast<sint32>(len));
     if (len > 0)
-        _stream.WriteBuffer(buf, len);
+        _stream.Write(buf, len);
 
     return LLBC_OK;
 }
@@ -809,7 +779,7 @@ int pyllbc_Stream::WriteBuffer(PyObject *val)
 
     _stream.Write(static_cast<sint32>(len));
     if (len > 0)
-        _stream.WriteBuffer(buf, len);
+        _stream.Write(buf, len);
 
     return LLBC_OK;
 }
@@ -863,75 +833,6 @@ int pyllbc_Stream::WriteDict(PyObject *val)
     }
 
     return LLBC_OK;
-}
-
-int pyllbc_Stream::WriteInst(PyObject *val)
-{
-    // 1) Search encode() method.
-    if (PyObject_HasAttr(val, _methEncode))
-    {
-        PyObject *rtn = PyObject_CallMethodObjArgs(val, _methEncode, _pyStream, nullptr);
-        if (!rtn)
-        {
-            pyllbc_TransferPyError();
-            return LLBC_FAILED;
-        }
-
-        Py_DECREF(rtn);
-
-        return LLBC_OK;
-    }
-
-    // 2) Use __dict__.
-    PyObject *dict = PyObject_GetAttr(val, This::_keyDict);
-    if (dict)
-    {
-        const int rtn = This::WriteDict(dict);
-        Py_DECREF(dict);
-
-        return rtn;
-    }
-
-    // 3) Use __slots__.
-    PyObject *slots = PyObject_GetAttr(val, This::_keySlots);
-    if (!slots)
-    {
-        pyllbc_SetError("could not write object", PYLLBC_ERROR_COMMON);
-        return LLBC_FAILED;
-    }
-
-    std::vector<std::pair<PyObject *, PyObject *> > kws;
-
-    const Py_ssize_t len = PySequence_Size(slots);
-    for (Py_ssize_t i = 0; i < len; ++i)
-    {
-        PyObject *slotItem = PySequence_ITEM(slots, i);
-        PyObject *slotVal = PyObject_GetAttr(val, slotItem);
-        if (slotVal)
-            kws.push_back(std::make_pair(slotItem, slotVal));
-        else
-            Py_DECREF(slotItem);
-    }
-
-    int rtn = LLBC_OK;
-    _stream.Write(static_cast<sint32>(kws.size()));
-    for (size_t i = 0; i < kws.size(); ++i)
-    {
-        if ((rtn = Write(kws[i].first)) != LLBC_OK)
-            break;
-        if ((rtn = Write(kws[i].second)) != LLBC_OK)
-            break;
-    }
-
-    for (size_t i = 0; i < kws.size(); ++i)
-    {
-        Py_DECREF(kws[i].first);
-        Py_DECREF(kws[i].second);
-    }
-
-    Py_DECREF(slots);
-
-    return rtn;
 }
 
 int pyllbc_Stream::FmtWrite(const LLBC_String &fmt, PyObject *values, PyObject *callerEnv)

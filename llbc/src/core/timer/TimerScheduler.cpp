@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Time.h"
 
@@ -28,12 +28,6 @@
 #include "llbc/core/timer/TimerData.h"
 
 #include "llbc/core/timer/TimerScheduler.h"
-
-__LLBC_INTERNAL_NS_BEGIN
-
-static LLBC_NS LLBC_TimerScheduler *__g_entryThreadTimerScheduler = nullptr;
-
-__LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
@@ -48,11 +42,9 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
 {
     _destroyed = true;
 
-    const size_t size = _heap.GetSize();
-    const _Heap::Container &elems = _heap.GetData();
-    for (size_t i = 1; i <= size; ++i)
+    for(auto &elem : _heap)
     {
-        LLBC_TimerData *data = const_cast<LLBC_TimerData *>(elems[i]);
+        LLBC_TimerData *data = elem;
         if (data->validate)
         {
             data->validate = false;
@@ -62,55 +54,8 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
         }
 
         if (--data->refCount == 0)
-            LLBC_Delete(data);
+            delete data;
     }
-}
-
-int LLBC_TimerScheduler::CreateEntryThreadScheduler()
-{
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (!tls->coreTls.entryThread)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
-    }
-    else if (tls->coreTls.timerScheduler)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REENTRY);
-        return LLBC_FAILED;
-    }
-
-    tls->coreTls.timerScheduler = 
-        LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = LLBC_New(LLBC_TimerScheduler);
-
-    return LLBC_OK;
-}
-
-int LLBC_TimerScheduler::DestroyEntryThreadScheduler()
-{
-    __LLBC_LibTls *tls = __LLBC_GetLibTls();
-    if (!tls->coreTls.entryThread)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
-    }
-    else if (!tls->coreTls.timerScheduler)
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-
-    tls->coreTls.timerScheduler = nullptr;
-
-    LLBC_Delete(LLBC_INTERNAL_NS __g_entryThreadTimerScheduler);
-    LLBC_INTERNAL_NS __g_entryThreadTimerScheduler = nullptr;
-
-    return LLBC_OK;
-}
-
-LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetEntryThreadScheduler()
-{
-    return LLBC_INTERNAL_NS __g_entryThreadTimerScheduler;
 }
 
 LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetCurrentThreadScheduler()
@@ -121,23 +66,26 @@ LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetCurrentThreadScheduler()
 
 void LLBC_TimerScheduler::Update()
 {
-    if (UNLIKELY(!_enabled))
-        return;
-    else if (_heap.IsEmpty())
-        return;
+    LLBC_ReturnIf(_enabled == false || _heap.empty(), void());
 
-    LLBC_TimerData *data;
-    sint64 now = LLBC_GetMilliSeconds();
-    while (_heap.FindTop(data) == LLBC_OK)
+    sint64 now = LLBC_GetMilliseconds();
+    while (_heap.empty() == false)
     {
+        LLBC_TimerData *data = _heap.top();
+        if(data == nullptr)
+        {
+            _heap.pop();
+            continue;
+        }
+
         if (now < data->handle)
             break;
 
-        _heap.DeleteTop();
+        _heap.pop();
         if (!data->validate)
         {
             if (--data->refCount == 0)
-                LLBC_Delete(data);
+                delete data;
 
             continue;
         }
@@ -180,12 +128,12 @@ void LLBC_TimerScheduler::Update()
             sint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
             data->handle = now + data->period - delay;
 
-            _heap.Insert(data);
+            _heap.push(data);
         }
         else
         {
             if (--data->refCount == 0)
-                LLBC_Delete(data);
+                delete data;
         }
     }
 }
@@ -202,10 +150,10 @@ void LLBC_TimerScheduler::SetEnabled(bool enabled)
 
 size_t LLBC_TimerScheduler::GetTimerCount() const
 {
-    return _heap.GetSize();
+    return _heap.size();
 }
 
-bool LLBC_TimerScheduler::IsDstroyed() const
+bool LLBC_TimerScheduler::IsDestroyed() const
 {
     return _destroyed;
 }
@@ -215,27 +163,24 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
     if (UNLIKELY(_destroyed))
         return LLBC_ERROR_INVALID;
 
-    LLBC_TimerData *data = LLBC_New(LLBC_TimerData);
-    ::memset(data, 0, sizeof(LLBC_TimerData));
-    data->handle = LLBC_GetMilliSeconds() + dueTime;
+    auto *data = new LLBC_TimerData;
+    memset(data, 0, sizeof(LLBC_TimerData));
+    data->handle = LLBC_GetMilliseconds() + dueTime;
     data->timerId = ++ _maxTimerId;
     data->dueTime = dueTime;
     data->period = period;
-    // data->repeatTimes = 0;
     data->timer = timer;
     data->validate = true;
-    // data->timeouting = false;
-    // data->cancelling = false;
     data->refCount = 2;
 
     if (timer->_timerData)
     {
         if (--timer->_timerData->refCount == 0)
-            LLBC_Delete(timer->_timerData);
+            delete timer->_timerData;
     }
 
     timer->_timerData = data;
-    _heap.Insert(data);
+    _heap.push(data);
 
     return LLBC_OK;
 }
@@ -247,7 +192,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
 
     LLBC_TimerData *data = timer->_timerData;
     ASSERT(data->timer == timer && 
-        "Timer manager internal error, LLBC_TimerData::timer != argument: timer!");
+        "Timer scheduler internal error, LLBC_TimerData::timer != argument: timer!");
 
     data->validate = false;
     data->cancelling = true;
@@ -257,13 +202,14 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     if (data->timeouting)
         return LLBC_OK;
 
-    if (data->handle - LLBC_GetMilliSeconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
+    if (data->handle - LLBC_GetMilliseconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
     {
-        int delElemRet = _heap.DeleteElem(data);
-        ASSERT(delElemRet == LLBC_OK &&
-            "Timer manager internal error, Could not found timer data when Cancel long timeout timer!");
+        _heap.erase(data);
         if (--data->refCount == 0)
-            LLBC_Delete(data);
+        {
+            delete data;
+            timer->_timerData = nullptr;
+        }
     }
 
     return LLBC_OK;
@@ -274,11 +220,9 @@ void LLBC_TimerScheduler::CancelAll()
     if (UNLIKELY(_destroyed))
         return;
 
-    const size_t size = _heap.GetSize();
-    _Heap::Container copyElems(_heap.GetData());
-    for (size_t i = 1; i <= size; ++i)
+    for(auto &elem : _heap)
     {
-        LLBC_TimerData *data = copyElems[i];
+        LLBC_TimerData *data = elem;
         if (UNLIKELY(!data->validate))
             return;
 
@@ -287,5 +231,3 @@ void LLBC_TimerScheduler::CancelAll()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

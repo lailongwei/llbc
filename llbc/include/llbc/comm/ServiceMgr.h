@@ -19,10 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_SERVICE_MGR_H__
-#define __LLBC_COMM_SERVICE_MGR_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
@@ -30,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare some classes.
  */
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -44,8 +42,8 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_ServiceMgr
 {
 public:
-    typedef std::map<int, LLBC_IService *> Id2Services;
-    typedef std::map<LLBC_String, LLBC_IService *> Name2Services;
+    typedef std::map<int, LLBC_Service *> Id2Services;
+    typedef std::map<LLBC_String, LLBC_Service *> Name2Services;
 
 public:
     /**
@@ -58,45 +56,49 @@ public:
     /**
      * Get service by service Id.
      * @param[in] id - the service Id.
-     * @return LLBC_IService * - the service, if not found, return nullptr.
+     * @return LLBC_Service * - the service, if not found, return nullptr.
      */
-    LLBC_IService *GetService(int id);
+    LLBC_Service *GetService(int id);
 
     /**
      * Get service by service name.
      * @param[in] name - the service name.
-     * @return LLBC_IService * - the service, if not found, return nullptr.
+     * @return LLBC_Service * - the service, if not found, return nullptr.
      */
-    LLBC_IService *GetService(const LLBC_String &name);
+    LLBC_Service *GetService(const LLBC_CString &name);
 
+public:
     /**
-     * Remove specified id service.
+     * Stop specific id service.
      * Note:
      *  1. Not allow to remove self thread drive's service, if try to call, 
      *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
-     * @param[in] id - the service Id.
+     * @param[in] id  - the service Id.
+     * @param[in] del - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveService(int id);
+    int Stop(int id, bool del = true);
 
     /**
-     * Remove specified name service, like Remove(int id) method.
+     * Stop specified name service, like Remove(int id) method.
+     * Note:
+     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
      * @param[in] name - the service name.
+     * @param[in] del  - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveService(const LLBC_String &name);
-
-    /**
-     * Wait all services.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int Wait();
+    int Stop(const LLBC_CString &name, bool del = true);
 
     /**
      * Stop all services.
+     * Note:
+     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
+     * @param[in] del - delete service or not, default is true.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Stop();
+    int StopAll(bool del = true);
 
 public:
     /**
@@ -113,42 +115,41 @@ public:
 
 private:
     /**
-     * Friend class: LLBC_Service.
+     * Friend class: LLBC_ServiceImpl.
      *  Access methods:
      *      OnServiceStart()
      *      OnServiceStop()
      */
-    friend class LLBC_Service;
+    friend class LLBC_ServiceImpl;
 
     /**
      * Add service to service manager.
      * @param[in] svc - the service.
      */
-    void OnServiceStart(LLBC_IService *svc);
+    void OnServiceStart(LLBC_Service *svc);
 
     /**
      * Remove service from service manager.
-     * @param[in] id - the service Id.
+     * @param[in] svc - the service.
      */
-    void OnServiceStop(LLBC_IService *svc);
+    void OnServiceStop(LLBC_Service *svc);
 
 private:
-    LLBC_IService *GetServiceNonLock(int id);
-    LLBC_IService *GetServiceNonLock(const LLBC_String &name);
+    int Stop(LLBC_Service *svc, bool del);
 
-private:
-    static bool InTls(const LLBC_IService *svc);
+    LLBC_Service *GetServiceNonLock(int id);
+    LLBC_Service *GetServiceNonLock(const LLBC_CString &name);
 
+    static bool InTls(const LLBC_Service *svc);
     static bool InTls(const Id2Services &svcs);
-
-    typedef std::map<LLBC_String, LLBC_IService *> _Services2;
-    static bool InTls(const _Services2 &svcs);
+    static bool InTls(const Name2Services &svcs);
 
 private:
     LLBC_SpinLock _lock;
 
+    std::vector<LLBC_Service *> _serviceList;
     Id2Services _id2Services;
-    _Services2 _name2Services;
+    Name2Services _name2Services;
 };
 
 /**
@@ -159,7 +160,7 @@ template class LLBC_EXPORT LLBC_Singleton<LLBC_ServiceMgr>;
 
 __LLBC_NS_END
 
-#include "llbc/comm/ServiceMgrImpl.h"
+#include "llbc/comm/ServiceMgrInl.h"
 
-#endif // !__LLBC_COMM_SERVICE_MGR_H__
+
 

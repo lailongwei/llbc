@@ -19,11 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_PACKET_PROTOCOL_H__
-#define __LLBC_COMM_PACKET_PROTOCOL_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#pragma once
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/protocol/IProtocol.h"
@@ -41,10 +37,8 @@ __LLBC_NS_BEGIN
  *   |      Length      |    0   |   4  |
  *   |      Opcode      |    4   |   4  |
  *   |      Status      |    8   |   2  |
- *   | Sender ServiceId |   10   |   4  |
- *   | Recver ServiceId |   14   |   4  |
- *   |      Flags       |   18   |   2  |
- *   |     ExtData1     |   20   |   8  |
+ *   |      Flags       |   10   |   2  |
+ *   |     ExtData1     |   12   |   8  |
  *Header total length: 20 bytes.
  */
 class LLBC_EXPORT LLBC_PacketProtocol : public LLBC_IProtocol
@@ -64,14 +58,6 @@ public:
     virtual int GetLayer() const;
 
 public:
-    /**
-     * When one connection established, will call this method.
-     * @param[in] local - the local address.
-     * @param[in] peer  - the peer address.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer);
-
     /**
      * When data send, will call this method.
      * @param[in] in             - the in data.
@@ -104,5 +90,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_PACKET_PROTOCOL_H__

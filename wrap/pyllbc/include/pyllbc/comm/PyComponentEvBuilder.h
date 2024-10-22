@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COMM_PY_COMPONENT_EV_BUILDER_H__
-#define __PYLLBC_COMM_PY_COMPONENT_EV_BUILDER_H__
+#pragma once
 
 #include "pyllbc/common/Common.h"
 #include "pyllbc/core/Core.h"
@@ -148,5 +147,3 @@ private:
     static PyObject *_attrErrNo;
     static PyObject *_attrSubErrNo;
 };
-
-#endif // !__PYLLBC_COMM_PY_COMPONENT_EV_BUILDER_H__

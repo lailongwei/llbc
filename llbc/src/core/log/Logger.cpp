@@ -19,20 +19,19 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/utils/Util_Text.h"
 
 #include "llbc/core/os/OS_Time.h"
 
 #include "llbc/core/thread/Guard.h"
-#include "llbc/core/thread/MessageBlock.h"
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
-#include "llbc/core/log/ILogAppender.h"
+#include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/LogAppenderBuilder.h"
 #include "llbc/core/log/LogRunnable.h"
 
@@ -42,16 +41,11 @@
 #pragma warning(disable:4996)
 #endif
 
-__LLBC_INTERNAL_NS_BEGIN
-
-static const LLBC_NS LLBC_String __g_invalidLoggerName;
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
-: _logLevel(LLBC_LogLevel::Debug)
+: _logLevel(LLBC_LogLevel::End)
+, _addTimestampInJsonLog(false)
 , _config(nullptr)
 
 , _logRunnable(nullptr)
@@ -60,9 +54,9 @@ LLBC_Logger::LLBC_Logger()
 , _flushInterval(LLBC_CFG_LOG_DEFAULT_LOG_FLUSH_INTERVAL)
 , _appenders(nullptr)
 
-, _msgBlockPoolInst(*_objPool.GetPoolInst<LLBC_MessageBlock>())
-, _logDataPoolInst(*_objPool.GetPoolInst<LLBC_LogData>())
-, _hookDelegs()
+, _objPool(true)
+, _logDataTypedObjPool(*_objPool.GetTypedObjPool<LLBC_LogData>())
+, _logHooks()
 {
 }
 
@@ -97,39 +91,43 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
 
     // Init basic data members.
     _name.append(config->GetLoggerName());
+
+    _logLevel = config->GetLogLevel();
+    _addTimestampInJsonLog = config->IsAddTimestampInJsonLog();
     _config = config;
 
-    _logLevel = MIN(_config->GetConsoleLogLevel(), _config->GetFileLogLevel());
     _flushInterval = _config->GetFlushInterval();
 
     // Create console appender, if acquire.
     if (_config->IsLogToConsole())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
-        appenderInitInfo.level = _config->GetConsoleLogLevel();
+        appenderInitInfo.logLevel = _config->GetConsoleLogLevel();
         appenderInitInfo.pattern = _config->GetConsolePattern();
         appenderInitInfo.colourfulOutput = _config->IsColourfulOutput();
 
-        LLBC_ILogAppender *appender = 
+        LLBC_BaseLogAppender *appender = 
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::Console);
         if (appender->Initialize(appenderInitInfo) != LLBC_OK)
         {
             LLBC_XDelete(appender);
+            ClearNonRunnableMembers();
+
             return LLBC_FAILED;
         }
 
-        this->AddAppender(appender);
+        AddAppender(appender);
     }
 
     // Create file appender, if acquire.
     if (_config->IsLogToFile())
     {
         LLBC_LogAppenderInitInfo appenderInitInfo;
-        appenderInitInfo.level = _config->GetFileLogLevel();
+        appenderInitInfo.logLevel = _config->GetFileLogLevel();
         appenderInitInfo.pattern = _config->GetFilePattern();
-        appenderInitInfo.file = _config->GetLogFile();
+        appenderInitInfo.filePath = _config->GetLogFile();
         appenderInitInfo.fileSuffix = _config->GetLogFileSuffix();
-        appenderInitInfo.dailyRolling = _config->IsDailyRollingMode();
+        appenderInitInfo.fileRollingMode = _config->GetFileRollingMode();
         appenderInitInfo.maxFileSize = _config->GetMaxFileSize();
         appenderInitInfo.maxBackupIndex = _config->GetMaxBackupIndex();
         appenderInitInfo.lazyCreateLogFile = _config->IsLazyCreateLogFile();
@@ -139,25 +137,27 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         else
             appenderInitInfo.fileBufferSize = _config->GetFileBufferSize();
 
-        LLBC_ILogAppender *appender =
+        LLBC_BaseLogAppender *appender =
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::File);
         if (appender->Initialize(appenderInitInfo) != LLBC_OK)
         {
             LLBC_XDelete(appender);
+            ClearNonRunnableMembers();
+
             return LLBC_FAILED;
         }
 
-        this->AddAppender(appender);
+        AddAppender(appender);
     }
 
     // Set/Create log runnable.
     if (_config->IsAsyncMode())
     {
-        _logRunnable = _config->IsIndependentThread() ? LLBC_New(LLBC_LogRunnable) : sharedLogRunnable;
+        _logRunnable = _config->IsIndependentThread() ? new LLBC_LogRunnable : sharedLogRunnable;
         _logRunnable->AddLogger(this);
 
         if (_config->IsIndependentThread())
-            _logRunnable->Activate(1, LLBC_ThreadFlag::Joinable, LLBC_ThreadPriority::BelowNormal);
+            _logRunnable->Activate(1, LLBC_ThreadPriority::BelowNormal);
     }
 
     return LLBC_OK;
@@ -181,210 +181,261 @@ void LLBC_Logger::Finalize()
     if (_config->IsAsyncMode())
     {
         if (_config->IsIndependentThread())
+        {
             _logRunnable->Stop();
+            delete _logRunnable;
+        }
         else
+        {
             Flush(true, false);
+        }
 
         _logRunnable = nullptr;
     }
 
-    // Uninstall all hooks.
-    for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
-        UninstallHookLockless(level);
+    // Clear non-runnable data members.
+    ClearNonRunnableMembers(false);
+}
 
-    // Delete all appenders.
-    while (_appenders)
+int LLBC_Logger::SetAppenderLogLevel(int appenderType, int logLevel)
+{
+    // Argument check.
+    if (!LLBC_LogAppenderType::IsValid(appenderType))
     {
-        LLBC_ILogAppender *appender = _appenders;
-        _appenders = _appenders->GetAppenderNext();
-
-        LLBC_Delete(appender);
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+    if (!LLBC_LogLevel::IsValid(logLevel) && logLevel != LLBC_LogLevel::End)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
     }
 
-    // Reset basic members.
-    _name.clear();
-    _config = nullptr;
-    _logLevel = LLBC_LogLevel::Debug;
-}
-
-const LLBC_String &LLBC_Logger::GetLoggerName() const
-{
-    LLBC_Logger *nonConstThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(nonConstThis->_lock);
-
-    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-    return _name;
-}
-
-void LLBC_Logger::SetLogLevel(int level)
-{
+    // Logger inited check.
     LLBC_LockGuard guard(_lock);
-    _logLevel = MIN(MAX(LLBC_LogLevel::Begin, level), LLBC_LogLevel::End - 1);
+    if (!IsInit())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    // Find appender.
+    LLBC_BaseLogAppender *appender = _appenders;
+    while (appender && appender->GetType() != appenderType)
+        appender = appender->GetAppenderNext();
+
+    if (!appender)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    // Set appender log level.
+    appender->SetLogLevel(logLevel);
+
+    // Update logger log level.
+    _logLevel = LLBC_LogLevel::End;
+    appender = _appenders;
+    while (appender)
+    {
+        _logLevel = MIN(appender->GetLogLevel(), _logLevel);
+        appender = appender->GetAppenderNext();
+    }
+
+    return LLBC_OK;
 }
 
 bool LLBC_Logger::IsTakeOver() const
 {
-    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(ncThis->_lock);
-
+    LLBC_LockGuard guard(_lock);
     return _config->IsTakeOver();
 }
 
 bool LLBC_Logger::IsAsyncMode() const
 {
-    LLBC_Logger *ncThis = const_cast<LLBC_Logger *>(this);
-    LLBC_LockGuard guard(ncThis->_lock);
-
+    LLBC_LockGuard guard(_lock);
     return _config->IsAsyncMode();
 }
 
-int LLBC_Logger::InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg)
+int LLBC_Logger::SetLogHook(int logLevel, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
 {
-    if (UNLIKELY(!LLBC_LogLevel::IsLegal(level) ||
-        !hookDeleg))
+    if (UNLIKELY(!LLBC_LogLevel::IsValid(logLevel)))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
     LLBC_LockGuard guard(_lock);
-    _hookDelegs[level] = hookDeleg;
+    _logHooks[logLevel] = logHook;
 
     return LLBC_OK;
 }
 
-void LLBC_Logger::UninstallHook(int level)
+int LLBC_Logger::SetLogHook(std::initializer_list<int> logLevels,
+                            const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
 {
-    LLBC_LockGuard guard(_lock);
-    UninstallHookLockless(level);
+    for (auto &logLevel : logLevels)
+    {
+        if (SetLogHook(logLevel, logHook) != LLBC_OK)
+            return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
 }
 
-void LLBC_Logger::UninstallHookLockless(int level)
+int LLBC_Logger::VOutput(int level,
+                         const char *tag,
+                         const char *file,
+                         int line,
+                         const char *func,
+                         const char *fmt,
+                         va_list va) 
 {
-    if (LIKELY(LLBC_LogLevel::IsLegal(level)))
-        _hookDelegs[level] = nullptr;
-}
+    if (_logLevel > level)
+        return LLBC_OK;
 
-int LLBC_Logger::VOutput(int level, const char *tag, const char *file, int line, const char *func, const char *fmt, va_list va) 
-{
-    LLBC_LogData *data = BuildLogData(level, tag, file, line, func, fmt, va);
+    LLBC_LogData *data = BuildLogData(level,
+                                      tag,
+                                      file,
+                                      line,
+                                      func,
+                                      fmt,
+                                      va);
     if (UNLIKELY(!data))
         return LLBC_FAILED;
 
-    if (_hookDelegs[level])
-        _hookDelegs[level](data);
+    if (_logHooks[level])
+        _logHooks[level](data);
 
     if (!_config->IsAsyncMode())
     {
-        const int ret = this->OutputLogData(*data);
+        _lock.Lock();
+        const int ret = OutputLogData(*data);
+        _lock.Unlock();
+
         LLBC_Recycle(data);
 
         return ret;
     }
 
-    LLBC_MessageBlock *block = _msgBlockPoolInst.GetObject();
-    block->Write(&data, sizeof(LLBC_LogData *));
-    _logRunnable->Push(block);
+    _logRunnable->PushLogData(data);
 
     return LLBC_OK;
 }
 
-int LLBC_Logger::NonFormatOutput(int level, const char *tag, const char *file, int line, const char *func, const char *msg, size_t msgLen)
+int LLBC_Logger::NonFormatOutput(int level,
+                                 const char *tag,
+                                 const char *file,
+                                 int line,
+                                 const char *func,
+                                 sint64 time,
+                                 const char *msg,
+                                 size_t msgLen)
 {
     if (level < _logLevel)
         return LLBC_OK;
 
-    LLBC_LogData *data = BuildLogData(level, tag, file, line, func, msg, msgLen);
-    if (UNLIKELY(!data))
-        return LLBC_FAILED;
-
-    if (_hookDelegs[level])
-        _hookDelegs[level](data);
+    LLBC_LogData *data = BuildLogData(level,
+                                      tag,
+                                      file,
+                                      line,
+                                      func,
+                                      time != 0 ? time : LLBC_GetMicroseconds(),
+                                      msg,
+                                      msgLen);
+    if (_logHooks[level])
+        _logHooks[level](data);
 
     if (!_config->IsAsyncMode())
     {
-        const int ret = this->OutputLogData(*data);
+        _lock.Lock();
+        const int ret = OutputLogData(*data);
+        _lock.Unlock();
+
         LLBC_Recycle(data);
 
         return ret;
     }
 
-    LLBC_MessageBlock *block = _msgBlockPoolInst.GetObject();
-    block->Write(&data, sizeof(LLBC_LogData *));
-    _logRunnable->Push(block);
+    _logRunnable->PushLogData(data);
 
     return LLBC_OK;
 }
 
-LLBC_LogData *LLBC_Logger::BuildLogData(int level,
-                                        const char *tag,
-                                        const char *file,
-                                        int line,
-                                        const char *func,
-                                        const char *fmt,
-                                        va_list va)
+LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
+                                                          const char *tag,
+                                                          const char *file,
+                                                          int line,
+                                                          const char *func,
+                                                          const char *fmt,
+                                                          va_list va)
 {
-    LLBC_LogData *data = _logDataPoolInst.GetObject();
-
     // Format message.
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-    int len = ::vsnprintf(libTls->coreTls.loggerFmtBuf,
-                          sizeof(libTls->coreTls.loggerFmtBuf),
-                          fmt,
-                          va);
+    int len = vsnprintf(libTls->coreTls.loggerFmtBuf,
+                        sizeof(libTls->coreTls.loggerFmtBuf),
+                        fmt,
+                        va);
     if (UNLIKELY(len < 0))
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        LLBC_Recycle(data);
-
         return nullptr;
     }
 
     // Normalize length.
-    if (len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1))
+    if (UNLIKELY(len > static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1)))
         len = static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1);
 
-    if (data->msgCap < len + 1)
+    LLBC_LogData *data = _logDataTypedObjPool.Acquire();
+    if (UNLIKELY(data->msgCap < len + 1))
     {
-        data->msgCap = MAX(len + 1, 256);
+        data->msgCap = MAX(len + 1, 192);
         data->msg = LLBC_Realloc(char, data->msg, data->msgCap);
     }
 
     // Copy formatted message to LogData.
     data->msgLen = len;
-    if (len > 0)
-        ::memcpy(data->msg, libTls->coreTls.loggerFmtBuf, len);
+    if (LIKELY(len > 0))
+        memcpy(data->msg, libTls->coreTls.loggerFmtBuf, len);
     data->msg[len] = '\0';
 
     // Fill other LogData members.
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, libTls);
+    FillLogDataNonMsgMembers(level,
+                             tag,
+                             file,
+                             line,
+                             func,
+                             LLBC_GetMicroseconds(),
+                             data,
+                             libTls);
 
     return data;
 }
 
-LLBC_LogData *LLBC_Logger::BuildLogData(int level,
-                                        const char *tag,
-                                        const char *file,
-                                        int line,
-                                        const char *func,
-                                        const char *msg,
-                                        size_t msgLen)
+LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
+                                                          const char *tag,
+                                                          const char *file,
+                                                          int line,
+                                                          const char *func,
+                                                          sint64 time,
+                                                          const char *msg,
+                                                          size_t msgLen)
 {
     // Calculate message length, if required.
     if (msgLen == static_cast<size_t>(-1) && msg)
-        msgLen = LLBC_StrLen(msg);
+        msgLen = strlen(msg);
 
     // Set message length to 0, if msg is null.
-    if (!msg)
+    if (UNLIKELY(!msg))
         msgLen = 0;
 
     // Normalize message length(<= LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1).
-    if (msgLen >= LLBC_CFG_LOG_FORMAT_BUF_SIZE)
+    if (UNLIKELY(msgLen >= LLBC_CFG_LOG_FORMAT_BUF_SIZE))
         msgLen = LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1;
 
     // Alloc new LogData, and adjust message capacity.
-    LLBC_LogData *data = _logDataPoolInst.GetObject();
-    const int msgCap = MAX(static_cast<int>(msgLen) + 1, 256);
+    LLBC_LogData *data = _logDataTypedObjPool.Acquire();
+    const int msgCap = MAX(static_cast<int>(msgLen) + 1, 192);
     if (data->msgCap < msgCap)
     {
         data->msgCap = msgCap;
@@ -393,92 +444,108 @@ LLBC_LogData *LLBC_Logger::BuildLogData(int level,
 
     // Copy message to LogData.
     data->msgLen = static_cast<int>(msgLen);
-    if (msgLen > 0)
-        ::memcpy(data->msg, msg, msgLen);
+    if (LIKELY(msgLen > 0))
+        memcpy(data->msg, msg, msgLen);
     data->msg[msgLen] = '\0';
 
     // Fill LogData other members.
-    FillLogDataNonMsgMembers(level, tag, file, line, func, data, __LLBC_GetLibTls());
+    FillLogDataNonMsgMembers(level,
+                             tag,
+                             file,
+                             line,
+                             func,
+                             time,
+                             data,
+                             __LLBC_GetLibTls());
 
     return data;
 }
 
-void LLBC_Logger::FillLogDataNonMsgMembers(int level,
-                                           const char *tag,
-                                           const char *file,
-                                           int line,
-                                           const char *func,
-                                           LLBC_LogData *logData,
-                                           __LLBC_LibTls *libTls)
+LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
+                                                             const char *tag,
+                                                             const char *file,
+                                                             int line,
+                                                             const char *func,
+                                                             sint64 time,
+                                                             LLBC_LogData *logData,
+                                                             __LLBC_LibTls *libTls)
 {
-    // fill: logger&logger name.
+    // fill: logger.
     logData->logger = this;
-    logData->loggerName = _name.c_str();
 
-    // fill: log level&log time.
+    // fill: log level.
     logData->level = level;
-    logData->logTime = LLBC_GetMilliSeconds();
 
-    // fill: other infos(file, tag, func).
+    // fill: log time.
+    logData->logTime = time;
+
+    // fill: file, func.
     if (file)
     {
-        // data->fileBeg = 0; // fileBeg always is 0.
-        logData->fileLen = LLBC_StrLenA(file);
+        logData->fileLen = static_cast<int>(strlen(file));
         if (!_config->IsLogCodeFilePath())
         {
-            #if LLBC_TARGET_PLATFORM_WIN32
-            const char *ps = strrchr(file, '\\');
-            if (ps == nullptr)
-                ps = strrchr(file, '/');
-            #else // Non-Win32
-            const char *ps = strrchr(file, '/');
-            #endif // Win32
-            if (ps != nullptr)
+            const char *ps = file + logData->fileLen - 1;
+            while (ps != file)
             {
-                logData->fileLen -= (static_cast<uint32>(ps - file) + 1);
-                file = ps + 1;
+                #if LLBC_TARGET_PLATFORM_WIN32
+                if (*ps == '\\' ||
+                    *ps == '/')
+                #else // Non-Win32
+                if (*ps == '/')
+                #endif
+                {
+                    logData->fileLen -= static_cast<int>((ps + 1 - file));
+                    file = ps + 1;
+                    break;
+                }
+
+                --ps;
             }
         }
 
-        logData->tagBeg = logData->fileLen;
-    }
+        const int exceedLen = logData->fileLen - static_cast<int>((sizeof(logData->file) - 1));
+        if (UNLIKELY(exceedLen > 0))
+        {
+            file += exceedLen;
+            logData->fileLen = sizeof(logData->file) - 1;
+        }
 
-    if (tag)
-    {
-        logData->tagLen = LLBC_StrLenA(tag);
-        logData->funcBeg = logData->tagBeg + logData->tagLen;
-    }
-    else
-    {
-        logData->funcBeg = logData->fileLen;
+        memcpy(logData->file, file, logData->fileLen);
+        logData->file[logData->fileLen] = '\0';
     }
 
     if (func)
-        logData->funcLen = LLBC_StrLenA(func);
-
-    const uint32 othersSize = logData->fileLen + logData->tagLen + logData->funcLen;
-    if (othersSize != 0)
     {
-        if (logData->othersCap < othersSize)
-        {
-            logData->othersCap = othersSize;
-            logData->others = LLBC_Realloc(char, logData->others, othersSize);
-        }
+        logData->funcLen = static_cast<int>(strlen(func));
+        const int exceedLen = logData->funcLen - static_cast<int>((sizeof(logData->func) - 1));
+        if (UNLIKELY(exceedLen > 0))
+            logData->funcLen = sizeof(logData->func) - 1;
 
-        if (file)
-            ::memcpy(logData->others, file, logData->fileLen);
-        if (tag)
-            ::memcpy(logData->others + logData->tagBeg, tag, logData->tagLen);
-        if (func)
-            ::memcpy(logData->others + logData->funcBeg, func, logData->funcLen);
+        memcpy(logData->func, func, logData->funcLen);
+        logData->func[logData->funcLen] = '\0';
     }
 
+    // fill: tag.
+    if (tag)
+    {
+        logData->tagLen = static_cast<int>(strlen(tag));
+        const int exceedLen = logData->tagLen - static_cast<int>((sizeof(logData->tag) - 1));
+        if (UNLIKELY(exceedLen > 0))
+            logData->tagLen = sizeof(logData->tag) - 1;
+
+        memcpy(logData->tag, tag, logData->tagLen);
+        logData->tag[logData->tagLen] = '\0';
+    }
+
+    // fill: line.
     logData->line = line;
 
+    // fill: threadId.
     logData->threadId = libTls->coreTls.threadId;
 }
 
-void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
+void LLBC_Logger::AddAppender(LLBC_BaseLogAppender *appender)
 {
     appender->SetAppenderNext(nullptr);
     if (!_appenders)
@@ -487,18 +554,16 @@ void LLBC_Logger::AddAppender(LLBC_ILogAppender *appender)
         return;
     }
 
-    LLBC_ILogAppender *tmpAppender = _appenders;
+    LLBC_BaseLogAppender *tmpAppender = _appenders;
     while (tmpAppender->GetAppenderNext())
-    {
         tmpAppender = tmpAppender->GetAppenderNext();
-    }
 
     tmpAppender->SetAppenderNext(appender);
 }
 
 int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
 {
-    LLBC_ILogAppender *appender = _appenders;
+    LLBC_BaseLogAppender *appender = _appenders;
     if (!appender)
         return LLBC_OK;
 
@@ -519,23 +584,23 @@ void LLBC_Logger::Flush(bool force, sint64 now)
     if (!force)
     {
         if (now == 0)
-            now = LLBC_GetMilliSeconds();
+            now = LLBC_GetMilliseconds();
         sint64 diff = now - _lastFlushTime;
         if (diff >= 0 && diff < _flushInterval)
             return;
     }
 
     // Flush appenders.
-    FlushAppenders(force);
+    FlushAppenders();
 
     // Update last flush time(use flushed time to avoid logger performance problem).
-    _lastFlushTime = now != 0 ? now : LLBC_GetMilliSeconds();
+    _lastFlushTime = now != 0 ? now : LLBC_GetMilliseconds();
 }
 
-void LLBC_Logger::FlushAppenders(bool force)
+void LLBC_Logger::FlushAppenders()
 {  
     // Foreach appenders to flush.
-    LLBC_ILogAppender *appender = _appenders;
+    LLBC_BaseLogAppender *appender = _appenders;
     while (appender)
     {
         appender->Flush();
@@ -543,10 +608,46 @@ void LLBC_Logger::FlushAppenders(bool force)
     }
 }
 
+void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
+{
+    // If require keep errno(include sub errno), cache it and define recover defer operation.
+    int errNo, subErrNo;
+    if (keepErrNo)
+    {
+        errNo = LLBC_GetLastError();
+        subErrNo = LLBC_GetSubErrorNo();
+    }
+
+    LLBC_Defer(
+        LLBC_DoIf(keepErrNo,
+            LLBC_SetLastError(errNo); LLBC_SetSubErrorNo(subErrNo)));
+
+    // Uninstall all hooks.
+    for (int level = LLBC_LogLevel::Begin; level != LLBC_LogLevel::End; ++level)
+        _logHooks[level] = nullptr;
+
+    // Delete all appenders.
+    while (_appenders)
+    {
+        LLBC_BaseLogAppender *appender = _appenders;
+        _appenders = _appenders->GetAppenderNext();
+
+        delete appender;
+    }
+
+    // Reset basic members.
+    _flushInterval = 0;
+    _lastFlushTime = 0;
+
+    _config = nullptr;
+    _addTimestampInJsonLog = false;
+    _logLevel = LLBC_LogLevel::End;
+
+    _name.clear();
+}
+
 __LLBC_NS_END
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)
 #endif
-
-#include "llbc/common/AfterIncl.h"

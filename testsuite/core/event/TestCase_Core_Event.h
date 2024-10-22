@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_EVENT_H__
-#define __LLBC_TEST_CASE_CORE_EVENT_H__
+#pragma once
 
 #include "llbc.h"
 using namespace llbc;
@@ -28,11 +27,12 @@ using namespace llbc;
 class TestCase_Core_Event : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Event();
-    virtual ~TestCase_Core_Event();
+    TestCase_Core_Event() = default;
+
+    ~TestCase_Core_Event() override = default;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void OnEvent1(LLBC_Event &ev);
@@ -44,8 +44,6 @@ private:
     void DumpEvParams(const LLBC_Event &ev);
 
 private:
-    LLBC_ListenerStub _ev1Stub;
-    LLBC_ListenerStub _ev1TooStub;
+    LLBC_ListenerStub _ev1Stub = 0;
+    LLBC_ListenerStub _ev1TooStub = 0;
 };
-
-#endif // !__LLBC_TEST_CASE_CORE_EVENT_H__

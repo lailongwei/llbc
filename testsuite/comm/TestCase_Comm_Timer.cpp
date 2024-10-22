@@ -24,23 +24,35 @@
 
 namespace
 {
-class TestComp : public LLBC_IComponent
+class TestComp : public LLBC_Component
 {
 public:
-    bool OnInitialize()
+    bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("Service startup, startup timers...");
+        LLBC_PrintLn("Service startup, startup timers...");
 
         _timeoutTimes = 0;
         _cancelTimes = 0;
 
         // Create long time timer and try to cancel
-        LLBC_Timer *longTimeTimer = LLBC_New(LLBC_Timer,
-                                             std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
-                                             std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
-        longTimeTimer->Schedule(LLBC_TimeSpan::FromMilliSeconds(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1));
-        LLBC_Delete(longTimeTimer);
+        LLBC_Timer *longTimeTimer = new LLBC_Timer(std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
+                                                   std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
+        longTimeTimer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME + 1));
+        delete longTimeTimer;
 
+        // Test reschedule timer in OnCancel event meth
+        LLBC_Timer *rescheduleInCancelTimer = new LLBC_Timer([](LLBC_Timer *timer) {
+            LLBC_PrintLn("RescheduleInCancelTimer timeout, cancel it!!!!!!");
+            timer->Cancel();
+        },
+                                                             [](LLBC_Timer *timer) {
+            LLBC_PrintLn("RescheduleInCancelTimer cancel, try reschedule!");
+            timer->Schedule(LLBC_TimeSpan::FromSeconds(2));
+        });
+        rescheduleInCancelTimer->Schedule(LLBC_TimeSpan::FromSeconds(1));
+        rescheduleInCancelTimer->Cancel();
+
+        // Timer performance test
         #ifdef LLBC_DEBUG
         const int testTimerCount = 200;
         #else // !defined(LLBC_DEBUG)
@@ -48,26 +60,21 @@ public:
         #endif
         for(int i = 1; i <=testTimerCount ; ++i) 
         {
-            // LLBC_Timer *timer = LLBC_New(LLBC_Timer,
-                                         // LLBC_New(__Deleg, this, &TestComp::OnTimerTimeout),
-                                         // LLBC_New(__Deleg, this, &TestComp::OnTimerCancel));
+            LLBC_Timer *timer = new LLBC_Timer(std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
+                                               std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
 
-            LLBC_Timer *timer = LLBC_New(LLBC_Timer,
-                                         std::bind(&TestComp::OnTimerTimeout, this, std::placeholders::_1),
-                                         std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
-
-            timer->Schedule(LLBC_TimeSpan::FromMilliSeconds(LLBC_Rand(5000, 15001)),
-                            LLBC_TimeSpan::FromMilliSeconds(LLBC_Rand(5000, 15001)));
+            timer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_Rand(5000, 15001)),
+                            LLBC_TimeSpan::FromMillis(LLBC_Rand(5000, 15001)));
         }
 
-        LLBC_PrintLine("Done!");
+        LLBC_PrintLn("Done!");
 
         return true;
     }
 
-    void OnDestroy()
+    void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("Service destroy!");
+        LLBC_PrintLn("Service destroy!");
     }
 
 public:
@@ -78,16 +85,16 @@ public:
         #else
         if (++_timeoutTimes % 20000 == 0)
         #endif
-            LLBC_PrintLine("%s: Timer <%s> trigger %d times timeout",
+            LLBC_PrintLn("%s: Timer <%s> trigger %d times timeout",
                            LLBC_Time::Now().ToString().c_str(),
                            timer->ToString().c_str(), _timeoutTimes);
-        timer->Schedule(LLBC_TimeSpan::FromMilliSeconds(LLBC_Rand(5000, 15001)));
+        timer->Schedule(LLBC_TimeSpan::FromMillis(LLBC_Rand(5000, 15001)));
     }
 
     void OnTimerCancel(LLBC_Timer *timer)
     {
         if (++_cancelTimes % 10000 == 0)
-            LLBC_PrintLine("Timer <%s> trigger %d times cancel", timer->ToString().c_str(), _cancelTimes);
+            LLBC_PrintLn("Timer <%s> trigger %d times cancel", timer->ToString().c_str(), _cancelTimes);
     }
 
 private:
@@ -109,28 +116,28 @@ TestCase_Comm_Timer::~TestCase_Comm_Timer()
 
 int TestCase_Comm_Timer::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Timer testcase:");
+    LLBC_PrintLn("Timer testcase:");
 
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "TimerTest");
-    svc->RegisterComponent(LLBC_New(TestComp));
+    LLBC_Service *svc = LLBC_Service::Create("TimerTest");
+    svc->AddComponent(new TestComp);
     if(svc->Start() != LLBC_OK)
     {
-        LLBC_PrintLine("Start service failed: reason: %s", LLBC_FormatLastError());
-        LLBC_Delete(svc);
+        LLBC_PrintLn("Start service failed: reason: %s", LLBC_FormatLastError());
+        delete svc;
         return -1;
     }
 
     svc->SetFPS(1000);
 
 #if LLBC_TARGET_PLATFORM_IPHONE
-    LLBC_PrintLine("Wait 100 seconds to exit...");
-    LLBC_ThreadManager::Sleep(100 * 1000);
+    LLBC_PrintLn("Wait 100 seconds to exit...");
+    LLBC_ThreadMgr::Sleep(100 * 1000);
 #else // Non-iPhone
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 #endif // iPhone
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return 0;
 }

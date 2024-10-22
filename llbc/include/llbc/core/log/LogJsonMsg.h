@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_JSONMSG_H__
-#define __LLBC_CORE_LOG_LOG_JSONMSG_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/rapidjson/json.h"
 
@@ -36,10 +33,13 @@ class LLBC_Logger;
 /**
  * \brief The json log msg class encapsulation.
  */
-class LLBC_EXPORT LLBC_LogJsonMsg
+class LLBC_EXPORT LLBC_LogJsonMsg final
 {
+    LLBC_DISABLE_ASSIGNMENT(LLBC_LogJsonMsg);
+    LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_LogJsonMsg);
+
 public:
-    explicit LLBC_LogJsonMsg(const char *loggerName,
+    explicit LLBC_LogJsonMsg(LLBC_Logger *logger,
                              const char* tag,
                              int lv,
                              const char *file,
@@ -61,8 +61,6 @@ public:
     void Finish(const char *fmt, ...);
 
 private:
-    bool _loggerMgrInited;
-
     LLBC_Logger *_logger;
     const char *_tag;
     int _lv;
@@ -75,6 +73,5 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/log/LogJsonMsgImpl.h"
+#include "llbc/core/log/LogJsonMsgInl.h"
 
-#endif // !__LLBC_CORE_LOG_LOG_JSONMSG_H__

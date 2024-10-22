@@ -21,14 +21,13 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/RawProtocol.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 __LLBC_NS_BEGIN
 
@@ -45,16 +44,11 @@ int LLBC_RawProtocol::GetLayer() const
     return LLBC_ProtocolLayer::PackLayer;
 }
 
-int LLBC_RawProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
-}
-
 int LLBC_RawProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
 
-    LLBC_MessageBlock *block = packet->GiveUp();
+    LLBC_MessageBlock *block = packet->GiveUpPayload();
     LLBC_Recycle(packet);
 
     if (!block)
@@ -69,7 +63,7 @@ int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
     LLBC_MessageBlock *block = reinterpret_cast<LLBC_MessageBlock *>(in);
 
     // Create packet and write data.
-    LLBC_Packet *packet = _pktPoolInst->GetObject();
+    LLBC_Packet *packet = _pktObjPool->Acquire();
     const size_t readableSize = block->GetReadableSize();
 
     packet->SetLength(readableSize);
@@ -77,18 +71,16 @@ int LLBC_RawProtocol::Recv(void *in, void *&out, bool &removeSession)
     packet->SetPayload(block);
 
     // Create output.
-    out = LLBC_New(LLBC_MessageBlock, sizeof(LLBC_Packet *));
+    out = new LLBC_MessageBlock(sizeof(LLBC_Packet *));
     (reinterpret_cast<LLBC_MessageBlock *>(out))->Write(&packet, sizeof(LLBC_Packet *));
 
     return LLBC_OK;
 }
 
-int LLBC_RawProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
+int LLBC_RawProtocol::AddCoder(int opcode, LLBC_CoderFactory *coder)
 {
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

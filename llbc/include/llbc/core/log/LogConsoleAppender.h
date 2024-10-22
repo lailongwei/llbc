@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_CONSOLE_APPENDER_H__
-#define __LLBC_CORE_LOG_LOG_CONSOLE_APPENDER_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #include "llbc/core/thread/FastLock.h"
@@ -34,20 +31,20 @@ __LLBC_NS_BEGIN
 /**
  * \brief The console type log appender class encapsulation.
  */
-class LLBC_LogConsoleAppender : public LLBC_BaseLogAppender
+class LLBC_HIDDEN LLBC_LogConsoleAppender : public LLBC_BaseLogAppender
 {
     typedef LLBC_BaseLogAppender _Base;
 
 public:
     LLBC_LogConsoleAppender();
-    virtual ~LLBC_LogConsoleAppender();
+    ~LLBC_LogConsoleAppender() override;
 
 public:
     /**
      * Get log appender type, see LLBC_LogAppenderType.
      * @return int - log appender type.
      */
-    virtual int GetType() const;
+    int GetType() const override;
 
 public:
     /**
@@ -55,19 +52,19 @@ public:
      * @param[in] initInfo - log appender initialize info structure.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(const LLBC_LogAppenderInitInfo &initInfo);
+    int Initialize(const LLBC_LogAppenderInitInfo &initInfo) override;
 
     /**
      * Finalize the appender.
      */
-    virtual void Finalize();
+    void Finalize() override;
 
     /**
      * Output log data.
      * @param[in] data - log data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Output(const LLBC_LogData &data);
+    int Output(const LLBC_LogData &data) override;
 
 private:
     /**
@@ -85,5 +82,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_LOG_LOG_CONSOLE_APPENDER_H__

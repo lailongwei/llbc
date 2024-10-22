@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_MESSAGE_BUFFER_H__
-#define __LLBC_CORE_LOG_LOG_MESSAGE_BUFFER_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -48,36 +47,36 @@ public:
      * @param[in] msg - msg string to append.
      * @return LLBC_LogMessageBuffer & - message buffer.
      */
-    LLBC_LogMessageBuffer &operator <<(const LLBC_String &msg);
-    LLBC_LogMessageBuffer &operator <<(const std::basic_string<char> &msg);
-    LLBC_LogMessageBuffer &operator <<(char *msg);
-    LLBC_LogMessageBuffer &operator <<(const char *msg);
-    LLBC_LogMessageBuffer &operator <<(char msg);
+    LLBC_LogMessageBuffer &operator<<(const LLBC_String &msg);
+    LLBC_LogMessageBuffer &operator<<(const std::basic_string<char> &msg);
+    LLBC_LogMessageBuffer &operator<<(char *msg);
+    LLBC_LogMessageBuffer &operator<<(const char *msg);
+    LLBC_LogMessageBuffer &operator<<(char msg);
 
     /**
      * Built-in type stream output operator support.
      * @param[in] val - value to append.
      * @return std::basic_ostream<char> & - stream object.
      */
-    std::basic_ostream<char> &operator <<(bool val);
-    std::basic_ostream<char> &operator <<(uint8 val);
-    std::basic_ostream<char> &operator <<(sint16 val);
-    std::basic_ostream<char> &operator <<(uint16 val);
-    std::basic_ostream<char> &operator <<(sint32 val);
-    std::basic_ostream<char> &operator <<(uint32 val);
-    std::basic_ostream<char> &operator <<(sint64 val);
-    std::basic_ostream<char> &operator <<(uint64 val);
-    std::basic_ostream<char> &operator <<(long val);
-    std::basic_ostream<char> &operator <<(ulong val);
-    std::basic_ostream<char> &operator <<(float val);
-    std::basic_ostream<char> &operator <<(double val);
-    std::basic_ostream<char> &operator <<(ldouble val);
-    std::basic_ostream<char> &operator <<(void *val);
+    std::basic_ostream<char> &operator<<(bool val);
+    std::basic_ostream<char> &operator<<(uint8 val);
+    std::basic_ostream<char> &operator<<(sint16 val);
+    std::basic_ostream<char> &operator<<(uint16 val);
+    std::basic_ostream<char> &operator<<(sint32 val);
+    std::basic_ostream<char> &operator<<(uint32 val);
+    std::basic_ostream<char> &operator<<(sint64 val);
+    std::basic_ostream<char> &operator<<(uint64 val);
+    std::basic_ostream<char> &operator<<(long val);
+    std::basic_ostream<char> &operator<<(ulong val);
+    std::basic_ostream<char> &operator<<(float val);
+    std::basic_ostream<char> &operator<<(double val);
+    std::basic_ostream<char> &operator<<(ldouble val);
+    std::basic_ostream<char> &operator<<(void *val);
 
     /**
      * Insertion operator for STL manipulators such as std::fixed.
      */
-    std::basic_ostream<char> &operator <<(ios_base_manip manip);
+    std::basic_ostream<char> &operator<<(ios_base_manip manip);
 
     /**
      * Cast to basic_ostream.
@@ -103,14 +102,14 @@ private:
 __LLBC_NS_END
 
 /**
- * operator << function define, using to adapt other implemented
+ * operator<< function define, using to adapt other implemented
  * stream output operator's class.
  */
 template <typename T>
-std::basic_ostream<char> &operator <<(LLBC_NS LLBC_LogMessageBuffer &msg, const T &val);
+std::basic_ostream<char> &operator<<(LLBC_NS LLBC_LogMessageBuffer &msg, const T &val);
 
-#include "llbc/core/log/LogMessageBufferImpl.h"
+#include "llbc/core/log/LogMessageBufferInl.h"
 
 #endif // LLBC_CFG_LOG_USING_WITH_STREAM
 
-#endif // !__LLBC_CORE_LOG_LOG_MESSAGE_BUFFER_H__
+

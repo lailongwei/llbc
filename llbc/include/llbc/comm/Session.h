@@ -19,11 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_SESSION_H__
-#define __LLBC_COMM_SESSION_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#pragma once
 
 #include "llbc/comm/SessionOpts.h"
 
@@ -34,7 +30,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_Socket;
-class LLBC_IService;
+class LLBC_Service;
 class LLBC_BasePoller;
 class LLBC_ProtocolStack;
 
@@ -107,7 +103,7 @@ public:
     /**
      * Constructor & Destructor.
      */
-    LLBC_Session(const LLBC_SessionOpts &sessionOpts);
+    explicit LLBC_Session(const LLBC_SessionOpts &sessionOpts);
     ~LLBC_Session();
 
 public:
@@ -169,15 +165,15 @@ public:
 
     /**
      * Get service.
-     * @return LLBC_IService * - service.
+     * @return LLBC_Service * - service.
      */
-    LLBC_IService *GetService();
+    LLBC_Service *GetService();
 
     /**
      * Set service.
      * @param[in] svc - service.
      */
-    void SetService(LLBC_IService *svc);
+    void SetService(LLBC_Service *svc);
 
     /**
      * Get protocol stack.
@@ -287,7 +283,7 @@ private:
     LLBC_SocketHandle _sockHandle;
 
     bool _fullStack;
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_BasePoller *_poller;
 
     LLBC_ProtocolStack *_protoStack;
@@ -298,6 +294,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/comm/SessionImpl.h"
+#include "llbc/comm/SessionInl.h"
 
-#endif // !__LLBC_COMM_SESSION_H__
+

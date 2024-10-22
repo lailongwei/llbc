@@ -19,24 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogFormattingInfo.h"
+#include "llbc/core/log/Logger.h"
+
 #include "llbc/core/log/LogNameToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogNameToken::LLBC_LogNameToken()
-{
-}
-
-LLBC_LogNameToken::~LLBC_LogNameToken()
-{
-}
-
-int LLBC_LogNameToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogNameToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -49,13 +42,10 @@ int LLBC_LogNameToken::GetType() const
 
 void LLBC_LogNameToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
-    formattedData.append(data.loggerName);
+    const int index = static_cast<int>(formattedData.size());
+    formattedData.append(data.logger->GetLoggerName());
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

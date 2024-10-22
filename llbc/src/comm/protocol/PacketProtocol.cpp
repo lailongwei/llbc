@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Session.h"
 #include "llbc/comm/Socket.h"
@@ -31,7 +30,7 @@
 #include "llbc/comm/protocol/PacketProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {
@@ -40,7 +39,7 @@ namespace
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const size_t __llbc_headerLen = 28;
+static constexpr size_t __llbc_headerLen = 20;
 
 void inline __DelPacketList(void *&data)
 {
@@ -54,7 +53,7 @@ void inline __DelPacketList(void *&data)
     while (block->Read(&packet, sizeof(LLBC_NS LLBC_Packet *)) == LLBC_OK)
         LLBC_Recycle(packet);
 
-    LLBC_Delete(block);
+    delete block;
 
     data = nullptr;
 }
@@ -82,11 +81,6 @@ int LLBC_PacketProtocol::GetLayer() const
     return _Layer::PackLayer;
 }
 
-int LLBC_PacketProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
-}
-
 int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     LLBC_Packet *packet = reinterpret_cast<LLBC_Packet *>(in);
@@ -95,30 +89,24 @@ int LLBC_PacketProtocol::Send(void *in, void *&out, bool &removeSession)
         LLBC_INL_NS __llbc_headerLen + packet->GetPayloadLength());
 
     // Create block and write header in.
-    LLBC_MessageBlock *block = LLBC_New(LLBC_MessageBlock, length);
+    LLBC_MessageBlock *block = new LLBC_MessageBlock(length);
 
     sint32 opcode = packet->GetOpcode();
-    uint16 status = static_cast<uint16>(packet->GetStatus());
-    int senderServiceId = packet->GetSenderServiceId();
-    int recverServiceId = packet->GetRecverServiceId();
+    sint16 status = static_cast<sint16>(packet->GetStatus());
     uint16 flags = static_cast<uint16>(packet->GetFlags());
     sint64 extData1 = packet->GetExtData1();
 
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-    LLBC_Host2Net(length);
-    LLBC_Host2Net(opcode);
-    LLBC_Host2Net(status);
-    LLBC_Host2Net(senderServiceId);
-    LLBC_Host2Net(recverServiceId);
-    LLBC_Host2Net(flags);
-    LLBC_Host2Net(extData1);
+    length = LLBC_Host2Net(length);
+    opcode = LLBC_Host2Net(opcode);
+    status = LLBC_Host2Net(status);
+    flags = LLBC_Host2Net(flags);
+    extData1 = LLBC_Host2Net(extData1);
 #endif // Net order.
 
     block->Write(&length, sizeof(length));
     block->Write(&opcode, sizeof(opcode));
     block->Write(&status, sizeof(status));
-    block->Write(&senderServiceId, sizeof(senderServiceId));
-    block->Write(&recverServiceId, sizeof(recverServiceId));
     block->Write(&flags, sizeof(flags));
     block->Write(&extData1, sizeof(extData1));
 
@@ -147,15 +135,20 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
         // Construct packet header.
         if (!_packet)
         {
+            // If header recv not done, return.
             size_t headerUsed;
-            if (!_headerAssembler.Assemble(readableBuf, readableSize, headerUsed)) // If header recv not done, return.
+            if (!_headerAssembler.Assemble(readableBuf, readableSize, headerUsed))
                 return LLBC_OK;
 
             // Create new packet.
-            _packet = _pktPoolInst->GetObject();
+            _packet = _pktObjPool->Acquire();
             _headerAssembler.SetToPacket(*_packet);
             _packet->SetSessionId(_sessionId);
             _packet->SetAcceptSessionId(_acceptSessionId);
+
+            // Reset header assembler.
+            _headerAssembler.Reset();
+
             // Check length.
             const size_t packetLen = _packet->GetLength();
             if (packetLen < LLBC_INL_NS __llbc_headerLen || packetLen > maxPacketLen)
@@ -163,8 +156,6 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
                 _stack->Report(this,
                                LLBC_ProtoReportLevel::Error,
                                LLBC_String().format("invalid packet len: %lu", _packet->GetLength()));
-
-                _headerAssembler.Reset();
 
                 LLBC_XRecycle(_packet);
                 _payloadNeedRecv = 0;
@@ -179,9 +170,6 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
             // Calculate payload need receive bytes.
             _payloadNeedRecv = packetLen - LLBC_INL_NS __llbc_headerLen;
 
-            // Reset the header assembler.
-            _headerAssembler.Reset();
-
             // Offset the readable buffer pointer and modify readable size value.
             readableBuf += headerUsed;
             readableSize -= headerUsed;
@@ -194,7 +182,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
 #endif // target platform is WIN32 and in x64 module.
         }
 
-        // Content packet content.
+        // Read packet content.
         size_t contentNeedRecv = _payloadNeedRecv - _payloadRecved;
         if (readableSize < contentNeedRecv) // if the readable data size < content need receive size, copy the data and return.
         {
@@ -206,7 +194,7 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
         // Readable data size >= content need receive size.
         _packet->Write(readableBuf, contentNeedRecv);
         if (!out)
-            out = LLBC_New(LLBC_MessageBlock, sizeof(LLBC_Packet *));
+            out = new LLBC_MessageBlock(sizeof(LLBC_Packet *));
         (reinterpret_cast<LLBC_MessageBlock *>(out))->Write(&_packet, sizeof(LLBC_Packet *));
 
         // Reset packet about data members.
@@ -226,5 +214,3 @@ int LLBC_PacketProtocol::Recv(void *in, void *&out, bool &removeSession)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

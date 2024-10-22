@@ -24,24 +24,22 @@
 
 namespace
 {
-    static LLBC_Tls<long> __g_tls;
-    static const long __g_threadNum = 5;
+    static LLBC_Tls<size_t> __g_tls;
+    static const int __g_threadNum = 5;
 }
 
-static int ThreadProc(void *arg)
+static void ThreadProc(void *arg)
 {
-    long threadIndex;
-    ::memcpy(&threadIndex, &arg, sizeof(long));
-    LLBC_PrintLine("thread %d startup", threadIndex);
+    int threadIndex = 0;
+    memcpy(&threadIndex, &arg, sizeof(int));
+    LLBC_PrintLn("thread %d startup", threadIndex);
 
-    __g_tls.SetValue(LLBC_New(long));
+    __g_tls.SetValue(0);
     (*__g_tls) = threadIndex;
     for(int i = 0; i < 5000000; ++i)
         (*__g_tls) += 1;
 
-    LLBC_PrintLine("thread [%ld] tls value: %ld", threadIndex, *__g_tls);
-
-    return 0;
+    LLBC_PrintLn("thread [%d] tls value: %lu", threadIndex, *__g_tls);
 }
 
 TestCase_Core_Thread_Tls::TestCase_Core_Thread_Tls()
@@ -54,15 +52,15 @@ TestCase_Core_Thread_Tls::~TestCase_Core_Thread_Tls()
 
 int TestCase_Core_Thread_Tls::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("core/thread/tls test");
+    LLBC_PrintLn("core/thread/tls test");
 
     // Create threads.
     LLBC_NativeThreadHandle threads[__g_threadNum] = {LLBC_INVALID_NATIVE_THREAD_HANDLE};
-    for(long i = 0; i < __g_threadNum; ++i)
+    for(int i = 0; i < __g_threadNum; ++i)
     {
         void *threadArg = nullptr;
-        ::memcpy(&threadArg, &i, sizeof(long));
-        LLBC_CreateThread(&threads[i], &ThreadProc, threadArg);
+        memcpy(&threadArg, &i, sizeof(int));
+        LLBC_CreateThread(&ThreadProc, threadArg, &threads[i]);
     }
 
     // Join threads.
@@ -71,7 +69,7 @@ int TestCase_Core_Thread_Tls::Run(int argc, char *argv[])
         LLBC_JoinThread(threads[i]);
     }
 
-    LLBC_PrintLine("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
     return 0;

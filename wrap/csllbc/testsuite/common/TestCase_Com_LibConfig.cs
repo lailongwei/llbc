@@ -44,7 +44,7 @@ class TestCase_Com_LibConfig : ITestCase
         Console.WriteLine("  Log default log to file: {0}", LibConfig.logDefaultLogToFile);
         Console.WriteLine("  Log default file log pattern: {0}", LibConfig.logDefaultFileLogPattern);
         Console.WriteLine("  Log default lazy create log file: {0}", LibConfig.lazyCreateLogFile);
-        Console.WriteLine("  Log default enabled daily-rolling mode: {0}", LibConfig.logDefaultEnabledDailyMode);
+        Console.WriteLine("  Log default file rolling mode: {0}", LibConfig.logDefaultEnabledDailyMode);
         Console.WriteLine("  Log default max log file size(in bytes): {0}", LibConfig.logDefaultMaxFileSize);
         Console.WriteLine("  Log default max backup index: {0}", LibConfig.logDefaultMaxBackupIndex);
         Console.WriteLine("  Log default log file buffer size(in bytes): {0}", LibConfig.logDefaultLogFileBufferSize);
@@ -67,9 +67,8 @@ class TestCase_Com_LibConfig : ITestCase
         Console.WriteLine("  Comm default service FPS: {0}", LibConfig.commDefaultServiceFPS);
         Console.WriteLine("  Comm max service FPS: {0}", LibConfig.commMaxServiceFPS);
         Console.WriteLine("  Comm per-thread max drive service count: {0}", LibConfig.commPerThreadMaxDriveServiceCount);
-        Console.WriteLine("  Comm enabled sampler support: {0}", LibConfig.commIsEnabledSamplerSupport);
+        Console.WriteLine("  Comm max supported component name length: {0}", LibConfig.commMaxCompNameLen);
         Console.WriteLine("  Comm enabled status handler: {0}", LibConfig.commIsEnabledStatusHandler);
-        Console.WriteLine("  Comm enabled status desc: {0}", LibConfig.commIsEnabledStatusDesc);
         Console.WriteLine("  Comm enabled unify pre-subscribe: {0}", LibConfig.commIsEnabledUnifyPreSubscribe);
         Console.WriteLine("  Comm poller model: {0}", LibConfig.commPollerModel);
         Console.WriteLine();

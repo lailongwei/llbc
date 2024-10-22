@@ -21,9 +21,8 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceMgr.h"
 
 namespace
@@ -34,10 +33,6 @@ namespace
 __LLBC_NS_BEGIN
 
 LLBC_ServiceMgr::LLBC_ServiceMgr()
-: _lock()
-
-, _id2Services()
-, _name2Services()
 {
 }
 
@@ -46,146 +41,138 @@ LLBC_ServiceMgr::~LLBC_ServiceMgr()
     // Do nothing.
 }
 
-LLBC_IService *LLBC_ServiceMgr::GetService(int id)
+LLBC_Service *LLBC_ServiceMgr::GetService(int id)
 {
     LLBC_LockGuard guard(_lock);
     return GetServiceNonLock(id);
 }
 
-LLBC_IService *LLBC_ServiceMgr::GetService(const LLBC_String &name)
+LLBC_Service *LLBC_ServiceMgr::GetService(const LLBC_CString &name)
 {
     LLBC_LockGuard guard(_lock);
     return GetServiceNonLock(name);
 }
 
-int LLBC_ServiceMgr::RemoveService(int id)
+int LLBC_ServiceMgr::Stop(int id, bool del)
 {
-    LLBC_LockGuard guard(_lock);
-    LLBC_IService *svc = GetServiceNonLock(id);
-    if (!svc)
-    {
-        return LLBC_FAILED;
-    }
-    else if (This::InTls(svc))
-    {
-        LLBC_SetLastError(LLBC_ERROR_PERM);
-        return LLBC_FAILED;
-    }
-
-    LLBC_Delete(svc);
-    return LLBC_OK;
-}
-
-int LLBC_ServiceMgr::RemoveService(const LLBC_String &name)
-{
+    // Find service.
     _lock.Lock();
-    LLBC_IService *svc = GetServiceNonLock(name);
+    LLBC_Service *svc = GetServiceNonLock(id);
     if (!svc)
     {
         _lock.Unlock();
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
         return LLBC_FAILED;
     }
     _lock.Unlock();
 
-    return RemoveService(svc->GetId());
+    // Exec service stop.
+    return Stop(svc, del);
 }
 
-int LLBC_ServiceMgr::Wait()
+int LLBC_ServiceMgr::Stop(const LLBC_CString &name, bool del)
 {
-    LLBC_LockGuard guard(_lock);
-    if (This::InTls(_id2Services))
+    // Find service.
+    _lock.Lock();
+    LLBC_Service *svc = GetServiceNonLock(name);
+    if (!svc)
     {
-        LLBC_SetLastError(LLBC_ERROR_PERM);
+        _lock.Unlock();
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
         return LLBC_FAILED;
     }
+    _lock.Unlock();
 
+    // Exec service stop.
+    return Stop(svc, del);
+}
+
+int LLBC_ServiceMgr::StopAll(bool del)
+{
+    // Fetch all services.
+    _lock.Lock();
     Id2Services svcs = _id2Services;
+    _lock.Unlock();
+
+    // Foreach stop services.
     for (Id2Services::iterator it = svcs.begin();
          it != svcs.end();
          ++it)
-    {
-        if (_id2Services.find(it->first) == _id2Services.end())
-            continue;
-
-        // Ignore return value.
-        it->second->Wait();
-    }
+        Stop(it->first, del);
 
     return LLBC_OK;
 }
 
-int LLBC_ServiceMgr::Stop()
+int LLBC_ServiceMgr::Stop(LLBC_Service *svc, bool del)
 {
-    LLBC_LockGuard guard(_lock);
-    if (This::InTls(_id2Services))
-    {
-        LLBC_SetLastError(LLBC_ERROR_PERM);
-        return LLBC_FAILED;
-    }
-
-    Id2Services svcs = _id2Services;
-    for (Id2Services::iterator it = svcs.begin();
-         it != svcs.end();
-         ++it)
-    {
-        if (_id2Services.find(it->first) == _id2Services.end())
-            continue;
-        
-        it->second->Stop();
-    }
+    svc->Stop();
+    if (del)
+        delete svc;
 
     return LLBC_OK;
 }
 
-bool LLBC_ServiceMgr::InTls(const LLBC_IService *svc)
+bool LLBC_ServiceMgr::InTls(const LLBC_Service *svc)
 {
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     void **svcs = tls->commTls.services;
-    for (int i = 0;
-         i <= LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT;
-         ++i)
-        if (reinterpret_cast<LLBC_IService *>(svcs[i]) == svc)
+    for (int i = 0; i < LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT; ++i)
+    {
+        if (svcs[i] == nullptr)
+            return false;
+
+        if (svcs[i] == svc)
             return true;
+    }
 
     return false;
 }
 
-bool LLBC_ServiceMgr::InTls(const This::Id2Services &svcs)
+bool LLBC_ServiceMgr::InTls(const Id2Services &svcs)
 {
     for (Id2Services::const_iterator it = svcs.begin();
          it != svcs.end();
          ++it)
-        if (This::InTls(it->second))
+        if (InTls(it->second))
             return true;
 
     return false;
 }
 
-bool LLBC_ServiceMgr::InTls(const This::Name2Services &svcs)
+bool LLBC_ServiceMgr::InTls(const Name2Services &svcs)
 {
     for (Name2Services::const_iterator it = svcs.begin();
          it != svcs.end();
          ++it)
-        if (This::InTls(it->second))
+        if (InTls(it->second))
             return true;
 
     return false;
 }
 
-void LLBC_ServiceMgr::OnServiceStart(LLBC_IService *svc)
+void LLBC_ServiceMgr::OnServiceStart(LLBC_Service *svc)
 {
     LLBC_LockGuard guard(_lock);
+
+    _serviceList.push_back(svc);
     _id2Services.insert(std::make_pair(svc->GetId(), svc));
     _name2Services.insert(std::make_pair(svc->GetName(), svc));
 }
 
-void LLBC_ServiceMgr::OnServiceStop(LLBC_IService *svc)
+void LLBC_ServiceMgr::OnServiceStop(LLBC_Service *svc)
 {
     LLBC_LockGuard guard(_lock);
+
+    const auto svcListIt =
+        std::find(_serviceList.begin(), _serviceList.end(), svc);
+    if (svcListIt == _serviceList.end())
+        return;
+
+    _serviceList.erase(svcListIt);
     _id2Services.erase(svc->GetId());
     _name2Services.erase(svc->GetName());
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

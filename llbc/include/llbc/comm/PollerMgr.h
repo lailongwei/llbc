@@ -19,10 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_POLLER_MGR_H__
-#define __LLBC_COMM_POLLER_MGR_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
@@ -32,7 +30,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_Socket;
-class LLBC_IService;
+class LLBC_Service;
 class LLBC_BasePoller;
 class LLBC_IProtocolFactory;
 
@@ -60,15 +58,26 @@ public:
      * Set service.
      * @param[in] svc - the service.
      */
-    void SetService(LLBC_IService *svc);
+    void SetService(LLBC_Service *svc);
 
 public:
     /**
-     * Startup poller manager.
-     * @param[in] count - the poller count.
+     * Initialize poller manager.
+     * @param[in] pollerCount - the poller count.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Start(int count);
+    int Init(int pollerCount);
+
+    /**
+     * Finalize poller manager.
+     */
+    void Finalize();
+
+    /**
+     * Startup poller manager.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Start();
 
     /**
      * Stop poller manager.
@@ -85,7 +94,10 @@ public:
      * @return int - the new session Id, if return 0, means connect failed.
      *               BE CAREFUL: the return value is a SESSION ID, not error indicator value!!!!!!!!
      */
-    int Listen(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory, const LLBC_SessionOpts &sessionOpts);
+    int Listen(const char *ip,
+               uint16 port,
+               LLBC_IProtocolFactory *protoFactory,
+               const LLBC_SessionOpts &sessionOpts);
 
     /**
      * Connect to peer address(call by service).
@@ -96,13 +108,17 @@ public:
      * @return int - the new session Id, if return 0, means connect failed.
      *               BE CAREFUL: the return value is a SESSION ID, not error indicator value!!!!!!!!
      */
-    int Connect(const char *ip, uint16 port, LLBC_IProtocolFactory *protoFactory, const LLBC_SessionOpts &sessionOpts);
+    int Connect(const char *ip,
+                uint16 port,
+                LLBC_IProtocolFactory *protoFactory,
+                const LLBC_SessionOpts &sessionOpts);
 
     /**
      * Asynchronous connect to peer address(call by service).
      * @param[in] ip   -              the ip address.
      * @param[in] port -              the port number. 
-     * @param[out] pendingSessionId - pending sessionId, when return 0, this output parameter will assign the session Id, otherwise set to 0.
+     * @param[out] pendingSessionId - pending sessionId, when return 0, this output parameter
+     *                                will assign the session Id, otherwise set to 0.
      * @param[in] protoFactory      - the protocol factory, default use service protocol factory.
      * @param[in] sessionOpts       - the session options.
      * @return int - return 0 if success, otherwise return -1.
@@ -175,21 +191,17 @@ private:
 
 private:
     int _type;
-    LLBC_IService *_svc;
-
-    int _pollerCount;
-    LLBC_BasePoller **_pollers;
-    LLBC_SpinLock _pollerLock;
-
+    LLBC_Service *_svc;
     int _maxSessionId;
 
-    typedef std::map<int, std::pair<LLBC_Socket *, LLBC_SessionOpts> > _PendingAddSocks;
-    _PendingAddSocks _pendingAddSocks;
-    typedef std::map<int, std::pair<LLBC_SockAddr_IN, LLBC_SessionOpts> > _PendingAsyncConns;
-    _PendingAsyncConns _pendingAsyncConns;
+    bool _inited;
+    bool _started;
+
+    LLBC_SpinLock _pollerLock;
+    std::vector<LLBC_BasePoller *> _pollers;
+
+    std::map<int, std::pair<LLBC_Socket *, LLBC_SessionOpts> > _pendingAddSocks;
+    std::map<int, std::pair<LLBC_SockAddr_IN, LLBC_SessionOpts> > _pendingAsyncConns;
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_POLLER_MGR_H__
-

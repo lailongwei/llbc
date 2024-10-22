@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_FILE_DIRECTORY_H__
-#define __LLBC_CORE_FILE_DIRECTORY_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -103,11 +102,11 @@ public:
      * Get specific path's files, not include directory type files.
      * @param[in]  path      - the path.
      * @param[out] files     - all given path's files.
-     * @param[in]  fileExt   - the file extension, included '.', if set to null. dont filter.
+     * @param[in]  ext       - the file extension, included '.', if set to null. dont filter.
      * @param[in] recursive  - recursive flag, if set to true, function will recursive scan path, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &fileExt, bool recursive = false);
+    static int GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &ext, bool recursive = false);
 
     /**
      * Recursive specific path's directories.
@@ -120,16 +119,22 @@ public:
 
 public:
     /**
+     * Get current executable module file directory.
+     * @return LLBC_String - the module file directory.
+     */
+    static LLBC_String ModuleFileDir();
+
+    /**
      * Get current executable module file name.
      * @return LLBC_String - the module file name.
      */
     static LLBC_String ModuleFileName();
 
     /**
-     * Get current executable module file directory.
-     * @return LLBC_String - the module file directory.
+     * Get current executable module file path(dir + name).
+     * @return LLBC_String - the module file path.
      */
-    static LLBC_String ModuleFileDir();
+    static LLBC_String ModuleFilePath();
 
     /**
      * Get given path directory name.
@@ -186,6 +191,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/file/DirectoryImpl.h"
+#include "llbc/core/file/DirectoryInl.h"
 
-#endif // !__LLBC_CORE_FILE_DIRECTORY_H__
+

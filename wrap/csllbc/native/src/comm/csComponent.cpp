@@ -51,24 +51,24 @@ csllbc_Component::csllbc_Component(_D::Deleg_Comp_OnInit initDeleg,
     _unHandledPacketDeleg = unHandledPacketDeleg;
 }
 
-bool csllbc_Component::OnInitialize()
+bool csllbc_Component::OnInit(bool &initFinished)
 {
     (*_initDeleg)();
     return true;
 }
 
-void csllbc_Component::OnDestroy()
+void csllbc_Component::OnDestroy(bool &destroyFinished)
 {
     (*_destroyDeleg)();
 }
 
-bool csllbc_Component::OnStart()
+bool csllbc_Component::OnStart(bool &startFinished)
 {
     (*_startDeleg)();
     return true;
 }
 
-void csllbc_Component::OnStop()
+void csllbc_Component::OnStop(bool &stopFinished)
 {
     (*_stopDeleg)();
 }
@@ -78,9 +78,42 @@ void csllbc_Component::OnUpdate()
     (*_updateDeleg)();
 }
 
-void csllbc_Component::OnIdle(int idleTime)
+void csllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
 {
-    (*_idleDeleg)(idleTime);
+    (*_idleDeleg)(static_cast<int>(idleTime.GetTotalMicros()));
+}
+
+void csllbc_Component::OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+{
+    switch(event)
+    {
+        case LLBC_ComponentEventType::SessionCreate:
+        {
+            OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+            break;
+        }
+        case LLBC_ComponentEventType::SessionDestroy:
+        {
+            OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+            break;
+        }
+        case LLBC_ComponentEventType::AsyncConnResult:
+        {
+            OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+            break;
+        }
+        case LLBC_ComponentEventType::ProtoReport:
+        {
+            OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+            break;
+        }
+        case LLBC_ComponentEventType::UnHandledPacket:
+        {
+            OnUnHandledPacket(*evArgs.AsPtr<LLBC_Packet>());
+            break;
+        }
+        default: break;
+    }
 }
 
 void csllbc_Component::OnSessionCreate(const LLBC_SessionInfo &sessionInfo)

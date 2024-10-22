@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_DICTIONARY_ELEM_H__
-#define __LLBC_OBJBASE_DICTIONARY_ELEM_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/objbase/KeyHashAlgorithm.h"
 
@@ -160,7 +157,7 @@ public:
      */
     LLBC_DictionaryElem *GetBucketElemPrev();
     /**
-     * Get previous buckt element.
+     * Get previous bucket element.
      * @return LLBC_DictionaryElem * - the previous bucket element.
      */
     const LLBC_DictionaryElem *GetBucketElemPrev() const;
@@ -190,8 +187,8 @@ public:
     /**
      * Operator *.
      */
-    LLBC_Object *&operator *();
-    LLBC_Object * const &operator *() const;
+    LLBC_Object *&operator*();
+    LLBC_Object * const &operator*() const;
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_DictionaryElem);
 
@@ -213,5 +210,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_OBJBASE_DICTIONARY_ELEM_H__

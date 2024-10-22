@@ -4,7 +4,6 @@ CPP文件简单封装,用于生成cpp文件.
 """
 
 from os import path as op
-from time import time, localtime, strftime
 
 
 class CppFile(object):
@@ -33,6 +32,7 @@ class CppFile(object):
     def author(self):
         """返回文件作者"""
         return self.__author
+
     @author.setter
     def author(self, author):
         """设置文件作者"""
@@ -42,6 +42,7 @@ class CppFile(object):
     def version(self):
         """返回文件版本"""
         return self.__ver
+
     @version.setter
     def version(self, version):
         """设置文件版本"""
@@ -51,6 +52,7 @@ class CppFile(object):
     def doc(self):
         """取得文件描述文档"""
         return self.__doc
+
     @doc.setter
     def doc(self, doc):
         """设置文件描述文档"""
@@ -60,6 +62,7 @@ class CppFile(object):
     def custom_filehead(self):
         """取得自定义文件头"""
         return self.__custom_filehead
+
     @custom_filehead.setter
     def custom_filehead(self, custom_filehead):
         """设置自定义文件头"""
@@ -69,6 +72,7 @@ class CppFile(object):
     def include_macro_prefix(self):
         """取得文件头包含宏前缀"""
         return self.__include_macro_prefix
+
     @include_macro_prefix.setter
     def include_macro_prefix(self, prefix):
         """设置取得文件头包含宏前缀"""
@@ -105,8 +109,6 @@ class CppFile(object):
     def build(self, sort_incl=True):
         """生成文件"""
         # Generate file head.
-        now_date = strftime('%Y-%m-%d', localtime(time()))
-
         if not self.__custom_filehead:
             cnt = '/**\n'
             cnt += ' *@file\t\t{0}\n'.format(op.basename(self.__fpath))
@@ -163,7 +165,7 @@ class CppFile(object):
         if macro:
             cnt += '#endif // !{0}\n\n'.format(macro)
 
-        with open(self.__fpath, 'wb+') as f:
+        with open(self.__fpath, 'w+') as f:
             f.write(cnt)
     # endregion
 

@@ -19,10 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_PACKET_HEADER_ASSEMBLER_H__
-#define __LLBC_COMM_PACKET_HEADER_ASSEMBLER_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
@@ -45,15 +43,15 @@ public:
     /**
      * Constructor & Destructor.
      */
-    LLBC_PacketHeaderAssembler(size_t headerLen);
+    explicit LLBC_PacketHeaderAssembler(size_t headerLen);
     virtual ~LLBC_PacketHeaderAssembler();
 
 public:
     /**
      * Assemble packet header.
-     * @param[in] data - the stream data.
-     * @param[in] len  - the stream data length, in bytes.
-     * @param[out] len - the used stream data, in bytes..
+     * @param[in] data  - the stream data.
+     * @param[in] len   - the stream data length, in bytes.
+     * @param[out] used - the used stream data, in bytes..
      * @return int - return 0 if success, otherwise return -1.
      */
     bool Assemble(const void *data, size_t len, size_t &used);
@@ -78,5 +76,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_PACKET_HEADER_ASSEMBLER_H__

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_VARIANT_VARIANT_TRAITS_H__
-#define __LLBC_CORE_VARIANT_VARIANT_TRAITS_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -56,23 +55,23 @@ public:
 
     /**
      * Arithmetic operators.
-     * +, -, *, /
+     * +, -, *, /, %
      */
     static LLBC_Variant add(const LLBC_Variant &left, const LLBC_Variant &right);
     static LLBC_Variant sub(const LLBC_Variant &left, const LLBC_Variant &right);
     static LLBC_Variant mul(const LLBC_Variant &left, const LLBC_Variant &right);
     static LLBC_Variant div(const LLBC_Variant &left, const LLBC_Variant &right);
+    static LLBC_Variant mod(const LLBC_Variant &left, const LLBC_Variant &right);
 
     /**
      * Arithmetic operators.
-     * +=, -=, *=, /=
+     * +=, -=, *=, /=, %=
      */
     static void add_equal(LLBC_Variant &left, const LLBC_Variant &right);
     static void sub_equal(LLBC_Variant &left, const LLBC_Variant &right);
     static void mul_equal(LLBC_Variant &left, const LLBC_Variant &right);
     static void div_equal(LLBC_Variant &left, const LLBC_Variant &right);
+    static void mod_equal(LLBC_Variant &left, const LLBC_Variant &right);
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_VARIANT_VARIANT_TRAITS_H__

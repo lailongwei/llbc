@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Packet.h"
 #include "llbc/comm/Socket.h"
@@ -37,7 +36,7 @@
  #include "llbc/comm/EpollPoller.h"
 #endif // Linux or Android
 #include "llbc/comm/PollerMgr.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {
@@ -58,18 +57,12 @@ This::_Handler This::_handlers[LLBC_PollerEvent::End] =
 };
 
 LLBC_BasePoller::LLBC_BasePoller()
-: _started(false)
-, _stopping(false)
+: _stopping(false)
 
 , _id(-1)
 , _brotherCount(0)
 , _svc(nullptr)
 , _pollerMgr(nullptr)
-
-, _sockets()
-, _sessions()
-
-, _connecting()
 {
 }
 
@@ -83,18 +76,18 @@ This *LLBC_BasePoller::Create(int type)
     switch (type)
     {
     case LLBC_PollerType::SelectPoller:
-        poller = LLBC_New(LLBC_SelectPoller);
+        poller = new LLBC_SelectPoller;
         break;
 
 #if LLBC_TARGET_PLATFORM_WIN32
     case LLBC_PollerType::IocpPoller:
-        poller = LLBC_New(LLBC_IocpPoller);
+        poller = new LLBC_IocpPoller;
         break;
 #endif
 
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
     case LLBC_PollerType::EpollPoller:
-        poller = LLBC_New(LLBC_EpollPoller);
+        poller = new LLBC_EpollPoller;
         break;
 #endif
 
@@ -118,7 +111,7 @@ void LLBC_BasePoller::SetBrothersCount(int count)
     _brotherCount = count;
 }
 
-void LLBC_BasePoller::SetService(LLBC_IService *svc)
+void LLBC_BasePoller::SetService(LLBC_Service *svc)
 {
     _svc = svc;
 }
@@ -137,14 +130,11 @@ int LLBC_BasePoller::Start()
 
 void LLBC_BasePoller::Stop()
 {
-    if (!_started || _stopping)
+    if (!IsActivated() || _stopping)
         return;
 
     _stopping = true;
-    while (_started)
-        LLBC_ThreadManager::Sleep(20);
-
-    _stopping = false;
+    Wait();
 }
 
 void LLBC_BasePoller::Cleanup()
@@ -160,7 +150,7 @@ void LLBC_BasePoller::Cleanup()
         block->Read(&ev, sizeof(LLBC_PollerEvent));
         LLBC_PollerEvUtil::DestroyEv(ev);
 
-        LLBC_Delete(block);
+        delete block;
     }
 
     // Delete all sessions.
@@ -177,10 +167,11 @@ void LLBC_BasePoller::Cleanup()
     for (_Connecting::iterator it = _connecting.begin();
          it != _connecting.end();
          ++it)
-        LLBC_Delete(it->second.socket);
+        delete it->second.socket;
     _connecting.clear();
 
-    _started = false;
+    // Reset stopping flag.
+    _stopping = false;
 }
 
 void LLBC_BasePoller::HandleQueuedEvents(int waitTime)
@@ -193,7 +184,7 @@ void LLBC_BasePoller::HandleQueuedEvents(int waitTime)
 
         (this->*_handlers[ev.type])(ev);
 
-        LLBC_Delete(block);
+        delete block;
     }
 }
 
@@ -238,7 +229,7 @@ void LLBC_BasePoller::HandleEv_Close(LLBC_PollerEvent &ev)
     }
 
     LLBC_SessionCloseInfo *closeInfo = 
-        LLBC_New(LLBC_SessionCloseInfo, ev.un.closeReason);
+        new LLBC_SessionCloseInfo(ev.un.closeReason);
     LLBC_XFree(ev.un.closeReason);
 
     LLBC_Session *session = it->second;
@@ -265,7 +256,7 @@ void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
     _Sessions::iterator it = _sessions.find(ev.sessionId);
     if (it == _sessions.end())
     {
-        LLBC_Delete(ev.un.protocolStackCtrlInfo.ctrlData);
+        delete ev.un.protocolStackCtrlInfo.ctrlData;
         ev.un.protocolStackCtrlInfo.ctrlData = nullptr;
 
         return;
@@ -279,7 +270,7 @@ void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
                                removeSession);
 
     // Delete ctrl data.
-    LLBC_Delete(ev.un.protocolStackCtrlInfo.ctrlData);
+    delete ev.un.protocolStackCtrlInfo.ctrlData;
     ev.un.protocolStackCtrlInfo.ctrlData = nullptr;
 
     // Remove session, if specified(Error number must be set when business logic determine remove this session).
@@ -290,12 +281,15 @@ void LLBC_BasePoller::HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev)
     }
 }
 
-LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket, int sessionId, const LLBC_SessionOpts &sessionOpts, LLBC_Session *acceptSession)
+LLBC_Session *LLBC_BasePoller::CreateSession(LLBC_Socket *socket,
+                                             int sessionId,
+                                             const LLBC_SessionOpts &sessionOpts,
+                                             LLBC_Session *acceptSession)
 {
     if (sessionId == 0)
         sessionId = _pollerMgr->AllocSessionId();
 
-    LLBC_Session *session = LLBC_New(LLBC_Session, sessionOpts);
+    LLBC_Session *session = new LLBC_Session(sessionOpts);
     session->SetId(sessionId);
     session->SetSocket(socket);
     socket->SetSession(session);
@@ -339,8 +333,15 @@ void LLBC_BasePoller::AddSession(LLBC_Session *session, bool needAddToIocp)
     _sessions.insert(std::make_pair(session->GetId(), session));
     _sockets.insert(std::make_pair(session->GetSocketHandle(), session));
 
-    // Build event and push to service.
+    // Pre-Add Service-Level session info to makesure protocol stack's 
+    // Service::Send()/Multicast()/Broadcast() methods call successfully.
     LLBC_Socket *sock = session->GetSocket();
+    _svc->AddReadySession(session->GetId(),
+                          session->GetAcceptId(),
+                          sock->IsListen(),
+                          true);
+
+    // Build session-create event and push to service.
     LLBC_MessageBlock *block = LLBC_SvcEvUtil::BuildSessionCreateEv(sock->GetLocalAddress(),
                                                                     sock->GetPeerAddress(),
                                                                     sock->IsListen(),
@@ -355,7 +356,7 @@ void LLBC_BasePoller::RemoveSession(LLBC_Session *session)
 {
     _sessions.erase(session->GetId());
     _sockets.erase(session->GetSocketHandle());
-    LLBC_Delete(session);
+    delete session;
 }
 
 void LLBC_BasePoller::SetConnectedSocketOpts(LLBC_Socket *sock, const LLBC_SessionOpts &sessionOpts)
@@ -374,5 +375,3 @@ void LLBC_BasePoller::SetConnectedSocketOpts(LLBC_Socket *sock, const LLBC_Sessi
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

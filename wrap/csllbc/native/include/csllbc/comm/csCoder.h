@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COMM_CSCODER_H__
-#define __CSLLBC_COMM_CSCODER_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -30,7 +29,7 @@
 /**
  * \brief The csharp coder class encapsulation.
  */
-class CSLLBC_HIDDEN csllbc_Coder : public LLBC_ICoder
+class CSLLBC_HIDDEN csllbc_Coder : public LLBC_Coder
 {
     typedef csllbc_Delegates _D;
 
@@ -62,6 +61,11 @@ public:
 
 public:
     /**
+     * Coder reuse support.
+     */
+    virtual void Reuse();
+
+    /**
      * Packet encode/decode methods.
      */
     virtual bool Encode(LLBC_Packet &packet);
@@ -77,16 +81,13 @@ private:
 /**
  * \brief The csharp codr factory class encapsulation.
  */
-class CSLLBC_HIDDEN csllbc_CoderFactory : public LLBC_ICoderFactory
+class CSLLBC_HIDDEN csllbc_CoderFactory : public LLBC_CoderFactory
 {
 public:
     /**
      * Create csharp layer coder.
      */
-    virtual LLBC_ICoder *Create() const;
-
-private:
-    sint64 _packetId;
+    virtual LLBC_Coder *Create() const;
 };
 
-#endif // !__CSLLBC_COMM_CSCODER_H__
+

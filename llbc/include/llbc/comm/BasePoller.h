@@ -19,11 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_BASE_POLLER_H__
-#define __LLBC_COMM_BASE_POLLER_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#pragma once
 
 #include "llbc/comm/PollerEvent.h"
 #include "llbc/comm/AsyncConnInfo.h"
@@ -35,7 +31,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Socket;
 class LLBC_Session;
-class LLBC_IService;
+class LLBC_Service;
 class LLBC_PollerMgr;
 class LLBC_SessionOpts;
 
@@ -46,13 +42,13 @@ __LLBC_NS_BEGIN
 /**
  * \brief The base poller class encapsulation.
  */
-class LLBC_HIDDEN LLBC_BasePoller : public LLBC_BaseTask
+class LLBC_HIDDEN LLBC_BasePoller : public LLBC_Task
 {
     typedef LLBC_BasePoller This;
 
 public:
     // Public Task::Push method, hide other Task methods.
-    using LLBC_BaseTask::Push;
+    using LLBC_Task::Push;
 
 public:
     /**
@@ -86,7 +82,7 @@ public:
      * Set service.
      * @param[in] svc - the service.
      */
-    void SetService(LLBC_IService *svc);
+    void SetService(LLBC_Service *svc);
 
     /**
      * Set poller manager.
@@ -127,7 +123,10 @@ protected:
     /**
      * Create new session from socket.
      */
-    LLBC_Session *CreateSession(LLBC_Socket *socket, int sessionId, const LLBC_SessionOpts &sessionOpts, LLBC_Session *acceptSession);
+    LLBC_Session *CreateSession(LLBC_Socket *socket,
+                                int sessionId,
+                                const LLBC_SessionOpts &sessionOpts,
+                                LLBC_Session *acceptSession);
 
 protected:
     /**
@@ -168,12 +167,11 @@ private:
     friend class LLBC_Session;
 
 protected:
-    volatile bool _started;
     volatile bool _stopping;
 
     int _id;
     int _brotherCount;
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_PollerMgr *_pollerMgr;
     
     typedef std::map<LLBC_SocketHandle, LLBC_Session *> _Sockets;
@@ -191,5 +189,3 @@ protected:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_BASE_POLLER_H__

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_OS_SOCKET_H__
-#define __LLBC_CORE_OS_OS_SOCKET_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -76,8 +75,8 @@ LLBC_EXPORT int LLBC_ShutdownSocketInputOutput(LLBC_SocketHandle handle);
  * @param[in] handle - socket handle.
  * @param[in] buf    - buffer containing the data to be transmitted.
  * @param[in] len    - length of data in buf.
- * @param[in] flag   - flags.
- * @return int       - if no error occurs, return the total number bytes sent, otherwise return -1.
+ * @param[in] flags  - flags.
+ * @return int - if no error occurs, return the total number bytes sent, otherwise return -1.
  */
 LLBC_EXPORT int LLBC_Send(LLBC_SocketHandle handle, const void *buf, int len, int flags);
 
@@ -139,7 +138,7 @@ LLBC_EXPORT int LLBC_CloseSocket(LLBC_SocketHandle handle);
  * Determine given socket is in non-blocking mode or not.
  * Note: 
  *      !!!Only avaliable in Non-WIN32 platform, in WIN3 platform, always return false 
- *      and LLBC_Errno always equal LLBC_ERROR_NOTIMPL.
+ *      and LLBC_GetLastError() always equal LLBC_ERROR_NOTIMPL.
  * @return bool - if return true, it means this socket working in non-blocking mode,
  *                if return false and LLBC_GetLastError() == 0, it means this socket working in blocking mode.
  *                otherwise LLBC_GetLastError() != 0, means error occurred.
@@ -300,7 +299,11 @@ LLBC_EXPORT int LLBC_ConnectToPeerEx(LLBC_SocketHandle handle,
  * @param[in/out] len - pointer the size of the optval buffer.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_GetSocketOption(LLBC_SocketHandle handle, int level, int optname, void *optval, LLBC_SocketLen *len);
+LLBC_EXPORT int LLBC_GetSocketOption(LLBC_SocketHandle handle,
+                                     int level,
+                                     int optname,
+                                     void *optval,
+                                     LLBC_SocketLen *len);
 
 /**
  * Set socket option.
@@ -311,8 +314,10 @@ LLBC_EXPORT int LLBC_GetSocketOption(LLBC_SocketHandle handle, int level, int op
  * @param[in] len     - size of the optval buffer.
  * @return int - if no error occurs, return zero, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_SetSocketOption(LLBC_SocketHandle handle, int level, int optname, const void *optval, LLBC_SocketLen len);
+LLBC_EXPORT int LLBC_SetSocketOption(LLBC_SocketHandle handle,
+                                     int level,
+                                     int optname,
+                                     const void *optval,
+                                     LLBC_SocketLen len);
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_OS_OS_SOCKET_H__

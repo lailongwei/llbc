@@ -19,13 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+
+// iconv lib header file.
+#if LLBC_TARGET_PLATFORM_WIN32
+ #include "llbc/core/iconv/iconv.h"
+#else // Non-Win32
+ #include <iconv.h>
+#endif // Win32
 
 #include "llbc/core/file/File.h"
-#if LLBC_TARGET_PLATFORM_WIN32
-#include "llbc/core/iconv/iconv.h"
-#endif // LLBC_TARGET_PLATFORM_WIN32
 
 #include "llbc/core/transcoder/Transcoder.h"
 
@@ -293,7 +297,7 @@ int LLBC_Transcoder::ReadWideCharFile(const LLBC_String &fileName, LLBC_WString 
     if (!file.IsOpened())
         return LLBC_FAILED;
 
-    const long contentSize = file.GetFileSize();
+    const sint64 contentSize = file.GetFileSize();
     if (UNLIKELY(contentSize < 0))
         return LLBC_FAILED;
 
@@ -303,8 +307,8 @@ int LLBC_Transcoder::ReadWideCharFile(const LLBC_String &fileName, LLBC_WString 
         return LLBC_FAILED;
     }
 
-    content.resize(contentSize / 2);
-    const long actuallyRead = file.Read(const_cast<wchar *>(content.c_str()), contentSize);
+    content.resize(static_cast<size_t>(contentSize) / 2);
+    const sint64 actuallyRead = file.Read(const_cast<wchar *>(content.c_str()), static_cast<size_t>(contentSize));
     if (actuallyRead == -1)
     {
         content.resize(0);
@@ -340,5 +344,3 @@ int LLBC_Transcoder::WriteWideCharToFile(const LLBC_WString &content, const LLBC
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

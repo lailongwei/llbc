@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_PY_STREAM_H__
-#define __PYLLBC_COM_PY_STREAM_H__
+#pragma once
 
 #include "pyllbc/common/LibHeader.h"
 
@@ -36,9 +35,9 @@ public:
     /**
      * Parameter constructor.
      * @param[in] pyStream - the python stream(steal reference).
-     * @param[in] size     - the stream initialize capacity, default is 0.
+     * @param[in] cap      - the stream initialize capacity, default is 0.
      */
-    pyllbc_Stream(PyObject *pyStream, size_t size = 0);
+    pyllbc_Stream(PyObject *pyStream, size_t cap = 0);
 
     /**
      * Destructor.
@@ -61,30 +60,56 @@ public:
 
 public:
     /**
-     * Get current position.
-     * @return size_t - the position value.
+     * Get read position.
+     * @return size_t - the read position.
      */
-    size_t GetPos() const;
+    size_t GetReadPos() const;
+
 
     /**
-     * Set current position.
-     * @param[in] pos - the new position.
+     * Set read position.
+     * @param[in] readPos - the new read position.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetPos(size_t pos);
+    int SetReadPos(size_t readPos);
 
     /**
-     * Get stream size.
-     * return size_t - the size.
+     * Get write position.
+     * @return size_t - the write position.
      */
-    size_t GetSize() const;
+    size_t GetWritePos() const;
 
     /**
-     * Set stream size(the new size must greater than old size).
-     * @param[in] size - the new stream size.
+     * Set write position.
+     * @param[in] writePos - the new read position.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int SetSize(size_t size);
+    int SetWritePos(size_t writePos);
+
+    /**
+     * Get stream capacity.
+     * return size_t - the capacity, in bytes.
+     */
+    size_t GetCap() const;
+
+    /**
+     * Recapacity stream(the new capacity must greater than old newCap).
+     * @param[in] newCap - the new stream capacity.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Recap(size_t newCap);
+
+    /**
+     * Get readable size.
+     * @return size_t - the readable size, in bytes.
+     */
+    size_t GetReadableSize() const;
+
+    /**
+     * Get writable size.
+     * @return size_t - the writable size, in bytes.
+     */
+    size_t GetWritableSize() const;
 
 public:
     /**
@@ -134,11 +159,8 @@ public:
     PyObject *ReadInt64();
     PyObject *ReadFloat();
     PyObject *ReadDouble();
-    PyObject *ReadPyInt();
-    PyObject *ReadPyLong();
     PyObject *ReadStr();
     PyObject *ReadStr2();
-    PyObject *ReadStr3();
     PyObject *ReadUnicode();
     PyObject *ReadByteArray();
     PyObject *ReadBuffer();
@@ -196,11 +218,8 @@ public:
     int WriteInt64(PyObject *val);
     int WriteFloat(PyObject *val);
     int WriteDouble(PyObject *val);
-    int WritePyInt(PyObject *val);
-    int WritePyLong(PyObject *val);
     int WriteStr(PyObject *val);
     int WriteStr2(PyObject *val);
-    int WriteStr3(PyObject *val);
     int WriteUnicode(PyObject *val);
     int WriteByteArray(PyObject *val);
     int WriteBuffer(PyObject *val);
@@ -208,7 +227,6 @@ public:
     int WriteList(PyObject *val);
     int WriteSequence(PyObject *val);
     int WriteDict(PyObject *val);
-    int WriteInst(PyObject *val);
 
     /**
      * Format write data.
@@ -224,11 +242,12 @@ private:
     LLBC_Stream _stream;
     PyObject *_pyStream;
 
-    static PyObject *_methEncode;
-    static PyObject *_methDecode;
-
     static PyObject *_keyDict;
     static PyObject *_keySlots;
+    static PyObject *_serMeths[6];
+    static PyObject *_deserMeths[8];
 };
 
-#endif // !__PYLLBC_COM_PY_STREAM_H__
+#include "pyllbc/common/PyStreamInl.h"
+
+

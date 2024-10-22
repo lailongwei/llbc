@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_MACRO_H__
-#define __PYLLBC_COM_MACRO_H__
+#pragma once
 
 #include "pyllbc/common/LibHeader.h"
 
@@ -71,4 +70,11 @@
 #define pyllbc_TopModule        pyllbc_s_TopModule
 #define pyllbc_InlModule        pyllbc_s_InlModule
 
-#endif // !__PYLLBC_COM_MACRO_H__
+/* The Python -> C++ argument parse converience macro define. */
+#define PYLLBC_ParseCObjBeginArgs(cobj, addiFmt, ...) \
+    unsigned PY_LONG_LONG valOf##cobj;                \
+    if (!PyArg_ParseTuple(args, "K" addiFmt, &valOf##cobj, ##__VA_ARGS__)) \
+        return nullptr;                               \
+                                                      \
+    memcpy(&cobj, &valOf##cobj, sizeof(cobj))         \
+

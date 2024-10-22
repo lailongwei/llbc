@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/file/File.h"
 #include "llbc/core/file/Directory.h"
@@ -64,13 +63,13 @@ LLBC_BundleHandle LLBC_CreateBundle(const LLBC_String &path)
     if (!LLBC_Directory::Exists(realPath))
         return LLBC_INVALID_BUNDLE_HANDLE;
 
-    return LLBC_New(LLBC_String, realPath);
+    return new LLBC_String(realPath);
 }
 
 void LLBC_ReleaseBundle(LLBC_BundleHandle bundle)
 {
     if (LIKELY(bundle != LLBC_INVALID_BUNDLE_HANDLE))
-        LLBC_Delete(reinterpret_cast<LLBC_String *>(bundle));
+        delete reinterpret_cast<LLBC_String *>(bundle);
 }
 
 LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle)
@@ -93,17 +92,23 @@ LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle)
     return path;
 }
 
-LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name)
+LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                  const LLBC_String &name)
 {
     return LLBC_GetBundleResPath(bundle, name, "", "");
 }
 
-LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext)
+LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                  const LLBC_String &name,
+                                  const LLBC_String &ext)
 {
-    return LLBC_GetBundleResPath(bundle, name, ext, ""); 
+    return LLBC_GetBundleResPath(bundle, name, ext, "");
 }
 
-LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &name, const LLBC_String &ext, const LLBC_String &inDir)
+LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
+                                  const LLBC_String &name,
+                                  const LLBC_String &ext,
+                                  const LLBC_String &inDir)
 {
     if (UNLIKELY(name.empty()))
     {
@@ -177,5 +182,3 @@ LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle, const LLBC_String &n
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_NON_IPHONE
-
-#include "llbc/common/AfterIncl.h"

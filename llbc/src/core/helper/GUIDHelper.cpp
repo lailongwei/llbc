@@ -20,7 +20,10 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <uuid/uuid.h>
+#endif // Non-Win32
 
 #include "llbc/core/helper/GUIDHelper.h"
 
@@ -29,7 +32,7 @@ __LLBC_NS_BEGIN
 LLBC_GUID LLBC_GUIDHelper::Gen()
 {
     LLBC_GUID guid;
-    ::memset(&guid, 0, sizeof(LLBC_GUID));
+    memset(&guid, 0, sizeof(LLBC_GUID));
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     uuid_generate(reinterpret_cast<unsigned char *>(&guid));
@@ -65,5 +68,3 @@ LLBC_String LLBC_GUIDHelper::GenStr()
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

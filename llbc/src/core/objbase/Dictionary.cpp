@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/Config.h"
 
@@ -42,7 +42,7 @@ LLBC_Dictionary::LLBC_Dictionary(LLBC_Dictionary::size_type bucketSize)
 {
     _bucket = reinterpret_cast<LLBC_DictionaryElem **>(
         malloc(_bucketSize * sizeof(LLBC_DictionaryElem *)));
-    LLBC_MemSet(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
+    memset(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
 }
 
 LLBC_Dictionary::~LLBC_Dictionary()
@@ -61,13 +61,13 @@ void LLBC_Dictionary::Clear()
         LLBC_DictionaryElem *temp = elem;
         elem = elem->GetElemNext();
 
-        LLBC_Delete(temp);
+        delete temp;
     }
 
     _size = 0;
     _head = _tail = nullptr;
 
-    LLBC_MemSet(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
+    memset(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
 }
 
 LLBC_Dictionary::size_type LLBC_Dictionary::GetSize() const
@@ -99,7 +99,7 @@ int LLBC_Dictionary::SetHashBucketSize(size_type bucketSize)
     _bucketSize = bucketSize;
     _bucket = reinterpret_cast<LLBC_DictionaryElem **>(
         realloc(_bucket, _bucketSize * sizeof(LLBC_DictionaryElem *)));
-    LLBC_MemSet(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
+    memset(_bucket, 0, _bucketSize * sizeof(LLBC_DictionaryElem *));
 
     // ReHash.
     it = Begin();
@@ -131,7 +131,7 @@ int LLBC_Dictionary::Insert(int key, LLBC_Dictionary::Obj *o)
         SetHashBucketSize(_bucketSize * 2);
     }
 
-    LLBC_DictionaryElem *elem = LLBC_New(LLBC_DictionaryElem, key, o);
+    LLBC_DictionaryElem *elem = new LLBC_DictionaryElem(key, o);
 
     // Link to doubly-linked list.
     if (_tail)
@@ -173,7 +173,7 @@ int LLBC_Dictionary::Insert(const LLBC_String &key, LLBC_Dictionary::Obj *o)
         SetHashBucketSize(_bucketSize * 2);
     }
 
-    LLBC_DictionaryElem *elem = LLBC_New(LLBC_DictionaryElem, key, o);
+    LLBC_DictionaryElem *elem = new LLBC_DictionaryElem(key, o);
 
     // Hash to bucket.
     elem->Hash(_bucket, _bucketSize);
@@ -264,7 +264,7 @@ int LLBC_Dictionary::Erase(Iter it)
     // Remove from doubly-linked list.
     RemoveFromDoublyLinkedList(elem);
 
-    LLBC_Delete(elem);
+    delete elem;
 
     _size -= 1;
 
@@ -386,13 +386,13 @@ LLBC_Dictionary::ConstReverseIter LLBC_Dictionary::ReverseEnd() const
     return ConstReverseIter(ConstIter::cpointer(nullptr));
 }
 
-LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](int key) const
+LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator[](int key) const
 {
     ConstIter it = Find(key);
     return it != End() ? it.Obj() : nullptr;
 }
 
-LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator [](const LLBC_String &key) const
+LLBC_Dictionary::ConstObj *LLBC_Dictionary::operator[](const LLBC_String &key) const
 {
     ConstIter it = Find(key);
     return it != End() ? it.Obj() : nullptr;
@@ -410,7 +410,7 @@ void LLBC_Dictionary::SetObjectFactory(LLBC_ObjectFactory *factory)
 
 LLBC_Object *LLBC_Dictionary::Clone() const
 {
-    LLBC_Dictionary *clone = LLBC_New(LLBC_Dictionary);
+    LLBC_Dictionary *clone = new LLBC_Dictionary;
 
     // Clone object factory.
     if (_objFactory)
@@ -464,7 +464,7 @@ void LLBC_Dictionary::Serialize(LLBC_Stream &s) const
     }
 }
 
-bool LLBC_Dictionary::DeSerialize(LLBC_Stream &s)
+bool LLBC_Dictionary::Deserialize(LLBC_Stream &s)
 {
     if (!_objFactory)
         return false;
@@ -557,5 +557,3 @@ void LLBC_Dictionary::RemoveFromDoublyLinkedList(LLBC_DictionaryElem *elem)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

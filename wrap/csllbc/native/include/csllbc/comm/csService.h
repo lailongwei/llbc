@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COMM_CSSERVICE_H__
-#define __CSLLBC_COMM_CSSERVICE_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -40,15 +39,14 @@ class CSLLBC_HIDDEN csllbc_Service
     typedef csllbc_Delegates _D;
 
 public:
-    typedef LLBC_IService::Type Type;
-    typedef LLBC_IService::DriveMode DriveMode;
+    typedef LLBC_ServiceDriveMode::ENUM DriveMode;
 
 public:
     /**
      * Constructor & Destructor.
      */
-    csllbc_Service(Type type, 
-                   const LLBC_String &name,
+    csllbc_Service(const LLBC_String &name,
+                   bool useNormalProtocolFactory,
                    bool fullStack,
                    _D::Deleg_Service_EncodePacket encodeDeleg,
                    _D::Deleg_Service_DecodePacket decodeDeleg,
@@ -73,11 +71,6 @@ public:
     bool IsStarted() const;
 
 public:
-    /**
-     * Get service type.
-     */
-    Type GetType() const;
-
     /**
      * Get service Id.
      */
@@ -150,7 +143,7 @@ public:
     /**
      * Multicast data.
      */
-    int Multicast(const LLBC_SessionIdList &sessionIds, int opcode, const void *bytes, size_t len, int status = 0);
+    int Multicast(const LLBC_SessionIds &sessionIds, int opcode, const void *bytes, size_t len, int status = 0);
     /**
      * Broadcast data.
      */
@@ -158,14 +151,14 @@ public:
 
 public:
     /**
-     * Register csharp layer components.
+     * Add csharp layer components.
      */
-    int RegisterComponent(csllbc_Component *comp);
+    int AddComponent(csllbc_Component *comp);
 
     /**
      * Register csharp layer coder.
      */
-    int RegisterCoder(int opcode);
+    int AddCoder(int opcode);
 
     /**
      * Subscribe/PreSubscribe/Unify-PreSubscribe specific opcode's packet.
@@ -213,7 +206,7 @@ public:
     static void RemovePacketDecodeDelegates(int svcId);
 
 private:
-    LLBC_IService *_llbcSvc;
+    LLBC_Service *_llbcSvc;
     csllbc_PacketHandler *_packetHandler;
 
     static LLBC_SpinLock _packetDelegatesLock;
@@ -222,4 +215,4 @@ private:
     static _PacketDecodeDelegs _packetDecodeDelegs;
 };
 
-#endif // !__CSLLBC_COMM_CSSERVICE_H__
+

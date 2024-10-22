@@ -27,29 +27,69 @@ namespace
 
 const int OPCODE = 1;
 
-class TestComp : public LLBC_IComponent
+class TestComp : public LLBC_Component
 {
 public:
     TestComp(bool asClient, bool useBst)
-    : LLBC_IComponent(LLBC_ComponentEvents::DefaultEvents | LLBC_ComponentEvents::OnUpdate)
+    : LLBC_Component()
     , _asClient(asClient)
     , _useBst(useBst)
     {
     }
 
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_PrintLine("Service created!");
+        LLBC_PrintLn("Service created!");
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_PrintLine("Service destroy!");
+        LLBC_PrintLn("Service destroy!");
     }
 
-    virtual void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
+    virtual void OnUpdate()
+    {
+        if (_asClient)
+            return;
+
+        LLBC_Service *svc = GetService();
+        if (_useBst)
+            svc->Broadcast(OPCODE, "Hello world!", 14, 0);
+        else
+            svc->Multicast(_sessionIds, OPCODE, "Hello, world!", 14, 0);
+    }
+
+    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    {
+        switch (event)
+        {
+            case LLBC_ComponentEventType::SessionCreate:
+            {
+                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                break;
+            }
+            case LLBC_ComponentEventType::SessionDestroy:
+            {
+                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                break;
+            }
+            default: break;
+        }
+    }
+
+public:
+    virtual void OnRecv(LLBC_Packet &packet)
+    {
+        const int sessionId = packet.GetSessionId();
+        const char *data = reinterpret_cast<const char *>(packet.GetPayload());
+
+        LLBC_PrintLn("Session[%4d] received data: %s", sessionId, data);
+    }
+
+private:
+    void OnSessionCreate(const LLBC_SessionInfo &sessionInfo)
     {
         if (sessionInfo.IsListenSession())
             return;
@@ -57,10 +97,10 @@ public:
         _sessionIds.push_back(sessionInfo.GetSessionId());
     }
 
-    virtual void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
+    void OnSessionDestroy(const LLBC_SessionDestroyInfo &destroyInfo)
     {
         int sessionId = destroyInfo.GetSessionId();
-        for (LLBC_SessionIdListIter it = _sessionIds.begin();
+        for (auto it = _sessionIds.begin();
              it != _sessionIds.end();
              it++)
             if (*it == sessionId)
@@ -70,32 +110,11 @@ public:
             }
     }
 
-    virtual void OnUpdate()
-    {
-        if (_asClient)
-            return;
-
-        LLBC_IService *svc = GetService();
-        if (_useBst)
-            svc->Broadcast(OPCODE, "Hello world!", 14, 0);
-        else
-            svc->Multicast(_sessionIds, OPCODE, "Hello, world!", 14, 0);
-    }
-
-public:
-    virtual void OnRecv(LLBC_Packet &packet)
-    {
-        const int sessionId = packet.GetSessionId();
-        const char *data = reinterpret_cast<const char *>(packet.GetPayload());
-
-        LLBC_PrintLine("Session[%4d] received data: %s", sessionId, data);
-    }
-
 private:
     bool _asClient;
     bool _useBst;
 
-    LLBC_SessionIdList _sessionIds;
+    LLBC_SessionIds _sessionIds;
 };
 
 }
@@ -104,7 +123,7 @@ const int TestCase_Comm_Multicast::_clientCnt = 50;
 
 TestCase_Comm_Multicast::TestCase_Comm_Multicast()
 : _asClient(true)
-, _svcType(LLBC_IService::Normal)
+, _useNmlProtocolFactory(true)
 
 , _runIp("127.0.0.1")
 , _runPort(0)
@@ -119,21 +138,26 @@ TestCase_Comm_Multicast::~TestCase_Comm_Multicast()
 
 int TestCase_Comm_Multicast::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Service multicast test:");
+    LLBC_PrintLn("Service multicast test:");
     if (argc < 5)
     {
-        LLBC_FilePrintLine(stderr, "Argument error, eg: ./a [client/server], [normal/raw] ip port [useBst=False]");
+        LLBC_FilePrintLn(stderr, "Argument error, eg: ./a [client/server], [normal/raw] ip port [useBst=False]");
         return LLBC_FAILED;
     }
 
     // Fetch arguments.
     FetchArgs(argc, argv);
 
-    LLBC_IService *svc = LLBC_IService::Create(_svcType, "MulticastTest");
+    LLBC_IProtocolFactory *protoFactory;
+    if (_useNmlProtocolFactory)
+        protoFactory = new LLBC_NormalProtocolFactory;
+    else
+        protoFactory = new LLBC_RawProtocolFactory;
+    LLBC_Service *svc = LLBC_Service::Create("MulticastTest", protoFactory);
     svc->SuppressCoderNotFoundWarning();
 
-    TestComp *comp = LLBC_New(TestComp, _asClient, _useBst);
-    svc->RegisterComponent(comp);
+    TestComp *comp = new TestComp(_asClient, _useBst);
+    svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 
     if (_asClient)
@@ -144,10 +168,10 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     svc->SetFPS(10);
     svc->Start();
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return LLBC_OK;
 }
@@ -155,7 +179,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
 void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
 {
     _asClient = LLBC_ToLower(argv[1]) == "client" ? true : false;
-    _svcType = LLBC_ToLower(argv[2]) == "normal" ? LLBC_IService::Normal : LLBC_IService::Raw;
+    _useNmlProtocolFactory = LLBC_ToLower(argv[2]) == "normal" ? true : false;
 
     _runIp = argv[3];
     _runPort = LLBC_Str2Int32(argv[4]);
@@ -164,36 +188,37 @@ void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
         _useBst = LLBC_ToLower(argv[5]) == "true" ? true : false;
 }
 
-int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_IService *svc)
+int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_Service *svc)
 {
     for (int i = 0; i < _clientCnt; ++i)
     {
         const int sessionId = svc->Connect(_runIp.c_str(), _runPort);
         if (sessionId == 0)
         {
-            LLBC_PrintLine("Connect to %s:%d failed, err: %s",
+            LLBC_PrintLn("Connect to %s:%d failed, err: %s",
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
             return LLBC_FAILED;
         }
 
-        LLBC_PrintLine("Connect to %s:%d succeed, sid: %d",
+        LLBC_PrintLn("Connect to %s:%d succeed, sid: %d",
             _runIp.c_str(), _runPort, sessionId);
     }
 
     return LLBC_OK;
 }
 
-int TestCase_Comm_Multicast::PrepareServerLogic(LLBC_IService *svc)
+int TestCase_Comm_Multicast::PrepareServerLogic(LLBC_Service *svc)
 {
     const int sessionId = svc->Listen(_runIp.c_str(), _runPort);
     if (sessionId == 0)
     {
-        LLBC_FilePrintLine(stderr, "Listen on %s:%d failed, err: %s",
-            _runIp.c_str(), _runPort, LLBC_FormatLastError());
+        LLBC_FilePrintLn(stderr,
+                         "Listen on %s:%d failed, err: %s",
+                         _runIp.c_str(), _runPort, LLBC_FormatLastError());
         return LLBC_FAILED;
     }
 
-    LLBC_PrintLine("Server listening on %s:%d...", _runIp.c_str(), _runPort);
+    LLBC_PrintLn("Server listening on %s:%d...", _runIp.c_str(), _runPort);
 
     return LLBC_OK;
 }

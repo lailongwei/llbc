@@ -19,26 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/utils/Util_Text.h"
 
 #include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogThreadIdToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogThreadIdToken::LLBC_LogThreadIdToken()
-{
-}
-
-LLBC_LogThreadIdToken::~LLBC_LogThreadIdToken()
-{
-}
-
-int LLBC_LogThreadIdToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogThreadIdToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -51,20 +42,13 @@ int LLBC_LogThreadIdToken::GetType() const
 
 void LLBC_LogThreadIdToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
+    const int index = static_cast<int>(formattedData.size());
 
     char buf[32];
-    #if LLBC_TARGET_PLATFORM_WIN32
-    ::sprintf_s(buf, sizeof(buf), "%d", data.threadId);
-    #else
-    ::sprintf(buf, "%d", data.threadId);
-    #endif
-    formattedData.append(buf);
+    const int len = snprintf(buf, sizeof(buf), "%d", data.threadId);
+    formattedData.append(buf, len);
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Select.h"
 
@@ -32,10 +32,10 @@ int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet 
     timeout.tv_sec = interval / 1000;
     timeout.tv_usec = (interval % 1000) * 1000;
 
-    int ret = ::select(nfds, readfds, writefds, exceptfds, &timeout);
+    int ret = select(nfds, readfds, writefds, exceptfds, &timeout);
     if (ret == 0)
     {
-        LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+        LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
     }
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     else if (ret == -1)
@@ -54,5 +54,3 @@ int LLBC_Select(int nfds, LLBC_FdSet *readfds, LLBC_FdSet *writefds, LLBC_FdSet 
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

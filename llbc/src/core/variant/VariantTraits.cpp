@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/variant/Variant.h"
 #include "llbc/core/variant/VariantArithmetic.h"
@@ -36,7 +36,7 @@
             lObj->clear();                                               \
     } else {                                                             \
         if (lObj == nullptr)                                             \
-            lObj = LLBC_New(LLBC_Variant::ty, *rObj);                    \
+            lObj = new LLBC_Variant::ty(*rObj);                          \
         else                                                             \
             *lObj = *rObj;                                               \
     }                                                                    \
@@ -106,29 +106,45 @@ bool LLBC_VariantTraits::eq(const LLBC_Variant &left, const LLBC_Variant &right)
 
     const LLBC_Variant::Holder &lHolder = left.GetHolder();
     const LLBC_Variant::Holder &rHolder = right.GetHolder();
-    if (left.IsStr())
+    if (left.IsStr()) // Str == Any
     {
-        __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(Str, str);
+        // Str == Non-Raw
+        if (!right.IsRaw())
+        {
+            __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(Str, str);
+        }
+        else // Str == Raw
+        {
+            if (right.IsDouble() || right.IsFloat())
+                return left.AsDouble() == right.AsDouble();
+            else if (right.IsUnsignedRaw())
+                return left.AsUInt64() == right.AsUInt64();
+            else
+                return left.AsInt64() == right.AsInt64();
+        }
     }
-    else if (left.IsSeq())
+    else if (left.IsSeq()) // Seq == Any
     {
         __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(Seq, seq);
     }
-    else if (left.IsDict())
+    else if (left.IsDict()) // Dict == Any
     {
         __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(Dict, dict);
     }
-    else if (left.IsRaw())
+    else if (left.IsRaw()) // Raw == Any
     {
-        if (!right.IsRaw())
+        if (!right.IsRaw() && !right.IsStr()) // Raw == Non-Raw&&Non-Str
             return false;
 
+        // Raw == Raw/Str
         if ((left.IsDouble() || left.IsFloat()) ||
             (right.IsDouble() || right.IsFloat()))
-            return left.AsDouble() == right.AsDouble();
-
-        return (left.GetHolder().data.raw.uint64Val == 
-            right.GetHolder().data.raw.uint64Val);
+            return std::fabs(left.AsDouble() - right.AsDouble()) <
+                std::numeric_limits<double>::epsilon();
+        else if (left.IsUnsignedRaw() || right.IsUnsignedRaw())
+            return left.AsUInt64() == right.AsUInt64();
+        else
+            return left.AsInt64() == right.AsInt64();
     }
 
     return (left.IsNil() && right.IsNil());
@@ -166,27 +182,40 @@ bool LLBC_VariantTraits::lt(const LLBC_Variant &left, const LLBC_Variant &right)
     {
         if (right.IsDict() ||
             right.IsSeq()) // Dict/Seq: true
+        {
             return true;
+        }
         else if (right.IsStr()) // Str: exec compare
+        {
             __LLBC_INL_OBJ_TYPE_VARS_LT_COMP(Str, str);
-        else // Raw/Nil: false
+        }
+        else if (right.IsRaw()) // Raw: exec compare(convert to raw)
+        {
+            if (right.IsDouble() || right.IsFloat())
+                return left.AsDouble() < right.AsDouble();
+            else if (right.IsUnsignedRaw())
+                return left.AsUInt64() < right.AsUInt64();
+            else
+                return left.AsInt64() < right.AsInt64();
+        }
+        else // Nil: false
+        {
             return false;
+        }
     }
     else if (left.IsRaw())
     {
         if (right.IsDict() ||
-            right.IsSeq() ||
-            right.IsStr()) // Dict/Seq/Str: true
+            right.IsSeq()) // Dict/Seq: true
         {
             return true;
         }
-        else if (right.IsRaw()) // Raw: exec compare
+        else if (right.IsStr() || right.IsRaw()) // Str/Raw: exec compare
         {
             if ((left.IsDouble() || left.IsFloat()) ||
                 (right.IsDouble() || right.IsFloat()))
                 return left.AsDouble() < right.AsDouble();
-
-            if (left.IsUnsignedRaw() || right.IsUnsignedRaw())
+            else if (left.IsUnsignedRaw() || right.IsUnsignedRaw())
                 return left.AsUInt64() < right.AsUInt64();
             else
                 return left.AsInt64() < right.AsInt64();
@@ -249,6 +278,14 @@ LLBC_Variant LLBC_VariantTraits::div(const LLBC_Variant &left, const LLBC_Varian
     return ret;
 }
 
+LLBC_Variant LLBC_VariantTraits::mod(const LLBC_Variant &left, const LLBC_Variant &right)
+{
+    LLBC_Variant ret;
+    assign(ret, left);
+    mod_equal(ret, right);
+    return ret;
+}
+
 void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right)
 {
     // &Left == &Right rules:
@@ -284,7 +321,7 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
             if (lDict)
                 lDict->insert(rDict->begin(), rDict->end());
             else
-                lDict = LLBC_New(LLBC_Variant::Dict, *rDict);
+                lDict = new LLBC_Variant::Dict(*rDict);
         }
 
         return;
@@ -304,7 +341,7 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
                 return;
 
             if (!lSeq)
-                lSeq = LLBC_New(LLBC_Variant::Seq);
+                lSeq = new LLBC_Variant::Seq;
             if (lSeq->capacity() < lSeq->size() + rDict->size())
                 lSeq->reserve(lSeq->size() + rDict->size());
 
@@ -321,7 +358,7 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
             if (lSeq)
                 lSeq->insert(lSeq->end(), rSeq->begin(), rSeq->end());
             else
-                lSeq = LLBC_New(LLBC_Variant::Seq, *rSeq);
+                lSeq = new LLBC_Variant::Seq(*rSeq);
         }
         else
         {
@@ -351,14 +388,14 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
             if (lStr)
                 lStr->append(*rStr);
             else
-                lStr = LLBC_New(LLBC_Variant::Str, *rStr);
+                lStr = new LLBC_Variant::Str(*rStr);
         }
         else
         {
             if (lStr)
                 lStr->append(right.AsStr());
             else
-                lStr = LLBC_New(LLBC_Variant::Str, right.AsStr());
+                lStr = new LLBC_Variant::Str(right.AsStr());
         }
 
         return;
@@ -721,10 +758,39 @@ void LLBC_VariantTraits::div_equal(LLBC_Variant &left, const LLBC_Variant &right
     LLBC_VariantArithmetic::Performs(left, right, LLBC_VariantArithmetic::VT_ARITHMETIC_DIV);
 }
 
+void LLBC_VariantTraits::mod_equal(LLBC_Variant &left, const LLBC_Variant &right)
+{
+    // &Left == &Right rules:
+    if (&left == &right)
+    {
+        LLBC_Variant clone;
+        assign(clone, left);
+        mod_equal(left, clone);
+
+        return;
+    }
+
+    // Left[Nil] or Right[Nil] = Nil
+    if (left.IsNil() || right.IsNil())
+    {
+        left.BecomeNil();
+        return;
+    }
+
+    // Left[Dict/Seq/Str] / Right[Non Nil] = Left # undefined
+    if (!left.IsRaw())
+        return;
+
+    // Left[Raw] / Right[Dict/Seq/Str] = Left[Raw]
+    if (!right.IsRaw())
+        return;
+
+    // Left[Raw] / Right[Raw] = VariantArithmetic(l, r, op)
+    LLBC_VariantArithmetic::Performs(left, right, LLBC_VariantArithmetic::VT_ARITHMETIC_MOD);
+}
+
 __LLBC_NS_END
 
 #undef __LLBC_INL_OBJ_TYPE_VARS_ASSIGN
 #undef __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP
 #undef __LLBC_INL_OBJ_TYPE_VARS_LT_COMP
-
-#include "llbc/common/AfterIncl.h"

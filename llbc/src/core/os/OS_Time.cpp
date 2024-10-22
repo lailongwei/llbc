@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Time.h"
 
@@ -71,7 +71,7 @@ uint64 LLBC_GetTickCount()
 #elif LLBC_TARGET_PLATFORM_MAC
     // Mac Impl.
     static mach_timebase_info_data_t timeBaseInfo;
-    uint64_t absoluteTime = ::mach_absolute_time();
+    uint64_t absoluteTime = mach_absolute_time();
 
     if (timeBaseInfo.denom == 0)
     {
@@ -83,7 +83,7 @@ uint64 LLBC_GetTickCount()
 #elif LLBC_TARGET_PLATFORM_IPHONE
     // Iphone Impl.
     struct timeval tv;
-    ::gettimeofday(&tv, nullptr);
+    gettimeofday(&tv, nullptr);
     return static_cast<uint64>(tv.tv_sec) * 1000 + static_cast<uint64>(tv.tv_usec / 1000);
 #elif LLBC_TARGET_PLATFORM_WIN32
     // WIN32 Impl.
@@ -102,7 +102,7 @@ int LLBC_GetTimeOfDay(struct timeval *tv, void *tz)
 #endif
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return ::gettimeofday(tv, tz);
+    return gettimeofday(tv, tz);
 #else
     if (UNLIKELY(!tv))
     {
@@ -110,7 +110,7 @@ int LLBC_GetTimeOfDay(struct timeval *tv, void *tz)
         return LLBC_FAILED;
     }
 
-    sint64 timeVal = LLBC_GetMicroSeconds();
+    sint64 timeVal = LLBC_GetMicroseconds();
     tv->tv_sec = (long)(timeVal / 1000000L);
     tv->tv_usec = (long)(timeVal % 1000000L);
 
@@ -134,5 +134,3 @@ int gettimeofday(struct timeval *tv, void *tz)
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)
 #endif
-
-#include "llbc/common/AfterIncl.h"

@@ -29,8 +29,8 @@
 
 LLBC_BEGIN_C_DECL
 
-csllbc_Service *csllbc_Service_Create(int svcType,
-                                      const char *svcName,
+csllbc_Service *csllbc_Service_Create(const char *svcName,
+                                      bool useNormalProtocolFactory,
                                       bool fullStack,
                                       csllbc_Delegates::Deleg_Service_EncodePacket encodeDeleg,
                                       csllbc_Delegates::Deleg_Service_DecodePacket decodeDeleg,
@@ -39,17 +39,10 @@ csllbc_Service *csllbc_Service_Create(int svcType,
                                       csllbc_Delegates::Deleg_Service_PacketUnifyPreHandler unifyPreHandlerDeleg,
                                       csllbc_Delegates::Deleg_Service_NativeCouldNotFoundDecoderReport notFoundDecoderDeleg)
 {
-    if (svcType != static_cast<int>(LLBC_IService::Raw) &&
-        svcType != static_cast<int>(LLBC_IService::Normal))
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return nullptr;
-    }
-
-    return LLBC_New(csllbc_Service,
-                    static_cast<csllbc_Service::Type>(svcType),
+    return new csllbc_Service(
                     svcName,
-                    fullStack != 0,
+                    useNormalProtocolFactory,
+                    fullStack,
                     encodeDeleg,
                     decodeDeleg,
                     handlerDeleg,
@@ -61,11 +54,6 @@ csllbc_Service *csllbc_Service_Create(int svcType,
 void csllbc_Service_Delete(csllbc_Service *svc)
 {
     LLBC_XDelete(svc);
-}
-
-int csllbc_Service_GetType(csllbc_Service *svc)
-{
-    return static_cast<int>(svc->GetType());
 }
 
 int csllbc_Service_GetId(csllbc_Service *svc)
@@ -85,7 +73,7 @@ int csllbc_Service_GetDriveMode(csllbc_Service *svc)
 
 int csllbc_Service_SetDriveMode(csllbc_Service *svc, int driveMode)
 {
-    return svc->SetDriveMode(static_cast<LLBC_IService::DriveMode>(driveMode));
+    return svc->SetDriveMode(static_cast<LLBC_ServiceDriveMode::ENUM>(driveMode));
 }
 
 int csllbc_Service_Start(csllbc_Service *svc, int pollerCount)
@@ -174,12 +162,12 @@ int csllbc_Service_SendPacket(csllbc_Service *svc,
                               sint64 packetId,
                               int status)
 {
-    csllbc_Coder *coder = LLBC_New(csllbc_Coder);
+    csllbc_Coder *coder = new csllbc_Coder;
     coder->SetEncodeInfo(packetId, svc->GetEncodePacketDeleg());
 
     if (svc->Send(sessionId, opcode, coder, status) != LLBC_OK)
     {
-        LLBC_Delete(coder);
+        delete coder;
         return LLBC_FAILED;
     }
 
@@ -194,7 +182,7 @@ int csllbc_Service_Multicast(csllbc_Service *svc,
                              int dataLen,
                              int status)
 {
-    LLBC_SessionIdList sessionIdList(sessionIdCount);
+    LLBC_SessionIds sessionIdList(sessionIdCount);
     for (int idx = 0; idx < sessionIdCount; ++idx)
         sessionIdList.push_back(sessionIds[idx]);
 
@@ -212,18 +200,18 @@ int csllbc_Service_Broadcast(csllbc_Service *svc,
     return svc->Broadcast(opcode, data, static_cast<size_t>(dataLen), status);
 }
 
-int csllbc_Service_RegisterComponent(csllbc_Service *svc,
-                                     csllbc_Delegates::Deleg_Comp_OnInit initDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnDestroy destroyDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnStart startDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnStop stopDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnUpdate updateDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnIdle idleDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnProtoReport protoReportDeleg,
-                                     csllbc_Delegates::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg)
+int csllbc_Service_AddComponent(csllbc_Service *svc,
+                                csllbc_Delegates::Deleg_Comp_OnInit initDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnDestroy destroyDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnStart startDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnStop stopDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnUpdate updateDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnIdle idleDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnProtoReport protoReportDeleg,
+                                csllbc_Delegates::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg)
 {
     csllbc_Component *comp = new csllbc_Component(initDeleg, destroyDeleg,
                                                   startDeleg, stopDeleg,
@@ -231,18 +219,18 @@ int csllbc_Service_RegisterComponent(csllbc_Service *svc,
                                                   sessionCreateDeleg, sessionDestroyDeleg, asyncConnResultDeleg,
                                                   protoReportDeleg, unHandledPacketDeleg);
 
-    if (svc->RegisterComponent(comp) != LLBC_OK)
+    if (svc->AddComponent(comp) != LLBC_OK)
     {
-        LLBC_Delete(comp);
+        delete comp;
         return LLBC_FAILED;
     }
 
     return LLBC_OK;
 }
 
-int csllbc_Service_RegisterCoder(csllbc_Service *svc, int opcode)
+int csllbc_Service_AddCoder(csllbc_Service *svc, int opcode)
 {
-    return svc->RegisterCoder(opcode);
+    return svc->AddCoder(opcode);
 }
 
 int csllbc_Service_Subscribe(csllbc_Service *svc, int opcode)

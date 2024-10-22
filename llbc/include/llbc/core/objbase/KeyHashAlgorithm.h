@@ -19,12 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_KEY_HASH_ALGORITHM_H__
-#define __LLBC_OBJBASE_KEY_HASH_ALGORITHM_H__
+#pragma once
 
-#include "llbc/common/Common.h"
-
-#include "llbc/core/singleton/Common.h"
+#include "llbc/core/singleton/Singleton.h"
 
 __LLBC_NS_BEGIN
 
@@ -36,7 +33,7 @@ class LLBC_EXPORT LLBC_HashAlgo
 public:
     enum
     {
-        Begin, 
+        Begin,
 
         BKDR = Begin,
         DJB,
@@ -62,14 +59,14 @@ public:
     /**
      * @brief Ctor&Dtor
      */
-    __LLBC_Hash();
-    ~__LLBC_Hash();
+    __LLBC_Hash() = default;
+    ~__LLBC_Hash() = default;
 
 public:
     /**
      * Hash specific bytes.
      * @param bytes - the will hash bytes.
-     * @param len   - the will has bytes length.
+     * @param size  - the will has bytes length.
      * @return uint32 - the hash value.
      */
     template <int Algo = LLBC_HashAlgo::Default>
@@ -79,21 +76,16 @@ public:
      * Hash specific bytes.
      * @param[in] algo  - the key hash algorithm type.
      * @param[in] bytes - the will has bytes.
-     * @param[in] len   - the will hash bytes length.
+     * @param[in] size  - the will hash bytes length.
      * @return uint32 - the hash value.
      */
     uint32 operator()(int algo, const void *bytes, size_t size);
 
 private:
     /**
-     * Define Hash base class. 
-     */
-    typedef std::binary_function<const void *, size_t, uint32> _HashBase;
-
-    /**
      * BKDR hash algorithm.
      */
-    struct _BKDRHash : public _HashBase
+    struct _BKDRHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -101,7 +93,7 @@ private:
     /**
      * DJB hash algorithm.
      */
-    struct _DJBHash : public _HashBase
+    struct _DJBHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -109,7 +101,7 @@ private:
     /**
      * SDBM hash algorithm.
      */
-    struct _SDBMHash : public _HashBase
+    struct _SDBMHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -117,7 +109,7 @@ private:
     /**
      * RS hash algorithm.
      */
-    struct _RSHash : public _HashBase
+    struct _RSHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -125,7 +117,7 @@ private:
     /**
      * JS hash algorithm.
      */
-    struct _JSHash : public _HashBase
+    struct _JSHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -133,7 +125,7 @@ private:
     /**
      * P. J. Weinberger hash algorithm.
      */
-    struct _PJHash : public _HashBase
+    struct _PJHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -141,7 +133,7 @@ private:
     /**
      * ELF hash algorithm.
      */
-    struct _ELFHash : public _HashBase
+    struct _ELFHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -149,7 +141,7 @@ private:
     /**
      * AP hash algorithm.
      */
-    struct _APHash : public _HashBase
+    struct _APHash
     {
         uint32 operator()(const void *buf, size_t size) const;
     };
@@ -161,22 +153,22 @@ private:
     LLBC_DISABLE_ASSIGNMENT(__LLBC_Hash);
 
 private:
-    const _BKDRHash _bkdrHash;
-    const _DJBHash _djbHash;
-    const _SDBMHash _sdbmHash;
-    const _RSHash _rsHash;
-    const _JSHash _jsHash;
-    const _PJHash _pjHash;
-    const _ELFHash _elfHash;
-    const _APHash _apHash;
+    const _BKDRHash _bkdrHash{};
+    const _DJBHash _djbHash{};
+    const _SDBMHash _sdbmHash{};
+    const _RSHash _rsHash{};
+    const _JSHash _jsHash{};
+    const _PJHash _pjHash{};
+    const _ELFHash _elfHash{};
+    const _APHash _apHash{};
 };
 
 __LLBC_NS_END
 
-#include "llbc/core/objbase/KeyHashAlgorithmImpl.h"
+#include "llbc/core/objbase/KeyHashAlgorithmInl.h"
 
 // Singleton macro define.
 template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS __LLBC_Hash>;
 #define LLBC_Hash (*(LLBC_NS LLBC_Singleton<LLBC_NS __LLBC_Hash>::Instance()))
 
-#endif // !__LLBC_OBJBASE_KEY_HASH_ALGORITHM_H__
+

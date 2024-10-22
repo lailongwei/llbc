@@ -32,7 +32,7 @@ TestCase_Com_Compiler::~TestCase_Com_Compiler()
 
 int TestCase_Com_Compiler::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("common/compiler test:");
+    LLBC_PrintLn("common/compiler test:");
 
     LLBC_String compInfo;
     compInfo.append_format("  Compiler Type: %d\n", LLBC_CUR_COMP)
@@ -41,9 +41,9 @@ int TestCase_Com_Compiler::Run(int argc, char *argv[])
         .append_format("  Minor Version: %d\n", LLBC_COMP_MINOR_VER)
         .append_format("  Patch Level: %d\n", LLBC_COMP_PATCH_LEVEL);
 
-    LLBC_PrintLine("%s", compInfo.c_str());
+    LLBC_PrintLn("%s", compInfo.c_str());
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
     return LLBC_OK;

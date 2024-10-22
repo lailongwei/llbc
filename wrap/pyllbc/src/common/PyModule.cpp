@@ -61,7 +61,7 @@ pyllbc_Module::~pyllbc_Module()
     }
 
     /* Destroy all sub modules. */
-    LLBC_STLHelper::DeleteContainer(_subModules, false);
+    LLBC_STLHelper::DeleteContainer(_subModules);
 
     /* Dereference self python module object. */
     Py_XDECREF(_module);
@@ -196,14 +196,14 @@ int pyllbc_Module::AddMethod(const LLBC_String &name,
                              const LLBC_String &doc)
 {
     char *hName = LLBC_Malloc(char, name.size() + 1);
-    LLBC_MemCpy(hName, name.c_str(), name.size());
+    memcpy(hName, name.c_str(), name.size());
     hName[name.size()] = '\0';
 
     char *hDoc = nullptr;
     if (!doc.empty())
     {
         hDoc = LLBC_Malloc(char, doc.size() + 1);
-        LLBC_MemCpy(hDoc, doc.c_str(), doc.size());
+        memcpy(hDoc, doc.c_str(), doc.size());
         hDoc[doc.size()] = '\0';
     }
 

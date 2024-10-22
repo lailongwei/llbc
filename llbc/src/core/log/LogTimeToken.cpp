@@ -19,13 +19,12 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/time/Time.h"
 
 #include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogTimeToken.h"
 
 __LLBC_NS_BEGIN
@@ -37,11 +36,7 @@ LLBC_LogTimeToken::LLBC_LogTimeToken()
 {
 }
 
-LLBC_LogTimeToken::~LLBC_LogTimeToken()
-{
-}
-
-int LLBC_LogTimeToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogTimeToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -55,8 +50,8 @@ int LLBC_LogTimeToken::GetType() const
 void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
     // Format non millisecond part.
-    int index = static_cast<int>(formattedData.size());
-    time_t timeInSecond = static_cast<time_t>(data.logTime / 1000);
+    const int index = static_cast<int>(formattedData.size());
+    const time_t timeInSecond = static_cast<time_t>(data.logTime / 1000000);
 
     if (timeInSecond != _lastFmtTime)
     {
@@ -67,18 +62,17 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
         localtime_r(&timeInSecond, &timeStruct);
     #endif
         _lastFmtTime = timeInSecond;
-        _cacheLen = strftime(_fmtCache, sizeof(_fmtCache), "%y-%m-%d %H:%M:%S.", &timeStruct);
+        _cacheLen = strftime(_fmtCache,
+                             sizeof(_fmtCache),
+                             "%y-%m-%d %H:%M:%S.", &timeStruct);
     }
 
     formattedData.append(_fmtCache, _cacheLen);
 
     // Format millisecond part.
-    formattedData.append_format("%03llu", data.logTime % 1000);
+    formattedData.append_format("%06llu", data.logTime % 1000000);
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

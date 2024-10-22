@@ -26,7 +26,7 @@ namespace
 {
     void __DeletePreHandleResult(void *result)
     {
-        LLBC_Delete(reinterpret_cast<char *>(result));
+        delete reinterpret_cast<char *>(result);
         std::cout <<"Prehandle result data deleted!" <<std::endl;
     }
 }
@@ -41,7 +41,7 @@ TestCase_Comm_PacketOp::~TestCase_Comm_PacketOp()
 
 int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("llbc library communication/packet test:");
+    LLBC_PrintLn("llbc library communication/packet test:");
 
     // Raw data type read/write test.
     std::cout <<"Raw data type read/write test(net byte order flag: " 
@@ -116,14 +116,10 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
     LLBC_Packet packet2;
     packet2.SetOpcode(10086);
     packet2.SetStatus(-1);
-    packet2.SetSenderServiceId(110);
-    packet2.SetRecverServiceId(220);
     packet2.SetFlags(1111);
     std::cout <<"After set opcode/status/serviceId/flags, these values are:" <<std::endl;
     std::cout <<"  opcode: " <<packet2.GetOpcode() <<std::endl;
     std::cout <<"  status: " <<packet2.GetStatus() <<std::endl;
-    std::cout <<"  sender service Id: " <<packet2.GetSenderServiceId() <<std::endl;
-    std::cout <<"  receiver service Id: " <<packet2.GetRecverServiceId() <<std::endl;
 
     std::cout <<"  flags: " <<packet2.GetFlags() <<std::endl;
     std::cout <<"  packet length: " <<packet2.GetLength() <<std::endl;
@@ -131,13 +127,23 @@ int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
 
     // PreHandleResult about test.
     std::cout <<"\nPreHandle result about test:" <<std::endl;
-
     std::cout <<"Create new packet to test prehandle result clear callback method" <<std::endl;
-    LLBC_Packet *preHandleTestPacket = LLBC_New(LLBC_Packet);
-    preHandleTestPacket->SetPreHandleResult(LLBC_New(char), __DeletePreHandleResult);
+    LLBC_Packet *preHandleTestPacket = new LLBC_Packet;
+    preHandleTestPacket->SetPreHandleResult(new char, __DeletePreHandleResult);
 
     std::cout <<"Delete prehandle test packet" <<std::endl;
     LLBC_XDelete(preHandleTestPacket);
+
+    // Stream output test.
+    std::cout <<"\nPacket stream output test:" <<std::endl;
+    LLBC_Packet streamOutputTest;
+    streamOutputTest.SetSessionId(10086);
+    streamOutputTest.SetOpcode(300);
+    streamOutputTest.SetStatus(400);
+    streamOutputTest.SetPayload(new LLBC_MessageBlock);
+    streamOutputTest <<3;
+    streamOutputTest <<"Hello world";
+    std::cout <<"streamOutputTest::operator<<(std::ostream &): " <<streamOutputTest <<std::endl;
 
     std::cout <<"Press any key to continue ...";
     getchar();

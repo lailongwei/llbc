@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Console.h"
 #include "llbc/core/utils/Util_Debug.h"
@@ -89,7 +89,7 @@ int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
     {
         if (::GetLastError() == WAIT_TIMEOUT)
         {
-            LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+            LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
         }
         else
         {
@@ -118,5 +118,3 @@ int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
 __LLBC_NS_END
 
 #endif // LLBC_TARGET_PLATFORM_WIN32
-
-#include "llbc/common/AfterIncl.h"

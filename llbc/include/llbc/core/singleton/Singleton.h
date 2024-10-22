@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_SINGLETON_SINGLETON_H__
-#define __LLBC_CORE_SINGLETON_SINGLETON_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/thread/SpinLock.h"
 
@@ -70,6 +67,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/singleton/SingletonImpl.h"
+#include "llbc/core/singleton/SingletonInl.h"
 
-#endif // !__LLBC_CORE_SINGLETON_SINGLETON_H__
+

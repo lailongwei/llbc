@@ -27,12 +27,19 @@ LLBC_EXTERN_C PyObject *_pyllbc_InitLoggerMgr(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &cfgFile))
         return nullptr;
 
-    LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
+    LLBC_LoggerMgr *loggerMgr = LLBC_LoggerMgrSingleton;
     if (loggerMgr->Initialize(cfgFile) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
         return nullptr;
     }
+
+    Py_RETURN_NONE;
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_UnInitLoggerMgr(PyObject *self, PyObject *args)
+{
+    LLBC_LoggerMgrSingleton->Finalize();
 
     Py_RETURN_NONE;
 }
@@ -49,11 +56,11 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
     char *tag = nullptr;
     char *loggerName = nullptr;
 
-    if (!PyArg_ParseTuple(args, "iOOis|ss", &level, &fileNameObj, &funcNameObj, &line, &msg, &loggerName, &tag))
+    if (!PyArg_ParseTuple(args, "iOiOs|ss", &level, &fileNameObj, &line, &funcNameObj, &msg, &loggerName, &tag))
         return nullptr;
 
-    LLBC_LoggerManager *loggerMgr = LLBC_LoggerManagerSingleton;
-    LLBC_Logger *logger = (!loggerName || LLBC_StrCmp(loggerName, "root") == 0) ? 
+    LLBC_LoggerMgr *loggerMgr = LLBC_LoggerMgrSingleton;
+    LLBC_Logger *logger = (!loggerName || strcmp(loggerName, "root") == 0) ? 
             loggerMgr->GetRootLogger() : loggerMgr->GetLogger(loggerName);
     if (!logger)
     {
@@ -75,7 +82,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
             return nullptr;
     }
 
-    int rtn = logger->NonFormatOutput(level, tag, file, line, func, msg, -1);
+    int rtn = logger->NonFormatOutput(level,
+                                      tag,
+                                      file,
+                                      line,
+                                      func,
+                                      0,
+                                      msg,
+                                      -1);
     if (UNLIKELY(rtn != LLBC_OK))
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__);

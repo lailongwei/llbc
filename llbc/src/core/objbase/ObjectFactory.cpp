@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/Config.h"
 
@@ -38,14 +38,12 @@ LLBC_ObjectFactory::~LLBC_ObjectFactory()
 
 LLBC_Object *LLBC_ObjectFactory::CreateObject() const
 {
-    return LLBC_New(LLBC_Object);
+    return new LLBC_Object;
 }
 
 LLBC_Object *LLBC_ObjectFactory::Clone() const
 {
-    return LLBC_New(LLBC_ObjectFactory);
+    return new LLBC_ObjectFactory;
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

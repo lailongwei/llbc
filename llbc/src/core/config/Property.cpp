@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/file/File.h"
 #include "llbc/core/helper/STLHelper.h"
@@ -30,37 +29,40 @@
 
 namespace
 {
-	typedef LLBC_NS LLBC_Property This;
-
     typedef LLBC_NS LLBC_Property::Properties::iterator _It;
     typedef LLBC_NS LLBC_Property::Properties::const_iterator _CIt;
 }
 
 __LLBC_NS_BEGIN
 
-const char This::NameSeparator = '.';
-const char This::NameValueSeparator = '=';
-const char This::CommentBeg = '#';
+const char LLBC_Property::NameSeparator = '.';
+const char LLBC_Property::NameValueSeparator = '=';
+const char LLBC_Property::CommentBeg = '#';
 
-const char This::EscapeChar = '\\';
+const char LLBC_Property::EscapeChar = '\\';
 const char * const LLBC_Property::EscapeChars = ".=#";
 
-LLBC_Property::LLBC_Property(const This &another)
+LLBC_Property::LLBC_Property(const LLBC_Property &another)
 {
     _parent = nullptr;
 
     if (another._value)
-        _value = LLBC_New(LLBC_Variant, *another._value);
+        _value = new LLBC_Variant(*another._value);
     else
         _value = nullptr;
 
     if (another._properties)
     {
-        _properties = LLBC_New(This::Properties);
-        for (This::Properties::const_iterator it = another._properties->begin();
+        _properties = new Properties;
+        for (Properties::const_iterator it = another._properties->begin();
              it != another._properties->end();
              it++)
-            _properties->insert(std::make_pair(it->first, LLBC_New(This, *it->second)));
+        {
+            LLBC_Property *childProp = new LLBC_Property(*it->second);
+            childProp->_parent = this;
+
+            _properties->insert(std::make_pair(it->first, childProp));
+        }
     }
     else
     {
@@ -76,10 +78,6 @@ LLBC_Property::LLBC_Property(LLBC_Property *parent)
 
 , _value(nullptr)
 , _properties(nullptr)
-
-, _comments()
-
-, _errMsg()
 {
 }
 
@@ -100,9 +98,9 @@ int LLBC_Property::LoadFromFile(const LLBC_String &file)
 int LLBC_Property::LoadFromContent(const LLBC_String &content)
 {
     // Backup all data members & set to nullptr.
-    This *backParent = _parent;
+    LLBC_Property *backParent = _parent;
     LLBC_Variant *backValue = _value;
-    This::Properties *backProperties = _properties;
+    Properties *backProperties = _properties;
     LLBC_String backComments = _comments;
 
     _parent = nullptr;
@@ -143,7 +141,7 @@ int LLBC_Property::LoadFromContent(const LLBC_String &content)
     if (backProperties)
     {
         LLBC_STLHelper::DeleteContainer(*backProperties);
-        LLBC_Delete(backProperties);
+        delete backProperties;
     }
 
     return LLBC_OK;
@@ -159,13 +157,15 @@ int LLBC_Property::SaveToContent(LLBC_String &content) const
 
     content.clear();
 
-    std::vector<const This *> properties;
+    std::vector<const LLBC_Property *> properties;
     CollectValueProperties(properties);
     for (size_t i = 0; i < properties.size(); ++i)
     {
-        const This *& prop = properties[i];
-        content.append_format("%s %c %s\n", prop->GetName().c_str(), 
-                This::NameValueSeparator, prop->SerializeValue().c_str());
+        const LLBC_Property *& prop = properties[i];
+        content.append_format("%s %c %s\n",
+                              prop->GetName().c_str(),
+                              NameValueSeparator,
+                              prop->SerializeValue().c_str());
     }
 
     return LLBC_OK;
@@ -203,12 +203,12 @@ LLBC_String LLBC_Property::GetName() const
 {
     LLBC_String name;
 
-    const This *child = this;
-    const This *parent = _parent;
+    const LLBC_Property *child = this;
+    const LLBC_Property *parent = _parent;
     while(parent)
     {
         if (!name.empty())
-            name.insert(0, 1, This::NameSeparator);
+            name.insert(0, 1, NameSeparator);
 
         for (_CIt it = parent->_properties->begin();
              it != parent->_properties->end();
@@ -226,7 +226,7 @@ LLBC_String LLBC_Property::GetName() const
     return name;
 }
 
-size_t LLBC_Property::GetPropertyCount() const
+size_t LLBC_Property::GetPropertiesCount() const
 {
     return (_properties ? _properties->size() : 0);
 }
@@ -244,7 +244,7 @@ LLBC_Strings LLBC_Property::GetPropertyNames(bool nest) const
     }
     else
     {
-        std::vector<const This *> valueProps;
+        std::vector<const LLBC_Property *> valueProps;
         CollectValueProperties(valueProps);
         for (size_t i = 0; i < valueProps.size(); ++i)
             names.push_back(valueProps[i]->GetName());
@@ -303,7 +303,7 @@ const LLBC_Property *LLBC_Property::GetProperty(const LLBC_String &name) const
         return nullptr;
     }
 
-    const LLBC_Strings names = name.split(This::NameSeparator, 1);
+    const LLBC_Strings names = name.split(NameSeparator, 1);
     const LLBC_String &topName = names[0];
 
     _CIt it = _properties->find(topName);
@@ -319,7 +319,7 @@ const LLBC_Property *LLBC_Property::GetProperty(const LLBC_String &name) const
 
 const LLBC_Property::Properties &LLBC_Property::GetAllProperties() const
 {
-    static const This::Properties emptyProperties;
+    static const Properties emptyProperties;
     if (!_properties)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -343,7 +343,7 @@ int LLBC_Property::RemoveProperty(const LLBC_String &name, bool removeAll)
         return LLBC_FAILED;
     }
 
-    const LLBC_Strings names = name.split(This::NameSeparator, 1);
+    const LLBC_Strings names = name.split(NameSeparator, 1);
     const LLBC_String &topName = names[0];
 
     _It it = _properties->find(topName);
@@ -353,10 +353,10 @@ int LLBC_Property::RemoveProperty(const LLBC_String &name, bool removeAll)
         return LLBC_FAILED;
     }
 
-    This *prop = it->second;
+    LLBC_Property *prop = it->second;
     if (names.size() == 1 || removeAll)
     {
-        LLBC_Delete(prop);
+        delete prop;
         _properties->erase(it);
 
         if (_properties->size() == 0)
@@ -387,7 +387,7 @@ LLBC_String LLBC_Property::GetComments(const LLBC_String &name) const
         return _comments;
     }
 
-    const This *prop = GetProperty(name);
+    const LLBC_Property *prop = GetProperty(name);
     if (!prop)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
@@ -405,28 +405,28 @@ int LLBC_Property::SetComments(const LLBC_String &name, const LLBC_String &comme
         return LLBC_OK;
     }
 
-    This *prop = const_cast<This *>(GetProperty(name));
+    LLBC_Property *prop = const_cast<LLBC_Property *>(GetProperty(name));
     if (!prop)
         return LLBC_FAILED;
 
     return prop->SetComments("", comments);
 }
 
-This &LLBC_Property::operator =(const This &another)
+LLBC_Property &LLBC_Property::operator=(const LLBC_Property &another)
 {
     _parent = nullptr;
 
     Cleanup();
     if (another._value)
-        _value = LLBC_New(LLBC_Variant, *another._value);
+        _value = new LLBC_Variant(*another._value);
 
     if (another._properties)
     {
-        _properties = LLBC_New(This::Properties);
-        for (This::Properties::const_iterator it = another._properties->begin();
+        _properties = new Properties;
+        for (Properties::const_iterator it = another._properties->begin();
              it != another._properties->end();
              it++)
-            _properties->insert(std::make_pair(it->first, LLBC_New(This, *it->second)));
+            _properties->insert(std::make_pair(it->first, new LLBC_Property(*it->second)));
     }
 
     _comments = another._comments;
@@ -458,15 +458,15 @@ void LLBC_Property::CleanupComments()
 void LLBC_Property::ExpandProperties(const LLBC_String &name)
 {
     if (!_properties)
-        _properties = LLBC_New(This::Properties);
+        _properties = new Properties;
 
-    const LLBC_Strings names = name.split(This::NameSeparator, 1);
+    const LLBC_Strings names = name.split(NameSeparator, 1);
     const LLBC_String &topName = names[0]; 
 
     _It it = _properties->find(topName);
     if (it == _properties->end())
     {
-        LLBC_Property *prop = LLBC_New(LLBC_Property, this);
+        LLBC_Property *prop = new LLBC_Property(this);
         it = _properties->insert(std::make_pair(topName, prop)).first;
     }
     else
@@ -489,7 +489,7 @@ bool LLBC_Property::CheckName(const LLBC_String &name, bool allowSeparator) cons
          it++)
     {
         const char &ch = *it;
-        if (ch == This::NameSeparator)
+        if (ch == NameSeparator)
         {
             if (!allowSeparator)
                 return false;
@@ -504,7 +504,7 @@ bool LLBC_Property::CheckName(const LLBC_String &name, bool allowSeparator) cons
             return false;
     }
 
-    const LLBC_Strings names = name.split(This::NameSeparator);
+    const LLBC_Strings names = name.split(NameSeparator);
     for (size_t i = 0; i < names.size(); ++i)
     {
         if (names[i].empty())
@@ -520,7 +520,7 @@ LLBC_Strings LLBC_Property::NormalizeContent(const LLBC_String &content)
     const char *unixLineEnd = "\n";
 
     const char *winLineEnd = "\r\n";
-    size_t lineEndLen = LLBC_StrLenA(winLineEnd);
+    size_t lineEndLen = strlen(winLineEnd);
 
     LLBC_String::size_type pos;
     LLBC_String normalizedContent(content);
@@ -529,7 +529,7 @@ LLBC_Strings LLBC_Property::NormalizeContent(const LLBC_String &content)
 
     // Replace MAC style line-end to UNIX style.
     const char *macLineEnd = "\r";
-    lineEndLen = LLBC_StrLenA(macLineEnd);
+    lineEndLen = strlen(macLineEnd);
     while ((pos = normalizedContent.find(macLineEnd)) != LLBC_String::npos)
         normalizedContent.replace(pos, lineEndLen, unixLineEnd);
 
@@ -545,14 +545,14 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
 {
     if (line.empty()) // Empty line.
         return LLBC_OK;
-    else if (line[0] == This::CommentBeg) // Comments line.
+    else if (line[0] == CommentBeg) // Comments line.
         return LLBC_OK;
 
     typedef LLBC_Strings _Pair;
-    _Pair pair = line.split(This::NameValueSeparator, 1);
+    _Pair pair = line.split(NameValueSeparator, 1);
     if (pair.size() != 2)
     {
-        _errMsg.format("line %d: could not find name-value separator '%c'", lineNo, This::NameValueSeparator);
+        _errMsg.format("line %d: could not find name-value separator '%c'", lineNo, NameValueSeparator);
         LLBC_SetLastError(LLBC_ERROR_FORMAT);
 
         return LLBC_FAILED;
@@ -570,9 +570,9 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
     const LLBC_String valueComments = pair[1].strip();
 
     LLBC_String::size_type pos = 0;
-    while ((pos = valueComments.find(This::CommentBeg, pos)) != LLBC_String::npos)
+    while ((pos = valueComments.find(CommentBeg, pos)) != LLBC_String::npos)
     {
-        if (pos == 0 || valueComments[pos - 1] != This::EscapeChar)
+        if (pos == 0 || valueComments[pos - 1] != EscapeChar)
             break;
         else
             pos += 1;
@@ -582,17 +582,17 @@ int LLBC_Property::ParseLine(const LLBC_String &line, int lineNo)
     if (pos != LLBC_String::npos)
     {
         value = valueComments.substr(0, pos)
-            .rstrip().unescape(This::EscapeChar);
+            .rstrip().unescape(EscapeChar);
         comments = valueComments.substr(pos + 1).lstrip();
     }
     else
     {
-        value = valueComments.strip().unescape(This::EscapeChar);
+        value = valueComments.strip().unescape(EscapeChar);
     }
 
     if (SetValue(name, value) == LLBC_OK)
     {
-        This *prop = const_cast<This *>(GetProperty(name));
+        LLBC_Property *prop = const_cast<LLBC_Property *>(GetProperty(name));
         prop->SetComments("", comments);
     }
 
@@ -610,20 +610,20 @@ LLBC_String LLBC_Property::SerializeValue() const
     LLBC_String valueStr;
     if (!value.IsNil())
         valueStr.append_format("%s", value.ValueToString()
-                .escape(This::EscapeChars, This::EscapeChar).c_str());
+                .escape(EscapeChars, EscapeChar).c_str());
 
     if (!_comments.empty())
     {
         if (valueStr.empty())
-            valueStr.append_format("%c %s", This::CommentBeg, _comments.c_str());
+            valueStr.append_format("%c %s", CommentBeg, _comments.c_str());
         else
-            valueStr.append_format(" %c %s", This::CommentBeg, _comments.c_str());
+            valueStr.append_format(" %c %s", CommentBeg, _comments.c_str());
     }
 
     return valueStr;
 }
 
-void LLBC_Property::CollectValueProperties(std::vector<const This *> &properties) const
+void LLBC_Property::CollectValueProperties(std::vector<const LLBC_Property *> &properties) const
 {
     if (!_properties)
     {
@@ -638,5 +638,3 @@ void LLBC_Property::CollectValueProperties(std::vector<const This *> &properties
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

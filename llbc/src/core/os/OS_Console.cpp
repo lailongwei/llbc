@@ -19,8 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+
 #include "llbc/core/file/File.h"
 #include "llbc/core/thread/FastLock.h"
 #include "llbc/core/os/OS_Console.h"
@@ -97,10 +98,10 @@ int LLBC_GetConsoleColor(FILE *file)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    return LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    return LLBC_INTERNAL_NS __g_consoleColor[fileNo - 1];
 #else
     HANDLE handle = (fileNo == 1 ? ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
     lock.Lock();
 
     CONSOLE_SCREEN_BUFFER_INFO info;
@@ -130,11 +131,11 @@ int LLBC_SetConsoleColor(FILE *file, int color)
     }
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    LLBC_INTERNAL_NS __g_consoleColor[(fileNo == 1 || fileNo == 2 ? 0 : 1)] = color;
+    LLBC_INTERNAL_NS __g_consoleColor[fileNo - 1] = color;
     return LLBC_OK;
 #else
     HANDLE handle = (fileNo == 1 ? ::GetStdHandle(STD_OUTPUT_HANDLE) : GetStdHandle(STD_ERROR_HANDLE));
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
     lock.Lock();
 
     if (::SetConsoleTextAttribute(handle, color) == 0)
@@ -152,13 +153,34 @@ int LLBC_SetConsoleColor(FILE *file, int color)
 int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
 {
     const int fileNo = LLBC_File::GetFileNo(file);
-    if (UNLIKELY(fileNo == -1))
-    {
-        return LLBC_FAILED;
-    }
+    LLBC_ReturnIf(UNLIKELY(fileNo == -1), LLBC_FAILED);
 
-    char *buf; int len;
-    LLBC_FormatArg(fmt, buf, len);
+    char stackBuf[512 + 128 + 1];
+
+    va_list ap;
+    va_start(ap, fmt);
+    int len = vsnprintf(stackBuf, sizeof(stackBuf), fmt, ap);
+    va_end(ap);
+
+    LLBC_SetErrAndReturnIf(UNLIKELY(len < 0), LLBC_ERROR_CLIB, LLBC_FAILED);
+
+    char *buf = stackBuf;
+    if (len >= static_cast<int>(sizeof(stackBuf)))
+    {
+        buf = LLBC_Malloc(char, len + 1);
+
+        va_start(ap, fmt);
+        len = vsnprintf(buf, len + 1, fmt, ap);
+        va_end(ap);
+
+        if (UNLIKELY(len < 0))
+        {
+            free(buf);
+            LLBC_SetLastError(LLBC_ERROR_CLIB);
+
+            return LLBC_FAILED;
+        }
+    }
 
     #if LLBC_TARGET_PLATFORM_NON_WIN32
     flockfile(file);
@@ -179,19 +201,16 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
     {
         fprintf(file, (newline ? "%s\n" : "%s"), buf);
     }
-    fflush(file);
     funlockfile(file);
     #else // Win32
-    const int clrIdx = (fileNo == 1 || fileNo == 2 ? 0 : 1);
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[clrIdx];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
 
     lock.Lock();
     fprintf(file, newline ? "%s\n" : "%s", buf);
-    fflush(file);
     lock.Unlock();
     #endif // !Non-Win32
 
-    LLBC_Free(buf);
+    LLBC_DoIf(len >= static_cast<int>(sizeof(stackBuf)), free(buf));
 
     return LLBC_OK;
 }
@@ -206,7 +225,7 @@ int LLBC_FlushFile(FILE *file)
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     flockfile(file);
-    if (UNLIKELY(::fflush(file) != 0))
+    if (UNLIKELY(fflush(file) != 0))
     {
         funlockfile(file);
         LLBC_SetLastError(LLBC_ERROR_CLIB);
@@ -217,10 +236,10 @@ int LLBC_FlushFile(FILE *file)
     return LLBC_OK;
 #else // Win32
     const int fileNo = LLBC_File::GetFileNo(file);
-    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[(fileNo == 1 || fileNo == 2 ? 0 : 1)];
+    LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
     lock.Lock();
 
-    if (UNLIKELY(::fflush(file) != 0))
+    if (UNLIKELY(fflush(file) != 0))
     {
         lock.Unlock();
         LLBC_SetLastError(LLBC_ERROR_CLIB);
@@ -233,5 +252,3 @@ int LLBC_FlushFile(FILE *file)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

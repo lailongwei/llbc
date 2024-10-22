@@ -10,6 +10,7 @@
 #include "llbc/core/rapidjson/stream.h"
 #include "llbc/core/rapidjson/document.h"
 #include "llbc/core/rapidjson/stringbuffer.h"
+#include "llbc/core/rapidjson/istreamwrapper.h"
 #include "llbc/core/rapidjson/error/en.h"
 
 __LLBC_NS_BEGIN
@@ -38,7 +39,7 @@ LLBC_EXPORT void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &out
 /**
  * LLBC_JsonValue output to stream operator function(in global ns).
  */
-LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value);
+LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_JsonValue &value);
 
 __LLBC_NS_END
 

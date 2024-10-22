@@ -29,6 +29,7 @@ namespace llbc
     /// </summary>
     public enum LogLevel
     {
+        Trace,
         Debug,
         Info,
         Warn,
@@ -82,7 +83,28 @@ namespace llbc
         }
         #endregion
 
-        #region Dbg/Info/Warn/Err/Fatal
+        #region Trace/Dbg/Info/Warn/Err/Fatal
+        /// <summary>
+        /// Log Trace level message.
+        /// </summary>
+        /// <param name="fmt">log message format</param>
+        /// <param name="args">log message arguments</param>
+        public void Trace(string fmt, params object[] args)
+        {
+            _Log(null, LogLevel.Trace, _baseSkipFrames, fmt, args);
+        }
+
+        /// <summary>
+        /// Log Trace level message.
+        /// </summary>
+        /// <param name="skipFrames">skip frames count</param>
+        /// <param name="fmt">log message format</param>
+        /// <param name="args">log message arguments</param>
+        public void Trace(int skipFrames, string fmt, params object[] args)
+        {
+            _Log(null, LogLevel.Trace, _baseSkipFrames + skipFrames, fmt, args);
+        }
+
         /// <summary>
         /// Log Debug level message.
         /// </summary>
@@ -188,7 +210,28 @@ namespace llbc
         }
         #endregion // Dbg/Info/Warn/Err/Fatal
 
-        #region Dbg<Tag>/Info<Tag>/Warn<Tag>/Err<Tag>/Fatal<Tag>
+        #region Trace<Tag>/Dbg<Tag>/Info<Tag>/Warn<Tag>/Err<Tag>/Fatal<Tag>
+        /// <summary>
+        /// Log Trace level message with tag.
+        /// </summary>
+        /// <param name="fmt">log message format</param>
+        /// <param name="args">log message arguments</param>
+        public void Trace<Tag>(string fmt, params object[] args)
+        {
+            _Log(typeof(Tag), LogLevel.Trace, _baseSkipFrames, fmt, args);
+        }
+
+        /// <summary>
+        /// Log Trace level message with tag.
+        /// </summary>
+        /// <param name="skipFrames">skip frames count</param>
+        /// <param name="fmt">log message format</param>
+        /// <param name="args">log message arguments</param>
+        public void Trace<Tag>(int skipFrames, string fmt, params object[] args)
+        {
+            _Log(typeof(Tag), LogLevel.Trace, _baseSkipFrames + skipFrames, fmt, args);
+        }
+
         /// <summary>
         /// Log Debug level message with tag.
         /// </summary>
@@ -295,7 +338,28 @@ namespace llbc
         }
         #endregion // Dbg<Tag>/Info<Tag>/Warn<Tag>/Err<Tag>/Fatal<Tag>
 
-        #region Dbg2/Info2/Warn2/Err2/Fatal2
+        #region Trace2/Dbg2/Info2/Warn2/Err2/Fatal2
+        /// <summary>
+        /// Log Trace level message with tag.
+        /// </summary>
+        /// <param name="fmt">log message format</param>
+        /// <param name="args">log message arguments</param>
+        public void Trace2(object tag, string fmt, params object[] args)
+        {
+            _Log(tag, LogLevel.Trace, _baseSkipFrames, fmt, args);
+        }
+
+        /// <summary>
+        /// Log Trace level message with tag.
+        /// </summary>
+        /// <param name="skipFrames">skip frames count</param>
+        /// <param name="fmt">log message format</param>
+        /// <param name="args">log message arguments</param>
+        public void Trace2(object tag, int skipFrames, string fmt, params object[] args)
+        {
+            _Log(tag, LogLevel.Trace, _baseSkipFrames + skipFrames, fmt, args);
+        }
+
         /// <summary>
         /// Log Debug level message with tag.
         /// </summary>
@@ -317,7 +381,7 @@ namespace llbc
             _Log(tag, LogLevel.Debug, _baseSkipFrames + skipFrames, fmt, args);
         }
 
-        /// <summary>
+       /// <summary>
         /// Log Info level message with tag.
         /// </summary>
         /// <param name="fmt">log message format</param>

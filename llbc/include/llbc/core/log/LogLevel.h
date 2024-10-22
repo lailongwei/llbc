@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_LOG_LEVEL_H__
-#define __LLBC_LOG_LEVEL_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -39,7 +38,8 @@ public:
     {
         Begin,
 
-        Debug = Begin,
+        Trace = Begin,
+        Debug,
         Info,
         Warn,
         Error,
@@ -50,58 +50,26 @@ public:
 
 public:
     /**
-     * Get Debug level string describe.
-     * @return const LLBC_String & - Debug level describe.
-     */
-    static const LLBC_String &GetDebugDesc();
-
-    /**
-     * Get Info level string describe.
-     * @return const LLBC_String & - Info level describe.
-     */
-    static const LLBC_String &GetInfoDesc();
-
-    /**
-     * Get Warn level string describe.
-     * @return const LLBC_String & - Warn level describe.
-     */
-    static const LLBC_String &GetWarnDesc();
-
-    /**
-     * Get Error level string describe.
-     * @return const LLBC_String & - Error level describe.
-     */
-    static const LLBC_String &GetErrorDesc();
-
-    /**
-     * Get Fatal level string describe.
-     * @return const LLBC_String & - Fatal level describe.
-     */
-    static const LLBC_String &GetFatalDesc();
-
-    /**
-     * Get specific log level string describe.
+     * Get specific log level string representation.
      * @param[in] level - log level.
-     * @return const LLBC_String & - level describe.
+     * @return const LLBC_String & - level representation.
      */
-    static const LLBC_String &GetLevelDesc(int level);
+    static const LLBC_CString &GetLevelStr(int level);
 
 public:
     /**
-     * Get specific log level by describe.
-     * @param[in] str - log level describe.
-     * @return int - log level.
+     * Get specific log level enum by level string representation.
+     * @param[in] levelStr - log level representation.
+     * @return int - log level enum.
      */
-    static int Str2Level(const char *str);
+    static int GetLevelEnum(const LLBC_CString &levelStr);
 
     /**
-     * Check giving log level is legal or not.
+     * Check giving log level is validate or not.
      * @param[in] level - the given log level.
-     * @return bool - return if log level is legal, otherwise return false.
+     * @return bool - return if log level is validate, otherwise return false.
      */
-    static bool IsLegal(int level);
+    static bool IsValid(int level);
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_LOG_LEVEL_H__

@@ -19,15 +19,16 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Process.h"
 #include "llbc/core/utils/Util_Text.h"
 #include  "llbc/core/file/Directory.h"
-#include "llbc/core/config/Property.h"
+#include "llbc/core/variant/Variant.h"
 
 #include "llbc/core/log/LogLevel.h"
+#include "llbc/core/log/LogRollingMode.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 
 /*
@@ -35,34 +36,30 @@
  */
 #define __LLBC_GetLogCfg(key, dft, rootMeth, asMeth)  __LLBC_GetLogCfg2(key, LLBC_CFG_LOG_DEFAULT_##dft, rootMeth, asMeth)
 
-#define __LLBC_GetLogCfg2(key, dft, rootMeth, asMeth) (cfg.HasProperty(key) ? \
-                                                       cfg.GetValue(key).asMeth() : \
-                                                       (_notConfigUseRoot ? rootCfg->rootMeth() : (dft))) \
+#define __LLBC_GetLogCfg2(key, dft, rootMeth, asMeth) (cfg[key] ? \
+                                                           cfg[key].asMeth() : \
+                                                               (_notConfigUseRoot ? rootCfg->rootMeth() : (dft))) \
 
 __LLBC_NS_BEGIN
 
 LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
-: _loggerName()
-, _notConfigUseRoot(false)
+: _notConfigUseRoot(false)
 
-, _logLevel(LLBC_LogLevel::End)
 , _asyncMode(false)
 , _independentThread(false)
 , _flushInterval(0)
 
+, _addTimestampInJsonLog(0)
+
 , _logToConsole(true)
 , _consoleLogLevel(LLBC_LogLevel::End)
-, _consolePattern()
 , _colourfulOutput(true)
 
 , _logToFile(false)
 , _fileLogLevel(LLBC_LogLevel::End)
-, _logFile()
-, _logFileSuffix()
 , _logCodeFilePath(true)
 , _forceAppLogPath(false)
-, _filePattern()
-, _dailyMode(true)
+, _fileRollingMode(LLBC_LogRollingMode::End)
 , _maxFileSize(INT_MAX)
 , _maxBackupIndex(0)
 , _fileBufferSize(0)
@@ -77,7 +74,7 @@ LLBC_LoggerConfigInfo::~LLBC_LoggerConfigInfo()
 }
 
 int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
-                                      const LLBC_Property &cfg,
+                                      const LLBC_Variant &cfg,
                                       const LLBC_LoggerConfigInfo *rootCfg)
 {
     // LoggerName.
@@ -85,52 +82,55 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
     // Not config use default/root option.
     LLBC_String notCfgUseOpt;
-    if (cfg.HasProperty("notConfigUse"))
-        notCfgUseOpt = cfg.GetValue("notConfigUse").AsStr();
+    if (cfg["notConfigUse"])
+        notCfgUseOpt = cfg["notConfigUse"].AsStr();
     else if (rootCfg)
         notCfgUseOpt = rootCfg->IsNotConfigUseRoot() ? "root" : "default";
     else
         notCfgUseOpt = LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE;
     _notConfigUseRoot = notCfgUseOpt.strip().tolower() == "root" && rootCfg;
 
-    // Common log configs.
-    if (cfg.HasProperty("level"))
-        _logLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("level").AsStr().c_str());
-    else
-        _logLevel = _notConfigUseRoot ? rootCfg->GetLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
-    _asyncMode = __LLBC_GetLogCfg("asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
+    _asyncMode = __LLBC_GetLogCfg(
+        "asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
     if (_asyncMode)
-        _independentThread = __LLBC_GetLogCfg("independentThread", INDEPENDENT_THREAD, IsIndependentThread, AsLooseBool);
-     _flushInterval = __LLBC_GetLogCfg("flushInterval", LOG_FLUSH_INTERVAL, GetFlushInterval, AsInt32);
+        _independentThread = __LLBC_GetLogCfg(
+            "independentThread", INDEPENDENT_THREAD, IsIndependentThread, AsLooseBool);
+     _flushInterval = __LLBC_GetLogCfg(
+         "flushInterval", LOG_FLUSH_INTERVAL, GetFlushInterval, AsInt32);
+
+    // Json styled log configs.
+    _addTimestampInJsonLog = __LLBC_GetLogCfg(
+        "addTimestampInJsonLog", ADD_TIMESTAMP_IN_JSON_LOG, IsAddTimestampInJsonLog, AsLooseBool);
 
     // Console log configs.
      _logToConsole = __LLBC_GetLogCfg("logToConsole", LOG_TO_CONSOLE, IsLogToConsole, AsLooseBool);
     if (_logToConsole)
     {
-        if (cfg.HasProperty("consoleLogLevel"))
-            _consoleLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("consoleLogLevel").AsStr().c_str());
+        if (cfg["consoleLogLevel"])
+            _consoleLogLevel = LLBC_LogLevel::GetLevelEnum(cfg["consoleLogLevel"].AsStr().c_str());
         else
-            _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : _logLevel;
+            _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
-        if (cfg.HasProperty("consolePattern"))
-            _consolePattern = cfg.GetValue("consolePattern").AsStr().c_str();
+        if (cfg["consolePattern"])
+            _consolePattern = cfg["consolePattern"].AsStr();
         else
             _consolePattern = _notConfigUseRoot ? 
                 rootCfg->GetConsolePattern().c_str() : LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN;
-        _colourfulOutput = __LLBC_GetLogCfg("colourfulOutput", COLOURFUL_OUTPUT, IsColourfulOutput, AsLooseBool);
+        _colourfulOutput = __LLBC_GetLogCfg(
+            "colourfulOutput", COLOURFUL_OUTPUT, IsColourfulOutput, AsLooseBool);
     }
 
     // File log configs.
     _logToFile = __LLBC_GetLogCfg("logToFile", LOG_TO_FILE, IsLogToFile, AsLooseBool);
     if (_logToFile)
     {
-        // File log level option.
-        if (cfg.HasProperty("fileLogLevel"))
-            _fileLogLevel = LLBC_LogLevel::Str2Level(cfg.GetValue("fileLogLevel").AsStr().c_str());
+        // File log level.
+        if (cfg["fileLogLevel"])
+            _fileLogLevel = LLBC_LogLevel::GetLevelEnum(cfg["fileLogLevel"].AsStr().c_str());
         else
-            _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : _logLevel;
+            _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
-        // Log dir option.
+        // Log file dir.
         if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, AsStr).strip()).empty())
         {
             #if LLBC_TARGET_PLATFORM_WIN32
@@ -141,13 +141,24 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         }
 
         // Force application log path(log file place into application module file dir).
-        _forceAppLogPath = __LLBC_GetLogCfg("forceAppLogPath", FORCE_APP_LOG_PATH, IsForceAppLogPath, AsLooseBool);
+        _forceAppLogPath = __LLBC_GetLogCfg(
+            "forceAppLogPath", FORCE_APP_LOG_PATH, IsForceAppLogPath, AsLooseBool);
 
-        // Log file path option.
-        if (cfg.HasProperty("logFile"))
-            _logFile = cfg.GetValue("logFile").AsStr().strip();
+        // Log file name.
+        if (cfg["logFile"])
+            _logFile = cfg["logFile"].AsStr().strip();
+
         if (_logFile.empty())
-            _logFile = _loggerName;
+        {
+            if (_loggerName != LLBC_CFG_LOG_ROOT_LOGGER_NAME &&
+                _notConfigUseRoot)
+                _logFile = rootCfg->GetOriginalLogFile();
+            else
+                _logFile = "%L";
+        }
+
+        _originalLogFile = _logFile;
+
         if (!_logDir.empty())
             _logFile = LLBC_Directory::Join(_logDir, _logFile);
         if (!LLBC_Directory::IsAbsPath(_logFile))
@@ -158,36 +169,54 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
                 _logFile = LLBC_Directory::AbsPath(_logFile);
         }
 
-        // Other file log options.
-        _logFileSuffix = __LLBC_GetLogCfg("logFileSuffix", LOG_FILE_SUFFIX, GetLogFileSuffix, AsStr);
-        _logCodeFilePath = __LLBC_GetLogCfg("logCodeFilePath", LOG_CODE_FILE_PATH, IsLogCodeFilePath, AsLooseBool);
-        if (cfg.HasProperty("filePattern"))
-            _filePattern = cfg.GetValue("filePattern").AsStr().c_str();
+        // Log file suffix.
+        _logFileSuffix = __LLBC_GetLogCfg(
+            "logFileSuffix", LOG_FILE_SUFFIX, GetLogFileSuffix, AsStr);
+        // Log code file path.
+        _logCodeFilePath = __LLBC_GetLogCfg(
+            "logCodeFilePath", LOG_CODE_FILE_PATH, IsLogCodeFilePath, AsLooseBool);
+        // Log file pattern.
+        if (cfg["filePattern"])
+            _filePattern = cfg["filePattern"].AsStr();
         else
             _filePattern = _notConfigUseRoot ? 
                 rootCfg->GetFilePattern().c_str() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN;
-        _dailyMode = __LLBC_GetLogCfg("dailyRollingMode", DAILY_MODE, IsDailyRollingMode, AsLooseBool);
-        _maxFileSize = __LLBC_GetLogCfg2("maxFileSize", LLBC_CFG_LOG_MAX_FILE_SIZE, GetMaxFileSize, AsLong);
-        _maxBackupIndex = __LLBC_GetLogCfg2("maxBackupIndex", LLBC_CFG_LOG_MAX_BACKUP_INDEX, GetMaxBackupIndex, AsInt32);
-        _lazyCreateLogFile = __LLBC_GetLogCfg2("lazyCreateLogFile", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE, IsLazyCreateLogFile, AsLooseBool);
 
+        // File rolling mode.
+        if (cfg["fileRollingMode"])
+            _fileRollingMode = LLBC_LogRollingMode::Str2Mode(cfg["fileRollingMode"].AsStr());
+        else
+            _fileRollingMode = _notConfigUseRoot ?
+                rootCfg->GetFileRollingMode() : LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
+        if (!LLBC_LogRollingMode::IsValid(_fileRollingMode))
+            _fileRollingMode = LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
+
+        // Max file size.
+        if (cfg["maxFileSize"])
+            _maxFileSize = NormalizeLogFileSize(cfg["maxFileSize"]);
+        else if (_notConfigUseRoot)
+            _maxFileSize = rootCfg->GetMaxFileSize();
+        else
+            _maxFileSize = LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
+        // Max backup index.
+        _maxBackupIndex = __LLBC_GetLogCfg2(
+            "maxBackupIndex", LLBC_CFG_LOG_MAX_BACKUP_INDEX, GetMaxBackupIndex, AsInt32);
+        // Lazy create log file.
+        _lazyCreateLogFile = __LLBC_GetLogCfg2(
+            "lazyCreateLogFile", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE, IsLazyCreateLogFile, AsLooseBool);
+
+        // File buffer size.
         if (_asyncMode)
-            _fileBufferSize = __LLBC_GetLogCfg("fileBufferSize", LOG_FILE_BUFFER_SIZE, GetFileBufferSize, AsInt32);
+            _fileBufferSize = __LLBC_GetLogCfg(
+                "fileBufferSize", LOG_FILE_BUFFER_SIZE, GetFileBufferSize, AsInt32);
     }
 
     // Misc configs.
     if (!rootCfg)
-        _takeOver = __LLBC_GetLogCfg2("takeOver", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED, IsTakeOver, AsLooseBool);
+        _takeOver = __LLBC_GetLogCfg2(
+            "takeOver", LLBC_CFG_LOG_ROOT_LOGGER_TAKE_OVER_UNCONFIGED, IsTakeOver, AsLooseBool);
 
     // Check configs.
-    if (!LLBC_LogLevel::IsLegal(_logLevel))
-        _logLevel = LLBC_CFG_LOG_DEFAULT_LEVEL;
-    if (!LLBC_LogLevel::IsLegal(_consoleLogLevel))
-        _consoleLogLevel = _logLevel;
-    if (!LLBC_LogLevel::IsLegal(_fileLogLevel))
-        _fileLogLevel = _logLevel;
-
-    _maxFileSize = MAX(1024, _maxFileSize);
     _maxBackupIndex = MAX(0, _maxBackupIndex);
     _flushInterval = MIN(MAX(0, _flushInterval), LLBC_CFG_LOG_MAX_LOG_FLUSH_INTERVAL);
 
@@ -203,13 +232,44 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
 void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 {
+    // Replace process id: %p.
     const LLBC_String curProcId = 
-        LLBC_Num2Str(LLBC_GetCurrentProcessId());
+        LLBC_NumToStr(LLBC_GetCurrentProcessId());
     _logFile.findreplace("%p", curProcId); 
 
-    const LLBC_String modFileName = 
-        LLBC_Directory::BaseName(LLBC_Directory::ModuleFileName());
-    _logFile.findreplace("%m", modFileName);
+    // Replace module file name: %m/%e.
+    const LLBC_String modFileName = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
+    _logFile.findreplace("%m", modFileName) //! '%m' replace format has been deprecated.
+            .findreplace("%e", modFileName);
+
+    // Replace logger name: %l.
+    _logFile.findreplace("%l", _loggerName);
+
+    // Replace smart logger name: %L.
+    // for root logger:
+    //   => %L => root
+    //   => xxx_%L => xxx
+    //   => xxx__%L => xxx
+    //   => xxx-%L => xxx
+    //   => xxx--%L => xxx
+    // for non-root logger: same as %l.
+    if (_loggerName != LLBC_CFG_LOG_ROOT_LOGGER_NAME ||
+        LLBC_Directory::BaseName(_logFile) == "%L")
+    {
+        _logFile.findreplace("%L", _loggerName);
+    }
+    else
+    {
+        LLBC_String::size_type smartLoggerNamePos = 0;
+        while ((smartLoggerNamePos = _logFile.find("%L", smartLoggerNamePos)) != LLBC_String::npos)
+        {
+            while (smartLoggerNamePos > 0 &&
+                (_logFile[smartLoggerNamePos - 1] == '_' ||
+                    _logFile[smartLoggerNamePos - 1] == '-'))
+                _logFile.erase(--smartLoggerNamePos);
+            _logFile.erase(smartLoggerNamePos, 2);
+        }
+    }
 
 #if LLBC_TARGET_PLATFORM_IPHONE
     if (_logToFile &&
@@ -219,6 +279,50 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 #endif // LLBC_TARGET_PLATFORM_IPHONE
 }
 
+sint64 LLBC_LoggerConfigInfo::NormalizeLogFileSize(const LLBC_String &logFileSize)
+{
+    // strip.
+    const LLBC_String nmlLogFileSizeStr = logFileSize.strip();
+
+    // If is empty, use default.
+    if (nmlLogFileSizeStr.empty())
+        return LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
+
+    // Find storage unit.
+    LLBC_String::size_type unitPos = 0;
+    for (; unitPos < nmlLogFileSizeStr.size(); ++unitPos)
+    {
+        if (!isdigit(nmlLogFileSizeStr[unitPos]) && nmlLogFileSizeStr[unitPos] != '.')
+            break;
+    }
+
+    // normalize storage unit.
+    const LLBC_String unit = nmlLogFileSizeStr.substr(unitPos).strip().tolower();
+    double nmlLogFileSize = LLBC_Variant(nmlLogFileSizeStr.substr(0, unitPos));
+    // - k/kb, kib
+    if (unit == "k" || unit == "kb")
+        nmlLogFileSize *= 1000.0;
+    else if (unit == "kib")
+        nmlLogFileSize *= 1024.0;
+    // - m/mb, mib
+    else if (unit == "m" || unit == "mb")
+        nmlLogFileSize *= (1000.0 * 1000.0);
+    else if (unit == "mib")
+        nmlLogFileSize *= (1024.0 * 1024.0);
+    // - g/gb, gib
+    else if (unit == "g" || unit == "gb")
+        nmlLogFileSize *= (1000.0 * 1000.0 * 1000.0);
+    else if (unit == "gib")
+        nmlLogFileSize *= (1024.0 * 1024.0 * 1024.0);
+    // - unknown/unsupported storage unit, ignore.
+    // else
+    //     // ... ...
+
+    // Clamp.
+    return MIN(MAX(1024ll, static_cast<sint64>(nmlLogFileSize)),
+               LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT);
+}
+
 __LLBC_NS_END
 
 /**
@@ -226,5 +330,3 @@ __LLBC_NS_END
  */
 #undef __LLBC_GetLogCfg
 #undef __LLBC_GetLogCfg2
-
-#include "llbc/common/AfterIncl.h"

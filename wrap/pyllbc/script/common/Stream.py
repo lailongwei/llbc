@@ -4,72 +4,88 @@ import inspect
 
 import llbc
 
+_llbc_inl = llbc.inl
+
 class pyllbcStream(object):
     """
     Stream class encapsulation, use to pack/unpack data sequence.
     """
-    def __init__(self, size=0, init_obj=None, endian=llbc.Endian.MachineEndian):
-        self.__c_obj = llbc.inl.NewPyStream(self, size, endian)
+    def __init__(self, cap=0, init_obj=None, endian=llbc.Endian.MachineEndian):
+        self.__c_obj = _llbc_inl.Stream_New(self, cap, endian)
         self.packobj(init_obj)
 
     def __del__(self):
-        llbc.inl.DelPyStream(self.__c_obj)
+        _llbc_inl.Stream_Del(self.__c_obj)
 
     @property
     def endian(self):
         """
         Get stream endian setting(see llbc.Endian module).
         """
-        return llbc.inl.GetPyStreamEndian(self.__c_obj)
+        return _llbc_inl.Stream_GetEndian(self.__c_obj)
 
     @endian.setter
     def endian(self, e):
         """
         Set stream endian(see llbc.Endian module).
         """
-        llbc.inl.SetPyStreamEndian(self.__c_obj, e)
+        _llbc_inl.Stream_SetEndian(self.__c_obj, e)
 
     @property
-    def pos(self):
+    def rpos(self):
         """
-        Get stream current reading/writing position.
+        Get stream read position.
         """
-        return llbc.inl.GetPyStreamPos(self.__c_obj)
+        return _llbc_inl.Stream_GetReadPos(self.__c_obj)
 
-    @pos.setter
-    def pos(self, p):
+    @rpos.setter
+    def rpos(self, p):
         """
-        Set stream current reading/writing position.
+        Set stream read position.
         """
-        llbc.inl.SetPyStreamPos(self.__c_obj, p)
+        _llbc_inl.Stream_SetReadPos(self.__c_obj, p)
 
     @property
-    def size(self):
+    def wpos(self):
         """
-        Get stream size(unsafe method, size will automatic adjust by stream).
+        Get stream write position.
         """
-        return llbc.inl.GetPyStreamSize(self.__c_obj)
+        return _llbc_inl.Stream_GetWritePos(self.__c_obj)
 
-    @size.setter
-    def size(self, s):
+    @wpos.setter
+    def wpos(self, p):
         """
-        Set stream size(unsafe method, size will automatic adjust by stream).
+        Set stream write position.
         """
-        llbc.inl.SetPyStreamSize(self.__c_obj, s)
+        _llbc_inl.Stream_SetWritePos(self.__c_obj, p)
+
+    @property
+    def cap(self):
+        """
+        Get stream capacity.
+        """
+        return _llbc_inl.Stream_GetCap(self.__c_obj)
+
+    @cap.setter
+    def cap(self, s):
+        """
+        Set stream capacity.
+        """
+        _llbc_inl.Stream_SetCap(self.__c_obj, s)
 
     @property
     def raw(self):
         """
-        Get stream memery view as buffer.
+        Get stream memery view as buffer, buffer range[0, wpos).
         """
-        return llbc.inl.PyStreamGetRaw(self.__c_obj)
+        return _llbc_inl.Stream_GetRaw(self.__c_obj)
 
     @raw.setter
     def raw(self, r):
         """
-        Set stream raw memory from str/buffer/bytearray.
+        Set stream raw memory from str/buffer/bytearray, wpos set to str/buffer/bytearray length.
         """
-        llbc.inl.PyStreamSetRaw(self.__c_obj, r)
+        _llbc_inl.Stream_SetRaw(self.__c_obj, r)
 
     @property
     def cobj(self):
@@ -86,24 +102,46 @@ class pyllbcStream(object):
         return binascii.hexlify(self.raw)
 
     @staticmethod
-    def getcachedsize():
-        return llbc.inl.PyStreamGetCachedSize()
+    def get_cached_compiled_expr_size():
+        """
+        Get cached compiled-expr size.
+        """
+        return _llbc_inl.Stream_GetCachedCompiledExprSize()
 
     @staticmethod
-    def getcachelimit():
-        return llbc.inl.PyStreamGetCacheLimit()
+    def get_compiled_expr_cache_limit():
+        """
+        Get compiled-expr cache limit.
+        """
+        return _llbc_inl.Stream_GetCompiledExprCacheLimit()
 
     @staticmethod
-    def setcachelimit(lmt):
-        llbc.inl.PyStreamSetCacheLimit(lmt)
+    def set_compiled_expr_cache_limit(lmt):
+        """
+        Set compiled-expr cache limit.
+        """
+        _llbc_inl.Stream_SetCompiledExprCacheLimit(lmt)
 
     @staticmethod
-    def discardexpr(expr):
-        llbc.inl.PyStreamDiscardExpr(expr)
+    def is_expr_compiled(expr):
+        """
+        Check given expr compiled or not.
+        """
+        return _llbc_inl.Stream_IsExprCompiled(expr)
 
     @staticmethod
-    def discardallexprs():
-        llbc.inl.PyStreamDiscardAllExprs()
+    def uncache_compiled_expr(expr):
+        """
+        Uncache compiled-expr.
+        """
+        _llbc_inl.Stream_UncacheCompiledExpr(expr)
+
+    @staticmethod
+    def uncache_all_compiled_exprs():
+        """
+        Uncache all compiled exprs.
+        """
+        _llbc_inl.Stream_UncacheAllCompiledExprs()
 
     def unpack(self, fmt):
         """
@@ -119,9 +157,8 @@ class pyllbcStream(object):
            f: float value.
            d: double value(only support Fomat method).
 
-           S: string value.
+           S: string value(null terminated).
            S#: string value, use another pack/unpack algorithm, 4 bytes length + string content(not include NULL character).
-           S$: string value, will read stream to end as string content, write like 'S', but not append string end character '\0'.
            U: unicode value.
 
            A: byte array value.
@@ -145,58 +182,56 @@ class pyllbcStream(object):
                {i:(C<int>)}
                ([SC<int>NA(i)]{int:S}B
         """
-        return self.__unpack(fmt)
+        caller_env = None
+        if fmt.find('C') >= 0 and not _llbc_inl.Stream_IsExprCompiled(fmt):
+            caller_env = inspect.stack()[1][0].f_globals
 
-    def unpackone(self, fmt):
-        return self.__unpack(fmt)[0]
+        return _llbc_inl.Stream_FmtRead(self.__c_obj, fmt, caller_env)
 
     def unpackcls(self, cls):
-        return llbc.inl.PyStreamRead(self.__c_obj, cls)
+        return _llbc_inl.Stream_Read(self.__c_obj, cls)
 
     def unpacknone(self):
-        return llbc.inl.PyStreamRead_None(self.__c_obj)
+        return _llbc_inl.Stream_Read_None(self.__c_obj)
 
     def unpackbyte(self):
-        return llbc.inl.PyStreamRead_Byte(self.__c_obj)
+        return _llbc_inl.Stream_Read_Byte(self.__c_obj)
 
     def unpackbool(self):
-        return llbc.inl.PyStreamRead_Bool(self.__c_obj)
+        return _llbc_inl.Stream_Read_Bool(self.__c_obj)
 
     def unpackint16(self):
-        return llbc.inl.PyStreamRead_Int16(self.__c_obj)
+        return _llbc_inl.Stream_Read_Int16(self.__c_obj)
 
     def unpackint32(self):
-        return llbc.inl.PyStreamRead_Int32(self.__c_obj)
+        return _llbc_inl.Stream_Read_Int32(self.__c_obj)
 
     def unpackint64(self):
-        return llbc.inl.PyStreamRead_Int64(self.__c_obj)
+        return _llbc_inl.Stream_Read_Int64(self.__c_obj)
 
     def unpackfloat(self):
-        return llbc.inl.PyStreamRead_Float(self.__c_obj)
+        return _llbc_inl.Stream_Read_Float(self.__c_obj)
 
     def unpackdouble(self):
-        return llbc.inl.PyStreamRead_Double(self.__c_obj)
+        return _llbc_inl.Stream_Read_Double(self.__c_obj)
 
     def unpackstr(self):
-        return llbc.inl.PyStreamRead_Str(self.__c_obj)
+        return _llbc_inl.Stream_Read_Str(self.__c_obj)
 
     def unpackstr2(self):
-        return llbc.inl.PyStreamRead_Str2(self.__c_obj)
-
-    def unpackstr3(self):
-        return llbc.inl.PyStreamRead_Str3(self.__c_obj)
+        return _llbc_inl.Stream_Read_Str2(self.__c_obj)
 
     def unpackunicode(self):
-        return llbc.inl.PyStreamRead_Unicode(self.__c_obj)
+        return _llbc_inl.Stream_Read_Unicode(self.__c_obj)
 
     def unpackbytearray(self):
-        return llbc.inl.PyStreamRead_ByteArray(self.__c_obj)
+        return _llbc_inl.Stream_Read_ByteArray(self.__c_obj)
 
     def unpackbuffer(self):
-        return llbc.inl.PyStreamRead_Buffer(self.__c_obj)
+        return _llbc_inl.Stream_Read_Buffer(self.__c_obj)
 
     def unpackstream(self, begin=0, end=-1):
-        return llbc.inl.PyStreamRead_Stream(self.__c_obj, begin, end)
+        return _llbc_inl.Stream_Read_Stream(self.__c_obj, begin, end)
 
     def pack(self, fmt, *values):
         """
@@ -212,9 +247,8 @@ class pyllbcStream(object):
            f: float value.
            d: double value(only support Fomat method).
 
-           S: string value.
+           S: string value, auto append '\0' charcter.
            S#: string value, use another pack/unpack algorithm, 4 bytes length + string content(not include NULL character).
-           S$: string value, will read stream to end as string content, write like 'S', but not append string end character '\0'.
            U: unicode value.
 
            A: byte array value.
@@ -231,85 +265,79 @@ class pyllbcStream(object):
         """
 
         caller_env = None
-        if fmt.find('C') >= 0 and not llbc.inl.PyStreamIsExprCompiled(fmt):
+        if fmt.find('C') >= 0 and not _llbc_inl.Stream_IsExprCompiled(fmt):
             caller_env = inspect.stack()[1][0].f_globals
 
-        return llbc.inl.PyStreamFmtWrite(self.__c_obj, fmt, values, caller_env)
+        return _llbc_inl.Stream_FmtWrite(self.__c_obj, fmt, values, caller_env)
 
     def packobj(self, obj):
-        return llbc.inl.PyStreamWrite(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write(self.__c_obj, obj)
 
     def packnone(self):
-        return llbc.inl.PyStreamWrite_None(self.__c_obj, None)
+        return _llbc_inl.Stream_Write_None(self.__c_obj, None)
 
     def packbyte(self, obj):
-        return llbc.inl.PyStreamWrite_Byte(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Byte(self.__c_obj, obj)
 
     def packbool(self, obj):
-        return llbc.inl.PyStreamWrite_Bool(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Bool(self.__c_obj, obj)
 
     def packint16(self, obj):
-        return llbc.inl.PyStreamWrite_Int16(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Int16(self.__c_obj, obj)
 
     def packint32(self, obj):
-        return llbc.inl.PyStreamWrite_Int32(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Int32(self.__c_obj, obj)
 
     def packint64(self, obj):
-        return llbc.inl.PyStreamWrite_Int64(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Int64(self.__c_obj, obj)
 
     def packfloat(self, obj):
-        return llbc.inl.PyStreamWrite_Float(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Float(self.__c_obj, obj)
 
     def packdouble(self, obj):
-        return llbc.inl.PyStreamWrite_Double(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Double(self.__c_obj, obj)
 
     def packstr(self, obj):
-        return llbc.inl.PyStreamWrite_Str(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Str(self.__c_obj, obj)
 
     def packstr2(self, obj):
-        return llbc.inl.PyStreamWrite_Str2(self.__c_obj, obj)
-
-    def packstr3(self, obj):
-        return llbc.inl.PyStreamWrite_Str3(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Str2(self.__c_obj, obj)
 
     def packunicode(self, obj):
-        return llbc.inl.PyStreamWrite_Unicode(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Unicode(self.__c_obj, obj)
 
     def packbytearray(self, obj):
-        return llbc.inl.PyStreamWrite_ByteArray(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_ByteArray(self.__c_obj, obj)
 
     def packbuffer(self, obj):
-        return llbc.inl.PyStreamWrite_Buffer(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Buffer(self.__c_obj, obj)
 
     def packtuple(self, obj):
-        return llbc.inl.PyStreamWrite_Tuple(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Tuple(self.__c_obj, obj)
 
     def packlist(self, obj):
-        return llbc.inl.PyStreamWrite_List(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_List(self.__c_obj, obj)
 
     def packsequence(self, obj):
-        return llbc.inl.PyStreamWrite_Sequence(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Sequence(self.__c_obj, obj)
 
     def packdict(self, obj):
-        return llbc.inl.PyStreamWrite_Dict(self.__c_obj, obj)
+        return _llbc_inl.Stream_Write_Dict(self.__c_obj, obj)
 
     def packstream(self, s, begin=0, to=-1):
         if not isinstance(s, pyllbcStream):
             raise TypeError('pack argument "s" must be stream type')
-        return llbc.inl.PyStreamWrite_Stream(self.__c_obj, s.cobj, begin, to)
+        return _llbc_inl.Stream_Write_Stream(self.__c_obj, s.cobj, begin, to)
 
     def encode(self, s):
         if not isinstance(s, pyllbcStream):
             raise TypeError('encode argument not Stream type')
 
-        return llbc.inl.PyStreamEncodeSelf(self.__c_obj, s.cobj)
+        return _llbc_inl.Stream_EncodeSelf(self.__c_obj, s.cobj)
 
-    def __unpack(self, fmt, stack_idx=1):
-        caller_env = None
-        if fmt.find('C') >= 0 and not llbc.inl.PyStreamIsExprCompiled(fmt):
-            caller_env = inspect.stack()[stack_idx + 1][0].f_globals
-
-        return llbc.inl.PyStreamFmtRead(self.__c_obj, fmt, caller_env)
+    def clear(self):
+        """clear stream"""
+        _llbc_inl.Stream_SetWritePos(self.__c_obj, 0)
 
 llbc.Stream = pyllbcStream
 

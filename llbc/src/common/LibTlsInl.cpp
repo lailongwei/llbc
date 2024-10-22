@@ -20,7 +20,6 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/OSHeader.h"
 #include "llbc/common/Macro.h"
@@ -30,7 +29,9 @@
 #include "llbc/common/LibTlsInl.h"
 
 __LLBC_INTERNAL_NS_BEGIN
+
 static LLBC_NS LLBC_TlsHandle __LLBC_libTlsHandle = LLBC_INVALID_TLS_HANDLE;
+
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
@@ -39,7 +40,9 @@ __LLBC_LibTls::__LLBC_LibTls()
 {
     commonTls.errNo = LLBC_ERROR_SUCCESS;
     commonTls.subErrNo = LLBC_ERROR_SUCCESS;
-    ::memset(&commonTls.errDesc, 0, __LLBC_ERROR_DESC_SIZE);
+    memset(&commonTls.errDesc, 0, sizeof(commonTls.errDesc));
+    memset(&commonTls.customErrDesc, 0, sizeof(commonTls.customErrDesc));
+    memset(&commonTls.clibErrFmtBuf, 0, sizeof(commonTls.clibErrFmtBuf));
 
     coreTls.llbcThread = false;
     coreTls.entryThread = false;
@@ -49,8 +52,8 @@ __LLBC_LibTls::__LLBC_LibTls()
     coreTls.nativeThreadHandle = LLBC_INVALID_NATIVE_THREAD_HANDLE;
     coreTls.task = nullptr;
     coreTls.timerScheduler = nullptr;
-    coreTls.safetyObjectPool = nullptr;
-    coreTls.unsafetyObjectPool = nullptr;
+    coreTls.safeObjPool = nullptr;
+    coreTls.unsafeObjPool = nullptr;
 
     #if LLBC_CFG_OS_IMPL_SYMBOL
      #if LLBC_TARGET_PLATFORM_WIN32
@@ -59,14 +62,14 @@ __LLBC_LibTls::__LLBC_LibTls()
     coreTls.symbol.win32Symbol->SizeOfStruct = sizeof(::SYMBOL_INFO);
     coreTls.symbol.win32Symbol->MaxNameLen = LLBC_CFG_OS_SYMBOL_MAX_SYMBOL_NAME;
 
-    ::memset(&coreTls.symbol.win32ImgHelpLine64, 0, sizeof(coreTls.symbol.win32ImgHelpLine64));
+    memset(&coreTls.symbol.win32ImgHelpLine64, 0, sizeof(coreTls.symbol.win32ImgHelpLine64));
     coreTls.symbol.win32ImgHelpLine64.SizeOfStruct = sizeof(coreTls.symbol.win32ImgHelpLine64);
      #endif // LLBC_TARGET_PLATFORM_WIN32
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
     objbaseTls.poolStack = nullptr;
 
-    ::memset(commTls.services, 0, sizeof(commTls.services));
+    memset(commTls.services, 0, sizeof(commTls.services));
 }
 
 __LLBC_LibTls::~__LLBC_LibTls()
@@ -78,9 +81,13 @@ __LLBC_LibTls::~__LLBC_LibTls()
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 }
 
+__LLBC_LibTls *__LLBC_EntryThreadLibTls = nullptr;
+
 void __LLBC_CreateLibTls()
 {
     LLBC_TlsHandle &tlsHandle = LLBC_INTERNAL_NS __LLBC_libTlsHandle;
+    if (tlsHandle != LLBC_INVALID_TLS_HANDLE)
+        return;
 
     bool tlsCreated;
 #if LLBC_TARGET_PLATFORM_NON_WIN32
@@ -123,7 +130,7 @@ __LLBC_LibTls *__LLBC_GetLibTls()
 
     if (UNLIKELY(!libTls))
     {
-        libTls = LLBC_New(__LLBC_LibTls);
+        libTls = new __LLBC_LibTls;
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
         (void)pthread_setspecific(tlsHandle, libTls);
@@ -144,19 +151,22 @@ void __LLBC_ResetLibTls()
     if ((libTls = reinterpret_cast<__LLBC_LibTls *>(
         pthread_getspecific(tlsHandle))))
     {
-        LLBC_Delete(libTls);
+        delete libTls;
         pthread_setspecific(tlsHandle, nullptr);
     }
 #else
     if ((libTls = reinterpret_cast<__LLBC_LibTls *>(
         ::TlsGetValue(tlsHandle))))
     {
-        LLBC_Delete(libTls);
+        delete libTls;
         ::TlsSetValue(tlsHandle, nullptr);
     }
 #endif
 }
 
-__LLBC_NS_END
+__LLBC_LibTls *__LLBC_GetEntryThreadLibTls()
+{
+    return __LLBC_EntryThreadLibTls;
+}
 
-#include "llbc/common/AfterIncl.h"
+__LLBC_NS_END

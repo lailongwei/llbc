@@ -91,7 +91,7 @@ LLBC_BEGIN_C_DECL
 
 csllbc_Ini_IniSection *csllbc_Ini_LoadFromContent(const char *content, int *sectionCount, int *errDescLen)
 {
-    LLBC_Ini *ini = LLBC_New(LLBC_Ini);
+    LLBC_Ini *ini = new LLBC_Ini;
     if (ini->LoadFromContent(content) != LLBC_OK)
     {
         LLBC_String errStr = LLBC_String().format(
@@ -103,7 +103,7 @@ csllbc_Ini_IniSection *csllbc_Ini_LoadFromContent(const char *content, int *sect
     }
 
     csllbc_Ini_IniSection *sections = _GetAllSections(ini, sectionCount);
-    LLBC_Delete(ini);
+    delete ini;
 
     return sections;
 }
@@ -116,26 +116,26 @@ void csllbc_Ini_FreeNativeSections(csllbc_Ini_IniSection *sections, int sectionC
     for (int sectionIdx = 0; sectionIdx < sectionCount; ++sectionIdx)
     {
         csllbc_Ini_IniSection &section = sections[sectionIdx];
-        LLBC_Free(section.sectionName);
+        free(section.sectionName);
 
         int valueCount = section.count;
         for (int valueIdx = 0; valueIdx < valueCount; ++valueIdx)
         {
-            LLBC_Free(section.keys[valueIdx]);
+            free(section.keys[valueIdx]);
             LLBC_XFree(section.values[valueIdx]);
         }
 
         if (valueCount > 0)
         {
-            LLBC_Free(section.keys);
-            LLBC_Free(section.keysLen);
+            free(section.keys);
+            free(section.keysLen);
 
-            LLBC_Free(section.values);
-            LLBC_Free(section.valuesLen);
+            free(section.values);
+            free(section.valuesLen);
         }
     }
 
-    LLBC_Free(sections);
+    free(sections);
 }
 
 LLBC_END_C_DECL

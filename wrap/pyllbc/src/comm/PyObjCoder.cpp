@@ -37,12 +37,12 @@ int pyllbc_ObjCoder::Encode(PyObject *in, std::string &out)
     LLBC_Json::Document *jsonVal = new LLBC_Json::Document(&wrapJson.GetAllocator());
     if (This::Encode(in, jsonVal) != LLBC_OK)
     {
-        LLBC_Delete(jsonVal);
+        delete jsonVal;
         return LLBC_FAILED;
     }
 
     wrapJson.PushBack((*jsonVal), wrapJson.GetAllocator());
-    LLBC_Delete(jsonVal);
+    delete jsonVal;
 
     // json stringify
     wrapJson.Accept(writer);
@@ -259,13 +259,13 @@ int pyllbc_ObjCoder::EncodeSeq(PyObject *in, LLBC_Json::Document &out)
         if (This::Encode(elemObj, elemJson) != LLBC_OK)
         {
             Py_DECREF(fastSeq);
-            LLBC_Delete(elemJson);
+            delete elemJson;
             return LLBC_FAILED;
         }
 
         out.PushBack(*elemJson, out.GetAllocator());
 
-        LLBC_Delete(elemJson);
+        delete elemJson;
     }
 
     Py_DECREF(fastSeq);
@@ -289,13 +289,13 @@ int pyllbc_ObjCoder::EncodeDict(PyObject *in, LLBC_Json::Document &out)
         LLBC_Json::Document *valJson = new LLBC_Json::Document(&out.GetAllocator());
         if (This::Encode(val, valJson) != LLBC_OK)
         {
-            LLBC_Delete(valJson);
+            delete valJson;
             return LLBC_FAILED;
         }
 
         out.AddMember(LLBC_JsonValue(strKey, out.GetAllocator()), *valJson, out.GetAllocator());
 
-        LLBC_Delete(valJson);
+        delete valJson;
     }
 
     return LLBC_OK;
@@ -329,7 +329,7 @@ int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_Json::Document &out)
             LLBC_Json::Document *slotValJson = new LLBC_Json::Document(&out.GetAllocator());
             if (This::Encode(slotVal, slotValJson) != LLBC_OK)
             {
-                LLBC_Delete(slotValJson);
+                delete slotValJson;
                 Py_DECREF(slotVal);
                 Py_DECREF(slotItem);
 
@@ -343,7 +343,7 @@ int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_Json::Document &out)
             {
                 pyllbc_TransferPyError();
 
-                LLBC_Delete(slotValJson);
+                delete slotValJson;
 
                 Py_DECREF(slotVal);
                 Py_DECREF(slotItem);
@@ -355,7 +355,7 @@ int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_Json::Document &out)
 
             out.AddMember(LLBC_JsonValue(itemStr, out.GetAllocator()), *slotValJson, out.GetAllocator());
 
-            LLBC_Delete(slotValJson);
+            delete slotValJson;
 
             Py_DECREF(slotVal);
         }

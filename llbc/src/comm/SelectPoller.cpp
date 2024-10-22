@@ -21,14 +21,13 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/Socket.h"
 #include "llbc/comm/Session.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/PollerType.h"
 #include "llbc/comm/SelectPoller.h"
-#include "llbc/comm/IService.h"
+#include "llbc/comm/Service.h"
 
 namespace
 {
@@ -53,7 +52,7 @@ LLBC_SelectPoller::~LLBC_SelectPoller()
 
 int LLBC_SelectPoller::Start()
 {
-    if (_started)
+    if (GetTaskState() != LLBC_TaskState::NotActivated)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
@@ -62,15 +61,11 @@ int LLBC_SelectPoller::Start()
     if (Activate() != LLBC_OK)
         return LLBC_FAILED;
 
-    _started = true;
     return LLBC_OK;
 }
 
 void LLBC_SelectPoller::Svc()
 {
-    while (!_started)
-        LLBC_Sleep(20);
-
     static const int interval = 20;
     LLBC_FdSet reads, writes, excepts;
 
@@ -79,7 +74,7 @@ void LLBC_SelectPoller::Svc()
         HandleQueuedEvents(0);
         if (_maxFd == 0)
         {
-            LLBC_ThreadManager::Sleep(interval);
+            LLBC_Sleep(interval);
             continue;
         }
 
@@ -89,7 +84,7 @@ void LLBC_SelectPoller::Svc()
         const int evCount = LLBC_Select(
             static_cast<int>(_maxFd + 1),&reads, &writes, &excepts, interval);
 
-        const sint64 begin = LLBC_GetMilliSeconds();
+        const sint64 begin = LLBC_GetMilliseconds();
         const int processed = HandleConnecting(writes, excepts);
 
         if (processed < evCount)
@@ -105,9 +100,9 @@ void LLBC_SelectPoller::Svc()
                 int sockErr;
                 LLBC_SessionCloseInfo *closeInfo;
                 if (sock->GetPendingError(sockErr) != LLBC_OK)
-                    closeInfo = LLBC_New(LLBC_SessionCloseInfo);
+                    closeInfo = new LLBC_SessionCloseInfo;
                 else
-                    closeInfo = LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_NETAPI, sockErr);
+                    closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_NETAPI, sockErr);
 
                 session->OnClose(nullptr, closeInfo);
             }
@@ -145,9 +140,9 @@ void LLBC_SelectPoller::Svc()
                     int sockErr;
                     LLBC_SessionCloseInfo *closeInfo;
                     if (UNLIKELY(sock->GetPendingError(sockErr) != LLBC_OK))
-                        closeInfo = LLBC_New(LLBC_SessionCloseInfo);
+                        closeInfo = new LLBC_SessionCloseInfo;
                     else
-                        closeInfo = LLBC_New(LLBC_SessionCloseInfo, LLBC_ERROR_CLIB, sockErr);
+                        closeInfo = new LLBC_SessionCloseInfo(LLBC_ERROR_CLIB, sockErr);
 
                     session->OnClose(closeInfo);
                 }
@@ -166,11 +161,11 @@ void LLBC_SelectPoller::Svc()
 #endif // LLBC_TARGET_PLATFORM_WIN32
         }
 
-        const sint64 elapsed = LLBC_GetMilliSeconds() - begin;
+        const sint64 elapsed = LLBC_GetMilliseconds() - begin;
         if (UNLIKELY(elapsed < 0))
             continue;
         else if (elapsed < interval)
-            LLBC_ThreadManager::Sleep(static_cast<int>(interval - elapsed));
+            LLBC_Sleep(static_cast<int>(interval - elapsed));
     }
 }
 
@@ -192,7 +187,7 @@ void LLBC_SelectPoller::HandleEv_AddSock(LLBC_PollerEvent &ev)
 
 void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 {
-    LLBC_Socket *socket = LLBC_New(LLBC_Socket);
+    LLBC_Socket *socket = new LLBC_Socket;
     socket->SetNonBlocking();
     socket->SetPollerType(LLBC_PollerType::SelectPoller);
 
@@ -225,7 +220,7 @@ void LLBC_SelectPoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
     }
     else
     {
-        LLBC_Delete(socket);
+        delete socket;
         LLBC_XDelete(ev.sessionOpts);
 
         _svc->Push(LLBC_SvcEvUtil::
@@ -313,7 +308,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
          it != _connecting.end();
          )
     {
-        // Check event triggered in writeable-set or excepts-set
+        // Check event triggered in writable-set or excepts-set
         const LLBC_SocketHandle handle = it->first;
         bool inExceptSet = false;
         const bool inWriteSet = !!LLBC_FdIsSet(handle, &writes);
@@ -343,7 +338,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
         processed += 1;
 
         int sockErr;
-        const char *reason = nullptr;
+        const char *reason;
         bool connected = inWriteSet;
         if (UNLIKELY(socket->GetPendingError(sockErr) != LLBC_OK))
         {
@@ -384,7 +379,7 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
         }
         else
         {
-            LLBC_Delete(socket);
+            delete socket;
         }
 
         // Erase socket from connecting map.
@@ -398,5 +393,3 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

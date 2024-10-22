@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_COMMON_H__
-#define __LLBC_COM_COMMON_H__
+
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 #include "llbc/common/Compiler.h"
@@ -30,9 +30,9 @@
 #include "llbc/common/OSHeader.h"
 // #include "llbc/common/ThirdHeader.h"
 #include "llbc/common/Macro.h"
-#include "llbc/common/BasicDataType.h"
 #include "llbc/common/Define.h"
-#include "llbc/common/Template.h"
+#include "llbc/common/BasicDataType.h"
+#include "llbc/common/TemplateDeduction.h"
 #include "llbc/common/Endian.h"
 #include "llbc/common/Stream.h"
 #include "llbc/common/StringDataType.h"
@@ -65,6 +65,10 @@ LLBC_HIDDEN int __LLBC_CommonStartup();
  */
 LLBC_HIDDEN void __LLBC_CommonCleanup();
 
-__LLBC_NS_END
+/**
+ * Get entry thread native thread handle.
+ * @return LLBC_NativeThreadHandle - the native thread handle.
+ */
+LLBC_EXPORT LLBC_NativeThreadHandle __LLBC_GetEntryThreadNativeThreadHandle();
 
-#endif // !__LLBC_COM_COMMON_H__
+__LLBC_NS_END

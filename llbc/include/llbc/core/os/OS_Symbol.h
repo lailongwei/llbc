@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_OS_OS_SYMBOL_H__
-#define __LLBC_CORE_OS_OS_SYMBOL_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -35,6 +34,12 @@ __LLBC_NS_BEGIN
 LLBC_EXPORT int LLBC_InitSymbol();
 
 /**
+ * Cleanup symbol.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXPORT int LLBC_CleanupSymbol();
+
+/**
  * Capture stack back trace.
  * @param[in]  skipFrames    - skip frames count, default 0.
  * @param[out] captureFrames - the final back traces, default is infinite.
@@ -46,5 +51,3 @@ LLBC_EXPORT LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames = 0, size_t
 #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_OS_OS_SYMBOL_H__

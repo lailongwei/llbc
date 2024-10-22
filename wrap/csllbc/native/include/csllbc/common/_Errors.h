@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COM__ERRORS_H__
-#define __CSLLBC_COM__ERRORS_H__
+#pragma once
 
 #include "csllbc/common/Macro.h"
 #include "csllbc/common/LibHeader.h"
@@ -34,4 +33,4 @@ LLBC_EXTERN_C CSLLBC_EXPORT const char *csllbc_FormatLastError(int *lastErrorLen
 
 LLBC_EXTERN_C CSLLBC_EXPORT const char *csllbc_StrError(unsigned int errNo, int *errLen);
 
-#endif // !__CSLLBC_COM__ERRORS_H__
+

@@ -448,8 +448,8 @@ namespace llbc
                 _nativeCompDelegates = new NativeComponentDelegates(_nativeComp);
 
                 IntPtr nativeSvcName = LibUtil.CreateNativeStr(_svcName);
-                _llbcSvc = LLBCNative.csllbc_Service_Create((int)svcType,
-                                                            nativeSvcName,
+                _llbcSvc = LLBCNative.csllbc_Service_Create(nativeSvcName,
+                                                            svcType == ServiceType.Normal,
                                                             fullStack,
                                                             _nativeCompDelegates.svcEncodePacket,
                                                             _nativeCompDelegates.svcDecodePacket,
@@ -461,19 +461,19 @@ namespace llbc
                 if (_llbcSvc.ToInt64() == 0)
                     throw ExceptionUtil.CreateExceptionFromCoreLib();
 
-                // Register native component.
-                if (LLBCNative.csllbc_Service_RegisterComponent(_llbcSvc,
-                                                                _nativeCompDelegates.onInit,
-                                                                _nativeCompDelegates.onDestroy,
-                                                                _nativeCompDelegates.onStart,
-                                                                _nativeCompDelegates.onStop,
-                                                                _nativeCompDelegates.onUpdate,
-                                                                _nativeCompDelegates.onIdle,
-                                                                _nativeCompDelegates.onSessionCreate,
-                                                                _nativeCompDelegates.onSessionDestroy,
-                                                                _nativeCompDelegates.onAsyncConnResult,
-                                                                _nativeCompDelegates.onProtoReport,
-                                                                _nativeCompDelegates.onUnHandledPacket) != LLBCNative.LLBC_OK)
+                // Add native component.
+                if (LLBCNative.csllbc_Service_AddComponent(_llbcSvc,
+                                                           _nativeCompDelegates.onInit,
+                                                           _nativeCompDelegates.onDestroy,
+                                                           _nativeCompDelegates.onStart,
+                                                           _nativeCompDelegates.onStop,
+                                                           _nativeCompDelegates.onUpdate,
+                                                           _nativeCompDelegates.onIdle,
+                                                           _nativeCompDelegates.onSessionCreate,
+                                                           _nativeCompDelegates.onSessionDestroy,
+                                                           _nativeCompDelegates.onAsyncConnResult,
+                                                           _nativeCompDelegates.onProtoReport,
+                                                           _nativeCompDelegates.onUnHandledPacket) != LLBCNative.LLBC_OK)
                     throw ExceptionUtil.CreateExceptionFromCoreLib();
 
                 // Add new service to global svc dictionaries.
@@ -662,13 +662,13 @@ namespace llbc
         }
         #endregion
 
-        #region RegisterCoder, RegisterGlobalCoder
+        #region AddCoder, RegisterGlobalCoder
         /// <summary>
         /// Register coder, opcode and coder must be unique.
         /// </summary>
         /// <param name="opcode">the coders opcode</param>
         /// <param name="coder">the coder type</param>
-        public void RegisterCoder(int opcode, Type coder)
+        public void AddCoder(int opcode, Type coder)
         {
             lock (_lock)
             {
@@ -676,7 +676,7 @@ namespace llbc
                     throw new LLBCException("Could not register coder when service running!");
                 else if (_coders.ContainsKey(coder) || _coders2.ContainsKey(opcode))
                     throw new LLBCException("Could not repeat to register coder: {0}", coder);
-                else if (LLBCNative.csllbc_Service_RegisterCoder(_llbcSvc, opcode) != LLBCNative.LLBC_OK)
+                else if (LLBCNative.csllbc_Service_AddCoder(_llbcSvc, opcode) != LLBCNative.LLBC_OK)
                     throw ExceptionUtil.CreateExceptionFromCoreLib();
 
                 _CoderInfo info = new _CoderInfo();
@@ -856,19 +856,19 @@ namespace llbc
         }
         #endregion
 
-        #region RegisterComponent
+        #region AddComponent
         /// <summary>
-        /// Register new component to service.
+        /// Add new component to service.
         /// </summary>
         /// <param name="component">the new component object</param>
-        public void RegisterComponent(IComponent component)
+        public void AddComponent(IComponent component)
         {
             lock (_lock)
             {
                 if (LLBCNative.csllbc_Service_IsStarted(_llbcSvc) != 0)
                     throw new LLBCException("Could not register component when service running");
 
-                _nativeComp.RegisterComponent(component);
+                _nativeComp.AddComponent(component);
             }
         }
         #endregion
@@ -1051,7 +1051,7 @@ namespace llbc
                             "GlobalCoder not found, send packet[{0}] failed, sessionId:{1}", typeof(T), sessionId);
                     // Get opcode.
                     else if (!_coders.TryGetValue(typeof(T), out coderInfo))
-                        throw new LLBCException("Could not find packet[{0}] opcode, please RegisterCoder first!", typeof(T));
+                        throw new LLBCException("Could not find packet[{0}] opcode, please AddCoder first!", typeof(T));
 
                     // Enabled full-stack option, push and waiting native coder to encode it.
                     if (_fullStack)
@@ -1076,7 +1076,7 @@ namespace llbc
                 lock (_lock)
                 {
                     if (!_coders.TryGetValue(typeof(T), out coderInfo))
-                        throw new LLBCException("Could not find packet[{0}] opcode, send failed, please RegisterCoder first!", obj.GetType());
+                        throw new LLBCException("Could not find packet[{0}] opcode, send failed, please AddCoder first!", obj.GetType());
 
                     // Enabled full-stack option, push and waiting native coder to encode it.
                     if (_fullStack)
@@ -1152,7 +1152,7 @@ namespace llbc
                             "GlobalCoder not found, multicast packet[{0}] failed", obj.GetType());
 
                     if (!_coders.TryGetValue(typeof(T), out coderInfo))
-                        throw new LLBCException("Could not find packet[{0}] opcode, multicast failed, please RegisterCoder first!", typeof(T));
+                        throw new LLBCException("Could not find packet[{0}] opcode, multicast failed, please AddCoder first!", typeof(T));
                     globalCoder = _globalCoder;
                 }
 
@@ -1168,7 +1168,7 @@ namespace llbc
                 lock (_lock)
                 {
                     if (!_coders.TryGetValue(typeof(T), out coderInfo))
-                        throw new LLBCException("Could not find packet[{0}] opcode, multicast failed, please RegisterCoder first!", typeof(T));
+                        throw new LLBCException("Could not find packet[{0}] opcode, multicast failed, please AddCoder first!", typeof(T));
                 }
 
                 MemoryStream stream = new MemoryStream();
@@ -1255,7 +1255,7 @@ namespace llbc
                     globalCoder = _globalCoder;
 
                     if (!_coders.TryGetValue(typeof(T), out coderInfo))
-                        throw new LLBCException("Could not find packet[{0}] opcode, broadcast failed, please RegisterCoder first!", typeof(T));
+                        throw new LLBCException("Could not find packet[{0}] opcode, broadcast failed, please AddCoder first!", typeof(T));
                 }
 
                 MemoryStream stream = new MemoryStream();
@@ -1269,7 +1269,7 @@ namespace llbc
                 lock (_lock)
                 {
                     if (!_coders.TryGetValue(typeof(T), out coderInfo))
-                        throw new LLBCException("Could not find packet[{0}] opcoce, broadcast failed, please RegisterCoder first!", typeof(T));
+                        throw new LLBCException("Could not find packet[{0}] opcoce, broadcast failed, please AddCoder first!", typeof(T));
                 }
 
                 MemoryStream stream = new MemoryStream();
@@ -1465,12 +1465,12 @@ namespace llbc
                 _fullStack = svc.fullStack;
             }
 
-            #region RegisterComponent/CleanupComponents
+            #region AddComponent/CleanupComponents
             /// <summary>
-            /// Register csharp layer component.
+            /// Add csharp layer component.
             /// </summary>
             /// <param name="component"></param>
-            public void RegisterComponent(IComponent component)
+            public void AddComponent(IComponent component)
             {
                 if (component == null)
                     throw new ArgumentException();
@@ -1741,7 +1741,7 @@ namespace llbc
 
             #region Encode about methods
             /// <summary>
-            /// Push will encode object to wait native LLBC_ICoder::Encoder() call.
+            /// Push will encode object to wait native LLBC_Coder::Encode() call.
             /// </summary>
             public void PushWillEncodeObj(int sessionId, int opcode, object obj, bool isCoder, long packetId, int status)
             {

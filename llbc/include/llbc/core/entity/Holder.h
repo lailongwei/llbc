@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_ENTITY_HOLDER_H__
-#define __LLBC_CORE_ENTITY_HOLDER_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/entity/IHolder.h"
 
@@ -56,6 +53,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/entity/HolderImpl.h"
+#include "llbc/core/entity/HolderInl.h"
 
-#endif // !__LLBC_CORE_ENTITY_HOLDER_H__
+

@@ -78,7 +78,7 @@ void pyllbc_PackLemmaCompiler::DiscardCache(const LLBC_String &expr)
             break;
         }
 
-    LLBC_Delete(it->second);
+    delete it->second;
     _exprs.erase(it);
 }
 
@@ -191,7 +191,7 @@ int pyllbc_PackLemmaCompiler::ReduceStack()
         _compilingStack.pop();
         if (_compilingStack.top()->Process(lemma) != LLBC_OK)
         {
-            LLBC_Delete(lemma);
+            delete lemma;
             return LLBC_FAILED;
         }
     }
@@ -211,7 +211,7 @@ int pyllbc_PackLemmaCompiler::Compile_SeqBegin(char ch, char nextCh, PyObject *c
         pyllbc_PackLemmaBuilder::Build(Type::SequenceType, compileEnv);
     if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_OK)
     {
-        LLBC_Delete(lemma);
+        delete lemma;
         return LLBC_FAILED;
     }
 
@@ -244,7 +244,7 @@ int pyllbc_PackLemmaCompiler::Compile_DictBegin(char ch, char nextCh, PyObject *
         pyllbc_PackLemmaBuilder::Build(Type::DictType, compileEnv);
     if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_OK)
     {
-        LLBC_Delete(lemma);
+        delete lemma;
         return LLBC_FAILED;
     }
 
@@ -292,7 +292,7 @@ int pyllbc_PackLemmaCompiler::Compile_Class(char ch, char nextCh, PyObject *comp
         pyllbc_PackLemmaBuilder::Build(Type::ClassType, compileEnv);
     if (lemma->Process(static_cast<Symbol>(ch)) != LLBC_OK)
     {
-        LLBC_Delete(lemma);
+        delete lemma;
         return LLBC_FAILED;
     }
 
@@ -362,14 +362,14 @@ int pyllbc_PackLemmaCompiler::Compile_Raw(char ch, char nextCh, PyObject *compil
 {
     const Symbol &smbl = static_cast<Symbol>(ch);
     pyllbc_PackLemma *topLemma = _compilingStack.top();
-    if ((smbl == Type::StringLen || smbl == Type::StringEnd) &&
+    if ((smbl == Type::StringLen) &&
         topLemma->GetType() == Type::RawType)
         return topLemma->Process(smbl, static_cast<Symbol>(nextCh));
 
     pyllbc_PackLemma *lemma = pyllbc_PackLemmaBuilder::Build(Type::RawType, compileEnv);
     if (lemma->Process(smbl, static_cast<Symbol>(nextCh)) != LLBC_OK)
     {
-        LLBC_Delete(lemma);
+        delete lemma;
         return LLBC_FAILED;
     }
 
@@ -440,7 +440,7 @@ void pyllbc_PackLemmaCompiler::RemoveOldestExpr()
     const LLBC_String &id = _exprsIdxQueue.front();
 
     _Exprs::iterator it = _exprs.find(id);
-    LLBC_Delete(it->second);
+    delete it->second;
     _exprs.erase(it);
 
     _exprsIdxQueue.pop_front();

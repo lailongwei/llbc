@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogTokenChain.h"
@@ -29,7 +29,7 @@
 __LLBC_NS_BEGIN
 
 LLBC_BaseLogAppender::LLBC_BaseLogAppender()
-: _level(LLBC_LogLevel::End)
+: _logLevel(LLBC_LogLevel::End)
 
 , _chain(nullptr)
 , _next(nullptr)
@@ -48,9 +48,9 @@ int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
         return LLBC_FAILED;
     }
 
-    _level = initInfo.level;
+    _logLevel = initInfo.logLevel;
 
-    _chain = LLBC_New(LLBC_LogTokenChain);
+    _chain = new LLBC_LogTokenChain;
     if (_chain->Build(initInfo.pattern) != LLBC_OK)
     {
         LLBC_XDelete(_chain);
@@ -63,9 +63,7 @@ int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
 void LLBC_BaseLogAppender::Finalize()
 {
     LLBC_XDelete(_chain);
-    _level = LLBC_LogLevel::End;
+    _logLevel = LLBC_LogLevel::End;
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

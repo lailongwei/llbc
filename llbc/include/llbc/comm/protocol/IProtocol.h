@@ -19,10 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_IPROTOCOL_H__
-#define __LLBC_COMM_IPROTOCOL_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
@@ -32,10 +30,10 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_Session;
-class LLBC_ICoderFactory;
+class LLBC_CoderFactory;
 class LLBC_ProtocolStack;
 class LLBC_IProtocolFilter;
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -49,7 +47,7 @@ class LLBC_EXPORT LLBC_IProtocol
     typedef LLBC_IProtocol This;
 
 public:
-    typedef std::map<int, LLBC_ICoderFactory *> Coders;
+    typedef std::map<int, LLBC_CoderFactory *> Coders;
 
 public:
     LLBC_IProtocol();
@@ -69,14 +67,6 @@ public:
     const Coders *GetCoders() const;
 
 public:
-    /**
-     * When one connection established, will call this method.
-     * @param[in] local - the local address.
-     * @param[in] peer  - the peer address.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer) = 0;
-
     /**
      * When data send, will call this method.
      * @param[in] in             - the in data.
@@ -127,9 +117,9 @@ protected:
 
     /**
      * Get service.
-     * @return LLBC_IService * - the service.
+     * @return LLBC_Service * - the service.
      */
-    LLBC_IService *GetService();
+    LLBC_Service *GetService();
 
 private:
     /**
@@ -161,7 +151,7 @@ private:
     /**
      * Set coder factories, only available in Codec-Layer.
      * @param[in] coders - the coder factories pointer.
-     * @return int - reutrn 0 if success, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     virtual int SetCoders(const Coders *coders);
 
@@ -170,12 +160,10 @@ protected:
     int _acceptSessionId;
     LLBC_Session *_session;
     LLBC_ProtocolStack* _stack;
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_IProtocolFilter *_filter;
     const Coders *_coders;
-    LLBC_ObjectPoolInst<LLBC_Packet> *_pktPoolInst;
+    LLBC_TypedObjPool<LLBC_Packet> *_pktObjPool;
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_IPROTOCOL_H__

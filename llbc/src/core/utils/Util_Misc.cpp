@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/utils/Util_Text.h"
 #include "llbc/core/utils/Util_Misc.h"
@@ -110,18 +110,16 @@ const std::map<LLBC_String, LLBC_Variant> &LLBC_StartArgs::GetAllNamingArguments
     return _namingArgs;
 }
 
-const LLBC_Variant &LLBC_StartArgs::operator [](size_t index) const
+const LLBC_Variant &LLBC_StartArgs::operator[](size_t index) const
 {
     return index < _seqArgs.size() ? 
         _seqArgs.at(index) : (LLBC_INL_NS __nilVariant);
 }
 
-const LLBC_Variant &LLBC_StartArgs::operator [](const LLBC_String &key) const
+const LLBC_Variant &LLBC_StartArgs::operator[](const LLBC_String &key) const
 {
     _NamingArgs::const_iterator it = _namingArgs.find(key);
     return it != _namingArgs.end() ? it->second : (LLBC_INL_NS __nilVariant);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/log/LogConsoleAppender.h"
 #include "llbc/core/log/LogFileAppender.h"
@@ -38,21 +38,21 @@ LLBC_LogAppenderBuilder::~LLBC_LogAppenderBuilder()
 {
 }
 
-LLBC_ILogAppender *LLBC_LogAppenderBuilder::BuildAppender(int type) const
+LLBC_BaseLogAppender *LLBC_LogAppenderBuilder::BuildAppender(int type) const
 {
-    LLBC_ILogAppender *appender = nullptr;
+    LLBC_BaseLogAppender *appender = nullptr;
     switch (type)
     {
     case LLBC_LogAppenderType::Console:
-        appender = LLBC_New(LLBC_LogConsoleAppender);
+        appender = new LLBC_LogConsoleAppender;
         break;
 
     case LLBC_LogAppenderType::File:
-        appender = LLBC_New(LLBC_LogFileAppender);
+        appender = new LLBC_LogFileAppender;
         break;
 
     case LLBC_LogAppenderType::Network:
-        appender = LLBC_New(LLBC_LogNetworkAppender);
+        appender = new LLBC_LogNetworkAppender;
         break;
 
     default:
@@ -63,5 +63,3 @@ LLBC_ILogAppender *LLBC_LogAppenderBuilder::BuildAppender(int type) const
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -19,11 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_COMPRESS_PROTOCOL_H__
-#define __LLBC_COMM_COMPRESS_PROTOCOL_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#pragma once
 
 #include "llbc/comm/protocol/IProtocol.h"
 
@@ -46,14 +42,6 @@ public:
     virtual int GetLayer() const;
 
 public:
-    /**
-     * When one connection established, will call this method.
-     * @param[in] local - the local address.
-     * @param[in] peer  - the peer address.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer);
-
     /**
      * When data send, will call this method.
      * @param[in] in             - the in data.
@@ -80,9 +68,7 @@ public:
      *        It means that you must self manage your coder memory.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int AddCoder(int opcode, LLBC_ICoderFactory *coder);
+    virtual int AddCoder(int opcode, LLBC_CoderFactory *coder);
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_COMPRESS_PROTOCOL_H__

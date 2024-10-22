@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COMM__SERVICE_H__
-#define __CSLLBC_COMM__SERVICE_H__
+#pragma once
 
 #include "csllbc/common/Common.h"
 #include "csllbc/core/Core.h"
@@ -32,14 +31,14 @@ class csllbc_Service;
 
 /**
  * Create new service.
- * @param[in] svcType   - the service type, see csllbc_Service::Type enumeration.
- * @param[in] svcName   - the service name.
- * @param[in] fullStack - the full-stack option.
- * @param[in] ...       - the delegates, internal used.
+ * @param[in] svcName                  - the service name.
+ * @param[in] useNormalProtocolFactory - the service type, see csllbc_Service::Type enumeration.
+ * @param[in] fullStack                - the full-stack option.
+ * @param[in] ...                      - the delegates, internal used.
  * @return csllbc_Service * - the created service, if failed, return nullptr.
  */
-LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(int svcType,
-                                                                  const char *svcName,
+LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(const char *svcName,
+                                                                  bool useNormalProtocolFactory,
                                                                   bool fullStack,
                                                                   csllbc_Delegates::Deleg_Service_EncodePacket encodeDeleg,
                                                                   csllbc_Delegates::Deleg_Service_DecodePacket decodeDeleg,
@@ -53,13 +52,6 @@ LLBC_EXTERN_C CSLLBC_EXPORT csllbc_Service *csllbc_Service_Create(int svcType,
  * @param[in] svc - will delete service.
  */
 LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_Delete(csllbc_Service *svc);
-
-/**
- * Get service type.
- * @param[in] svc - the service.
- * @return int - the service type, see csllbc_Service::Type enumerations.
- */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_GetType(csllbc_Service *svc);
 
 /**
  * Get service Id.
@@ -244,23 +236,23 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_Broadcast(csllbc_Service *svc,
                                                          int status);
 
 /**
- * Register all csharp comp delegates.
+ * Add all csharp comp delegates.
  * @param[in] svc       - the service.
  * @param[in] delegates - all comp event handler delegates.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_RegisterComponent(csllbc_Service *svc,
-                                                                 csllbc_Delegates::Deleg_Comp_OnInit initDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnDestroy destroyDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnStart startDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnStop stopDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnUpdate updateDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnIdle idleDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnProtoReport protoReportDeleg,
-                                                                 csllbc_Delegates::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg);
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_AddComponent(csllbc_Service *svc,
+                                                            csllbc_Delegates::Deleg_Comp_OnInit initDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnDestroy destroyDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnStart startDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnStop stopDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnUpdate updateDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnIdle idleDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnSessionCreate sessionCreateDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnSessionDestroy sessionDestroyDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnAsyncConnResult asyncConnResultDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnProtoReport protoReportDeleg,
+                                                            csllbc_Delegates::Deleg_Comp_OnUnHandledPacket unHandledPacketDeleg);
 
 /**
  * Register csharp layer coder.
@@ -268,7 +260,7 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_RegisterComponent(csllbc_Service 
  * @param[in] opcode - the opcode.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_RegisterCoder(csllbc_Service *svc, int opcode);
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_AddCoder(csllbc_Service *svc, int opcode);
 
 /**
  * Subscribe specific opcode's packet.
@@ -301,4 +293,4 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Service_UnifyPreSubscribe(csllbc_Service 
  */
 LLBC_EXTERN_C CSLLBC_EXPORT void csllbc_Service_OnSvc(csllbc_Service *svc, bool fullFrame);
 
-#endif // !__CSLLBC_COMM__SERVICE_H__
+

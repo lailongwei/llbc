@@ -19,15 +19,14 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_COMPILE_H__
-#define __LLBC_COM_COMPILE_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
 // Compiler types macro define.
 #define LLBC_COMP_MSVC  0  // Microsoft visual c++ compiler(cl)
-#define LLBC_COMP_GCC   1  // GNU c compiler(gcc/g++)
-#define LLBC_COMP_CLANG 2  // CLang compiler(clang)(for now, could not determine)
+#define LLBC_COMP_GCC   1  // GNU compiler(gcc/g++)
+#define LLBC_COMP_CLANG 2  // CLang compiler(clang)
 #define LLBC_COMP_OTHER 3  // Other compiles
 
 // Determine current compiler.
@@ -59,7 +58,7 @@
 // GNU C compiler.
 // The compiler version is converted, if gcc version is 3.2.0
 // the version value is 30200
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
  #define LLBC_CUR_COMP          LLBC_COMP_GCC
  #define LLBC_CUR_COMP_DESC     "gcc"
  #define LLBC_COMP_VER          (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -70,12 +69,12 @@
 
 // CLang compiler.
 // The compile version is converted, like GUN C compiler
-#if defined(__clang__) && !defined(LLBC_CUR_COMP)
+#if defined(__clang__)
  #define LLBC_CUR_COMP          LLBC_COMP_CLANG
  #define LLBC_CUR_COMP_DESC     "clang"
- #define LLBC_COMP_VER          (__clang_major__ *10000 + __clang_minar__ *100 + __clang_patchlevel__)
+ #define LLBC_COMP_VER          (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
  #define LLBC_COMP_MAJOR_VER    __clang_major__
- #define LLBC_COMP_MINOR_VER    __clang_minar__
+ #define LLBC_COMP_MINOR_VER    __clang_minor__
  #define LLBC_COMP_PATCH_LEVEL  __clang_patchlevel__
 #endif
 
@@ -90,4 +89,4 @@
  #define LLBC_COMP_PATCH_LEVEL  0
  #endif
 
-#endif // !__LLBC_COM_COMPILE_H__
+

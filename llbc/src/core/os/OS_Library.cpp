@@ -19,8 +19,12 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <dlfcn.h>
+#endif // Non-Win32
 
 #include "llbc/core/file/Directory.h"
 
@@ -85,12 +89,11 @@ __LLBC_NS_BEGIN
 
 LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName)
 {
-    LLBC_LibraryHandle handle = LLBC_INVALID_LIBRARY_HANDLE;
+    LLBC_LibraryHandle handle;
+
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     if ((handle = dlopen(fileName, RTLD_LAZY)) == LLBC_INVALID_LIBRARY_HANDLE)
-    {
         LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
-    }
 
     return handle;
 #else // LLBC_TARGET_PLATFORM_WIN32
@@ -98,7 +101,7 @@ LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName)
     LLBC_String libName(fileName);
     libName.findreplace(LLBC_SLASH_A, LLBC_BACKLASH_A);
     if (libName.empty())
-        libName = LLBC_Directory::ModuleFileName();
+        libName = LLBC_Directory::ModuleFilePath();
 
     if ((handle = ::LoadLibraryExA(libName.c_str(), nullptr, 0)) == LLBC_INVALID_LIBRARY_HANDLE)
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -160,5 +163,3 @@ int LLBC_CloseLibrary(LLBC_LibraryHandle handle)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

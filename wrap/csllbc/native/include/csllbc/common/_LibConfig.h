@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __CSLLBC_COM__LIB_CONFIG_H__
-#define __CSLLBC_COM__LIB_CONFIG_H__
+#pragma once
 
 #include "csllbc/common/LibHeader.h"
 #include "csllbc/common/Macro.h"
@@ -56,10 +55,12 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_IsDefaultColourfulOutput();
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_IsDefaultLogToFile();
 // LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultFileLogPattern(sint64 pattern, int patternLen);
-// LLBC_CFG_LOG_DEFAULT_DAILY_MODE
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_IsDefaultEnabledDailyMode();
-// LLBC_CFG_LOG_MAX_FILE_SIZE
-LLBC_EXTERN_C CSLLBC_EXPORT sint64 csllbc_LibConfig_Log_MaxFileSize();
+// LLBC_CFG_LOG_DEFAULT_DAILY_ROLLING
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_DefaultFileRollingMode();
+// LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT
+LLBC_EXTERN_C CSLLBC_EXPORT sint64 csllbc_LibConfig_Log_MaxFileSizeLimit();
+// LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE
+LLBC_EXTERN_C CSLLBC_EXPORT sint64 csllbc_LibConfig_Log_DefaultMaxFileSize();
 // LLBC_CFG_LOG_MAX_BACKUP_INDEX
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Log_MaxBackupIndex();
 // LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE
@@ -101,12 +102,8 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_MinServiceFPS();
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_MaxServiceFPS();
 // LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_PerThreadDriveMaxServiceCount();
-// LLBC_CFG_COMM_ENABLE_SAMPLER_SUPPORT
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledSamplerSupport();
 // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledStatusHandler();
-// LLBC_CFG_COMM_ENABLE_STATUS_DESC
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledStatusDesc();
 // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_IsEnabledUnifyPreSubscribe();
 // LLBC_CFG_COMM_POLLER_MODEL
@@ -114,4 +111,4 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Comm_PollerModel(sint64 model, 
 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#endif // !__CSLLBC_COM__LIB_CONFIG_H__
+

@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
-#define __LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 #include "llbc/core/thread/SimpleLock.h"
@@ -59,6 +56,14 @@ public:
      * @param[in] block - message block.
      */
     void PushBack(LLBC_MessageBlock *block);
+
+public:
+    /**
+     * Pop all message blocks.
+     * @param[out] blocks - the message blocks.
+     * @return bool - return true if has block(s), otherwise return false.
+     */
+    bool PopAll(LLBC_MessageBlock *&blocks);
 
     /**
      * Fetch and remove the first message block of the controlled sequence.
@@ -105,9 +110,9 @@ public:
 public:
     /**
      * Get the message block current size.
-     * @return ulong - current size.
+     * @return size_t - current size.
      */
-    ulong GetSize() const;
+    size_t GetSize() const;
 
     /**
      * Cleanup the message queue.
@@ -121,13 +126,6 @@ private:
      * @param[in] front    - front flag, if false, will append to tail.
      */
     void Push(LLBC_MessageBlock *block, bool front);
-
-    /**
-     * Insert the message of the controlled sequence, non lock.
-     * @param[in] block - message block.
-     * @param[in] front - front flag, if false, will append to tail.
-     */
-    void PushNonLock(LLBC_MessageBlock *block, bool front);
 
     /**
      * Insert the message block at the begin of the controlled sequence, non lock.
@@ -150,13 +148,6 @@ private:
      * @return bool - return true if success, otherwise return false.
      */
     bool Pop(LLBC_MessageBlock *&block, int interval, bool front);
-
-    /**
-     * Pop the message block of the controlled sequence, non lock.
-     * @param[out] block - message block.
-     * @param[in]  front - front flag, if false, will fetch from tail.
-     */
-    void PopNonLock(LLBC_MessageBlock *&block, bool front);
 
     /**
      * Pop the first mesage block of the controlled sequence, non lock.
@@ -182,11 +173,11 @@ public:
     LLBC_MessageBlock *_head;
     LLBC_MessageBlock *_tail;
 
-    ulong _size;
+    volatile size_t _size;
 };
 
 __LLBC_NS_END
 
-#include "llbc/core/thread/MessageQueueImpl.h"
+#include "llbc/core/thread/MessageQueueInl.h"
 
-#endif // !__LLBC_CORE_THREAD_MESSAGE_QUEUE_H__
+

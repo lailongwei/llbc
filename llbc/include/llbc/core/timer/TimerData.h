@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_TIMER_TIMER_DATA_H__
-#define __LLBC_CORE_TIMER_TIMER_DATA_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -35,6 +34,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The timer data structure encapsulation.
  */
+#pragma pack(push, 1)
 struct LLBC_HIDDEN LLBC_TimerData
 {
     // Timer handle, use to build timer heap.
@@ -49,7 +49,7 @@ struct LLBC_HIDDEN LLBC_TimerData
     sint64 period;
 
     // Repeat times.
-    uint64 repeatTimes;
+    sint64 repeatTimes;
 
     // timer object.
     LLBC_Timer *timer;
@@ -64,6 +64,7 @@ struct LLBC_HIDDEN LLBC_TimerData
     // ref count.
     uint8 refCount;
 };
+#pragma pack(pop)
 
 __LLBC_NS_END
 
@@ -74,9 +75,9 @@ namespace std
  * \brief The std::less<T> template class specialization: std::less<LLBC_TimerData *>.
  */
 template <>
-struct less<LLBC_NS LLBC_TimerData *> : public binary_function<LLBC_NS LLBC_TimerData *, LLBC_NS LLBC_TimerData *, bool>
+struct less<LLBC_NS LLBC_TimerData *>
 {
-    bool operator()(LLBC_NS LLBC_TimerData * const &t1, LLBC_NS LLBC_TimerData * const &t2)
+    bool operator()(LLBC_NS LLBC_TimerData * const &t1, LLBC_NS LLBC_TimerData * const &t2) const
     {
         return t1->handle < t2->handle;
     }
@@ -86,9 +87,9 @@ struct less<LLBC_NS LLBC_TimerData *> : public binary_function<LLBC_NS LLBC_Time
  * \brief The std::greater<T> template class specialization: std::greater<LLBC_TimerData *>.
  */
 template <>
-struct greater<LLBC_NS LLBC_TimerData *> : public binary_function<LLBC_NS LLBC_TimerData *, LLBC_NS LLBC_TimerData *, bool>
+struct greater<LLBC_NS LLBC_TimerData *>
 {
-    bool operator()(LLBC_NS LLBC_TimerData * const &t1, LLBC_NS LLBC_TimerData * const &t2)
+    bool operator()(LLBC_NS LLBC_TimerData * const &t1, LLBC_NS LLBC_TimerData * const &t2) const
     {
         return t1->handle > t2->handle;
     }
@@ -96,4 +97,4 @@ struct greater<LLBC_NS LLBC_TimerData *> : public binary_function<LLBC_NS LLBC_T
 
 }
 
-#endif // !__LLBC_CORE_TIMER_TIMER_DATA_H__
+

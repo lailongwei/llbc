@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_AUTO_RELEASE_POOL_H__
-#define __LLBC_OBJBASE_AUTO_RELEASE_POOL_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/objbase/Object.h"
 
@@ -110,6 +107,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/objbase/AutoReleasePoolImpl.h"
+#include "llbc/core/objbase/AutoReleasePoolInl.h"
 
-#endif // !__LLBC_OBJBASE_AUTO_RELEASE_POOL_H__
+

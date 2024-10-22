@@ -19,8 +19,16 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ #include <dirent.h>
+#endif // Non-Win32
+
+#if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
+ #include <mach-o/dyld.h>
+#endif
 
 #include "llbc/core/file/Directory.h"
 #include "llbc/core/file/File.h"
@@ -89,13 +97,15 @@ int LLBC_Directory::Create(const LLBC_String &path)
             continue;
 
 #if LLBC_TARGET_PLATFORM_WIN32
-        if (!::CreateDirectoryA(toPath.c_str(), nullptr))
+        if (!::CreateDirectoryA(toPath.c_str(), nullptr) &&
+            ::GetLastError() != ERROR_ALREADY_EXISTS)
         {
             LLBC_SetLastError(LLBC_ERROR_OSAPI);
             return LLBC_FAILED;
         }
 #else
-        if (mkdir(toPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0) // permission: rwxr-xr-x
+        if (mkdir(toPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0 &&
+            errno != EEXIST) // permission: rwxrwxr-x
         {
             LLBC_SetLastError(LLBC_ERROR_CLIB);
             return LLBC_FAILED;
@@ -369,7 +379,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool 
     return GetFiles(path, files, __emptyFileExt, recursive);
 }
 
-int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &fileExt, bool recursive)
+int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &ext, bool recursive)
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     struct stat fileStat;
@@ -435,7 +445,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
     LLBC_String findPath = Join(path, "*.*");
 
     WIN32_FIND_DATAA findData;
-    LLBC_DirHandle handle = ::FindFirstFileA(findPath.c_str(), &findData);
+    HANDLE handle = ::FindFirstFileA(findPath.c_str(), &findData);
     if (handle == INVALID_HANDLE_VALUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -448,7 +458,7 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
         if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
             if (!recursive ||
-                ::strcmp(findData.cFileName, "..") == 0)
+                strcmp(findData.cFileName, "..") == 0)
                 continue;
 
             if (GetFiles(Join(path, findData.cFileName), files, recursive) != LLBC_OK)
@@ -472,14 +482,14 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
 #endif // Non-Win32
 
     if (files.empty() || 
-            fileExt.empty())
+            ext.empty())
         return LLBC_OK;
 
     for (int i = static_cast<int>(files.size() - 1); i >= 0; --i)
     {
         const LLBC_String &file = files[i];
         const LLBC_Strings splited = SplitExt(file);
-        if (splited.size() == 1 || splited[1] != fileExt)
+        if (splited.size() == 1 || splited[1] != ext)
             files.erase(files.begin() + i);
     }
 
@@ -553,7 +563,7 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
     LLBC_String dirName = Join(path, "*.*");
 
     WIN32_FIND_DATAA findData;
-    LLBC_DirHandle handle = ::FindFirstFileA(dirName.c_str(), &findData);
+    HANDLE handle = ::FindFirstFileA(dirName.c_str(), &findData);
     if (handle == INVALID_HANDLE_VALUE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -592,48 +602,59 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
+LLBC_String LLBC_Directory::ModuleFileDir()
+{
+    return DirName(ModuleFilePath());
+}
+
 LLBC_String LLBC_Directory::ModuleFileName()
 {
-#if LLBC_TARGET_PLATFORM_NON_WIN32
+    return BaseName(ModuleFilePath());
+}
+
+LLBC_String LLBC_Directory::ModuleFilePath()
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    DWORD ret;
+    int bufLen = MAX_PATH + 1;
+    char *buf = LLBC_Malloc(char, bufLen);
+    while ((ret = ::GetModuleFileNameA(nullptr, buf, bufLen)) == bufLen)
+        buf = LLBC_Realloc(char, buf, bufLen * 2);
+
+    if (ret == 0)
+    {
+
+        free(buf);
+        LLBC_SetLastError(LLBC_ERROR_OSAPI); 
+        return "";
+    }
+
+    buf[ret] = '\0';
+    LLBC_String modFileName(buf);
+    free(buf);
+
+    return modFileName;
+#elif LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
+    char buf[PATH_MAX + 1];
+    uint32 size = sizeof(buf);
+    if (_NSGetExecutablePath(buf, &size) != 0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return "";
+    }
+
+    return LLBC_String(buf, size);
+#else // Linux/Android
     ssize_t ret = -1;
     char buf[PATH_MAX + 1];
     if ((ret = readlink("/proc/self/exe", buf, PATH_MAX)) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_String();
+        return "";
     }
 
-    buf[ret] = '\0';
-
-    return buf;
-#else // LLBC_TARGET_PLATFORM_WIN32
-    DWORD ret = 0;
-    int bufLen = MAX_PATH + 1;
-    char *buf = LLBC_Malloc(char, bufLen);
-    while ((ret = ::GetModuleFileNameA(nullptr, buf, bufLen)) == bufLen)
-    {
-        buf = LLBC_Realloc(char, buf, bufLen * 2);
-    }
-
-    if (ret == 0)
-    {
-        LLBC_Free(buf);
-        LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        return LLBC_String();
-    }
-
-    buf[ret] = '\0';
-
-    const LLBC_String modFileName(buf);
-    LLBC_Free(buf);
-
-    return modFileName;
-#endif // LLBC_TARGET_PLATFORM_NON_WIN32
-}
-
-LLBC_String LLBC_Directory::ModuleFileDir()
-{
-    return DirName(ModuleFileName());
+    return LLBC_String(buf, ret);
+#endif // Win32
 }
 
 LLBC_String LLBC_Directory::DirName(const LLBC_String &path)
@@ -706,19 +727,17 @@ LLBC_String LLBC_Directory::CurDir()
  
     return cwd;
 #else
-    LPSTR cwd = nullptr;
-    DWORD cwdSize = 0;
-    cwdSize = ::GetCurrentDirectoryA(0, nullptr);
-    cwd = reinterpret_cast<LPSTR>(::malloc(cwdSize * sizeof(CHAR)));
+    DWORD cwdSize = ::GetCurrentDirectoryA(0, nullptr);
+    LPSTR cwd = reinterpret_cast<LPSTR>(malloc(cwdSize * sizeof(CHAR)));
     if (::GetCurrentDirectoryA(cwdSize, cwd) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        ::free(cwd);
+        free(cwd);
         return "";
     }
     
-    const LLBC_String path(cwd);
-    ::free(cwd);
+    LLBC_String path(cwd);
+    free(cwd);
 
     return path;
 #endif
@@ -752,5 +771,3 @@ int LLBC_Directory::SetCurDir(const LLBC_String &path)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

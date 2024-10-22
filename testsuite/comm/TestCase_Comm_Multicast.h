@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_COMM_MULTICAST_H__
-#define __LLBC_TEST_CASE_COMM_MULTICAST_H__
+#pragma once
 
 # include "llbc.h"
 using namespace llbc;
@@ -37,12 +36,12 @@ public:
 private:
     void FetchArgs(int argc, char *argv[]);
 
-    int PrepareClientLogic(LLBC_IService *svc);
-    int PrepareServerLogic(LLBC_IService *svc);
+    int PrepareClientLogic(LLBC_Service *svc);
+    int PrepareServerLogic(LLBC_Service *svc);
 
 private:
     bool _asClient;
-    LLBC_IService::Type _svcType;
+    bool _useNmlProtocolFactory;
 
     LLBC_String _runIp;
     int _runPort;
@@ -51,5 +50,3 @@ private:
 
     static const int _clientCnt;
 };
-
-#endif // !__LLBC_TEST_CASE_COMM_MULTICAST_H__

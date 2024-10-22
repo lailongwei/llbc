@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_EXPORT_H__
-#define __LLBC_COM_EXPORT_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
@@ -40,9 +39,14 @@
 // WIN32
 #if LLBC_TARGET_PLATFORM_WIN32
  #ifndef LLBC_EXPORT
-  #define LLBC_EXPORTING 1
-  #define LLBC_EXPORT __declspec(dllexport)
- #endif
+  #ifdef LLBC_CORE_LIB_STATIC
+   #define LLBC_EXPORTING 2
+   #define LLBC_EXPORT
+  #else
+   #define LLBC_EXPORTING 3
+   #define LLBC_EXPORT __declspec(dllexport)
+  #endif
+#endif
  #ifndef LLBC_HIDDEN
   #define LLBC_HIDDEN
  #endif
@@ -81,4 +85,4 @@
  #endif
 #endif // LLBC_TARGET_PLATFORM_ANDROID
 
-#endif // !__LLBC_COM_EXPORT_H__
+

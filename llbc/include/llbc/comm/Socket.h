@@ -19,10 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_SOCKET_H__
-#define __LLBC_COMM_SOCKET_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
@@ -118,12 +116,12 @@ public:
     /**
      * Implement bool operator.
      */
-    operator bool () const;
+    operator bool() const;
 
     /**
      * Implement ! operator.
      */
-    bool operator ! () const;
+    bool operator!() const;
 
 public:
     /**
@@ -187,7 +185,7 @@ public:
     /**
      * Set recv buffer size.
      * @param[in] size - buffer size, in bytes.
-     * @return int - return 0 if succerss, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int SetRecvBufSize(size_t size);
 
@@ -220,7 +218,7 @@ public:
     /**
      * Set max packet size.
      * @param[in] size - packet size, in bytes.
-     * @return int - return 0 if succerss, otherwise return -1.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int SetMaxPacketSize(size_t size);
 
@@ -436,7 +434,7 @@ public:
     const LLBC_OverlappedGroup &GetOverlappedGroup() const;
 
     /**
-     * About all overlapped operate methods.
+     * About all overlapped Operate methods.
      */
     void InsertOverlapped(LLBC_POverlapped ol);
     void RemoveOverlapped(LLBC_POverlapped ol);
@@ -502,5 +500,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_SOCKET_H__

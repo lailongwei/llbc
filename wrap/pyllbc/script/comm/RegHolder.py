@@ -145,10 +145,10 @@ class pyllbcSvcRegInfo(object):
                 to_svc.type != llbc.Service.RAW:
             if self._enopcode is not None:
                 # print 'register encoder {}:{}'.format(self._enopcode, wrapped)
-                to_svc.registerencoder(self._enopcode, wrapped)
+                to_svc.addencoder(self._enopcode, wrapped)
             if self._deopcodes:
                 # print 'register decoder {}:{}'.format(self._deopcodes, wrapped)
-                map(lambda op: to_svc.registerdecoder(op, wrapped), self._deopcodes)
+                map(lambda op: to_svc.adddecoder(op, wrapped), self._deopcodes)
 
         elif ty == self.Handler:
             map(lambda op: to_svc.subscribe(op, self._normalize_callable(to_svc, wrapped)), self._hldropcodes)
@@ -167,7 +167,7 @@ class pyllbcSvcRegInfo(object):
             to_svc.set_default_presubscribe_exc_handler(self._normalize_callable(to_svc, wrapped))
 
         if self._ascomp:
-            to_svc.registercomp(wrapped())
+            to_svc.addcomp(wrapped())
 
     def decorate_cls(self, to_svc_cls):
         wrapped = self._wrapped()

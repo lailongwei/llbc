@@ -171,21 +171,30 @@ namespace llbc
         }
 
         /// <summary>
-        /// Logger default daily-rolling mode option.
+        /// Logger default file rolling mode option.
         /// <para>config layer: llbc core library</para>
         /// </summary>
-        public static bool logDefaultEnabledDailyMode
+        public static int logDefaultEnabledDailyMode
         {
-            get { return LLBCNative.csllbc_LibConfig_Log_IsDefaultEnabledDailyMode() != 0; }
+            get { return LLBCNative.csllbc_LibConfig_Log_DefaultFileRollingMode(); }
         }
 
         /// <summary>
-        /// Logger default max log file size, in bytes.
+        /// Logger max log file size limit, in bytes.
         /// <para>config layer: llbc core library</para>
+        /// </summary>
+        public static long logMaxFileSizeLimit
+        {
+            get { return LLBCNative.csllbc_LibConfig_Log_MaxFileSizeLimit(); }
+        }
+
+        /// <summary>
+        /// Logger default log file size, in bytes.
+        /// <param>config layer: llbc core library</param>
         /// </summary>
         public static long logDefaultMaxFileSize
         {
-            get { return LLBCNative.csllbc_LibConfig_Log_MaxFileSize(); }
+            get { return LLBCNative.csllbc_LibConfig_Log_DefaultMaxFileSize(); }
         }
 
         /// <summary>
@@ -315,12 +324,12 @@ namespace llbc
         }
 
         /// <summary>
-        /// Service Sampler-Support enabled config.
+        /// Service max supported component name length.
         /// <para>config layer: llbc core library</para>
         /// </summary>
-        public static bool commIsEnabledSamplerSupport
+        public static int commMaxCompNameLen
         {
-            get { return LLBCNative.csllbc_LibConfig_Comm_IsEnabledSamplerSupport() != 0; }
+            get { return LLBCNative.csllbc_LibConfig_Comm_MaxCompNameLen(); }
         }
 
         /// <summary>
@@ -330,15 +339,6 @@ namespace llbc
         public static bool commIsEnabledStatusHandler
         {
             get { return LLBCNative.csllbc_LibConfig_Comm_IsEnabledStatusHandler() != 0; }
-        }
-
-        /// <summary>
-        /// Service Status-Desc enabled config.
-        /// <para>config layer: llbc core library</para>
-        /// </summary>
-        public static bool commIsEnabledStatusDesc
-        {
-            get { return LLBCNative.csllbc_LibConfig_Comm_IsEnabledStatusDesc() != 0; }
         }
 
         /// <summary>

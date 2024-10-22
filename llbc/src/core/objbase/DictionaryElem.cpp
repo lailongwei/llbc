@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/common/Config.h"
 
@@ -60,7 +60,7 @@ LLBC_DictionaryElem::LLBC_DictionaryElem(int key, LLBC_Object *o)
 
 LLBC_DictionaryElem::LLBC_DictionaryElem(const LLBC_String &key, LLBC_Object *o)
 : _intKey(0)
-, _strKey(LLBC_New(LLBC_String, key))
+, _strKey(new LLBC_String(key))
 , _hash(0)
 
 , _obj(o)
@@ -149,14 +149,14 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
         hashed = this;
 
 #ifdef LLBC_DEBUG
-        int confictCount = 0;
+        int conflictCount = 0;
         LLBC_DictionaryElem *countElem = hashed;
         for(; countElem != nullptr; countElem = countElem->GetBucketElemNext())
         {
-            confictCount += 1;
+            conflictCount += 1;
         }
 
-        trace("Dictionary(addr: %x), key confict!, bucket: %d, count: %d\n", this, _hash, confictCount);
+        trace("Dictionary(addr:%p), key conflict!, bucket:%u, count:%d\n", this, _hash, conflictCount);
 #endif
     }
 }
@@ -250,16 +250,14 @@ void LLBC_DictionaryElem::SetBucketElemNext(LLBC_DictionaryElem *next)
     _bucketNext = next;
 }
 
-LLBC_Object *&LLBC_DictionaryElem::operator *()
+LLBC_Object *&LLBC_DictionaryElem::operator*()
 {
     return _obj;
 }
 
-LLBC_Object * const &LLBC_DictionaryElem::operator *() const
+LLBC_Object * const &LLBC_DictionaryElem::operator*() const
 {
     return _obj;
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -27,17 +27,17 @@ LLBC_BEGIN_C_DECL
 
 int csllbc_Log_Init(const char *cfgFile)
 {
-    return LLBC_LoggerManagerSingleton->Initialize(cfgFile);
+    return LLBC_LoggerMgrSingleton->Initialize(cfgFile);
 }
 
 int csllbc_Log_IsInited()
 {
-    return LLBC_LoggerManagerSingleton->IsInited() ? 1 : 0;
+    return LLBC_LoggerMgrSingleton->IsInited() ? 1 : 0;
 }
 
 LLBC_Logger *csllbc_Log_GetLogger(const char *loggerName)
 {
-    return LLBC_LoggerManagerSingleton->GetLogger(loggerName);
+    return LLBC_LoggerMgrSingleton->GetLogger(loggerName);
 }
 
 int csllbc_Log_GetLogLevel(LLBC_Logger *logger)
@@ -53,12 +53,19 @@ int csllbc_Log_LogMsg(LLBC_Logger *logger,
                       const char *msg,
                       const char *tag)
 {
-    return logger->NonFormatOutput(level, tag, fileName, lineNo, func, msg, LLBC_StrLen(msg)); 
+    return logger->NonFormatOutput(level,
+                                   tag,
+                                   fileName,
+                                   lineNo,
+                                   func,
+                                   0,
+                                   msg,
+                                   strlen(msg)); 
 }
 
 void csllbc_Log_Destroy()
 {
-    LLBC_LoggerManagerSingleton->Finalize();
+    LLBC_LoggerMgrSingleton->Finalize();
 }
 
 LLBC_END_C_DECL

@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
  #include "llbc/core/os/OS_Time.h"
@@ -108,7 +108,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
     struct timeval tvStart, tvEnd;
     struct timespec ts;
 
-    ::gettimeofday(&tvStart, nullptr);
+    gettimeofday(&tvStart, nullptr);
     tvEnd = tvStart;
     tvEnd.tv_sec += milliSeconds / 1000;
     tvEnd.tv_usec += (milliSeconds % 1000) * 1000;
@@ -131,7 +131,7 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
         return TryWait();
     }
 
-    sint64 expireTime = LLBC_GetMilliSeconds() + milliSeconds;
+    sint64 expireTime = LLBC_GetMilliseconds() + milliSeconds;
     do
     {
         if(TryWait())
@@ -145,19 +145,19 @@ bool LLBC_Semaphore::TimedWait(int milliSeconds)
         {
             return true;
         }
-    } while(LLBC_GetMilliSeconds() < expireTime);
+    } while(LLBC_GetMilliseconds() < expireTime);
 
-    LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+    LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
     return false;
 #else
-    DWORD waitRet = 0;
+    DWORD waitRet;
     if((waitRet = ::WaitForSingleObject(_sem, milliSeconds)) == WAIT_OBJECT_0)
     {
         return true;
     }
     else if(waitRet == WAIT_TIMEOUT)
     {
-        LLBC_SetLastError(LLBC_ERROR_TIMEOUT);
+        LLBC_SetLastError(LLBC_ERROR_TIMEOUTED);
         return false;
     }
 
@@ -190,5 +190,3 @@ void LLBC_Semaphore::Post(int count)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

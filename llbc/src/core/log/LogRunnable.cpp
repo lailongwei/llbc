@@ -19,23 +19,23 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/os/OS_Time.h"
-#include "llbc/core/thread/MessageBlock.h"
-#include "llbc/core/objectpool/PoolObjectReflection.h"
+#include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/Logger.h"
-#include "llbc/core/log/ILogAppender.h"
 #include "llbc/core/log/LogRunnable.h"
 
 __LLBC_NS_BEGIN
 
 LLBC_LogRunnable::LLBC_LogRunnable()
-: _stoped(false)
+: _stopping(false)
 {
+    for (size_t i = 0; i < sizeof(_logDatas) / sizeof(_logDatas[0]); ++i)
+        _logDatas[i].reserve(4096);
 }
 
 LLBC_LogRunnable::~LLBC_LogRunnable()
@@ -63,57 +63,72 @@ int LLBC_LogRunnable::AddLogger(LLBC_Logger* logger)
 
 void LLBC_LogRunnable::Stop()
 {
-    _stoped = true;
-    Wait();
+    LLBC_ReturnIf(GetTaskState() == LLBC_TaskState::NotActivated, void());
+
+    // Mask stopping and waiting for thread stopped.
+    _stopping = true;
+    LLBC_ReturnIf(Wait() == LLBC_OK, void());
+
+    // If Wait() call failed, maybe call LogRunnable::Stop() in difference thread(eg: in crash hook),
+    // in this case, force waiting for LogRunnable thread stopped.
+    while (GetTaskState() != LLBC_TaskState::NotActivated)
+        LLBC_Sleep(10);
+}
+
+void LLBC_LogRunnable::PushLogData(LLBC_LogData *logData)
+{
+    _logDataLock.Lock();
+    _logDatas[0].push_back(logData);
+    _logDataLock.Unlock();
 }
 
 void LLBC_LogRunnable::Cleanup()
 {
-    while (TryPopAndProcLogData(10));
+    (void)TryPopAndProcLogDatas();
 
     FlushLoggers(true, 0);
     _loggers.clear();
+
+    _stopping = false;
 }
 
 void LLBC_LogRunnable::Svc()
 {
-    while (LIKELY(!_stoped))
+    while (LIKELY(!_stopping))
     {
-        if (!TryPopAndProcLogData(100))
-            continue;
+        if (!TryPopAndProcLogDatas())
+            LLBC_Sleep(1);
 
-        FlushLoggers(false, LLBC_GetMilliSeconds());
+        FlushLoggers(false, LLBC_GetMilliseconds());
     }
 }
 
-LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogData(int maxPopWaitTime)
+LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogDatas()
 {
-    LLBC_LogData *logData;
-    LLBC_MessageBlock *block;
-    if (TimedPop(block, maxPopWaitTime) != LLBC_OK)
+    _logDataLock.Lock();
+    std::swap(_logDatas[0], _logDatas[1]);
+    _logDataLock.Unlock();
+
+    auto &logDatas = _logDatas[1];
+    if (logDatas.empty())
         return false;
 
-    if (UNLIKELY(block->Read(&logData, sizeof(LLBC_LogData *)) != LLBC_OK))
+    for (auto &logData : logDatas)
     {
-        LLBC_Recycle(block);
-        return false;
+        logData->logger->OutputLogData(*logData);
+        LLBC_Recycle(logData);
     }
 
-    LLBC_Recycle(block);
-
-    logData->logger->OutputLogData(*logData);
-    LLBC_Recycle(logData);
+    logDatas.clear();
 
     return true;
 }
 
-void LLBC_LogRunnable::FlushLoggers(bool force, sint64 now)
+LLBC_FORCE_INLINE void LLBC_LogRunnable::FlushLoggers(bool force, sint64 now)
 {
-    size_t loggerCnt = _loggers.size();
+    const size_t loggerCnt = _loggers.size();
     for (size_t i = 0; i < loggerCnt; ++i)
         _loggers[i]->Flush(false, now);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

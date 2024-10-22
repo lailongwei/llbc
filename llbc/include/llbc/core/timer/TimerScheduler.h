@@ -19,12 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_TIMER_TIMER_SCHEDULER_H__
-#define __LLBC_CORE_TIMER_TIMER_SCHEDULER_H__
+#pragma once
 
-#include "llbc/common/Common.h"
-
-#include "llbc/core/timer/BinaryHeap.h"
+#include "llbc/core/timer/Heap.h"
 
 __LLBC_NS_BEGIN
 
@@ -42,37 +39,13 @@ class LLBC_EXPORT LLBC_TimerScheduler
 {
     typedef LLBC_TimerScheduler _This;
 
-    typedef LLBC_BinaryHeap<LLBC_TimerData *> _Heap;
+    typedef LLBC_Heap<LLBC_TimerData *> _Heap;
 
 public:
     LLBC_TimerScheduler();
     virtual ~LLBC_TimerScheduler();
 
 public:
-    /**
-     * Create the entry thread(Call LLBC_Startup()/LLBC_Cleanup() methods' thread) scheduler.
-     * Call by LLBC framework, do not try to call it.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    static int CreateEntryThreadScheduler();
-
-    /**
-     * Destroy entry thread(Call LLBC_Startup()/LLBC_Cleanup() methods' thread) scheduler.
-     * Call by LLBC framework, do not try to call it.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    static int DestroyEntryThreadScheduler();
-
-public:
-    /**
-     * Get entry thread(Call LLBC_Startup()/LLBC_Cleanup() methods' thread) scheduler.
-     * @return _This * - scheduler pointer.
-     * Note:
-     *      If you use entry thread to schedule timer, you must call this method to fetch
-     *      the entry thread scheduler and call Update() method to drive all timers.
-     */
-    static _This *GetEntryThreadScheduler();
-
     /**
      * Get current thread timer scheduler, thread must be LLBC style thread.
      * @return _This * - timer scheduler pointer.
@@ -119,7 +92,7 @@ private:
      * Get scheduler destroyed flag.
       *@return bool - destroyed flag.
      */
-    bool IsDstroyed() const;
+    bool IsDestroyed() const;
 
     /**
      * Schedule timer.
@@ -132,7 +105,7 @@ private:
 
     /**
      * Cancel timer.
-     * @param[in] - timer object.
+     * @param[in] timer - timer object.
      * @return int - return 0 if success, otherwise return -1.
      */
     virtual int Cancel(LLBC_Timer *timer);
@@ -149,5 +122,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_TIMER_TIMER_SCHEDULER_H__

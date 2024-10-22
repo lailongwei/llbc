@@ -19,16 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/utils/Util_Text.h"
 #include "llbc/core/log/LogLevel.h"
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const LLBC_NS LLBC_String __level2StrDesc[LLBC_NS LLBC_LogLevel::End + 1] =
+static const LLBC_NS LLBC_CString __level2StrRepr[LLBC_NS LLBC_LogLevel::End + 1] =
 {
+    "TRACE",
     "DEBUG",
     "INFO",
     "WARN",
@@ -42,74 +43,37 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-const LLBC_String &LLBC_LogLevel::GetDebugDesc()
-{
-    return LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Debug];
-}
-
-const LLBC_String &LLBC_LogLevel::GetInfoDesc()
-{
-    return LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Info];
-}
-
-const LLBC_String &LLBC_LogLevel::GetWarnDesc()
-{
-    return LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Warn];
-}
-
-const LLBC_String &LLBC_LogLevel::GetErrorDesc()
-{
-    return LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Error];
-}
-
-const LLBC_String &LLBC_LogLevel::GetFatalDesc()
-{
-    return LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Fatal];
-}
-
-const LLBC_String &LLBC_LogLevel::GetLevelDesc(int level)
+const LLBC_CString &LLBC_LogLevel::GetLevelStr(int level)
 {
     return ((level >= LLBC_LogLevel::Begin && level < LLBC_LogLevel::End) ?
-        LLBC_INTERNAL_NS __level2StrDesc[level] : LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::End]);
+        LLBC_INTERNAL_NS __level2StrRepr[level] : LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::End]);
 }
 
-int LLBC_LogLevel::Str2Level(const char *level)
+int LLBC_LogLevel::GetLevelEnum(const LLBC_CString &levelStr)
 {
-    if (UNLIKELY(!level))
-    {
+    if (UNLIKELY(levelStr.empty()))
         return LLBC_LogLevel::End;
-    }
 
-    LLBC_String upperStr = LLBC_ToUpper(level);
-    if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Debug])
-    {
+    const LLBC_String upperStr = LLBC_ToUpper(levelStr.c_str());
+    if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Trace] == upperStr)
+        return LLBC_LogLevel::Trace;
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Debug] == upperStr)
         return LLBC_LogLevel::Debug;
-    }
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Info])
-    {
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Info] == upperStr)
         return LLBC_LogLevel::Info;
-    }
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Warn])
-    {
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Warn] == upperStr)
         return LLBC_LogLevel::Warn;
-    }
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Error])
-    {
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Error] == upperStr)
         return LLBC_LogLevel::Error;
-    }
-    else if (upperStr == LLBC_INTERNAL_NS __level2StrDesc[LLBC_LogLevel::Fatal])
-    {
+    else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Fatal] == upperStr)
         return LLBC_LogLevel::Fatal;
-    }
 
     return LLBC_LogLevel::End;
 }
 
-bool LLBC_LogLevel::IsLegal(int level)
+bool LLBC_LogLevel::IsValid(int level)
 {
     return (LLBC_LogLevel::Begin <= level && level < LLBC_LogLevel::End);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

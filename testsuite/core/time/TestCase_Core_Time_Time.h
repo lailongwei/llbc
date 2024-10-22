@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_TEST_CASE_CORE_TIME_TIME_H__
-#define __LLBC_TEST_CASE_CORE_TIME_TIME_H__
+#pragma once
 
 #include "llbc.h"
 using namespace llbc;
@@ -40,9 +39,9 @@ private:
     void TimeClassTest();
     void TimeSpanClassTest();
     void CpuTimeTest();
+    void GetIntervalToTest();
+    void CrossTimePeriodTest();
 
     void PrintTimeStruct(const LLBC_TimeStruct &ts);
     void PrintCLibTimeStruct(const struct tm &ts);
 };
-
-#endif // !__LLBC_TEST_CASE_CORE_TIME_TIME_H__

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_ERRNO_H__
-#define __LLBC_COM_ERRNO_H__
+#pragma once
 
 #include "llbc/common/Macro.h"
 
@@ -28,13 +27,6 @@
 #include "llbc/common/BasicDataType.h"
 
 __LLBC_NS_BEGIN
-
-// LLBC library error number.
-LLBC_EXPORT int *__LLBC_Errno();
-#define LLBC_Errno (*__LLBC_Errno())
-// LLBC library sub error number of OS-API errno.
-LLBC_EXPORT int *__LLBC_SubErrno();
-#define LLBC_SubErrno (*__LLBC_SubErrno())
 
 //
 // Values are 32 bit values laid out as follow:
@@ -339,14 +331,14 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_ERROR_FORMAT                ((int)(0xc0000013))
 
 //
-// Message Id: LLBC_ERROR_TIMEOUT
+// Message Id: LLBC_ERROR_TIMEOUTED
 //
 // MessageText:
 //
-// timeout.
+// timeouted.
 //
-#define __LLBC_ERROR_TIMEOUT             ((int)(0x00000014))
-#define LLBC_ERROR_TIMEOUT               ((int)(0xc0000014))
+#define __LLBC_ERROR_TIMEOUTED           ((int)(0x00000014))
+#define LLBC_ERROR_TIMEOUTED             ((int)(0xc0000014))
 
 //
 // Message Id: LLBC_ERROR_BUSY
@@ -383,7 +375,7 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 //
 // MessageText:
 //
-// would block.
+// would stripe.
 //
 #define __LLBC_ERROR_WBLOCK              ((int)(0x00000018))
 #define LLBC_ERROR_WBLOCK                ((int)(0xc0000018))
@@ -597,6 +589,7 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 //
 #define __LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0x0000002d))
 #define LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0xc000002d))
+
 //
 // Message Id: LLBC_ERROR_NOT_SUPPORT
 //
@@ -608,10 +601,18 @@ LLBC_EXPORT int *__LLBC_SubErrno();
 #define LLBC_ERROR_NOT_SUPPORT           ((int)(0xc000002e))
 
 //
+// Message Id: LLBC_ERROR_CANCELLED
+//
+// MessageText:
+//
+// cancelled.
+//
+#define __LLBC_ERROR_CANCELLED           ((int)(0x0000002f))
+#define LLBC_ERROR_CANCELLED             ((int)(0xc000002f))
+
+//
 //!! Sentinel error no.
 //
 #define __LLBC_ERROR_SENTINEL            ((int)(0x000000ff))
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COM_ERRNO_H__

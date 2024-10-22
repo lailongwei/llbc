@@ -19,57 +19,110 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_BASE_LOG_TOKEN_H__
-#define __LLBC_CORE_LOG_BASE_LOG_TOKEN_H__
+#pragma once
 
-#include "llbc/common/Common.h"
-
-#include "llbc/core/log/ILogToken.h"
+#include "llbc/core/log/LogFormattingInfo.h"
 
 __LLBC_NS_BEGIN
 
 /**
- * \brief The basic log token class encapsulation.
+ * \brief The log token type encapsulation.
  */
-class LLBC_HIDDEN LLBC_BaseLogToken : public LLBC_ILogToken
+class LLBC_LogTokenType
 {
 public:
-    LLBC_BaseLogToken();
-    virtual ~LLBC_BaseLogToken();
+    /**
+     * Token type enumeration.
+     */
+    enum
+    {
+        StrToken       = '\0',// ..: string type token.
+        NameToken      = 'N', // %N: logger name type token.
+        ExecNameToken  = 'e', // %e: executable name type token.
+        TagToken       = 'g', // %g: tag type token.
+        FileToken      = 'f', // %f: file name type token.
+        LineToken      = 'l', // %l: file line type token.
+        FunctionToken  = 'F', // %F: function token.
+        ThreadIdToken  = 't', // %t: thread id type token.
+        ProcessIdToken = 'p', // %p: process id type token.
+        LevelToken     = 'L', // %L: level type token, like DEBUG, INFO, eg ...
+        NewLineToken   = 'n', // %n: new line type.
+        MsgToken       = 'm', // %m: message type token.
+        TimeToken      = 'T', // %T: time token.
+        EnvToken       = 'E', // %E: environment token.
+        EscapeToken    = '%', // %%: escape token.
+
+        NullToken      = '?', // null token.
+    };
+};
+
+/**
+ * Pre-declare some classes.
+ */
+struct LLBC_LogData;
+
+/**
+ * \brief The basic log token class encapsulation.
+ */
+class LLBC_HIDDEN LLBC_BaseLogToken
+{
+public:
+    LLBC_BaseLogToken(): _nextToken(nullptr) {  }
+    virtual ~LLBC_BaseLogToken() = default;
+
+public:
+    /**
+     * Initialize the log token.
+     * @param[in] formatter - log formatter.
+     * @param[in] str       - token append string data.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str) = 0;
+
+    /**
+     * Get token type.
+     * @return int - token type.
+     */
+    virtual int GetType() const = 0;
+
+    /**
+     * Format the log data.
+     * @param[in] data           - log data.
+     * @param[out] formattedData - store location for formatted log string.
+     */
+    virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const = 0;
 
 protected:
     /**
      * Get token log formatter.
      * @return LLBC_LogFormattingInfo * - log formatter.
      */
-    virtual LLBC_LogFormattingInfo *GetFormatter() const;
+    const LLBC_LogFormattingInfo &GetFormatter() const { return _formatter; }
 
     /**
      * Set token log formatter.
      * @param[in] formatter - log formatter.
      */
-    virtual void SetFormatter(LLBC_LogFormattingInfo *formatter);
+    void SetFormatter(const LLBC_LogFormattingInfo &formatter) { _formatter = formatter; }
 
 protected:
     friend class LLBC_LogTokenChain;
 
     /**
      * Get next token.
-     * @return LLBC_ILogToken * - next log token.
+     * @return LLBC_BaseLogToken * - next log token.
      */
-    virtual LLBC_ILogToken *GetTokenNext() const;
+    LLBC_BaseLogToken *GetTokenNext() const { return _nextToken; }
 
     /**
      * Set next token.
      * @param[in] next - next log token.
      */
-    virtual void SetTokenNext(LLBC_ILogToken *next);
+    void SetTokenNext(LLBC_BaseLogToken *next) { _nextToken = next; }
 
 private:
-    LLBC_LogFormattingInfo *_formatter;
-    LLBC_ILogToken *_nextToken;
+    LLBC_LogFormattingInfo _formatter;
+    LLBC_BaseLogToken *_nextToken;
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_LOG_BASE_LOG_TOKEN_H__

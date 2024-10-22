@@ -19,12 +19,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_RUNNABLE_H__
-#define __LLBC_CORE_LOG_LOG_RUNNABLE_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/thread/Task.h"
+#include "llbc/core/thread/SpinLock.h"
 
 __LLBC_NS_BEGIN
 
@@ -32,6 +30,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 class LLBC_Logger;
+struct LLBC_LogData;
 
 __LLBC_NS_END
 
@@ -40,7 +39,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief Log Runnable class encapsulation.
  */
-class LLBC_LogRunnable : public LLBC_BaseTask
+class LLBC_LogRunnable : public LLBC_Task
 {
 public:
     /**
@@ -62,6 +61,12 @@ public:
      */
     void Stop();
 
+    /**
+     * Push log data.
+     * @param[in] logData - the log data.
+     */
+    void PushLogData(LLBC_LogData *logData);
+
 public:
     /**
      * Cleanup method, when task terminated, will call this method.
@@ -75,24 +80,24 @@ public:
 
 private:
     /**
-     * Try pop and process log data.
-     * @param[in] maxPopWaitTime - the max pop wait time, in milli-second.
+     * Try pop and process log datas.
      * @return bool - return true if process success, otherwise return false.
      */
-    bool TryPopAndProcLogData(int maxPopWaitTime);
+    bool TryPopAndProcLogDatas();
 
     /**
      * Flush all loggers.
      * @param[in] force - force or not.
-     * @param[in] now   - now time, in milli-seconds. if is set to 0, will call LLBC_GetMilliSeconds() to fetch now time.
+     * @param[in] now   - now time, in milli-seconds. if is set to 0, will call LLBC_GetMilliseconds() to fetch now time.
      */
     void FlushLoggers(bool force, sint64 now);
 
 private:
-    volatile bool _stoped;
+    volatile bool _stopping;
     std::vector<LLBC_Logger *> _loggers;
+
+    LLBC_SpinLock _logDataLock;
+    std::vector<LLBC_LogData *> _logDatas[2];
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_LOG_LOG_RUNNABLE_H__

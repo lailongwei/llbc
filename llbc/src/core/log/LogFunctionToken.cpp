@@ -19,24 +19,15 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogFunctionToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogFunctionToken::LLBC_LogFunctionToken()
-{
-}
-
-LLBC_LogFunctionToken::~LLBC_LogFunctionToken()
-{
-}
-
-int LLBC_LogFunctionToken::Initialize(LLBC_LogFormattingInfo *formatter, const LLBC_String &str)
+int LLBC_LogFunctionToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
@@ -49,14 +40,13 @@ int LLBC_LogFunctionToken::GetType() const
 
 void LLBC_LogFunctionToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    int index = static_cast<int>(formattedData.size());
-    if (data.funcLen > 0)
-        formattedData.append(data.others + data.funcBeg, data.funcLen);
+    if (data.funcLen == 0)
+        return;
 
-    LLBC_LogFormattingInfo *formatter = GetFormatter();
-    formatter->Format(formattedData, index);
+    const int index = static_cast<int>(formattedData.size());
+    formattedData.append(data.func, data.funcLen);
+
+    GetFormatter().Format(formattedData, index);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

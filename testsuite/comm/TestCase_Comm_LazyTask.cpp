@@ -27,17 +27,17 @@ namespace
     class LazyClass
     {
     public:
-        void BeforeRun(LLBC_IService *svc, const LLBC_Variant &data)
+        void BeforeRun(LLBC_Service *svc)
         {
-            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "BeforeRun()", data.ToString().c_str());
-            svc->Post(this, &LazyClass::AfterRun, data);
+            LLBC_PrintLn("Hello, I'm lazy task, func: %s", "BeforeRun()");
+            svc->Post(this, &LazyClass::AfterRun);
         }
 
-        void AfterRun(LLBC_IService *svc, const LLBC_Variant &data)
+        void AfterRun(LLBC_Service *svc)
         {
-            LLBC_PrintLine("Hello, I'm lazy task, func: %s, data: %s", "AfterRun()", data.ToString().c_str());
+            LLBC_PrintLn("Hello, I'm lazy task, func: %s", "AfterRun()");
 
-            svc->Post(this, &LazyClass::BeforeRun, data);
+            svc->Post(this, &LazyClass::BeforeRun);
         }
     };
 }
@@ -52,25 +52,25 @@ TestCase_Comm_LazyTask::~TestCase_Comm_LazyTask()
 
 int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("service/lazy task test:");
+    LLBC_PrintLn("service/lazy task test:");
 
-    LLBC_IService *svc = LLBC_IService::Create(LLBC_IService::Normal, "LazyTaskTest");
+    LLBC_Service *svc = LLBC_Service::Create("LazyTaskTest");
 
-    LazyClass *taskObj = LLBC_New(LazyClass);
+    LazyClass *taskObj = new LazyClass;
     LLBC_Variant taskData;
     taskData["IntVal"] = 51215;
     taskData["StrVal"] = "Hello World";
     taskData["DictData"] = LLBC_Variant();
     taskData["DictData"]["EmbeddedVal"] = 3.1415926;
-    svc->Post(taskObj, &LazyClass::BeforeRun, taskData);
+    svc->Post(taskObj, &LazyClass::BeforeRun);
 
     svc->Start();
 
-    LLBC_PrintLine("Press any key to exit...");
+    LLBC_PrintLn("Press any key to exit...");
     getchar();
 
-    LLBC_Delete(svc);
-    LLBC_Delete(taskObj);
+    delete svc;
+    delete taskObj;
 
     return LLBC_OK;
 }

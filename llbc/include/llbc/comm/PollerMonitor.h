@@ -19,10 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_POLLER_MONITOR_H__
-#define __LLBC_COMM_POLLER_MONITOR_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
@@ -30,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The poller monitor class encapsulation.
  */
-class LLBC_EXPORT LLBC_PollerMonitor : private LLBC_BaseTask
+class LLBC_EXPORT LLBC_PollerMonitor : private LLBC_Task
 {
     typedef LLBC_Delegate<void()> _Deleg;
 
@@ -71,12 +69,7 @@ public:
 
 private:
     _Deleg _deleg;
-
-    volatile bool _started;
     volatile bool _stopping;
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_POLLER_MONITOR_H__
-

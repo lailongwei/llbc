@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_SOCKET_DATA_TYPE_H__
-#define __LLBC_COM_SOCKET_DATA_TYPE_H__
+#pragma once
 
 #include "llbc/common/PFConfig.h"
 
@@ -35,7 +34,7 @@ __LLBC_NS_END
 /**
  * socket addr stream output operator previous declare.
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a);
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_SockAddr_IN &a);
 
 __LLBC_NS_BEGIN
 
@@ -249,19 +248,19 @@ public:
 
 public:
     /**
-     * Operator = overlapped function.
+     * Operator= overlapped function.
      */
-    LLBC_SockAddr_IN &operator =(const LLBC_SockAddr_IN &right);
+    LLBC_SockAddr_IN &operator=(const LLBC_SockAddr_IN &right);
 
     /**
      * Stream output operator.
      */
-    friend std::ostream & ::operator <<(std::ostream &o, const LLBC_SockAddr_IN &a);
+    friend std::ostream & ::operator<<(std::ostream &o, const LLBC_SockAddr_IN &a);
 
     /**
-     * Operator == overlapped function.
+     * Operator== overlapped function.
      */
-    bool operator ==(const LLBC_SockAddr_IN &right) const;
+    bool operator==(const LLBC_SockAddr_IN &right) const;
 
 private:
     // Address family, like struct sockaddr_in.sim_family.
@@ -390,5 +389,3 @@ private:
 typedef LLBC_OverlappedGroup * LLBC_POverlappedGroup;
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COM_SOCKET_DATA_TYPE_H__

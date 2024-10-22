@@ -21,7 +21,6 @@
 
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/comm/protocol/ProtocolLayer.h"
 #include "llbc/comm/protocol/CompressProtocol.h"
@@ -41,11 +40,6 @@ int LLBC_CompressProtocol::GetLayer() const
     return LLBC_ProtocolLayer::CompressLayer;
 }
 
-int LLBC_CompressProtocol::Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer)
-{
-    return LLBC_OK;
-}
-
 int LLBC_CompressProtocol::Send(void *in, void *&out, bool &removeSession)
 {
     out = in;
@@ -58,12 +52,10 @@ int LLBC_CompressProtocol::Recv(void *in, void *&out, bool &removeSession)
     return LLBC_OK;
 }
 
-int LLBC_CompressProtocol::AddCoder(int opcode, LLBC_ICoderFactory *coder)
+int LLBC_CompressProtocol::AddCoder(int opcode, LLBC_CoderFactory *coder)
 {
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_ITESTCASE_TESTCASE_H__
-#define __LLBC_CORE_ITESTCASE_TESTCASE_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -52,7 +51,7 @@ public:
 
     /**
      * Run function.
-     * @param[in] argc - argunemts count.
+     * @param[in] argc - arguments count.
      * @param[in] argv - arguments array.
      *
      * @return int - testcase return status code.
@@ -61,5 +60,3 @@ public:
 };
 
 __LLBC_NS_END
-
-#endif // __LLBC_CORE_ITESTCASE_TESTCASE_H__

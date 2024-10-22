@@ -121,10 +121,10 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
         return LLBC_FAILED;
     }
 
-    Base *lemma = LLBC_New(pyllbc_PackLemma_Raw);
+    Base *lemma = new pyllbc_PackLemma_Raw;
     if (lemma->Process(ch) != LLBC_OK)
     {
-        LLBC_Delete(lemma);
+        delete lemma;
         _state = Base::Error;
 
         return LLBC_FAILED;
@@ -184,7 +184,7 @@ PyObject *pyllbc_PackLemma_Sequence::Read(pyllbc_Stream *stream)
 
     int len;
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
-    if (!llbcStream.ReadSInt32(len))
+    if (!llbcStream.Read(len))
     {
         pyllbc_SetError("not enough bytes to unpack sequence(head-part)");
         return nullptr;
@@ -254,9 +254,9 @@ int pyllbc_PackLemma_Sequence::Write(pyllbc_Stream *stream, PyObject *values)
     LLBC_Stream &llbcStream = stream->GetLLBCStream();
 
 #if LLBC_TARGET_PROCESSOR_X86_64
-    llbcStream.WriteSInt32(static_cast<sint32>(len));
+    llbcStream.Write(static_cast<sint32>(len));
 #else
-    llbcStream.WriteSInt32(len);
+    llbcStream.Write(len);
 #endif
 
     for (Py_ssize_t i = 0; i < len; ++i)

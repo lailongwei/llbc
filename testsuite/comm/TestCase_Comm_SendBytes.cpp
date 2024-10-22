@@ -27,36 +27,36 @@ namespace
 
 const int OPCODE = 0;
 
-class TestComp : public LLBC_IComponent
+class TestComp : public LLBC_Component
 {
 public:
-    virtual bool OnInitialize()
+    virtual bool OnInit(bool &initFinished)
     {
-        LLBC_IService *svc = GetService();
-        LLBC_PrintLine("Service create: %p", svc);
+        LLBC_Service *svc = GetService();
+        LLBC_PrintLn("Service create: %p", svc);
 
         return true;
     }
 
-    virtual void OnDestroy()
+    virtual void OnDestroy(bool &destroyFinished)
     {
-        LLBC_IService *svc = GetService();
-        LLBC_PrintLine("Service destroy: %p", svc);
+        LLBC_Service *svc = GetService();
+        LLBC_PrintLn("Service destroy: %p", svc);
     }
 
     virtual void OnUpdate()
     {
-        // LLBC_IService *svc = GetService();
-        // LLBC_PrintLine("Service update: %p", svc);
+        // LLBC_Service *svc = GetService();
+        // LLBC_PrintLn("Service update: %p", svc);
     }
 
 public:
     void OnRecv(LLBC_Packet &packet)
     {
         const char *data = reinterpret_cast<const char *>(packet.GetPayload());
-        LLBC_PrintLine("Recved packet, data: %s", data);
+        LLBC_PrintLn("Recved packet, data: %s", data);
 
-        LLBC_IService *svc = GetService();
+        LLBC_Service *svc = GetService();
         svc->Send(packet.GetSessionId(), packet.GetOpcode(), "Hello, World!", 14, 0);
     }
 };
@@ -65,7 +65,7 @@ public:
 
 TestCase_Comm_SendBytes::TestCase_Comm_SendBytes()
 : _asClient(true)
-, _svcType(LLBC_IService::Normal)
+, _useNmlProtocolFactory(true)
 
 , _runIp("127.0.0.1")
 , _runPort(0)
@@ -78,68 +78,75 @@ TestCase_Comm_SendBytes::~TestCase_Comm_SendBytes()
 
 int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
 {
-    LLBC_PrintLine("Servie send bytes test:");
+    LLBC_PrintLn("Servie send bytes test:");
     if (argc < 5)
     {
-        LLBC_PrintLine("argument error, eg: ./a [client/server] [normal/raw] ip port");
+        LLBC_PrintLn("argument error, eg: ./a [client/server] [normal/raw] ip port");
         return LLBC_FAILED;
     }
 
     FetchArgs(argc, argv);
-    LLBC_IService *svc = LLBC_IService::Create(_svcType, "SendBytesTest");
+    LLBC_IProtocolFactory *protoFactory;
+    if (_useNmlProtocolFactory)
+        protoFactory = new LLBC_NormalProtocolFactory;
+    else
+        protoFactory = new LLBC_RawProtocolFactory;
+    LLBC_Service *svc = LLBC_Service::Create("SendBytesTest", protoFactory);
     svc->SuppressCoderNotFoundWarning();
 
-    TestComp *comp = LLBC_New(TestComp);
-    svc->RegisterComponent(comp);
+    TestComp *comp = new TestComp;
+    svc->AddComponent(comp);
 
     svc->Subscribe(OPCODE, comp, &TestComp::OnRecv);
 
-    int sid = 0;
+    int sid;
     if (_asClient)
     {
         sid = svc->Connect(_runIp.c_str(), _runPort);
         if (sid == 0)
         {
-            LLBC_FilePrintLine(stderr, "connect to %s:%d failed, err: %s",
-                _runIp.c_str(), _runPort, LLBC_FormatLastError());
-            LLBC_Delete(svc);
+            LLBC_FilePrintLn(stderr,
+                             "connect to %s:%d failed, err: %s",
+                             _runIp.c_str(),
+                             _runPort, LLBC_FormatLastError());
+            delete svc;
 
             return LLBC_FAILED;
         }
 
-        LLBC_PrintLine("server connect to %s:%d success", _runIp.c_str(), _runPort);
+        LLBC_PrintLn("server connect to %s:%d success", _runIp.c_str(), _runPort);
     }
     else
     {
         sid = svc->Listen(_runIp.c_str(), _runPort);
         if (sid == 0)
         {
-            LLBC_FilePrintLine(stderr, "failed to listen on %s:%d, err: %s",
+            LLBC_FilePrintLn(stderr, "failed to listen on %s:%d, err: %s",
                 _runIp.c_str(), _runPort, LLBC_FormatLastError());
-            LLBC_Delete(svc);
+            delete svc;
 
             return LLBC_FAILED;
         }
 
-        LLBC_PrintLine("server listen on %s:%d", _runIp.c_str(), _runPort);
+        LLBC_PrintLn("server listen on %s:%d", _runIp.c_str(), _runPort);
     }
 
     svc->Start();
 
     if (_asClient)
     {
-        LLBC_Packet *pkt = LLBC_New(LLBC_Packet);
-        pkt->SetHeader(sid, OPCODE, 0);
+        LLBC_Packet *pkt = new LLBC_Packet;
+        pkt->SetHeader(sid, OPCODE, 0, 0);
         pkt->Write("Hello, world");
         pkt->Write(0);
 
         svc->Send(pkt);
     }
 
-    LLBC_PrintLine("Press any key to continue...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
-    LLBC_Delete(svc);
+    delete svc;
 
     return LLBC_OK;
 }
@@ -147,7 +154,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
 void TestCase_Comm_SendBytes::FetchArgs(int argc, char *argv[])
 {
     _asClient = LLBC_ToLower(argv[1]) == "client" ? true : false;
-    _svcType = LLBC_ToLower(argv[2]) == "normal" ? LLBC_IService::Normal : LLBC_IService::Raw;
+    _useNmlProtocolFactory = LLBC_ToLower(argv[2]) == "normal" ? true : false;
 
     _runIp = argv[3];
     _runPort = LLBC_Str2Int32(argv[4]);

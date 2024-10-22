@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/rapidjson/json.h"
 
@@ -47,7 +47,7 @@ void LLBC_JsonToString(const LLBC_JsonValue &value, LLBC_String &outStr, bool is
     outStr = buffer.GetString();
 }
 
-std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value)
+std::ostream &operator<<(std::ostream &o, const LLBC_JsonValue &value)
 {
     LLBC_Json::StringBuffer buffer;
     LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
@@ -57,5 +57,3 @@ std::ostream &operator <<(std::ostream &o, const LLBC_JsonValue &value)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

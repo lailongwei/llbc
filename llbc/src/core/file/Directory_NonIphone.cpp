@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/file/Directory.h"
 
@@ -63,13 +63,13 @@ LLBC_String LLBC_Directory::HomeDir()
     char *envVal = LLBC_Malloc(char, requiredSize);
     if (getenv_s(&requiredSize, envVal, requiredSize, "HOMEPATH") != 0)
     {
-        LLBC_Free(envVal);
+        free(envVal);
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_String();
     }
 
     LLBC_String path(envVal);
-    LLBC_Free(envVal);
+    free(envVal);
 #else // Non-Win32
     char *envVal = getenv("HOME");
     if (!envVal)
@@ -117,20 +117,23 @@ LLBC_String LLBC_Directory::TempDir()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     return "/tmp";
 #else // Win32
-    DWORD bufLen = 0;
-    bufLen = ::GetTempPathA(0, nullptr);
-    bufLen += 1;
+    const DWORD bufLen = ::GetTempPathA(0, nullptr) + 1;
+    if (UNLIKELY(bufLen == 1))
+    {
+        LLBC_SetLastError(LLBC_ERROR_OSAPI);
+        return "";
+    }
 
-    LPSTR buf = reinterpret_cast<LPSTR>(::malloc(sizeof(CHAR) * bufLen));
+    LPSTR buf = reinterpret_cast<LPSTR>(malloc(sizeof(CHAR) * bufLen));
     if (::GetTempPathA(bufLen, buf) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
-        ::free(buf);
+        free(buf);
         return "";
     }
 
     LLBC_String path = buf;
-    ::free(buf);
+    free(buf);
 
     if (path[path.length() - 1] == LLBC_BACKLASH_A)
         return path.substr(0, path.length() - 1);

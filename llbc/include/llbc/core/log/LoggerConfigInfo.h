@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOGGER_CONFIG_INFO_H__
-#define __LLBC_CORE_LOG_LOGGER_CONFIG_INFO_H__
+#pragma once
 
 #include "llbc/common/Common.h"
 
@@ -29,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * Previous declare some classes.
  */
-class LLBC_Property;
+class LLBC_Variant;
 
 __LLBC_NS_END
 
@@ -53,7 +52,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int Initialize(const LLBC_String &loggerName,
-                   const LLBC_Property &cfg,
+                   const LLBC_Variant &cfg,
                    const LLBC_LoggerConfigInfo *rootCfg);
 
 public:
@@ -71,8 +70,8 @@ public:
 
 public:
     /**
-     * Get log level.
-     * @return int - log level.
+     * Get logger log level.
+     * @return int - the logger log level.
      */
     int GetLogLevel() const;
 
@@ -93,6 +92,13 @@ public:
      * @return int - the file refresh interval.
      */
     int GetFlushInterval() const;
+
+public:
+    /**
+     * Add timestamp in json log.
+     * @return bool - add timestamp in json log flag.
+     */
+    bool IsAddTimestampInJsonLog() const;
 
 public:
     /**
@@ -151,6 +157,12 @@ public:
     const LLBC_String &GetLogFile() const;
 
     /**
+     * Get original log file name.
+     * @return const LLBC_String & - original log file name.
+     */
+    const LLBC_String &GetOriginalLogFile() const;
+
+    /**
      * Get log file suffix.
      * @return const LLBC_String & - log file suffix.
      */
@@ -169,16 +181,16 @@ public:
     bool IsForceAppLogPath() const;
 
     /**
-     * Get daily rolling mode switch(available in file appender).
-     * @return bool - daily rolling mode switch.
+     * Get file rolling mode.
+     * @return bool - file rolling mode.
      */
-    bool IsDailyRollingMode() const;
+    int GetFileRollingMode() const;
 
     /**
      * Get max log file size.
-     * @return long - max log file size.
+     * @return sint64 - max log file size.
      */
-    long GetMaxFileSize() const;
+    sint64 GetMaxFileSize() const;
 
     /**
      * Get max backup log file index.
@@ -213,6 +225,13 @@ private:
     void NormalizeLogFileName();
 
     /**
+     * Normalize log file size.
+     * @param logFileSize - the un-normalized log file size.
+     * @return sint64 - the normalized log file size.
+     */
+    sint64 NormalizeLogFileSize(const LLBC_String &logFileSize);
+
+    /**
      * Disable assignment.
      */
     LLBC_DISABLE_ASSIGNMENT(LLBC_LoggerConfigInfo);
@@ -221,10 +240,11 @@ private:
     LLBC_String _loggerName;
     bool _notConfigUseRoot;
 
-    int _logLevel;
     bool _asyncMode;
     bool _independentThread;
     int _flushInterval;
+
+    bool _addTimestampInJsonLog;
 
     bool _logToConsole;
     int _consoleLogLevel;
@@ -235,12 +255,13 @@ private:
     int _fileLogLevel;
     LLBC_String _logDir;
     LLBC_String _logFile;
+    LLBC_String _originalLogFile;
     LLBC_String _logFileSuffix;
     bool _logCodeFilePath;
     bool _forceAppLogPath;
     LLBC_String _filePattern;
-    bool _dailyMode;
-    long _maxFileSize;
+    int _fileRollingMode;
+    sint64 _maxFileSize;
     int _maxBackupIndex;
     int _fileBufferSize;
     bool _lazyCreateLogFile;
@@ -250,6 +271,6 @@ private:
 
 __LLBC_NS_END
 
-#include "llbc/core/log/LoggerConfigInfoImpl.h"
+#include "llbc/core/log/LoggerConfigInfoInl.h"
 
-#endif // !__LLBC_CORE_LOG_LOGGER_CONFIG_INFO_H__
+

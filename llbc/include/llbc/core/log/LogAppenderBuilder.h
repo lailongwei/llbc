@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_LOG_LOG_APPENDER_BUILDER_H__
-#define __LLBC_CORE_LOG_LOG_APPENDER_BUILDER_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/singleton/Singleton.h"
 
@@ -31,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * Pre-declare some classes.
  */
-class LLBC_ILogAppender;
+class LLBC_BaseLogAppender;
 
 __LLBC_NS_END
 
@@ -47,7 +44,7 @@ public:
     ~LLBC_LogAppenderBuilder();
 
 public:
-    LLBC_ILogAppender *BuildAppender(int type) const;
+    LLBC_BaseLogAppender *BuildAppender(int type) const;
 };
 
 /**
@@ -57,5 +54,3 @@ template class LLBC_HIDDEN LLBC_Singleton<LLBC_LogAppenderBuilder>;
 #define LLBC_LogAppenderBuilderSingleton LLBC_Singleton<LLBC_NS LLBC_LogAppenderBuilder>::Instance()
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_LOG_LOG_APPENDER_BUILDER_H__

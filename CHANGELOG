@@ -1,8 +1,329 @@
 # llbc library update log file.
 # Longwei Lai<lailongwei@126.com>
 ######################################################################################
+# Version: 1.1.1
+# 2023/4/4 - 
+# 1. 重构 LLBC_Stream, 重构后: 实现读写分离 + 更强大&适配性更好的类型检测支持
+# 2. 标准化 LLBC_Service phase, 完整简化代码
+# 3. 简化 LLBC_Service Send()/Multicast()/Broadcast() 接口及实现
+# 4. 优化 LLBC_Service 组件操作方法
+# 5. 简化 LLBC_Packet 默认 packet header
+# 6. 优化 Num to Str 实现
+# 7. LLBC_LogAndXXX() 宏支持附带格式化字符串及参数
+# 8. 初步支持 cmake 构建
+# 9. premake 构建支持自定义 toolset
+# 10. Time 相关 接口/变量 命名简化
+# 11. 对象池代码简化/性能提升/诊断能力加强
+# 12. MD5接口标准化(参考python)
+# 13. 随机支持更新: mtrand实现替换为stl自带实现, 支持权值随机
+# 14. LLBC_Variant更新: 适配性加强/性能提升/序列化空间占用优化
+# 15. 其他 代码优化/性能提升/测试代码完善
+# 16. Logger完善:
+#     - 废除logLevel配置项, 只保留明确的consoleLogLevel/fileLogLevel配置来明确配置appender log level
+#     - 支持条件判断宏日志打印支持(极其方便), 如: LLBC_WarnAndReturnIf/LLBC_ErrorAndBreakIf/...
+#     - 支持环境变量pattern打印: %E{EnvName}
+#     - Debug/Trace日志级别对调, 调整后, Trace级别将是最低级别
+# 17. 完整优化LLBC_Time/LLBC_TimeSpan, 性能及接口全面优化、简化
+# 18. LLBC_Component方法收敛(感谢reckful)
+# 19. LLBC_BinaryHeap调整为使用stl::priority_queue实现(感谢reckful)
+# 20. 废除框架中旧式对象池实现, 提供全新设计及实现的对象池, 代码得到极大的简化, 同时性能得到足够的提升
+# 21. 其它杂项优化
+#
+# Version: 1.1.0
+# 2022/8 - 23/4/4
+# ThreadMgr测试用例增加Thread Start/Stop Hook测试代码
+# 优化非LogRunnable start线程stop时的等待逻辑
+# LogRunnable兼容非Start()调用者线程进行Stop()的情况, 以确保在Crash-Hook中的LoggerMgr->Finalize()调用可正常结束
+# 删除空ThreadEntry函数, 去除测试代码
+# 修复LLBC_Task/LLBC_ThreadMgr改造后的相关Bugs, 优化部分逻辑:
+# - Service下管理的Poller Tasks start/stop 线程不配对导致wait失败，引发可能的crash问题;
+# - 所有Task子类进行Stop()方法优化, 去除不再需要的标记位, 同时进行代码简化;
+# ThreadMgr提供Thread Start/Stop hook支持（于线程上下文）
+# Service-Level SesionInfo添加时间从Service线程处理SessionCreate时机前置到Poller线程AddSession()时机，确保业务自定义协议栈中调用Service::Send类接口有效
+# PollerMgr代码优化
+# LLBC_Task增加ThreadMgr/ThreadGroup Handle获取接口
+# Disable assignment宏优化
+# Fix __LLBC_FilePrint函数内部一处malloc/free mismatch问题
+# Json Log增加timestamp自动输出支持(通过addTimestampInJsonLog选项控制, 默认关闭)
+# 简化核心库头文件包含
+# 去除不必要的子模块目录头文件
+# ThreadMgr/Task相关代码完善
+# App事件事件方法命名简化: OnAppConfigXXXX() -> OnAppXXX()
+# App命名简化: Application -> App
+# LLBC_XXXManager -> LLBC_XXXMgr
+# App命名简化: Application -> App
+# LLBC_XXXManager -> LLBC_XXXMgr
+# 提升__LLBC_FilePrint()性能
+# 修复LLBC_BasicString一处operator*()实现bug
+# LLBC_EventManager -> LLBC_EventMgr
+# 修复App一处startPhase定义问题
+# 修复Service初始化组件失败时引发组件重复delete的问题
+# 修复GC池Array有处陈年老bug
+# 修复Logger初始化失败时引发的crash问题
+# ThreadMgr/Task整体重构、简化;LLBC_PrintLine/LLBC_FilePrintLine命名简化;Log Uninit output信息强化
+# 修复一处 non-win32 路径长度宏定义问题
+# 日志pattern支持: 进程主执行映像名输出:%e; 日志文件名的主执行映像名从%m调整成%e(对%m还保持兼容), 以确保跟日志pattern定义一致
+# Fix LLBC_STLHelper::RecycleContainer()对std::unordered_map/std::array的匹配问题
+# style: 去除文件末尾的多余空行 for testsuite & wrap
+# revert: Python-ast.h 改动回退
+# style: 去除文件末尾的多余空行 for testsuite & wrap
+# 优化头文件包含, 采用 #pragma once 机制
+# 修正 EventFirer 风格
+# 优化LLBC_Array一次迭代器合法性判断代码
+# 空格行删除
+# 修正 EventFirer 风格
+# 规整EventFirer相关代码
+# Service event 支持链式发送
+# Service event 支持链式发送: 修正头文件引用
+# Service event 支持链式发送: 代码风格修正
+# Service event 支持链式发送: 添加 service event firer 的对象池函数支持
+# Service event 支持链式发送: 修正 ReferencablePoolObj 使用 & 代码风格
+# 修正App Stop Signals一处手抖问题(SIGFPE被包含)
+# Service event 支持链式发送
+# Service event 支持链式发送
+# TLS对象池访问兼容非llbc thread(将产生内存泄露)
+# 旧式sprintf()函数调用去除
+# 旧式sprintf()函数调用去除
+# 增强LLBC_Variant::operator[] const在类型为Seq时的兼容性
+# Fix bug of Stopping ExternalDrive Service
+# 修复高版本GCC编译器编译错误
+# 丢弃t/master特定代码
+# 修复高版本编译器编译错误
+# 优化Non-Win32平台crash信号处理: 先调整成DFL, 再进行处理, 如过程中无法处理, 重新raise signal
+# 调整logger log_level设置逻辑
+# Log console appender多彩输出时不强制设置bg color
+# 修复Log库优化时不兼容非llbc thread日志输出的问题; LLBC_BaseTask类名简化为LLBC_Task
+# 补回t/master专用代码
+# Fix编译错误
+# LLBC_BasicString支持LLBC_BasicCString参数构造
+# 删除t/master合并过来的非通用代码
+# 去除LLBC_BasicCString::str()方法, 以减少同功能方法数量(c_str()); LLBC_BasicString增加跟LLBC_BasicCString互操作支持, 包括:比较, 逻辑运算
+# Component方法反射调用TestCase增加getchar()调用
+# 修复linux平台编译错误
+# 整体进行llbc核心库代码规整
+# 优化Comp异步等待初始化/销毁流程: 过程中不止对已初始化Comps进行必要的Update调用, 同时确保Service基础资源可被心跳及访问, 包括:会话/Timer调度器/事件管理器/Post-Tasks/...
+# 针对NonWin32 platform, 在crash handler处理异常时不进行exit(xxx), 而是进行signal reraise
+# ServiceMgr stop service逻辑修改:去除InTls约束
+# c# wrapped/lua wrapped层适配Log rolling mode支持
+# 更新LLBC_LogLevel接口定义
+# Log file rolling支持扩充: NoRolling/HourlyRolling/DailyRolling
+# 更新WinPreBuild.bat
+# 优化LLBC_ServiceMgr&LLBC_Application中的GetService()/StopService()接口性能
+# 扩大LLBC_Component::AddMethod()方法支持, 原只支持当前组件方法（也是一个约束），当前由业务角度出发增加Delegate方法支持，以确保业务可以直接将lambda方法作为component通用方法进行注册，减轻业务编码量
+# Update windows-build.yml
+# 调整Service Add To ServiceMgr时机为InitComps()&StartComps()前, 以确保业务可完整反射获取Service并进行Method的方法反射调用
+# TestSuite注册同步更新
+# 删除旧comp测试文件
+# 修正一处ptr value获取warning
+# 恢复pyllbc编译库设定文件
+# 修正LLBC_BasicCString::opeartor+/-(difference_type)内部assert bug
+# 优化Component 动态反射方法调用 接口methName参数
+# lua wrap中的Directory模块增加Exists支持，以开放给onemt使用
+# 修正LLBC_Stream一处重构导致的bug
+# Log console appender DIRECT_LOG_TO_CONSOLE 配置关闭; 修正关闭时切换stdout/stderr输出时, stdout未刷新导致的output交叉问题
+# 更新premake5.lua
+# 修正一处日志优化时产生的log runnable线程占用100%的bug
+# 更新pyllbc log测试代码中的测试配置文件名
+# LLBC_Variant增加[const ]char *operator() const隐式转换支持(从Ptr类型特化实现), 增加支持后: [const ]char *的construct/assignment/implicit cast支持都标准化, 不再会解析成ptr类型从而引发不必要的crash, crash示例代码:
+# LLBC_Variant str("hello world")
+# std::cout <<(str ? str : "hey judy") <<std::endl;
+# 以上代码将引发core, 转为三目运算符中的?后面的表达式默认转换为pointer非str, 最终core
+# LogData对象池 每条带对象数量定义 调整到Config.h
+# 优化LLBC_Directory中ModuleFile dir/name/path 命名
+# LogData内存条带容量调整为512
+# Component配置更新做最大限度的配置保留: 清理非当前配置类型配置; 配置加载失败时, 保留旧有配置
+# 恢复logData队列（性能提升不明显情况下，优先保证设计清晰及代码简洁）
+# 优化日志性能: 日志数据push优化; LogData类型对象池条带优化
+# CString注释完善
+# 会对t公司进行的临时支持
+# 删除多余空行
+# 完全去除CString的constexpr约束
+# 兼容c++11严格constexpr标准
+# 修正ptrdiff_t未定义问题
+# 优化LLBC_Component::GetComponent()方法, 增加const版本支持
+# Service增加GetComponent()const方法支持; 完善LLBC_BasicCString操作方法
+# 更新lua log testcase代码
+# LLBC_BasicCString调整为stl string命名风格，以降低使用时的学习成本跟增加业务代码一致性
+# 回退临时测试代码
+# 修复LLBC_BasicCString operator==/operator<优化时未添加const约束的问题
+# 修正non-win32平台编译错误
+# LLBC_CString优化; 日志优化
+# LLBC_CString支持hash, 优化实现
+# 修正格式化检查参数位置错误bug
+# 兼容框架未初始化时对LOG_XXX()宏的调用
+# 调整日志文件默认缓冲大小(40K)
+# 修正LLBC_CPUDebug实现，以规避不必要的误差
+# 调整LOG宏定义:L[J/S]OG_XXX2()参数1由tag调整为loggerName, L[J/S]OG_XXX3()参数1由loggerName调整为tag; 去除废弃代码
+# 完善BasicCString
+# 优化LogRunnable空闲睡眠时间
+# 修正Logger的consoleLogLevel/fileLogLevel读取逻辑, 旧:有配置则读取, 无则使用root or default; 新:有配置则读取, 无则确认是否有配置logLevel有则使用, 最后再使用root or default
+# 适当调整LogData.msg的初始分配最小大小(256->(128+64)), 部分cast/unlikely规整
+# LogData回收时, 增加如msg缓冲过大(超过格式化缓存7/8时)进行释放的逻辑
+# 删除废弃宏
+# 修复LogData优化后可能的logger finalize卡死问题
+# 修改日志测试配置文件
+# 优化BasicCString及日志
+# 日志优化，减少LogData内部间接内存分配
+# 规避可能的日志宏变量与业务参数冲突问题
+# 优化LogFileAppender日志性能; 代码整理
+# 规避格式化参数命名冲突
+# 日志FileAppender优化
+# 优化LogFileAppender一处时间判断; test logger file output增加tag打印
+# 优化LogLineToken常量表实现, Finx linux&mac平台 编译错误
+# 优化Log Appender性能
+# 调整JsonLog测试次数
+# 修复Log时间精度调整到micro-seconds后的Bug
+# 调整App启动失败时的LLBC_Cleanup()调用时机(析构中调用), 以确保业务可最终拿到错误码, 以进行处理
+# 修复一处comp 初始化/启动 失败时的状态码判断问题
+# 修复LLBC_Startup重复调用时, win32 symbol未cleanup导致的startup失败问题
+# 修正core服务托管后llbc dump无法产生的问题
+# LLBC_Stream::Skip()恢复bool返回
+# non-win32平台crash处理中, 增加"无法获取core pattern dir时的默认处理"
+# 修复Log格式化一处bug
+# llbc core lib链接时增加dl库链接
+# 删除旧编译系统支持文件
+# 修正gcc 9.4.0版本编译报错
+# 修正premake一处filter bug
+# 调整Prevent config load时机到LoadConfig()内部函数; 修正一处初始化问题;
+# testsuite中所有测试相关配置文件在构建时自动copy到output目录; 标准化testsuite中测试配置文件名;
+# 增加.idea目录忽略
+# Service/Comp标准化配置读取支持测试代码支持
+# 标准化Service/Comp配置支持; App增加"阻挡配置加载"接口支持;
+# 修正LLBC_Variant在序列化Str/Dict时可能的Core
+# 修复LLBC_Property在复制构造时parent未设置的Bug; 去除工作的This定义及前缀使用;
+# testsuite项目添加.ini/.xml/.cfg文件加入工程, 以方便在vs中直接编辑; 设置调试目录为输出目录;
+# LLBC_Stream性能优化、代码简化，TestCase完善
+# LLBC_Swap在Stream中的运用去除
+# 去除template function多余inline
+# 完整简化LLBC_Stream读写接口(只保留Read()/Write()两个接口), 统一Read/Write实现
+# Fix合并分枝旧风格代码产生的编译错误
+# 调整inline实现文件名风格：XXXImpl.h->XXXInl.h; IService去除，统一成Service
+# LLBC_IService类名调整为LLBC_Service，以更简化使用
+# 移除协议栈中的Connect()接口
+# pyllbc native Stream对象部分方法调整为inline
+# 完整优化LLBC_Service::GetComponent()方法性能
+# Stream XXXSize()接口调整成XXXCap()
+# 删除多余空行
+# 移除frametimeout 相关代码
+# 移除多余的LLBC_Free/LLBC_Delete/LLBC_Deletes/LLBC_New/LLBC_News宏
+# refactor: 更新 README Build Status
+# 支持 linux/windows/macos 平台 ci
+# refactor: GBK 字符编码测试
+# chore: 支持 linux/windows/macos 平台 ci
+# refactor: 优化测试代码, 去除没有使用的类和方法
+# Update c-cpp.yml
+# Update c-cpp.yml
+# Github action 支持 windows 编译平台
+# 移除 appveyor
+# Github action 添加 windows 平台支持
+# 替换 Github action 编译平台为 centos, 移除其余 ci 平台
+# 移除 Travis ci
+# 更新 github action 库依赖
+# Github action 编译平台设为 centos
+# Github action 接入
+# Create c-cpp.yml
+# 允许Timer在Cancel中Reschedule
+# Application Start()/Stop() 方法支持重写
+# Log time精度调整到微秒
+# 修正tinyxml2.cpp中llbc namespace定义中包含c++库头文件引发的编译报错
+# 代码风格统一
+# Fix GetComponent<>() bug
+# 优化 Service GetComponent 性能
+# Application及Component事件方法名调整：Will->Early, After->Late
+# Component增加IsInited()/IsStarted()接口
+# 修复Comp中的OnStartFinish/OnWillStop事件方法调用顺序错误问题
+# App start phase枚举定义优化
+# Component支持Application阶段事件处理;Component增加OnStartFinish/OnWillStop事件阶段实现
+# 删除AppCfgTest代码中多余cout
+# App支持启动阶段获取
+# 支持 mac 平台编译
+# 调整LLBC_Application::Start()参数: name支持默认不填写, 为空时将使用进程可执行文件名(去除后缀后的名字)
+# LLBC_Time时间戳相关接口整理, 整理后: static接口:NowTimestampInXXX(), non-static接口:GetTimestampInXXX()
+# pyllbc testsuite代码整体重新运行, 兼容性问题修正
+# pyllbc导出方法更新
+# 修复pyllbc Service.adddecoder内部错误(使用了旧的native export method)
+# 修正GetComponent注释错误
+# 修复pyllbc packet receive时, 如无decoder, stream数据不会attack到packet.data的bug
+# pyllbc中的Stream简化&优化&Bug Fix:简化str pack/unpack, 去除S$支持;优化str/unocode pack/unpack性能;修复str/unicode的pack unpack bug
+# 优化Application一处return
+# LLBC_Component增加GetComponent方法, 以简化Component获取; 部分非强制事件方法调整成inline实现
+# LLBC_Stream::GetBuf()、LLBC_Stream::GetBufStartWithPos()调整为template方法, 以更方便使用
+# 修复pyllbc中Service相关代码问题
+# 优化非win32平台cpu frequency获取耗时
+# 修正部分测试用例在框架迭代中未同步更新导致运行不正常的问题
+# 优化Service Frame Tasks处理代码性能
+# 1. 整体去除llbc Service中SvcType定义;废除pyllbc Service中的CODEC设计;Component::OnIdle()参数从int调整为无歧义的LLBC_TimeSpan;其他细节优化;
+# Task内部等待时间统一调整为1ms
+# 增加LLBC_Foreach宏支持
+# 将RawProtocolFactory及NormalProtocolFactory导出
+# 增加LLBC_ContinueIf/LLBC_LogAndContinueIf支持
+# 修正windows平台无SIGQUIT导致的编译错误
+# feat: 前置 application stop 标志时机
+# 去除Application::Run方法, Start内部直接进入app loop, 同时将app tick事件方法调整为OnUpdate
+# App stop信号增加SIGQUIT
+# 完善LLBC_xxxIf便利宏支持
+# 优化LLBC_Service::GetComponent方法
+# 调整Service线程启动时等待_started标记时间
+# 删除service中旧风格typedef
+# 移除Util_Text.h中Trim相关函数(LLBC_BasicString已经提供支持, 无需重复定义函数)
+# 去除多余全局命名空间前缀;删除string相关包装函数(Util_Text.h)
+# 修复windows平台信号相关编译错误
+# 修复windows平台编译错误
+# Service::GetComponent()接口优化;Application支持Run
+# wrap层同步core lib中Service相关接口名字调整
+# 调整Service相关接口风格及命名
+# 临时支持接口类查找(新旧代码调整遗留问题临时修正)
+# 支持Starting/Stopping comps时对已经started的comp进行OnUpdate调用
+# 规整component events
+# 删除空cpp文件
+# 去除多余LLBC_SetLastError()方法
+# Coder相关类名/文件名去除I前缀
+# 修正LLBC_GetLastError()函数编译问题
+# 去除Component Factory接口类I前缀
+# 错误码相关整理:支持自定义错误码描述(只在Library及Custom类型的Error上有效);去除LLBC_Errno/LLBC_SubErrorNo宏
+# 修正一处LLBC_Application::OnWillStart()启动失败后的errno设置bug
+# 更新Component类及文件命名, 去除I前缀;修复windows编译错误
+# App支持WillStart/WillStop
+# LLBC_File支持Write(const char *)
+# 增加App StartFinish/SopFinish事件方法
+# 调整非Win32平台crash handler方法名
+# 修复windows编译warnings
+# App stop流程调整:优先stop all services, 以确保栈序
+# App/Service-Comp阶段事件方法等待重试间隔调整为100ms
+# Component的Init/Destroy/Start/Stop事件方法支持等待机制(类App)
+# 修复递归锁问题
+# 修正StopService()错误未设置错误码的问题
+# ServiceMgr改进;buf fix
+# 同步修改pyllbc层的appliation对象OnStop接口定义
+# 修复lua testsuite.lua中reguire旧文件名导致的require报错
+# 修复csllbc LibConfig几处signed/unsigned compare warnings
+# 修复linux一处编译错误
+# 修复LogRunnable一处可能的core
+# App OnStart/OnStop 尝试间隔调整为10ms
+# 规整Application OnStop()事件接口, 将是否可以stop调整为由出参带出, 返回值为void, 以确保定义跟行为跟OnStart()一致;Service接入application reload事件
+# linux平台链接选项-rdynamic, 以确保持进程内调用backtrace()相关接口时可返回symbol name
+# pyllbc适配核心库修改
+# Windows crash hook功能完善,测试代码完善
+# 设置启动项目
+# 标准化crash hook支持
+# T/master
+# 更新csllbc生成文件
+# 修复windows msvc编译器long类型转换问题
+# 修正一处pyllbc native method注册错误
+# pyllbc同步corelib中的Property接口修改
+# 修正csllbc_testsuite项目路径问题; premake5.lua添加到llbc项目files中, 以方便直接在vs中编辑
+# 增加variant支持;Application改进;其他细节优化
+# Application命名调整
+# Fix一处编译warning
+# 添加pyllbc生成文件ignore
+# 更新.gitignore
+# 删除自动生成文件
+# 修正一处文件命名问题
+# Update appveyor.yml
+# 删除tencent无关开发者通知
+#
 # Version: 1.0.9
-# 2020/9~
+# 2020/9~2022/8
 # 1)【llbc core】Facade->Component命名变更
 # 2)【llbc core】优化LLBC_Directory::Join()，使用变长模板参数简化原有实现(感谢caochunxi)
 # 3)【llbc core】标准化Variant排序实现, 确保行为跟python一致
@@ -28,12 +349,57 @@
 # 23)【llbc core】LLBC_BasicCString增加std::ostream &operator <<(std::ostream &operator <<, const LLBC_BasicCString &)方法支持
 # 24)【llbc core】相关多余LLBC_EXTERN宏使用去除
 # 25)【llbc core】对象池反射方法简化, 去除IsPoolObject()/GiveBackToPool()方法要求, 以让对象池使用者以更轻的负担编写反射支持的类实现
+# 26)【llbc core】简化Hash包装, 提供LLBC_Hash<algo>(bytes, size) 及 LLBC_Hash()方法支持
+# 27)【llbc core】对象池结合推进中项目进行优化:
+#   - 便利性接口提供
+#   - 泛化GC对象、非GC对象的接口访问及使用, 标准化LLBC_ObjectGuard, 能统一管理GC/非GC对象, 支持copy construct/copy assignment
+#   - 对象池反射改进及简化: 简化反射支持接口约束, 增加c++11的泛型反射支持, LLBC_Recycle优化、完善
+#   - 对象重用代码优化
+# 28)【llbc core】Event模块整体代码简化及命名优化
+# 29)【llbc core】RDTSC/LLBC_CPUTime完整重构, 标准化cpu时间获取支持
+# 30)【llbc core】框架代码中的static const number变量定义调整成constexpr
+# 31)【pyllbc】修复一处dist操作内存泄漏
+# 32)【llbc all】完整简化Makefile, 同时修复部分projs有并发编译时的依赖报错问题
+# 33)【llbc all】部分旧风格代码的整理(2015年前)
+# 34)【llbc core】完整优化LLBC_Stream内部的resize实现, 确保在内存分配时有一个可控的分配策略
+# 35)【llbc core】修正部分宏在未引入namespace时的报错问题(集中行log module)
+# 36)【llbc core】完整简化llbc对不是大部分模块都有使用的OS API/C lib/C++ lib头文件引用, 以降低编译耗时及减少不必要的耦合, 同时也增强可移植性
+# 37)【llbc core】Timer timeout handler/cancel handler及Service相关Subscribe方法简化, 支持(Obj *, void (Obj *)(xxx))接口
+# 38)【llbc core】LLBC_Time/LLBC_TimeSpan接口规整及简化
+# 39)【llcb core】LLBC_Timer的TimerScheduler获取隋式延迟到Schedule调用处, 以确保跨线程创建的Timer可被实际执行线程Schedule
+# 40)【llbc core】优化LLBC_Packet payload相关接口访问
+# 41)【llbc all】处理新g++编译器编译问题
+# 42)【llbc core】LLBC_Delegate性能优化, 增加operator == nullptr/operator != nullptr支持
+# 43)【llbc core】LLBC_TimerData内存占用优化
+# 44)【llbc core】LLBC_Variant性能优化，泛型变参支持
+# 45)【llbc core】对象池代码规整，性能优化，部分常用类型在llbc框架内直接特化(感谢@bravepan)
+# 46)【llbc all】兼容macos arm平台编译(感谢@reckzhang)
+# 47)【llbc all】更新premake, 增加vs2022支持
+# 48)【llbc core】LLBC_MessageQueue完整优化
+# 49)【llbc core】LLBC_Service队列消息创建、处理完整优化
+# 50)【llbc core】提升日志库性能(提升100%), 日志相关代码规整
+# 50)【lullbc】提升日志库性能(提升100%), 日志相关代码规整(为龙腾《苏丹的复仇》项目进行)
+# 51)【pyllbc】去除vs20xx后的HAS_ROUND宏报错
+# 52)【llbc all】去除BeforeIncl.h/AfterIncl.h文件(统一通过premake完成)
+# 53)【llbc core】去除LLBC_MemCpy/LLBC_MemSet多余宏, 使用c库memcpy/memmove/memset代替
+# 54)【llbc core】规整LLBC_Stream中的Read/Write接口(去除ReadBuffer/WriteBuffer)
+# 55)【llbc core】Service默认帧率调整到200, 暂时禁止service frame time特性
+# 56)【llbc core】标准化RDTSC支持宏及相关代码, 包括LLBC_CPUTime
+# 57)【lullbc】lua库升级到5.4.0_patch
+# 58)【lullbc】标准化lullbc库,提供Chrono/Directory/CPUTime/Threading模块支持, 旧有支持执行命名及模块标准化
+# 59)【lullbc】lulib_setting.lua简化, 去除use_setting标记
+# 60)【pyllbc】pylib_setting.lua简化, 去除use_setting标记
+# 61)【llbc all】其他诸多细节完善, 优化
+
 # BugFix:
 #   - 【llbc core】修复若干string split bugs(感谢ericyonng)
 #   - 【llbc core】修复Time format一处格式化bug
 #   - 【llbc core】修复logger finalize一处死锁问题(by caochunxi)
 #   - 【llbc core】修复一处variant构造bug
 #   - 【llbc core】修复Random中RandInt()接口返回可能不在指定区间的Bug
+#   - 【llbc core】修复LLBC_MessageBlock一处memory overlapped检查bug(黏连属于合法但旧代码认为非法)
+#   - 【llbc core】修复LLBC_LogData中funcbeg/funclen未初始化导致的coredump问题
+#   - 【llbc core】LLBC_File设置BufMode的泄漏问题修复
 
 # Version: 1.0.7-1.0.8
 # 2019/06~2020/9

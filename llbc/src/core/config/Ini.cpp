@@ -20,10 +20,8 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/file/File.h"
-#include "llbc/core/variant/Variant.h"
 #include "llbc/core/helper/STLHelper.h"
 #include "llbc/core/config/Ini.h"
 
@@ -129,7 +127,7 @@ LLBC_Ini::LLBC_Ini(const This &another)
 
 LLBC_Ini::~LLBC_Ini()
 {
-    LLBC_STLHelper::DeleteContainer(_sections, true);
+    LLBC_STLHelper::DeleteContainer(_sections);
 }
 
 int LLBC_Ini::LoadFromFile(const LLBC_String &file)
@@ -143,7 +141,7 @@ int LLBC_Ini::LoadFromFile(const LLBC_String &file)
 
 int LLBC_Ini::LoadFromContent(const LLBC_String &content)
 {
-    LLBC_STLHelper::DeleteContainer(_sections, true);
+    LLBC_STLHelper::DeleteContainer(_sections);
     _sectionNames.clear();
 
     LLBC_String sectionName;
@@ -192,7 +190,7 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
     LLBC_Strings *sortedSections = nullptr;
     if (sortSections)
     {
-        sortedSections = LLBC_New(LLBC_Strings, _sectionNames);
+        sortedSections = new LLBC_Strings(_sectionNames);
         std::sort(sortedSections->begin(), sortedSections->end());
     }
 
@@ -301,7 +299,7 @@ int LLBC_Ini::SetSection(const LLBC_String &sectionName, const LLBC_IniSection &
         }
         else
         {
-            LLBC_Delete(it->second);
+            delete it->second;
             _sections.erase(it);
         }
     }
@@ -310,7 +308,7 @@ int LLBC_Ini::SetSection(const LLBC_String &sectionName, const LLBC_IniSection &
         _sectionNames.push_back(sectionName);
     }
 
-    _sections.insert(std::make_pair(sectionName, LLBC_New(LLBC_IniSection, section)));
+    _sections.insert(std::make_pair(sectionName, new LLBC_IniSection(section)));
     return LLBC_OK;
 }
 
@@ -331,7 +329,7 @@ const LLBC_IniSections &LLBC_Ini::GetAllSections() const
     return _sections;
 }
 
-LLBC_Ini &LLBC_Ini::operator =(const This &another)
+LLBC_Ini &LLBC_Ini::operator=(const This &another)
 {
     if (this == &another)
         return *this;
@@ -452,7 +450,7 @@ int LLBC_Ini::TryParseSectionName(const LLBC_String &content,
     if (it == _sections.end())
     {
         _sections.insert(std::make_pair(sectionName, 
-            LLBC_New(LLBC_IniSection))).first->second->SetSectionComment(comment);
+            new LLBC_IniSection)).first->second->SetSectionComment(comment);
         _sectionNames.push_back(sectionName);
     }
     else if (it->second->GetSectionComment().empty())
@@ -571,11 +569,11 @@ void LLBC_Ini::Copy(const This &another)
     _errMsg = another._errMsg;
     _sectionNames = another._sectionNames;
 
-    LLBC_STLHelper::DeleteContainer(_sections, true);
+    LLBC_STLHelper::DeleteContainer(_sections);
     for (LLBC_IniSections::const_iterator it = another._sections.begin();
          it != another._sections.end();
          ++it)
-        _sections.insert(std::make_pair(it->first, LLBC_New(LLBC_IniSection, *it->second)));
+        _sections.insert(std::make_pair(it->first, new LLBC_IniSection(*it->second)));
 }
 
 void LLBC_Ini::Err_UnSpecificSection(size_t lineNum, size_t columnNum)
@@ -606,5 +604,3 @@ void LLBC_Ini::Err_SeparatorNotFound(size_t lineNum, size_t columnNum, char sep)
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

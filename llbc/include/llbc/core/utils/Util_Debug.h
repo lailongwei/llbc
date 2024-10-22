@@ -19,23 +19,21 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_UTILS_UTIL_DEBUG_H__
-#define __LLBC_CORE_UTILS_UTIL_DEBUG_H__
+#pragma once
 
-#include "llbc/common/Common.h"
-
-#include "llbc/core/thread/SpinLock.h"
+#include "llbc/core/time/TimeSpan.h"
 
 __LLBC_NS_BEGIN
 
 /**
  * Convert byte array to string format(hexadecimal format).
- * @param[in] buf - buffer pointer.
- * @param[in] len - buffer length.
- * @param[in] lineWidth - line width, default is 16.
- * @return std::string - the formatted string data.
+ * @param[in] bytes     - buffer pointer.
+ * @param[in] len       - buffer length.
+ * @param[in] byteSep   - byte separator.
+ * @param[in] lineWidth - line width, default is 0.
+ * @return LLBC_String - the formatted string data.
  */
-LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWidth = 16);
+LLBC_EXPORT LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep = '\0', size_t lineWidth = 0);
 
 /**
  * Trace function define.
@@ -47,7 +45,7 @@ LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWi
 #ifndef trace 
  #ifdef LLBC_DEBUG
   #define trace(format, ...) LLBC_FilePrint(stdout, format, ##__VA_ARGS__)
-  #define traceline(format, ...) LLBC_FilePrintLine(stdout, format, ##__VA_ARGS__)
+  #define traceline(format, ...) LLBC_FilePrintLn(stdout, format, ##__VA_ARGS__)
  #else
   #define trace(format, ...)
   #define traceline(format, ...)
@@ -55,225 +53,106 @@ LLBC_EXPORT std::string LLBC_Byte2Hex(const void *buf, size_t len, uint32 lineWi
 #endif
 
 /**
- * \brief CPU tick counter, is a high-resoultion preformance counter.
+ * \brief Provides a set of methods and properties that you can use to accurately measure elapsed time.
  */
-class LLBC_EXPORT LLBC_CPUTime
+class LLBC_EXPORT LLBC_Stopwatch final
 {
 public:
+    /**
+     * Constructor & Destructor.
+     */
+    explicit LLBC_Stopwatch(bool autoStart = true);
 
 public:
-    LLBC_CPUTime();
-    LLBC_CPUTime(uint64 cpuCount);
-    ~LLBC_CPUTime();
+    /**
+     * Start or resumes, measuring elapsed time for an interval. 
+     */
+    void Start();
+
+    /**
+     * Stop measuring elapsed time for an interval.
+     */
+    void Stop();
+
+    /**
+     * Stops time interval measurement and resets the elapsed time to zero.
+     */
+    void Reset();
+
+    /**
+     * Gets a value indicating whether the Stopwatch timer is running.
+     * @return bool - the running flag.
+     */
+    bool IsRunning() const { return _beginTime != 0; }
 
 public:
-    static uint64 GetCPUFreqPerSecond();
-    static uint64 GetCPUFreqPerMilliSecond();
-    static uint64 GetCPUFreqPerMicroSecond();
-    static uint64 GetCPUFreqPerNanoSecond();
+    /**
+     * Indicates whether the timer is based on a high-resolution performance counter. This field is read-only.
+     * @return bool - the high resolution flag.
+     */
+    static constexpr bool IsHighResolution()
+    {
+        #if LLBC_SUPPORT_RDTSC
+        return true;
+        #else
+        return false;
+        #endif
+    }
+
+    /**
+     * Gets the frequency of the timer as the number of ticks per second. This field is read-only.
+     * @return uint64 - the watcher frequency.
+     */
+    static uint64 GetFrequency() { return _frequency; }
+
+    /**
+     * Gets the total elapsed time measured by the current instance.
+     * @return LLBC_TimeSpan - the elapsed time.
+     */
+    LLBC_TimeSpan Elapsed() const;
+
+    /**
+     * Gets the total elapsed time measured by the current instance, in nano-seconds.
+     * @return uint64 - the total elapsed time, in nano-seconds.
+     */
+    uint64 ElapsedNanos() const;
+
+    /**
+     * ets the total elapsed time measured by the current instance, in timer ticks.
+     * @return uint64 - the total elapsed time, in timer tick.
+     */
+    uint64 ElapsedTicks() const;
 
 public:
-    static LLBC_CPUTime Current();
-    
-    uint64 GetCpuCount() const;
-
-    int ToSeconds() const;
-    sint64 ToMilliSeconds() const;
-    sint64 ToMicroSeconds() const;
-    sint64 ToNanoSeconds() const;
-
-    static int ToSeconds(uint64 cpuCount);
-    static sint64 ToMilliSeconds(uint64 cpuCount);
-    static sint64 ToMicroSeconds(uint64 cpuCount);
-    static sint64 ToNanoSeconds(uint64 cpuCount);
-
+    /**
+     * Get elapsed time string reprsentation.
+     * @return LLBC_String - the elapsed time string representation, in milli-seconds.
+     */
     LLBC_String ToString() const;
 
 public:
-    LLBC_CPUTime operator +(const LLBC_CPUTime &right) const;
-    LLBC_CPUTime operator -(const LLBC_CPUTime &right) const;
-    LLBC_CPUTime &operator +=(const LLBC_CPUTime &right);
-    LLBC_CPUTime &operator -=(const LLBC_CPUTime &right);
-
-    bool operator <(const LLBC_CPUTime &right) const;
-    bool operator >(const LLBC_CPUTime &right) const;
-    bool operator <=(const LLBC_CPUTime &right) const;
-    bool operator >=(const LLBC_CPUTime &right) const;
-    bool operator ==(const LLBC_CPUTime &right) const;
-    bool operator !=(const LLBC_CPUTime &right) const;
-
-    operator uint64() const;
-
-public:
+    /**
+     * Init watcher frequency.
+     */
     static void InitFrequency();
 
 private:
-    uint64 _cpuCount;
-
-    static uint64 _freqPerSecond;
-    static uint64 _freqPerMillisecond;
-    static uint64 _freqPerMicroSecond;
-    static uint64 _freqPerNanoSecond;
-};
-
-/**
- * \brief The performanze analyze point encapsulation.
- */
-class LLBC_EXPORT LLBC_PerfAnalyzePoint
-{
-public:
-    /**
-     * \brief The point analyze data encapsulation.
-     */
-    class LLBC_PointAnalyzeData
-    {
-    public:
-        sint64 analyzeTime; // analyze time.
-
-        bool analyzeFinished; // analyze finish flag.
-        sint64 beginAnalyzeTime; // eegin analyze time.
-        sint64 endAnalyzeTime; // end finish time.
-    };
-
-public:
-    explicit LLBC_PerfAnalyzePoint(LLBC_PerfAnalyzePoint *parent,
-                                   const char *name,
-                                   const char *codeFileName,
-                                   int codeLine);
-    ~LLBC_PerfAnalyzePoint();
-
-public:
-    /**
-     * Start performanze analyze.
-     */
-    void StartPerfAnalyze();
-
-    /**
-     * Stop performanze analyze.
-     */
-    void StopPerfAnalyze();
-
-public:
-    /**
-     * Get analyze point name.
-     * @const char * - the analyze point name.
-     */
-    const char *GetName() const;
-
-    /**
-     * Get code file name.
-     * @const char * - analyze point code file name.
-     */
-    const char *GetCodeFileName() const;
-
-    /**
-     * Get code line number.
-     * @return int - the code line number.
-     */
-    int GetCodeLine() const;
-
-    /**
-     * Get parent analyze point.
-     * @return LLBC_PerfAnalyzePoint - the parent analyze point(maybe null).
-     */
-    const LLBC_PerfAnalyzePoint *GetParent() const;
-
-    /**
-     * Get children analyze points.
-     * @return const std::map<const char *, LLBC_PerfAnalyzePoint *> * - the children analyze points.
-     */
-    const std::map<const char *, LLBC_PerfAnalyzePoint *> *GetChildren() const;
-
-public:
-    /**
-     * Get total trigger times.
-     * @return uint64 - the total trigger times.
-     */
-    uint64 GetTotalTriggerTimes() const;
-
-    /**
-     * Get total cost time.
-     * @return sint64 - the total cost time.
-     */
-    sint64 GetTotalCostTime() const;
-
-public:
-    /**
-     * Check current time trigger finished or not.
-     * @return bool - the finished flag.
-     */
-    bool IsCurrentTimeTriggerFinished() const;
-
-    /**
-     * Get first trigger begin time.
-     * @return sint64 - the first trigger begin time.
-     */
-    sint64 GetFirstTriggerBeginTime() const;
-
-    /**
-     * Get first trigger end time.
-     * @return sint64 - the first trigger end time.
-     */
-    sint64 GetFirstTriggerEndTime() const;
-
-    /**
-     * Get last trigger begin time.
-     * @return sint64 - the last trigger begin time.
-     */
-    sint64 GetLastTriggerBeginTime() const;
-
-    /**
-     * Get last trigger end time.
-     * @return sint64 - the last trigger end time.
-     */
-    sint64 GetLastTriggerEndTime() const;
-
-public:
-
-private:
-    const char *_name; // Performance point name.
-    const char *_codeFileName; // Performance analyze code file name.
-    int _codeLine; // Performance analyze code line.
-    LLBC_PerfAnalyzePoint *_parent; // Parent performance analyze point(weak ref).
-    std::map<const char *, LLBC_PerfAnalyzePoint *> *_children; // Children performance analyze point.
-
-    uint64 _totalAnalyzeTimes; // Total analyze times.
-    sint64 _totalCostTime; // Total cost time, in micro-seconds.
-
-    bool _curTimeTriggerFinished; // Current time trigger finished flag.
-    sint64 _firstTriggerBeginTime; // First trigger begin.
-    sint64 _firstTriggerEndTime; // First trigger end time.
-    sint64 _lastTriggerBeginTime; // Last trigger begin time.
-    sint64 _lastTriggerEndTime; // Last trigger end time.
-
-    sint64 _maxCostTriggerBeginTime; // Max cost trigger begin time.
-    sint64 _maxCostTriggerEndTime; // Max cost trigger end time.
-    sint64 _maxCostTriggerTimes; // Max cost trigger times(which trigger point triggered).
-
-    sint64 _minCostTriggerBeginTime; // Min cost trigger begin time.
-    sint64 _minCostTriggerEndTime; // Min cost trigger end time.
-    sint64 _minCostTriggerTimes; // Min cost trigger times(which trigger point triggered).
-
-    std::list<LLBC_PointAnalyzeData> _analyzeData;
-};
-
-/**
- * \brief The performance analyzer encapsulation.
- */
-class LLBC_EXPORT LLBC_PerfAnalyzer
-{
-private:
-    LLBC_SpinLock _lock;
+    uint64 _beginTime;
+    uint64 _elapsedTime;
+    static uint64 _frequency;
 };
 
 __LLBC_NS_END
 
 /**
- * stream output operator function for cpu time(in global ns).
+ * stream output operator function for Stopwatch(in global ns).
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator <<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
+inline std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Stopwatch &watcher)
+{
+    return o << watcher.ToString();
+}
 
-#include "llbc/core/utils/Util_DebugImpl.h"
+#include "llbc/core/utils/Util_DebugInl.h"
 
-#endif // !__LLBC_CORE_UTILS_UTIL_DEBUG_H__
+
 

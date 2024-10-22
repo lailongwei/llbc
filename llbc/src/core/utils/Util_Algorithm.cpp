@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 #include "llbc/common/Macro.h"
 
 #include "llbc/core/utils/Util_Algorithm.h"
@@ -80,98 +80,6 @@ int LLBC_FlowType::Str2Type(const char *type)
     return LLBC_FlowType::Unknown;
 }
 
-LLBC_String LLBC_ItoA(sint32 value, int radix)
-{
-    return LLBC_I64toA(value, radix);
-}
-
-LLBC_String LLBC_UItoA(uint32 value, int radix)
-{
-    return LLBC_UI64toA(value, value);
-}
-
-LLBC_String LLBC_I64toA(sint64 value, int radix)
-{
-    char *p;
-    char *firstDigit;
-    char temp;
-    unsigned int digval;
-    char buf[64] = {0};
-
-    p = buf;
-    firstDigit = p;
-
-    if (value < 0)
-    {
-        p[0] = '-';
-        firstDigit = ++p;
-
-        value = -value;
-    }
-
-    do
-    {
-        digval = (unsigned int)(value % radix);
-        value /= radix;
-
-        if (digval > 9)
-            *p++ = (char)(digval - 10 + 'a');
-        else
-            *p++ = (char)(digval + '0');
-    } while (value > 0);
-
-    *p-- = '\0';
-
-    do 
-    {
-        temp = *p;
-        *p = *firstDigit;
-        *firstDigit = temp;
-
-        --p;
-        ++firstDigit;
-    } while (firstDigit < p);
-
-    return buf;
-}
-
-LLBC_String LLBC_UI64toA(uint64 value, int radix)
-{
-    char *p;
-    char *firstDigit;
-    char temp;
-    unsigned int digval;
-    char buf[64] = {0};
-
-    p = buf;
-    firstDigit = p;
-
-    do
-    {
-        digval = (unsigned int)(value % radix);
-        value /= radix;
-
-        if (digval > 9)
-            *p++ = (char)(digval - 10 + 'a');
-        else
-            *p++ = (char)(digval + '0');
-    } while (value > 0);
-
-    *p-- = '\0';
-
-    do 
-    {
-        temp = *p;
-        *p = *firstDigit;
-        *firstDigit = temp;
-
-        --p;
-        ++firstDigit;
-    } while (firstDigit < p);
-
-    return buf;
-}
-
 LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &willEscapeChars, char escapeChar)
 {
     const size_t strLen = escapeString.size();
@@ -198,7 +106,7 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
             buffer = LLBC_Calloc(char, strLen * 2);
 
         const size_t copyLen = i - copyIdx;
-        LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+        memcpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
 
         bufIdx += copyLen;
         buffer[bufIdx++] = escapeChar;
@@ -211,12 +119,12 @@ LLBC_String &LLBC_StringEscape(LLBC_String &escapeString, const LLBC_String &wil
         if (copyIdx < strLen)
         {
             const size_t copyLen = strLen - copyIdx;
-            LLBC_MemCpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
+            memcpy(buffer + bufIdx, &escapeString[copyIdx], copyLen);
             bufIdx += copyLen;
         }
 
         escapeString.assign(buffer, bufIdx);
-        LLBC_Free(buffer);
+        free(buffer);
     }
     return escapeString;
 }
@@ -234,7 +142,7 @@ __LLBC_NS_END
   char *_itoa(int value, char *string, int radix)
   {
       LLBC_String result = LLBC_ItoA(value, radix);
-      ::strcmp(string, result.c_str());
+      strcmp(string, result.c_str());
 
       return nullptr;
   }
@@ -244,7 +152,7 @@ __LLBC_NS_END
   char *_i64toa(long long value, char *string, int radix)
   {
       LLBC_String result = LLBC_I64toA(value, radix);
-      ::strcmp(string, result.c_str());
+      strcmp(string, result.c_str());
 
       return nullptr;
   }
@@ -254,12 +162,10 @@ __LLBC_NS_END
   char *_ui64toa(unsigned long long value, char *string, int radix)
   {
       LLBC_String result = LLBC_UI64toA(value, radix);
-      ::strcmp(string, result.c_str());
+      strcmp(string, result.c_str());
 
       return nullptr;
   }
  #endif
 
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
-
-#include "llbc/common/AfterIncl.h"

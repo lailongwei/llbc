@@ -19,12 +19,12 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 #include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
 #include "llbc/core/utils/Util_Text.h"
 
-#include "llbc/core/log/ILogToken.h"
+#include "llbc/core/log/BaseLogToken.h"
 #include "llbc/core/log/LogFormattingInfo.h"
 #include "llbc/core/log/LogTokenBuilder.h"
 #include "llbc/core/log/LogTokenChain.h"
@@ -32,16 +32,9 @@
 __LLBC_INTERNAL_NS_BEGIN
 
 /**
- * Some token parse state constant values define.
- */
-static const int __g_literal_state = 0;
-static const int __g_converter_state = 1;
-static const int __g_number_state = 2;
-
-/**
  * Default pattern.
  */
-static const char *__g_default_pattern = "%T [%L] - %m%n";
+static const char __g_default_pattern[] = "%T [%L] - %m%n";
 
 __LLBC_INTERNAL_NS_END
 
@@ -65,33 +58,42 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
         return LLBC_FAILED;
     }
 
-    char ch = '\0';
-    const char *curPattern = nullptr;
-    LLBC_String::size_type patternLength = 0;
-    int state = LLBC_INTERNAL_NS __g_literal_state;
+    // Define token parse state.
+    enum class TokenParseState
+    {
+        NormalState, // Normal state.
+        ParsingToken, // Parsing token state.
+        ParsingTokenIndent, // Parsing token indent state.
+        ParsingTokenAddiParam, // Parsing token additional params state.
+    };
 
-    LLBC_ILogToken *token = nullptr;
-    LLBC_LogFormattingInfo *formatter = nullptr;
-
-    LLBC_String buf;
+    // Get pattern and length.
+    const char *curPattern;
+    LLBC_String::size_type patternLen;
     if (pattern.empty())
     {
         curPattern = LLBC_INTERNAL_NS __g_default_pattern;
-        patternLength = LLBC_StrLenA(LLBC_INTERNAL_NS __g_default_pattern);
+        patternLen = sizeof(LLBC_INTERNAL_NS __g_default_pattern) - 1;
     }
     else
     {
         curPattern = pattern.data();
-        patternLength = pattern.size();
+        patternLen = pattern.size();
     }
 
-    for (size_t i = 0; i < patternLength;)
+    // Parse pattern.
+    LLBC_String buf;
+    LLBC_BaseLogToken *token = nullptr;
+    LLBC_LogFormattingInfo formatter;
+    auto state = TokenParseState::NormalState;
+    auto tokenBuilder = LLBC_LogTokenBuilderSingleton;
+    for (size_t i = 0; i < patternLen; )
     {
-        ch = curPattern[i++];
+        const char ch = curPattern[i++];
         switch(state)
         {
-        case LLBC_INTERNAL_NS __g_literal_state:
-            if (i == patternLength)
+        case TokenParseState::NormalState:
+            if (i == patternLen)
             {
                 buf.append(1, ch);
                 break;
@@ -108,17 +110,16 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                 {
                     if (!buf.empty())
                     {
-                        token = LLBC_LogTokenBuilderSingleton->BuildLogToken(LLBC_LogTokenType::StrToken);
+                        token = tokenBuilder->BuildLogToken(LLBC_LogTokenType::StrToken);
                         token->Initialize(formatter, buf);
                         AppendToken(token);
 
                         buf.clear();
-                        formatter = nullptr;
                     }
 
                     buf.append(1, ch);
-                    LLBC_XDelete(formatter);
-                    state = LLBC_INTERNAL_NS __g_converter_state;
+                    formatter.Reset();
+                    state = TokenParseState::ParsingToken;
                 }
             }
             else
@@ -128,45 +129,43 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
             break;
 
-        case LLBC_INTERNAL_NS __g_converter_state:
+        case TokenParseState::ParsingToken:
             buf.append(1, ch);
-            
-            if ((ch >= 0x30 && ch <= 0x39) || ch == '-')
+
+            // Try convert to <ParsingTokenIndent> state.
+            if ((ch >= '0' && ch <= '9') || ch == '-')
             {
-                state = LLBC_INTERNAL_NS __g_number_state;
+                state = TokenParseState::ParsingTokenIndent;
+                break;
+            }
+
+            // Try convert to <ParsingTokenAddiParam> state.
+            if (pattern[i] == '{')
+            {
+                state = TokenParseState::ParsingTokenAddiParam;
                 break;
             }
 
             buf.erase(buf.rfind(LLBC_LogTokenType::EscapeToken));
-            token = LLBC_LogTokenBuilderSingleton->BuildLogToken(ch);
-            if (!formatter)
-                formatter = LLBC_New(LLBC_LogFormattingInfo);
+            token = tokenBuilder->BuildLogToken(ch);
 
             token->Initialize(formatter, "");
             AppendToken(token);
 
-            formatter = nullptr;
-            state = LLBC_INTERNAL_NS __g_literal_state;
+            formatter.Reset();
+            state = TokenParseState::NormalState;
 
             break;
 
-        case LLBC_INTERNAL_NS __g_number_state:
-            if ((ch < 0x30 || ch > 0x39) && ch != '-')
+        case TokenParseState::ParsingTokenIndent:
+            if ((ch < '0' || ch > '9') && ch != '-')
             {
-                int minLength = LLBC_Str2Int32(&buf[buf.rfind(LLBC_LogTokenType::EscapeToken) + 1]);
-                if (!formatter)
-                {
-                    formatter = LLBC_New(LLBC_LogFormattingInfo, minLength < 0 ? true : false, ::abs(minLength), INT_MAX);
-                }
-                else
-                {
-                    formatter->SetLeftAligh(minLength < 0 ? true : false);
-                    formatter->SetMinLen(minLength);
-                    formatter->SetMaxLen(INT_MAX);
-                }
+                const int minLength = LLBC_Str2Int32(&buf[buf.rfind(LLBC_LogTokenType::EscapeToken) + 1]);
+                formatter.leftAlign = minLength < 0 ? true : false;
+                formatter.minLen = std::abs(minLength);
 
                 i--;
-                state = LLBC_INTERNAL_NS __g_converter_state;
+                state = TokenParseState::ParsingToken;
 
                 break;
             }
@@ -174,12 +173,25 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
             buf.append(1, ch);
             break;
 
-        default:
-            LLBC_XDelete(formatter);
-            Cleanup();
+        case TokenParseState::ParsingTokenAddiParam:
+            if (ch == '}')
+            {
+                formatter.addiParam = buf.substr(buf.rfind("{") + 1);
 
-            LLBC_SetLastError(LLBC_ERROR_FORMAT);
-            return LLBC_FAILED;
+                const size_t tokenPos = buf.rfind(LLBC_LogTokenType::EscapeToken) + 1;
+                token = tokenBuilder->BuildLogToken(buf[tokenPos]);
+                token->Initialize(formatter, "");
+                AppendToken(token);
+
+                formatter.Reset();
+                state = TokenParseState::NormalState;
+
+                buf.erase(tokenPos - 1);
+            }
+            else
+            {
+                buf.append(1, ch);
+            }
 
             break;
         }
@@ -187,9 +199,12 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
     if (!buf.empty())
     {
-        token = LLBC_LogTokenBuilderSingleton->BuildLogToken(LLBC_LogTokenType::StrToken);
-        token->Initialize(nullptr, buf);
+        formatter.Reset();
+        token = tokenBuilder->BuildLogToken(LLBC_LogTokenType::StrToken);
+        token->Initialize(formatter, buf);
         AppendToken(token);
+
+        buf.clear();
     }
 
     return LLBC_OK;
@@ -197,7 +212,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
 void LLBC_LogTokenChain::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    LLBC_ILogToken *token = _head;
+    LLBC_BaseLogToken *token = _head;
     while (token)
     {
         token->Format(data, formattedData);
@@ -209,14 +224,14 @@ void LLBC_LogTokenChain::Cleanup()
 {
     while (_head)
     {
-        LLBC_ILogToken *next = _head->GetTokenNext();
+        LLBC_BaseLogToken *next = _head->GetTokenNext();
 
-        LLBC_Delete(_head);
+        delete _head;
         _head = next;
     }
 }
 
-void LLBC_LogTokenChain::AppendToken(LLBC_ILogToken *token)
+void LLBC_LogTokenChain::AppendToken(LLBC_BaseLogToken *token)
 {
     token->SetTokenNext(nullptr);
 
@@ -226,21 +241,11 @@ void LLBC_LogTokenChain::AppendToken(LLBC_ILogToken *token)
         return;
     }
 
-    if (!_head->GetTokenNext())
-    {
-        _head->SetTokenNext(token);
-        return;
-    }
-
-    LLBC_ILogToken *tmp = _head;
+    LLBC_BaseLogToken *tmp = _head;
     while (tmp->GetTokenNext())
-    {
-        tmp= tmp->GetTokenNext();
-    }
+        tmp = tmp->GetTokenNext();
 
     tmp->SetTokenNext(token);
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

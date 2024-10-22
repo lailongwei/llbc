@@ -19,11 +19,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
-#include "llbc/common/BeforeIncl.h"
 
-#include "llbc/core/time/Common.h"
-#include "llbc/core/variant/Common.h"
+#include "llbc/common/Export.h"
+
+#include "llbc/core/time/Time.h"
+#include "llbc/core/variant/Variant.h"
 
 #include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/Timer.h"
@@ -41,12 +41,6 @@ LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
 , _timeoutDeleg(timeoutDeleg)
 , _cancelDeleg(cancelDeleg)
 {
-    if (!scheduler)
-    {
-        __LLBC_LibTls *libTls = __LLBC_GetLibTls();
-        if (libTls)
-            _scheduler = reinterpret_cast<Scheduler *>(libTls->coreTls.timerScheduler);
-    }
 }
 
 LLBC_Timer::~LLBC_Timer()
@@ -55,22 +49,23 @@ LLBC_Timer::~LLBC_Timer()
     {
         Cancel();
         if (--_timerData->refCount == 0)
-            LLBC_Delete(_timerData);
-;
+            delete _timerData;
     }
 
     if (_data)
-        LLBC_Delete(_data);
+        delete _data;
 }
 
-uint64 LLBC_Timer::GetDueTime() const
+LLBC_TimeSpan LLBC_Timer::GetDueTime() const
 {
-    return _timerData ? _timerData->dueTime : 0;
+    return _timerData ?
+        LLBC_TimeSpan::FromMillis(_timerData->dueTime) : LLBC_TimeSpan::zero;
 }
 
-uint64 LLBC_Timer::GetPeriod() const
+LLBC_TimeSpan LLBC_Timer::GetPeriod() const
 {
-    return _timerData ? _timerData->period : 0;
+    return _timerData ?
+        LLBC_TimeSpan::FromMillis(_timerData->period) : LLBC_TimeSpan::zero;
 }
 
 LLBC_TimerId LLBC_Timer::GetTimerId() const
@@ -78,47 +73,29 @@ LLBC_TimerId LLBC_Timer::GetTimerId() const
     return _timerData ? _timerData->timerId : LLBC_INVALID_TIMER_ID;
 }
 
-void LLBC_Timer::SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg)
+sint64 LLBC_Timer::GetTimeoutTimes() const
 {
-    _timeoutDeleg = timeoutDeleg;
-}
-
-void LLBC_Timer::SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg)
-{
-    _cancelDeleg = cancelDeleg;
+    return _timerData ? _timerData->repeatTimes : 0;
 }
 
 LLBC_Variant &LLBC_Timer::GetTimerData()
 {
-    if (!_data)
-        _data = new LLBC_Variant();
-    return *_data;
+    return *(_data ? _data : (_data = new LLBC_Variant));
 }
 
-const LLBC_Variant & LLBC_Timer::GetTimerData() const
+const LLBC_Variant &LLBC_Timer::GetTimerData() const
 {
-    return const_cast<LLBC_Timer *>(this)->GetTimerData();
-}
-
-    void LLBC_Timer::OnTimeout()
-{
-    if (LIKELY(_timeoutDeleg))
-        _timeoutDeleg(this);
-}
-
-void LLBC_Timer::OnCancel()
-{
-    if (_cancelDeleg)
-        _cancelDeleg(this);
+    return _data ? *_data : LLBC_Variant::nil;
 }
 
 int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
 {
-    if (_timerData && _timerData->cancelling)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
-        return LLBC_FAILED;
-    }
+    // Note: Allow reschedule in <OnCancel> event meth.
+    // if (_timerData && _timerData->cancelling)
+    // {
+    //     LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
+    //     return LLBC_FAILED;
+    // }
 
     const int cancelRet = Cancel();
     if (UNLIKELY(cancelRet != LLBC_OK))
@@ -134,8 +111,8 @@ int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &peri
         }
     }
 
-    const sint64 dueTimeMillis = MAX(0ll, dueTime.GetTotalMilliSeconds());
-    sint64 periodMillis = MAX(0ll, period.GetTotalMilliSeconds());
+    const sint64 dueTimeMillis = MAX(0ll, dueTime.GetTotalMillis());
+    sint64 periodMillis = MAX(0ll, period.GetTotalMillis());
     if (periodMillis == 0ll)
         periodMillis = dueTimeMillis;
 
@@ -158,7 +135,7 @@ int LLBC_Timer::Cancel()
 
 bool LLBC_Timer::IsScheduling() const
 {
-    return (_timerData != nullptr && _timerData->validate);
+    return (_timerData && _timerData->validate);
 }
 
 bool LLBC_Timer::IsTimeouting() const
@@ -174,10 +151,12 @@ bool LLBC_Timer::IsCancelling() const
 LLBC_String LLBC_Timer::ToString() const
 {
     return LLBC_String().format(
-        "timerId: %llu, dueTime: %llu, period: %llu, scheduling: %s",
-        GetTimerId(), GetDueTime(), GetPeriod(), IsScheduling()? "true" : "false");
+        "timerId:%llu, dueTime:%llums, period:%llums, timeoutTimes:%lld, scheduling:%s",
+        GetTimerId(),
+        GetDueTime().GetTotalMillis(),
+        GetPeriod().GetTotalMillis(),
+        GetTimeoutTimes(),
+        IsScheduling()? "true" : "false");
 }
 
 __LLBC_NS_END
-
-#include "llbc/common/AfterIncl.h"

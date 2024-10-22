@@ -30,25 +30,28 @@ class TestCase_Core_Log_Logger : ITestCase
     {
         Console.WriteLine("Core/Log/Logger test:");
 
-        string logCfg = "Logger_Cfg.cfg";
+        string logCfg = "LogTestCfg.cfg";
         LoggerMgr.Init(logCfg);
 
         // Test Root logger.
         Log.enabledLogFileInfo = true;
+        Log.Trace("A trace message from Log.Trace()...");
         Log.Dbg("A debug message from Log.Dbg()...");
         Log.Info("A info message from Log.Info()...");
         Log.Warn("A warn message from Log.Warn()...");
         Log.Err("A error message from Log.Err()...");
         Log.Fatal("A fatal message from Log.Fatal()...");
 
+        Log.Trace<Log>("A trace message from Log.Trace<Log>()...");
         Log.Dbg<Log>("A debug message from Log.Dbg<Log>()...");
-        Log.Info<Log>("A debug message from Log.Dbg<Log>()...");
-        Log.Warn<Log>("A debug message from Log.Dbg<Log>()...");
-        Log.Err<Log>("A debug message from Log.Dbg<Log>()...");
-        Log.Fatal<Log>("A debug message from Log.Dbg<Log>()...");
+        Log.Info<Log>("A info message from Log.Info<Log>()...");
+        Log.Warn<Log>("A warn message from Log.Warn<Log>()...");
+        Log.Err<Log>("A error message from Log.Error<Log>()...");
+        Log.Fatal<Log>("A fatal message from Log.Fatal<Log>()...");
 
         // Get test logger to test.
         var testLogger = LoggerMgr.Get("test");
+        testLogger.Trace("A trace message from testLogger.Trace()...");
         testLogger.Dbg("A debug message from testLogger.Dbg()...");
         testLogger.Info("A info message from testLogger.Info()...");
         testLogger.Warn("A warn message from testLogger.Warn()...");

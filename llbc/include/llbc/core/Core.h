@@ -19,33 +19,130 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_CORE_CORE_H__
-#define __LLBC_CORE_CORE_H__
+#pragma once
 
-#include "llbc/common/Common.h"
+// core/os
+#include "llbc/core/os/OS_Time.h"
+#include "llbc/core/os/OS_Atomic.h"
+#include "llbc/core/os/OS_Library.h"
+#include "llbc/core/os/OS_Thread.h"
+#include "llbc/core/os/OS_Process.h"
+#include "llbc/core/os/OS_Console.h"
+#include "llbc/core/os/OS_Socket.h"
+#include "llbc/core/os/OS_Select.h"
+#include "llbc/core/os/OS_Network.h"
+#include "llbc/core/os/OS_Symbol.h"
+#if LLBC_TARGET_PLATFORM_LINUX
+#include "llbc/core/os/OS_Epoll.h"
+#endif
+#if LLBC_TARGET_PLATFORM_WIN32
+#include "llbc/core/os/OS_Iocp.h"
+#endif
 
-#include "llbc/core/os/Common.h"
-#include "llbc/core/algo/Algo.h"
-#include "llbc/core/bundle/Common.h"
-#include "llbc/core/utils/Common.h"
-#include "llbc/core/sampler/Common.h"
-#include "llbc/core/helper/Common.h"
-#include "llbc/core/file/Common.h"
-#include "llbc/core/variant/Common.h"
+// core/algo
+#include "llbc/core/algo/RingBuffer.h"
+
+// core/bundle
+#include "llbc/core/bundle/Bundle.h"
+
+// core/utils
+#include "llbc/core/utils/Util_Math.h"
+#include "llbc/core/utils/Util_Algorithm.h"
+#include "llbc/core/utils/Util_Debug.h"
+#include "llbc/core/utils/Util_Text.h"
+#include "llbc/core/utils/Util_Delegate.h"
+#include "llbc/core/utils/Util_MD5.h"
+#include "llbc/core/utils/Util_Base64.h"
+#include "llbc/core/utils/Util_Misc.h"
+#include "llbc/core/utils/Util_Network.h"
+#include "llbc/core/utils/Util_Variant.h"
+
+// core/helper
+#include "llbc/core/helper/STLHelper.h"
+#include "llbc/core/helper/GUIDHelper.h"
+
+// core/file
+#include "llbc/core/file/File.h"
+#include "llbc/core/file/Directory.h"
+
+// core/variant
+#include "llbc/core/variant/Variant.h"
+
+// core/rapidjson
 #include "llbc/core/rapidjson/json.h"
-#include "llbc/core/config/Common.h"
-#include "llbc/core/time/Common.h"
-#include "llbc/core/event/Common.h"
-#include "llbc/core/timer/Common.h"
-#include "llbc/core/thread/Common.h"
-#include "llbc/core/singleton/Common.h"
-#include "llbc/core/log/Common.h"
-#include "llbc/core/random/Common.h"
-#include "llbc/core/entity/Common.h"
-#include "llbc/core/transcoder/Common.h"
-#include "llbc/core/library/Common.h"
-#include "llbc/core/objbase/ObjBase.h"
-#include "llbc/core/objectpool/Common.h"
+
+// core/tinyxml2
+#include "llbc/core/tinyxml2/tinyxml2.h"
+
+// core/config
+#include "llbc/core/config/Ini.h"
+#include "llbc/core/config/Property.h"
+
+// core/time
+#include "llbc/core/time/Time.h"
+
+// core/event
+#include "llbc/core/event/EventFirer.h"
+#include "llbc/core/event/EventMgr.h"
+
+// core/timer
+#include "llbc/core/timer/Timer.h"
+#include "llbc/core/timer/TimerScheduler.h"
+
+// core/thread
+#include "llbc/core/thread/DummyLock.h"
+#include "llbc/core/thread/SimpleLock.h"
+#include "llbc/core/thread/RecursiveLock.h"
+#include "llbc/core/thread/FastLock.h"
+#include "llbc/core/thread/SpinLock.h"
+#include "llbc/core/thread/RWLock.h"
+#include "llbc/core/thread/Guard.h"
+#include "llbc/core/thread/ConditionVariable.h"
+#include "llbc/core/thread/Semaphore.h"
+#include "llbc/core/thread/Tls.h"
+#include "llbc/core/thread/MessageBlock.h"
+#include "llbc/core/thread/MessageBuffer.h"
+#include "llbc/core/thread/MessageQueue.h"
+#include "llbc/core/thread/ThreadMgr.h"
+#include "llbc/core/thread/Task.h"
+
+// core/singleton
+#include "llbc/core/singleton/Singleton.h"
+
+// core/log
+#include "llbc/core/log/LogData.h"
+#include "llbc/core/log/LogLevel.h"
+#include "llbc/core/log/BaseLogAppender.h"
+#include "llbc/core/log/Logger.h"
+#include "llbc/core/log/LoggerMgr.h"
+#include "llbc/core/log/LogJsonMsg.h"
+
+// core/random
+#include "llbc/core/random/Random.h"
+
+// core/entity
+#include "llbc/core/entity/IHolder.h"
+#include "llbc/core/entity/Entity.h"
+
+// core/transcoder
+#include "llbc/core/transcoder/Transcoder.h"
+
+// core/library
+#include "llbc/core/library/Library.h"
+
+// core/objbase
+#include "llbc/core/objbase/Object.h"
+#include "llbc/core/objbase/ObjectMacro.h"
+#include "llbc/core/objbase/ObjectFactory.h"
+#include "llbc/core/objbase/Array.h"
+#include "llbc/core/objbase/Dictionary.h"
+#include "llbc/core/objbase/DictionaryElem.h"
+#include "llbc/core/objbase/AutoReleasePool.h"
+#include "llbc/core/objbase/AutoReleasePoolStack.h"
+
+// core/objpool
+#include "llbc/core/objpool/ObjPool.h"
+#include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 __LLBC_NS_BEGIN
 
@@ -62,5 +159,3 @@ LLBC_HIDDEN int __LLBC_CoreStartup();
 LLBC_HIDDEN void __LLBC_CoreCleanup();
 
 __LLBC_NS_END
-
-#endif // !__LLBC_CORE_CORE_H__

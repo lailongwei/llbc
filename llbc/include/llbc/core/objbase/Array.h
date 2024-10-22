@@ -19,10 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_OBJBASE_ARRAY_H__
-#define __LLBC_OBJBASE_ARRAY_H__
-
-#include "llbc/common/Common.h"
+#pragma once
 
 #include "llbc/core/objbase/Object.h"
 
@@ -71,18 +68,16 @@ public:
     {   // do nothing.
     }
 
-    reference operator *() const
+    reference operator*() const
     {   // return designated object.
         _Checkit();
-        if(_Forward)
-        {
+        if (_Forward)
             return *(_arr + _idx);
-        }
 
         return *(_arr + _idx - 1);
     }
 
-    iterator &operator =(const iterator &rhs)
+    iterator &operator=(const iterator &rhs)
     {   // copy with another iter.
         _arr = rhs._arr;
         _idx = rhs._idx;
@@ -90,98 +85,80 @@ public:
         return *this;
     }
 
-    iterator &operator ++()
+    iterator &operator++()
     {   // preincrement.
         _Checkit();
-        if(_Forward)
-        {
+        if (_Forward)
             ++_idx;
-        }
         else
-        {
             --_idx;
-        }
 
         return *this;
     }
 
-    const iterator operator ++(int)
+    const iterator operator++(int)
     {   // postincrement.
         iterator temp(*this);
         ++*this;
         return temp;
     }
 
-    iterator &operator --()
+    iterator &operator--()
     {   // predecrement.
         _Checkit();
-        if(_Forward)
-        {
+        if (_Forward)
             --_idx;
-        }
         else
-        {
             ++_idx;
-        }
 
         return *this;
     }
 
-    const iterator operator --(int)
+    const iterator operator--(int)
     {   // postdecrement.
         iterator temp(*this);
         --*this;
         return temp;
     }
 
-    iterator &operator +=(difference_type off)
+    iterator &operator+=(difference_type off)
     {   // increment by integer.
-        if(_Forward)
-        {
+        if (_Forward)
             _idx += off;
-        }
         else
-        {
             _idx -= off;
-        }
 
         _Checkit();
         return *this;
     }
 
-    const iterator operator +(difference_type off) const
+    const iterator operator+(difference_type off) const
     {   // return this + integer.
         iterator temp(*this);
         return temp += off;
     }
 
-    iterator &operator -=(difference_type off)
+    iterator &operator-=(difference_type off)
     {   // decrement by integer.
-        if(_Forward)
-        {
+        if (_Forward)
             _idx -= off;
-        }
         else
-        {
             _idx += off;
-        }
 
         _Checkit();
         return *this;
     }
 
-    const iterator operator -(difference_type off) const
+    const iterator operator-(difference_type off) const
     {   // return this - integer.
         iterator temp(*this);
         return temp -= off;
     }
 
-    difference_type operator -(const iterator &rhs) const
+    difference_type operator-(const iterator &rhs) const
     {   // return difference of iterators.
-        if(_Forward)
-        {
+        if (_Forward)
             return _idx - rhs._idx;
-        }
 
         return rhs._idx - _idx;
     }
@@ -191,44 +168,40 @@ public:
         return *(*this + off);
     }
 
-    bool operator <(const iterator &rhs) const
+    bool operator<(const iterator &rhs) const
     {   // test if this < rhs.
 #ifdef LLBC_DEBUG
-        if(UNLIKELY(_arr != rhs._arr))
-        {
+        if (UNLIKELY(_arr != rhs._arr))
             _Xinvarg();
-        }
 #endif
         return _Forward ? _idx < rhs._idx : _idx > rhs._idx;
     }
 
-    bool operator ==(const iterator &rhs) const
+    bool operator==(const iterator &rhs) const
     {   // test for iterator equality.
 #ifdef LLBC_DEBUG
-        if(UNLIKELY(_arr != rhs._arr))
-        {
+        if (UNLIKELY(_arr != rhs._arr))
             _Xinvarg();
-        }
 #endif
         return _idx == rhs._idx;
     }
 
-    bool operator !=(const iterator &rhs) const
+    bool operator!=(const iterator &rhs) const
     {   // test for iterator inequality.
         return !(*this == rhs);
     }
 
-    bool operator <=(const iterator &rhs) const
+    bool operator<=(const iterator &rhs) const
     {   // test if this <= rhs.
         return !(rhs < *this);
     }
 
-    bool operator >(const iterator &rhs) const
+    bool operator>(const iterator &rhs) const
     {   // test if this > rhs.
         return rhs < *this;
     }
 
-    bool operator >=(const iterator &rhs) const
+    bool operator>=(const iterator &rhs) const
     {   // test if this >= rhs.
         return !(*this < rhs);
     }
@@ -260,18 +233,12 @@ protected:
     void _Checkit() const
     {
 #ifdef LLBC_DEBUG
-        if(UNLIKELY(!_arr))
-        {
+        if (UNLIKELY(!_arr))
             _Xnullptr();
-        }
-        if(UNLIKELY(_idx < 0))
-        {
+        if (UNLIKELY(_idx < 0))
             _Xunf();
-        }
-        if(UNLIKELY(_idx == LONG_MAX))
-        {
+        if (UNLIKELY(_idx == LONG_MAX))
             _Xlen();
-        }
 #endif
     }
 
@@ -313,67 +280,67 @@ public:
     {   // do nothing.
     }
 
-    reference operator *()
+    reference operator*()
     {   // return designated object.
         return (reference)**(_MyBase *)this;
     }
 
-    iterator &operator =(const iterator &rhs)
+    iterator &operator=(const iterator &rhs)
     {   // copy with another iter.
         (*(_MyBase *)this) = rhs;
         return *this;
     }
 
-    iterator &operator ++()
+    iterator &operator++()
     {   // preincrement.
         ++(*(_MyBase *)this);
         return *this;
     }
 
-    const iterator operator ++(int)
+    const iterator operator++(int)
     {   // postincrement.
         iterator temp(*this);
         ++*this;
         return temp;
     }
 
-    iterator &operator --()
+    iterator &operator--()
     {   // predecrement.
         --(*(_MyBase *)this);
         return *this;
     }
 
-    const iterator operator --(int)
+    const iterator operator--(int)
     {
         iterator temp(*this);
         --*this;
         return temp;
     }
 
-    iterator &operator +=(difference_type off)
+    iterator &operator+=(difference_type off)
     {   // increment by integer.
         *(_MyBase *)this += off;
         return *this;
     }
 
-    const iterator operator +(difference_type off) const
+    const iterator operator+(difference_type off) const
     {   // return this + integer.
         iterator temp(*this);
         return temp += off;
     }
 
-    iterator &operator -=(difference_type off)
+    iterator &operator-=(difference_type off)
     {   // decrement by integer.
         return *this += -off;
     }
 
-    const iterator operator -(difference_type off) const
+    const iterator operator-(difference_type off) const
     {   // return this - integer.
         iterator temp(*this);
         return temp -= off;
     }
 
-    difference_type operator -(const _MyBase &rhs) const
+    difference_type operator-(const _MyBase &rhs) const
     {   // return difference of iterators.
         return *(_MyBase *)this - rhs;
     }
@@ -508,8 +475,8 @@ public:
     /**
      * Subscript operations.
      */
-    Obj *&operator [](difference_type off);
-    ConstObj *operator [](difference_type off) const;
+    Obj *&operator[](difference_type off);
+    ConstObj *operator[](difference_type off) const;
 
 public:
     /**
@@ -564,10 +531,10 @@ public:
     void SetObjectFactory(LLBC_ObjectFactory *factory);
 
     /**
-     * Serialize/DeSerialize support.
+     * Serialize/Deserialize support.
      */
     virtual void Serialize(LLBC_Stream &s) const;
-    virtual bool DeSerialize(LLBC_Stream &s);
+    virtual bool Deserialize(LLBC_Stream &s);
 
     /**
      * Disable assignment.
@@ -587,6 +554,6 @@ public:
 
 __LLBC_NS_END
 
-#include "llbc/core/objbase/ArrayImpl.h"
+#include "llbc/core/objbase/ArrayInl.h"
 
-#endif // !__LLBC_OBJBASE_ARRAY_H__
+

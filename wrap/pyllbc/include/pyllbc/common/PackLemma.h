@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __PYLLBC_COM_PACK_LEMMA_H__
-#define __PYLLBC_COM_PACK_LEMMA_H__
+#pragma once
 
 #include "pyllbc/common/LibHeader.h"
 #include "pyllbc/common/PyStream.h"
@@ -63,7 +62,6 @@ public:
 
         String = 'S',
         StringLen = '#',
-        StringEnd = '$',
         Unicode = 'U',
 
         ByteArray = 'A',
@@ -217,5 +215,3 @@ protected:
 
     PyObject *_compileEnv;
 };
-
-#endif // !__PYLLBC_COM_PACK_LEMMA_H__

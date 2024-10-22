@@ -19,10 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_SESSION_OPTS_H__
-#define __LLBC_COMM_SESSION_OPTS_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
@@ -81,7 +79,7 @@ public:
     /**
      * Set socket recv buffer size.
      * Note:
-     *  Some OS Platform supported send buffer dynamic adjust, like: windows 7 and laters, windows 2008 server and laters, linux kerner 2.4+.
+     *  Some OS Platform supported send buffer dynamic adjust, like: windows 7 and laters, windows 2008 server and laters, linux kernel 2.4+.
      * @param[in] sockRecvBufSize - the socket recv buffer size.
      */
     void SetSockRecvBufSize(size_t sockRecvBufSize);
@@ -126,22 +124,22 @@ public:
 
 public:
     /**
-     * operator ==
+     * operator==
      */
-    bool operator ==(const LLBC_SessionOpts &another) const;
+    bool operator==(const LLBC_SessionOpts &another) const;
 
 private:
     bool _noDelay; // No-delay option, default is true.
     size_t _sockSendBufSize; // socket send buffer size, in bytes, default is 0, it means use os default.
     size_t _sockRecvBufSize; // socket recv buffer size, in bytes, default is 0, it means use os default.
     size_t _sessionSendBufSize; // session send buffer size, in bytes, default is LLBC_CFG_COMM_DFT_SESSION_SEND_BUF_SIZE
-    size_t _sessionRecvBufSize; // sessiontrecv buffer size(init size), in bytes, default is LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE.
+    size_t _sessionRecvBufSize; // session recv buffer size(init size), in bytes, default is LLBC_CFG_COMM_DFT_SESSION_RECV_BUF_SIZE.
     size_t _maxPacketSize; // max packet seize in packet protocol
 };
 
 __LLBC_NS_END
 
-#include "llbc/comm/SessionOptsImpl.h"
+#include "llbc/comm/SessionOptsInl.h"
 
 __LLBC_NS_BEGIN
 
@@ -151,5 +149,3 @@ __LLBC_NS_BEGIN
 LLBC_EXTERN LLBC_EXPORT const LLBC_SessionOpts LLBC_DftSessionOpts;
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_SESSION_OPTS_H__

@@ -19,10 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_PROTOCOL_LAYER_H__
-#define __LLBC_COMM_PROTOCOL_LAYER_H__
+#pragma once
 
-#include "llbc/common/Common.h"
 #include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
@@ -64,5 +62,3 @@ public:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_PROTOCOL_LAYER_H__

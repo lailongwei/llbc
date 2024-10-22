@@ -19,8 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COM_ERRORS_H__
-#define __LLBC_COM_ERRORS_H__
+#pragma once
 
 #include "llbc/common/Macro.h"
 
@@ -34,9 +33,19 @@ LLBC_EXPORT int LLBC_GetLastError();
 
 /**
  * Set llbc library last error.
- * @param[in] no - error no.
+ * @param[in] no           - error no.
+ * @param[in] customErrStr - custom error string.
  */
-LLBC_EXPORT void LLBC_SetLastError(int no);
+LLBC_EXPORT void LLBC_SetLastError(int no, const char *customErrStr = nullptr);
+
+/**
+ * Set llbc last error(enum type).
+ * @param[in] no           - error no.
+ * @param[in] customErrStr - custom error string.
+ */
+template <typename EnumTy>
+typename std::enable_if<std::is_enum<EnumTy>::value, void>::type
+LLBC_SetLastError(EnumTy no, const char *customErrStr = nullptr);
 
 /**
  * Format error message.
@@ -45,11 +54,10 @@ LLBC_EXPORT void LLBC_SetLastError(int no);
  */
 LLBC_EXPORT const char *LLBC_StrError(int no);
 
-
 /**
  * Format error message(extend version).
- * @param[in] no        - error number.
- * @param[in] subErrrno - the sub error number.
+ * @param[in] no       - error number.
+ * @param[in] subErrno - the sub error number.
  */
 LLBC_EXPORT const char *LLBC_StrErrorEx(int no, int subErrno);
 
@@ -110,5 +118,7 @@ LLBC_HIDDEN void __LLBC_DestroyErrors();
 
 __LLBC_NS_END
 
-#endif // !__LLBC_COM_ERRORS_H__
+#include <llbc/common/ErrorsInl.h>
+
+
 

@@ -19,11 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef __LLBC_COMM_PROTOCOL_STACK_H__
-#define __LLBC_COMM_PROTOCOL_STACK_H__
-
-#include "llbc/common/Common.h"
-#include "llbc/core/Core.h"
+#pragma once
 
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolLayer.h"
@@ -35,9 +31,9 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Packet;
 class LLBC_IProtocolFilter;
-class LLBC_ICoderFactory;
+class LLBC_CoderFactory;
 class LLBC_Session;
-class LLBC_IService;
+class LLBC_Service;
 
 __LLBC_NS_END
 
@@ -74,15 +70,15 @@ public:
 public:
     /**
      * Get service.
-     * @return LLBC_IService * - the service.
+     * @return LLBC_Service * - the service.
      */
-    LLBC_IService *GetService();
+    LLBC_Service *GetService();
 
     /**
      * Set service to protocol stack, use to report something to service.
      * @param[in] svc - the service.
      */
-    void SetService(LLBC_IService *svc);
+    void SetService(LLBC_Service *svc);
 
     /**
      * Get session.
@@ -140,8 +136,6 @@ public:
     int SetFilter(LLBC_IProtocolFilter *filter, int toProto);
 
 public:
-    int Connect(LLBC_SockAddr_IN &local, LLBC_SockAddr_IN &peer);
-
     /**
      * When packet send, will use this protocol stack method to filter and encode packet.
      * @param[in] willEncode     - the will send packet.
@@ -240,7 +234,7 @@ public:
 private:
     StackType _type;
 
-    LLBC_IService *_svc;
+    LLBC_Service *_svc;
     LLBC_Session *_session;
     bool _suppressCoderNotFoundError;
 
@@ -250,6 +244,3 @@ private:
 };
 
 __LLBC_NS_END
-
-#endif // !__LLBC_COMM_PROTOCOL_STACK_H__
-
