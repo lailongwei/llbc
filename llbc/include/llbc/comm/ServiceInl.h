@@ -121,7 +121,7 @@ typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value &&
 LLBC_Service::GetComponent()
 {
     // Get component name.
-    const LLBC_CString compName = LLBC_GetCompName(Comp);
+    const static LLBC_CString compName = LLBC_GetCompName(Comp);
 
     // Normal search.
     LockService();
