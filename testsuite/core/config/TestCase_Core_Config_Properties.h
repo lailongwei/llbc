@@ -24,15 +24,12 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Config_Property : public LLBC_BaseTestCase
+class TestCase_Core_Config_Properties : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Config_Property();
-    ~TestCase_Core_Config_Property();
+    TestCase_Core_Config_Properties();
+    ~TestCase_Core_Config_Properties();
 
 public:
     virtual int Run(int argc, char *argv[]);
-
-private:
-    LLBC_String _file;
 };
