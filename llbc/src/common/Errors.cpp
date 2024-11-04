@@ -117,26 +117,34 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "not allow",                // 0x0024
     // initialize comp failed.
     "initialize comp failed",   // 0x0025
+    // late initialize comp failed.
+    "late initialize comp failed", // 0x0026
     // start comp failed.
-    "start comp failed",        // 0x0026
+    "start comp failed",        // 0x0027
+    // late start comp failed.
+    "late start comp failed",   // 0x0028
     // WSA specific: WSASYSNOTREADY
-    "underlying network subsystem is not ready for network communication", // 0x0027
+    "underlying network subsystem is not ready for network communication", // 0x0029
     // WSA specific: WSAVERNOTSUPPORTED
-    "the version of Windows Sockets support requested is not provided by this particular Windows Sockets implementation", // 0x0028
+    "the version of Windows Sockets support requested is not provided by this particular Windows Sockets implementation", // 0x002a
     // WSA specific: WSAEINPROGRESS
-    "a blocking windows Sockets 1.1 operations in progress", // 0x0029
+    "a blocking windows Sockets 1.1 operations in progress", // 0x002b
     // WSA specific: WSAEPROCLIM
-    "limit on the number of tasks supported by the Windows Sockets implementation has been reached", // 0x002a
+    "limit on the number of tasks supported by the Windows Sockets implementation has been reached", // 0x002c
     // the specific socket is listen socket.
-    "the specific socket is listen socket", // 0x002b
+    "the specific socket is listen socket", // 0x002d
     // object is not pool object.
-    "object is not pool object",// 0x002c
+    "object is not pool object",// 0x002e
     // session send buffer limit.
-    "session send buffer limit",// 0x002d
+    "session send buffer limit",// 0x002f
     // not support.
-    "not support",              // 0x002e
+    "not support",              // 0x0030
     // cancelled.
-    "cancelled",                // 0x002f
+    "cancelled",                // 0x0031
+    // application early start failed.
+    "application early start failed", // 0x0032
+    // application start failed.
+    "application start failed", // 0x0033
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;

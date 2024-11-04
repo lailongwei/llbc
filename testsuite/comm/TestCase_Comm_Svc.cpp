@@ -39,47 +39,49 @@ public:
     }
 
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_PrintLn("Service create!");
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         LLBC_PrintLn("Service destroy!");
     }
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    void OnEvent(int eventType, const LLBC_Variant &eventParams) override
     {
-        switch(event)
+        switch(eventType)
         {
             case LLBC_ComponentEventType::SessionCreate:
             {
-                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
                 break;
             }
             case LLBC_ComponentEventType::SessionDestroy:
             {
-                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
                 break;
             }
             case LLBC_ComponentEventType::AsyncConnResult:
             {
-                OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+                OnAsyncConnResult(*eventParams.AsPtr<LLBC_AsyncConnResult>());
                 break;
             }
             case LLBC_ComponentEventType::UnHandledPacket:
             {
-                OnUnHandledPacket(*evArgs.AsPtr<LLBC_Packet>());
+                OnUnHandledPacket(*eventParams.AsPtr<LLBC_Packet>());
                 break;
             }
             case LLBC_ComponentEventType::ProtoReport:
             {
-                OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+                OnProtoReport(*eventParams.AsPtr<LLBC_ProtoReport>());
                 break;
             }
-            default: break;
+
+            default:
+                break;
         }
     }
 

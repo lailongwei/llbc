@@ -162,32 +162,44 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildFireEventEv(LLBC_Event *ev,
     return evBlock;
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppPhaseEv(bool earlyStart,
-                                                   bool startFail,
-                                                   bool startFinish,
-                                                   bool earlyStop)
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppPhaseEv(bool willStart,
+                                                   bool startFailed,
+                                                   bool startFinished,
+                                                   bool willStop,
+                                                   int cfgType,
+                                                   const LLBC_Variant &cfg)
 {
     LLBC_SvcEv_AppPhaseEv *wrapEv;
     auto evBlock = __CreateEvBlock(wrapEv);
-    wrapEv->earlyStart = earlyStart;
-    wrapEv->startFail = startFail;
-    wrapEv->startFinish = startFinish;
-    wrapEv->earlyStop = earlyStop;
+    wrapEv->willStart = willStart;
+    wrapEv->startFailed = startFailed;
+    wrapEv->startFinished = startFinished;
+    wrapEv->willStop = willStop;
+
+    wrapEv->cfgType = cfgType;
+    wrapEv->cfg = cfg;
 
     return evBlock;
 }
 
-LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppCfgReloadEv(int cfgType,
-                                                       const LLBC_Property &propCfg,
-                                                       const LLBC_Variant &nonPropCfg)
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppReloadedEv(int cfgType,
+                                                      const LLBC_Variant &cfg)
 {
-    LLBC_SvcEv_AppCfgReloadedEv *wrapEv;
+    LLBC_SvcEv_AppReloadedEv *wrapEv;
     auto evBlock = __CreateEvBlock(wrapEv);
     wrapEv->cfgType = cfgType;
-    if (cfgType == LLBC_AppConfigType::Property)
-        wrapEv->propCfg = propCfg;
-    else
-        wrapEv->nonPropCfg = nonPropCfg;
+    wrapEv->cfg = cfg;
+
+    return evBlock;
+}
+
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildComponentEventEv(int eventType,
+                                                         const LLBC_Variant &eventParams)
+{
+    LLBC_SvcEv_ComponentEventEv *wrapEv;
+    auto evBlock = __CreateEvBlock(wrapEv);
+    wrapEv->eventType = eventType;
+    wrapEv->eventParams = eventParams;
 
     return evBlock;
 }

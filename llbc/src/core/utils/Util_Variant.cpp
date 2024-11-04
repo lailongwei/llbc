@@ -19,8 +19,6 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/config/Ini.h"
-#include "llbc/core/config/Property.h"
-
 #include "llbc/core/tinyxml2/tinyxml2.h"
 
 #include "llbc/core/utils/Util_Variant.h"
@@ -103,25 +101,6 @@ void LLBC_VariantUtil::Xml2Variant(const ::llbc::tinyxml2::XMLElement &elem, LLB
         if (var.DictFind(childVar[LLBC_XMLKeys::Name]) == var.DictEnd())
             var.DictInsert(childVar[LLBC_XMLKeys::Name], childVar);
     }
-}
-
-void LLBC_VariantUtil::Property2Variant(const LLBC_Property &prop, LLBC_Variant &var)
-{
-    // Leaf config node, get value.
-    if (prop.GetPropertiesCount() == 0)
-    {
-        var = prop.GetValue();
-        return;
-    }
-
-    // Non-Leaf config node, convert to variant(dict).
-    if (var.IsDict())
-        var.Clear();
-    else
-        var.BecomeDict();
-
-    for (auto &propItem : prop.GetAllProperties())
-        Property2Variant(*propItem.second, var[propItem.first]);
 }
 
 __LLBC_NS_END

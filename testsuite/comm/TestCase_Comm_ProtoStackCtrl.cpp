@@ -80,7 +80,8 @@ namespace
                     OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
                     break;
                 }
-                default: break;
+                default:
+                    break;
             }
         }
 

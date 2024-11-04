@@ -30,64 +30,56 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const LLBC_NS LLBC_String __cfgSuffix_Ini = ".ini";
-static const LLBC_NS LLBC_String __cfgSuffix_Xml = ".xml";
-static const LLBC_NS LLBC_String __cfgSuffix_Property = ".cfg";
-static const LLBC_NS LLBC_String __cfgSuffix_Unknown = "";
+static const LLBC_NS LLBC_Strings __cfgSuffixes_Ini = { ".ini" };
+static const LLBC_NS LLBC_Strings __cfgSuffixes_Xml = { ".xml" };
+static const LLBC_NS LLBC_Strings __cfgSuffixes_Property = { ".cfg", ".properties" };
+static const LLBC_NS LLBC_Strings __cfgSuffixes_Unknown = { "" };
 
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-const LLBC_String &LLBC_AppConfigType::GetConfigSuffix(int cfgType)
+const LLBC_Strings &LLBC_AppConfigType::GetConfigSuffixes(int cfgType)
 {
     if (cfgType == Ini)
-        return LLBC_INL_NS __cfgSuffix_Ini;
+        return LLBC_INL_NS __cfgSuffixes_Ini;
     else if (cfgType == Xml)
-        return LLBC_INL_NS __cfgSuffix_Xml;
+        return LLBC_INL_NS __cfgSuffixes_Xml;
     else if (cfgType == Property)
-        return LLBC_INL_NS __cfgSuffix_Property;
+        return LLBC_INL_NS __cfgSuffixes_Property;
     else
-        return LLBC_INL_NS __cfgSuffix_Unknown;
+        return LLBC_INL_NS __cfgSuffixes_Unknown;
 }
 
 auto LLBC_AppConfigType::GetConfigType(const LLBC_String &cfgSuffix) -> ENUM
 {
-    auto nmlCfgSuffix = cfgSuffix.strip().tolower();
-    if (nmlCfgSuffix == LLBC_INL_NS __cfgSuffix_Ini)
-        return Ini;
-    else if (nmlCfgSuffix == LLBC_INL_NS __cfgSuffix_Xml)
-        return Xml;
-    else if (nmlCfgSuffix == LLBC_INL_NS __cfgSuffix_Property)
-        return Property;
-    else
-        return End;
+    const auto nmlCfgSuffix = cfgSuffix.strip().tolower();
+    LLBC_Foreach(LLBC_INL_NS __cfgSuffixes_Ini, LLBC_ReturnIf(nmlCfgSuffix == item, Ini));
+    LLBC_Foreach(LLBC_INL_NS __cfgSuffixes_Xml, LLBC_ReturnIf(nmlCfgSuffix == item, Xml));
+    LLBC_Foreach(LLBC_INL_NS __cfgSuffixes_Property, LLBC_ReturnIf(nmlCfgSuffix == item, Property));
+
+    return End;
 }
 
 LLBC_App *LLBC_App::_thisApp = nullptr;
 
 LLBC_App::LLBC_App()
 : _startPhase(LLBC_AppStartPhase::Stopped)
-
+, _startThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
 , _llbcLibStartupInApp(false)
-
-, _loadingCfg(false)
-, _preventCfgLoad(0)
-, _cfgType(LLBC_AppConfigType::End)
-
+, _requireStop(false)
 , _services(*LLBC_ServiceMgrSingleton)
 
-, _startThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
-
-, _requireStop(false)
+, _loading(0)
+, _cfgType(LLBC_AppConfigType::End)
 {
     ASSERT(!_thisApp && "Not allow create more than one application object");
 
     _thisApp = this;
     _libEventHandlers.emplace(LLBC_AppEventType::Stop,
         LLBC_Delegate<void(const LLBC_AppEvent &)>(this, &LLBC_App::HandleEvent_Stop));
-    _libEventHandlers.emplace(LLBC_AppEventType::ReloadApplicationConfig,
-        LLBC_Delegate<void(const LLBC_AppEvent &)>(this, &LLBC_App::HandleEvent_ReloadAppCfg));
+    _libEventHandlers.emplace(LLBC_AppEventType::Reload,
+        LLBC_Delegate<void(const LLBC_AppEvent &)>(this, &LLBC_App::HandleEvent_Reload));
 }
 
 LLBC_App::~LLBC_App()
@@ -95,6 +87,28 @@ LLBC_App::~LLBC_App()
     ASSERT(!IsStarted() && "Please stop application before destruct");
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup());
     _thisApp = nullptr;
+}
+
+bool LLBC_App::HasConfig() const
+{
+    LLBC_LockGuard guard(_loadLock);
+    return _cfgType != LLBC_AppConfigType::End;
+}
+
+LLBC_Variant LLBC_App::GetConfig() const
+{
+    LLBC_LockGuard guard(_loadLock);
+    LLBC_Variant cfg = _cfg;
+
+    return cfg;
+}
+
+LLBC_String LLBC_App::GetConfigPath() const
+{
+    LLBC_LockGuard guard(_loadLock);
+    LLBC_String cfgPath(_cfgPath.c_str(), _cfgPath.size());
+
+    return cfgPath;
 }
 
 int LLBC_App::SetConfigPath(const LLBC_String &cfgPath)
@@ -114,7 +128,7 @@ int LLBC_App::SetConfigPath(const LLBC_String &cfgPath)
     LLBC_SetErrAndReturnIf(IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Lock and check _started flag again.
-    LLBC_LockGuard guard(_cfgLock);
+    LLBC_LockGuard guard(_loadLock);
     LLBC_SetErrAndReturnIf(IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Save config info.
@@ -124,42 +138,31 @@ int LLBC_App::SetConfigPath(const LLBC_String &cfgPath)
     return LLBC_OK;
 }
 
-int LLBC_App::ReloadConfig(bool callEvMeth)
+int LLBC_App::Reload()
 {
-    // Not allow reload config if application not start.
+    return ReloadImpl(true, true);
+}
+
+int LLBC_App::PreventReload()
+{
+    // Not allow reload if application not start.
     LLBC_SetErrAndReturnIf(!IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
-    // Lock and check again.
-    LLBC_LockGuard guard(_cfgLock);
-    LLBC_SetErrAndReturnIf(!IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
-
-    // Config not found when application start.
-    LLBC_SetErrAndReturnIf(_cfgType == LLBC_AppConfigType::End, LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
-
-    // Reload.
-    LLBC_ReturnIf(LoadConfig(false) != LLBC_OK, LLBC_FAILED);
-
-    // Call config reload event method.
-    if (callEvMeth)
-    {
-        OnConfigReload();
-        for (auto &svcPair : this->_services.GetAllIndexedByIdServices())
-            svcPair.second->ProcessAppConfigReload();
-    }
+    // Increment loading flag.
+    LLBC_AtomicFetchAndAdd(&_loading, 1);
 
     return LLBC_OK;
 }
 
-void LLBC_App::PreventConfigLoad()
+int LLBC_App::CancelPreventReload()
 {
-    LLBC_LockGuard guard(_cfgLock);
-    ++_preventCfgLoad;
-}
+    // Not allow reload if application not start.
+    LLBC_SetErrAndReturnIf(!IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
-void LLBC_App::CancelPreventConfigLoad()
-{
-    LLBC_LockGuard guard(_cfgLock);
-    _preventCfgLoad = MAX(0, _preventCfgLoad - 1);
+    // Decrement loading flag.
+    LLBC_AtomicFetchAndSub(&_loading, 1);
+
+    return LLBC_OK;
 }
 
 int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
@@ -174,11 +177,16 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     LLBC_ReturnIf(_startArgs.Parse(argc, argv) != LLBC_OK, LLBC_FAILED);
 
     // Startup llbc library.
-    _llbcLibStartupInApp = true;
     if (LLBC_Startup() != LLBC_OK)
     {
         LLBC_ReturnIf(LLBC_GetLastError() != LLBC_ERROR_REENTRY, LLBC_FAILED);
+
         LLBC_SetLastError(LLBC_OK);
+        _llbcLibStartupInApp = false;
+    }
+    else
+    {
+        _llbcLibStartupInApp = true;
     }
 
     // Normalize application name.
@@ -189,10 +197,9 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     // Define app start failed defer.
     int ret = LLBC_FAILED;
     LLBC_Defer(if (ret != LLBC_OK) {
+        _cfg.BecomeNil();
         _cfgPath.clear();
         _cfgType = LLBC_AppConfigType::End;
-        _propCfg.RemoveAllProperties();
-        _nonPropCfg.BecomeNil();
 
         _name.clear();
 
@@ -202,27 +209,25 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
 
     // Set start phase to starting.
     _startPhase = LLBC_AppStartPhase::Starting;
-
     // Set start threadId.
     _startThreadId = LLBC_GetCurrentThreadId();
 
-    // Locate config path.
+    // Locate config path & Load config.
     if (_cfgPath.empty())
     {
-        int intCfgType;
-        if (!(_cfgPath = LocateConfigPath(name, intCfgType)).empty())
-            _cfgType = static_cast<LLBC_AppConfigType::ENUM>(intCfgType);
+        int cfgType;
+        if (!(_cfgPath = LocateConfigPath(name, cfgType)).empty())
+            _cfgType = static_cast<LLBC_AppConfigType::ENUM>(cfgType);
     }
 
-    // Load config.
-    LLBC_ReturnIf(!_cfgPath.empty() && LoadConfig(true) != LLBC_OK, LLBC_FAILED);
+    // Reload
+    LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadImpl(false, false) != LLBC_OK, LLBC_FAILED);
 
     // Handle progress crash.
-    if (LLBC_HandleCrash() != LLBC_OK)
-        return LLBC_FAILED;
+    LLBC_ReturnIf(LLBC_HandleCrash() != LLBC_OK, LLBC_FAILED);
 
     // Install required signal handlers.
-    // - App stop signals
+    // - App stop signals.
     const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
 #if LLBC_TARGET_PLATFORM_WIN32
     for (auto &stopSig : stopSigs)
@@ -235,22 +240,29 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         sigaction(stopSig, &sa, nullptr);
 #endif // Win32
 
+    // - App reload signals.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    // - App config reload signal
-    const int cfgReloadSigs[]LLBC_CFG_APP_CFG_RELOAD_SIGNALS;
-    sa.sa_handler = LLBC_App::HandleSignal_ReloadAppCfg;
+    const int cfgReloadSigs[]LLBC_CFG_APP_RELOAD_SIGNALS;
+    sa.sa_handler = LLBC_App::HandleSignal_Reload;
     for (auto &cfgReloadSig : cfgReloadSigs)
         sigaction(cfgReloadSig, &sa, nullptr);
 #endif // Non-Win32
 
     // Call OnEarlyStart event method.
-    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-    if (OnEarlyStart(argc, argv) != LLBC_OK)
+    while (true)
     {
-        if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
-            LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+        bool earlyStartFinished = true;
+        LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+        if (OnEarlyStart(argc, argv, earlyStartFinished) != LLBC_OK)
+        {
+            if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
+                LLBC_SetLastError(LLBC_ERROR_APP_EARLY_START_FAILED);
 
-        return LLBC_FAILED;
+            return LLBC_FAILED;
+        }
+
+        LLBC_BreakIf(earlyStartFinished);
+        LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
     }
 
     // Fire App-WillStart event to all service(s).
@@ -260,12 +272,11 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     while (true)
     {
         bool startFinished = true;
-
         LLBC_SetLastError(LLBC_ERROR_SUCCESS);
         if (OnStart(argc, argv, startFinished) != LLBC_OK)
         {
             if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
-                LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+                LLBC_SetLastError(LLBC_ERROR_APP_START_FAILED);
 
             // Fire App-StartFail event to all service(s).
             FireAppPhaseChangeEvToServices(false, true, false, false);
@@ -326,7 +337,14 @@ void LLBC_App::Stop()
     _startPhase = LLBC_AppStartPhase::Stopping;
 
     // Call OnEarlyStop event method.
-    OnEarlyStop();
+    while (true)
+    {
+        bool earlyStopFinished = true;
+        OnEarlyStop(earlyStopFinished);
+        LLBC_BreakIf(earlyStopFinished);
+
+        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
+    }
 
     // Fire App-WillStop event to all service(s).
     FireAppPhaseChangeEvToServices(false, false, false, true);
@@ -363,7 +381,7 @@ void LLBC_App::Stop()
         sigaction(stopSig, &sa, nullptr);
 #endif // Win32
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    const int cfgReloadSigs[]LLBC_CFG_APP_CFG_RELOAD_SIGNALS;
+    const int cfgReloadSigs[]LLBC_CFG_APP_RELOAD_SIGNALS;
     for (auto &cfgReloadSig : cfgReloadSigs)
         sigaction(cfgReloadSig, &sa, nullptr);
 #endif // Non-Win32
@@ -371,8 +389,7 @@ void LLBC_App::Stop()
     // Cleanup members.
     _cfgPath.clear();
     _cfgType = LLBC_AppConfigType::End;
-    _propCfg.RemoveAllProperties();
-    _nonPropCfg.BecomeNil();
+    _cfg.BecomeNil();
 
     _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
 
@@ -484,7 +501,7 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
     if (execName.endswith("_d") || execName.endswith("_debug"))
         cfgFileNames.push_back(execName.substr(0, execName.rfind('_')));
 
-    // Execute config file locate.
+    // Execute config file locatee
     for (auto &cfgFileDir : cfgFileDirs)
     {
         for (auto &cfgFileName : cfgFileNames)
@@ -493,9 +510,11 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
                  cfgType != LLBC_AppConfigType::End;
                  ++cfgType)
             {
-                auto cfgPath = LLBC_Directory::Join(
-                    cfgFileDir, cfgFileName + LLBC_AppConfigType::GetConfigSuffix(cfgType));
-                LLBC_ReturnIf(LLBC_File::Exists(cfgPath), cfgPath);
+                for (auto &cfgSuffix : LLBC_AppConfigType::GetConfigSuffixes(cfgType))
+                {
+                    auto cfgPath = LLBC_Directory::Join(cfgFileDir, cfgFileName + cfgSuffix);
+                    LLBC_ReturnIf(LLBC_File::Exists(cfgPath), cfgPath);
+                }
             }
         }
     }
@@ -504,45 +523,61 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
     return "";
 }
 
-int LLBC_App::LoadConfig(bool lock)
+int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
 {
-    // Reentry check.
-    LLBC_SetErrAndReturnIf(_loadingCfg, LLBC_ERROR_REENTRY, LLBC_FAILED);
+    // Lock and check.
+    LLBC_LockGuard guard(_loadLock);
+    LLBC_SetErrAndReturnIf(checkAppStarted && !IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(_loading > 0, LLBC_ERROR_REENTRY, LLBC_FAILED);
 
-    // Lock and check again.
-    if (lock)
-        _cfgLock.Lock();
-    LLBC_Defer(if (lock) _cfgLock.Unlock());
+    // Reload config.
+    LLBC_AtomicFetchAndAdd(&_loading, 1);
+    LLBC_Defer(LLBC_AtomicFetchAndSub(&_loading, 1));
+    LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadConfig() != LLBC_OK, LLBC_FAILED);
 
-    // Not allow reentry.
-    LLBC_SetErrAndReturnIf(_loadingCfg, LLBC_ERROR_REENTRY, LLBC_FAILED);
-    // If prevent config load, return faled.
-    LLBC_SetErrAndReturnIf(_preventCfgLoad != 0, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+    // Note: Execute other application level resource(s) reload.
+    // ... ...
 
+    // Call reload event method.
+    if (callEvMeth)
+    {
+        OnReload();
+        for (auto &svcId : _services.GetAllServiceIds())
+        {
+            auto svc = _services.GetService(svcId);
+            LLBC_ContinueIf(!svc);
+
+            svc->Push(LLBC_SvcEvUtil::BuildAppReloadedEv(_cfgType, _cfg));
+        }
+    }
+
+    return LLBC_OK;
+}
+
+int LLBC_App::ReloadConfig()
+{
     // Check config file exist or not.
     LLBC_SetErrAndReturnIf(!LLBC_File::Exists(_cfgPath), LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
 
-    _loadingCfg = true;
-    LLBC_Defer(_loadingCfg = false);
-
-    LLBC_DoIf(_cfgType == LLBC_AppConfigType::Ini, return LoadIniConfig());
-    LLBC_DoIf(_cfgType == LLBC_AppConfigType::Xml, return LoadXmlConfig());
-    LLBC_DoIf(_cfgType == LLBC_AppConfigType::Property, return LoadPropertyConfig());
+    // Reload llbc framework supported config type files.
+    LLBC_DoIf(_cfgType == LLBC_AppConfigType::Ini, return ReloadIniConfig());
+    LLBC_DoIf(_cfgType == LLBC_AppConfigType::Xml, return ReloadXmlConfig());
+    LLBC_DoIf(_cfgType == LLBC_AppConfigType::Property, return ReloadPropertyConfig());
     
     LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
     return LLBC_FAILED;
 }
 
-int LLBC_App::LoadIniConfig()
+int LLBC_App::ReloadIniConfig()
 {
     LLBC_Ini ini;
     LLBC_ReturnIf(ini.LoadFromFile(_cfgPath) != LLBC_OK, LLBC_FAILED);
 
-    LLBC_VariantUtil::Ini2Variant(ini, _nonPropCfg);
+    LLBC_VariantUtil::Ini2Variant(ini, _cfg);
     return LLBC_OK;
 }
 
-int LLBC_App::LoadXmlConfig()
+int LLBC_App::ReloadXmlConfig()
 {
     ::llbc::tinyxml2::XMLDocument doc;
     const auto xmlLoadRet = doc.LoadFile(_cfgPath.c_str());
@@ -555,13 +590,14 @@ int LLBC_App::LoadXmlConfig()
         return LLBC_FAILED;
     }
 
-    LLBC_VariantUtil::Xml2Variant(doc, _nonPropCfg);
+    LLBC_VariantUtil::Xml2Variant(doc, _cfg);
     return LLBC_OK;
 }
 
-int LLBC_App::LoadPropertyConfig()
+int LLBC_App::ReloadPropertyConfig()
 {
-    return _propCfg.LoadFromFile(_cfgPath);
+    _cfg.BecomeNil();
+    return LLBC_Properties::LoadFromFile(_cfgPath, _cfg);
 }
 
 void LLBC_App::HandleEvents(bool &doNothing)
@@ -596,9 +632,9 @@ void LLBC_App::HandleEvents(bool &doNothing)
     }
 }
 
-void LLBC_App::HandleEvent_ReloadAppCfg(const LLBC_AppEvent &ev)
+void LLBC_App::HandleEvent_Reload(const LLBC_AppEvent &ev)
 {
-    ReloadConfig();
+    Reload();
 }
 
 void LLBC_App::HandleEvent_Stop(const LLBC_AppEvent &ev)
@@ -611,19 +647,33 @@ void LLBC_App::HandleSignal_Stop(int sig)
     ThisApp()->PushEvent(LLBC_AppEventType::Stop);
 }
 
-void LLBC_App::HandleSignal_ReloadAppCfg(int sig)
+void LLBC_App::HandleSignal_Reload(int sig)
 {
-    ThisApp()->PushEvent(LLBC_AppEventType::ReloadApplicationConfig);
+    ThisApp()->PushEvent(LLBC_AppEventType::Reload);
 }
 
-void LLBC_App::FireAppPhaseChangeEvToServices(bool earlyStart,
-                                              bool startFail,
-                                              bool startFinish,
-                                              bool earlyStop)
+void LLBC_App::FireAppPhaseChangeEvToServices(bool willStart,
+                                              bool startFailed,
+                                              bool startFinished,
+                                              bool willStop)
 {
-    for (auto svcItem : _services.GetAllIndexedByIdServices())
-        svcItem.second->Push(
-            LLBC_SvcEvUtil::BuildAppPhaseEv(earlyStart, startFail, startFinish, earlyStop));
+    LLBC_Variant cfg;
+    int cfgType = LLBC_AppConfigType::End;
+    if (startFinished)
+    {
+        cfg = _cfg;
+        cfgType = _cfgType;
+    }
+
+    for (auto &svcId : _services.GetAllServiceIds())
+    {
+        auto svc = _services.GetService(svcId);
+        LLBC_ContinueIf(!svc);
+
+        svc->Push(
+            LLBC_SvcEvUtil::BuildAppPhaseEv(
+                willStart, startFailed, startFinished, willStop, cfgType, cfg));
+    }
 }
 
 __LLBC_NS_END

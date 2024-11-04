@@ -102,16 +102,16 @@ public:
 
 public:
     /**
-     * Get all services(included not-start/starting/stoping status services).
-     * @return const Id2Services & - the services collections(indexed by service id).
+     * Get all services ids(included not-start/starting/stoping status services).
+     * @return std::vector<int> - the service ids collections.
      */
-    const Id2Services &GetAllIndexedByIdServices() const;
+    std::vector<int> GetAllServiceIds() const;
 
     /**
-     * Get all services(included not-start/starting/stoping status services).
-     * @return const Name2Services & - the services collections(indexed by service name).
+     * Get all service names(included not-start/starting/stoping status services).
+     * @return LLBC_Strings - the services names collections.
      */
-    const Name2Services &GetAllIndexedByNameServices() const;
+    LLBC_Strings GetAllServiceNames() const;
 
 private:
     /**
@@ -145,7 +145,7 @@ private:
     static bool InTls(const Name2Services &svcs);
 
 private:
-    LLBC_SpinLock _lock;
+    mutable LLBC_SpinLock _lock;
 
     std::vector<LLBC_Service *> _serviceList;
     Id2Services _id2Services;

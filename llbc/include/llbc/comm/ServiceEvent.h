@@ -55,7 +55,9 @@ public:
         FireEv,
 
         AppPhaseEv,
-        AppCfgReloaded,
+        AppReloaded,
+
+        ComponentEvent,
 
         End
     };
@@ -186,24 +188,37 @@ struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
  */
 struct LLBC_HIDDEN LLBC_SvcEv_AppPhaseEv : public LLBC_ServiceEvent
 {
-    bool earlyStart;
-    bool startFail;
-    bool startFinish;
-    bool earlyStop;
+    bool willStart;
+    bool startFailed;
+    bool startFinished;
+    bool willStop;
+
+    int cfgType;
+    LLBC_Variant cfg;
 
     LLBC_SvcEv_AppPhaseEv();
 };
 
 /**
- * \brief The application config reloaded event structure encapsulation.
+ * \brief The application reloaded event structure encapsulation.
  */
-struct LLBC_HIDDEN LLBC_SvcEv_AppCfgReloadedEv : public LLBC_ServiceEvent
+struct LLBC_HIDDEN LLBC_SvcEv_AppReloadedEv : public LLBC_ServiceEvent
 {
     int cfgType;
-    LLBC_Property propCfg;
-    LLBC_Variant nonPropCfg;
+    LLBC_Variant cfg;
 
-    LLBC_SvcEv_AppCfgReloadedEv();
+    LLBC_SvcEv_AppReloadedEv();
+};
+
+/**
+ * \brief The component event ev structure encapsulation.
+ */
+struct LLBC_HIDDEN LLBC_SvcEv_ComponentEventEv : public LLBC_ServiceEvent
+{
+    int eventType;
+    LLBC_Variant eventParams;
+
+    LLBC_SvcEv_ComponentEventEv();
 };
 
 /**
@@ -278,17 +293,24 @@ public:
     /**
      * Build application phase event.
      */
-    static LLBC_MessageBlock *BuildAppPhaseEv(bool earlyStart,
-                                              bool startFail,
-                                              bool startFinish,
-                                              bool earlyStop);
+    static LLBC_MessageBlock *BuildAppPhaseEv(bool willStart,
+                                              bool startFailed,
+                                              bool startFinished,
+                                              bool willStop,
+                                              int cfgType,
+                                              const LLBC_Variant &cfg = LLBC_Variant::nil);
 
     /**
-     * Build application config reload event.
+     * Build application reloaded event.
      */
-    static LLBC_MessageBlock *BuildAppCfgReloadEv(int cfgType,
-                                                  const LLBC_Property &propCfg,
-                                                  const LLBC_Variant &nonPropCfg);
+    static LLBC_MessageBlock *BuildAppReloadedEv(int cfgType,
+                                                 const LLBC_Variant &cfg);
+
+    /**
+     * Build component event ev.
+     */
+    static LLBC_MessageBlock *BuildComponentEventEv(int eventType,
+                                                    const LLBC_Variant &eventParams);
 
 public:
     /**

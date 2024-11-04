@@ -44,7 +44,7 @@ public:
     {
     }
 
-    virtual ~TestEvent()
+    ~TestEvent() override
     {
     }
 
@@ -65,7 +65,7 @@ public:
     }
 
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_Sleep(1000);
 
@@ -74,15 +74,15 @@ public:
         _ev1StaticHandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID1, &EventTestComp::HandleEvent_Static);
         _ev3HandlerStub = svc->SubscribeEvent(TestEvent::TEST_EV_ID3, this, &EventTestComp::HandleEvent3);
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         std::cout <<"Service destroy..." <<std::endl;
     }
 
-    virtual void OnUpdate()
+    void OnUpdate() override
     {
         LLBC_Service *svc = GetService();
 

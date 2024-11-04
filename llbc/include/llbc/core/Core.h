@@ -76,7 +76,7 @@
 
 // core/config
 #include "llbc/core/config/Ini.h"
-#include "llbc/core/config/Property.h"
+#include "llbc/core/config/Properties.h"
 
 // core/time
 #include "llbc/core/time/Time.h"

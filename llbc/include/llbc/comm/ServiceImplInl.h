@@ -40,13 +40,9 @@ inline int LLBC_ServiceImpl::GetConfigType() const
 
 inline const LLBC_Variant &LLBC_ServiceImpl::GetConfig() const
 {
-    return _nonPropCfg;
+    return _cfg;
 }
 
-inline const LLBC_Property &LLBC_ServiceImpl::GetPropertyConfig() const
-{
-    return _propCfg;
-}
 inline bool LLBC_ServiceImpl::IsFullStack() const
 {
     return _fullStack;

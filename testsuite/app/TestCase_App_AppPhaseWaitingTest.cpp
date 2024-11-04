@@ -31,28 +31,40 @@ public:
                     const LLBC_String &name,
                     const char *phaseStr,
                     LLBC_Time &begTime,
-                    LLBC_TimeSpan &waitTime,
+                    const LLBC_TimeSpan &waitTime,
+                    LLBC_Time &notFinishedLogTime,
                     bool &finFlag)
     {
         const char *operatorType = isApp ? "App" : "Service";
         if (begTime == LLBC_Time::utcBegin)
+        {
             begTime = LLBC_Time::Now();
+            notFinishedLogTime = begTime;
+        }
 
-        const auto alreadyWait = LLBC_Time::Now() - begTime;
+        const auto now = LLBC_Time::Now();
+        const auto alreadyWait = now - begTime;
         if (alreadyWait < waitTime)
         {
             finFlag = false;
-            fprintf(stdout,
-                    "[%s]%s %s %sing...\n",
-                    alreadyWait.ToString().c_str(),
-                    operatorType,
-                    name.c_str(),
-                    phaseStr);
+            if (now - notFinishedLogTime >= LLBC_TimeSpan::oneMillisec * 200)
+            {
+                fprintf(stdout,
+                        "[%s]%s %s %sing...\n",
+                        alreadyWait.ToString().c_str(),
+                        operatorType,
+                        name.c_str(),
+                        phaseStr);
+
+                notFinishedLogTime = now;
+            }
         }
         else
         {
             finFlag = true;
-            fprintf(stdout, "%s %s %s finished\n", operatorType, name.c_str(), phaseStr);
+            fprintf(stdout,
+                    "[%s]%s %s %s finished\n",
+                    alreadyWait.ToString().c_str(), operatorType, name.c_str(), phaseStr);
         }
     }
 };
@@ -62,100 +74,119 @@ class TestCompBase : public LLBC_Component
 public:
     TestCompBase()
     {
-        _initWaitTime = _destroyWaitTime = LLBC_TimeSpan::FromSeconds(3);
+        _initWaitTime = _lateInitWaitTime = _earlyDestroyWaitTime = _destroyWaitTime = LLBC_TimeSpan::FromSeconds(3);
         _startWaitTime = _lateStartWaitTime = _earlyStopWaitTime = _stopWaitTime = LLBC_TimeSpan::FromSeconds(2);
     }
 
-    virtual ~TestCompBase() = default;
+    ~TestCompBase() override = default;
 
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
-        TestWaiter()(false, LLBC_GetTypeName(*this), "init", _initTime, _initWaitTime, initFinished);
-        return true;
+        TestWaiter()(false, LLBC_GetTypeName(*this), "init", _initTime, _initWaitTime, _notFinishedLogTime, initFinished);
+        return LLBC_OK;
     }
 
-    virtual void OnDestroy(bool &destroyFinished)
+    int OnLateInit(bool &lateInitFinished) override
     {
-        TestWaiter()(false, LLBC_GetTypeName(*this), "destroy", _destroyTime, _destroyWaitTime, destroyFinished);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "late-init", _lateInitTime, _lateInitWaitTime, _notFinishedLogTime, lateInitFinished);
+        return LLBC_OK;
     }
 
-    virtual bool OnStart(bool &startFinished)
+    void OnEarlyDestroy(bool &earlyDestroyFinished) override
     {
-        TestWaiter()(false, LLBC_GetTypeName(*this), "start", _startTime, _startWaitTime, startFinished);
-        return true;
+        TestWaiter()(false, LLBC_GetTypeName(*this), "early-destroy", _earlyDestroyTime, _earlyDestroyWaitTime, _notFinishedLogTime, earlyDestroyFinished);
     }
 
-    virtual void OnLateStart(bool &lateStartFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
-        TestWaiter()(false, LLBC_GetTypeName(*this), "late-start", _lateStartTime, _lateStartWaitTime, lateStartFinished);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "destroy", _destroyTime, _destroyWaitTime, _notFinishedLogTime, destroyFinished);
     }
 
-    virtual void OnEarlyStop(bool &earlyStopFinished)
+    int OnStart(bool &startFinished) override
     {
-        TestWaiter()(false, LLBC_GetTypeName(*this), "early-stop", _earlyStopTime, _earlyStopWaitTime, earlyStopFinished);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "start", _startTime, _startWaitTime, _notFinishedLogTime, startFinished);
+        return LLBC_OK;
     }
 
-    virtual void OnStop(bool &stopFinished)
+    int OnLateStart(bool &lateStartFinished) override
     {
-        TestWaiter()(false, LLBC_GetTypeName(*this), "stop", _stopTime, _stopWaitTime, stopFinished);
+        TestWaiter()(false, LLBC_GetTypeName(*this), "late-start", _lateStartTime, _lateStartWaitTime, _notFinishedLogTime, lateStartFinished);
+        return LLBC_OK;
     }
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    void OnEarlyStop(bool &earlyStopFinished) override
     {
-        switch(event)
+        TestWaiter()(false, LLBC_GetTypeName(*this), "early-stop", _earlyStopTime, _earlyStopWaitTime, _notFinishedLogTime, earlyStopFinished);
+    }
+
+    void OnStop(bool &stopFinished) override
+    {
+        TestWaiter()(false, LLBC_GetTypeName(*this), "stop", _stopTime, _stopWaitTime, _notFinishedLogTime, stopFinished);
+    }
+
+    void OnEvent(int eventType, const LLBC_Variant &eventParams) override
+    {
+        switch(eventType)
         {
-            case LLBC_ComponentEventType::AppEarlyStart:
+            case LLBC_ComponentEventType::AppWillStart:
             {
-                OnAppEarlyStart();
+                OnAppWillStart();
                 break;
             }
-            case LLBC_ComponentEventType::AppStartFail:
+            case LLBC_ComponentEventType::AppStartFailed:
             {
-                OnAppStartFail();
+                OnAppStartFailed();
                 break;
             }
-            case LLBC_ComponentEventType::AppStartFinish:
+            case LLBC_ComponentEventType::AppStartFinished:
             {
-                OnAppStartFinish();
+                OnAppStartFinished();
                 break;
             }
-            case LLBC_ComponentEventType::AppEarlyStop:
+            case LLBC_ComponentEventType::AppWillStop:
             {
-                OnAppEarlyStop();
+                OnAppWillStop();
                 break;
             }
-            default: break;
+            default:
+                break;
         }
     }
 
 private:
-    void OnAppEarlyStart()
+    void OnAppWillStart()
     {
-        std::cout << LLBC_GetTypeName(*this) << ": OnAppEarlyStart()..." << std::endl;
+        std::cout << LLBC_GetTypeName(*this) << ": OnAppWillStart()..." << std::endl;
     }
 
-    void OnAppStartFail()
+    void OnAppStartFailed()
     {
-        std::cout << LLBC_GetTypeName(*this) << ": OnAppStartFail()..." << std::endl;
+        std::cout << LLBC_GetTypeName(*this) << ": OnAppStartFailed()..." << std::endl;
     }
 
-    void OnAppStartFinish()
+    void OnAppStartFinished()
     {
-        std::cout << LLBC_GetTypeName(*this) << ": OnAppStartFinish()..." << std::endl;
+        std::cout << LLBC_GetTypeName(*this) << ": OnAppStartFinished()..." << std::endl;
     }
 
-    void OnAppEarlyStop()
+    void OnAppWillStop()
     {
-        std::cout << LLBC_GetTypeName(*this) << ": OnAppEarlyStop()..." << std::endl;
+        std::cout << LLBC_GetTypeName(*this) << ": OnAppWillStop()..." << std::endl;
     }
 
 private:
-    LLBC_Time _initTime, _destroyTime;
-    LLBC_Time _startTime, _lateStartTime, _earlyStopTime, _stopTime;
+    LLBC_Time _notFinishedLogTime;
 
-    LLBC_TimeSpan _initWaitTime, _destroyWaitTime;
-    LLBC_TimeSpan _startWaitTime, _lateStartWaitTime, _earlyStopWaitTime, _stopWaitTime;
+    LLBC_Time _initTime, _lateInitTime;
+    LLBC_Time _earlyDestroyTime, _destroyTime;
+    LLBC_Time _startTime, _lateStartTime;
+    LLBC_Time _earlyStopTime, _stopTime;
+
+    LLBC_TimeSpan _initWaitTime, _lateInitWaitTime;
+    LLBC_TimeSpan _earlyDestroyWaitTime, _destroyWaitTime;
+    LLBC_TimeSpan _startWaitTime, _lateStartWaitTime;
+    LLBC_TimeSpan _earlyStopWaitTime, _stopWaitTime;
 };
 
 class TestCompA : public TestCompBase
@@ -183,18 +214,24 @@ class PreAddTestComp : public LLBC_Component
     };
 
 public:
-    virtual bool OnInit(bool &finished)
+    ~PreAddTestComp() override
     {
-        _timer.SetTimeoutHandler(this, &PreAddTestComp::OnTimeout);
-        return true;
+        LLBC_PrintLn("PreAddTestComp::~PreAddTestComp() called");
     }
 
-    virtual void OnDestroy(bool &finished)
+public:
+    int OnInit(bool &finished) override
+    {
+        _timer.SetTimeoutHandler(this, &PreAddTestComp::OnTimeout);
+        return LLBC_OK;
+    }
+
+    void OnDestroy(bool &finished) override
     {
         _timer.SetTimeoutHandler(nullptr);
     }
 
-    virtual bool OnStart(bool &finished)
+    int OnStart(bool &finished) override
     {
         LLBC_Service *svc = GetService();
         svc->SubscribeEvent(TestEvIds::Ev1, [](LLBC_Event &ev)
@@ -215,10 +252,10 @@ public:
 
         LLBC_PrintLn("%s: OnStart", LLBC_GetTypeName(PreAddTestComp));
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnStop(bool &finshed)
+    void OnStop(bool &finshed) override
     {
         LLBC_PrintLn("%s: OnStop", LLBC_GetTypeName(PreAddTestComp));
 
@@ -252,12 +289,12 @@ public:
         _startWaitTime = LLBC_TimeSpan::FromSeconds(5);
         _stopWaitTime = LLBC_TimeSpan::FromSeconds(5);
     }
-    virtual ~TestApp() = default;
+    ~TestApp() override = default;
 
 public:
-    virtual int OnStart(int argc, char *argv[], bool &startFinished)
+    int OnStart(int argc, char *argv[], bool &startFinished) override
     {
-        TestWaiter()(true, GetName(), "start", _startTime, _startWaitTime, startFinished);
+        TestWaiter()(true, GetName(), "start", _startTime, _startWaitTime, _notFinishedLogTime, startFinished);
         
         if (startFinished)
         {
@@ -267,18 +304,24 @@ public:
             testSvc->AddComponent(new TestCompB);
             testSvc->AddComponent(new TestCompC);
 
-            testSvc->Start();
+            if (testSvc->Start() != LLBC_OK)
+            {
+                LLBC_FilePrintLn(stderr, "Start service failed, err:%s", LLBC_FormatLastError());
+                return LLBC_FAILED;
+            }
         }
 
         return LLBC_OK;
     }
 
-    virtual void OnStop(bool &stopFinished)
+    void OnStop(bool &stopFinished) override
     {
-        TestWaiter()(true, GetName(), "stop", _stopTime, _stopWaitTime, stopFinished);
+        TestWaiter()(true, GetName(), "stop", _stopTime, _stopWaitTime, _notFinishedLogTime, stopFinished);
     }
 
 private:
+    LLBC_Time _notFinishedLogTime;
+
     LLBC_Time _startTime;
     LLBC_Time _stopTime;
     LLBC_TimeSpan _startWaitTime;

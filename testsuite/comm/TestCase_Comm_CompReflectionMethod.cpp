@@ -28,7 +28,7 @@ namespace
     {
     public:
         ITestComp() : LLBC_Component() {}
-        virtual ~ITestComp() = default;
+        ~ITestComp() override = default;
     };
 
     class TestComp : public ITestComp
@@ -39,7 +39,7 @@ namespace
             _timer = nullptr;
         }
 
-        virtual ~TestComp() = default;
+        ~TestComp() override = default;
 
     public:
         void OnPrint()
@@ -48,7 +48,7 @@ namespace
         }
 
     public:
-        virtual bool OnInit(bool &initFinished)
+        int OnInit(bool &initFinished) override
         {
             AddMethod("Foo", [this](const LLBC_Variant &callArgs, LLBC_Variant &callRet) {
                 callRet = Foo(callArgs["x"], callArgs["y"].AsStr());
@@ -60,10 +60,10 @@ namespace
                 return 0;
             });
 
-            return true;
+            return LLBC_OK;
         }
 
-        virtual bool OnStart(bool &startFinished)
+        int OnStart(bool &startFinished) override
         {
             LLBC_PrintLn("Service start");
             _timer = new LLBC_Timer(
@@ -71,10 +71,10 @@ namespace
                 std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
             _timer->Schedule(LLBC_TimeSpan::FromSeconds(2), LLBC_TimeSpan::FromSeconds(5));
 
-            return true;
+            return LLBC_OK;
         }
 
-        virtual void OnStop(bool &stopFinished)
+        void OnStop(bool &stopFinished) override
         {
             LLBC_PrintLn("Service stop");
             _timer->Cancel();
@@ -93,7 +93,7 @@ namespace
         }
 
     private:
-        virtual void OnTimerTimeout(LLBC_Timer *timer)
+        void OnTimerTimeout(LLBC_Timer *timer)
         {
             LLBC_PrintLn("Call methods:");
             LLBC_PrintLn("- Call Foo(3, \"hello world\") ret:%d", Foo(3, "hello world"));
@@ -114,7 +114,7 @@ namespace
             LLBC_PrintLn("- Reflection call Call Goo(6, \"hey judy\") ret:%d, retParams:%s", ret, callRet.ToString().c_str());
         }
 
-        virtual void OnTimerCancel(LLBC_Timer *timer)
+        void OnTimerCancel(LLBC_Timer *timer)
         {
             LLBC_PrintLn("Timer cancelled!");
         }
@@ -126,7 +126,7 @@ namespace
     class TestCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual ITestComp *Create(LLBC_Service *service) const
+        ITestComp *Create(LLBC_Service *service) const override
         {
             return new TestComp;
         }

@@ -51,7 +51,7 @@
 #include "core/file/TestCase_Core_File_Directory.h"
 #include "core/variant/TestCase_Core_Variant.h"
 #include "core/config/TestCase_Core_Config_Ini.h"
-#include "core/config/TestCase_Core_Config_Property.h"
+#include "core/config/TestCase_Core_Config_Properties.h"
 #include "core/time/TestCase_Core_Time_Time.h"
 #include "core/timer/TestCase_Core_Timer_Heap.h"
 #include "core/event/TestCase_Core_Event.h"

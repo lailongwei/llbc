@@ -24,7 +24,7 @@
 
 #include "llbc/core/file/Directory.h"
 #include "llbc/core/helper/STLHelper.h"
-#include "llbc/core/config/Property.h"
+#include "llbc/core/config/Properties.h"
 #include "llbc/core/tinyxml2/tinyxml2.h"
 #include "llbc/core/utils/Util_Text.h"
 #include "llbc/core/utils/Util_Variant.h"
@@ -52,11 +52,8 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
     const LLBC_String &ext = LLBC_Directory::SplitExt(cfgFile)[1].tolower();
     if (ext == ".cfg")
     {
-        LLBC_Property propCfg;
-        if (propCfg.LoadFromFile(cfgFile) != LLBC_OK)
+        if (LLBC_Properties::LoadFromFile(cfgFile, cfg) != LLBC_OK)
             return LLBC_FAILED;
-
-        LLBC_VariantUtil::Property2Variant(propCfg, cfg);
     }
     else if (ext == ".xml")
     {

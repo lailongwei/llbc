@@ -89,16 +89,6 @@ inline int LLBC_ComponentMethods::CallMethod(const LLBC_CString &methName, const
     return meth(arg, ret);
 }
 
-inline bool LLBC_Component::IsInited() const
-{
-    return _inited;
-}
-
-inline bool LLBC_Component::IsStarted() const
-{
-    return _started;
-}
-
 inline LLBC_Service *LLBC_Component::GetService() const
 {
     return _svc;
@@ -114,11 +104,6 @@ LLBC_Component::GetComponent() const
 inline const LLBC_Component *LLBC_Component::GetComponent(const LLBC_CString &compName) const
 {
     return const_cast<LLBC_Component *>(this)->GetComponent(compName);
-}
-
-inline int LLBC_Component::GetConfigType() const
-{
-    return _cfgType;
 }
 
 inline const LLBC_ComponentMethods &LLBC_Component::GetAllMethods() const
@@ -153,49 +138,6 @@ inline int LLBC_Component::CallMethod(const LLBC_CString &methName,
     }
 
     return _meths->CallMethod(methName, arg, ret);
-}
-
-inline bool LLBC_Component::OnInit(bool &finished)
-{
-    return true;
-}
-
-inline void LLBC_Component::OnDestroy(bool &finished)
-{
-}
-
-inline bool LLBC_Component::OnStart(bool &finished)
-{
-    return true;
-}
-
-inline void LLBC_Component::OnLateStart(bool &finished)
-{
-}
-
-inline void LLBC_Component::OnEarlyStop(bool &finished)
-{
-}
-
-inline void LLBC_Component::OnStop(bool &finished)
-{
-}
-
-inline void LLBC_Component::OnUpdate()
-{
-}
-
-inline void LLBC_Component::OnLateUpdate()
-{
-}
-
-inline void LLBC_Component::OnIdle(const LLBC_TimeSpan &idleTime)
-{
-}
-
-inline void LLBC_Component::OnEvent(LLBC_ComponentEventType::ENUM event, const llbc::LLBC_Variant& evArgs)
-{
-
 }
 
 inline void LLBC_Component::SetService(LLBC_Service *svc)

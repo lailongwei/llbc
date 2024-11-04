@@ -104,13 +104,13 @@ pyllbc_Component::~pyllbc_Component()
     Py_DECREF(_compEvCallArgs);
 }
 
-bool pyllbc_Component::OnInit(bool &initFinished)
+int pyllbc_Component::OnInit(bool &initFinished)
 {
     LLBC_ReturnIf(!_pyOnInitMeth, true);
 
     PyObject *pyRet = CallComponentMeth(_pyOnInitMeth, _EvBuilder::BuildInitializeEv(_pySvc), true, true);
 
-    return ParsePythonRet(pyRet, initFinished);
+    return ParsePythonRet(pyRet, initFinished) ? LLBC_OK : LLBC_FAILED;
 }
 
 void pyllbc_Component::OnDestroy(bool &destroyFinished)
@@ -122,13 +122,13 @@ void pyllbc_Component::OnDestroy(bool &destroyFinished)
     ParsePythonRet(pyRet, destroyFinished);
 }
 
-bool pyllbc_Component::OnStart(bool &startFinished)
+int pyllbc_Component::OnStart(bool &startFinished)
 {
     LLBC_ReturnIf(!_pyOnStartMeth, true);
 
     PyObject *pyRet = CallComponentMeth(_pyOnStartMeth, _EvBuilder::BuildStartEv(_pySvc), true, true);
 
-    return ParsePythonRet(pyRet, startFinished);
+    return ParsePythonRet(pyRet, startFinished) ? LLBC_OK : LLBC_FAILED;
 }
 
 void pyllbc_Component::OnStop(bool &stopFinished)

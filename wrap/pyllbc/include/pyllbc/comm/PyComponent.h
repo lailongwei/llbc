@@ -54,7 +54,7 @@ public:
     /**
      * When service start and not not init comp before, will call then event handler function.
      */
-    virtual bool OnInit(bool &initFinished);
+    virtual int OnInit(bool &initFinished);
 
     /**
      * When service destroy, will call this event handler function.
@@ -64,7 +64,7 @@ public:
     /**
      * When service start, will call this event handler function.
      */
-    virtual bool OnStart(bool &startFinished);
+    virtual int OnStart(bool &startFinished);
 
     /**
      * When service stop, will call this event handler function.

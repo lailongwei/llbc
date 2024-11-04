@@ -48,18 +48,18 @@ namespace
         }
 
     public:
-        virtual bool OnInit(bool &initFinished)
+        int OnInit(bool &initFinished) override
         {
             LLBC_PrintLn("Service initialize");
-            return true;
+            return LLBC_OK;
         }
 
-        virtual void OnDestroy(bool &destroyFinished)
+        void OnDestroy(bool &destroyFinished) override
         {
             LLBC_PrintLn("Service destroy");
         }
 
-        virtual bool OnStart(bool &startFinished)
+        int OnStart(bool &startFinished) override
         {
             LLBC_PrintLn("Service start");
             _timer = new LLBC_Timer(
@@ -67,10 +67,10 @@ namespace
                               std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
             _timer->Schedule(LLBC_TimeSpan::FromSeconds(2), LLBC_TimeSpan::FromSeconds(5));
 
-            return true;
+            return LLBC_OK;
         }
 
-        virtual void OnStop(bool &stopFinished)
+        void OnStop(bool &stopFinished) override
         {
             LLBC_PrintLn("Service stop");
             _timer->Cancel();
@@ -78,28 +78,28 @@ namespace
         }
 
     public:
-        virtual void OnUpdate()
+        void OnUpdate() override
         {
             LLBC_PrintLn("Update...");
         }
 
-        virtual void OnLateUpdate()
+        void OnLateUpdate() override
         {
             LLBC_PrintLn("Late Update...");
         }
 
-        virtual void OnIdle(const LLBC_TimeSpan &idleTime)
+        void OnIdle(const LLBC_TimeSpan &idleTime) override
         {
             LLBC_PrintLn("Idle, idle time: %s...", idleTime.ToString().c_str());
         }
 
     public:
-        virtual void OnTimerTimeout(LLBC_Timer *timer)
+        void OnTimerTimeout(LLBC_Timer *timer)
         {
             LLBC_PrintLn("Timer timeout!");
         }
 
-        virtual void OnTimerCancel(LLBC_Timer *timer)
+        void OnTimerCancel(LLBC_Timer *timer)
         {
             LLBC_PrintLn("Timer cancelled!");
         }
@@ -111,7 +111,7 @@ namespace
     class TestCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual ITestComp *Create(LLBC_Service *service) const
+        ITestComp *Create(LLBC_Service *service) const override
         {
             return new TestComp;
         }
@@ -121,7 +121,7 @@ namespace
     {
     public:
         IEchoComp() {}
-        virtual ~IEchoComp() = default;
+        ~IEchoComp() override = default;
     };
 
     class EchoComp : public IEchoComp
@@ -136,7 +136,7 @@ namespace
     class EchoCompFactory : public LLBC_ComponentFactory
     {
     public:
-        virtual IEchoComp *Create(LLBC_Service *service) const
+        IEchoComp *Create(LLBC_Service *service) const override
         {
             return new EchoComp;
         }

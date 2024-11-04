@@ -112,7 +112,8 @@ void csllbc_Component::OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_V
             OnUnHandledPacket(*evArgs.AsPtr<LLBC_Packet>());
             break;
         }
-        default: break;
+        default:
+            break;
     }
 }
 

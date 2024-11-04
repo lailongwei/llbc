@@ -28,67 +28,6 @@ inline LLBC_AppEvent::LLBC_AppEvent(int evType)
 {
 }
 
-inline int LLBC_App::OnEarlyStart(int argc, char *argv[])
-{
-    return LLBC_OK;
-}
-
-inline void LLBC_App::OnLateStart(int argc, char *argv[])
-{
-}
-
-inline void LLBC_App::OnEarlyStop()
-{
-}
-
-inline void LLBC_App::OnLateStop()
-{
-}
-
-inline void LLBC_App::OnUpdate(bool &doNothing)
-{
-}
-
-inline void LLBC_App::OnConfigReload()
-{
-}
-
-template <typename App>
-inline App *LLBC_App::ThisApp()
-{
-    return static_cast<App *>(_thisApp);
-}
-
-inline LLBC_App *LLBC_App::ThisApp()
-{
-    return _thisApp;
-}
-
-inline bool LLBC_App::HasConfig() const
-{
-    return !_cfgPath.empty();
-}
-
-inline const LLBC_Property &LLBC_App::GetPropertyConfig() const
-    {
-    return _propCfg;
-}
-
-inline const LLBC_Variant &LLBC_App::GetConfig() const
-{
-    return _nonPropCfg;
-}
-
-inline LLBC_AppConfigType::ENUM LLBC_App::GetConfigType() const
-{
-    return _cfgType;
-}
-
-inline const LLBC_String &LLBC_App::GetConfigPath() const
-{
-    return _cfgPath;
-}
-
 inline bool LLBC_App::IsStopped() const
 {
     return _startPhase == LLBC_AppStartPhase::Stopped;
@@ -109,24 +48,9 @@ inline bool LLBC_App::IsStopping() const
     return _startPhase == LLBC_AppStartPhase::Stopping;
 }
 
-inline int LLBC_App::GetStartPhase() const
-{
-    return _startPhase;
-}
-
 inline int LLBC_App::PushEvent(int evType)
 {
     return PushEvent(new LLBC_AppEvent(evType));
-}
-
-inline const LLBC_String &LLBC_App::GetName() const
-{
-    return _name;
-}
-
-inline const LLBC_StartArgs &LLBC_App::GetStartArgs() const
-{
-    return _startArgs;
 }
 
 inline LLBC_Service *LLBC_App::GetService(int id) const

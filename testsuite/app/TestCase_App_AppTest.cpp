@@ -26,10 +26,10 @@ namespace
     class TestComp : public LLBC_Component
     {
     public:
-        virtual bool OnStart(bool &startFinished)
+        int OnStart(bool &startFinished) override
         {
             LLBC_PrintLn("Simulate comp start failed case...");
-            return false;
+            return LLBC_OK;
         }
     };
 
@@ -42,7 +42,7 @@ namespace
         }
 
     public:
-        virtual int OnStart(int argc, char *arg[], bool &startFinished)
+        int OnStart(int argc, char *arg[], bool &startFinished) override
         {
             LLBC_PrintLn("Application start, name:%s", GetName().c_str());
 

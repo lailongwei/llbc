@@ -295,11 +295,11 @@
 #else // Non-Win32
  #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM, SIGQUIT}
 #endif // Win32
-// Application config reload signals.
+// Application reload signals.
 #if LLBC_TARGET_PLATFORM_WIN32
-#define LLBC_CFG_APP_CFG_RELOAD_SIGNALS             {}
+#define LLBC_CFG_APP_RELOAD_SIGNALS                  {}
 #else // Non-Win32
-#define LLBC_CFG_APP_CFG_RELOAD_SIGNALS             {SIGUSR2}
+#define LLBC_CFG_APP_RELOAD_SIGNALS                  {SIGUSR2}
 #endif // Win32
 
 

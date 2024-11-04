@@ -180,16 +180,10 @@ public:
     virtual int GetConfigType() const = 0;
 
     /**
-     * Get non-property type config.
-     * @return const LLBC_Variant & - the non-property application config.
+     * Get service config.
+     * @return const LLBC_Variant & - the service config.
      */
     virtual const LLBC_Variant &GetConfig() const = 0;
-
-    /**
-     * Get property type config.
-     * @return const LLBC_Property & - the property config.
-     */
-    virtual const LLBC_Property &GetPropertyConfig() const = 0;
 
     /**
      * Get full stack option.
@@ -606,18 +600,19 @@ public:
     virtual LLBC_ServiceEventFirer BeginFireEvent(int eventId) = 0;
 
     /**
-     * Add component event into service. Operated in the next service drive loop.
-     * @param[in] eventEnum
-     * @param[in] eventParams
-     */
-    virtual void AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams) = 0;
-
-public:
-    /**
      * Get event manager.
      * @return LLBC_EventMgr & - the event manager.
      */
     virtual LLBC_EventMgr &GetEventManager() = 0;
+
+public:
+    /**
+     * Add component event into service. Operated in the next service drive loop.
+     * @param[in] eventType   - the event type, see LLBC_ComponentEventType enum.
+     * @param[in] eventParams - the event params.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int AddComponentEvent(int eventType, const LLBC_Variant &eventParams) = 0;
 
 public:
     /**
@@ -714,12 +709,6 @@ protected:
 
 protected:
     /**
-     * Get component list.
-     */
-    virtual const std::vector<LLBC_Component *> &GetComponentList() const = 0;
-
-protected:
-    /**
      * Declare friend class: LLBC_Component.
      * Access method list:
      *     GetComponentList()
@@ -727,16 +716,9 @@ protected:
     friend class LLBC_Component;
 
     /**
-     * Declare friend class: LLBC_App.
-     *  Access method list:
-     *      ProcessAppConfigReload()
+     * Get component list.
      */
-    friend class LLBC_App;
-
-    /**
-     * Process application config reload event.
-     */
-    virtual void ProcessAppConfigReload() = 0;
+    virtual const std::vector<LLBC_Component *> &GetComponentList() const = 0;
 
 protected:
     /**

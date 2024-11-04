@@ -76,16 +76,10 @@ public:
     virtual int GetConfigType() const;
 
     /**
-     * Get non-property type config.
-     * @return const LLBC_Variant & - the non-property application config.
+     * Get service config.
+     * @return const LLBC_Variant & - the service config.
      */
     virtual const LLBC_Variant &GetConfig() const;
-
-    /**
-     * Get property type config.
-     * @return const LLBC_Property & - the property config.
-     */
-    virtual const LLBC_Property &GetPropertyConfig() const;
 
     /**
      * Get full stack option.
@@ -377,17 +371,19 @@ public:
     virtual LLBC_ServiceEventFirer BeginFireEvent(int eventId);
 
     /**
-     * Add component event into service. Operated in the next service drive loop.
-     * @param[in] eventEnum
-     * @param[in] eventParams
-     */
-    virtual void AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams);
-
-    /**
      * Get event manager.
      * @return LLBC_EventMgr & - the event manager.
      */
     virtual LLBC_EventMgr &GetEventManager();
+
+public:
+    /**
+     * Add component event into service. Operated in the next service drive loop.
+     * @param[in] eventType   - the event type, see LLBC_ComponentEventType enum.
+     * @param[in] eventParams - the event params.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int AddComponentEvent(int compEvent, const LLBC_Variant &eventParams);
 
 public:
     /**
@@ -456,12 +452,6 @@ protected:
 
 protected:
     /**
-     * Process application config reload event.
-     */
-    virtual void ProcessAppConfigReload();
-
-protected:
-    /**
      * Declare friend class: LLBC_pollerMgr.
      *  Access method list:
      *      AddSessionProtocolFactory()
@@ -500,8 +490,10 @@ protected:
 private:
     /**
      * Service config operation methods.
+     * @param[in] appCfgType    - the application config type, see LLBC_AppConfigType.
+     * @param[in] appCfg        - the application config.
      */
-    void UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev = nullptr);
+    void UpdateServiceCfg(int appCfgType, const LLBC_Variant &appCfg);
 
     /**
      * Service TLS operation methods.
@@ -534,7 +526,8 @@ private:
     void HandleEv_UnsubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_FireEv(LLBC_ServiceEvent &ev);
     void HandleEv_AppPhaseEv(LLBC_ServiceEvent &ev);
-    void HandleEv_AppCfgReload(LLBC_ServiceEvent &ev);
+    void HandleEv_AppReloaded(LLBC_ServiceEvent &ev);
+    void HandleEv_ComponentEvent(LLBC_ServiceEvent &ev);
 
     /**
      * Component operation methods.
@@ -608,8 +601,7 @@ private:
 
     // Config about members.
     int _cfgType; // Config type, see LLBC_AppConfigType enum.
-    LLBC_Property _propCfg; // Prop type config content.
-    LLBC_Variant _nonPropCfg; // Non-Prop type config content(xml/ini/...).
+    LLBC_Variant _cfg; // Prop type config content.
 
     // Protocol/poller/session about members.
     bool _fullStack; // ProtocolStack running mode(full/half).
@@ -642,8 +634,9 @@ private:
     int _frameInterval; // Frame interval, 1000/_fps.
     sint64 _begSvcTime; // Begin heartbeat time, update on every heartbeat begin.
 
-public:
+private:
     // Components about members.
+    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
     std::list<LLBC_Component *> _willRegComps; // Will register component list.
     std::vector<LLBC_Component *> _compList; // Component list.
     std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
@@ -678,7 +671,7 @@ private:
     // - Event support members.
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
-    std::queue<std::pair<LLBC_ComponentEventType::ENUM, const LLBC_Variant &>> _componentEvents; // Component events.
+    std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
 };
 
 __LLBC_NS_END

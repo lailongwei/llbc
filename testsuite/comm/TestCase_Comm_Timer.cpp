@@ -27,7 +27,7 @@ namespace
 class TestComp : public LLBC_Component
 {
 public:
-    bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_PrintLn("Service startup, startup timers...");
 
@@ -69,10 +69,10 @@ public:
 
         LLBC_PrintLn("Done!");
 
-        return true;
+        return LLBC_OK;
     }
 
-    void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         LLBC_PrintLn("Service destroy!");
     }

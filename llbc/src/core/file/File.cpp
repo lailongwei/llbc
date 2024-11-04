@@ -426,7 +426,7 @@ LLBC_Strings LLBC_File::ReadLines()
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
     // Split(don't strip empty line).
-    LLBC_Strings lines = fileCnt.split(LLBC_LF, -1, false);
+    LLBC_Strings lines = fileCnt.split("\n", -1, false);
     // Strip CR character(\r).
     for (auto &line : lines)
     {

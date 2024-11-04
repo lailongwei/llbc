@@ -37,30 +37,30 @@ public:
         LLBC_PrintLn(">>> Comp ctor called!");
     }
 
-    virtual ~TestComp()
+    ~TestComp() override
     {
         LLBC_PrintLn(">>> Comp dtor called!");
     }
 
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_PrintLn("Service initialize");
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         LLBC_PrintLn("Service destroy");
     }
 
-    virtual bool OnStart(bool &finished)
+    int OnStart(bool &finished) override
     {
         LLBC_PrintLn("Service start");
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnStop(bool &finished)
+    void OnStop(bool &finished) override
     {
         static const LLBC_TimeSpan stopDurTime = LLBC_TimeSpan::FromSeconds(15);
         if (_begStopTime == LLBC_Time::utcBegin)
@@ -90,41 +90,42 @@ public:
         LLBC_PrintLn("Service stop finished");
     }
 
-    virtual void OnUpdate()
+    void OnUpdate() override
     {
         LLBC_PrintLn("Service update");
     }
 
-    virtual void OnIdle(const LLBC_TimeSpan &idleTime)
+    void OnIdle(const LLBC_TimeSpan &idleTime) override
     {
         LLBC_PrintLn("Service idle, idleTime: %s", idleTime.ToString().c_str());
     }
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    void OnEvent(int eventType, const LLBC_Variant &eventParams) override
     {
-        switch (event)
+        switch (eventType)
         {
             case LLBC_ComponentEventType::SessionCreate:
             {
-                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
                 break;
             }
             case LLBC_ComponentEventType::SessionDestroy:
             {
-                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
                 break;
             }
             case LLBC_ComponentEventType::AsyncConnResult:
             {
-                OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+                OnAsyncConnResult(*eventParams.AsPtr<LLBC_AsyncConnResult>());
                 break;
             }
-            default: break;
+            default:
+                break;
         }
     }
 
 public:
-    virtual void OnDataArrival(LLBC_Packet &packet)
+    void OnDataArrival(LLBC_Packet &packet)
     {
         LLBC_PrintLn("Session[%d] receive data, len: %lu\n", 
             packet.GetSessionId(), packet.GetLength());
