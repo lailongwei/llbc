@@ -84,7 +84,8 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
         if (ch != Base::Class)
         {
             _state = Base::Error;
-            pyllbc_SetError("class-lemma expect class format character to start, got: %c", ch);
+            pyllbc_SetError(LLBC_String().format(
+                "class-lemma expect class format character to start, got: %c", ch));
 
             return LLBC_FAILED;
         }
@@ -100,7 +101,8 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
         if (ch != Base::ClassNameBegin)
         {
             _state = Base::Error;
-            pyllbc_SetError("class-lemma expect class name begin format character, got: %c", ch);
+            pyllbc_SetError(LLBC_String().format(
+                "class-lemma expect class name begin format character, got: %c", ch));
 
             return LLBC_FAILED;
         }
@@ -133,9 +135,8 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
                 else if (!(_class = GetClassFromEnvAndName()))
                 {
                     _state = Base::Error;
-
-                    LLBC_String errStr;
-                    pyllbc_SetError(errStr.format("class name '%s' is not defined", _clsName.c_str()));
+                    pyllbc_SetError(LLBC_String().format(
+                        "class name '%s' is not defined", _clsName.c_str()));
 
                     return LLBC_FAILED;
                 }
@@ -153,7 +154,8 @@ int pyllbc_PackLemma_Class::Process(Symbol ch, Symbol nextCh)
     if (legalNames.find(static_cast<char>(ch)) == LLBC_String::npos)
     {
         _state = Base::Error;
-        pyllbc_SetError("invalid class name character: %c", ch);
+        pyllbc_SetError(LLBC_String().format(
+            "invalid class name character: %c", ch));
 
         return LLBC_FAILED;
     }
@@ -200,9 +202,7 @@ int pyllbc_PackLemma_Class::Write(pyllbc_Stream *stream, PyObject *values)
         if (_class != valuesClass)
         {
             Py_DECREF(valuesClass);
-
-            LLBC_String errStr;
-            pyllbc_SetError(errStr.format(
+            pyllbc_SetError(LLBC_String().format(
                 "will pack values type not specific class: %s", _clsName.c_str()));
 
             return LLBC_FAILED;

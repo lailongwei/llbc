@@ -58,7 +58,9 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_GetItem(PyObject *self, PyObject *args)
         return pyllbc_ObjUtil::Variant2Obj(cit->second);
 
     // Not found, set index error.
-    pyllbc_SetError(LLBC_String().format("not found event param, key:%s", evParamKey), LLBC_ERROR_NOT_FOUND, PyExc_IndexError);
+    LLBC_String errDesc;
+    errDesc.format("not found event param, key:%s", evParamKey);
+    pyllbc_SetError(errDesc.c_str(), LLBC_ERROR_NOT_FOUND, PyExc_IndexError);
     return nullptr;
 }
 

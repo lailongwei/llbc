@@ -45,6 +45,7 @@ void pyllbc_FrameCallable::Call(LLBC_Service *llbcSvc)
     else
     {
         const LLBC_String callableDesc = pyllbc_ObjUtil::GetObjStr(_callable);
-        pyllbc_TransferPyError(LLBC_String().format("When call callable: %s", callableDesc.c_str()));
+        pyllbc_TransferPyError(
+            LLBC_String().format("When call callable: %s", callableDesc.c_str()));
     }
 }

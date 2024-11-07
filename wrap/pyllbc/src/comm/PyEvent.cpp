@@ -172,9 +172,12 @@ void pyllbc_EventListener::Invoke(LLBC_Event &ev)
         Py_DECREF(meth);
         Py_XDECREF(selfObj);
 
-        pyllbc_TransferPyError(LLBC_String().format(
-            "When call event listener, evId:%d, listener meth:%s, obj:%s", 
-            ev.GetId(), pyllbc_ObjUtil::GetObjStr(meth).c_str(), selfObj ? pyllbc_ObjUtil::GetObjStr(selfObj).c_str() : "None"));
+        pyllbc_TransferPyError(
+            LLBC_String().format(
+                "When call event listener, evId:%d, listener meth:%s, obj:%s", 
+                ev.GetId(),
+                pyllbc_ObjUtil::GetObjStr(meth).c_str(),
+                selfObj ? pyllbc_ObjUtil::GetObjStr(selfObj).c_str() : "None"));
         return;
     }
 

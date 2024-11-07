@@ -166,9 +166,9 @@ PyObject *pyllbc_Stream::Read(PyObject *cls)
             const LLBC_String clsStr = PyString_AS_STRING(pyClsStr);
             Py_DECREF(pyClsStr);
     
-            LLBC_String addiMsg;
-            pyllbc_TransferPyError(addiMsg.format(
+            pyllbc_TransferPyError(LLBC_String().format(
                 "When create class[%s] instance in Stream.unpack() method", clsStr.c_str()));
+
             return nullptr;
         }
     

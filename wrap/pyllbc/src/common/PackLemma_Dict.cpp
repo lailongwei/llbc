@@ -73,7 +73,8 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
         if (ch != Base::DictBegin)
         {
             _state = Base::Error;
-            pyllbc_SetError("dict-lemma expect dict begin character'{', got %c", ch);
+            pyllbc_SetError(LLBC_String().format(
+                "dict-lemma expect dict begin character'{', got %c", ch));
 
             return LLBC_FAILED;
         }
@@ -127,7 +128,8 @@ int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
     if (raw.find(ch) == raw.end())
     {
         _state = Base::Error;
-        pyllbc_SetError("dict-lemma could direct process non-raw type format character: %c", ch);
+        pyllbc_SetError(LLBC_String().format(
+            "dict-lemma could direct process non-raw type format character: %c", ch));
 
         return LLBC_FAILED;
     }

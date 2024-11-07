@@ -100,9 +100,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerSchedule(PyObject *self, PyObject *args)
 
     if (timer->Schedule(dueTime, period) != LLBC_OK)
     {
-        const LLBC_String timerDesc = timer->ToString();
-        pyllbc_TransferLLBCError(__FILE__, __LINE__, timerDesc);
-
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, timer->ToString());
         return nullptr;
     }
 
@@ -116,9 +114,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerCancel(PyObject *self, PyObject *args)
 
     if (timer->Cancel() != LLBC_OK)
     {
-        const LLBC_String timerDesc = timer->ToString();
-        pyllbc_TransferLLBCError(__FILE__, __LINE__, timerDesc);
-
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, timer->ToString());
         return nullptr;
     }
 

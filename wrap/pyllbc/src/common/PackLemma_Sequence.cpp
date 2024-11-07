@@ -68,9 +68,7 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
         if (seqBegin.find(ch) == seqBegin.end())
         {
             _state = Base::Error;
-
-            LLBC_String errStr;
-            pyllbc_SetError(errStr.format(
+            pyllbc_SetError(LLBC_String().format(
                 "sequence-lemma expect sequence begin character, got %c", ch));
 
             return LLBC_FAILED;
@@ -96,10 +94,7 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
         if (UNLIKELY(_lemmas.empty()))
         {
             _state = Base::Error;
-
-            LLBC_String errMsg;
-            pyllbc_SetError(errMsg.format(
-                "sequence-lemma not exist sub lemma to describe sequence element type"));
+            pyllbc_SetError("sequence-lemma not exist sub lemma to describe sequence element type");
 
             return LLBC_FAILED;
         }
@@ -113,9 +108,7 @@ int pyllbc_PackLemma_Sequence::Process(Symbol ch, Symbol nextCh)
     if (raw.find(ch) == raw.end())
     {
         _state = Base::Error;
-
-        LLBC_String errMsg;
-        pyllbc_SetError(errMsg.format(
+        pyllbc_SetError(LLBC_String().format(
             "bad format character in sequence-lemma, format character: %c", ch));
 
         return LLBC_FAILED;
