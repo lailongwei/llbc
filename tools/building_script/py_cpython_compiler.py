@@ -78,11 +78,14 @@ class CPythonCompiler(object):
         # 定义cpython配置选项
         cpython_config_opts = [
             '--enable-shared',
+            'CFLAGS="-Wno-register"',
             '--prefix="{}"'.format(cfg.pyllbc_cpython_publish_path)
         ]
 
         if cfg.is_debug:
             cpython_config_opts.append('--with-pydebug')
+        # else:
+        #     cpython_config_opts.append('--enable-optimizations')
 
         # 配置cpython
         Log.fi('Configure cpython, isdebug:{}...', cfg.is_debug)
