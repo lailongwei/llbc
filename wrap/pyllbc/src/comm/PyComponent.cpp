@@ -163,33 +163,33 @@ void pyllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
     CallComponentMeth(_pyOnIdleMeth, _holdedOnIdleEv, false, false);
 }
 
-void pyllbc_Component::OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+void pyllbc_Component::OnEvent(int eventType, const LLBC_Variant &eventParams)
 {
-    switch(event)
+    switch(eventType)
     {
         case LLBC_ComponentEventType::SessionCreate:
         {
-            OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+            OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
             break;
         }
         case LLBC_ComponentEventType::SessionDestroy:
         {
-            OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+            OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
             break;
         }
         case LLBC_ComponentEventType::AsyncConnResult:
         {
-            OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+            OnAsyncConnResult(*eventParams.AsPtr<LLBC_AsyncConnResult>());
             break;
         }
         case LLBC_ComponentEventType::ProtoReport:
         {
-            OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+            OnProtoReport(*eventParams.AsPtr<LLBC_ProtoReport>());
             break;
         }
         case LLBC_ComponentEventType::UnHandledPacket:
         {
-            OnUnHandledPacket(*evArgs.AsPtr<LLBC_Packet>());
+            OnUnHandledPacket(*eventParams.AsPtr<LLBC_Packet>());
             break;
         }
         default: break;

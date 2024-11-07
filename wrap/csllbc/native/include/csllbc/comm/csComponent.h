@@ -60,7 +60,7 @@ public:
     virtual void OnUpdate();
     virtual void OnIdle(const LLBC_TimeSpan &idleTime);
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
+    virtual void OnEvent(int eventType, const LLBC_Variant &eventParams);
 
 private:
     void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);

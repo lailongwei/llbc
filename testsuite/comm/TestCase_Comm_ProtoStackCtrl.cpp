@@ -66,18 +66,18 @@ namespace
     class TestComp : public LLBC_Component
     {
     public:
-        virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+        virtual void OnEvent(int eventType, const LLBC_Variant &eventParams) override
         {
-            switch (event)
+            switch (eventType)
             {
                 case LLBC_ComponentEventType::SessionCreate:
                 {
-                    OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                    OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
                     break;
                 }
                 case LLBC_ComponentEventType::SessionDestroy:
                 {
-                    OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                    OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
                     break;
                 }
                 default:

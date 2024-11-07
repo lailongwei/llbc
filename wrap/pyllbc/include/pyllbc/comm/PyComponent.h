@@ -88,7 +88,7 @@ public:
      * @param[in] evIndex
      * @param[in] evArgs
      */
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
+    virtual void OnEvent(int eventType, const LLBC_Variant &eventParams);
 
 private:
     /**
