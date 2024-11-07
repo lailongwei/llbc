@@ -421,10 +421,12 @@ project "testsuite"
     -- Copy all testcases config files to output directory.
     postbuildmessage("Copying all testcase config files to output directory...");
     local test_cfgs = {
-        "core/config/IniTestCfg.ini",
+        "core/config/test_ini.ini",
+        "core/config/test_prop.properties",
         "core/log/LogTestCfg.cfg",
         "core/log/LogTestCfg.xml",
         "app/AppCfgTest.cfg",
+        "app/AppCfgTest.properties",
         "app/AppCfgTest.ini",
         "app/AppCfgTest.xml",
     }
@@ -572,7 +574,8 @@ project "pyllbc"
     -- Enable c++17 support.
     filter { "system:not windows", "language:c++" }
         buildoptions {
-            "-std=c++17"
+            "-std=c++17",
+            "-Wno-register"
         }
     filter {}
 
