@@ -1,6 +1,12 @@
 # CMake minimum version.
 cmake_minimum_required(VERSION 3.2)
 
+# Set custom compiler.
+set(CUSTOM_COMPILE_TOOLSET_DIR "/data/home/user00/workspace/projects/nrc/code/3rdparty/x86_64-unknown-linux-gnu-gcc")
+set(STDC_LIB_DIR "${CUSTOM_COMPILE_TOOLSET_DIR}/lib64")
+set(CMAKE_CXX_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/g++")
+set(CMAKE_C_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/gcc")
+
 # Set project name.
 project(llbc)
 
@@ -8,8 +14,9 @@ project(llbc)
 set(CMAKE_CXX_STANDARD 17)
 
 # Set project cmake options.
-set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_COLOR_MAKEFILE on)
+set(CMAKE_VERBOSE_MAKEFILE on)
+set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 # Disable min/max macro define(on MSVC compiler).
 if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -18,10 +25,8 @@ endif()
 
 # Set llbc core lib directory.
 set(LLBC_LIB_DIR ${PROJECT_SOURCE_DIR}/llbc)
-
 # Set llbc testsuite directory.
 set(LLBC_TESTSUITE_DIR ${PROJECT_SOURCE_DIR}/testsuite)
-
 # Set llbc wrap directory.
 set(LLBC_WRAP_DIR ${PROJECT_SOURCE_DIR}/wrap)
 
