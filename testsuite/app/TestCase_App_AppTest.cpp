@@ -58,7 +58,7 @@ namespace
             return LLBC_OK;
         }
 
-        virtual void OnStop(bool &stopFinished)
+        virtual void OnStop(bool &stopFinished) override
         {
             LLBC_PrintLn("Application stop");
             LLBC_XDelete(_testSvc);
