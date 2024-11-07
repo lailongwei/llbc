@@ -328,11 +328,16 @@ int TestCase_Core_ObjPool::ReflectTest()
         LLBC_ErrorAndReturnIfNot(objPtr->IsReuseMethodCalled(), LLBC_FAILED);
     }
 
-    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    // Note: -Wmismatched-new-delete/-Wmismatched-dealloc only available on GCC 11 or later version
+    #if (LLBC_CUR_COMP == LLBC_COMP_GCC && LLBC_COMP_MAJOR_VER >= 11) || LLBC_CUR_COMP == LLBC_COMP_CLANG
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wmismatched-new-delete"
+    #endif
+
     LLBC_ObjReflector::Delete<_ReusableClass>(objPtr);
     free(objPtr);
+
+    #if (LLBC_CUR_COMP == LLBC_COMP_GCC && LLBC_COMP_MAJOR_VER >= 11) || LLBC_CUR_COMP == LLBC_COMP_CLANG
     #pragma GCC diagnostic pop
     #endif
 
