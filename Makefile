@@ -159,6 +159,7 @@ clean_$(TEST_TARGET):
 clean_$(WRAPS_TARGET): $(addprefix clean_,$(ALL_WRAP_TARGETS))
 clean_$(PYWRAP_TARGET):
 	@(if [ -e build/$(PREMAKE_ACTION)/pyllbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f pyllbc.make clean; fi)
+	@(if [ -d ./wrap/pyllbc/cpython ]; then cd ./wrap/pyllbc/cpython && make clean; fi)
 	@$(shell find ./wrap/pyllbc -type f -name "*.pyc" -exec rm {} \;)
 clean_$(CSWRAP_TARGET):
 	@(if [ -e build/$(PREMAKE_ACTION)/csllbc_native.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_native.make clean; fi)
