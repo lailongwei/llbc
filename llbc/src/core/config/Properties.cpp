@@ -103,7 +103,7 @@ int LLBC_Properties::LoadFromString(const LLBC_String &str,
 }
 
 int LLBC_Properties::SaveToFile(const LLBC_Variant &properties,
-                                LLBC_String &filePath,
+                                const LLBC_String &filePath,
                                 LLBC_String *errMsg)
 {
     LLBC_String propContent;

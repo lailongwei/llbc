@@ -71,7 +71,7 @@ public:
      * @return int - return 0 if success, otherwise return -1. 
      */
     static int SaveToFile(const LLBC_Variant &properties,
-                          LLBC_String &filePath,
+                          const LLBC_String &filePath,
                           LLBC_String *errMsg = nullptr);
 
     /**
