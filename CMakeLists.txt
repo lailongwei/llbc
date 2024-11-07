@@ -1,11 +1,11 @@
 # CMake minimum version.
 cmake_minimum_required(VERSION 3.2)
 
-# Set custom compiler.
-set(CUSTOM_COMPILE_TOOLSET_DIR "/data/home/user00/workspace/projects/nrc/code/3rdparty/x86_64-unknown-linux-gnu-gcc")
-set(STDC_LIB_DIR "${CUSTOM_COMPILE_TOOLSET_DIR}/lib64")
-set(CMAKE_CXX_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/g++")
-set(CMAKE_C_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/gcc")
+# Set custom compiler, if you need.
+# set(CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir")
+# set(STDC_LIB_DIR "${CUSTOM_COMPILE_TOOLSET_DIR}/lib64")
+# set(CMAKE_CXX_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/g++")
+# set(CMAKE_C_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/gcc")
 
 # Set project name.
 project(llbc)
