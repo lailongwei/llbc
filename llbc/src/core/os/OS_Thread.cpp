@@ -662,25 +662,6 @@ int LLBC_KillThread(LLBC_NativeThreadHandle handle, int sig)
 #endif
 }
 
-void LLBC_Sleep(int milliSeconds)
-{
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    if (milliSeconds <= 0)
-    {
-        sched_yield();
-    }
-    else
-    {
-        struct timespec ts;
-        ts.tv_sec = milliSeconds / 1000;
-        ts.tv_nsec = (milliSeconds % 1000) * 1000 * 1000;
-        nanosleep(&ts, nullptr);
-    }
-#else
-    ::Sleep(milliSeconds);
-#endif
-}
-
 int LLBC_TlsAlloc(LLBC_TlsHandle *handle)
 {
     if (!handle)

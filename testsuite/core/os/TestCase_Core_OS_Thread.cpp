@@ -26,7 +26,7 @@ static void ThreadProc(void *arg)
 {
     const char *threadDesc = reinterpret_cast<const char *>(arg);
 
-    int loopVal = 10;
+    constexpr int loopVal = 50;
     for(int i = 0; i < loopVal; ++i)
     {
         LLBC_ThreadId id = LLBC_GetCurrentThreadId();
@@ -39,10 +39,13 @@ static void ThreadProc(void *arg)
         LLBC_PrintLn("Hello, I'm thread %s[handle:%ld, id:%d, prio:%d]", threadDesc, handle, id, LLBC_GetThreadPriority(handle));
 #endif
 
-        LLBC_Sleep(1000);
+        // LLBC_Sleep(1000);
+        LLBC_Yield();
     }
 
-    LLBC_Sleep(60 * 1000);
+    LLBC_PrintLn("%s begin sleep 10 seconds", threadDesc);
+    LLBC_Sleep(10 * 1000);
+    LLBC_PrintLn("%s end sleep 10 seconds", threadDesc);
 }
 
 TestCase_Core_OS_Thread::TestCase_Core_OS_Thread()
