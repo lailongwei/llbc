@@ -41,7 +41,8 @@ public:
      * Constructor & Destructor.
      */
     LLBC_AutoReleasePool();
-    virtual ~LLBC_AutoReleasePool();
+
+    ~LLBC_AutoReleasePool() override;
 
 public:
     /**
@@ -68,14 +69,14 @@ public:
      * Auto release method, use to prevent call.
      * @return int - always return -1, and set last error to permission denied error.
      */
-    virtual int AutoRelease();
+    int AutoRelease() override;
 
     /**
      * Clone method, use to prevent call.
      * @return LLBC_Object * - the cloned object, always return nullptr, 
      *                         and set last error to permission denied error.
      */
-    virtual LLBC_Object *Clone() const;
+    LLBC_Object *Clone() const override;
 
 private:
     /**

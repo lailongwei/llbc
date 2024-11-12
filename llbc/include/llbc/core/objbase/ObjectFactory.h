@@ -36,7 +36,8 @@ public:
      * Constructor/Destructor.
      */
     LLBC_ObjectFactory();
-    virtual ~LLBC_ObjectFactory();
+
+    ~LLBC_ObjectFactory() override;
 
 public:
     /**
@@ -50,7 +51,7 @@ public:
      * Re-write clone method.
      * @return LLBC_Object * - the clone object.
      */
-    virtual LLBC_Object *Clone() const;
+    LLBC_Object *Clone() const override;
 };
 
 __LLBC_NS_END

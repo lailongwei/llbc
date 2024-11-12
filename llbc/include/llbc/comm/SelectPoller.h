@@ -29,41 +29,47 @@ class LLBC_HIDDEN LLBC_SelectPoller final : public LLBC_BasePoller
 {
 public:
     LLBC_SelectPoller();
-    virtual ~LLBC_SelectPoller();
+
+    ~LLBC_SelectPoller() override;
 
 public:
     /**
      * Startup poller.
      * @return int - return 0 if start success, otherwise return -1.
      */
-    virtual int Start();
+    int Start() override;
 
     /**
      * Task startup method.
      */
-    virtual void Svc();
+    void Svc() override;
 
     /**
      * Task Cleanup handler.
      */
-    virtual void Cleanup();
+    void Cleanup() override;
 
 protected:
     /**
      * Queued event handlers.
      */
-    virtual void HandleEv_AddSock(LLBC_PollerEvent &ev);
-    virtual void HandleEv_AsyncConn(LLBC_PollerEvent &ev);
-    virtual void HandleEv_Send(LLBC_PollerEvent &ev);
-    virtual void HandleEv_Close(LLBC_PollerEvent &ev);
-    virtual void HandleEv_Monitor(LLBC_PollerEvent &ev);
-    virtual void HandleEv_TakeOverSession(LLBC_PollerEvent &ev);
+    void HandleEv_AddSock(LLBC_PollerEvent &ev) override;
+
+    void HandleEv_AsyncConn(LLBC_PollerEvent &ev) override;
+
+    void HandleEv_Send(LLBC_PollerEvent &ev) override;
+
+    void HandleEv_Close(LLBC_PollerEvent &ev) override;
+
+    void HandleEv_Monitor(LLBC_PollerEvent &ev) override;
+
+    void HandleEv_TakeOverSession(LLBC_PollerEvent &ev) override;
 
     /**
      * Add session to poller.
      */
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    virtual void AddSession(LLBC_Session *session);
+    void AddSession(LLBC_Session *session) override;
 #else
     virtual void AddSession(LLBC_Session *session, bool needAddToIocp = true);
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
@@ -71,7 +77,7 @@ protected:
     /**
      * Remove session from poller.
      */
-    virtual void RemoveSession(LLBC_Session *session);
+    void RemoveSession(LLBC_Session *session) override;
 
 private:
     /**

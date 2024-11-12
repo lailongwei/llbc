@@ -146,7 +146,7 @@ public:
     using LLBC_Task::Wait;
 
 public:
-    virtual ~LLBC_Service() = default;
+    ~LLBC_Service() override = default;
 
 public:
     /**

@@ -32,34 +32,36 @@ class LLBC_EXPORT LLBC_SimpleLock : public LLBC_ILock
 {
 public:
     LLBC_SimpleLock();
-    virtual ~LLBC_SimpleLock();
+
+    ~LLBC_SimpleLock() override;
 
 public:
     /**
      * Acquire lock.
      */
-    virtual void Lock();
+    void Lock() override;
 
     /**
      * Try acquire lock.
      */
-    virtual bool TryLock();
+    bool TryLock() override;
 
     /**
      * Release lock.
      */
-    virtual void Unlock();
+    void Unlock() override;
 
     /**
      * Dummy lock check.
      * @return bool - return true if is dummy lock, otherwise false.
      */
-    virtual bool IsDummyLock() const;
+    bool IsDummyLock() const override;
 
 private:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     friend class LLBC_ConditionVariable;
-    virtual void *Handle();
+
+    void *Handle() override;
 #endif
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_SimpleLock);

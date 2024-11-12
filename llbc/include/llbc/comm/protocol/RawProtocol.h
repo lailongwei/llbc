@@ -33,14 +33,15 @@ class LLBC_EXPORT LLBC_RawProtocol : public LLBC_IProtocol
 {
 public:
     LLBC_RawProtocol();
-    virtual ~LLBC_RawProtocol();
+
+    ~LLBC_RawProtocol() override;
 
 public:
     /**
      * Get the protocol layer.
      * @return int - the protocol layer.
      */
-    virtual int GetLayer() const;
+    int GetLayer() const override;
 
 public:
     /**
@@ -50,7 +51,7 @@ public:
      * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(void *in, void *&out, bool &removeSession);
+    int Send(void *in, void *&out, bool &removeSession) override;
 
     /**
      * When data received, will call this method.
@@ -59,7 +60,7 @@ public:
      * @param[out] removeSession - when error occurred, this out param determine remove session or not.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Recv(void *in, void *&out, bool &removeSession);
+    int Recv(void *in, void *&out, bool &removeSession) override;
 
     /**
      * Add coder factory to protocol, only available in Codec-Layer.

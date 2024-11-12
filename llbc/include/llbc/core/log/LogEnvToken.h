@@ -32,7 +32,8 @@ class LLBC_HIDDEN LLBC_LogEnvToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogEnvToken() = default;
-    virtual ~LLBC_LogEnvToken() = default;
+
+    ~LLBC_LogEnvToken() override = default;
 
 public:
     /**
@@ -41,20 +42,20 @@ public:
      * @param[in] str       - token append string data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str);
+    int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str) override;
 
     /**
      * Get token type.
      * @return int - token type.
      */
-    virtual int GetType() const;
+    int GetType() const override;
 
     /**
      * Format the log data.
      * @param[in] data           - log data.
      * @param[out] formattedData - store location for formatted log string.
      */
-    virtual void Format(const LLBC_LogData &data, LLBC_String &formattedData) const;
+    void Format(const LLBC_LogData &data, LLBC_String &formattedData) const override;
 
 private:
     LLBC_String _envValue;

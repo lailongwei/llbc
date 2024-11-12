@@ -378,7 +378,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~LLBC_Array();
+    ~LLBC_Array() override;
 
 public:
     /**
@@ -523,7 +523,7 @@ public:
      * Re-write clone method.
      * @return LLBC_Object * - the clone object.
      */
-    LLBC_Object *Clone() const;
+    LLBC_Object *Clone() const override;
 
     /**
      * Set the object factory.
@@ -533,8 +533,9 @@ public:
     /**
      * Serialize/Deserialize support.
      */
-    virtual void Serialize(LLBC_Stream &s) const;
-    virtual bool Deserialize(LLBC_Stream &s);
+    void Serialize(LLBC_Stream &s) const override;
+
+    bool Deserialize(LLBC_Stream &s) override;
 
     /**
      * Disable assignment.

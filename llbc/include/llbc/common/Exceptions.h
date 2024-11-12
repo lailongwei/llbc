@@ -31,7 +31,8 @@ class LLBC_InvalidArgException : public std::logic_error
 public:
     explicit LLBC_InvalidArgException(const std::string &what)
         : ::std::logic_error(what) {  }
-    virtual ~LLBC_InvalidArgException() LLBC_NO_EXCEPT {  }
+
+    ~LLBC_InvalidArgException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_NullPtrException : public std::logic_error
@@ -39,7 +40,8 @@ class LLBC_NullPtrException : public std::logic_error
 public:
     explicit LLBC_NullPtrException(const std::string &what)
         : ::std::logic_error(what) {  }
-    virtual ~LLBC_NullPtrException() LLBC_NO_EXCEPT {  }
+
+    ~LLBC_NullPtrException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_LengthException : public std::logic_error
@@ -47,7 +49,8 @@ class LLBC_LengthException : public std::logic_error
 public:
     explicit LLBC_LengthException(const std::string &what)
         : ::std::logic_error(what) {  }
-    virtual ~LLBC_LengthException() LLBC_NO_EXCEPT {  }
+
+    ~LLBC_LengthException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_RangeException : public std::logic_error
@@ -55,7 +58,8 @@ class LLBC_RangeException : public std::logic_error
 public:
     explicit LLBC_RangeException(const std::string &what)
         : ::std::logic_error(what) {  }
-    virtual ~LLBC_RangeException() LLBC_NO_EXCEPT {  }
+
+    ~LLBC_RangeException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_OverflowException : public std::logic_error
@@ -63,7 +67,8 @@ class LLBC_OverflowException : public std::logic_error
 public:
     explicit LLBC_OverflowException(const std::string &what)
         : ::std::logic_error(what) {  }
-    virtual ~LLBC_OverflowException() LLBC_NO_EXCEPT {  }
+
+    ~LLBC_OverflowException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_UnderflowException : public std::logic_error
@@ -71,7 +76,8 @@ class LLBC_UnderflowException : public std::logic_error
 public:
     explicit LLBC_UnderflowException(const std::string &what)
         : ::std::logic_error(what) {  }
-    virtual ~LLBC_UnderflowException() LLBC_NO_EXCEPT {  }
+
+    ~LLBC_UnderflowException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_IOException : public std::logic_error
@@ -79,7 +85,8 @@ class LLBC_IOException : public std::logic_error
 public:
     explicit LLBC_IOException(const std::string &what)
         : std::logic_error(what) {  }
-    virtual ~LLBC_IOException() LLBC_NO_EXCEPT {  }
+
+    ~LLBC_IOException() LLBC_NO_EXCEPT override {  }
 };
 
 __LLBC_NS_END

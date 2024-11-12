@@ -40,20 +40,20 @@ public:
     /**
      * Destructor.
      */
-    virtual ~LLBC_BaseTestCase();
+    ~LLBC_BaseTestCase() override;
 
 public:
     /**
      * Get testcase name.
      * @return const LLBC_String & - testcase name.
      */
-    virtual const LLBC_String &GetName() const;
+    const LLBC_String &GetName() const override;
 
     /**
      * Set testcase name.
      * @param[in] name - testcase name.
      */
-    void SetName(const LLBC_String &name);
+    void SetName(const LLBC_String &name) override;
 
 private:
     LLBC_String _testcaseName;
