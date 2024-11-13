@@ -87,7 +87,7 @@ local llbc_arch_types = {
 }
 
 local llbc_arch_type = llbc_arch_types.x86
-if not llbc_system_type ~= llbc_system_types.windows then
+if llbc_system_type ~= llbc_system_types.windows then
     local machine_arch = os_capture('uname -m'):lower()
     if machine_arch:sub(1, #'x86') == 'x86' then
         llbc_arch_type = llbc_arch_types.x86
