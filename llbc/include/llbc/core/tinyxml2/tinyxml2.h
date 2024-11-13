@@ -339,8 +339,7 @@ class MemPoolT : public MemPool
 {
 public:
     MemPoolT() : _blockPtrs(), _root(0), _currentAllocs(0), _nAllocs(0), _maxAllocs(0), _nUntracked(0)	{}
-    ~MemPoolT() override
-    {
+    ~MemPoolT() {
         MemPoolT< ITEM_SIZE >::Clear();
     }
 
@@ -357,16 +356,14 @@ public:
         _nUntracked = 0;
     }
 
-    int ItemSize() const override
-    {
+    virtual int ItemSize() const	{
         return ITEM_SIZE;
     }
     int CurrentAllocs() const		{
         return _currentAllocs;
     }
 
-    void* Alloc() override
-    {
+    virtual void* Alloc() {
         if ( !_root ) {
             // Need a new block.
             Block* block = new Block();
@@ -392,8 +389,7 @@ public:
         return result;
     }
 
-    void Free( void* mem ) override
-    {
+    virtual void Free( void* mem ) {
         if ( !mem ) {
             return;
         }
@@ -411,8 +407,7 @@ public:
                 ITEM_SIZE, _nAllocs, _blockPtrs.Size() );
     }
 
-    void SetTracked() override
-    {
+    void SetTracked() {
         --_nUntracked;
     }
 
@@ -988,15 +983,12 @@ class LLBC_TINYXML2_LIB XMLText : public XMLNode
 {
     friend class XMLDocument;
 public:
-    bool Accept( XMLVisitor* visitor ) const override;
+    virtual bool Accept( XMLVisitor* visitor ) const;
 
-    XMLText* ToText() override
-    {
+    virtual XMLText* ToText()			{
         return this;
     }
-
-    const XMLText* ToText() const override
-    {
+    virtual const XMLText* ToText() const	{
         return this;
     }
 
@@ -1009,15 +1001,14 @@ public:
         return _isCData;
     }
 
-    XMLNode* ShallowClone( XMLDocument* document ) const override;
-
-    bool ShallowEqual( const XMLNode* compare ) const override;
+    virtual XMLNode* ShallowClone( XMLDocument* document ) const;
+    virtual bool ShallowEqual( const XMLNode* compare ) const;
 
 protected:
     explicit XMLText( XMLDocument* doc )	: XMLNode( doc ), _isCData( false )	{}
-    ~XMLText() override {}
+    virtual ~XMLText()												{}
 
-    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr ) override;
+    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr );
 
 private:
     bool _isCData;
@@ -1032,28 +1023,23 @@ class LLBC_TINYXML2_LIB XMLComment : public XMLNode
 {
     friend class XMLDocument;
 public:
-    XMLComment*	ToComment() override
-    {
+    virtual XMLComment*	ToComment()					{
+        return this;
+    }
+    virtual const XMLComment* ToComment() const		{
         return this;
     }
 
-    const XMLComment* ToComment() const override
-    {
-        return this;
-    }
+    virtual bool Accept( XMLVisitor* visitor ) const;
 
-    bool Accept( XMLVisitor* visitor ) const override;
-
-    XMLNode* ShallowClone( XMLDocument* document ) const override;
-
-    bool ShallowEqual( const XMLNode* compare ) const override;
+    virtual XMLNode* ShallowClone( XMLDocument* document ) const;
+    virtual bool ShallowEqual( const XMLNode* compare ) const;
 
 protected:
     explicit XMLComment( XMLDocument* doc );
+    virtual ~XMLComment();
 
-    ~XMLComment() override;
-
-    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr) override;
+    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr);
 
 private:
     XMLComment( const XMLComment& );	// not supported
@@ -1076,28 +1062,23 @@ class LLBC_TINYXML2_LIB XMLDeclaration : public XMLNode
 {
     friend class XMLDocument;
 public:
-    XMLDeclaration*	ToDeclaration() override
-    {
+    virtual XMLDeclaration*	ToDeclaration()					{
+        return this;
+    }
+    virtual const XMLDeclaration* ToDeclaration() const		{
         return this;
     }
 
-    const XMLDeclaration* ToDeclaration() const override
-    {
-        return this;
-    }
+    virtual bool Accept( XMLVisitor* visitor ) const;
 
-    bool Accept( XMLVisitor* visitor ) const override;
-
-    XMLNode* ShallowClone( XMLDocument* document ) const override;
-
-    bool ShallowEqual( const XMLNode* compare ) const override;
+    virtual XMLNode* ShallowClone( XMLDocument* document ) const;
+    virtual bool ShallowEqual( const XMLNode* compare ) const;
 
 protected:
     explicit XMLDeclaration( XMLDocument* doc );
+    virtual ~XMLDeclaration();
 
-    ~XMLDeclaration() override;
-
-    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr ) override;
+    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr );
 
 private:
     XMLDeclaration( const XMLDeclaration& );	// not supported
@@ -1116,28 +1097,23 @@ class LLBC_TINYXML2_LIB XMLUnknown : public XMLNode
 {
     friend class XMLDocument;
 public:
-    XMLUnknown*	ToUnknown() override
-    {
+    virtual XMLUnknown*	ToUnknown()					{
+        return this;
+    }
+    virtual const XMLUnknown* ToUnknown() const		{
         return this;
     }
 
-    const XMLUnknown* ToUnknown() const override
-    {
-        return this;
-    }
+    virtual bool Accept( XMLVisitor* visitor ) const;
 
-    bool Accept( XMLVisitor* visitor ) const override;
-
-    XMLNode* ShallowClone( XMLDocument* document ) const override;
-
-    bool ShallowEqual( const XMLNode* compare ) const override;
+    virtual XMLNode* ShallowClone( XMLDocument* document ) const;
+    virtual bool ShallowEqual( const XMLNode* compare ) const;
 
 protected:
     explicit XMLUnknown( XMLDocument* doc );
+    virtual ~XMLUnknown();
 
-    ~XMLUnknown() override;
-
-    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr ) override;
+    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr );
 
 private:
     XMLUnknown( const XMLUnknown& );	// not supported
@@ -1289,17 +1265,13 @@ public:
         SetValue( str, staticMem );
     }
 
-    XMLElement* ToElement() override
-    {
+    virtual XMLElement* ToElement()				{
         return this;
     }
-
-    const XMLElement* ToElement() const override
-    {
+    virtual const XMLElement* ToElement() const {
         return this;
     }
-
-    bool Accept( XMLVisitor* visitor ) const override;
+    virtual bool Accept( XMLVisitor* visitor ) const;
 
     /** Given an attribute name, Attribute() returns the value
     	for the attribute of that name, or null if none
@@ -1695,18 +1667,15 @@ public:
     ElementClosingType ClosingType() const {
         return _closingType;
     }
-
-    XMLNode* ShallowClone( XMLDocument* document ) const override;
-
-    bool ShallowEqual( const XMLNode* compare ) const override;
+    virtual XMLNode* ShallowClone( XMLDocument* document ) const;
+    virtual bool ShallowEqual( const XMLNode* compare ) const;
 
 protected:
-    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr ) override;
+    char* ParseDeep( char* p, StrPair* parentEndTag, int* curLineNumPtr );
 
 private:
     XMLElement( XMLDocument* doc );
-
-    ~XMLElement() override;
+    virtual ~XMLElement();
     XMLElement( const XMLElement& );	// not supported
     void operator=( const XMLElement& );	// not supported
 
@@ -1748,16 +1717,13 @@ class LLBC_TINYXML2_LIB XMLDocument : public XMLNode
 public:
     /// constructor
     XMLDocument( bool processEntities = true, Whitespace whitespaceMode = PRESERVE_WHITESPACE );
-    ~XMLDocument() override;
+    ~XMLDocument();
 
-    XMLDocument* ToDocument() override
-    {
+    virtual XMLDocument* ToDocument()				{
         TIXMLASSERT( this == _document );
         return this;
     }
-
-    const XMLDocument* ToDocument() const override
-    {
+    virtual const XMLDocument* ToDocument() const	{
         TIXMLASSERT( this == _document );
         return this;
     }
@@ -1854,8 +1820,7 @@ public:
     	@endverbatim
     */
     void Print( XMLPrinter* streamer=0 ) const;
-
-    bool Accept( XMLVisitor* visitor ) const override;
+    virtual bool Accept( XMLVisitor* visitor ) const;
 
     /**
     	Create a new Element associated with
@@ -1946,13 +1911,10 @@ public:
 	// internal
 	void MarkInUse(const XMLNode* const);
 
-    XMLNode* ShallowClone( XMLDocument* /*document*/ ) const override
-    {
+    virtual XMLNode* ShallowClone( XMLDocument* /*document*/ ) const	{
         return 0;
     }
-
-    bool ShallowEqual( const XMLNode* /*compare*/ ) const override
-    {
+    virtual bool ShallowEqual( const XMLNode* /*compare*/ ) const	{
         return false;
     }
 
@@ -2273,8 +2235,7 @@ public:
     	with only required whitespace and newlines.
     */
     XMLPrinter( FILE* file=0, bool compact = false, int depth = 0 );
-
-    ~XMLPrinter() override {}
+    virtual ~XMLPrinter()	{}
 
     /** If streaming, write the BOM and declaration. */
     void PushHeader( bool writeBOM, bool writeDeclaration );
@@ -2316,24 +2277,18 @@ public:
     void PushDeclaration( const char* value );
     void PushUnknown( const char* value );
 
-    bool VisitEnter( const XMLDocument& /*doc*/ ) override;
-
-    bool VisitExit( const XMLDocument& /*doc*/ ) override
-    {
+    virtual bool VisitEnter( const XMLDocument& /*doc*/ );
+    virtual bool VisitExit( const XMLDocument& /*doc*/ )			{
         return true;
     }
 
-    bool VisitEnter( const XMLElement& element, const XMLAttribute* attribute ) override;
+    virtual bool VisitEnter( const XMLElement& element, const XMLAttribute* attribute );
+    virtual bool VisitExit( const XMLElement& element );
 
-    bool VisitExit( const XMLElement& element ) override;
-
-    bool Visit( const XMLText& text ) override;
-
-    bool Visit( const XMLComment& comment ) override;
-
-    bool Visit( const XMLDeclaration& declaration ) override;
-
-    bool Visit( const XMLUnknown& unknown ) override;
+    virtual bool Visit( const XMLText& text );
+    virtual bool Visit( const XMLComment& comment );
+    virtual bool Visit( const XMLDeclaration& declaration );
+    virtual bool Visit( const XMLUnknown& unknown );
 
     /**
     	If in print to memory mode, return a pointer to
