@@ -292,7 +292,7 @@ public:
      * Constructor & Destructor.
      */
     explicit LLBC_Dictionary(size_type bucketSize = LLBC_CFG_OBJBASE_DICT_DFT_BUCKET_SIZE);
-    virtual ~LLBC_Dictionary();
+    ~LLBC_Dictionary() override;
 
 public:
     /**
@@ -387,7 +387,7 @@ public:
      * Re-write clone method.
      * @return LLBC_Object * - the clone object.
      */
-    LLBC_Object *Clone() const;
+    LLBC_Object *Clone() const override;
 
     /**
      * Set object create factory.
@@ -398,8 +398,8 @@ public:
     /**
      * Serialize/Deserialize support.
      */
-    virtual void Serialize(LLBC_Stream &s) const;
-    virtual bool Deserialize(LLBC_Stream &s);
+    void Serialize(LLBC_Stream &s) const override;
+    bool Deserialize(LLBC_Stream &s) override;
 
     /**
      * Disable assignment.

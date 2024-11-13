@@ -33,14 +33,14 @@ class LLBC_Holder : public LLBC_IHolder
 {
 public:
     explicit LLBC_Holder(ValueType *value);
-    virtual ~LLBC_Holder();
+    ~LLBC_Holder() override;
 
 public:
     /**
      * Get holder value.
      * @return [in] void * - value.
      */
-    virtual void *GetValue() const;
+    void *GetValue() const override;
 
     /**
      * Disable assignment.

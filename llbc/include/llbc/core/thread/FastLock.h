@@ -43,34 +43,34 @@ class LLBC_EXPORT LLBC_FastLock : public LLBC_ILock
 {
 public:
     LLBC_FastLock();
-    virtual ~LLBC_FastLock();
+    ~LLBC_FastLock() override;
 
 public:
     /**
      * Acquire lock.
      */
-    virtual void Lock();
+    void Lock() override;
 
     /**
      * Try acquire lock.
      */
-    virtual bool TryLock();
+    bool TryLock() override;
 
     /**
      * Release lock.
      */
-    virtual void Unlock();
+    void Unlock() override;
 
     /**
      * Dummy lock check.
      * @return bool - return true if is dummy lock, otherwise false.
      */
-    virtual bool IsDummyLock() const;
+    bool IsDummyLock() const override;
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 private:
     friend class LLBC_ConditionVariable;
-    virtual void *Handle();
+    void *Handle() override;
 #endif
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_FastLock);

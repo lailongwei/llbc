@@ -42,7 +42,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~LLBC_PollerMonitor();
+    ~LLBC_PollerMonitor() override;
 
 public:
     /**
@@ -60,12 +60,12 @@ public:
     /**
      * Task entry method.
      */
-    virtual void Svc();
+    void Svc() override;
 
     /**
      * Task cleanup method.
      */
-    virtual void Cleanup();
+    void Cleanup() override;
 
 private:
     _Deleg _deleg;

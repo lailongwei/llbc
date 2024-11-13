@@ -32,34 +32,34 @@ class LLBC_EXPORT LLBC_SpinLock : public LLBC_ILock
 {
 public:
     LLBC_SpinLock();
-    virtual ~LLBC_SpinLock();
+    ~LLBC_SpinLock() override;
 
 public:
     /**
      * Acquire lock.
      */
-    virtual void Lock();
+    void Lock() override;
 
     /**
      * Try acquire lock.
      */
-    virtual bool TryLock();
+    bool TryLock() override;
 
     /**
      * Release lock.
      */
-    virtual void Unlock();
+    void Unlock() override;
 
     /**
      * Dummy lock check.
      * @return bool - return true if is dummy lock, otherwise false.
      */
-    virtual bool IsDummyLock() const;
+    bool IsDummyLock() const override;
 
 private:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     friend class LLBC_ConditionVariable;
-    void *Handle();
+    void *Handle() override;
 #endif
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_SpinLock);

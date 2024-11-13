@@ -46,7 +46,7 @@ public:
      * Constructor/Destructor.
      */
     LLBC_LogRunnable();
-    virtual ~LLBC_LogRunnable();
+    ~LLBC_LogRunnable() override;
 
 public:
     /**
@@ -71,12 +71,12 @@ public:
     /**
      * Cleanup method, when task terminated, will call this method.
      */
-    virtual void Cleanup();
+    void Cleanup() override;
 
     /**
      * Task service routine.
      */
-    virtual void Svc();
+    void Svc() override;
 
 private:
     /**

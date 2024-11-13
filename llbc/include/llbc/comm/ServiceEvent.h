@@ -70,7 +70,7 @@ struct LLBC_HIDDEN LLBC_ServiceEvent
 {
     int type;
 
-    LLBC_ServiceEvent(int evType);
+    explicit LLBC_ServiceEvent(int evType);
     virtual ~LLBC_ServiceEvent() = default;
 };
 
@@ -104,7 +104,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_SessionDestroy : public LLBC_ServiceEvent
     LLBC_SessionCloseInfo *closeInfo;
 
     LLBC_SvcEv_SessionDestroy();
-    virtual ~LLBC_SvcEv_SessionDestroy();
+    ~LLBC_SvcEv_SessionDestroy() override;
 };
 
 /**
@@ -128,7 +128,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_DataArrival : public LLBC_ServiceEvent
     LLBC_Packet *packet;
 
     LLBC_SvcEv_DataArrival();
-    virtual ~LLBC_SvcEv_DataArrival();
+    ~LLBC_SvcEv_DataArrival() override;
 };
 
 /**
@@ -157,7 +157,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_SubscribeEv : public LLBC_ServiceEvent
     LLBC_EventListener *listener;
 
     LLBC_SvcEv_SubscribeEv();
-    virtual ~LLBC_SvcEv_SubscribeEv();
+    ~LLBC_SvcEv_SubscribeEv() override;
 };
 
 /**
@@ -180,7 +180,7 @@ struct LLBC_HIDDEN LLBC_SvcEv_FireEv : public LLBC_ServiceEvent
     LLBC_Delegate<void(LLBC_Event *)> dequeueHandler;
 
     LLBC_SvcEv_FireEv();
-    virtual ~LLBC_SvcEv_FireEv();
+    ~LLBC_SvcEv_FireEv() override;
 };
 
 /**
