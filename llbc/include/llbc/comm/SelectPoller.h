@@ -54,15 +54,10 @@ protected:
      * Queued event handlers.
      */
     void HandleEv_AddSock(LLBC_PollerEvent &ev) override;
-
     void HandleEv_AsyncConn(LLBC_PollerEvent &ev) override;
-
     void HandleEv_Send(LLBC_PollerEvent &ev) override;
-
     void HandleEv_Close(LLBC_PollerEvent &ev) override;
-
     void HandleEv_Monitor(LLBC_PollerEvent &ev) override;
-
     void HandleEv_TakeOverSession(LLBC_PollerEvent &ev) override;
 
     /**
