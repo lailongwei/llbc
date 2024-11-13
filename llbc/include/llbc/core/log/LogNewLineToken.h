@@ -32,7 +32,6 @@ class LLBC_HIDDEN LLBC_LogNewLineToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogNewLineToken() = default;
-
     ~LLBC_LogNewLineToken() override = default;
 
 public:

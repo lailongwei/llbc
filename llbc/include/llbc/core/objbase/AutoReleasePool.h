@@ -41,7 +41,6 @@ public:
      * Constructor & Destructor.
      */
     LLBC_AutoReleasePool();
-
     ~LLBC_AutoReleasePool() override;
 
 public:

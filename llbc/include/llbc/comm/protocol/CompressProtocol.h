@@ -32,7 +32,6 @@ class LLBC_EXPORT LLBC_CompressProtocol : public LLBC_IProtocol
 {
 public:
     LLBC_CompressProtocol();
-
     ~LLBC_CompressProtocol() override;
 
 public:

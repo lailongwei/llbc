@@ -43,7 +43,6 @@ class LLBC_EXPORT LLBC_FastLock : public LLBC_ILock
 {
 public:
     LLBC_FastLock();
-
     ~LLBC_FastLock() override;
 
 public:
@@ -71,7 +70,6 @@ public:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 private:
     friend class LLBC_ConditionVariable;
-
     void *Handle() override;
 #endif
 

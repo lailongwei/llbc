@@ -32,7 +32,6 @@ class LLBC_EXPORT LLBC_RecursiveLock : public LLBC_ILock
 {
 public:
     LLBC_RecursiveLock();
-
     ~LLBC_RecursiveLock() override;
 
 public:
@@ -60,7 +59,6 @@ public:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 private:
     friend class LLBC_ConditionVariable;
-
     void *Handle() override;
 #endif
 

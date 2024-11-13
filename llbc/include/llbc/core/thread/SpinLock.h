@@ -32,7 +32,6 @@ class LLBC_EXPORT LLBC_SpinLock : public LLBC_ILock
 {
 public:
     LLBC_SpinLock();
-
     ~LLBC_SpinLock() override;
 
 public:

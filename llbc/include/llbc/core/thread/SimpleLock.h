@@ -32,7 +32,6 @@ class LLBC_EXPORT LLBC_SimpleLock : public LLBC_ILock
 {
 public:
     LLBC_SimpleLock();
-
     ~LLBC_SimpleLock() override;
 
 public:
@@ -60,7 +59,6 @@ public:
 private:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     friend class LLBC_ConditionVariable;
-
     void *Handle() override;
 #endif
 

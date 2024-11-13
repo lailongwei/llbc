@@ -32,7 +32,6 @@ class LLBC_HIDDEN LLBC_LogEscapeToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogEscapeToken() = default;
-
     ~LLBC_LogEscapeToken() override = default;
 
 public:

@@ -33,7 +33,6 @@ class LLBC_Holder : public LLBC_IHolder
 {
 public:
     explicit LLBC_Holder(ValueType *value);
-
     ~LLBC_Holder() override;
 
 public:

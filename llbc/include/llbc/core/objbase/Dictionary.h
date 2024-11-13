@@ -292,7 +292,6 @@ public:
      * Constructor & Destructor.
      */
     explicit LLBC_Dictionary(size_type bucketSize = LLBC_CFG_OBJBASE_DICT_DFT_BUCKET_SIZE);
-
     ~LLBC_Dictionary() override;
 
 public:
@@ -400,7 +399,6 @@ public:
      * Serialize/Deserialize support.
      */
     void Serialize(LLBC_Stream &s) const override;
-
     bool Deserialize(LLBC_Stream &s) override;
 
     /**

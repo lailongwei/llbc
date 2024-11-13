@@ -55,7 +55,6 @@ public:
      * Constructor & Destructor.
      */
     LLBC_BasePoller();
-
     ~LLBC_BasePoller() override;
 
 public:

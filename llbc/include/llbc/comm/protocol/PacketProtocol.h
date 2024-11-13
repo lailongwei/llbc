@@ -48,7 +48,6 @@ public:
      * Constructor & Destructor.
      */
     LLBC_PacketProtocol();
-
     ~LLBC_PacketProtocol() override;
 
 public:

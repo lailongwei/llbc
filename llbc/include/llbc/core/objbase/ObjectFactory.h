@@ -36,7 +36,6 @@ public:
      * Constructor/Destructor.
      */
     LLBC_ObjectFactory();
-
     ~LLBC_ObjectFactory() override;
 
 public:

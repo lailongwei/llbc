@@ -29,7 +29,6 @@ class LLBC_HIDDEN LLBC_LogNullToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogNullToken() = default;
-
     ~LLBC_LogNullToken() override = default;
 
 public:

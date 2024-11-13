@@ -32,7 +32,6 @@ class LLBC_EXPORT LLBC_CodecProtocol : public LLBC_IProtocol
 {
 public:
     LLBC_CodecProtocol();
-
     ~LLBC_CodecProtocol() override;
 
 public:

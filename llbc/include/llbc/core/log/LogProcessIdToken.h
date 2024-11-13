@@ -32,7 +32,6 @@ class LLBC_HIDDEN LLBC_LogProcessIdToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogProcessIdToken();
-
     ~LLBC_LogProcessIdToken() override = default;
 
 public:

@@ -32,7 +32,6 @@ class LLBC_HIDDEN LLBC_LogFunctionToken : public LLBC_BaseLogToken
 {
 public:
     LLBC_LogFunctionToken() = default;
-
     ~LLBC_LogFunctionToken() override = default;
 
 public:

@@ -29,44 +29,35 @@ __LLBC_NS_BEGIN
 class LLBC_InvalidArgException : public std::logic_error
 {
 public:
-    explicit LLBC_InvalidArgException(const std::string &what)
-        : ::std::logic_error(what) {  }
-
+    explicit LLBC_InvalidArgException(const std::string &what) : std::logic_error(what) {  }
     ~LLBC_InvalidArgException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_NullPtrException : public std::logic_error
 {
 public:
-    explicit LLBC_NullPtrException(const std::string &what)
-        : ::std::logic_error(what) {  }
-
+    explicit LLBC_NullPtrException(const std::string &what) : std::logic_error(what) {  }
     ~LLBC_NullPtrException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_LengthException : public std::logic_error
 {
 public:
-    explicit LLBC_LengthException(const std::string &what)
-        : ::std::logic_error(what) {  }
-
+    explicit LLBC_LengthException(const std::string &what) : std::logic_error(what) {  }
     ~LLBC_LengthException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_RangeException : public std::logic_error
 {
 public:
-    explicit LLBC_RangeException(const std::string &what)
-        : ::std::logic_error(what) {  }
-
+    explicit LLBC_RangeException(const std::string &what) : std::logic_error(what) {  }
     ~LLBC_RangeException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_OverflowException : public std::logic_error
 {
 public:
-    explicit LLBC_OverflowException(const std::string &what)
-        : ::std::logic_error(what) {  }
+    explicit LLBC_OverflowException(const std::string &what) : std::logic_error(what) {  }
 
     ~LLBC_OverflowException() LLBC_NO_EXCEPT override {  }
 };
@@ -74,18 +65,14 @@ public:
 class LLBC_UnderflowException : public std::logic_error
 {
 public:
-    explicit LLBC_UnderflowException(const std::string &what)
-        : ::std::logic_error(what) {  }
-
+    explicit LLBC_UnderflowException(const std::string &what) : std::logic_error(what) {  }
     ~LLBC_UnderflowException() LLBC_NO_EXCEPT override {  }
 };
 
 class LLBC_IOException : public std::logic_error
 {
 public:
-    explicit LLBC_IOException(const std::string &what)
-        : std::logic_error(what) {  }
-
+    explicit LLBC_IOException(const std::string &what) : std::logic_error(what) {  }
     ~LLBC_IOException() LLBC_NO_EXCEPT override {  }
 };
 

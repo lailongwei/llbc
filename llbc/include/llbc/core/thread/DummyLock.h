@@ -32,7 +32,6 @@ class LLBC_EXPORT LLBC_DummyLock : public LLBC_ILock
 {
 public:
     LLBC_DummyLock();
-
     ~LLBC_DummyLock() override;
 
 public:

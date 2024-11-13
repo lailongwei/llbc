@@ -33,7 +33,6 @@ class LLBC_EXPORT LLBC_RawProtocol : public LLBC_IProtocol
 {
 public:
     LLBC_RawProtocol();
-
     ~LLBC_RawProtocol() override;
 
 public:
