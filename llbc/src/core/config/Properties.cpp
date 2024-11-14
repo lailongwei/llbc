@@ -21,6 +21,7 @@
 
 #include "llbc/common/Export.h"
 
+#include <cctype>
 #include "llbc/core/file/File.h"
 #include "llbc/core/config/Properties.h"
 
