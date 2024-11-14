@@ -477,7 +477,7 @@ void TestCase_Core_Variant::PairTest()
 
     pa.first.clear();
     pa.second.clear();
-	// For compatibility with vs2017
+    // For compatibility with vs2017
     pa = static_cast<std::pair<std::vector<int>, std::map<int, int> >>(var2);
     std::cout << "Recover from Variant, pair.first:" << LLBC_Variant(pa.first)
         << ", pair.second:" << LLBC_Variant(pa.second) << std::endl;
