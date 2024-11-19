@@ -40,8 +40,4 @@ private:
 
 private:
     void DumpEvParams(const LLBC_Event &ev);
-
-private:
-    LLBC_ListenerStub _ev1Stub = 0;
-    LLBC_ListenerStub _ev1TooStub = 0;
 };

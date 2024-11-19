@@ -96,7 +96,7 @@ int TestCase_Core_Event::BasicTest()
 
         // Add Event4 listener.
         LLBC_PrintLn("- Add Event4 listener...");
-        evMgr.AddListener(EventIds::Event4, [this, &evMgr](LLBC_Event &ev) {
+        evMgr.AddListener(EventIds::Event4, [](LLBC_Event &ev) {
             LLBC_FilePrintLn(stderr, "Error: Event4 handler called");
         });
 
@@ -155,17 +155,17 @@ int TestCase_Core_Event::InfiniteEventFireTest()
 
     // Add event listeners.
     LLBC_EventMgr evMgr;
-    evMgr.AddListener(EventIds::Event1, [this, &evMgr](LLBC_Event &ev) {
+    evMgr.AddListener(EventIds::Event1, [&evMgr](LLBC_Event &ev) {
         LLBC_PrintLn("In Event1 handler, fire Event2...");
         evMgr.BeginFire(EventIds::Event2)
             .Fire();
     });
-    evMgr.AddListener(EventIds::Event2, [this, &evMgr](LLBC_Event &ev) {
+    evMgr.AddListener(EventIds::Event2, [&evMgr](LLBC_Event &ev) {
         LLBC_PrintLn("In Event2 handler, fire Event3...");
         evMgr.BeginFire(EventIds::Event3)
         .Fire();
     });
-    evMgr.AddListener(EventIds::Event3, [this, &evMgr](LLBC_Event &ev) {
+    evMgr.AddListener(EventIds::Event3, [&evMgr](LLBC_Event &ev) {
         LLBC_PrintLn("In Event3 handler, fire Event1 too...");
         auto ret = evMgr.BeginFire(EventIds::Event1)
             .Fire();
