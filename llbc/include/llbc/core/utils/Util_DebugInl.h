@@ -32,13 +32,13 @@ inline LLBC_Stopwatch::LLBC_Stopwatch(bool autoStart)
 {
 }
 
-inline void LLBC_Stopwatch::Start()
+inline void LLBC_Stopwatch::Resume()
 {
     if (_beginTime == 0)
         _beginTime = LLBC_RdTsc();
 }
 
-inline void LLBC_Stopwatch::Stop()
+inline void LLBC_Stopwatch::Pause()
 {
     if (_beginTime != 0)
     {

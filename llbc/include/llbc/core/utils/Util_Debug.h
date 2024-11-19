@@ -65,14 +65,14 @@ public:
 
 public:
     /**
-     * Start or resumes, measuring elapsed time for an interval. 
+     * Resume measuring elapsed time for an interval. 
      */
-    void Start();
+    void Resume();
 
     /**
-     * Stop measuring elapsed time for an interval.
+     * Pause measuring elapsed time for an interval.
      */
-    void Stop();
+    void Pause();
 
     /**
      * Stops time interval measurement and resets the elapsed time to zero.
