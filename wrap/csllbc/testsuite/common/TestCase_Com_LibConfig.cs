@@ -67,7 +67,6 @@ class TestCase_Com_LibConfig : ITestCase
         Console.WriteLine("  Comm default service FPS: {0}", LibConfig.commDefaultServiceFPS);
         Console.WriteLine("  Comm max service FPS: {0}", LibConfig.commMaxServiceFPS);
         Console.WriteLine("  Comm per-thread max drive service count: {0}", LibConfig.commPerThreadMaxDriveServiceCount);
-        Console.WriteLine("  Comm max supported component name length: {0}", LibConfig.commMaxCompNameLen);
         Console.WriteLine("  Comm enabled status handler: {0}", LibConfig.commIsEnabledStatusHandler);
         Console.WriteLine("  Comm enabled unify pre-subscribe: {0}", LibConfig.commIsEnabledUnifyPreSubscribe);
         Console.WriteLine("  Comm poller model: {0}", LibConfig.commPollerModel);

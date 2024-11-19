@@ -51,10 +51,10 @@ csllbc_Component::csllbc_Component(_D::Deleg_Comp_OnInit initDeleg,
     _unHandledPacketDeleg = unHandledPacketDeleg;
 }
 
-bool csllbc_Component::OnInit(bool &initFinished)
+int csllbc_Component::OnInit(bool &initFinished)
 {
     (*_initDeleg)();
-    return true;
+    return LLBC_OK;
 }
 
 void csllbc_Component::OnDestroy(bool &destroyFinished)
@@ -62,10 +62,10 @@ void csllbc_Component::OnDestroy(bool &destroyFinished)
     (*_destroyDeleg)();
 }
 
-bool csllbc_Component::OnStart(bool &startFinished)
+int csllbc_Component::OnStart(bool &startFinished)
 {
     (*_startDeleg)();
-    return true;
+    return LLBC_OK;
 }
 
 void csllbc_Component::OnStop(bool &stopFinished)
@@ -83,7 +83,7 @@ void csllbc_Component::OnIdle(const LLBC_TimeSpan &idleTime)
     (*_idleDeleg)(static_cast<int>(idleTime.GetTotalMicros()));
 }
 
-void csllbc_Component::OnEvent(int eventType, const LLBC_Variant &evParams)
+void csllbc_Component::OnEvent(int eventType, const LLBC_Variant &eventParams)
 {
     switch(eventType)
     {
