@@ -40,7 +40,7 @@ public:
     /**
      * Ctor & Dtor.
      */
-    LLBC_EventMgr() = delete;
+    LLBC_EventMgr();
     explicit LLBC_EventMgr(LLBC_Service *svc);
     virtual ~LLBC_EventMgr();
 
@@ -182,7 +182,7 @@ protected:
     std::set<int> _pendingRemoveEvIds;
     std::set<LLBC_ListenerStub> _pendingRemoveEvStubs;
 
-    LLBC_Service *_parentService;
+    LLBC_Service* const _parentService ;
 };
 
 __LLBC_NS_END

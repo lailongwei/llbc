@@ -48,6 +48,8 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
         LLBC_Recycle(listener);
 }
 
+LLBC_EventMgr::LLBC_EventMgr() : LLBC_EventMgr(nullptr) {}
+
 LLBC_EventMgr::LLBC_EventMgr(LLBC_Service *svc)
 : _firing(0)
 , _pendingRemoveAllListeners(false)
@@ -185,6 +187,8 @@ int LLBC_EventMgr::RemoveListener(const LLBC_ListenerStub &stub)
 
     _stub2ListenerInfos.erase(stubIt);
 
+    LLBC_PrintLn("remove listener event:%d stub:%llu", evId, stub);
+
     return LLBC_OK;
 }
 
@@ -314,6 +318,7 @@ void LLBC_EventMgr::AddListenerInfo(_ListenerInfo *li)
 
     _stub2ListenerInfos[li->stub] = std::make_pair(li->evId, --lis.end());
 
+    LLBC_PrintLn("add listener event:%d stub:%llu", li->evId, li->stub);
     if (_parentService)
         _parentService->OnComponentAddEventStub(li->stub);
 }
