@@ -78,7 +78,7 @@ int TestCase_Core_Event::BasicTest()
         DumpEvParams(ev);
     });
 
-    auto ev2Stub = evMgr.AddListener(EventIds::Event2, [this, &evMgr](LLBC_Event &ev) {
+    evMgr.AddListener(EventIds::Event2, [this, &evMgr](LLBC_Event &ev) {
         LLBC_PrintLn("- Event2 event handler called, params:");
         DumpEvParams(ev);
 
@@ -90,7 +90,7 @@ int TestCase_Core_Event::BasicTest()
             .Fire();
     });
 
-    auto ev3Stub = evMgr.AddListener(EventIds::Event3, [this, &evMgr, ev1Stub1](LLBC_Event &ev) {
+    evMgr.AddListener(EventIds::Event3, [this, &evMgr, ev1Stub1](LLBC_Event &ev) {
         LLBC_PrintLn("Event3 event handler called, params:");
         DumpEvParams(ev);
 

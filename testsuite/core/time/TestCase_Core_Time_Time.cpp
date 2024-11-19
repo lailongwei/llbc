@@ -325,7 +325,7 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
             finalSpan += LLBC_TimeSpan::FromSpanStr(spanStr);
     }
 
-    sw.Stop();
+    sw.Pause();
     std::cout << "- Finish, test times:" << testTimes * testSpanStrs.size()
               << ", cost time:" << sw.Elapsed().GetTotalMicros() << " micro sec"
               << ", per time cost: " << sw.Elapsed().GetTotalMicros() /
