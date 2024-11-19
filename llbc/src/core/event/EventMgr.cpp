@@ -20,6 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+#include "llbc/comm/Service.h"
 #include "llbc/common/Export.h"
 
 #include "llbc/core/os/OS_Atomic.h"
@@ -47,10 +48,10 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
         LLBC_Recycle(listener);
 }
 
-LLBC_EventMgr::LLBC_EventMgr()
+LLBC_EventMgr::LLBC_EventMgr(LLBC_Service *svc)
 : _firing(0)
-
 , _pendingRemoveAllListeners(false)
+, _parentService(svc)
 {
 }
 
@@ -312,6 +313,9 @@ void LLBC_EventMgr::AddListenerInfo(_ListenerInfo *li)
     lis.push_back(li);
 
     _stub2ListenerInfos[li->stub] = std::make_pair(li->evId, --lis.end());
+
+    if (_parentService)
+        _parentService->OnComponentAddEventStub(li->stub);
 }
 
 __LLBC_NS_END

@@ -40,6 +40,7 @@ __LLBC_NS_BEGIN
 
 class LLBC_HIDDEN LLBC_ServiceImpl final : public LLBC_Service
 {
+    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
 public:
     /**
      * Create specified type service.
@@ -389,6 +390,20 @@ public:
 
 public:
     /**
+     * When before component in running phase add event listener stub by event mgr,
+     * if component stop running can auto remove listener by stub.
+     * @param[in] stub - the listener stub.
+     */
+    virtual void OnComponentAddEventStub(const LLBC_ListenerStub &stub);
+
+    /**
+     * Remove listener stub by component and it's phase.
+     * @param[in] comp - the component.
+     * @param[in] phase - the component running phase.
+     */
+    void RemoveEventListenerStub(const LLBC_Component *comp, _CompRunningPhase phase);
+public:
+    /**
      * Post lazy task to service.
      * @param[in] runnable - the runnable obj.
      * @return int - return 0 if success, otherwise return -1.
@@ -642,11 +657,12 @@ private:
 
 private:
     // Components about members.
-    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
     std::list<LLBC_Component *> _willRegComps; // Will register component list.
     std::vector<LLBC_Component *> _compList; // Component list.
     std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
     std::map<LLBC_String, LLBC_Library *> _compLibraries; // Component libraries(if is dynamic load component).
+
+    LLBC_Component * _curComp; // Current component.
 
     // Coder & Handler about members.
     std::map<int, LLBC_CoderFactory *> _coderFactories; // Coder Factories.
@@ -678,6 +694,7 @@ private:
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
     std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
+    std::map<const LLBC_Component *, std::map<_CompRunningPhase, std::set<LLBC_ListenerStub>>> _compPhaseListeners; // Component phase listeners.
 };
 
 __LLBC_NS_END

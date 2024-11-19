@@ -26,6 +26,7 @@
 __LLBC_NS_BEGIN
 class LLBC_Event;
 class LLBC_EventFirer;
+class LLBC_Service;
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -39,7 +40,8 @@ public:
     /**
      * Ctor & Dtor.
      */
-    LLBC_EventMgr();
+    LLBC_EventMgr() = delete;
+    explicit LLBC_EventMgr(LLBC_Service *svc);
     virtual ~LLBC_EventMgr();
 
 public:
@@ -179,6 +181,8 @@ protected:
     bool _pendingRemoveAllListeners;
     std::set<int> _pendingRemoveEvIds;
     std::set<LLBC_ListenerStub> _pendingRemoveEvStubs;
+
+    LLBC_Service *_parentService;
 };
 
 __LLBC_NS_END

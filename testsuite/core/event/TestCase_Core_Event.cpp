@@ -34,7 +34,7 @@ namespace
         };
     };
 
-    static LLBC_EventMgr evMgr;
+    LLBC_EventMgr evMgr(nullptr);
 }
 
 int TestCase_Core_Event::Run(int argc, char *argv[])

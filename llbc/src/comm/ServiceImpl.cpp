@@ -119,6 +119,8 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _begSvcTime(0)
 
+, _curComp(nullptr)
+
 // Service extend functions about members.
 , _releasePoolStack(nullptr)
 
@@ -126,6 +128,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _threadUnsafeObjPool(false)
 
 , _timerScheduler(nullptr)
+, _evManager(this)
 {
     // Create service name, if is empty.
     if (_name.empty())
@@ -970,6 +973,32 @@ int LLBC_ServiceImpl::AddComponentEvent(int eventType, const LLBC_Variant &event
     }
 
     return Push(LLBC_SvcEvUtil::BuildComponentEventEv(eventType, eventParams));
+}
+
+void LLBC_ServiceImpl::OnComponentAddEventStub(const LLBC_ListenerStub &stub)
+{
+    if (_curComp != nullptr && _curComp->_runningPhase < _CompRunningPhase::LateStarted)
+        _compPhaseListeners[_curComp][_curComp->_runningPhase].emplace(stub);
+}
+
+void LLBC_ServiceImpl::RemoveEventListenerStub(const LLBC_Component *comp, _CompRunningPhase phase)
+{
+    auto itComp = _compPhaseListeners.find(comp);
+    if (itComp == _compPhaseListeners.end())
+        return;
+
+    auto &phaseListeners = itComp->second;
+    auto itPhase = phaseListeners.find(phase);
+    if (itPhase == phaseListeners.end())
+        return;
+
+    auto &stubs = itPhase->second;
+    for (auto stub : stubs)
+        _evManager.RemoveListener(stub);
+
+    phaseListeners.erase(itPhase);
+    if (phaseListeners.empty())
+        _compPhaseListeners.erase(itComp);
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
@@ -1872,6 +1901,7 @@ void LLBC_ServiceImpl::HandleEv_ComponentEvent(LLBC_ServiceEvent &_)
 // Define comp init macro.
 #define __LLBC_Inl_InitComp(comp, initMeth, toPhase, failSetErrno)        \
     {                                                                     \
+        _curComp = comp;                                                  \
         while (true) {                                                    \
             bool initFinished = true;                                     \
             LLBC_SetLastError(LLBC_ERROR_SUCCESS);                        \
@@ -1897,6 +1927,7 @@ void LLBC_ServiceImpl::HandleEv_ComponentEvent(LLBC_ServiceEvent &_)
                                                                           \
         if (comp->_runningPhase != _CompRunningPhase::toPhase) {          \
             compsInitSucc = false;                                        \
+            RemoveEventListenerStub(comp, comp->_runningPhase);           \
             break;                                                        \
         }                                                                 \
     }                                                                     \
@@ -1952,17 +1983,18 @@ int LLBC_ServiceImpl::InitComps()
 }
 
 // Define component destroy macro.
-#define __LLBC_Inl_DestoryComp(comp, destroyMeth, toPhase)    \
-    while (true) {                                            \
-        bool destroyFinished = true;                          \
-        comp->destroyMeth(destroyFinished);                   \
-        if (destroyFinished) {                                \
-            comp->_runningPhase = _CompRunningPhase::toPhase; \
-            break;                                            \
-        }                                                     \
-                                                              \
-        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);           \
-    }                                                         \
+#define __LLBC_Inl_DestoryComp(comp, destroyMeth, toPhase)          \
+    while (true) {                                                  \
+        RemoveEventListenerStub(comp, _CompRunningPhase::toPhase);  \
+        bool destroyFinished = true;                                \
+        comp->destroyMeth(destroyFinished);                         \
+        if (destroyFinished) {                                      \
+            comp->_runningPhase = _CompRunningPhase::toPhase;       \
+            break;                                                  \
+        }                                                           \
+                                                                    \
+        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);                 \
+    }                                                               \
 
 void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
 {
