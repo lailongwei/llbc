@@ -35,10 +35,8 @@ public:
     int Run(int argc, char *argv[]) override;
 
 private:
-    void OnEvent1(LLBC_Event &ev);
-    void OnEvent1Too(LLBC_Event &ev);
-
-    void OnEvent2(LLBC_Event &ev);
+    int BasicTest();
+    int InfiniteEventFireTest();
 
 private:
     void DumpEvParams(const LLBC_Event &ev);

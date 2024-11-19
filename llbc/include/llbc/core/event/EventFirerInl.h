@@ -91,13 +91,18 @@ LLBC_EventFirer &LLBC_EventFirer::SetParam(const KeyType &paramKey, const ParamT
     return *this;
 }
 
-inline void LLBC_EventFirer::Fire()
+inline int LLBC_EventFirer::Fire()
 {
     if (LIKELY(_ev))
     {
-        _evMgr->Fire(_ev);
+        const int ret = _evMgr->Fire(_ev);
         _ev = nullptr;
+
+        return ret;
     }
+
+    LLBC_SetLastError(LLBC_ERROR_INVALID);
+    return LLBC_FAILED;
 }
 
 __LLBC_NS_END

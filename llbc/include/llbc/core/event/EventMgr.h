@@ -107,15 +107,19 @@ public:
 
     /**
      * Remove all listeners.
+     * @return int - return 0 if success, otherwise return -1,
+     *               specially, if return LLBC_FAILED, and fetch the last error is pending,
+     *               it means operation will success on later, but pending at now.
      */
-    virtual void RemoveAllListeners();
+    virtual int RemoveAllListeners();
 
 public:
     /**
      * Fire event.
      * @param[in] ev - event object.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    virtual void Fire(LLBC_Event *ev);
+    virtual int Fire(LLBC_Event *ev);
 
     /**
      * Begin fire event.
@@ -128,7 +132,7 @@ public:
      * Check event manager is firing or not.
      * @return bool - firing flag.
      */
-    virtual bool IsFiring() const;
+    bool IsFiring() const;
 
 protected:
     /**
@@ -139,7 +143,7 @@ protected:
     /**
      * Before fire event method.
      */
-    void BeforeFireEvent();
+    int BeforeFireEvent(const LLBC_Event &ev);
 
     /**
      * After fire event method.
@@ -161,24 +165,60 @@ protected:
         ~_ListenerInfo();
     };
 
+    /**
+     * \brief The pending event operation structure.
+     */
+    struct _PendingEventOp
+    {
+        enum _PendingEventOpType
+        {
+            AddListener,
+            RemoveAllListeners,
+            RemoveListenersById,
+            RemoveListenerByStub,
+        };
+
+        _PendingEventOpType opType;
+        union
+        {
+            _ListenerInfo *listenerInfo;
+            int eventId;
+            LLBC_ListenerStub eventStub;
+        } opInfo;
+
+        explicit _PendingEventOp(_PendingEventOpType opType);
+        ~_PendingEventOp();
+    };
+
 private:
+    // Disable assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_EventMgr);
+
+    // Add listener check.
     int AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_ListenerStub &stub);
-    void AddListenerInfo(_ListenerInfo *li);
+
+    // Add listener info to event manager.
+    int AddListenerInfo(_ListenerInfo *listenerInfo);
 
 protected:
-    typedef std::list<_ListenerInfo *> _ListenerInfos; // deleg info list
-    typedef std::map<int, _ListenerInfos> _Id2ListenerInfos; // event id 2 listeners
-    typedef std::map<LLBC_ListenerStub, std::pair<int, _ListenerInfos::iterator> > _Stub2ListenerInfos; // stub id 2 listeners
+    typedef std::list<_ListenerInfo *> _ListenerInfos; // listener info list.
 
-    int _firing;
-    static sint64 _maxListenerStub;
+    int _firing; // Firing flag.
+    std::vector<int> _firingEventIds; // Firing event ids, used for prevent event fire endless loop.
+    static sint64 _maxListenerStub; // Max listener stub.
 
-    _Id2ListenerInfos _id2ListenerInfos;
-    _Stub2ListenerInfos _stub2ListenerInfos;
+    std::map<int, _ListenerInfos> _id2ListenerInfos; // event id 2 listeners.
+    std::map<LLBC_ListenerStub, std::pair<int, _ListenerInfos::iterator> > _stub2ListenerInfos; // stub id 2 listeners.
 
+    // Pending operations when event firing.
+    // All pending event operations(Add/Remove(by event id)/Remove(by listener stub).
+    std::vector<_PendingEventOp *> _pendingEventOps;
+    // Pending remove all event listeners flag, used for prevent event firing in event firing.
     bool _pendingRemoveAllListeners;
-    std::set<int> _pendingRemoveEvIds;
-    std::set<LLBC_ListenerStub> _pendingRemoveEvStubs;
+    // Pending remove event ids, used for prevent event firing in event firing.
+    std::set<int> _pendingRemoveEventIds_;
+    // Pending remove event stubs, used for prevent event firing in event firing.
+    std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 };
 
 __LLBC_NS_END

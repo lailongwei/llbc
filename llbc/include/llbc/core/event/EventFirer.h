@@ -60,8 +60,9 @@ public:
 
     /**
      * Fire firer holded event.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void Fire();
+    int Fire();
 
 public:
     // Copy assignment & Move assignment.

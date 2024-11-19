@@ -174,7 +174,7 @@ class LLBC_EXPORT LLBC_EventListener
 {
 public:
     /**
-     * Ctor & Detor.
+     * Ctor & Dtor.
      */
     LLBC_EventListener() = default;
     virtual ~LLBC_EventListener() = default;
