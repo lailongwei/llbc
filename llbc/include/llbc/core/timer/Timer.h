@@ -44,7 +44,12 @@ class LLBC_EXPORT LLBC_Timer
 
 public:
     /**
-     * Constructor.
+     * Default constructor.
+     */
+    LLBC_Timer(): LLBC_Timer(nullptr, nullptr, nullptr) {  }
+
+    /**
+     * Construct from delegate(s) and scheduler.
      * @param[in] timeoutDeleg - the timeout handler delegate.
      * @param[in] cancelDeleg  - the cancel handler delegate(optional).
      * @param[in] scheduler    - timer scheduler, if set to nullptr, it means use default scheduler, 
@@ -55,7 +60,7 @@ public:
      *              In llbc service logic thread, use Service's timer scheduler.
      *              In other non-llbc library style thread, scheduler is nullptr.
      */
-    explicit LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg = nullptr,
+    explicit LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
                         const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg = nullptr,
                         Scheduler *scheduler = nullptr);
     virtual ~LLBC_Timer();
