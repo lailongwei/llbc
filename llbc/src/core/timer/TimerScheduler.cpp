@@ -25,7 +25,6 @@
 #include "llbc/core/os/OS_Time.h"
 
 #include "llbc/core/timer/Timer.h"
-#include "llbc/core/timer/TimerData.h"
 
 #include "llbc/core/timer/TimerScheduler.h"
 
@@ -127,7 +126,6 @@ void LLBC_TimerScheduler::Update()
         {
             sint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
             data->handle = now + data->period - delay;
-
             _heap.push(data);
         }
         else
