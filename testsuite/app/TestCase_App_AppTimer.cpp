@@ -29,20 +29,26 @@ class TestApp : public LLBC_App
 {
 public:
     TestApp()
-    : _phaseTimers{}
+    : _phaseTimers{new LLBC_Timer(), new LLBC_Timer(), new LLBC_Timer(), new LLBC_Timer()}
     , _phaseMaxWaitTimes{LLBC_TimeSpan::oneSec * 5,
                          LLBC_TimeSpan::oneSec * 5,
                          LLBC_TimeSpan::oneSec * 3.5,
                          LLBC_TimeSpan::oneSec * 3.5}
-    , _phaseNames{ "EarlyStart", "Start", "EarlyStop", "Stop" }
+    , _phaseNames{"EarlyStart", "Start", "EarlyStop", "Stop"}
     {
+    }
+
+    ~TestApp() override
+    {
+        for (size_t i = 0; i < sizeof(_phaseTimers) / sizeof(_phaseTimers[0]); ++i)
+            delete _phaseTimers[i];
     }
 
 public:
     int OnEarlyStart(int argc, char *argv[], bool &earlyStartFinished) override
     {
         // Log app will start.
-        if (!_phaseTimers->IsScheduling())
+        if (!_phaseTimers[0]->IsScheduling())
             LLBC_PrintLn("App[%s] will start...", GetName().c_str());
 
         return _OnPhase(0, earlyStartFinished);
@@ -56,8 +62,8 @@ public:
     void OnLateStart(int argc, char *argv[]) override
     {
         // Cancel EarlyStart/Start timers.
-        _phaseTimers[0].Cancel();
-        _phaseTimers[1].Cancel();
+        _phaseTimers[0]->Cancel();
+        _phaseTimers[1]->Cancel();
 
         // Log start finished.
         LLBC_PrintLn("App start finished(press <Ctrl + C> to exit app)");
@@ -72,7 +78,7 @@ public:
     void OnEarlyStop(bool &earlyStopFinished) override
     {
         // Log app will stop & Cancel update timer.
-        if (!_phaseTimers[2].IsScheduling())
+        if (!_phaseTimers[2]->IsScheduling())
         {
             LLBC_PrintLn("App will stop...");
             _updateTimer.Cancel();
@@ -89,8 +95,8 @@ public:
     void OnLateStop() override
     {
         // Cancel EarlyStop/Stop timers.
-        _phaseTimers[2].Cancel();
-        _phaseTimers[3].Cancel();
+        _phaseTimers[2]->Cancel();
+        _phaseTimers[3]->Cancel();
 
         // Log app stop finished.
         LLBC_PrintLn("App stop finished");
@@ -101,12 +107,12 @@ private:
     {
         const auto now = LLBC_Time::Now();
         auto phaseName = _phaseNames[phaseIndex];
-        auto &phaseTimer = _phaseTimers[phaseIndex];
+        auto &phaseTimer = *_phaseTimers[phaseIndex];
         auto &phaseMaxWaitTime = _phaseMaxWaitTimes[phaseIndex];
         if (!phaseTimer.IsScheduling())
         {
             _phaseBeginTime = now;
-            phaseTimer.SetTimeoutHandler([this, phaseName](LLBC_Timer *timer) {
+            phaseTimer.SetTimeoutHandler([phaseName](LLBC_Timer *timer) {
                 LLBC_PrintLn("- %s %s timer timeout...", LLBC_Time::Now().ToString().c_str(), phaseName);
             });
 
@@ -122,7 +128,7 @@ private:
 
 private:
     // Phase timers: EarlyStart/Start/EarlyStop/Stop
-    LLBC_Timer _phaseTimers[4];
+    LLBC_Timer *_phaseTimers[4];
     // Phase max wait times: EarlyStart/Start/EarlyStop/Stop.
     LLBC_TimeSpan _phaseMaxWaitTimes[4];
     // Phase names: EarlyStart/Start/EarlyStop/Stop.
