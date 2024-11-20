@@ -25,7 +25,6 @@
 #include "llbc/core/time/Time.h"
 #include "llbc/core/variant/Variant.h"
 
-#include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/Timer.h"
 #include "llbc/core/timer/TimerScheduler.h"
 

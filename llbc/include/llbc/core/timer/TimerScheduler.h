@@ -22,11 +22,11 @@
 #pragma once
 
 #include "llbc/core/timer/Heap.h"
+#include "llbc/core/timer/TimerData.h"
 
 __LLBC_NS_BEGIN
 
 class LLBC_Timer;
-struct LLBC_TimerData;
 
 __LLBC_NS_END
 
@@ -39,7 +39,9 @@ class LLBC_EXPORT LLBC_TimerScheduler
 {
     typedef LLBC_TimerScheduler _This;
 
-    typedef LLBC_Heap<LLBC_TimerData *> _Heap;
+    typedef LLBC_Heap<LLBC_TimerData *,
+                      std::vector<LLBC_TimerData *>,
+                      std::greater<LLBC_NS LLBC_TimerData *> > _Heap;
 
 public:
     LLBC_TimerScheduler();

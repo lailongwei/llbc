@@ -149,7 +149,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         for (int i = 0; i < loopLmt; ++i)
             LLOG_TRACE2("perftest", "performance test msg, msg idx:%d", i);
 
-        sw.Stop();
+        sw.Pause();
         LLBC_PrintLn("Performance test completed, "
                        "log times:%d, cost:%s ms, per-log cost:%.3f us",
                        loopLmt,

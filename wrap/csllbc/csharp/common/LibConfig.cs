@@ -324,15 +324,6 @@ namespace llbc
         }
 
         /// <summary>
-        /// Service max supported component name length.
-        /// <para>config layer: llbc core library</para>
-        /// </summary>
-        public static int commMaxCompNameLen
-        {
-            get { return LLBCNative.csllbc_LibConfig_Comm_MaxCompNameLen(); }
-        }
-
-        /// <summary>
         /// Service Status-Handler enabled config.
         /// <para>config layer: llbc core library</para>
         /// </summary>

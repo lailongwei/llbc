@@ -56,8 +56,8 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         LLBC_PrintLn("  - Watch detail info, ElapsedNanos:%llu, ElapsedTicks:%llu",
                      sw.ElapsedNanos(), sw.ElapsedTicks());
 
-        sw.Stop();
-        LLBC_PrintLn("- Stop watcher and sleep 1000ms...");
+        sw.Pause();
+        LLBC_PrintLn("- Pause watcher and sleep 1000ms...");
         LLBC_Sleep(1000);
         LLBC_PrintLn("- Done, watcher: %s", sw.ToString().c_str());
 
@@ -67,9 +67,9 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         LLBC_Sleep(618);
         LLBC_PrintLn("- After sleep 618ms, watcher: %s", sw.ToString().c_str());
 
-        sw.Start();
+        sw.Resume();
         LLBC_Sleep(618);
-        LLBC_PrintLn("- After Start & sleep 618ms, watcher: %s", sw.ToString().c_str());
+        LLBC_PrintLn("- After Resume & sleep 618ms, watcher: %s", sw.ToString().c_str());
     }
 
     LLBC_Print("\n");

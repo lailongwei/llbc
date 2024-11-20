@@ -24,20 +24,12 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Event : public LLBC_BaseTestCase
+class TestCase_App_AppTimer: public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Event() = default;
-
-    ~TestCase_Core_Event() override = default;
+    TestCase_App_AppTimer();
+    virtual ~TestCase_App_AppTimer();
 
 public:
-    int Run(int argc, char *argv[]) override;
-
-private:
-    int BasicTest();
-    int InfiniteEventFireTest();
-
-private:
-    void DumpEvParams(const LLBC_Event &ev);
+    virtual int Run(int argc, char *argv[]);
 };

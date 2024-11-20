@@ -96,6 +96,7 @@
 #include "app/TestCase_App_AppTest.h"
 #include "app/TestCase_App_AppCfgTest.h"
 #include "app/TestCase_App_AppPhaseWaitingTest.h"
+#include "app/TestCase_App_AppTimer.h"
 
 extern int TestSuite_Main(int argc, char *argv[]);
 

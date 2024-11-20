@@ -88,6 +88,6 @@ void TestCase_Core_OS_Symbol::PrintBackTrace()
     LLBC_PrintLn("Not implement Symbol function(Try enable LLBC_CFG_OS_IMPL_SYMBOL option and rebuild llbc library to enable Symbol function)");
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
-    sw.Stop();
+    sw.Pause();
     LLBC_PrintLn("Capture stack backtrace used time(ms):%s", sw.ToString().c_str());
 }

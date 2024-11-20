@@ -537,7 +537,7 @@ int TestCase_Core_ObjPool::PerfTest()
         }
     }
 
-    sw.Stop();
+    sw.Pause();
     LLBC_PrintLn("New/Delete test fin, cost: %lld us", sw.Elapsed().GetTotalMicros());
 
     // Execute object pool acquire/release test.
@@ -565,7 +565,7 @@ int TestCase_Core_ObjPool::PerfTest()
         }
     }
 
-    sw2.Stop();
+    sw2.Pause();
     LLBC_PrintLn("ObjPool New/Delete test fin, cost: %lld us, perf improvement: %.3f",
                  sw2.Elapsed().GetTotalMicros(),
                  (sw.ElapsedTicks() - sw2.ElapsedTicks()) / static_cast<double>(sw2.ElapsedTicks()));
