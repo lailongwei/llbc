@@ -249,6 +249,8 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
 #endif // Non-Win32
 
     // Call OnEarlyStart event method.
+    LLBC_TimerScheduler *timerScheduler =
+        reinterpret_cast<LLBC_TimerScheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler);
     while (true)
     {
         bool earlyStartFinished = true;
@@ -262,7 +264,9 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         }
 
         LLBC_BreakIf(earlyStartFinished);
+
         LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
+        timerScheduler->Update();
     }
 
     // Fire App-WillStart event to all service(s).
@@ -285,7 +289,9 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         }
 
         LLBC_BreakIf(startFinished);
+
         LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
+        timerScheduler->Update();
     }
 
     // Update start phase to Started.
@@ -306,6 +312,8 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         // Handle events.
         bool handleEvsDoNothing = true;
         HandleEvents(handleEvsDoNothing);
+        // Update timer scheduler.
+        timerScheduler->Update();
 
         // If require stop, execute stop.
         if (_requireStop)
@@ -337,6 +345,8 @@ void LLBC_App::Stop()
     _startPhase = LLBC_AppStartPhase::Stopping;
 
     // Call OnEarlyStop event method.
+    LLBC_TimerScheduler *timerScheduler =
+        reinterpret_cast<LLBC_TimerScheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler);
     while (true)
     {
         bool earlyStopFinished = true;
@@ -344,6 +354,7 @@ void LLBC_App::Stop()
         LLBC_BreakIf(earlyStopFinished);
 
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
+        timerScheduler->Update();
     }
 
     // Fire App-WillStop event to all service(s).
@@ -360,6 +371,7 @@ void LLBC_App::Stop()
         LLBC_BreakIf(stopFinished);
 
         LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
+        timerScheduler->Update();
     }
 
     // Set phase to Stopped.
