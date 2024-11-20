@@ -394,7 +394,7 @@ public:
      * if component stop running can auto remove listener by stub.
      * @param[in] stub - the listener stub.
      */
-    virtual void OnComponentAddEventStub(const LLBC_ListenerStub &stub);
+    void OnComponentAddEventStub(const LLBC_ListenerStub &stub) override;
 
     /**
      * Remove listener stub by component and it's phase.
