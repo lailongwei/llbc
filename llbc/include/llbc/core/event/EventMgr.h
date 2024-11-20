@@ -207,7 +207,6 @@ protected:
 
     int _firing; // Firing flag.
     std::vector<int> _firingEventIds; // Firing event ids, used for prevent event fire endless loop.
-    static sint64 _maxListenerStub; // Max listener stub.
 
     std::map<int, _ListenerInfos> _id2ListenerInfos; // event id 2 listeners.
     std::map<LLBC_ListenerStub, std::pair<int, _ListenerInfos::iterator> > _stub2ListenerInfos; // stub id 2 listeners.
