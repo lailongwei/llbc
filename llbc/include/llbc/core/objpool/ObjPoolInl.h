@@ -674,7 +674,7 @@ LLBC_FORCE_INLINE LLBC_TypedObjPool<Obj> *LLBC_ObjPool::GetTypedObjPool()
     }
 
     // Create new typed object pool.
-    auto wrappedTypedObjPool = 
+    auto wrappedTypedObjPool =
         LLBC_Malloc(_WrappedTypedObjPool, sizeof(_WrappedTypedObjPool) + sizeof(_TypedObjPool));
     wrappedTypedObjPool->rttiName = rttiName;
     wrappedTypedObjPool->ReleaseObj = &_TypedObjPool::ReleaseObj_s;
