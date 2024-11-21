@@ -979,6 +979,8 @@ void LLBC_ServiceImpl::OnComponentAddEventStub(const LLBC_ListenerStub &stub)
 {
     if (_curComp != nullptr && _curComp->_runningPhase < _CompRunningPhase::LateStarted)
         _compPhaseListeners[_curComp][_curComp->_runningPhase].emplace(stub);
+    else
+        _compPhaseListeners[nullptr][_CompRunningPhase::LateStarted].emplace(stub);
 }
 
 void LLBC_ServiceImpl::RemoveEventListenerStub(const LLBC_Component *comp, _CompRunningPhase phase)
@@ -2096,6 +2098,9 @@ int LLBC_ServiceImpl::StartComps()
 
 void LLBC_ServiceImpl::StopComps()
 {
+    // Before before-stop
+    RemoveEventListenerStub(nullptr, _CompRunningPhase::LateStarted);
+
     // Before-Stop comps.
     for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
     {

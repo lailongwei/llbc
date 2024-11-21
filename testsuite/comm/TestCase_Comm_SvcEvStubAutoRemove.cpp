@@ -34,6 +34,7 @@ namespace
             TEST_EV_LATE_INIT = 2,
             TEST_EV_START = 3,
             TEST_EV_LATE_START = 4,
+            TEST_EV_RUNNING = 5,
         };
 
     public:
@@ -56,8 +57,9 @@ namespace
         {
             eventMgr->AddListener(TestEvent::TEST_EV_INIT, this, &TestCompA::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompA init!");
-            flag = false;
-            return LLBC_FAILED;
+//            flag = false;
+//            return LLBC_FAILED;
+            return LLBC_OK;
         }
         int OnLateInit(bool &flag) override
         {
@@ -92,6 +94,11 @@ namespace
         void OnStop(bool &flag) override
         {
             LLBC_PrintLn("TestCompA stop!");
+        }
+
+        void Do()
+        {
+            eventMgr->AddListener(TestEvent::TEST_EV_RUNNING, this, &TestCompA::_OnEv_TestHandle);
         }
     };
 
@@ -139,6 +146,11 @@ namespace
         {
             LLBC_PrintLn("TestCompB stop!");
         }
+
+        void Do()
+        {
+            eventMgr->AddListener(TestEvent::TEST_EV_RUNNING, this, &TestCompB::_OnEv_TestHandle);
+        }
     };
 }
 
@@ -157,11 +169,14 @@ int TestCase_Comm_SvcEvStubAutoRemove::Run(int argc, char *argv[])
     // Create service
     LLBC_Service *svc = LLBC_Service::Create("SvcTest", protoFactory);
     eventMgr = &svc->GetEventManager();
-    TestCompB *compB = new TestCompB;
+    auto *compB = new TestCompB;
     svc->AddComponent(compB);
-    TestCompA *compA = new TestCompA;
+    auto *compA = new TestCompA;
     svc->AddComponent(compA);
     svc->Start(8);
+
+    compA->Do();
+    compB->Do();
 
     delete svc;
 

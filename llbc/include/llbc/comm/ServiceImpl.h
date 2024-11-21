@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/ServiceEventFirer.h"
@@ -694,7 +696,7 @@ private:
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
     std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
-    std::map<const LLBC_Component *, std::map<_CompRunningPhase, std::set<LLBC_ListenerStub>>> _compPhaseListeners; // Component phase listeners.
+    std::map<std::optional<const LLBC_Component *>, std::map<_CompRunningPhase, std::set<LLBC_ListenerStub>>> _compPhaseListeners; // Component phase listeners.
 };
 
 __LLBC_NS_END

@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "llbc/comm/Service.h"
 #include "llbc/common/Export.h"
 
+#include "llbc/comm/Service.h"
 #include "llbc/core/os/OS_Atomic.h"
 
 #include "llbc/core/helper/STLHelper.h"
