@@ -58,34 +58,34 @@ int TestCase_Core_Config_Properties::Run(int argc, char *argv[])
     // Test: SaveToString()
     LLBC_String errMsg;
     LLBC_String content;
-    LLBC_ErrorAndReturnIfNot(LLBC_Properties::SaveToString(property, content, &errMsg) == LLBC_OK,
-                             LLBC_FAILED,
-                             "SaveToString failed, error:%s", errMsg.c_str());
+    LLBC_ErrorAndReturnIf(LLBC_Properties::SaveToString(property, content, &errMsg) != LLBC_OK,
+                          LLBC_FAILED,
+                          "SaveToString failed, error:%s", errMsg.c_str());
     std::cout <<"After save to string, string content is:\n" <<content <<std::endl;
 
     // Test: LoadFromString()
     LLBC_Variant properties2;
-    LLBC_ErrorAndReturnIfNot(LLBC_Properties::LoadFromString(content, properties2, &errMsg) == LLBC_OK,
-                             LLBC_FAILED,
-                             "LoadFromString failed, error:%s", errMsg.c_str());
+    LLBC_ErrorAndReturnIf(LLBC_Properties::LoadFromString(content, properties2, &errMsg) == LLBC_OK,
+                          LLBC_FAILED,
+                          "LoadFromString failed, error:%s", errMsg.c_str());
     dumpProperties(properties2);
 
     // Test: LoadFromFile()
     LLBC_Variant properties3;
     const LLBC_String propFile = "test_prop.properties";
 	std::cout <<"Load from file: " <<propFile <<std::endl;
-    LLBC_ErrorAndReturnIfNot(LLBC_Properties::LoadFromFile(propFile, properties3, &errMsg) == LLBC_OK,
-                             LLBC_FAILED,
-                             "LoadFromFile failed, error:%s", errMsg.c_str());
+    LLBC_ErrorAndReturnIf(LLBC_Properties::LoadFromFile(propFile, properties3, &errMsg) == LLBC_OK,
+                          LLBC_FAILED,
+                          "LoadFromFile failed, error:%s", errMsg.c_str());
     std::cout <<"Load from file <" <<propFile <<">, properties is:" <<std::endl;
 	dumpProperties(properties3);
 
     // Test: SaveToFile()
     auto outPropFile = LLBC_Directory::SplitExt(propFile)[0] + "_out" + LLBC_Directory::SplitExt(propFile)[1];
     std::cout <<"Save to file: " <<outPropFile <<std::endl;
-    LLBC_ErrorAndReturnIfNot(LLBC_Properties::SaveToFile(properties3, outPropFile, &errMsg) == LLBC_OK,
-                             LLBC_FAILED,
-                             "SveToFile failed, error:%s", errMsg.c_str());
+    LLBC_ErrorAndReturnIf(LLBC_Properties::SaveToFile(properties3, outPropFile, &errMsg) == LLBC_OK,
+                          LLBC_FAILED,
+                          "SveToFile failed, error:%s", errMsg.c_str());
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();

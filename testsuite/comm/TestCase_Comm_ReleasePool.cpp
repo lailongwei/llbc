@@ -25,7 +25,7 @@
 namespace
 {
 
-class TestObj : public LLBC_Object
+class TestObj final : public LLBC_Object
 {
 public:
     TestObj()
@@ -39,7 +39,7 @@ public:
     }
 };
 
-class MyComp : public LLBC_Component
+class MyComp final : public LLBC_Component
 {
 public:
     MyComp() {  }

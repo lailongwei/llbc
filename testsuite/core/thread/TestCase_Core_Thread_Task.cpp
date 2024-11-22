@@ -28,7 +28,7 @@ namespace
 /**
  * \brief Test task encapsulation.
  */
-class BasicTestTask : public LLBC_Task
+class BasicTestTask final : public LLBC_Task
 {
 public:
     explicit BasicTestTask(size_t perThreadPopTimes);
@@ -97,8 +97,8 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/thread/task test:");
 
-    LLBC_ErrorAndReturnIfNot(BasicTaskTest() == LLBC_OK, LLBC_FAILED)
-    LLBC_ErrorAndReturnIfNot(EmptyTaskTest() == LLBC_OK, LLBC_FAILED)
+    LLBC_ErrorAndReturnIf(BasicTaskTest() != LLBC_OK, LLBC_FAILED)
+    LLBC_ErrorAndReturnIf(EmptyTaskTest() != LLBC_OK, LLBC_FAILED)
 
     return LLBC_OK;
 }
@@ -163,7 +163,7 @@ int TestCase_Core_Thread_Task::EmptyTaskTest()
     task->Activate(threadNum);
 
     LLBC_PrintLn("Wait EmptyTestTask...");
-    LLBC_ErrorAndReturnIfNot(task->Wait() == LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(task->Wait() != LLBC_OK, LLBC_FAILED);
     LLBC_PrintLn("EmptyTestTask wait finished!");
 
     LLBC_PrintLn("Press any key to continue ...");

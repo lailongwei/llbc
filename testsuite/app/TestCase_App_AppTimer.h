@@ -24,12 +24,12 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_App_AppTimer: public LLBC_BaseTestCase
+class TestCase_App_AppTimer final : public LLBC_BaseTestCase
 {
 public:
     TestCase_App_AppTimer();
-    virtual ~TestCase_App_AppTimer();
+    ~TestCase_App_AppTimer() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 };

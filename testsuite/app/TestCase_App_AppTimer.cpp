@@ -25,7 +25,7 @@ using namespace llbc;
 namespace
 {
 
-class TestApp : public LLBC_App
+class TestApp final : public LLBC_App
 {
 public:
     TestApp()

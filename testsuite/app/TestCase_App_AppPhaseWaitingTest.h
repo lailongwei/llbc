@@ -24,12 +24,12 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_App_AppPhaseWaitingTest : public LLBC_BaseTestCase
+class TestCase_App_AppPhaseWaitingTest final : public LLBC_BaseTestCase
 {
 public:
     TestCase_App_AppPhaseWaitingTest() = default;
-    virtual ~TestCase_App_AppPhaseWaitingTest() = default;
+    ~TestCase_App_AppPhaseWaitingTest() override = default;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 };

@@ -403,10 +403,3 @@
 #define LLBC_ExitIf(cond, exitCode)                                 \
     { if ((cond)) exit(static_cast<int>(exitCode)); }               \
 
-#define LLBC_DoIfNot(cond, behav) LLBC_DoIf(!(cond), behav)
-#define LLBC_ContinueIfNot(cond) LLBC_ContinueIf(!(cond))
-#define LLBC_BreakIfNot(cond, behav) LLBC_BreakIf(!(cond))
-#define LLBC_SetErrAndBreakIfNot(cond, err) LLBC_SetErrAndBreakIf(!(cond), err)
-#define LLBC_ReturnIfNot(cond, ret) LLBC_ReturnIf(!(cond), ret)
-#define LLBC_SetErrAndReturnIfNot(cond, err, ret) LLBC_SetErrAndReturnIf(!(cond), err, ret)
-#define LLBC_ExitIfNot(cond, exitCode) LLBC_ExitIf(!(cond), exitCode)

@@ -31,7 +31,7 @@ namespace
         ~ITestComp() override = default;
     };
 
-    class TestComp : public ITestComp
+    class TestComp final : public ITestComp
     {
     public:
         TestComp()
@@ -123,7 +123,7 @@ namespace
         LLBC_Timer *_timer;
     };
 
-    class TestCompFactory : public LLBC_ComponentFactory
+    class TestCompFactory final : public LLBC_ComponentFactory
     {
     public:
         ITestComp *Create(LLBC_Service *service) const override

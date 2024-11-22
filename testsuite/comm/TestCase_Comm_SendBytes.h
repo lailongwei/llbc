@@ -24,14 +24,14 @@
 # include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_SendBytes : public LLBC_BaseTestCase
+class TestCase_Comm_SendBytes final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Comm_SendBytes();
-    virtual ~TestCase_Comm_SendBytes();
+    ~TestCase_Comm_SendBytes() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void FetchArgs(int argc, char *argv[]);

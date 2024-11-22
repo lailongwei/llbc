@@ -24,7 +24,7 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Timer_Heap : public LLBC_BaseTestCase
+class TestCase_Core_Timer_Heap final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Timer_Heap() = default;

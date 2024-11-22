@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_SvcBase : public LLBC_BaseTestCase
+class TestCase_Comm_SvcBase final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Comm_SvcBase();
-    virtual ~TestCase_Comm_SvcBase();
+    ~TestCase_Comm_SvcBase() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void ListenTest(const char *ip, uint16 port);
