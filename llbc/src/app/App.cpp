@@ -324,7 +324,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
 
         // Execute sleep, if not do anything.
         if (runDoNothing && handleEvsDoNothing)
-            LLBC_Sleep(1);
+            LLBC_Sleep(LLBC_CFG_APP_IDLE_SLEEP_TIME);
     }
 }
 
