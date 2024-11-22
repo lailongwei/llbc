@@ -220,7 +220,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
             _cfgType = static_cast<LLBC_AppConfigType::ENUM>(cfgType);
     }
 
-    // Reload
+    // Reload.
     LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadImpl(false, false) != LLBC_OK, LLBC_FAILED);
 
     // Handle progress crash.
@@ -513,7 +513,7 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
     if (execName.endswith("_d") || execName.endswith("_debug"))
         cfgFileNames.push_back(execName.substr(0, execName.rfind('_')));
 
-    // Execute config file locatee
+    // Execute config file locate.
     for (auto &cfgFileDir : cfgFileDirs)
     {
         for (auto &cfgFileName : cfgFileNames)
