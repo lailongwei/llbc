@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Time_Time : public LLBC_BaseTestCase
+class TestCase_Core_Time_Time final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Time_Time();
-    virtual ~TestCase_Core_Time_Time();
+    ~TestCase_Core_Time_Time() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void OSTimeTest();

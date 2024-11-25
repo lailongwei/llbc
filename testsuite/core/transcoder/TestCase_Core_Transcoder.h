@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Transcoder : public LLBC_BaseTestCase
+class TestCase_Core_Transcoder final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Transcoder();
-    virtual ~TestCase_Core_Transcoder();
+    ~TestCase_Core_Transcoder() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     virtual int SimpleConvertTest();

@@ -42,8 +42,8 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("EventMgr test:");
 
-    LLBC_ErrorAndReturnIfNot(BasicTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(InfiniteEventFireTest() == LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(BasicTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(InfiniteEventFireTest() != LLBC_OK, LLBC_FAILED);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();

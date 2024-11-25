@@ -23,7 +23,7 @@
 
 namespace
 {
-    class TestComp : public LLBC_Component
+    class TestComp final : public LLBC_Component
     {
     public:
         int OnStart(bool &startFinished) override
@@ -33,7 +33,7 @@ namespace
         }
     };
 
-    class TestApp : public LLBC_App
+    class TestApp final : public LLBC_App
     {
     public:
         TestApp()
@@ -58,7 +58,7 @@ namespace
             return LLBC_OK;
         }
 
-        virtual void OnStop(bool &stopFinished) override
+        void OnStop(bool &stopFinished) override
         {
             LLBC_PrintLn("Application stop");
             LLBC_XDelete(_testSvc);

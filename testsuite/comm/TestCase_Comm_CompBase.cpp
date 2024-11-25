@@ -28,10 +28,10 @@ namespace
     {
     public:
         ITestComp() : LLBC_Component() {}
-        virtual ~ITestComp() = default;
+        ~ITestComp() override = default;
     };
     
-    class TestComp : public ITestComp
+    class TestComp final : public ITestComp
     {
     public:
         TestComp()
@@ -39,7 +39,7 @@ namespace
             _timer = nullptr;
         }
 
-        virtual ~TestComp() = default;
+        ~TestComp() override = default;
 
     public:
         void OnPrint()
@@ -108,7 +108,7 @@ namespace
         LLBC_Timer *_timer;
     };
 
-    class TestCompFactory : public LLBC_ComponentFactory
+    class TestCompFactory final : public LLBC_ComponentFactory
     {
     public:
         ITestComp *Create(LLBC_Service *service) const override
@@ -124,7 +124,7 @@ namespace
         ~IEchoComp() override = default;
     };
 
-    class EchoComp : public IEchoComp
+    class EchoComp final : public IEchoComp
     {
     public:
         void OnPrint()
@@ -133,7 +133,7 @@ namespace
         }
     };
 
-    class EchoCompFactory : public LLBC_ComponentFactory
+    class EchoCompFactory final : public LLBC_ComponentFactory
     {
     public:
         IEchoComp *Create(LLBC_Service *service) const override
@@ -143,10 +143,10 @@ namespace
     };
 
     class BaseComp2 : public LLBC_Component {};
-    class Comp2 : public BaseComp2 {};
+    class Comp2 final : public BaseComp2 {};
 
     class BaseComp3 : public LLBC_Component {};
-    class DerivedComp3 : public BaseComp3 {};
+    class DerivedComp3 final : public BaseComp3 {};
 }
 
 TestCase_Comm_CompBase::TestCase_Comm_CompBase()

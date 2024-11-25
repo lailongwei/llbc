@@ -556,35 +556,7 @@ __LLBC_INTERNAL_NS_END
     }                                                                                        \
 
 /**
- * LOG AND <XXX> IF NOT macros.
- */
-#define LLBC_LogAndDoIfNot(cond, logLv, behav, ...) LLBC_LogAndDoIf(!(cond), logLv, behav, ##__VA_ARGS__)
-#define LLBC_LogAndDoIfNot2(cond, logger, logLv, behav, ...) LLBC_LogAndDoIf2(!(cond), logger, logLv, behav, ##__VA_ARGS__)
-#define LLBC_LogAndDoIfNot3(cond, logTag, logLv, behav, ...) LLBC_LogAndDoIf3(!(cond), logTag, logLv, behav, ##__VA_ARGS__)
-#define LLBC_LogAndDoIfNot4(cond, logger, logTag, logLv, behav, ...) LLBC_LogAndDoIf3(!(cond), logger, logTag, logLv, behav, ##__VA_ARGS__)
-
-#define LLBC_LogAndContinueIfNot(cond, logLv, ...) LLBC_LogAndContinueIf(!(cond), logLv, ##__VA_ARGS__)
-#define LLBC_LogAndContinueIfNot2(cond, logger, logLv, ...) LLBC_LogAndContinueIf2(!(cond), logger, logLv, ##__VA_ARGS__)
-#define LLBC_LogAndContinueIfNot3(cond, logTag, logLv, ...) LLBC_LogAndContinueIf3(!(cond), logTag, logLv, ##__VA_ARGS__)
-#define LLBC_LogAndContinueIfNot4(cond, logger, logTag, logLv, ...) LLBC_LogAndContinueIf4(!(cond), logger, logTag, logLv, ##__VA_ARGS__)
-
-#define LLBC_LogAndBreakIfNot(cond, logLv, ...) LLBC_LogAndBreakIf(!(cond), logLv, ##__VA_ARGS__)
-#define LLBC_LogAndBreakIfNot2(cond, logger, logLv, ...) LLBC_LogAndBreakIf2(!(cond), logger, logLv, ##__VA_ARGS__)
-#define LLBC_LogAndBreakIfNot3(cond, logTag, logLv, ...) LLBC_LogAndBreakIf3(!(cond), logTag, logLv, ##__VA_ARGS__)
-#define LLBC_LogAndBreakIfNot4(cond, logger, logTag, logLv, ...) LLBC_LogAndBreakIf4(!(cond), logger, logTag, logLv, ##__VA_ARGS__)
-
-#define LLBC_LogAndReturnIfNot(cond, logLv, ret, ...) LLBC_LogAndReturnIf(!(cond), logLv, ret, ##__VA_ARGS__)
-#define LLBC_LogAndReturnIfNot2(cond, logger, logLv, ret, ...) LLBC_LogAndReturnIf2(!(cond), logger, logLv, ret, ##__VA_ARGS__)
-#define LLBC_LogAndReturnIfNot3(cond, logTag, logLv, ret, ...) LLBC_LogAndReturnIf3(!(cond), logTag, logLv, ret, ##__VA_ARGS__)
-#define LLBC_LogAndReturnIfNot4(cond, logger, logTag, logLv, ret, ...) LLBC_LogAndReturnIf4(!(cond), logger, logTag, logLv, ret, ##__VA_ARGS__)
-
-#define LLBC_LogAndExitIfNot(cond, logLv, exitCode, ...) LLBC_LogAndExitIf(!(cond), logLv, exitCode, ##__VA_ARGS__)
-#define LLBC_LogAndExitIfNot2(cond, logger, logLv, exitCode, ...) LLBC_LogAndExitIf2(!(cond), logger, logLv, exitCode, ##__VA_ARGS__)
-#define LLBC_LogAndExitIfNot3(cond, logTag, logLv, exitCode, ...) LLBC_LogAndExitIf3(!(cond), logTag, logLv, exitCode, ##__VA_ARGS__)
-#define LLBC_LogAndExitIfNot4(cond, logger, logTag, logLv, exitCode, ...) LLBC_LogAndExitIf4(!(cond), logger, logTag, logLv, exitCode, ##__VA_ARGS__)
-
-/**
- * <LOG LV> AND DO IF (NOT) macros.
+ * <LOG LV> AND DO IF macros.
  */
 #define LLBC_DebugAndDoIf(cond, behav, ...) LLBC_LogAndDoIf(cond, Debug, behav, ##__VA_ARGS__)
 #define LLBC_DebugAndDoIf2(cond, logger, behav, ...) LLBC_LogAndDoIf2(cond, logger, Debug, behav, ##__VA_ARGS__)
@@ -610,34 +582,8 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_FatalAndDoIf2(cond, logger, behav, ...) LLBC_LogAndDoIf2(cond, logger, Fatal, behav, ##__VA_ARGS__)
 #define LLBC_FatalAndDoIf3(cond, logTag, behav, ...) LLBC_LogAndDoIf3(cond, logTag, Fatal, behav, ##__VA_ARGS__)
 #define LLBC_FatalAndDoIf4(cond, logger, logTag, behav, ...) LLBC_LogAndDoIf4(cond, logger, logTag, Fatal, behav, ##__VA_ARGS__)
-
-#define LLBC_DebugAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Debug, behav, ##__VA_ARGS__)
-#define LLBC_DebugAndDoIfNot2(cond, logger, behav, ...) LLBC_LogAndDoIfNot2(cond, logger, Debug, behav, ##__VA_ARGS__)
-#define LLBC_DebugAndDoIfNot3(cond, logTag, behav, ...) LLBC_LogAndDoIfNot3(cond, logTag, Debug, behav, ##__VA_ARGS__)
-#define LLBC_DebugAndDoIfNot4(cond, logger, logTag, behav, ...) LLBC_LogAndDoIfNot4(cond, logger, logTag, Debug, behav, ##__VA_ARGS__)
-#define LLBC_TraceAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Trace, behav, ##__VA_ARGS__)
-#define LLBC_TraceAndDoIfNot2(cond, logger, behav, ...) LLBC_LogAndDoIfNot2(cond, logger, Trace, behav, ##__VA_ARGS__)
-#define LLBC_TraceAndDoIfNot3(cond, logTag, behav, ...) LLBC_LogAndDoIfNot3(cond, logTag, Trace, behav, ##__VA_ARGS__)
-#define LLBC_TraceAndDoIfNot4(cond, logger, logTag, behav, ...) LLBC_LogAndDoIfNot4(cond, logger, logTag, Trace, behav, ##__VA_ARGS__)
-#define LLBC_InfoAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Info, behav, ##__VA_ARGS__)
-#define LLBC_InfoAndDoIfNot2(cond, logger, behav, ...) LLBC_LogAndDoIfNot2(cond, logger, Info, behav, ##__VA_ARGS__)
-#define LLBC_InfoAndDoIfNot3(cond, logTag, behav, ...) LLBC_LogAndDoIfNot3(cond, logTag, Info, behav, ##__VA_ARGS__)
-#define LLBC_InfoAndDoIfNot4(cond, logger, logTag, behav, ...) LLBC_LogAndDoIfNot4(cond, logger, logTag, Info, behav, ##__VA_ARGS__)
-#define LLBC_WarnAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Warn, behav, ##__VA_ARGS__)
-#define LLBC_WarnAndDoIfNot2(cond, logger, behav, ...) LLBC_LogAndDoIfNot2(cond, logger, Warn, behav, ##__VA_ARGS__)
-#define LLBC_WarnAndDoIfNot3(cond, logTag, behav, ...) LLBC_LogAndDoIfNot3(cond, logTag, Warn, behav, ##__VA_ARGS__)
-#define LLBC_WarnAndDoIfNot4(cond, logger, logTag, behav, ...) LLBC_LogAndDoIfNot4(cond, logger, logTag, Warn, behav, ##__VA_ARGS__)
-#define LLBC_ErrorAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Error, behav, ##__VA_ARGS__)
-#define LLBC_ErrorAndDoIfNot2(cond, logger, behav, ...) LLBC_LogAndDoIfNot2(cond, logger, Error, behav, ##__VA_ARGS__)
-#define LLBC_ErrorAndDoIfNot3(cond, logTag, behav, ...) LLBC_LogAndDoIfNot3(cond, logTag, Error, behav, ##__VA_ARGS__)
-#define LLBC_ErrorAndDoIfNot4(cond, logger, logTag, behav, ...) LLBC_LogAndDoIfNot4(cond, logger, logTag, Error, behav, ##__VA_ARGS__)
-#define LLBC_FatalAndDoIfNot(cond, behav, ...) LLBC_LogAndDoIfNot(cond, Fatal, behav, ##__VA_ARGS__)
-#define LLBC_FatalAndDoIfNot2(cond, logger, behav, ...) LLBC_LogAndDoIfNot2(cond, logger, Fatal, behav, ##__VA_ARGS__)
-#define LLBC_FatalAndDoIfNot3(cond, logTag, behav, ...) LLBC_LogAndDoIfNot3(cond, logTag, Fatal, behav, ##__VA_ARGS__)
-#define LLBC_FatalAndDoIfNot4(cond, logger, logTag, behav, ...) LLBC_LogAndDoIfNot4(cond, logger, logTag, Fatal, behav, ##__VA_ARGS__)
-
 /**
- * <LOG LV> AND CONTINUE IF (NOT) macros.
+ * <LOG LV> AND CONTINUE IF macros.
  */
 #define LLBC_DebugAndContinueIf(cond, ...) LLBC_LogAndContinueIf(cond, Debug, ##__VA_ARGS__)
 #define LLBC_DebugAndContinueIf2(cond, logger, ...) LLBC_LogAndContinueIf2(cond, logger, Debug, ##__VA_ARGS__)
@@ -664,33 +610,8 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_FatalAndContinueIf3(cond, logTag, ...) LLBC_LogAndContinueIf3(cond, logTag, Fatal, ##__VA_ARGS__)
 #define LLBC_FatalAndContinueIf4(cond, logger, logTag, ...) LLBC_LogAndContinueIf4(cond, logger, logTag, Fatal, ##__VA_ARGS__)
 
-#define LLBC_DebugAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndContinueIfNot2(cond, logger, ...) LLBC_LogAndContinueIfNot2(cond, logger, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndContinueIfNot3(cond, logTag, ...) LLBC_LogAndContinueIfNot3(cond, logTag, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndContinueIfNot4(cond, logger, logTag, ...) LLBC_LogAndContinueIfNot4(cond, logger, logTag, Debug, ##__VA_ARGS__)
-#define LLBC_TraceAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Trace, ##__VA_ARGS__)
-#define LLBC_TraceAndContinueIfNot2(cond, logger, ...) LLBC_LogAndContinueIfNot2(cond, logger, Trace, ##__VA_ARGS__)
-#define LLBC_TraceAndContinueIfNot3(cond, logTag, ...) LLBC_LogAndContinueIfNot3(cond, logTag, Trace, ##__VA_ARGS__)
-#define LLBC_TraceAndContinueIfNot4(cond, logger, logTag, ...) LLBC_LogAndContinueIfNot4(cond, logger, logTag, Trace, ##__VA_ARGS__)
-#define LLBC_DebugAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndContinueIfNot2(cond, logger, ...) LLBC_LogAndContinueIfNot2(cond, logger, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndContinueIfNot3(cond, logTag, ...) LLBC_LogAndContinueIfNot3(cond, logTag, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndContinueIfNot4(cond, logger, logTag, ...) LLBC_LogAndContinueIfNot4(cond, logger, logTag, Debug, ##__VA_ARGS__)
-#define LLBC_WarnAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Warn, ##__VA_ARGS__)
-#define LLBC_WarnAndContinueIfNot2(cond, logger, ...) LLBC_LogAndContinueIfNot2(cond, logger, Warn, ##__VA_ARGS__)
-#define LLBC_WarnAndContinueIfNot3(cond, logTag, ...) LLBC_LogAndContinueIfNot3(cond, logTag, Warn, ##__VA_ARGS__)
-#define LLBC_WarnAndContinueIfNot4(cond, logger, logTag, ...) LLBC_LogAndContinueIfNot4(cond, logger, logTag, Warn, ##__VA_ARGS__)
-#define LLBC_ErrorAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Error, ##__VA_ARGS__)
-#define LLBC_ErrorAndContinueIfNot2(cond, logger, ...) LLBC_LogAndContinueIfNot2(cond, logger, Error, ##__VA_ARGS__)
-#define LLBC_ErrorAndContinueIfNot3(cond, logTag, ...) LLBC_LogAndContinueIfNot3(cond, logTag, Error, ##__VA_ARGS__)
-#define LLBC_ErrorAndContinueIfNot4(cond, logger, logTag, ...) LLBC_LogAndContinueIfNot4(cond, logger, logTag, Error, ##__VA_ARGS__)
-#define LLBC_FatalAndContinueIfNot(cond, ...) LLBC_LogAndContinueIfNot(cond, Fatal, ##__VA_ARGS__)
-#define LLBC_FatalAndContinueIfNot2(cond, logger, ...) LLBC_LogAndContinueIfNot2(cond, logger, Fatal, ##__VA_ARGS__)
-#define LLBC_FatalAndContinueIfNot3(cond, logTag, ...) LLBC_LogAndContinueIfNot3(cond, logTag, Fatal, ##__VA_ARGS__)
-#define LLBC_FatalAndContinueIfNot4(cond, logger, logTag, ...) LLBC_LogAndContinueIfNot4(cond, logger, logTag, Fatal, ##__VA_ARGS__)
-
 /**
- * <LOG LV> AND BREAK IF (NOT) macros.
+ * <LOG LV> AND BREAK IF macros.
  */
 #define LLBC_DebugAndBreakIf(cond, ...) LLBC_LogAndBreakIf(cond, Debug, ##__VA_ARGS__)
 #define LLBC_DebugAndBreakIf2(cond, logger, ...) LLBC_LogAndBreakIf2(cond, logger, Debug, ##__VA_ARGS__)
@@ -717,33 +638,8 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_FatalAndBreakIf3(cond, logTag, ...) LLBC_LogAndBreakIf3(cond, logTag, Fatal, ##__VA_ARGS__)
 #define LLBC_FatalAndBreakIf4(cond, logger, logTag, ...) LLBC_LogAndBreakIf4(cond, logger, logTag, Fatal, ##__VA_ARGS__)
 
-#define LLBC_DebugAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndBreakIfNot2(cond, logger, ...) LLBC_LogAndBreakIfNot2(cond, logger, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndBreakIfNot3(cond, logTag, ...) LLBC_LogAndBreakIfNot3(cond, logTag, Debug, ##__VA_ARGS__)
-#define LLBC_DebugAndBreakIfNot4(cond, logger, logTag, ...) LLBC_LogAndBreakIfNot4(cond, logger, logTag, Debug, ##__VA_ARGS__)
-#define LLBC_TraceAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Trace, ##__VA_ARGS__)
-#define LLBC_TraceAndBreakIfNot2(cond, logger, ...) LLBC_LogAndBreakIfNot2(cond, logger, Trace, ##__VA_ARGS__)
-#define LLBC_TraceAndBreakIfNot3(cond, logTag, ...) LLBC_LogAndBreakIfNot3(cond, logTag, Trace, ##__VA_ARGS__)
-#define LLBC_TraceAndBreakIfNot4(cond, logger, logTag, ...) LLBC_LogAndBreakIfNot4(cond, logger, logTag, Trace, ##__VA_ARGS__)
-#define LLBC_InfoAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Info, ##__VA_ARGS__)
-#define LLBC_InfoAndBreakIfNot2(cond, logger, ...) LLBC_LogAndBreakIfNot2(cond, logger, Info, ##__VA_ARGS__)
-#define LLBC_InfoAndBreakIfNot3(cond, logTag, ...) LLBC_LogAndBreakIfNot3(cond, logTag, Info, ##__VA_ARGS__)
-#define LLBC_InfoAndBreakIfNot4(cond, logger, logTag, ...) LLBC_LogAndBreakIfNot4(cond, logger, logTag, Info, ##__VA_ARGS__)
-#define LLBC_WarnAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Warn, ##__VA_ARGS__)
-#define LLBC_WarnAndBreakIfNot2(cond, logger, ...) LLBC_LogAndBreakIfNot2(cond, logger, Warn, ##__VA_ARGS__)
-#define LLBC_WarnAndBreakIfNot3(cond, logTag, ...) LLBC_LogAndBreakIfNot3(cond, logTag, Warn, ##__VA_ARGS__)
-#define LLBC_WarnAndBreakIfNot4(cond, logger, logTag, ...) LLBC_LogAndBreakIfNot4(cond, logger, logTag, Warn, ##__VA_ARGS__)
-#define LLBC_ErrorAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Error, ##__VA_ARGS__)
-#define LLBC_ErrorAndBreakIfNot2(cond, logger, ...) LLBC_LogAndBreakIfNot2(cond, logger, Error, ##__VA_ARGS__)
-#define LLBC_ErrorAndBreakIfNot3(cond, logTag, ...) LLBC_LogAndBreakIfNot3(cond, logTag, Error, ##__VA_ARGS__)
-#define LLBC_ErrorAndBreakIfNot4(cond, logger, logTag, ...) LLBC_LogAndBreakIfNot4(cond, logger, logTag, Error, ##__VA_ARGS__)
-#define LLBC_FatalAndBreakIfNot(cond, ...) LLBC_LogAndBreakIfNot(cond, Fatal, ##__VA_ARGS__)
-#define LLBC_FatalAndBreakIfNot2(cond, logger, ...) LLBC_LogAndBreakIfNot2(cond, logger, Fatal, ##__VA_ARGS__)
-#define LLBC_FatalAndBreakIfNot3(cond, logTag, ...) LLBC_LogAndBreakIfNot3(cond, logTag, Fatal, ##__VA_ARGS__)
-#define LLBC_FatalAndBreakIfNot4(cond, logger, logTag, ...) LLBC_LogAndBreakIfNot4(cond, logger, logTag, Fatal, ##__VA_ARGS__)
-
 /**
- * <LOG LV> AND RETURN IF (NOT) macros.
+ * <LOG LV> AND RETURN IF macros.
  */
 #define LLBC_DebugAndReturnIf(cond, ret, ...) LLBC_LogAndReturnIf(cond, Debug, ret, ##__VA_ARGS__)
 #define LLBC_DebugAndReturnIf2(cond, logger, ret, ...) LLBC_LogAndReturnIf2(cond, logger, Debug, ret, ##__VA_ARGS__)
@@ -770,33 +666,8 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_FatalAndReturnIf3(cond, logTag, ret, ...) LLBC_LogAndReturnIf3(cond, logTag, Fatal, ret, ##__VA_ARGS__)
 #define LLBC_FatalAndReturnIf4(cond, logger, logTag, ret, ...) LLBC_LogAndReturnIf4(cond, logger, logTag, Fatal, ret, ##__VA_ARGS__)
 
-#define LLBC_DebugAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Debug, ret, ##__VA_ARGS__)
-#define LLBC_DebugAndReturnIfNot2(cond, logger, ret, ...) LLBC_LogAndReturnIfNot2(cond, logger, Debug, ret, ##__VA_ARGS__)
-#define LLBC_DebugAndReturnIfNot3(cond, logTag, ret, ...) LLBC_LogAndReturnIfNot3(cond, logTag, Debug, ret, ##__VA_ARGS__)
-#define LLBC_DebugAndReturnIfNot4(cond, logger, logTag, ret, ...) LLBC_LogAndReturnIfNot4(cond, logger, logTag, Debug, ret, ##__VA_ARGS__)
-#define LLBC_TraceAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Trace, ret, ##__VA_ARGS__)
-#define LLBC_TraceAndReturnIfNot2(cond, logger, ret, ...) LLBC_LogAndReturnIfNot2(cond, logger, Trace, ret, ##__VA_ARGS__)
-#define LLBC_TraceAndReturnIfNot3(cond, logTag, ret, ...) LLBC_LogAndReturnIfNot3(cond, logTag, Trace, ret, ##__VA_ARGS__)
-#define LLBC_TraceAndReturnIfNot4(cond, logger, logTag, ret, ...) LLBC_LogAndReturnIfNot4(cond, logger, logTag, Trace, ret, ##__VA_ARGS__)
-#define LLBC_InfoAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Info, ret, ##__VA_ARGS__)
-#define LLBC_InfoAndReturnIfNot2(cond, logger, ret, ...) LLBC_LogAndReturnIfNot2(cond, logger, Info, ret, ##__VA_ARGS__)
-#define LLBC_InfoAndReturnIfNot3(cond, logTag, ret, ...) LLBC_LogAndReturnIfNot3(cond, logTag, Info, ret, ##__VA_ARGS__)
-#define LLBC_InfoAndReturnIfNot4(cond, logger, logTag, ret, ...) LLBC_LogAndReturnIfNot4(cond, logger, logTag, Info, ret, ##__VA_ARGS__)
-#define LLBC_WarnAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Warn, ret, ##__VA_ARGS__)
-#define LLBC_WarnAndReturnIfNot2(cond, logger, ret, ...) LLBC_LogAndReturnIfNot2(cond, logger, Warn, ret, ##__VA_ARGS__)
-#define LLBC_WarnAndReturnIfNot3(cond, logTag, ret, ...) LLBC_LogAndReturnIfNot3(cond, logTag, Warn, ret, ##__VA_ARGS__)
-#define LLBC_WarnAndReturnIfNot4(cond, logger, logTag, ret, ...) LLBC_LogAndReturnIfNot4(cond, logger, logTag, Warn, ret, ##__VA_ARGS__)
-#define LLBC_ErrorAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Error, ret, ##__VA_ARGS__)
-#define LLBC_ErrorAndReturnIfNot2(cond, logger, ret, ...) LLBC_LogAndReturnIfNot2(cond, logger, Error, ret, ##__VA_ARGS__)
-#define LLBC_ErrorAndReturnIfNot3(cond, logTag, ret, ...) LLBC_LogAndReturnIfNot3(cond, logTag, Error, ret, ##__VA_ARGS__)
-#define LLBC_ErrorAndReturnIfNot4(cond, logger, logTag, ret, ...) LLBC_LogAndReturnIfNot4(cond, logger, logTag, Error, ret, ##__VA_ARGS__)
-#define LLBC_FatalAndReturnIfNot(cond, ret, ...) LLBC_LogAndReturnIfNot(cond, Fatal, ret, ##__VA_ARGS__)
-#define LLBC_FatalAndReturnIfNot2(cond, logger, ret, ...) LLBC_LogAndReturnIfNot2(cond, logger, Fatal, ret, ##__VA_ARGS__)
-#define LLBC_FatalAndReturnIfNot3(cond, logTag, ret, ...) LLBC_LogAndReturnIfNot3(cond, logTag, Fatal, ret, ##__VA_ARGS__)
-#define LLBC_FatalAndReturnIfNot4(cond, logger, logTag, ret, ...) LLBC_LogAndReturnIfNot4(cond, logger, logTag, Fatal, ret, ##__VA_ARGS__)
-
 /**
- * <LOG LV> AND EXIT IF (NOT) macros.
+ * <LOG LV> AND EXIT IF macros.
  */
 #define LLBC_DebugAndExitIf(cond, exitCode, ...) LLBC_LogAndExitIf(cond, Debug, exitCode, ##__VA_ARGS__)
 #define LLBC_DebugAndExitIf2(cond, logger, exitCode, ...) LLBC_LogAndExitIf2(cond, logger, Debug, exitCode, ##__VA_ARGS__)
@@ -822,30 +693,5 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_FatalAndExitIf2(cond, logger, exitCode, ...) LLBC_LogAndExitIf2(cond, logger, Fatal, exitCode, ##__VA_ARGS__)
 #define LLBC_FatalAndExitIf3(cond, logTag, exitCode, ...) LLBC_LogAndExitIf3(cond, logTag, Fatal, exitCode, ##__VA_ARGS__)
 #define LLBC_FatalAndExitIf4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIf4(cond, logger, logTag, Fatal, exitCode, ##__VA_ARGS__)
-
-#define LLBC_DebugAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Debug, exitCode, ##__VA_ARGS__)
-#define LLBC_DebugAndExitIfNot2(cond, logger, exitCode, ...) LLBC_LogAndExitIfNot2(cond, logger, Debug, exitCode, ##__VA_ARGS__)
-#define LLBC_DebugAndExitIfNot3(cond, logTag, exitCode, ...) LLBC_LogAndExitIfNot3(cond, logTag, Debug, exitCode, ##__VA_ARGS__)
-#define LLBC_DebugAndExitIfNot4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIfNot4(cond, logger, logTag, Debug, exitCode, ##__VA_ARGS__)
-#define LLBC_TraceAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Trace, exitCode, ##__VA_ARGS__)
-#define LLBC_TraceAndExitIfNot2(cond, logger, exitCode, ...) LLBC_LogAndExitIfNot2(cond, logger, Trace, exitCode, ##__VA_ARGS__)
-#define LLBC_TraceAndExitIfNot3(cond, logTag, exitCode, ...) LLBC_LogAndExitIfNot3(cond, logTag, Trace, exitCode, ##__VA_ARGS__)
-#define LLBC_TraceAndExitIfNot4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIfNot4(cond, logger, logTag, Trace, exitCode, ##__VA_ARGS__)
-#define LLBC_InfoAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Info, exitCode, ##__VA_ARGS__)
-#define LLBC_InfoAndExitIfNot2(cond, logger, exitCode, ...) LLBC_LogAndExitIfNot2(cond, logger, Info, exitCode, ##__VA_ARGS__)
-#define LLBC_InfoAndExitIfNot3(cond, logTag, exitCode, ...) LLBC_LogAndExitIfNot3(cond, logTag, Info, exitCode, ##__VA_ARGS__)
-#define LLBC_InfoAndExitIfNot4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIfNot4(cond, logger, logTag, Info, exitCode, ##__VA_ARGS__)
-#define LLBC_WarnAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Warn, exitCode, ##__VA_ARGS__)
-#define LLBC_WarnAndExitIfNot2(cond, logger, exitCode, ...) LLBC_LogAndExitIfNot2(cond, logger, Warn, exitCode, ##__VA_ARGS__)
-#define LLBC_WarnAndExitIfNot3(cond, logTag, exitCode, ...) LLBC_LogAndExitIfNot3(cond, logTag, Warn, exitCode, ##__VA_ARGS__)
-#define LLBC_WarnAndExitIfNot4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIfNot4(cond, logger, logTag, Warn, exitCode, ##__VA_ARGS__)
-#define LLBC_ErrorAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Error, exitCode, ##__VA_ARGS__)
-#define LLBC_ErrorAndExitIfNot2(cond, logger, exitCode, ...) LLBC_LogAndExitIfNot2(cond, logger, Error, exitCode, ##__VA_ARGS__)
-#define LLBC_ErrorAndExitIfNot3(cond, logTag, exitCode, ...) LLBC_LogAndExitIfNot3(cond, logTag, Error, exitCode, ##__VA_ARGS__)
-#define LLBC_ErrorAndExitIfNot4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIfNot4(cond, logger, logTag, Error, exitCode, ##__VA_ARGS__)
-#define LLBC_FatalAndExitIfNot(cond, exitCode, ...) LLBC_LogAndExitIfNot(cond, Fatal, exitCode, ##__VA_ARGS__)
-#define LLBC_FatalAndExitIfNot2(cond, logger, exitCode, ...) LLBC_LogAndExitIfNot2(cond, logger, Fatal, exitCode, ##__VA_ARGS__)
-#define LLBC_FatalAndExitIfNot3(cond, logTag, exitCode, ...) LLBC_LogAndExitIfNot3(cond, logTag, Fatal, exitCode, ##__VA_ARGS__)
-#define LLBC_FatalAndExitIfNot4(cond, logger, logTag, exitCode, ...) LLBC_LogAndExitIfNot4(cond, logger, logTag, Fatal, exitCode, ##__VA_ARGS__)
 
 #include "llbc/core/log/LoggerMgrInl.h"

@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_ExternalDriveSvc : public LLBC_BaseTestCase
+class TestCase_Comm_ExternalDriveSvc final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Comm_ExternalDriveSvc();
-    virtual ~TestCase_Comm_ExternalDriveSvc();
+    ~TestCase_Comm_ExternalDriveSvc() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     LLBC_Service *_svc;

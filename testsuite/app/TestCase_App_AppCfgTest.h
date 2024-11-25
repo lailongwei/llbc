@@ -24,12 +24,12 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_App_AppCfgTest : public LLBC_BaseTestCase
+class TestCase_App_AppCfgTest final : public LLBC_BaseTestCase
 {
 public:
     TestCase_App_AppCfgTest();
-    virtual ~TestCase_App_AppCfgTest();
+    ~TestCase_App_AppCfgTest() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 };

@@ -27,7 +27,7 @@ namespace
 
 class EventTestComp;
 
-class TestEvent : public LLBC_Event
+class TestEvent final : public LLBC_Event
 {
 public:
     enum
@@ -52,7 +52,7 @@ public:
     LLBC_String data;
 };
 
-class EventTestComp : public LLBC_Component
+class EventTestComp final : public LLBC_Component
 {
 public:
     EventTestComp()

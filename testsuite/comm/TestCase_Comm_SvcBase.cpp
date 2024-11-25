@@ -35,7 +35,7 @@ public:
     };
 };
 
-struct TestData : public LLBC_Coder
+struct TestData final : public LLBC_Coder
 {
     int iVal;
     LLBC_String strVal;
@@ -69,7 +69,7 @@ struct TestData : public LLBC_Coder
     }
 };
 
-class TestDataFactory : public LLBC_CoderFactory
+class TestDataFactory final : public LLBC_CoderFactory
 {
 public:
     LLBC_Coder *Create() const override
@@ -78,7 +78,7 @@ public:
     }
 };
 
-class TestComp : public LLBC_Component
+class TestComp final : public LLBC_Component
 {
 public:
     TestComp()
@@ -242,10 +242,10 @@ private:
     }
 };
 
-class TestCompFactory : public LLBC_ComponentFactory
+class TestCompFactory final : public LLBC_ComponentFactory
 {
 public:
-    LLBC_Component *Create(LLBC_Service *service) const
+    LLBC_Component *Create(LLBC_Service *service) const override
     {
         return new TestComp;
     }

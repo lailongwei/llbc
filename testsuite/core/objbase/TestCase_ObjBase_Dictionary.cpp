@@ -25,7 +25,7 @@
 namespace
 {
 
-class TestObj : public LLBC_Object
+class TestObj final : public LLBC_Object
 {
 public:
     TestObj()
@@ -34,13 +34,13 @@ public:
         std::cout <<"TestObj construct: " <<this <<std::endl;
     }
 
-    virtual ~TestObj()
+    ~TestObj() override
     {
         std::cout <<"Testobj destruct: " <<this <<std::endl;
     }
 
 public:
-    virtual LLBC_String ToString() const
+    LLBC_String ToString() const override
     {
         LLBC_String str;
         str.append_format("TestObj, serial num: %d", m_serialNum);
