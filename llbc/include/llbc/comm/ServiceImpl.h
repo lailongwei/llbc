@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <optional>
-
 #include "llbc/comm/Service.h"
 #include "llbc/comm/ServiceEvent.h"
 #include "llbc/comm/ServiceEventFirer.h"
@@ -42,7 +40,6 @@ __LLBC_NS_BEGIN
 
 class LLBC_HIDDEN LLBC_ServiceImpl final : public LLBC_Service
 {
-    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
 public:
     /**
      * Create specified type service.
@@ -392,18 +389,11 @@ public:
 
 public:
     /**
-     * When before component in running phase add event listener stub by event mgr,
-     * if component stop running can auto remove listener by stub.
-     * @param[in] stub - the listener stub.
+     * Add collaborate event mgr.
+     * @param[in] evMgr   - event mgr object.
      */
-    void OnComponentAddEventStub(const LLBC_ListenerStub &stub) override;
+    void AddCollaborateEventMgr(LLBC_EventMgr *evMgr) override;
 
-    /**
-     * Remove listener stub by component and it's phase.
-     * @param[in] comp - the component.
-     * @param[in] phase - the component running phase.
-     */
-    void RemoveEventListenerStub(const LLBC_Component *comp, _CompRunningPhase phase);
 public:
     /**
      * Post lazy task to service.
@@ -603,6 +593,29 @@ private:
                      bool checkSessionValidity = true);
 
 private:
+    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
+
+    /**
+     * When before component in running phase add event listener stub by event mgr,
+     * if component stop running can auto remove listener by stub.
+     * @param[in] stub - the listener stub.
+     */
+    void OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
+
+    /**
+     * When event manager destroy remove related stub and event manager's hook.
+     * @param[in] evMgr - the event manager object.
+     */
+    void OnCollaborateEventMgrDestroy(llbc::LLBC_EventMgr *evMgr);
+
+    /**
+     * Remove listener stub by component and it's phase.
+     * @param[in] comp - the component.
+     * @param[in] phase - the component running phase.
+     */
+    void RemoveEventListenerStub(LLBC_Component *comp, _CompRunningPhase phase);
+
+private:
     static int _maxId; // Max service Id.
 
     int _id; // Service Id.
@@ -696,7 +709,43 @@ private:
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
     std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
-    std::map<std::optional<const LLBC_Component *>, std::map<_CompRunningPhase, std::set<LLBC_ListenerStub>>> _compPhaseListeners; // Component phase listeners.
+
+    // - EventMgrHook members
+    class _SvcEvMgrHook : public LLBC_EventMgrHook // Service event manager hook
+    {
+    public:
+        _SvcEvMgrHook() = delete;
+        explicit _SvcEvMgrHook(LLBC_ServiceImpl *svc);
+        ~_SvcEvMgrHook() override;
+    public:
+        void OnAddedListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub) override;
+        void OnEventMgrDestroy(LLBC_EventMgr *evMgr) override;
+    private:
+        LLBC_ServiceImpl *_service;
+    };
+    std::map<const LLBC_EventMgr*, _SvcEvMgrHook *> _evMgrHook; // Service hooks
+
+    class _ManagedStubInfo // Managed event listener stub info
+    {
+    public:
+        _CompRunningPhase phase;
+        LLBC_Component * const comp;
+        LLBC_EventMgr * const evMgr;
+        LLBC_ListenerStub stub;
+    public:
+        _ManagedStubInfo() = delete;
+        _ManagedStubInfo(_CompRunningPhase phase,
+                         LLBC_Component *comp,
+                         LLBC_EventMgr *evMgr,
+                         LLBC_ListenerStub &stub);
+    };
+    std::map<LLBC_ListenerStub, _ManagedStubInfo *> _allStubInfos; //  Managed stub info objects
+    std::map<const LLBC_EventMgr *,
+        std::set<const _ManagedStubInfo *>> _evMgrStubInfos; // Stub info, which is associated with the event manager
+    std::map<_CompRunningPhase,
+        std::map<const LLBC_Component *,
+            std::set<const _ManagedStubInfo *>>> _phaseCompStubInfos; // Before comp in running phase managed stub infos
+    std::set<const _ManagedStubInfo *> _runningCompStubInfos; // Stub info is added during the component's running phase.
 };
 
 __LLBC_NS_END

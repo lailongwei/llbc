@@ -25,6 +25,14 @@
 
 __LLBC_NS_BEGIN
 
+inline bool LLBC_EventMgr::SetEventMgrHook(LLBC_EventMgrHook *evMgrHook)
+{
+    if (evMgrHook == nullptr)
+        return false;
+    _evMgrHook = evMgrHook;
+    return true;
+}
+
 template <typename ObjectType>
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id, 
                                              ObjectType *obj, 

@@ -48,12 +48,10 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
         LLBC_Recycle(listener);
 }
 
-LLBC_EventMgr::LLBC_EventMgr() : LLBC_EventMgr(nullptr) {}
-
-LLBC_EventMgr::LLBC_EventMgr(LLBC_Service *svc)
+LLBC_EventMgr::LLBC_EventMgr()
 : _firing(0)
 , _pendingRemoveAllListeners(false)
-, _parentService(svc)
+, _evMgrHook(nullptr)
 {
 }
 
@@ -63,6 +61,12 @@ LLBC_EventMgr::~LLBC_EventMgr()
     ASSERT(!IsFiring() && "Not allow delete LLBC_EventMgr when event firing");
     // Assert: Make sure pending event operations is empty.
     ASSERT(_pendingEventOps.empty() && "llbc framework internal error: _pendingEventOps is not empty!");
+
+    if (_evMgrHook)
+    {
+        _evMgrHook->OnEventMgrDestroy(this);
+        _evMgrHook = nullptr;
+    }
 
     // Recycle all listener infos.
     for (auto it = _id2ListenerInfos.begin(); it != _id2ListenerInfos.end(); ++it)
@@ -198,8 +202,6 @@ int LLBC_EventMgr::RemoveListener(const LLBC_ListenerStub &stub)
         _id2ListenerInfos.erase(idIt);
 
     _stub2ListenerInfos.erase(stubIt);
-
-    // LLBC_PrintLn("remove listener event:%d stub:%llu", evId, stub);
 
     return LLBC_OK;
 }
@@ -403,9 +405,8 @@ int LLBC_EventMgr::AddListenerInfo(_ListenerInfo *listenerInfo)
 
     _stub2ListenerInfos[listenerInfo->stub] = std::make_pair(listenerInfo->evId, --listenerInfos.end());
 
-    // LLBC_PrintLn("add listener event:%d stub:%llu", listenerInfo->evId, listenerInfo->stub);
-    if (_parentService)
-        _parentService->OnComponentAddEventStub(listenerInfo->stub);
+    if (_evMgrHook)
+        _evMgrHook->OnAddedListener(this, listenerInfo->stub);
   
     return LLBC_OK;
 }

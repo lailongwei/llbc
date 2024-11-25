@@ -26,10 +26,32 @@
 __LLBC_NS_BEGIN
 class LLBC_Event;
 class LLBC_EventFirer;
-class LLBC_Service;
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
+
+/**
+ * \brief The event manager class encapsulation.
+ */
+ class LLBC_EXPORT LLBC_EventMgrHook
+ {
+ public:
+     LLBC_EventMgrHook() = default;
+     virtual ~LLBC_EventMgrHook() {};
+ public:
+     /**
+      * Event manager added a listener.
+      * @param[in] evMgr  - event mgr object.
+      * @param[in] stub   - event deleg stub.
+      */
+     virtual void OnAddedListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub) = 0;
+
+     /**
+      * Event manager is being destroyed.
+      * @param[in] evMgr  - event mgr object.
+      */
+     virtual void OnEventMgrDestroy(LLBC_EventMgr *evMgr) = 0;
+ };
 
 /**
  * \brief The event manager class encapsulation.
@@ -41,8 +63,15 @@ public:
      * Ctor & Dtor.
      */
     LLBC_EventMgr();
-    explicit LLBC_EventMgr(LLBC_Service *svc);
     virtual ~LLBC_EventMgr();
+
+public:
+    /**
+     * Set event mgr hook.
+     * @param[in] evMgrHook  - event mgr hook object.
+     * @return bool          - set hook success or not.
+     */
+    bool SetEventMgrHook(LLBC_EventMgrHook *evMgrHook);
 
 public:
     /**
@@ -221,7 +250,7 @@ protected:
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
-    LLBC_Service* const _parentService ;
+    LLBC_EventMgrHook *_evMgrHook;
 };
 
 __LLBC_NS_END

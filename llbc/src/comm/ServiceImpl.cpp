@@ -128,7 +128,6 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _threadUnsafeObjPool(false)
 
 , _timerScheduler(nullptr)
-, _evManager(this)
 {
     // Create service name, if is empty.
     if (_name.empty())
@@ -975,32 +974,13 @@ int LLBC_ServiceImpl::AddComponentEvent(int eventType, const LLBC_Variant &event
     return Push(LLBC_SvcEvUtil::BuildComponentEventEv(eventType, eventParams));
 }
 
-void LLBC_ServiceImpl::OnComponentAddEventStub(const LLBC_ListenerStub &stub)
+void LLBC_ServiceImpl::AddCollaborateEventMgr(LLBC_EventMgr *evMgr)
 {
-    if (_curComp != nullptr && _curComp->_runningPhase < _CompRunningPhase::LateStarted)
-        _compPhaseListeners[_curComp][_curComp->_runningPhase].emplace(stub);
-    else
-        _compPhaseListeners[nullptr][_CompRunningPhase::LateStarted].emplace(stub);
-}
-
-void LLBC_ServiceImpl::RemoveEventListenerStub(const LLBC_Component *comp, _CompRunningPhase phase)
-{
-    auto itComp = _compPhaseListeners.find(comp);
-    if (itComp == _compPhaseListeners.end())
+    if (_evMgrHook.find(evMgr) != _evMgrHook.end())
         return;
-
-    auto &phaseListeners = itComp->second;
-    auto itPhase = phaseListeners.find(phase);
-    if (itPhase == phaseListeners.end())
-        return;
-
-    auto &stubs = itPhase->second;
-    for (auto stub : stubs)
-        _evManager.RemoveListener(stub);
-
-    phaseListeners.erase(itPhase);
-    if (phaseListeners.empty())
-        _compPhaseListeners.erase(itComp);
+    auto * hook = new _SvcEvMgrHook(this);
+    evMgr->SetEventMgrHook(hook);
+    _evMgrHook.emplace(evMgr, hook);
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
@@ -1926,7 +1906,7 @@ void LLBC_ServiceImpl::HandleEv_ComponentEvent(LLBC_ServiceEvent &_)
                 OnSvc(false);                                             \
             LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);                  \
         }                                                                 \
-                                                                          \
+        _curComp = nullptr;                                               \
         if (comp->_runningPhase != _CompRunningPhase::toPhase) {          \
             compsInitSucc = false;                                        \
             RemoveEventListenerStub(comp, comp->_runningPhase);           \
@@ -2378,6 +2358,102 @@ LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(int sessionId,
     return LockableSend(packet, lock, checkRunningPhase, checkSessionValidity);
 }
 
+void LLBC_ServiceImpl::OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub)
+{
+    if (_allStubInfos.find(stub) != _allStubInfos.end())
+        return;
+
+    _ManagedStubInfo *stubInfo = nullptr;
+    if (_curComp != nullptr)
+    {
+        stubInfo = new _ManagedStubInfo(_curComp->_runningPhase, _curComp, evMgr, stub);
+        _phaseCompStubInfos[_curComp->_runningPhase][_curComp].emplace(stubInfo);
+    }
+    else
+    {
+        stubInfo = new _ManagedStubInfo(_CompRunningPhase::LateStarted, nullptr, evMgr, stub);
+        _runningCompStubInfos.emplace(stubInfo);
+    }
+    _evMgrStubInfos[evMgr].emplace(stubInfo);
+    _allStubInfos.emplace(stub, stubInfo);
+}
+
+void LLBC_ServiceImpl::OnCollaborateEventMgrDestroy(llbc::LLBC_EventMgr *evMgr)
+{
+    // remove its hook
+    auto itHook = _evMgrHook.find(evMgr);
+    if (itHook == _evMgrHook.end())
+        return;
+    delete itHook->second;
+    _evMgrHook.erase(itHook);
+
+    // remove its stub
+    auto itStub = _evMgrStubInfos.find(evMgr);
+    if (itStub == _evMgrStubInfos.end())
+        return;
+    for (const auto *stubInfo : itStub->second)
+    {
+        auto *comp = stubInfo->comp;
+        if (comp == nullptr)
+            _runningCompStubInfos.erase(stubInfo);
+        else
+        {
+            auto phase = stubInfo->phase;
+            _phaseCompStubInfos[phase][comp].erase(stubInfo);
+
+            if (_phaseCompStubInfos[phase][comp].empty())
+                _phaseCompStubInfos[phase].erase(comp);
+
+            if (_phaseCompStubInfos[phase].empty())
+                _phaseCompStubInfos.erase(phase);
+        }
+        auto stub = stubInfo->stub;
+        delete _allStubInfos[stub];
+        _allStubInfos.erase(stub);
+
+        evMgr->RemoveListener(stub);
+    }
+    _evMgrStubInfos.erase(evMgr);
+}
+
+void LLBC_ServiceImpl::RemoveEventListenerStub(LLBC_Component *comp, _CompRunningPhase phase)
+{
+    // really remove stub
+    auto removeStubInfo = [this](const _ManagedStubInfo * stubInfo)
+    {
+        auto stub = stubInfo->stub;
+        stubInfo->evMgr->RemoveListener(stub);
+
+        this->_evMgrStubInfos[stubInfo->evMgr].erase(stubInfo);
+        if (this->_evMgrStubInfos[stubInfo->evMgr].empty())
+            this->_evMgrStubInfos.erase(stubInfo->evMgr);
+
+        delete this->_allStubInfos[stub];
+        _allStubInfos.erase(stub);
+    };
+    if (comp == nullptr)
+    {
+        for (const auto *stubInfo : _runningCompStubInfos)
+            removeStubInfo(stubInfo);
+        _runningCompStubInfos.clear();
+    }
+    else
+    {
+        auto itPhase = _phaseCompStubInfos.find(phase);
+        if (itPhase == _phaseCompStubInfos.end())
+            return;
+        auto itComp = itPhase->second.find(comp);
+        if (itComp == itPhase->second.end())
+            return;
+
+        for(const auto *stubInfo : itComp->second)
+            removeStubInfo(stubInfo);
+        itPhase->second.erase(comp);
+        if (itPhase->second.empty())
+            _phaseCompStubInfos.erase(phase);
+    }
+}
+
 LLBC_ServiceImpl::_ReadySessionInfo::_ReadySessionInfo(int sessionId,
                                                        int acceptSessionId,
                                                        bool isListenSession,
@@ -2393,6 +2469,37 @@ LLBC_ServiceImpl::_ReadySessionInfo::~_ReadySessionInfo()
 {
     if (codecStack)
         delete codecStack;
+}
+
+LLBC_ServiceImpl::_SvcEvMgrHook::_SvcEvMgrHook(LLBC_ServiceImpl *svc)
+: _service(svc)
+{
+}
+
+LLBC_ServiceImpl::_SvcEvMgrHook::~_SvcEvMgrHook()
+{
+    _service = nullptr;
+}
+
+void LLBC_ServiceImpl::_SvcEvMgrHook::OnAddedListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub)
+{
+    _service->OnEventMgrAddListener(evMgr, stub);
+}
+
+void LLBC_ServiceImpl::_SvcEvMgrHook::OnEventMgrDestroy(LLBC_EventMgr *evMgr)
+{
+    _service->OnCollaborateEventMgrDestroy(evMgr);
+}
+
+llbc::LLBC_ServiceImpl::_ManagedStubInfo::_ManagedStubInfo(_CompRunningPhase phase,
+                                                           llbc::LLBC_Component *comp,
+                                                           llbc::LLBC_EventMgr *evMgr,
+                                                           llbc::LLBC_ListenerStub &stub)
+: phase(phase)
+, comp(comp)
+, evMgr(evMgr)
+, stub(stub)
+{
 }
 
 __LLBC_NS_END

@@ -616,11 +616,10 @@ public:
 
 public:
     /**
-     * When before component in running phase add event listener stub by event mgr,
-     * if component stop running can auto remove listener by stub.
-     * @param[in] stub - the listener stub.
+     * Add collaborate event mgr.
+     * @param[in] evMgr   - event mgr object.
      */
-    virtual void OnComponentAddEventStub(const LLBC_ListenerStub &stub) = 0;
+    virtual void AddCollaborateEventMgr(LLBC_EventMgr *evMgr) = 0;
 
 public:
     /**
