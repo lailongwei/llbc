@@ -189,16 +189,16 @@ private:
     LLBC_TimeSpan _earlyStopWaitTime, _stopWaitTime;
 };
 
-class TestCompA : public TestCompBase
+class TestCompA final : public TestCompBase
 {};
 
-class TestCompB : public TestCompBase
+class TestCompB final : public TestCompBase
 {};
 
-class TestCompC : public TestCompBase
+class TestCompC final : public TestCompBase
 {};
 
-class PreAddTestComp : public LLBC_Component
+class PreAddTestComp final : public LLBC_Component
 {
     class TestEvIds
     {
@@ -281,7 +281,7 @@ private:
     LLBC_Timer _timer;
 };
 
-class TestApp : public LLBC_App
+class TestApp final : public LLBC_App
 {
 public:
     TestApp()

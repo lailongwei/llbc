@@ -24,7 +24,7 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Event : public LLBC_BaseTestCase
+class TestCase_Core_Event final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Event() = default;

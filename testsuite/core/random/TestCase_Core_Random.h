@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Random : public LLBC_BaseTestCase
+class TestCase_Core_Random final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Random();
-    virtual ~TestCase_Core_Random();
+    ~TestCase_Core_Random() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void Exec_RandInt_end_Test(int end, int times);

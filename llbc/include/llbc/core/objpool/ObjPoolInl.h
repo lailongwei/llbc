@@ -442,7 +442,7 @@ LLBC_Json::Value LLBC_TypedObjPool<Obj>::GetStatistics(LLBC_Json::MemoryPoolAllo
     stat.AddMember("using_obj_count", static_cast<uint32>(_usingObjCount), jsonAlloc);
     // - using_obj_rate.
     stat.AddMember("using_obj_rate",
-                   objCount != 0 ? static_cast<uint32>(_usingObjCount) / objCount : 0.0,
+                   objCount != 0 ? static_cast<double>(_usingObjCount) / objCount : 0.0,
                    jsonAlloc);
     // - reusable_obj_count.
     stat.AddMember("reusable_obj_count", _reusableObjCount, jsonAlloc);
@@ -674,7 +674,7 @@ LLBC_FORCE_INLINE LLBC_TypedObjPool<Obj> *LLBC_ObjPool::GetTypedObjPool()
     }
 
     // Create new typed object pool.
-    auto wrappedTypedObjPool = 
+    auto wrappedTypedObjPool =
         LLBC_Malloc(_WrappedTypedObjPool, sizeof(_WrappedTypedObjPool) + sizeof(_TypedObjPool));
     wrappedTypedObjPool->rttiName = rttiName;
     wrappedTypedObjPool->ReleaseObj = &_TypedObjPool::ReleaseObj_s;

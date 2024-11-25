@@ -3,7 +3,7 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Com_Macro : public LLBC_BaseTestCase
+class TestCase_Com_Macro final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Com_Macro() = default;

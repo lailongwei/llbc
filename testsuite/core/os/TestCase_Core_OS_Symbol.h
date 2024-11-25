@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_OS_Symbol : public LLBC_BaseTestCase
+class TestCase_Core_OS_Symbol final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_OS_Symbol();
-    virtual ~TestCase_Core_OS_Symbol();
+    ~TestCase_Core_OS_Symbol() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void Foo1();

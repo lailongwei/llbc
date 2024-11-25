@@ -24,7 +24,7 @@
 
 namespace
 {
-    class SvcStartStopTestComp : public LLBC_Component
+    class SvcStartStopTestComp final : public LLBC_Component
     {
     public:
         int OnInit(bool &initFinished) override

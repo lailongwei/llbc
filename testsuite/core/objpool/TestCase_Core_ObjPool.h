@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_ObjPool : public LLBC_BaseTestCase
+class TestCase_Core_ObjPool final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_ObjPool() = default;
-    virtual ~TestCase_Core_ObjPool() = default;
+    ~TestCase_Core_ObjPool() override = default;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
     int BaseTest();
     int AcquireTest();

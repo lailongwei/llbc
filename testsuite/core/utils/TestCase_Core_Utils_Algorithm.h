@@ -24,8 +24,8 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Utils_Algorithm : public LLBC_BaseTestCase
+class TestCase_Core_Utils_Algorithm final : public LLBC_BaseTestCase
 {
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 };

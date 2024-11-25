@@ -25,7 +25,7 @@ using namespace llbc;
 namespace
 {
 
-class TestCompA : public LLBC_Component
+class TestCompA final : public LLBC_Component
 {
 public:
     int OnStart(bool &finished) override
@@ -71,7 +71,7 @@ private:
     LLBC_Timer cfgReloadTimer_;
 };
 
-class TestCompB : public LLBC_Component
+class TestCompB final : public LLBC_Component
 {
 public:
     int OnStart(bool &finished) override
@@ -84,7 +84,7 @@ public:
     }
 };
 
-class TestApp : public LLBC_App
+class TestApp final : public LLBC_App
 {
 public:
     TestApp(LLBC_TimeSpan startNeedTime, LLBC_TimeSpan stopNeedTime)

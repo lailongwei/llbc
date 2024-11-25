@@ -25,7 +25,7 @@
 namespace
 {
 
-class EchoServerComp : public LLBC_Component
+class EchoServerComp final : public LLBC_Component
 {
 public:
     int OnInit(bool &initFinished) override
@@ -111,7 +111,7 @@ private:
     }
 };
 
-class EchoClientComp : public LLBC_Component
+class EchoClientComp final : public LLBC_Component
 {
 public:
     EchoClientComp()

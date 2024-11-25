@@ -24,7 +24,7 @@
 
 namespace
 {
-class TestComp : public LLBC_Component
+class TestComp final : public LLBC_Component
 {
 public:
     int OnInit(bool &initFinished) override

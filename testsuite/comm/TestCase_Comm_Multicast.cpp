@@ -27,7 +27,7 @@ namespace
 
 const int OPCODE = 1;
 
-class TestComp : public LLBC_Component
+class TestComp final : public LLBC_Component
 {
 public:
     TestComp(bool asClient, bool useBst)

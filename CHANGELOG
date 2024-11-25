@@ -10,24 +10,39 @@
 # 5. 简化 LLBC_Packet 默认 packet header
 # 6. 优化 Num to Str 实现
 # 7. LLBC_LogAndXXX() 宏支持附带格式化字符串及参数
-# 8. 初步支持 cmake 构建
-# 9. premake 构建支持自定义 toolset
-# 10. Time 相关 接口/变量 命名简化
-# 11. 对象池代码简化/性能提升/诊断能力加强
-# 12. MD5接口标准化(参考python)
-# 13. 随机支持更新: mtrand实现替换为stl自带实现, 支持权值随机
-# 14. LLBC_Variant更新: 适配性加强/性能提升/序列化空间占用优化
-# 15. 其他 代码优化/性能提升/测试代码完善
-# 16. Logger完善:
+# 8. premake 构建支持自定义 toolset
+# 9. Time 相关 接口/变量 命名简化
+# 10. 对象池代码简化/性能提升/诊断能力加强
+# 11. MD5接口标准化(参考python)
+# 12. 随机支持更新: mtrand实现替换为stl自带实现, 支持权值随机
+# 13. LLBC_Variant更新: 适配性加强/性能提升/序列化空间占用优化/mod操作支持
+# 14. Random支持shuffle
+# 15. Logger完善:
 #     - 废除logLevel配置项, 只保留明确的consoleLogLevel/fileLogLevel配置来明确配置appender log level
 #     - 支持条件判断宏日志打印支持(极其方便), 如: LLBC_WarnAndReturnIf/LLBC_ErrorAndBreakIf/...
 #     - 支持环境变量pattern打印: %E{EnvName}
 #     - Debug/Trace日志级别对调, 调整后, Trace级别将是最低级别
-# 17. 完整优化LLBC_Time/LLBC_TimeSpan, 性能及接口全面优化、简化
-# 18. LLBC_Component方法收敛(感谢reckful)
-# 19. LLBC_BinaryHeap调整为使用stl::priority_queue实现(感谢reckful)
-# 20. 废除框架中旧式对象池实现, 提供全新设计及实现的对象池, 代码得到极大的简化, 同时性能得到足够的提升
-# 21. 其它杂项优化
+#     - 进一步优化整个日志代码及性能, 特别在log pattern格式化时的性能, 性能提升较大
+# 16. 完整优化LLBC_Time/LLBC_TimeSpan, 性能及接口全面优化、简化, 特别在time/time span string解析上
+# 17. LLBC_Component方法收敛(感谢reckful)，收敛后Component非流程化事件处理通过OnEvent()完成, 业务层也可以使用Component Event机制来进行Component事件dispatch
+# 18. LLBC_BinaryHeap调整为使用stl::priority_queue实现(感谢reckful)
+# 19. 废除框架中旧式对象池实现, 提供全设计及实现的对象池, 代码得到极大的简化, 同时性能得到足够的提升
+# 20. 构建流程、脚本完善：
+#     * 支持 cmake 构建
+#     * premake 调整为使用gmake2
+#     * lua/cpython submodule构建及发布流程整理及完善, llbc版本号提取到cfg.py中
+#     * 完整支持从架构：x86/ARM, 当前已适配mac平台的x86/ARM架构
+# 22. LLBC_BinaryHeap优化, 调整为使用std::priority_queue实现
+# 23. 优化整个框架os api/c lib/c++ lib头文件包含, 尽量降低包含依赖并提升编译速度
+# 24. Properties配置读写类重构, 重构后读取的结果为LLBC_Variant，更易于使用
+# 25. App->Service->Component配置管理简化、优化, 优化后, 所有配置都统一为LLBC_Variant
+# 26. 标准化app reload概念及实现, 标准化后, Component原有的冗长的OnAppConfigReloaded()将变成OnReload()
+# 27. 重写的virtual方法统一使用override限定
+# 28. 提供标准化LLBC_Stopwatch实现, 以代替原有旧式的LLBC_CPUTime实现, 同时tsc读取已调整为读取稳态tsc
+# 29. LLBC_EventMgr完整优化, 同时对Firing过程的add/remove listener及嵌套firing操作支持将更友好, 特别地: 增加了死循环fire的检测
+# 30. LLBC_App调度线程完整支持LLBC_Timer的调度, 即: 主线程也可以使用LLBC_Timer
+# 31. LLBC_File相关接口改进、优化
+# 32. 其它杂项优化及改进
 #
 # Version: 1.1.0
 # 2022/8 - 23/4/4
