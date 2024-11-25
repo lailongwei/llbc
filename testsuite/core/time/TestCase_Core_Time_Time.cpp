@@ -88,6 +88,11 @@ void TestCase_Core_Time_Time::TimeClassTest()
     LLBC_Time defaultTime;
     std::cout <<"Default time: " <<defaultTime <<std::endl;
 
+    // NowTimeStampInXXX() tet.
+    std::cout << "LLBC_Time::NowTimestampInSecs(): " << LLBC_Time::NowTimestampInSecs() << std::endl;
+    std::cout << "LLBC_Time::NowTimestampInMillis(): " << LLBC_Time::NowTimestampInMillis() << std::endl;
+    std::cout << "LLBC_Time::NowTimestampInMicros(): " << LLBC_Time::NowTimestampInMicros() << std::endl;
+
     // Now(), GetTimeTick(), Format(), FormatAsGmt() test.
     LLBC_Time now = LLBC_Time::Now();
     std::cout <<"now time: " <<now 

@@ -67,6 +67,24 @@ public:
      */
     static LLBC_Time Now();
 
+    /**
+     * Get now timestamp, in seconds.
+     * @return time_t - now timestamp, in seconds.
+     */
+    static time_t NowTimestampInSecs();
+
+    /**
+     * Get now timestamp, in milli-seconds.
+     * @return time_t - now timestamp, in milli-seconds.
+     */
+    static sint64 NowTimestampInMillis();
+
+    /**
+     * Get now timestamp, in micro-seconds.
+     * @return time_t - now timestamp, in micro-seconds.
+     */
+    static sint64 NowTimestampInMicros();
+
 public:
     /**
      * Create time object from some ways.
