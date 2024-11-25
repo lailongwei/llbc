@@ -35,31 +35,31 @@ public:
      * Constructor & Destructor.
      */
     pyllbc_PackLemma_Top(PyObject *compileEnv = nullptr);
-    virtual ~pyllbc_PackLemma_Top();
+    ~pyllbc_PackLemma_Top() override;
 
 public:
     /**
      * Get lemma type, see Type enumeration.
      * @return Type - the lemma type enumeration.
      */
-    virtual Type GetType() const;
+    Type GetType() const override;
     /**
      * Get lemma current state, see State enumeration.
      * @return State - the lemma state enumeration.
      */
-    virtual State GetState() const;
+    State GetState() const override;
 
     /**
      * Check lemma is serializable(Readable & Writable) or not.
      * @return bool - return true f serializable, otherwise return false.
      */
-    virtual bool IsSerializable() const;
+    bool IsSerializable() const override;
 
     /**
      * Check lemma is parse done or not.
      * @return bool - return - true if done, otherwise not done or maybe error occurred.
      */
-    virtual bool IsDone() const;
+    bool IsDone() const override;
     
     /**
      * Process character sequence.
@@ -67,26 +67,26 @@ public:
      * @param[in] nextCh - the next character symbol(can use it to reference).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Process(Symbol ch, Symbol nextCh = Base::InvalidSymbol);
+    int Process(Symbol ch, Symbol nextCh = Base::InvalidSymbol) override;
     /**
      * Process lemma.
      * @param[in] lemma - the lemma.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Process(Base *lemma);
+    int Process(Base *lemma) override;
 
     /**
      * Read data from pystream according lemma format.
      * @param[in] stream - the pystream.
      * @return PyObject * - the readed python layer object, new reference, if error occurred return nullptr.
      */
-    virtual PyObject *Read(pyllbc_Stream *stream);
+    PyObject *Read(pyllbc_Stream *stream) override;
     /**
      * rite python layer data to given string according lemma format.
      * @param[in] stream - the pystream.
      * @param[in] values - the python layer values, must be tuple or None, if error occurred return nullptr.
      */
-    virtual int Write(pyllbc_Stream *stream, PyObject *values);
+    int Write(pyllbc_Stream *stream, PyObject *values) override;
 
 private:
     std::vector<Base *> _lemmas;

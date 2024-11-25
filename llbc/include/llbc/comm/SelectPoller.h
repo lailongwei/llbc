@@ -66,7 +66,7 @@ protected:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     void AddSession(LLBC_Session *session) override;
 #else
-    virtual void AddSession(LLBC_Session *session, bool needAddToIocp = true);
+    void AddSession(LLBC_Session *session, bool needAddToIocp = true) override;
 #endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
     /**

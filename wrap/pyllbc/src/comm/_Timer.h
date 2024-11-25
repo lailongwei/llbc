@@ -98,7 +98,8 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerSchedule(PyObject *self, PyObject *args)
     PY_LONG_LONG dueTime, period;
     PYLLBC_ParseCObjBeginArgs(timer, "LL", &dueTime, &period);
 
-    if (timer->Schedule(dueTime, period) != LLBC_OK)
+    if (timer->Schedule(LLBC_TimeSpan::FromMillis(dueTime), 
+                        LLBC_TimeSpan::FromMillis(period)) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, timer->ToString());
         return nullptr;

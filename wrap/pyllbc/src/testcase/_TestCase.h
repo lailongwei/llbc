@@ -28,10 +28,10 @@ class LLBC_HIDDEN pyllbc_TestCase : public LLBC_BaseTestCase
 {
 public:
     pyllbc_TestCase() {  }
-    virtual ~pyllbc_TestCase() {  }
+    ~pyllbc_TestCase() override {  }
 
 public:
-    virtual int Run(int argc, char *argv[])
+    int Run(int argc, char *argv[]) override
     {
         PyObject *pyObj = reinterpret_cast<PyObject *>(LLBC_Str2Ptr(argv[0]));
 

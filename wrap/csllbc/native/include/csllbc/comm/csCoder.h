@@ -45,7 +45,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~csllbc_Coder();
+    ~csllbc_Coder() override;
     
 public:
     /**
@@ -63,13 +63,13 @@ public:
     /**
      * Coder reuse support.
      */
-    virtual void Reuse();
+    void Reuse() override;
 
     /**
      * Packet encode/decode methods.
      */
-    virtual bool Encode(LLBC_Packet &packet);
-    virtual bool Decode(LLBC_Packet &packet);
+    bool Encode(LLBC_Packet &packet) override;
+    bool Decode(LLBC_Packet &packet) override;
 
 private:
     sint64 _packetId;
@@ -87,7 +87,7 @@ public:
     /**
      * Create csharp layer coder.
      */
-    virtual LLBC_Coder *Create() const;
+    LLBC_Coder *Create() const override;
 };
 
 
