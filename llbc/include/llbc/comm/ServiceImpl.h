@@ -676,7 +676,6 @@ private:
     std::vector<LLBC_Component *> _compList; // Component list.
     std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
     std::map<LLBC_String, LLBC_Library *> _compLibraries; // Component libraries(if is dynamic load component).
-
     LLBC_Component * _curComp; // Current component.
 
     // Coder & Handler about members.

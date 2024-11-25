@@ -33,7 +33,7 @@
 #include "llbc/core/event/EventMgr.h"
 
 __LLBC_NS_BEGIN
-     static sint64 _maxListenerStub = 1;
+static sint64 _maxListenerStub = 1;
 
 LLBC_EventMgr::_ListenerInfo::_ListenerInfo()
 : evId(0)

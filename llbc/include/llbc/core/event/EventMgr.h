@@ -249,7 +249,7 @@ protected:
     std::set<int> _pendingRemoveEventIds_;
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
-
+    // Event manager hook
     LLBC_EventMgrHook *_evMgrHook;
 };
 
