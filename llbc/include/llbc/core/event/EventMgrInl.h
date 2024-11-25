@@ -25,12 +25,27 @@
 
 __LLBC_NS_BEGIN
 
-inline bool LLBC_EventMgr::SetEventMgrHook(LLBC_EventMgrHook *evMgrHook)
+inline int LLBC_EventMgr::AddEventMgrHook(const LLBC_String &name, LLBC_EventMgrHook *hook)
 {
-    if (evMgrHook == nullptr)
-        return false;
-    _evMgrHook = evMgrHook;
-    return true;
+    if (_evMgrHook.find(name) != _evMgrHook.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+    _evMgrHook[name] = hook;
+    return LLBC_OK;
+}
+
+inline void LLBC_EventMgr::RemoveEventMgrHook(const LLBC_String &name)
+{
+    auto it = _evMgrHook.find(name);
+    if (it == _evMgrHook.end())
+        return;
+    auto *hook = it->second;
+    _evMgrHook.erase(it);
+
+    hook->OnEventMgrDestroy();
+    delete hook;
 }
 
 template <typename ObjectType>

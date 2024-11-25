@@ -51,7 +51,6 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
 LLBC_EventMgr::LLBC_EventMgr()
 : _firing(0)
 , _pendingRemoveAllListeners(false)
-, _evMgrHook(nullptr)
 {
 }
 
@@ -62,11 +61,14 @@ LLBC_EventMgr::~LLBC_EventMgr()
     // Assert: Make sure pending event operations is empty.
     ASSERT(_pendingEventOps.empty() && "llbc framework internal error: _pendingEventOps is not empty!");
 
-    if (_evMgrHook)
+    // Recycle all hook.
+    for (auto it : _evMgrHook)
     {
-        _evMgrHook->OnEventMgrDestroy(this);
-        _evMgrHook = nullptr;
+        it.second->OnEventMgrDestroy();
+        delete it.second;
+        it.second = nullptr;
     }
+    _evMgrHook.clear();
 
     // Recycle all listener infos.
     for (auto it = _id2ListenerInfos.begin(); it != _id2ListenerInfos.end(); ++it)
@@ -405,8 +407,8 @@ int LLBC_EventMgr::AddListenerInfo(_ListenerInfo *listenerInfo)
 
     _stub2ListenerInfos[listenerInfo->stub] = std::make_pair(listenerInfo->evId, --listenerInfos.end());
 
-    if (_evMgrHook)
-        _evMgrHook->OnAddedListener(this, listenerInfo->stub);
+    for (auto it : _evMgrHook)
+        it.second->OnAddedListener(listenerInfo->stub);
   
     return LLBC_OK;
 }

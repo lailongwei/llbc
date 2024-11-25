@@ -389,10 +389,11 @@ public:
 
 public:
     /**
-     * Add collaborate event mgr.
-     * @param[in] evMgr   - event mgr object.
+     * Add collaborative event mgr.
+     * @param[in] evMgr - event mgr object.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void AddCollaborateEventMgr(LLBC_EventMgr *evMgr) override;
+    int AddCollaborativeEventMgr(LLBC_EventMgr *evMgr) override;
 
 public:
     /**
@@ -606,7 +607,7 @@ private:
      * When event manager destroy remove related stub and event manager's hook.
      * @param[in] evMgr - the event manager object.
      */
-    void OnCollaborateEventMgrDestroy(llbc::LLBC_EventMgr *evMgr);
+    void OnCollaborativeEventMgrDestroy(llbc::LLBC_EventMgr *evMgr);
 
     /**
      * Remove listener stub by component and it's phase.
@@ -708,21 +709,6 @@ private:
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
     std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
-
-    // - EventMgrHook members
-    class _SvcEvMgrHook : public LLBC_EventMgrHook // Service event manager hook
-    {
-    public:
-        _SvcEvMgrHook() = delete;
-        explicit _SvcEvMgrHook(LLBC_ServiceImpl *svc);
-        ~_SvcEvMgrHook() override;
-    public:
-        void OnAddedListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub) override;
-        void OnEventMgrDestroy(LLBC_EventMgr *evMgr) override;
-    private:
-        LLBC_ServiceImpl *_service;
-    };
-    std::map<const LLBC_EventMgr*, _SvcEvMgrHook *> _evMgrHook; // Service hooks
 
     class _ManagedStubInfo // Managed event listener stub info
     {

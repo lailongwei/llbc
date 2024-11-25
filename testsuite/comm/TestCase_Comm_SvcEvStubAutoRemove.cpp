@@ -94,7 +94,6 @@ namespace
         {
             LLBC_PrintLn("TestCompA stop!");
         }
-
         void Do()
         {
             eventMgr->AddListener(TestEvent::TEST_EV_RUNNING, this, &TestCompA::_OnEv_TestHandle);
@@ -146,7 +145,6 @@ namespace
         {
             LLBC_PrintLn("TestCompB stop!");
         }
-
         void Do()
         {
             eventMgr->AddListener(TestEvent::TEST_EV_RUNNING, this, &TestCompB::_OnEv_TestHandle);
@@ -170,7 +168,7 @@ int TestCase_Comm_SvcEvStubAutoRemove::Run(int argc, char *argv[])
     // Create service
     LLBC_Service *svc = LLBC_Service::Create("SvcTest", protoFactory);
     eventMgr = new LLBC_EventMgr;
-    svc->AddCollaborateEventMgr(eventMgr);
+    svc->AddCollaborativeEventMgr(eventMgr);
     auto *compB = new TestCompB;
     svc->AddComponent(compB);
     auto *compA = new TestCompA;
@@ -181,11 +179,6 @@ int TestCase_Comm_SvcEvStubAutoRemove::Run(int argc, char *argv[])
     {
         compA->Do();
         compB->Do();
-    }
-    else
-    {
-        delete compA;
-        delete compB;
     }
 
     delete svc;

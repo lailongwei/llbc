@@ -36,21 +36,22 @@ __LLBC_NS_BEGIN
  class LLBC_EXPORT LLBC_EventMgrHook
  {
  public:
-     LLBC_EventMgrHook() = default;
+     LLBC_EventMgrHook() = delete;
+     LLBC_EventMgrHook(LLBC_EventMgr *evMgr) : _evMgr(evMgr) {}
      virtual ~LLBC_EventMgrHook() {};
  public:
      /**
       * Event manager added a listener.
-      * @param[in] evMgr  - event mgr object.
       * @param[in] stub   - event deleg stub.
       */
-     virtual void OnAddedListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub) = 0;
+     virtual void OnAddedListener(LLBC_ListenerStub stub) = 0;
 
      /**
       * Event manager is being destroyed.
-      * @param[in] evMgr  - event mgr object.
       */
-     virtual void OnEventMgrDestroy(LLBC_EventMgr *evMgr) = 0;
+     virtual void OnEventMgrDestroy() = 0;
+ protected:
+     LLBC_EventMgr * _evMgr; // Related event manager.
  };
 
 /**
@@ -68,10 +69,17 @@ public:
 public:
     /**
      * Set event mgr hook.
-     * @param[in] evMgrHook  - event mgr hook object.
-     * @return bool          - set hook success or not.
+     * @param[in] name  - the name for hook.
+     * @param[in] hook  - event mgr hook object.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    bool SetEventMgrHook(LLBC_EventMgrHook *evMgrHook);
+    int AddEventMgrHook(const LLBC_String &name, LLBC_EventMgrHook *hook);
+
+    /**
+     * Remove event mgr hook.
+     * @param[in] name  - the name for hook.
+     */
+    void RemoveEventMgrHook(const LLBC_String &name);
 
 public:
     /**
@@ -249,8 +257,9 @@ protected:
     std::set<int> _pendingRemoveEventIds_;
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
+
     // Event manager hook
-    LLBC_EventMgrHook *_evMgrHook;
+    std::map<LLBC_String, LLBC_EventMgrHook *> _evMgrHook;
 };
 
 __LLBC_NS_END

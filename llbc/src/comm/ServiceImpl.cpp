@@ -974,13 +974,39 @@ int LLBC_ServiceImpl::AddComponentEvent(int eventType, const LLBC_Variant &event
     return Push(LLBC_SvcEvUtil::BuildComponentEventEv(eventType, eventParams));
 }
 
-void LLBC_ServiceImpl::AddCollaborateEventMgr(LLBC_EventMgr *evMgr)
+int LLBC_ServiceImpl::AddCollaborativeEventMgr(LLBC_EventMgr *evMgr)
 {
-    if (_evMgrHook.find(evMgr) != _evMgrHook.end())
-        return;
-    auto * hook = new _SvcEvMgrHook(this);
-    evMgr->SetEventMgrHook(hook);
-    _evMgrHook.emplace(evMgr, hook);
+    // Check service running phase.
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(
+            NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    class _SvcEvMgrHook : public LLBC_EventMgrHook // Service event manager hook
+    {
+    public:
+        _SvcEvMgrHook() = delete;
+        explicit _SvcEvMgrHook(LLBC_EventMgr *evMgr, LLBC_ServiceImpl *svc)
+        : LLBC_EventMgrHook(evMgr)
+        , _service(svc)
+        {
+        }
+        ~_SvcEvMgrHook() override
+        {
+            _service = nullptr;
+        }
+    public:
+        void OnAddedListener(LLBC_ListenerStub stub) override
+        {
+            _service->OnEventMgrAddListener(_evMgr, stub);
+        }
+        void OnEventMgrDestroy() override
+        {
+            _service->OnCollaborativeEventMgrDestroy(_evMgr);
+        }
+    private:
+        LLBC_ServiceImpl *_service;
+    };
+
+    return evMgr->AddEventMgrHook(GetName(), new _SvcEvMgrHook(evMgr, this));
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
@@ -2378,15 +2404,8 @@ void LLBC_ServiceImpl::OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_Listener
     _allStubInfos.emplace(stub, stubInfo);
 }
 
-void LLBC_ServiceImpl::OnCollaborateEventMgrDestroy(llbc::LLBC_EventMgr *evMgr)
+void LLBC_ServiceImpl::OnCollaborativeEventMgrDestroy(llbc::LLBC_EventMgr *evMgr)
 {
-    // remove its hook
-    auto itHook = _evMgrHook.find(evMgr);
-    if (itHook == _evMgrHook.end())
-        return;
-    delete itHook->second;
-    _evMgrHook.erase(itHook);
-
     // remove its stub
     auto itStub = _evMgrStubInfos.find(evMgr);
     if (itStub == _evMgrStubInfos.end())
@@ -2469,26 +2488,6 @@ LLBC_ServiceImpl::_ReadySessionInfo::~_ReadySessionInfo()
 {
     if (codecStack)
         delete codecStack;
-}
-
-LLBC_ServiceImpl::_SvcEvMgrHook::_SvcEvMgrHook(LLBC_ServiceImpl *svc)
-: _service(svc)
-{
-}
-
-LLBC_ServiceImpl::_SvcEvMgrHook::~_SvcEvMgrHook()
-{
-    _service = nullptr;
-}
-
-void LLBC_ServiceImpl::_SvcEvMgrHook::OnAddedListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub)
-{
-    _service->OnEventMgrAddListener(evMgr, stub);
-}
-
-void LLBC_ServiceImpl::_SvcEvMgrHook::OnEventMgrDestroy(LLBC_EventMgr *evMgr)
-{
-    _service->OnCollaborateEventMgrDestroy(evMgr);
 }
 
 llbc::LLBC_ServiceImpl::_ManagedStubInfo::_ManagedStubInfo(_CompRunningPhase phase,

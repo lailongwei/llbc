@@ -616,10 +616,11 @@ public:
 
 public:
     /**
-     * Add collaborate event mgr.
-     * @param[in] evMgr   - event mgr object.
+     * Add collaborative event mgr.
+     * @param[in] evMgr - event mgr object.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    virtual void AddCollaborateEventMgr(LLBC_EventMgr *evMgr) = 0;
+    virtual int AddCollaborativeEventMgr(LLBC_EventMgr *evMgr) = 0;
 
 public:
     /**
