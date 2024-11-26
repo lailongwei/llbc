@@ -39,6 +39,7 @@ __LLBC_NS_BEGIN
      LLBC_EventMgrHook() = delete;
      LLBC_EventMgrHook(LLBC_EventMgr *evMgr) : _evMgr(evMgr) {}
      virtual ~LLBC_EventMgrHook() {};
+
  public:
      /**
       * Event manager added a listener.
@@ -50,6 +51,7 @@ __LLBC_NS_BEGIN
       * Event manager is being destroyed.
       */
      virtual void OnEventMgrDestroy() = 0;
+
  protected:
      LLBC_EventMgr * _evMgr; // Related event manager.
  };
