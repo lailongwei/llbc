@@ -37,6 +37,8 @@ class LLBC_ObjPool;
 template <typename Obj>
 class LLBC_TypedObjPool;
 
+class LLBC_Object;
+
 /**
  * \brief The pool object base class encapsulation.
  */
@@ -444,6 +446,13 @@ public:
     typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
     Recycle(Obj *obj)
     {
+        if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
+        {
+            // add obj to gc-pool, if already do nothing
+            obj->AutoRelease();
+            return;
+        }
+
         LLBC_TypedObjPool<Obj> *typedObjPool =
             reinterpret_cast<LLBC_TypedObjPool<Obj> *>(obj->GetTypedObjPool());
         if (typedObjPool)
@@ -457,6 +466,13 @@ public:
     typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
     Recycle(Obj *obj)
     {
+        if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
+        {
+            // add obj to gc-pool, if already do nothing
+            obj->AutoRelease();
+            return;
+        }
+
         RecycleInl<Obj>(obj, 0);
     }
 
@@ -715,8 +731,13 @@ public:
      * Acquire object from pool.
      * @return Obj * - the object pointer.
      */
-    template <typename Obj>
-    Obj *Acquire() { return GetTypedObjPool<Obj>()->Acquire(); }
+    template <typename Obj> Obj *Acquire() 
+    {
+        static_assert(
+            !std::is_base_of_v<LLBC_Object, Obj>,
+            "Obj can not create by ObjPool, as is derived form LLBC_Object");
+        return GetTypedObjPool<Obj>()->Acquire();
+    }
 
     /**
      * Acquire guarded object from pool.

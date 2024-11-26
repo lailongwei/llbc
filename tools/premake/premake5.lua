@@ -556,9 +556,15 @@ project "pyllbc"
     -- link cpython lib.
     -- local py_ver_str = os_capture('python --version')
     -- local py_ver_match_str = '(%w+ )(%d+).(%d+).(%d+)'
+    local py_ver_str = '2.7.18'
     local cpython_readme_file = io.open(llbc_py_wrap_path .. '/cpython/README', 'r')
-    local py_ver_str = cpython_readme_file:read()
-    cpython_readme_file:close()
+    if not cpython_readme_file then
+        io.stderr:write(string.format('Could not open cpython README file, set set python version to:%s\n', py_ver_str))
+    else
+        py_ver_str = cpython_readme_file:read()
+        cpython_readme_file:close()
+    end
+
     local py_ver_match_str = '(.*)(%d+).(%d+).(%d+).*'
     local py_major_ver = string.gsub(py_ver_str, py_ver_match_str, '%2')
     local py_minor_ver = string.gsub(py_ver_str, py_ver_match_str, '%3')
