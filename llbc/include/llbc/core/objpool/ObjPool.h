@@ -448,7 +448,7 @@ public:
     {
         if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
         {
-            // 引用计数对象执行引用计数减1
+            // add obj to gc-pool, if already do nothing
             obj->AutoRelease();
             return;
         }
@@ -468,11 +468,11 @@ public:
     {
         if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
         {
-            // 引用计数对象执行引用计数减1
+            // add obj to gc-pool, if already do nothing
             obj->AutoRelease();
             return;
         }
-        
+
         RecycleInl<Obj>(obj, 0);
     }
 
