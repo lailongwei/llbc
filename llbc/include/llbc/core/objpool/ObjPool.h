@@ -450,7 +450,9 @@ public:
         {
             // 引用计数对象执行引用计数减1
             obj->AutoRelease();
+            return;
         }
+
         LLBC_TypedObjPool<Obj> *typedObjPool =
             reinterpret_cast<LLBC_TypedObjPool<Obj> *>(obj->GetTypedObjPool());
         if (typedObjPool)
@@ -468,7 +470,9 @@ public:
         {
             // 引用计数对象执行引用计数减1
             obj->AutoRelease();
+            return;
         }
+        
         RecycleInl<Obj>(obj, 0);
     }
 

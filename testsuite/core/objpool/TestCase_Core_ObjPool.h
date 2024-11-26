@@ -45,6 +45,7 @@ public:
     int GuardedPoolObjTest();
     int LibSupportedObjPoolClassesTest();
     int CommonClassTest_Stream();
+    int RecycleTest();
 
     template <typename Obj>
     static void RandAllocAndRelease(LLBC_ObjPool &objPool,

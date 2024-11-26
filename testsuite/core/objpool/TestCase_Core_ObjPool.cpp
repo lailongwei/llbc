@@ -43,7 +43,7 @@ class _OD_D final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD
 class _OD_E final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_E() override { LLBC_PrintLn("_OD_E destruct"); } };
 class _OD_F final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_F() override { LLBC_PrintLn("_OD_F destruct"); } };
 class _OD_G final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_G() override { LLBC_PrintLn("_OD_G destruct"); } };
-
+class _OD_H final : public LLBC_Object { public: ~_OD_H() override { LLBC_PrintLn("_OD_H destruct");}};
 }
 
 int TestCase_Core_ObjPool::Run(int argc, char *argv[])
@@ -60,6 +60,7 @@ int TestCase_Core_ObjPool::Run(int argc, char *argv[])
     LLBC_ReturnIf(GuardedPoolObjTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(LibSupportedObjPoolClassesTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(CommonClassTest_Stream() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(RecycleTest() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -818,4 +819,36 @@ void TestCase_Core_ObjPool::RandAllocAndRelease(LLBC_ObjPool &objPool,
 
     while (--releaseTimes >= 0)
         objPool.Release(objs[releaseTimes]);
+}
+
+int TestCase_Core_ObjPool::RecycleTest()
+{
+    // obj from pool recycle test
+    LLBC_ObjPool objPool;
+    auto* g = objPool.Acquire<_OD_G>();
+    LLBC_Recycle(g);
+
+    // obj by new
+    // TODO():no way to judge，just test
+    auto str = new std::string("obj by new test");
+    LLBC_Recycle(str);
+    
+    // obj as a LLBC_Object
+    auto* obj = new _OD_H;
+    // obj delegate to auto-gc pool, call this only once
+    obj->AutoRelease();
+
+    // add ref
+    obj->Retain();
+    LLBC_ReturnIf(obj->GetAutoRefCount() != 1, LLBC_FAILED)
+    LLBC_ReturnIf(obj->GetRefCount() != 2, LLBC_FAILED)
+    // sub ref
+    LLBC_Recycle(obj);
+
+    // only for test, frame will call Purge automatically
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    auto poolStack = reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack);
+    poolStack->Purge();
+
+    return LLBC_OK;
 }
