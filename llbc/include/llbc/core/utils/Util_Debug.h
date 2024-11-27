@@ -59,9 +59,17 @@ class LLBC_EXPORT LLBC_Stopwatch final
 {
 public:
     /**
-     * Constructor & Destructor.
+     * Construct stopwatch object.
+     * @param[in] autoStart - start measuring after constructed flag, default is true.
      */
     explicit LLBC_Stopwatch(bool autoStart = true);
+
+    /**
+     * Construct stopwatch object by elapsed ticks.
+     * @param[in] elapsedTicks      - elapsed ticks.
+     * @param[in] continueMeasuring - continue measuring flag, default is false.
+     */
+    explicit LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring = false);
 
 public:
     /**

@@ -72,6 +72,17 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         LLBC_PrintLn("- After Resume & sleep 618ms, watcher: %s", sw.ToString().c_str());
     }
 
+    // - Construct from ticks test.
+    {
+        LLBC_PrintLn("Construct from ticks test:");
+        const auto beginTick = LLBC_RdTsc();
+        LLBC_Sleep(618);
+        const auto elapsedTick = LLBC_RdTsc() - beginTick;
+
+        LLBC_Stopwatch sw(elapsedTick);
+        LLBC_PrintLn("- After sleep 618ms, watcher: %s", sw.ToString().c_str());
+    }
+
     LLBC_Print("\n");
 
     LLBC_PrintLn("Press any key to continue ...");
