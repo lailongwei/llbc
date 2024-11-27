@@ -83,6 +83,7 @@
 #endif
 
 // C++ standard header files.
+#include <string>
 #include <iostream>
 #include <sstream>
 #include <memory>
