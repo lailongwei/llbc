@@ -597,11 +597,18 @@ private:
     using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
 
     /**
-     * When before component in running phase add event listener stub by event mgr,
-     * if component stop running can auto remove listener by stub.
+     * Event manager added listener by stub.
+     * @param[in] evMgr - the event manager object.
      * @param[in] stub - the listener stub.
      */
     void OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
+
+    /**
+     * Event manager will remove listener by stub.
+     * @param[in] evMgr - the event manager object.
+     * @param[in] stub - the listener stub.
+     */
+    void OnEventMgrWillRemoveListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
 
     /**
      * When event manager destroy remove related stub and event manager's hook.

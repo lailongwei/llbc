@@ -169,9 +169,9 @@ int TestCase_Comm_SvcEvStubAutoRemove::Run(int argc, char *argv[])
     LLBC_Service *svc = LLBC_Service::Create("SvcTest", protoFactory);
     eventMgr = new LLBC_EventMgr;
     svc->AddCollaborativeEventMgr(eventMgr);
-    auto *compB = new TestCompB;
+    auto compB = new TestCompB;
     svc->AddComponent(compB);
-    auto *compA = new TestCompA;
+    auto compA = new TestCompA;
     svc->AddComponent(compA);
     svc->Start(8);
 

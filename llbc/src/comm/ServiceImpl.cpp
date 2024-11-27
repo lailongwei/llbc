@@ -983,30 +983,31 @@ int LLBC_ServiceImpl::AddCollaborativeEventMgr(LLBC_EventMgr *evMgr)
     class _SvcEvMgrHook : public LLBC_EventMgrHook // Service event manager hook
     {
     public:
-        _SvcEvMgrHook() = delete;
-        explicit _SvcEvMgrHook(LLBC_EventMgr *evMgr, LLBC_ServiceImpl *svc)
-        : LLBC_EventMgrHook(evMgr)
-        , _service(svc)
-        {
-        }
+        explicit _SvcEvMgrHook(LLBC_ServiceImpl *svc) : _service(svc) {}
         ~_SvcEvMgrHook() override
         {
             _service = nullptr;
         }
+
     public:
-        void OnAddedListener(LLBC_ListenerStub stub) override
+        void OnAddedListener(int evId, LLBC_ListenerStub stub) override
         {
             _service->OnEventMgrAddListener(_evMgr, stub);
+        }
+        void OnWillRemoveListener(int evId, LLBC_ListenerStub stub) override
+        {
+            _service->OnEventMgrWillRemoveListener(_evMgr, stub);
         }
         void OnEventMgrDestroy() override
         {
             _service->OnCollaborativeEventMgrDestroy(_evMgr);
         }
+
     private:
         LLBC_ServiceImpl *_service;
     };
 
-    return evMgr->AddEventMgrHook(GetName(), new _SvcEvMgrHook(evMgr, this));
+    return evMgr->AddEventMgrHook(GetName(), new _SvcEvMgrHook(this));
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
@@ -2404,15 +2405,19 @@ void LLBC_ServiceImpl::OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_Listener
     _allStubInfos.emplace(stub, stubInfo);
 }
 
+void LLBC_ServiceImpl::OnEventMgrWillRemoveListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub)
+{
+}
+
 void LLBC_ServiceImpl::OnCollaborativeEventMgrDestroy(llbc::LLBC_EventMgr *evMgr)
 {
     // remove its stub
     auto itStub = _evMgrStubInfos.find(evMgr);
     if (itStub == _evMgrStubInfos.end())
         return;
-    for (const auto *stubInfo : itStub->second)
+    for (const auto stubInfo : itStub->second)
     {
-        auto *comp = stubInfo->comp;
+        auto comp = stubInfo->comp;
         if (comp == nullptr)
             _runningCompStubInfos.erase(stubInfo);
         else
@@ -2452,7 +2457,7 @@ void LLBC_ServiceImpl::RemoveEventListenerStub(LLBC_Component *comp, _CompRunnin
     };
     if (comp == nullptr)
     {
-        for (const auto *stubInfo : _runningCompStubInfos)
+        for (const auto stubInfo : _runningCompStubInfos)
             removeStubInfo(stubInfo);
         _runningCompStubInfos.clear();
     }
@@ -2465,7 +2470,7 @@ void LLBC_ServiceImpl::RemoveEventListenerStub(LLBC_Component *comp, _CompRunnin
         if (itComp == itPhase->second.end())
             return;
 
-        for(const auto *stubInfo : itComp->second)
+        for(const auto stubInfo : itComp->second)
             removeStubInfo(stubInfo);
         itPhase->second.erase(comp);
         if (itPhase->second.empty())

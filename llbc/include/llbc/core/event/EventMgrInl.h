@@ -27,22 +27,30 @@ __LLBC_NS_BEGIN
 
 inline int LLBC_EventMgr::AddEventMgrHook(const LLBC_String &name, LLBC_EventMgrHook *hook)
 {
-    if (_evMgrHook.find(name) != _evMgrHook.end())
+    if (hook == nullptr)
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    if (!_evMgrHooks.emplace(name, hook).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
-    _evMgrHook[name] = hook;
+
+    hook->SetEventMgr(this);
     return LLBC_OK;
 }
 
 inline void LLBC_EventMgr::RemoveEventMgrHook(const LLBC_String &name)
 {
-    auto it = _evMgrHook.find(name);
-    if (it == _evMgrHook.end())
+    auto it = _evMgrHooks.find(name);
+    if (it == _evMgrHooks.end())
         return;
-    auto *hook = it->second;
-    _evMgrHook.erase(it);
+
+    auto hook = it->second;
+    _evMgrHooks.erase(it);
 
     hook->OnEventMgrDestroy();
     delete hook;

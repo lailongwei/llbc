@@ -35,6 +35,18 @@
 __LLBC_NS_BEGIN
 static sint64 _maxListenerStub = 1;
 
+int LLBC_EventMgrHook::SetEventMgr(llbc::LLBC_EventMgr *evMgr)
+{
+    if (_evMgr != nullptr)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+
+    _evMgr = evMgr;
+    return LLBC_OK;
+}
+
 LLBC_EventMgr::_ListenerInfo::_ListenerInfo()
 : evId(0)
 , stub(0)
@@ -62,13 +74,13 @@ LLBC_EventMgr::~LLBC_EventMgr()
     ASSERT(_pendingEventOps.empty() && "llbc framework internal error: _pendingEventOps is not empty!");
 
     // Recycle all hook.
-    for (auto it : _evMgrHook)
+    for (auto it : _evMgrHooks)
     {
         it.second->OnEventMgrDestroy();
         delete it.second;
         it.second = nullptr;
     }
-    _evMgrHook.clear();
+    _evMgrHooks.clear();
 
     // Recycle all listener infos.
     for (auto it = _id2ListenerInfos.begin(); it != _id2ListenerInfos.end(); ++it)
@@ -155,7 +167,11 @@ int LLBC_EventMgr::RemoveListener(int id)
 
     _ListenerInfos &listenerInfos = idIt->second;
     for (auto it = listenerInfos.begin(); it != listenerInfos.end(); ++it)
+    {
+        for (auto hookIt : _evMgrHooks)
+            hookIt.second->OnWillRemoveListener(id, (*it)->stub);
         _stub2ListenerInfos.erase((*it)->stub);
+    }
 
     LLBC_STLHelper::RecycleContainer(listenerInfos);
     _id2ListenerInfos.erase(idIt);
@@ -196,6 +212,9 @@ int LLBC_EventMgr::RemoveListener(const LLBC_ListenerStub &stub)
     const int evId = stubIt->second.first;
     const auto idIt = _id2ListenerInfos.find(evId);
     _ListenerInfos &listenerInfos = idIt->second;
+
+    for (auto hookIt : _evMgrHooks)
+        hookIt.second->OnWillRemoveListener(evId, stub);
 
     _ListenerInfos::iterator &listenerIt = stubIt->second.second;
     LLBC_Recycle(*listenerIt);
@@ -407,8 +426,8 @@ int LLBC_EventMgr::AddListenerInfo(_ListenerInfo *listenerInfo)
 
     _stub2ListenerInfos[listenerInfo->stub] = std::make_pair(listenerInfo->evId, --listenerInfos.end());
 
-    for (auto it : _evMgrHook)
-        it.second->OnAddedListener(listenerInfo->stub);
+    for (auto hookIt : _evMgrHooks)
+        hookIt.second->OnAddedListener(listenerInfo->evId, listenerInfo->stub);
   
     return LLBC_OK;
 }
