@@ -977,8 +977,7 @@ int LLBC_ServiceImpl::AddComponentEvent(int eventType, const LLBC_Variant &event
 int LLBC_ServiceImpl::AddCollaborativeEventMgr(LLBC_EventMgr *evMgr)
 {
     // Check service running phase.
-    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(
-            NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     class _SvcEvMgrHook : public LLBC_EventMgrHook // Service event manager hook
     {
@@ -2105,7 +2104,7 @@ int LLBC_ServiceImpl::StartComps()
 
 void LLBC_ServiceImpl::StopComps()
 {
-    // Before before-stop
+    // Before before-stop.
     RemoveEventListenerStub(nullptr, _CompRunningPhase::LateStarted);
 
     // Before-Stop comps.
@@ -2418,7 +2417,7 @@ void LLBC_ServiceImpl::OnCollaborativeEventMgrDestroy(llbc::LLBC_EventMgr *evMgr
     for (const auto stubInfo : itStub->second)
     {
         auto comp = stubInfo->comp;
-        if (comp == nullptr)
+        if (!comp)
             _runningCompStubInfos.erase(stubInfo);
         else
         {
@@ -2455,7 +2454,7 @@ void LLBC_ServiceImpl::RemoveEventListenerStub(LLBC_Component *comp, _CompRunnin
         delete this->_allStubInfos[stub];
         _allStubInfos.erase(stub);
     };
-    if (comp == nullptr)
+    if (!comp)
     {
         for (const auto stubInfo : _runningCompStubInfos)
             removeStubInfo(stubInfo);

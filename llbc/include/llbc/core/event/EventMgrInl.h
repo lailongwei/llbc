@@ -25,9 +25,9 @@
 
 __LLBC_NS_BEGIN
 
-inline int LLBC_EventMgr::AddEventMgrHook(const LLBC_String &name, LLBC_EventMgrHook *hook)
+inline int LLBC_EventMgr::AddEventMgrHook(const LLBC_CString &name, LLBC_EventMgrHook *hook)
 {
-    if (hook == nullptr)
+    if (!hook)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
@@ -43,7 +43,7 @@ inline int LLBC_EventMgr::AddEventMgrHook(const LLBC_String &name, LLBC_EventMgr
     return LLBC_OK;
 }
 
-inline void LLBC_EventMgr::RemoveEventMgrHook(const LLBC_String &name)
+inline void LLBC_EventMgr::RemoveEventMgrHook(const LLBC_CString &name)
 {
     auto it = _evMgrHooks.find(name);
     if (it == _evMgrHooks.end())

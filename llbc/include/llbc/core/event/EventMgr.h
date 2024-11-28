@@ -70,7 +70,7 @@ __LLBC_NS_BEGIN
      LLBC_EventMgr * _evMgr; // Related event manager.
 
  private:
-     // Friend class
+     // Friend class.
      friend class LLBC_EventMgr;
  };
 
@@ -93,13 +93,13 @@ public:
      * @param[in] hook  - event mgr hook object.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AddEventMgrHook(const LLBC_String &name, LLBC_EventMgrHook *hook);
+    int AddEventMgrHook(const LLBC_CString &name, LLBC_EventMgrHook *hook);
 
     /**
      * Remove event mgr hook.
      * @param[in] name  - the name for hook.
      */
-    void RemoveEventMgrHook(const LLBC_String &name);
+    void RemoveEventMgrHook(const LLBC_CString &name);
 
 public:
     /**
@@ -278,7 +278,7 @@ protected:
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
-    // Event manager hook
+    // Event manager hook.
     std::map<LLBC_String, LLBC_EventMgrHook *> _evMgrHooks;
 };
 
