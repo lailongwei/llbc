@@ -65,9 +65,8 @@ namespace
         {
             eventMgr->AddListener(EventIds::TEST_EV_START, this, &TestCompA::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompA start!");
-//            finished = false;
-//            return LLBC_FAILED;
-            return LLBC_OK;
+            finished = false;
+            return LLBC_FAILED;
         }
         
         int OnLateStart(bool &finished) override
