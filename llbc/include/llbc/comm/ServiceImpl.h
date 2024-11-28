@@ -595,6 +595,7 @@ private:
 
 private:
     using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
+    class _ManagedStubInfo;
 
     /**
      * Event manager added listener by stub.
@@ -621,7 +622,14 @@ private:
      * @param[in] comp - the component.
      * @param[in] phase - the component running phase.
      */
-    void RemoveEventListenerStub(LLBC_Component *comp, _CompRunningPhase phase);
+    void RemoveListenerStubByCompAndPhase(LLBC_Component *comp, _CompRunningPhase phase);
+
+    /**
+     * Really remove listener stub.
+     * @param[in] evMgr - the event manager object.
+     * @param[in] stub - the listener stub.
+     */
+    void RemoveEventListenerStub(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
 
 private:
     static int _maxId; // Max service Id.
@@ -655,7 +663,9 @@ private:
     bool _suppressedCoderNotFoundWarning; // Suppress coder not found warning flag.
     LLBC_IProtocolFactory *_dftProtocolFactory; // Default protocol factory.
     std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory; // Specific protocol factory.
-    class _ReadySessionInfo // Ready session information.
+
+    // Ready session information.
+    class _ReadySessionInfo
     {
     public:
         int sessionId;
@@ -670,6 +680,7 @@ private:
                           LLBC_ProtocolStack *codecStack = nullptr);
         ~_ReadySessionInfo();
     };
+
     std::map<int, _ReadySessionInfo *> _readySessionInfos; // Ready sessions set.
     mutable LLBC_SpinLock _readySessionInfosLock; // Ready session set lock.
 
@@ -684,7 +695,7 @@ private:
     std::vector<LLBC_Component *> _compList; // Component list.
     std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
     std::map<LLBC_String, LLBC_Library *> _compLibraries; // Component libraries(if is dynamic load component).
-    LLBC_Component * _curComp; // Current component.
+    LLBC_Component * _curPreparingComp; // Current preparing component.
 
     // Coder & Handler about members.
     std::map<int, LLBC_CoderFactory *> _coderFactories; // Coder Factories.
@@ -717,13 +728,15 @@ private:
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
     std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
 
-    class _ManagedStubInfo // Managed event listener stub info
+    // Managed event listener stub info.
+    class _ManagedStubInfo
     {
     public:
         _CompRunningPhase phase;
         LLBC_Component * const comp;
         LLBC_EventMgr * const evMgr;
         LLBC_ListenerStub stub;
+
     public:
         _ManagedStubInfo() = delete;
         _ManagedStubInfo(_CompRunningPhase phase,
@@ -731,12 +744,13 @@ private:
                          LLBC_EventMgr *evMgr,
                          LLBC_ListenerStub &stub);
     };
-    std::map<LLBC_ListenerStub, _ManagedStubInfo *> _allStubInfos; //  Managed stub info objects
-    std::map<const LLBC_EventMgr *,
-        std::set<const _ManagedStubInfo *>> _evMgrStubInfos; // Stub info, which is associated with the event manager
+
+    LLBC_ListenerStub _removingStub; // Stub who is removing.
+    std::set<const LLBC_EventMgr *> _destroyingEvMgrs; // Destroying event managers.
+    std::map<const LLBC_EventMgr *, std::map<LLBC_ListenerStub, _ManagedStubInfo *>> _evMgr2StubInfos; // All stub info.
     std::map<_CompRunningPhase,
         std::map<const LLBC_Component *,
-            std::set<const _ManagedStubInfo *>>> _phaseCompStubInfos; // Before comp in running phase managed stub infos
+            std::set<const _ManagedStubInfo *>>> _preparingCompStubInfos; // Before comp in running phase managed stub infos.
     std::set<const _ManagedStubInfo *> _runningCompStubInfos; // Stub info is added during the component's running phase.
 };
 

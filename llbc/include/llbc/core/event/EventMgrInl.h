@@ -25,37 +25,6 @@
 
 __LLBC_NS_BEGIN
 
-inline int LLBC_EventMgr::AddEventMgrHook(const LLBC_CString &name, LLBC_EventMgrHook *hook)
-{
-    if (!hook)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
-
-    if (!_evMgrHooks.emplace(name, hook).second)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    hook->SetEventMgr(this);
-    return LLBC_OK;
-}
-
-inline void LLBC_EventMgr::RemoveEventMgrHook(const LLBC_CString &name)
-{
-    auto it = _evMgrHooks.find(name);
-    if (it == _evMgrHooks.end())
-        return;
-
-    auto hook = it->second;
-    _evMgrHooks.erase(it);
-
-    hook->OnEventMgrDestroy();
-    delete hook;
-}
-
 template <typename ObjectType>
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id, 
                                              ObjectType *obj, 

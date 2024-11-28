@@ -27,8 +27,8 @@ using namespace llbc;
 class TestCase_Comm_SvcEvStubAutoRemove : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_SvcEvStubAutoRemove();
-    virtual ~TestCase_Comm_SvcEvStubAutoRemove();
+    TestCase_Comm_SvcEvStubAutoRemove() = default;
+    virtual ~TestCase_Comm_SvcEvStubAutoRemove() = default;
 
 public:
     virtual int Run(int argc, char *argv[]);

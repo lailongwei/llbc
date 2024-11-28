@@ -25,161 +25,170 @@
 namespace
 {
     LLBC_EventMgr *eventMgr;
-    class TestEvent : public LLBC_Event
+    enum EventIds
     {
-    public:
-        enum
-        {
-            TEST_EV_INIT = 1,
-            TEST_EV_LATE_INIT = 2,
-            TEST_EV_START = 3,
-            TEST_EV_LATE_START = 4,
-            TEST_EV_RUNNING = 5,
-        };
-
-    public:
-        TestEvent(int evId)
-                : LLBC_Event(evId)
-        {
-        }
-
-        ~TestEvent() override
-        {
-        }
-        LLBC_String data;
+        TEST_EV_INIT = 1,
+        TEST_EV_LATE_INIT = 2,
+        TEST_EV_START = 3,
+        TEST_EV_LATE_START = 4,
+        TEST_EV_RUNNING = 5,
     };
 
-    class TestCompA : public LLBC_Component {
-    private:
-        void _OnEv_TestHandle(LLBC_Event &ev) {}
+    class TestCompA : public LLBC_Component
+    {
     public:
-        int OnInit(bool &flag) override
+        int OnInit(bool &finished) override
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_INIT, this, &TestCompA::_OnEv_TestHandle);
+            eventMgr->AddListener(EventIds::TEST_EV_INIT, this, &TestCompA::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompA init!");
             return LLBC_OK;
         }
-        int OnLateInit(bool &flag) override
+        
+        int OnLateInit(bool &finished) override
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_LATE_INIT, this, &TestCompA::_OnEv_TestHandle);
+            eventMgr->AddListener(EventIds::TEST_EV_LATE_INIT, this, &TestCompA::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompA late init!");
             return LLBC_OK;
         }
-        void OnEarlyDestroy(bool &flag) override
+        
+        void OnEarlyDestroy(bool &finished) override
         {
             LLBC_PrintLn("TestCompA early destroy!");
         }
-        void OnDestroy(bool &flag) override
+        
+        void OnDestroy(bool &finished) override
         {
             LLBC_PrintLn("TestCompA destroy!");
         }
-        int OnStart(bool &flag) override
+        
+        int OnStart(bool &finished) override
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_START, this, &TestCompA::_OnEv_TestHandle);
+            eventMgr->AddListener(EventIds::TEST_EV_START, this, &TestCompA::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompA start!");
-            flag = false;
-            return LLBC_FAILED;
+//            finished = false;
+//            return LLBC_FAILED;
+            return LLBC_OK;
         }
-        int OnLateStart(bool &flag) override
+        
+        int OnLateStart(bool &finished) override
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_LATE_START, this, &TestCompA::_OnEv_TestHandle);
+            eventMgr->AddListener(EventIds::TEST_EV_LATE_START, this, &TestCompA::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompA late start!");
             return LLBC_OK;
         }
-        void OnEarlyStop(bool &flag) override
+        
+        void OnEarlyStop(bool &finished) override
         {
             LLBC_PrintLn("TestCompA early stop!");
         }
-        void OnStop(bool &flag) override
+        
+        void OnStop(bool &finished) override
         {
             LLBC_PrintLn("TestCompA stop!");
         }
+        
         void Do()
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_RUNNING, this, &TestCompA::_OnEv_TestHandle);
+            eventMgr->AddListener(EventIds::TEST_EV_RUNNING, this, &TestCompA::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompA do something!");
         }
-    };
-
-    class TestCompB : public LLBC_Component {
+        
     private:
         void _OnEv_TestHandle(LLBC_Event &ev) {}
+    };
+
+    class TestCompB : public LLBC_Component
+    {
     public:
-        int OnInit(bool &flag) override
+        int OnInit(bool &finished) override
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_INIT, this, &TestCompB::_OnEv_TestHandle);
+            eventMgr->AddListener(EventIds::TEST_EV_INIT, this, &TestCompB::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompB init!");
             return LLBC_OK;
         }
-        int OnLateInit(bool &flag) override
+        
+        int OnLateInit(bool &finished) override
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_LATE_INIT, this, &TestCompB::_OnEv_TestHandle);
+            test_stub_late_init = eventMgr->AddListener(EventIds::TEST_EV_LATE_INIT, this, &TestCompB::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompB late init!");
             return LLBC_OK;
         }
-        void OnEarlyDestroy(bool &flag) override
+        
+        void OnEarlyDestroy(bool &finished) override
         {
             LLBC_PrintLn("TestCompB early destroy!");
         }
-        void OnDestroy(bool &flag) override
+        
+        void OnDestroy(bool &finished) override
         {
             LLBC_PrintLn("TestCompB destroy!");
         }
-        int OnStart(bool &flag) override
+        
+        int OnStart(bool &finished) override
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_START, this, &TestCompB::_OnEv_TestHandle);
+            eventMgr->AddListener(EventIds::TEST_EV_START, this, &TestCompB::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompB start!");
             return LLBC_OK;
         }
-        int OnLateStart(bool &flag) override
+        
+        int OnLateStart(bool &finished) override
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_LATE_START, this, &TestCompB::_OnEv_TestHandle);
+            eventMgr->AddListener(EventIds::TEST_EV_LATE_START, this, &TestCompB::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompB late start!");
+
+            auto svc = GetService();
+            svc->Post([&](LLBC_Service *) {
+                Do();
+                GetComponent<TestCompA>()->Do();
+
+                eventMgr->RemoveListener(test_stub_do);
+                eventMgr->RemoveListener(test_stub_late_init);
+            });
+
             return LLBC_OK;
         }
-        void OnEarlyStop(bool &flag) override
+        
+        void OnEarlyStop(bool &finished) override
         {
             LLBC_PrintLn("TestCompB early stop!");
         }
-        void OnStop(bool &flag) override
+        
+        void OnStop(bool &finished) override
         {
             LLBC_PrintLn("TestCompB stop!");
         }
+        
         void Do()
         {
-            eventMgr->AddListener(TestEvent::TEST_EV_RUNNING, this, &TestCompB::_OnEv_TestHandle);
+            test_stub_do = eventMgr->AddListener(EventIds::TEST_EV_RUNNING, this, &TestCompB::_OnEv_TestHandle);
             LLBC_PrintLn("TestCompB do something!");
         }
+        
+    private:
+        void _OnEv_TestHandle(LLBC_Event &ev) {}
+
+    private:
+        LLBC_ListenerStub test_stub_late_init;
+        LLBC_ListenerStub test_stub_do;
     };
-}
-
-TestCase_Comm_SvcEvStubAutoRemove::TestCase_Comm_SvcEvStubAutoRemove()
-{
-}
-
-TestCase_Comm_SvcEvStubAutoRemove::~TestCase_Comm_SvcEvStubAutoRemove()
-{
 }
 
 int TestCase_Comm_SvcEvStubAutoRemove::Run(int argc, char *argv[])
 {
-    LLBC_IProtocolFactory *protoFactory = new LLBC_NormalProtocolFactory;
-
     // Create service
-    LLBC_Service *svc = LLBC_Service::Create("SvcTest", protoFactory);
+    LLBC_Service *svc = LLBC_Service::Create("SvcTest");
+
     eventMgr = new LLBC_EventMgr;
     svc->AddCollaborativeEventMgr(eventMgr);
-    auto compB = new TestCompB;
-    svc->AddComponent(compB);
-    auto compA = new TestCompA;
-    svc->AddComponent(compA);
+
+    svc->AddComponent<TestCompA>();
+    svc->AddComponent<TestCompB>();
+
     svc->Start(8);
 
-    if (svc->IsStarted())
-    {
-        compA->Do();
-        compB->Do();
-    }
+    LLBC_PrintLn("Service running!");
+
+    svc->Stop();
 
     delete svc;
     delete eventMgr;
