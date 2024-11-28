@@ -138,7 +138,6 @@ namespace
             auto svc = GetService();
             svc->Post([&](LLBC_Service *) {
                 Do();
-                GetComponent<TestCompA>()->Do();
 
                 eventMgr->RemoveListener(test_stub_do);
                 eventMgr->RemoveListener(test_stub_late_init);
