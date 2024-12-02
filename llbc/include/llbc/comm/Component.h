@@ -613,6 +613,7 @@ private:
         LateInited,
         Started,
         LateStarted,
+        End,
     };
 
     _CompRunningPhase _runningPhase;

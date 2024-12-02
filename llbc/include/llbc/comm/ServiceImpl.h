@@ -595,19 +595,18 @@ private:
 
 private:
     using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
-    class _ManagedStubInfo;
 
     /**
      * Event manager added listener by stub.
      * @param[in] evMgr - the event manager object.
-     * @param[in] stub - the listener stub.
+     * @param[in] stub  - the listener stub.
      */
     void OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
 
     /**
      * Event manager will remove listener by stub.
      * @param[in] evMgr - the event manager object.
-     * @param[in] stub - the listener stub.
+     * @param[in] stub  - the listener stub.
      */
     void OnEventMgrWillRemoveListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
 
@@ -619,7 +618,7 @@ private:
 
     /**
      * Remove listener stub by component and it's phase.
-     * @param[in] comp - the component.
+     * @param[in] comp  - the component.
      * @param[in] phase - the component running phase.
      */
     void RemoveListenerStubByCompAndPhase(LLBC_Component *comp, _CompRunningPhase phase);
@@ -627,7 +626,7 @@ private:
     /**
      * Really remove listener stub.
      * @param[in] evMgr - the event manager object.
-     * @param[in] stub - the listener stub.
+     * @param[in] stub  - the listener stub.
      */
     void RemoveEventListenerStub(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
 
@@ -732,14 +731,13 @@ private:
     class _ManagedStubInfo
     {
     public:
-        _CompRunningPhase phase;
+        int phase;
         LLBC_Component * const comp;
         LLBC_EventMgr * const evMgr;
         LLBC_ListenerStub stub;
 
     public:
-        _ManagedStubInfo() = delete;
-        _ManagedStubInfo(_CompRunningPhase phase,
+        _ManagedStubInfo(int phase,
                          LLBC_Component *comp,
                          LLBC_EventMgr *evMgr,
                          LLBC_ListenerStub &stub);
@@ -747,11 +745,10 @@ private:
 
     LLBC_ListenerStub _removingStub; // Stub who is removing.
     std::set<const LLBC_EventMgr *> _destroyingEvMgrs; // Destroying event managers.
-    std::map<const LLBC_EventMgr *, std::map<LLBC_ListenerStub, _ManagedStubInfo *>> _evMgr2StubInfos; // All stub info.
-    std::map<_CompRunningPhase,
-        std::map<const LLBC_Component *,
-            std::set<const _ManagedStubInfo *>>> _preparingCompStubInfos; // Before comp in running phase managed stub infos.
-    std::set<const _ManagedStubInfo *> _runningCompStubInfos; // Stub info is added during the component's running phase.
+    std::map<const LLBC_EventMgr *, std::map<LLBC_ListenerStub, _ManagedStubInfo *> > _evMgr2StubInfos; // All stub info.
+
+    std::map<const LLBC_Component *, std::set<const _ManagedStubInfo *> >
+        _phaseCompStubInfos[static_cast<size_t>(_CompRunningPhase::End)]; // Phase for comp managed stub infos.
 };
 
 __LLBC_NS_END

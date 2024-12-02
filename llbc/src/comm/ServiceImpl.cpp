@@ -983,7 +983,6 @@ int LLBC_ServiceImpl::AddCollaborativeEventMgr(LLBC_EventMgr *evMgr)
     {
     public:
         explicit _SvcEvMgrHook(LLBC_ServiceImpl *svc) : _service(svc) {}
-        ~_SvcEvMgrHook() override { _service = nullptr; }
 
     public:
         void OnAddedListener(int evId, LLBC_ListenerStub stub) override
@@ -996,7 +995,7 @@ int LLBC_ServiceImpl::AddCollaborativeEventMgr(LLBC_EventMgr *evMgr)
             _service->OnEventMgrWillRemoveListener(_evMgr, stub);
         }
 
-        void OnEventMgrDestroy() override
+        void OnWillRemoveEventMgrHook() override
         {
             _service->OnCollaborativeEventMgrDestroy(_evMgr);
         }
@@ -1005,7 +1004,12 @@ int LLBC_ServiceImpl::AddCollaborativeEventMgr(LLBC_EventMgr *evMgr)
         LLBC_ServiceImpl *_service;
     };
 
-    return evMgr->AddEventMgrHook(GetName(), new _SvcEvMgrHook(this));
+    auto hook = new _SvcEvMgrHook(this);
+    auto ret = evMgr->AddEventMgrHook(GetName(), hook);
+    if (ret != LLBC_OK)
+        delete hook;
+
+    return ret;
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
@@ -2385,21 +2389,16 @@ LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(int sessionId,
 
 void LLBC_ServiceImpl::OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub)
 {
-    auto &stub2Infos = _evMgr2StubInfos[evMgr];
-    if (stub2Infos.find(stub) != stub2Infos.end())
+    if (_destroyingEvMgrs.find(evMgr) != _destroyingEvMgrs.end())
         return;
 
-    _ManagedStubInfo *stubInfo = nullptr;
-    if (_curPreparingComp != nullptr)
-    {
-        stubInfo = new _ManagedStubInfo(_curPreparingComp->_runningPhase, _curPreparingComp, evMgr, stub);
-        _preparingCompStubInfos[_curPreparingComp->_runningPhase][_curPreparingComp].emplace(stubInfo);
-    }
-    else
-    {
-        stubInfo = new _ManagedStubInfo(_CompRunningPhase::LateStarted, nullptr, evMgr, stub);
-        _runningCompStubInfos.emplace(stubInfo);
-    }
+    auto &stub2Infos = _evMgr2StubInfos[evMgr];
+    ASSERT(stub2Infos.find(stub) == stub2Infos.end() && "llbc framework internal error");
+
+    auto curPhase = static_cast<int>(_curPreparingComp ? _curPreparingComp->_runningPhase : _CompRunningPhase::LateStarted);
+
+    auto stubInfo = new _ManagedStubInfo(curPhase, _curPreparingComp, evMgr, stub);
+    _phaseCompStubInfos[curPhase][_curPreparingComp].emplace(stubInfo);
 
     stub2Infos.emplace(stub, stubInfo);
 }
@@ -2421,23 +2420,17 @@ void LLBC_ServiceImpl::OnEventMgrWillRemoveListener(LLBC_EventMgr *evMgr, LLBC_L
     if (itInfo == stub2Info.end())
         return;
 
-    auto &info = itInfo->second;
-    if (!info->comp)
-        _runningCompStubInfos.erase(info);
-    else
-    {
-        auto &comp2Info = _preparingCompStubInfos[info->phase];
-        auto &infos = comp2Info[info->comp];
-        infos.erase(info);
-        if (infos.empty())
-            comp2Info.erase(info->comp);
-        if (comp2Info.empty())
-            _preparingCompStubInfos.erase(info->phase);
-    }
+    auto info = itInfo->second;
 
-    stub2Info.erase(stub);
+    auto &comp2Info = _phaseCompStubInfos[info->phase];
+    auto infos = comp2Info.find(info->comp);
+    infos->second.erase(info);
+    if (infos->second.empty())
+        comp2Info.erase(infos);
+
+    stub2Info.erase(itInfo);
     if (stub2Info.empty())
-        _evMgr2StubInfos.erase(evMgr);
+        _evMgr2StubInfos.erase(itStub2Info);
 
     delete info;
 }
@@ -2457,18 +2450,12 @@ void LLBC_ServiceImpl::OnCollaborativeEventMgrDestroy(llbc::LLBC_EventMgr *evMgr
     for (size_t i = 0; i < stubInfos.size(); ++i)
     {
         auto stubInfo = stubInfos[i];
-        if (!stubInfo->comp)
-            _runningCompStubInfos.erase(stubInfo);
-        else
-        {
-            auto &comp2Info = _preparingCompStubInfos[stubInfo->phase];
-            auto &infos = comp2Info[stubInfo->comp];
-            infos.erase(stubInfo);
-            if (infos.empty())
-                comp2Info.erase(stubInfo->comp);
-            if (comp2Info.empty())
-                _preparingCompStubInfos.erase(stubInfo->phase);
-        }
+        
+        auto &comp2Info = _phaseCompStubInfos[stubInfo->phase];
+        auto infos = comp2Info.find(stubInfo->comp);
+        infos->second.erase(stubInfo);
+        if (infos->second.empty())
+            comp2Info.erase(infos);
 
         RemoveEventListenerStub(stubInfo->evMgr, stubInfo->stub);
     }
@@ -2476,47 +2463,34 @@ void LLBC_ServiceImpl::OnCollaborativeEventMgrDestroy(llbc::LLBC_EventMgr *evMgr
 
 void LLBC_ServiceImpl::RemoveListenerStubByCompAndPhase(LLBC_Component *comp, _CompRunningPhase phase)
 {
-    if (!comp)
-    {
-        for (const auto stubInfo : _runningCompStubInfos)
-        {
-            if (_destroyingEvMgrs.find(stubInfo->evMgr) != _destroyingEvMgrs.end())
-                continue;
-            RemoveEventListenerStub(stubInfo->evMgr, stubInfo->stub);
-        }
-        _runningCompStubInfos.clear();
-    }
-    else
-    {
-        auto itPhase = _preparingCompStubInfos.find(phase);
-        if (itPhase == _preparingCompStubInfos.end())
-            return;
-        auto &comp2Info = itPhase->second;
-        auto itComp = comp2Info.find(comp);
-        if (itComp == comp2Info.end())
-            return;
+    auto curPhase = static_cast<int>(phase);
+    auto &comp2Info = _phaseCompStubInfos[curPhase];
+    if (comp2Info.empty())
+        return;
+    auto itComp = comp2Info.find(comp);
+    if (itComp == comp2Info.end())
+        return;
 
-        for(const auto &stubInfo : itComp->second)
-        {
-            if (_destroyingEvMgrs.find(stubInfo->evMgr) != _destroyingEvMgrs.end())
-                continue;
-            RemoveEventListenerStub(stubInfo->evMgr, stubInfo->stub);
-        }
-        comp2Info.erase(comp);
-        if (comp2Info.empty())
-            _preparingCompStubInfos.erase(phase);
+    for(const auto &stubInfo : itComp->second)
+    {
+        if (_destroyingEvMgrs.find(stubInfo->evMgr) != _destroyingEvMgrs.end())
+            continue;
+        RemoveEventListenerStub(stubInfo->evMgr, stubInfo->stub);
     }
+    comp2Info.erase(itComp);
 }
 
 void LLBC_ServiceImpl::RemoveEventListenerStub(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub)
 {
     _removingStub = stub;
 
-    auto &stub2Infos = _evMgr2StubInfos[evMgr];
-    delete stub2Infos[stub];
-    stub2Infos.erase(stub);
+    auto itStub2Infos = _evMgr2StubInfos.find(evMgr);
+    auto &stub2Infos = itStub2Infos->second;
+    auto info = stub2Infos.find(stub);
+    delete info->second;
+    stub2Infos.erase(info);
     if (stub2Infos.empty())
-        _evMgr2StubInfos.erase(evMgr);
+        _evMgr2StubInfos.erase(itStub2Infos);
 
     evMgr->RemoveListener(stub);
 
@@ -2540,7 +2514,7 @@ LLBC_ServiceImpl::_ReadySessionInfo::~_ReadySessionInfo()
         delete codecStack;
 }
 
-llbc::LLBC_ServiceImpl::_ManagedStubInfo::_ManagedStubInfo(_CompRunningPhase phase,
+llbc::LLBC_ServiceImpl::_ManagedStubInfo::_ManagedStubInfo(int phase,
                                                            llbc::LLBC_Component *comp,
                                                            llbc::LLBC_EventMgr *evMgr,
                                                            llbc::LLBC_ListenerStub &stub)

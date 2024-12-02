@@ -22,7 +22,6 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/comm/Service.h"
 #include "llbc/core/os/OS_Atomic.h"
 
 #include "llbc/core/helper/STLHelper.h"
@@ -37,7 +36,7 @@ static sint64 _maxListenerStub = 1;
 
 int LLBC_EventMgr::AddEventMgrHook(const LLBC_CString &name, LLBC_EventMgrHook *hook)
 {
-    if (!hook)
+    if (name.empty() || !hook)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
@@ -62,20 +61,8 @@ void LLBC_EventMgr::RemoveEventMgrHook(const LLBC_CString &name)
     auto hook = it->second;
     _evMgrHooks.erase(it);
 
-    hook->OnEventMgrDestroy();
+    hook->OnWillRemoveEventMgrHook();
     delete hook;
-}
-
-int LLBC_EventMgrHook::SetEventMgr(llbc::LLBC_EventMgr *evMgr)
-{
-    if (_evMgr != nullptr)
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    _evMgr = evMgr;
-    return LLBC_OK;
 }
 
 LLBC_EventMgr::_ListenerInfo::_ListenerInfo()
@@ -104,14 +91,12 @@ LLBC_EventMgr::~LLBC_EventMgr()
     // Assert: Make sure pending event operations is empty.
     ASSERT(_pendingEventOps.empty() && "llbc framework internal error: _pendingEventOps is not empty!");
 
-    // Recycle all hook.
+    // Recycle all hooks.
     for (auto &item : _evMgrHooks)
     {
-        item.second->OnEventMgrDestroy();
+        item.second->OnWillRemoveEventMgrHook();
         delete item.second;
-        item.second = nullptr;
     }
-    _evMgrHooks.clear();
 
     // Recycle all listener infos.
     for (auto it = _id2ListenerInfos.begin(); it != _id2ListenerInfos.end(); ++it)
@@ -202,7 +187,6 @@ int LLBC_EventMgr::RemoveListener(int id)
         for (auto &item : _evMgrHooks)
             item.second->OnWillRemoveListener(id, (*it)->stub);
         _stub2ListenerInfos.erase((*it)->stub);
-        LLBC_PrintLn("remove listener event:%d stub:%llu", id, (*it)->stub);
     }
 
     LLBC_STLHelper::RecycleContainer(listenerInfos);

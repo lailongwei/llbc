@@ -93,7 +93,7 @@ namespace
         }
         
     private:
-        void _OnEv_TestHandle(LLBC_Event &ev) {}
+        void _OnEv_TestHandle(LLBC_Event &) {}
     };
 
     class TestCompB : public LLBC_Component
@@ -136,8 +136,9 @@ namespace
             LLBC_PrintLn("TestCompB late start!");
 
             auto svc = GetService();
-            svc->Post([&](LLBC_Service *) {
+            svc->Post([&](LLBC_Service *svc) {
                 Do();
+                svc->GetComponent<TestCompA>()->Do();
 
                 eventMgr->RemoveListener(test_stub_do);
                 eventMgr->RemoveListener(test_stub_late_init);
@@ -163,7 +164,7 @@ namespace
         }
         
     private:
-        void _OnEv_TestHandle(LLBC_Event &ev) {}
+        void _OnEv_TestHandle(LLBC_Event &) {}
 
     private:
         LLBC_ListenerStub test_stub_late_init;
@@ -182,7 +183,7 @@ int TestCase_Comm_SvcEvStubAutoRemove::Run(int argc, char *argv[])
     svc->AddComponent<TestCompA>();
     svc->AddComponent<TestCompB>();
 
-    svc->Start(8);
+    svc->Start();
 
     LLBC_PrintLn("Service running!");
 

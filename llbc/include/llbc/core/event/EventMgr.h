@@ -42,29 +42,29 @@ __LLBC_NS_BEGIN
  public:
      /**
       * Event manager added a listener.
-     * @param[in] evId - event Id.
+     * @param[in] evId  - event Id.
       * @param[in] stub - event deleg stub.
       */
      virtual void OnAddedListener(int evId, LLBC_ListenerStub stub) = 0;
 
      /**
       * Event manager will remove a listener.
-     * @param[in] evId - event Id.
+     * @param[in] evId  - event Id.
       * @param[in] stub - event deleg stub.
       */
      virtual void OnWillRemoveListener(int evId, LLBC_ListenerStub stub) = 0;
 
      /**
-      * Event manager is being destroyed.
+      * Event manager hook will remove.
       */
-     virtual void OnEventMgrDestroy() = 0;
+     virtual void OnWillRemoveEventMgrHook() = 0;
 
  private:
      /**
       * Associated event manager.
       * @param[in] evMgr - event manager object.
       */
-     int SetEventMgr(LLBC_EventMgr *evMgr);
+     void SetEventMgr(LLBC_EventMgr *evMgr) { _evMgr = evMgr; }
 
  protected:
      LLBC_EventMgr * _evMgr; // Related event manager.
