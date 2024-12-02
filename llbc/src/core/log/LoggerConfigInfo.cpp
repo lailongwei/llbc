@@ -134,9 +134,9 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, AsStr).strip()).empty())
         {
             #if LLBC_TARGET_PLATFORM_WIN32
-            _logDir = _logDir.findreplace(LLBC_SLASH_A, LLBC_BACKLASH_A);
+            _logDir = _logDir.findreplace('/', '\\');
             #else
-            _logDir = _logDir.findreplace(LLBC_BACKLASH_A, LLBC_SLASH_A);
+            _logDir = _logDir.findreplace('\\', '/');
             #endif
         }
 
@@ -274,7 +274,7 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 #if LLBC_TARGET_PLATFORM_IPHONE
     if (_logToFile &&
         !_logFile.empty() &&
-        _logFile[0] != LLBC_SLASH_A)
+        _logFile[0] != '/')
         _logFile = LLBC_Directory::Join(LLBC_Directory::TempDir(), _logFile);
 #endif // LLBC_TARGET_PLATFORM_IPHONE
 }

@@ -46,6 +46,17 @@
 #define __LLBC_INTERNAL_NS_END   \
     }                            \
 
+// Common return values define.
+#define LLBC_OK     (0)
+#define LLBC_FAILED (-1)
+
+// Wait infinite macro define.
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+#define LLBC_INFINITE    ((int)(0xffffffff))
+#else // LLBC_TARGET_PLATFORM_WIN32
+#define LLBC_INFINITE    INFINITE
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
+
 // llbc library error describe buffer size.
 #define __LLBC_ERROR_DESC_SIZE            2048
 // llbc clib error format buffer size.

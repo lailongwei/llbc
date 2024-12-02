@@ -30,7 +30,6 @@
 #include "llbc/common/OSHeader.h"
 // #include "llbc/common/ThirdHeader.h"
 #include "llbc/common/Macro.h"
-#include "llbc/common/Define.h"
 #include "llbc/common/BasicDataType.h"
 #include "llbc/common/TemplateDeduction.h"
 #include "llbc/common/Endian.h"

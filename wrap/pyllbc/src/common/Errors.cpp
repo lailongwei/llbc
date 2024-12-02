@@ -58,8 +58,7 @@ void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&trace
             const char *fileName = PyString_AsString(codeObj->co_filename);
             const char *definedName = PyString_AsString(codeObj->co_name);
 
-            errStr.append_format("%c<llbc holded>File: %s, line: %d, in %s",
-                                 LLBC_LF,
+            errStr.append_format("\n<llbc holded>File: %s, line: %d, in %s",
                                  fileName,
                                  tbs->tb_lineno,
                                  definedName);

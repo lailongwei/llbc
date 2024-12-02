@@ -222,12 +222,12 @@ void LLBC_LoggerMgr::UnInitOutput(int logLv,
     if (file)
     {
         #if LLBC_TARGET_PLATFORM_WIN32
-        const char *fileBaseName = strrchr(file, LLBC_BACKLASH_A);
-        LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_SLASH_A));
+        const char *fileBaseName = strrchr(file, '\\');
+        LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, '/'));
         LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
         #else
-        const char *fileBaseName = strrchr(file, LLBC_SLASH_A);
-        LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_BACKLASH_A));
+        const char *fileBaseName = strrchr(file, '/');
+        LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, '\\'));
         LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
         #endif
     }
@@ -311,12 +311,12 @@ void LLBC_LoggerMgr::UnInitNonFormatOutput(int logLv,
     if (file)
     {
 #if LLBC_TARGET_PLATFORM_WIN32
-    const char *fileBaseName = strrchr(file, LLBC_BACKLASH_A);
-    LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_SLASH_A));
+    const char *fileBaseName = strrchr(file, '\\');
+    LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, '/'));
     LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
 #else
-    const char *fileBaseName = strrchr(file, LLBC_SLASH_A);
-    LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, LLBC_BACKLASH_A));
+    const char *fileBaseName = strrchr(file, '/');
+    LLBC_DoIf(!fileBaseName, fileBaseName = strrchr(file, '\\'));
     LLBC_DoIf(fileBaseName, file = fileBaseName + 1);
 #endif
     }
