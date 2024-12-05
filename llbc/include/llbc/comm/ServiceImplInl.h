@@ -58,6 +58,16 @@ inline bool LLBC_ServiceImpl::IsStarted() const
     return _runningPhase == LLBC_ServiceRunningPhase::Started;
 }
 
+inline int LLBC_ServiceImpl::GetFPS() const
+{
+    return _fps;
+}
+
+inline int LLBC_ServiceImpl::GetFrameInterval() const
+{
+    return _frameInterval;
+}
+
 inline LLBC_EventMgr &LLBC_ServiceImpl::GetEventManager()
 {
     return _evManager;

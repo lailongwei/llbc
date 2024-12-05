@@ -116,13 +116,16 @@
 #define LLBC_ISUNSIGNED_TYPE(type)     ((type)(0 - 1) > 0)
 #define LLBC_ISUNSIGNED_VAL(type, val) ((type)val >= 0 && (type)~a >= (type)0)
 
-// Force inline macro define.
+// Force-Inline/No-Inline macro define.
 #if defined(_MSC_VER)
  #define LLBC_FORCE_INLINE __forceinline
+ #define LLBC_NO_INLINE    __declspec(noinline)
 #elif defined(__GNUC__) || defined(__clang__)
  #define LLBC_FORCE_INLINE __inline__ __attribute__((always_inline))
+ #define LLBC_NO_INLINE    __attribute__((noinline))
 #else
  #define LLBC_FORCE_INLINE inline
+ #define LLBC_NO_INLINE
 #endif
 
 // Extern macro define.
