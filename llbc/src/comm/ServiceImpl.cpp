@@ -334,12 +334,6 @@ int LLBC_ServiceImpl::Stop()
     }
 }
 
-int LLBC_ServiceImpl::GetFPS() const
-{
-    LLBC_LockGuard guard(_lock);
-    return _fps;
-}
-
 int LLBC_ServiceImpl::SetFPS(int fps)
 {
     if (fps != static_cast<int>(LLBC_INFINITE) &&
@@ -353,21 +347,11 @@ int LLBC_ServiceImpl::SetFPS(int fps)
 
     _fps = fps;
     if (_fps != static_cast<int>(LLBC_INFINITE))
-    {
         _frameInterval = 1000 / _fps;
-    }
     else
-    {
         _frameInterval = 0;
-    }
 
     return LLBC_OK;
-}
-
-int LLBC_ServiceImpl::GetFrameInterval() const
-{
-    LLBC_LockGuard guard(_lock);
-    return _frameInterval;
 }
 
 int LLBC_ServiceImpl::Listen(const char *ip,
@@ -1318,39 +1302,36 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
         // <svc_name>.xxx.xxx.xxx....
         _cfg = appCfg[GetName()];
     }
-    else
+    else if (_cfgType == LLBC_AppConfigType::Ini)
     {
-        if (_cfgType == LLBC_AppConfigType::Ini)
+        // Service config section: [<svc_name>]
+        // Comp config section(s): [<svc_name>.<comp_name>]
+        for (auto it = appCfg.DictBegin(); it != appCfg.DictEnd(); ++it)
         {
-            // Service config section: [<svc_name>]
-            // Comp config section(s): [<svc_name>.<comp_name>]
-            for (auto it = appCfg.DictBegin(); it != appCfg.DictEnd(); ++it)
-            {
-                const auto iniSectionName = it->first.AsStr();
-                if (iniSectionName == GetName() ||
-                    (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1))
-                    _cfg[iniSectionName] = it->second;
-            }
+            const auto iniSectionName = it->first.AsStr();
+            if (iniSectionName == GetName() ||
+                (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1))
+                _cfg[iniSectionName] = it->second;
         }
-        else if (_cfgType == LLBC_AppConfigType::Xml)
+    }
+    else if (_cfgType == LLBC_AppConfigType::Xml)
+    {
+        auto &svcCfgs = appCfg[LLBC_XMLKeys::Children];
+        for (auto &svcCfg : svcCfgs.AsSeq())
         {
-            auto &svcCfgs = appCfg[LLBC_XMLKeys::Children];
-            for (auto &svcCfg : svcCfgs.AsSeq())
-            {
-                const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].AsStr();
-                if (svcCfgName != "Service" &&
-                    svcCfgName != "service" &&
-                    svcCfgName != "Svc" &&
-                    svcCfgName != "svc")
-                    continue;
+            const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].AsStr();
+            if (svcCfgName != "Service" &&
+                svcCfgName != "service" &&
+                svcCfgName != "Svc" &&
+                svcCfgName != "svc")
+                continue;
 
-                const auto &svcCfgAttrs = svcCfg[LLBC_XMLKeys::Attrs];
-                if (svcCfgAttrs["Name"] == GetName() ||
-                    svcCfgAttrs["name"] == GetName())
-                {
-                    _cfg = svcCfg;
-                    break;
-                }
+            const auto &svcCfgAttrs = svcCfg[LLBC_XMLKeys::Attrs];
+            if (svcCfgAttrs["Name"] == GetName() ||
+                svcCfgAttrs["name"] == GetName())
+            {
+                _cfg = svcCfg;
+                break;
             }
         }
     }
