@@ -608,7 +608,8 @@ private:
     // The component Running phase.
     enum class _CompRunningPhase
     {
-        NotInit,
+        Begin,
+        NotInit = Begin,
         Inited,
         LateInited,
         Started,

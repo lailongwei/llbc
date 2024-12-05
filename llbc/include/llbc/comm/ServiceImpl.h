@@ -594,7 +594,8 @@ private:
                      bool checkSessionValidity = true);
 
 private:
-    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
+    // Component running phase.
+    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase;
 
     /**
      * Event manager added listener by stub.
@@ -621,14 +622,15 @@ private:
      * @param[in] comp  - the component.
      * @param[in] phase - the component running phase.
      */
-    void RemoveListenerStubByCompAndPhase(LLBC_Component *comp, _CompRunningPhase phase);
+    void RemoveListenerStubByCompAndPhase(LLBC_Component *comp, int phase);
 
     /**
      * Really remove listener stub.
-     * @param[in] evMgr - the event manager object.
-     * @param[in] stub  - the listener stub.
+     * @param[in] evMgr      - the event manager object.
+     * @param[in] stub       - the listener stub.
+     * @param[in] removeStub - the remove stub flag.
      */
-    void RemoveEventListenerStub(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
+    void RemoveEventListenerStub(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub, bool removeStub = true);
 
 private:
     static int _maxId; // Max service Id.

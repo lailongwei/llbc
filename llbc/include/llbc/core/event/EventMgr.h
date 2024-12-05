@@ -278,7 +278,7 @@ protected:
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
-    // Event manager hook.
+    // Event manager hooks.
     std::map<LLBC_String, LLBC_EventMgrHook *> _evMgrHooks;
 };
 
