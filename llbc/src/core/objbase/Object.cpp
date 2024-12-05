@@ -98,9 +98,7 @@ LLBC_Object *LLBC_Object::Clone() const
 
 LLBC_String LLBC_Object::ToString() const
 {
-    LLBC_String str;
-    return str.append("Object: ")
-              .append_format("%x", this);
+    return LLBC_String().format("Object[%p, ref:%d, autoRef:%d]", this, _ref, _autoRef);
 }
 
 void LLBC_Object::Serialize(LLBC_Stream &s) const
