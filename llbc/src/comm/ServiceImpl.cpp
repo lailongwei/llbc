@@ -1292,7 +1292,12 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
     _cfgType = appCfgType;
     _cfg.BecomeNil();
 
+    if (_cfgType < LLBC_AppConfigType::Begin ||
+        _cfgType >= LLBC_AppConfigType::End)
+        return;
+
     // Update service config.
+    bool isXmlCfg = false;
     if (_cfgType == LLBC_AppConfigType::Property)
     {
         // Service config prop name:
@@ -1309,13 +1314,22 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
         for (auto it = appCfg.DictBegin(); it != appCfg.DictEnd(); ++it)
         {
             const auto iniSectionName = it->first.AsStr();
-            if (iniSectionName == GetName() ||
-                (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1))
-                _cfg[iniSectionName] = it->second;
+            if (iniSectionName == GetName())
+            {
+                for (auto &iniCfgItem : it->second.AsDict())
+                    _cfg.DictInsert(iniCfgItem.first, iniCfgItem.second);
+            }
+            else if (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1)
+            {
+                auto &compCfg = _cfg[iniSectionName.substr(GetName().size() + 1)];
+                for (auto &compCfgItem : it->second.AsDict())
+                    compCfg.DictInsert(compCfgItem.first, compCfgItem.second);
+            }
         }
     }
-    else if (_cfgType == LLBC_AppConfigType::Xml)
+    else // if (_cfgType == LLBC_AppConfigType::Xml)
     {
+        isXmlCfg = true;
         auto &svcCfgs = appCfg[LLBC_XMLKeys::Children];
         for (auto &svcCfg : svcCfgs.AsSeq())
         {
@@ -1335,6 +1349,21 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
             }
         }
     }
+
+    // After config update, read recognizable service config.
+    // - Update service fps:
+    for (auto cfgItem : _cfg.AsDict())
+    {
+        if (cfgItem.first.AsStr().tolower() == "fps")
+        {
+            const auto fps = isXmlCfg ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
+            SetFPS(fps);
+            break;
+        }
+    }
+
+    // - Update other service configs.
+    // ... ...
 }
 
 void LLBC_ServiceImpl::AddServiceToTls()

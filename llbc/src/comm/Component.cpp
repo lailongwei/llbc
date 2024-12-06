@@ -364,31 +364,22 @@ void LLBC_Component::UpdateComponentCfg()
 
     // Get config type.
     _cfgType = _svc->GetConfigType();
-
     // Reset config.
     _cfg.BecomeNil();
+
+    if (_cfgType < LLBC_AppConfigType::Begin ||
+        _cfgType >= LLBC_AppConfigType::End)
+        return;
 
     // Update component config.
     auto &svcCfg = _svc->GetConfig();
     const LLBC_CString compName(LLBC_GetCompName(*this));
-    if (_cfgType == LLBC_AppConfigType::Property)
+    if (_cfgType == LLBC_AppConfigType::Property ||
+        _cfgType == LLBC_AppConfigType::Ini)
     {
-        // Component config prop name:
-        // <comp_name>
-        // <comp_name>.xxx
-        // <comp_name>.xxx.xxx
-        // <comp_name>.xxx.xxx.xxx....
         _cfg = svcCfg[compName];
     }
-    else if (_cfgType == LLBC_AppConfigType::Ini)
-    {
-        // Component config section: [<svc_name>.<comp_name>]
-        const auto compCfgKey =
-            LLBC_String().format("%s.%s", _svc->GetName().c_str(), compName.c_str());
-            const auto it = svcCfg.DictFind(compCfgKey);
-        _cfg = it != svcCfg.DictEnd() ? it->second : LLBC_Variant::nil;
-    }
-    else if (_cfgType == LLBC_AppConfigType::Xml)
+    else // if (_cfgType == LLBC_AppConfigType::Xml)
     {
         // Component config:
         // <Component/component/Comp/comp Name/name="xxx">
