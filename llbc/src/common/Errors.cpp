@@ -144,6 +144,10 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "application early start failed", // 0x0032
     // application start failed.
     "application start failed", // 0x0033
+    // timer scheduler destroying.
+    "timer scheduler destroying", // 0x0034
+    // timer scheduler canceling all.
+    "timer scheduler canceling all", // 0x0035
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;

@@ -118,7 +118,8 @@ private:
 private:
     LLBC_TimerId _maxTimerId;
     bool _enabled;
-    bool _destroyed;
+    bool _destroying;
+    bool _cancelingAll;
 
     _Heap _heap;
 };
