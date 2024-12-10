@@ -171,7 +171,7 @@ int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 peri
     auto *data = new LLBC_TimerData;
     memset(data, 0, sizeof(LLBC_TimerData));
     data->handle = LLBC_GetMilliseconds() + dueTime;
-    data->timerId = ++ _maxTimerId;
+    data->timerId = ++_maxTimerId;
     data->dueTime = dueTime;
     data->period = period;
     data->timer = timer;
