@@ -68,7 +68,7 @@ public:
     /**
      * Object reuse method.
      */
-    virtual void Reuse() = 0;
+    // virtual void Reuse() = 0;
 
 public:
     // Assignment supported(skip _typedObjPool assignment).
@@ -209,7 +209,7 @@ public:
     template <typename Obj>
     static
     typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
-    Reuse(void *mem) { reinterpret_cast<LLBC_PoolObj *>(mem)->Reuse(); }
+    Reuse(void *mem) { ReuseInl<Obj>(mem, 0); }
 
     template <typename Obj>
     static
@@ -446,6 +446,7 @@ public:
     typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
     Recycle(Obj *obj)
     {
+        LLBC_ReturnIf(obj == nullptr, void());
         if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
         {
             // add obj to gc-pool, if already do nothing
@@ -466,6 +467,7 @@ public:
     typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
     Recycle(Obj *obj)
     {
+        LLBC_ReturnIf(obj == nullptr, void());
         if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
         {
             // add obj to gc-pool, if already do nothing

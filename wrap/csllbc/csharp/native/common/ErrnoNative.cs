@@ -137,5 +137,9 @@ namespace llbc
 
         static public uint LLBC_ERROR_APP_START_FAILED       = 0xc0000033;
 
+        static public uint LLBC_ERROR_TIMER_SCHEDULER_DESTROYING= 0xc0000034;
+
+        static public uint LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL= 0xc0000035;
+
     }
 }
