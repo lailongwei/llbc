@@ -652,6 +652,27 @@ __LLBC_NS_BEGIN
 #define LLBC_ERROR_APP_START_FAILED      ((int)(0xc0000033))
 
 //
+// Message Id: LLBC_ERROR_TIMER_SCHEDULER_DESTROYING
+//
+// MessageText:
+//
+// timer scheduler destroying.
+//
+#define __LLBC_ERROR_TIMER_SCHEDULER_DESTROYING ((int)(0x00000034))
+#define LLBC_ERROR_TIMER_SCHEDULER_DESTROYING   ((int)(0xc0000034))
+
+//
+// Message Id: LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL
+//
+// MessageText:
+//
+// timer scheduler canceling all.
+//
+#define __LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL ((int)(0x00000035))
+#define LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL   ((int)(0xc0000035))
+
+
+//
 //!! Sentinel error no.
 //
 #define __LLBC_ERROR_SENTINEL            ((int)(0x000000ff))

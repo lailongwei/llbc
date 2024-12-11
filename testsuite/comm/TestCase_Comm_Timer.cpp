@@ -44,13 +44,11 @@ public:
         LLBC_Timer *rescheduleInCancelTimer = new LLBC_Timer([](LLBC_Timer *timer) {
             LLBC_PrintLn("RescheduleInCancelTimer timeout, cancel it!!!!!!");
             timer->Cancel();
-        },
-                                                             [](LLBC_Timer *timer) {
+        }, [](LLBC_Timer *timer) {
             LLBC_PrintLn("RescheduleInCancelTimer cancel, try reschedule!");
             timer->Schedule(LLBC_TimeSpan::FromSeconds(2));
         });
-        rescheduleInCancelTimer->Schedule(LLBC_TimeSpan::FromSeconds(1));
-        rescheduleInCancelTimer->Cancel();
+        rescheduleInCancelTimer->Schedule(LLBC_Time::Now() + LLBC_TimeSpan::oneSec * 5, LLBC_TimeSpan::oneSec * 10);
 
         // Timer performance test
         #ifdef LLBC_DEBUG

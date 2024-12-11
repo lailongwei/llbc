@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/time/TimeSpan.h"
+#include "llbc/core/time/Time.h"
 #include "llbc/core/utils/Util_Delegate.h"
 
 __LLBC_NS_BEGIN
@@ -153,11 +153,19 @@ public:
 public:
     /**
      * Schedule timer.
-     * @param[in] dueTime - due time, in milli-seconds.
-     * @param[in] period  - period value, in milli-seconds, if is zero, will use dueTime to schedule.
+     * @param[in] firstTime - first timeout time, must be >= LLBC_Time::Now().
+     * @param[in] period    - period time, if is zero, will use firstTime - LLBC_Time::Now().
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
+    virtual int Schedule(const LLBC_Time &firstTime, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
+
+    /**
+     * Schedule timer.
+     * @param[in] firstPeriod - first period time.
+     * @param[in] period      - period time, if is zero, wll use firstPeriod.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
 
     /**
      * Cancel this timer.
