@@ -196,7 +196,7 @@ LLBC_Time LLBC_Time::AddYears(int years) const
     newTimeStruct.tm_year += years;
     bool isLeap = IsLeapYear(GetYear());
     if (isLeap && 
-        GetMonth() == 2 && GetDay() == 29)
+        GetMonth() == 2 && GetDayOfMonth() == 29)
     {
         if (!IsLeapYear(GetYear() + years))
             newTimeStruct.tm_mday -= 1;

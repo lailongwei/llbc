@@ -121,20 +121,63 @@ public:
 
 public:
     /**
-     * Get local time parts(year, month, day, hour, minute, second, dayofweek).
-     * Notes: GetMonth() start by 1, GetDayOfWeek() start by 0(sunday), GetDayOfYear() start by 1.
-     * @return int - the specified time parts.
+     * Get year.
+     * @return int - year.
      */
     int GetYear() const;
+
+    /**
+     * Get month, started by 0.
+     * \return int - month.
+     */
     int GetMonth() const;
-    int GetDay() const;
+
+    /**
+     * Get day of week, started by 0(sunday).
+     * @return int - day of week.
+     */
     int GetDayOfWeek() const;
-    int GetDayOfMonth() const;
+
+    /**
+     * Get day of month, started by 1.
+     * @return int - day of month.
+     */
+     int GetDayOfMonth() const;
+
+    /**
+     * Get day of year, started by 0.
+     * @return int - day of year.
+     */
     int GetDayOfYear() const;
+
+    /**
+     * Get hour in day, range: [0, 23].
+     * @return int - hour in day.
+     */
     int GetHour() const;
+
+    /**
+     * Get minute in day, range: [0, 59].
+     * @return int - minute in day.
+     */
     int GetMinute() const;
+
+    /**
+     * Get second in day, range: [0, 59].
+     * @return int - second in day.
+     */
     int GetSecond() const;
+
+    /**
+     * Get milli-second in second, range: [0, 999]
+     * @return int - milli-second in second.
+     */
     int GetMillisecond() const;
+
+    /**
+     * Get micro-second in milli-second, range: [0, 999]
+     * @return int - micro-second in milli-second.
+     */
     int GetMicrosecond() const;
 
     /**
