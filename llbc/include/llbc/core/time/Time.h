@@ -29,11 +29,6 @@ class LLBC_Time;
 
 __LLBC_NS_END
 
-/**
- * Time class stream output operators previous declare.
- */
-LLBC_EXPORT std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t);
-
 __LLBC_NS_BEGIN
 
 /**
