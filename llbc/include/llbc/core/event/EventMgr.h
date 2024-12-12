@@ -33,46 +33,53 @@ __LLBC_NS_BEGIN
 /**
  * \brief The event manager class encapsulation.
  */
- class LLBC_EXPORT LLBC_EventMgrHook
- {
- public:
-     LLBC_EventMgrHook() : _evMgr(nullptr) {}
-     virtual ~LLBC_EventMgrHook() {};
+class LLBC_EXPORT LLBC_EventMgrHook
+{
+public:
+    LLBC_EventMgrHook() : _evMgr(nullptr) {}
+    virtual ~LLBC_EventMgrHook() {}
 
- public:
-     /**
-      * Event manager added a listener.
-     * @param[in] evId  - event Id.
-      * @param[in] stub - event deleg stub.
-      */
-     virtual void OnAddedListener(int evId, LLBC_ListenerStub stub) = 0;
+public:
+    /**
+     * Event manager added a listener.
+     * @param[in] evId - event Id.
+     * @param[in] stub - event deleg stub.
+     */
+    virtual void OnAddedListener(int evId, LLBC_ListenerStub stub) = 0;
 
-     /**
-      * Event manager will remove a listener.
-     * @param[in] evId  - event Id.
-      * @param[in] stub - event deleg stub.
-      */
-     virtual void OnWillRemoveListener(int evId, LLBC_ListenerStub stub) = 0;
+    /**
+     * Event manager will remove a listener.
+     * @param[in] evId - event Id.
+     * @param[in] stub - event deleg stub.
+     */
+    virtual void OnWillRemoveListener(int evId, LLBC_ListenerStub stub) = 0;
 
-     /**
-      * Event manager hook will remove.
-      */
-     virtual void OnWillRemoveEventMgrHook() = 0;
+    /**
+     * Event manager hook will remove.
+     */
+    virtual void OnWillRemoveEventMgrHook() = 0;
 
- private:
-     /**
-      * Associated event manager.
-      * @param[in] evMgr - event manager object.
-      */
-     void SetEventMgr(LLBC_EventMgr *evMgr) { _evMgr = evMgr; }
+protected:
+    /**
+     * Get event manager object.
+     * @return LLBC_EventMgr* - event manager object pointer.
+     */
+    LLBC_EventMgr* GetEventMgr() { return _evMgr ? _evMgr : nullptr; }
 
- protected:
-     LLBC_EventMgr * _evMgr; // Related event manager.
+private:
+    /**
+     * Associated event manager.
+     * @param[in] evMgr - event manager object.
+     */
+    void SetEventMgr(LLBC_EventMgr *evMgr) { _evMgr = evMgr; }
 
- private:
-     // Friend class.
-     friend class LLBC_EventMgr;
- };
+private:
+    // Friend class.
+    friend class LLBC_EventMgr;
+
+private:
+    LLBC_EventMgr *_evMgr; // Related event manager.
+};
 
 /**
  * \brief The event manager class encapsulation.

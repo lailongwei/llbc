@@ -305,7 +305,7 @@ namespace llbc
         public PacketExcHandlerAttribute(PacketHandlePhase phase)
         {
             _asDefault = true;
-            _phase = phase;
+            phase = phase;
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace llbc
         /// <param name="opcodes"></param>
         public PacketExcHandlerAttribute(PacketHandlePhase phase, params int[] opcodes)
         {
-            _phase = phase;
+            phase = phase;
             if (opcodes.Length == 0 || 
                 phase == PacketHandlePhase.UnifyPreHandle)
             {
@@ -323,7 +323,7 @@ namespace llbc
                 return;
             }
 
-            _phase = phase;
+            phase = phase;
             _opcodes = new List<int>(opcodes.Length);
             _opcodes.AddRange(opcodes);
         }
@@ -335,7 +335,7 @@ namespace llbc
         /// <param name="coders"></param>
         public PacketExcHandlerAttribute(PacketHandlePhase phase, params Type[] coders)
         {
-            _phase = phase;
+            phase = phase;
             if (coders.Length == 0 ||
                 phase == PacketHandlePhase.UnifyPreHandle)
             {
@@ -366,12 +366,12 @@ namespace llbc
 
         public PacketHandlePhase phase
         {
-            get { return _phase; }
+            get { return phase; }
         }
 
         private bool _asDefault;
         private List<int> _opcodes;
-        private PacketHandlePhase _phase;
+        private PacketHandlePhase phase;
     }
 
     /// <summary>

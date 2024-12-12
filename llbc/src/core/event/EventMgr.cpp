@@ -42,7 +42,7 @@ int LLBC_EventMgr::AddEventMgrHook(const LLBC_CString &name, LLBC_EventMgrHook *
         return LLBC_FAILED;
     }
 
-    if (!_evMgrHooks.emplace(name, hook).second)
+    if (hook->GetEventMgr() || !_evMgrHooks.emplace(name, hook).second)
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;

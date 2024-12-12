@@ -594,9 +594,6 @@ private:
                      bool checkSessionValidity = true);
 
 private:
-    // Component running phase.
-    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase;
-
     /**
      * Event manager added listener by stub.
      * @param[in] evMgr - the event manager object.
@@ -615,7 +612,7 @@ private:
      * When event manager destroy remove related stub and event manager's hook.
      * @param[in] evMgr - the event manager object.
      */
-    void OnCollaborativeEventMgrDestroy(llbc::LLBC_EventMgr *evMgr);
+    void OnWillRemoveEventMgrHook(llbc::LLBC_EventMgr *evMgr);
 
     /**
      * Remove listener stub by component and it's phase.
@@ -633,6 +630,9 @@ private:
     void RemoveEventListenerStub(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub, bool removeStub = true);
 
 private:
+    // Component running phase.
+    using _CompRunningPhase = LLBC_Component::_CompRunningPhase;
+
     static int _maxId; // Max service Id.
 
     int _id; // Service Id.
@@ -747,7 +747,7 @@ private:
 
     LLBC_ListenerStub _removingStub; // Stub who is removing.
     std::set<const LLBC_EventMgr *> _destroyingEvMgrs; // Destroying event managers.
-    std::map<const LLBC_EventMgr *, std::map<LLBC_ListenerStub, _ManagedStubInfo *> > _evMgr2StubInfos; // All stub info.
+    std::map<const LLBC_EventMgr *, std::map<LLBC_ListenerStub, _ManagedStubInfo> > _evMgr2StubInfos; // All stub info.
 
     std::map<const LLBC_Component *, std::set<const _ManagedStubInfo *> >
         _phaseCompStubInfos[static_cast<size_t>(_CompRunningPhase::End)]; // Phase for comp managed stub infos.
