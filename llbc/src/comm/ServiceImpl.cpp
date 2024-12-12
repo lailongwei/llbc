@@ -2108,7 +2108,7 @@ void LLBC_ServiceImpl::UpdateComps()
 {
     for(auto &comp : _compList)
     {
-        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+        if (comp->_runningPhase >= _CompRunningPhase::Started)
             comp->OnUpdate();
     }
 }
@@ -2117,7 +2117,7 @@ void LLBC_ServiceImpl::LateUpdateComps()
 {
     for(auto &comp : _compList)
     {
-        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+        if (comp->_runningPhase >= _CompRunningPhase::Started)
             comp->OnLateUpdate();
     }
 }
