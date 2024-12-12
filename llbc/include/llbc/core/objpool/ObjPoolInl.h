@@ -227,7 +227,7 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
            "The object is not a objpool object");
 
     // Reuse/Delete obj.
-    if (LLBC_ObjReflector::IsReusable<Obj>())
+    if constexpr (LLBC_ObjReflector::IsReusable<Obj>())
     {
         LLBC_ObjReflector::Reuse<Obj>(wrappedObj->buff);
     }
@@ -245,7 +245,7 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
     __LLBC_INL_LockObjPool();
 
     // Stat reusable object count.
-    if (LLBC_ObjReflector::IsReusable<Obj>())
+    if constexpr (LLBC_ObjReflector::IsReusable<Obj>())
         ++_reusableObjCount;
 
     // Link to stripe->freeObjs.
