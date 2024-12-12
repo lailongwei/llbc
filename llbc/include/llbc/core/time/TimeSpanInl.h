@@ -23,11 +23,6 @@
 
 #include "llbc/core/time/TimeConst.h"
 
-inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span)
-{
-    return stream <<span.ToString();
-}
-
 __LLBC_NS_BEGIN
 
 inline LLBC_TimeSpan LLBC_TimeSpan::FromDays(int days, int hours, int minutes, int seconds, int millis, int micros)
@@ -352,3 +347,9 @@ inline bool LLBC_TimeSpan::Deserialize(LLBC_Stream &stream)
 }
 
 __LLBC_NS_END
+
+inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span)
+{
+    return stream <<span.ToString();
+}
+

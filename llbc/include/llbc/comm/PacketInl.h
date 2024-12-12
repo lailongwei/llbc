@@ -651,4 +651,3 @@ inline std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Packet &pack
     return (o << packet.ToString());
 }
 
-

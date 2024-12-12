@@ -282,3 +282,9 @@ inline void LLBC_Time::FillTimeStruct()
 }
 
 __LLBC_NS_END
+
+inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
+{
+    return stream << t.ToString();
+}
+

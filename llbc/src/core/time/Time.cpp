@@ -31,11 +31,6 @@
 #pragma warning(disable:4996)
 #endif
 
-std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
-{
-    return stream << t.ToString();
-}
-
 __LLBC_INTERNAL_NS_BEGIN
 
 static constexpr LLBC_NS LLBC_TimeSpan (LLBC_NS LLBC_Time::*__g_GetTimeOfTimeCycleMeths[4])() const {
