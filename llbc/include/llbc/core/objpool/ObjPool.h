@@ -528,12 +528,6 @@ public:
 
 public:
     /**
-     * Obj cast operator impl.
-     */
-    operator Obj *() { return _obj; }
-    operator const Obj *() const { return _obj; }
-
-    /**
      * object member access operator impl.
      */
     Obj *operator->() { return _obj; }
