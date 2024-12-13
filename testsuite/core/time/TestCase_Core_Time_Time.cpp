@@ -559,6 +559,30 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
                         LLBC_Time::FromTimeStr("2023-07-23 02:00:00"),
                         LLBC_TimeSpan::zero,
                         true);
+
+    {
+        auto from = LLBC_Time::FromTimeStr("2020-12-01 23:59:59");
+        auto to = LLBC_Time::FromTimeStr("2020-12-02 00:00:00");
+
+        std::cout << "- Crossed day test:" << std::endl;
+        std::cout << "  - from: " << from << std::endl;
+        std::cout << "  - to:   " << to << std::endl;
+        auto crossDay = LLBC_Time::GetCrossedDays(from, to);
+        std::cout << "  - crossDay: " << crossDay << std::endl;
+
+        std::cout << " - Crossed day test with diff:";
+        to = LLBC_Time::FromTimeStr("2020-12-02 08:00:00");
+        std::cout << "  - from: " << from << std::endl;
+        std::cout << "  - to:   " << to << std::endl;
+        crossDay = LLBC_Time::GetCrossedDays(from, to, 8);
+        std::cout << "  - crossDay: " << crossDay << std::endl;
+
+        to = LLBC_Time::FromTimeStr("2020-12-02 07:59:59");
+        std::cout << "  - from: " << from << std::endl;
+        std::cout << "  - to:   " << to << std::endl;
+        crossDay = LLBC_Time::GetCrossedDays(from, to, 8);
+        std::cout << "  - crossDay: " << crossDay << std::endl;
+    }
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
