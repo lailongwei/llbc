@@ -341,12 +341,12 @@ public:
      * Get crossed days between from and to time.
      * @param[in] from - from time.
      * @param[in] to   - to time.
-     * @param[in] diffHours - diff hours from daily zero time.
+     * @param[in] diffHours - diff time from daily zero time.
      * @return uint32 - crossed days.
      */
     static uint32 GetCrossedDays(const LLBC_Time &from, 
                                  const LLBC_Time &to,
-                                 uint32 diffHours = 0);
+                                 const LLBC_TimeSpan &difftime = LLBC_TimeSpan::zero);
 public:
     /**
      * Time span operations.

@@ -579,23 +579,25 @@ bool LLBC_Time::IsCrossed(const LLBC_Time &from,
 
 uint32 LLBC_Time::GetCrossedDays(const LLBC_Time &from, 
                                  const LLBC_Time &to,
-                                 uint32 diffHours)
+                                 const LLBC_TimeSpan &difftime)
 {
     // If span < 0, return false.
     const LLBC_TimeSpan diff = to - from;
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
         return 0;
 
-    if (diffHours > 0) {
-        diffHours = diffHours%24;
-        auto newFrom = from - LLBC_TimeSpan::FromHours(diffHours);
-        auto newTo = to - LLBC_TimeSpan::FromHours(diffHours);
+    if (difftime != LLBC_TimeSpan::zero) 
+    {
+        auto newFrom = from - difftime;
+        auto newTo = to - difftime;
 
         auto fromZero = LLBC_Time::FromTimeParts(newFrom.GetYear(), newFrom.GetMonth(), newFrom.GetDayOfMonth(), 0, 0, 0);
         auto toZero = LLBC_Time::FromTimeParts(newTo.GetYear(), newTo.GetMonth(), newTo.GetDayOfMonth(), 0, 0, 0);
 
         return (toZero - fromZero).GetDays();
-    } else {
+    } 
+    else 
+    {
         auto fromZero = LLBC_Time::FromTimeParts(from.GetYear(), from.GetMonth(), from.GetDayOfMonth(), 0, 0, 0);
         auto toZero = LLBC_Time::FromTimeParts(to.GetYear(), to.GetMonth(), to.GetDayOfMonth(), 0, 0, 0);
 
