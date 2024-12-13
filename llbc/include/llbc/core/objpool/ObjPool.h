@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Macro.h"
 #include "llbc/core/rapidjson/json.h"
 
 // Disable some warnings.
