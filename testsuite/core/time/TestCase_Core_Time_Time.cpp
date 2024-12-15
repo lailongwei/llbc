@@ -104,7 +104,7 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     // Get Time parts test.
     std::cout <<"Now year:" <<now.GetYear() 
-        <<", month:" <<now.GetMonth() <<", day:" <<now.GetDay() <<std::endl;
+        <<", month:" <<now.GetMonth() <<", day:" <<now.GetDayOfMonth() <<std::endl;
     std::cout <<"Now hour:" <<now.GetHour() 
         <<", minute:" <<now.GetMinute() <<", second:" <<now.GetSecond() <<std::endl;
     std::cout <<"Now millisecond: " <<now.GetMillisecond() 

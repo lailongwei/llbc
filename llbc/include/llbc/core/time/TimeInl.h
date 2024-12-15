@@ -108,12 +108,7 @@ inline int LLBC_Time::GetYear() const
 
 inline int LLBC_Time::GetMonth() const
 {
-    return _localTimeStruct.tm_mon + 1; // start by 1
-}
-
-inline int LLBC_Time::GetDay() const
-{
-    return _localTimeStruct.tm_mday;
+    return _localTimeStruct.tm_mon;
 }
 
 inline int LLBC_Time::GetDayOfWeek() const
@@ -123,12 +118,12 @@ inline int LLBC_Time::GetDayOfWeek() const
 
 inline int LLBC_Time::GetDayOfMonth() const
 {
-        return GetDayOfYear() - GetMonthSpanDays(GetYear(), GetMonth() - 1);
+    return _localTimeStruct.tm_mday;
 }
 
 inline int LLBC_Time::GetDayOfYear() const
 {
-    return _localTimeStruct.tm_yday + 1; // start by 1
+    return _localTimeStruct.tm_yday;
 }
 
 inline int LLBC_Time::GetHour() const
@@ -287,3 +282,9 @@ inline void LLBC_Time::FillTimeStruct()
 }
 
 __LLBC_NS_END
+
+inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
+{
+    return stream << t.ToString();
+}
+

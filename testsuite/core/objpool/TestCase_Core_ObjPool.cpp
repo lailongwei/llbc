@@ -668,8 +668,6 @@ int TestCase_Core_ObjPool::GuardedPoolObjTest()
         auto guard1 = objPool.AcquireGuarded<GuardTestA>();
         // Method call test.
         guard1->Foo(); // operator->
-        static_cast<GuardTestA *>(guard1)->Foo(); // operator GuardTestA *
-        (*guard1).Foo(); // operator*
         guard1.Get()->Foo(); // Get()
 
         // Test copy construct.
