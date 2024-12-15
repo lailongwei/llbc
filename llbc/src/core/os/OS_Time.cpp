@@ -19,20 +19,33 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 #include "llbc/common/Export.h"
 
 #include "llbc/core/os/OS_Time.h"
+
+// Include cpu info fetch support header file.
+#if LLBC_TARGET_PLATFORM_WIN32
+#include <intrin.h>
+#elif LLBC_TARGET_PLATFORM_LINUX
+#include <cpuid.h>
+#endif
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(disable:4996)
 #endif
 
 __LLBC_INTERNAL_NS_BEGIN
+
+// timezone.
 static int __g_timezone;
+
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
+
+#if LLBC_SUPPORT_RDTSC
+LLBC_EXPORT bool __LLBC_supportedRdtscp = false;
+#endif // Supported RDTSC
 
 void LLBC_TZSet()
 {
@@ -49,6 +62,24 @@ void LLBC_TZSet()
     _tzset();
     LLBC_INTERNAL_NS __g_timezone = _timezone;
 #endif // Non-WIN32
+}
+
+void LLBC_InitTSCSupportFlags()
+{
+    // RDTSCP flag.
+#if LLBC_SUPPORT_RDTSC
+    #if LLBC_TARGET_PLATFORM_WIN32
+    int cpuInfo[4];
+    __cpuid(&cpuInfo[0], 0x80000001);
+    __LLBC_supportedRdtscp = ((d & (1 << 27)) != 0);
+    #elif LLBC_TARGET_PLATFORM_LINUX
+    uint32 a = 0, b = 0, c = 0, d = 0;
+    __get_cpuid(0x80000001, &a, &b, &c, &d);
+    __LLBC_supportedRdtscp = ((d & (1 << 27)) != 0);
+    #else // default: set to true.
+    __LLBC_supportedRdtscp = true;
+    #endif
+#endif // LLBC_SUPPORT_RDTSC
 }
 
 int LLBC_GetTimezone()
