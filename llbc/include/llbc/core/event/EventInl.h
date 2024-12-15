@@ -21,6 +21,12 @@
 
 #pragma once
 
+__LLBC_INTERNAL_NS_BEGIN
+
+static const LLBC_NS LLBC_Variant __nilVariant;
+
+__LLBC_INTERNAL_NS_END
+
 __LLBC_NS_BEGIN
 
 inline int LLBC_Event::GetId() const
@@ -43,16 +49,40 @@ inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
     _dontDelAfterFire = dontDelAfterFire;
 }
 
-template<typename KeyType>
-const LLBC_Variant &LLBC_Event::GetParam(const KeyType &key) const
+template<typename T>
+std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, const LLBC_Variant &>
+LLBC_Event::GetParams(const T &key) const
 {
-    return GetParam(LLBC_Variant(key));
+    const auto it = _stringKeyParams.find(key);
+    return it != _stringKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-template <typename KeyType, typename ParamType>
-LLBC_Event &LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
+template<typename T>
+std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, LLBC_Variant &>
+LLBC_Event::SetParam(const T &key, const LLBC_Variant &param) const
 {
-    return SetParam(LLBC_Variant(key), LLBC_Variant(param));
+    if (const auto it = _stringKeyParams.find(key); it == _stringKeyParams.end())
+        _stringKeyParams.insert(std::make_pair(key, param));
+    else
+        it->second = param;
+
+    return *this;
+}
+
+template<typename T>
+std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, LLBC_Variant &>
+LLBC_Event::operator[](const T &key)
+{
+    const auto it = _stringKeyParams.find(key);
+    return it != _stringKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;
+}
+
+template<typename T>
+std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, const LLBC_Variant &>
+LLBC_Event::operator[](const T &key) const
+{
+    const auto it = _stringKeyParams.find(key);
+    return it != _stringKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
 inline void * LLBC_Event::GetExtData() const
@@ -77,18 +107,6 @@ inline void LLBC_Event::ClearExtData()
     }
 
     _extDataClearDeleg = nullptr;
-}
-
-template<typename KeyType>
-LLBC_Variant &LLBC_Event::operator[](const KeyType &key)
-{
-    return operator[](LLBC_Variant(key));
-}
-
-template<typename KeyType>
-const LLBC_Variant &LLBC_Event::operator[](const KeyType &key) const
-{
-    return operator[](LLBC_Variant(key));
 }
 
 __LLBC_NS_END
