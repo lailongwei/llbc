@@ -71,7 +71,7 @@ void LLBC_InitTSCSupportFlags()
     #if LLBC_TARGET_PLATFORM_WIN32
     int cpuInfo[4];
     __cpuid(&cpuInfo[0], 0x80000001);
-    __LLBC_supportedRdtscp = ((d & (1 << 27)) != 0);
+    __LLBC_supportedRdtscp = ((cpuInfo[3] & (1 << 27)) != 0);
     #elif LLBC_TARGET_PLATFORM_LINUX
     uint32 a = 0, b = 0, c = 0, d = 0;
     __get_cpuid(0x80000001, &a, &b, &c, &d);

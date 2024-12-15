@@ -39,7 +39,7 @@ __LLBC_NS_BEGIN
  */
 #if LLBC_SUPPORT_RDTSC
 extern LLBC_EXPORT bool __LLBC_supportedRdtscp;
-#endif // Supported RDTSC
+#endif // LLBC_SUPPORT_RDTSC
 
 /**
  * Set timezone.
