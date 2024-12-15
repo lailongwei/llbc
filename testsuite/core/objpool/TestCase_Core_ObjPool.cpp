@@ -36,13 +36,13 @@ class DerivedCls final : public BaseCls
 public:
 };
 
-class _OD_A final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_A() override { LLBC_PrintLn("_OD_A destruct"); } };
-class _OD_B final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_B() override { LLBC_PrintLn("_OD_B destruct"); } };
-class _OD_C final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_C() override { LLBC_PrintLn("_OD_C destruct"); } };
-class _OD_D final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_D() override { LLBC_PrintLn("_OD_D destruct"); } };
-class _OD_E final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_E() override { LLBC_PrintLn("_OD_E destruct"); } };
-class _OD_F final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_F() override { LLBC_PrintLn("_OD_F destruct"); } };
-class _OD_G final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_G() override { LLBC_PrintLn("_OD_G destruct"); } };
+class _OD_A final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_A() override { LLBC_PrintLn("_OD_A destruct"); } };
+class _OD_B final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_B() override { LLBC_PrintLn("_OD_B destruct"); } };
+class _OD_C final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_C() override { LLBC_PrintLn("_OD_C destruct"); } };
+class _OD_D final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_D() override { LLBC_PrintLn("_OD_D destruct"); } };
+class _OD_E final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_E() override { LLBC_PrintLn("_OD_E destruct"); } };
+class _OD_F final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_F() override { LLBC_PrintLn("_OD_F destruct"); } };
+class _OD_G final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_G() override { LLBC_PrintLn("_OD_G destruct"); } };
 class _OD_H final : public LLBC_Object { public: ~_OD_H() override { LLBC_PrintLn("_OD_H destruct");}};
 }
 

@@ -65,11 +65,6 @@ public:
      */
     void SetTypedObjPool(void *typedObjPool) { _typedObjPool = typedObjPool; }
 
-    /**
-     * Object reuse method.
-     */
-    virtual void Reuse() = 0;
-
 public:
     // Assignment supported(skip _typedObjPool assignment).
     LLBC_PoolObj &operator=(const LLBC_PoolObj &other) { return *this; }
@@ -114,10 +109,6 @@ public:
 
 public:
     // IsReusable implement.
-    template <typename Obj>
-    static constexpr
-    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, bool>::type
-    IsReusable() { return true; }
 
     template <typename Obj>
     static constexpr
@@ -127,8 +118,7 @@ public:
 
     template <typename Obj>
     static constexpr
-    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value &&
-                            !LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
+    typename std::enable_if<!LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
                             !LLBC_IsTemplSpec<Obj, std::unordered_map>::value, bool>::type
     IsReusable() { return IsReusableInl<Obj>(0); }
 
@@ -206,10 +196,6 @@ private:
 
 public:
     // Reuse implement.
-    template <typename Obj>
-    static
-    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
-    Reuse(void *mem) { reinterpret_cast<LLBC_PoolObj *>(mem)->Reuse(); }
 
     template <typename Obj>
     static
@@ -219,8 +205,7 @@ public:
 
     template <typename Obj>
     static
-    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value &&
-                            !LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
+    typename std::enable_if<!LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
                             !LLBC_IsTemplSpec<Obj, std::unordered_map>::value, void>::type
     Reuse(void *mem) { ReuseInl<Obj>(mem, 0); }
 
@@ -446,6 +431,7 @@ public:
     typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
     Recycle(Obj *obj)
     {
+        LLBC_ReturnIf(UNLIKELY(obj == nullptr), void());
         if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
         {
             // add obj to gc-pool, if already do nothing
@@ -466,6 +452,7 @@ public:
     typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
     Recycle(Obj *obj)
     {
+        LLBC_ReturnIf(UNLIKELY(obj == nullptr), void());
         if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
         {
             // add obj to gc-pool, if already do nothing
