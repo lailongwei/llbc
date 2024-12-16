@@ -22,6 +22,8 @@
 #pragma once
 
 #include "llbc/core/rapidjson/json.h"
+#include "llbc/core/os/OS_Thread.h"
+#include "llbc/core/utils/Util_Text.h"
 
 // Disable some warnings.
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -875,6 +877,9 @@ private:
     // ReleaseObj() method offset in _WrappedTypedObjPool.
     static constexpr size_t _releaseObjMethOffset =
         offsetof(_WrappedTypedObjPool, typedObjPool) - offsetof(_WrappedTypedObjPool, ReleaseObj);
+
+    // objpool name default is 'ObjPool_<thread_id>_<safe/unsafe>_<inc-id>'
+    LLBC_String _name;
 };
 
 __LLBC_NS_END
