@@ -495,6 +495,8 @@ inline LLBC_ObjPool::LLBC_ObjPool(bool threadSafe)
 , _orderedDeleteNodes(nullptr)
 , _orderedDeleteNodeTree(nullptr)
 {
+    thread_local int id = 0;
+    _name.format("ObjPool_%d_%s_%d", LLBC_GetCurrentThreadId(), threadSafe ? "safe" : "unsafe", ++id);
     // Init lock.
     __LLBC_INL_InitObjPoolLock();
 }
@@ -566,37 +568,40 @@ inline void LLBC_ObjPool::Collect(bool deep)
     }
 }
 
-inline LLBC_String LLBC_ObjPool::GetStatistics(int statFmt, bool pretty) const
+inline LLBC_String LLBC_ObjPool::GetStatistics(int statFmt) const
 {
     // Lock & Defer unlock.
     __LLBC_INL_LockObjPool();
     LLBC_Defer(__LLBC_INL_UnlockObjPool());
 
-    // Gen CSV format stat.
-    if (statFmt == LLBC_ObjPoolStatFormat::CSV)
+    if ((statFmt & LLBC_ObjPoolStatFormat::CSV) != 0)
     {
-        // Add headline.
         LLBC_String stat;
-        stat.append("name;reusable;"
-                    "obj_size;wrapped_obj_size;obj_count;"
-                    "using_obj_count;using_obj_rate;"
-                    "reusable_obj_count;reusable_obj_rate;"
-                    "free_obj_count;free_obj_rate;"
-                    "stripe_size;obj_count_per_stripe;stripe_count;"
-                    "using_mem;reusable_mem;free_mem;total_mem;total_mem2");
+        if ((statFmt & LLBC_ObjPoolStatFormat::CSVWithoutHead) >> 1 != 0)
+        {
+            // Add headline 
+            stat.append("pool_name;name;reusable;"
+                        "obj_size;wrapped_obj_size;obj_count;"
+                        "using_obj_count;using_obj_rate;"
+                        "reusable_obj_count;reusable_obj_rate;"
+                        "free_obj_count;free_obj_rate;"
+                        "stripe_size;obj_count_per_stripe;stripe_count;"
+                        "using_mem;reusable_mem;free_mem;total_mem;total_mem2");
+        }
 
-        // Add typed object pools stat.
+         // Add typed object pools stat.
         LLBC_Json::Document jsonDoc;
         for (auto &typedObjPoolItem : _typedObjPools)
         {
             auto &wrappedTypedObjPool = typedObjPoolItem.second;
             auto typedObjPoolStat = wrappedTypedObjPool->GetStatistics(wrappedTypedObjPool->typedObjPool,
                                                                        jsonDoc.GetAllocator());
-            stat.append_format("\n%s;%d;"
+            stat.append_format("\n%s;%s;%d;"
                                "%u;%u;%u;%u;%.3f;%u;%.3f;%u;%.3f;"
                                "%u;%u;%u;"
                                "%u;%u;%u;%u;%u",
                                // Meta info:
+                               _name.c_str(),
                                typedObjPoolStat["name"].GetString(),
                                typedObjPoolStat["reusable"].GetBool(),
                                // Object info:
@@ -641,7 +646,7 @@ inline LLBC_String LLBC_ObjPool::GetStatistics(int statFmt, bool pretty) const
 
         // Format.
         LLBC_Json::StringBuffer jsonSB;
-        if (pretty)
+        if ((statFmt & LLBC_ObjPoolStatFormat::PrettyJson) != 0)
         {
             LLBC_Json::PrettyWriter<LLBC_Json::StringBuffer> jsonWritter(jsonSB);
             jsonDoc.Accept(jsonWritter);
@@ -985,6 +990,16 @@ inline void LLBC_ObjPool::OperateOneOrderedDeleteNode(_OrderedDeleteNode *ordere
         OperateOneOrderedDeleteNode(item.second, isCollect, deepCollect);
 }
 
+
+inline void LLBC_ObjPool::SetName(const LLBC_CString& poolName)
+{
+    _name = poolName;
+}
+
+inline LLBC_CString LLBC_ObjPool::GetName() const
+{
+    return _name;
+}
 __LLBC_NS_END
 
 #undef __LLBC_INL_InitObjPoolLock

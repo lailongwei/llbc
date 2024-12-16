@@ -446,7 +446,7 @@ int TestCase_Core_ObjPool::MultiThreadThread()
         void Cleanup() override
         {
             LLBC_PrintLn("All threads test finished, objPool stat:\n%s",
-                         _objPool.GetStatistics(LLBC_ObjPoolStatFormat::Json, true).c_str());
+                         _objPool.GetStatistics(LLBC_ObjPoolStatFormat::PrettyJson).c_str());
         }
 
     public:

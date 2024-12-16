@@ -22,6 +22,8 @@
 #pragma once
 
 #include "llbc/core/rapidjson/json.h"
+#include "llbc/core/os/OS_Thread.h"
+#include "llbc/core/utils/Util_Text.h"
 
 // Disable some warnings.
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -492,8 +494,10 @@ class LLBC_ObjPoolStatFormat
 public:
     enum ENUM
     {
-        Json,
-        CSV,
+        Json = 0,
+        PrettyJson,
+        CSV = 2,
+        CSVWithoutHead,
     };
 };
 
@@ -759,8 +763,7 @@ public:
      * @param[in] pretty  - pretty flag.
      * @return LLBC_String - the object pool statistics.
      */
-    LLBC_String GetStatistics(int statFmt = LLBC_ObjPoolStatFormat::CSV,
-                              bool pretty = false) const;
+    LLBC_String GetStatistics(int statFmt = LLBC_ObjPoolStatFormat::CSV) const;
 
     /**
      * Ensure <ObjA> deletion before <ObjB>.
@@ -777,6 +780,18 @@ public:
      * @return LLBC_String - the ensure deletion tree.
      */
     LLBC_String GetOrderedDeleteTree(bool pretty = false) const;
+
+     /**
+     * Set name for objPool
+     * @param[in] poolName - the name of this objPool.
+     */
+    void SetName(const LLBC_CString& poolName);
+
+    /**
+     * Get name of objPool
+     * @return LLBC_CString - the name of this objPool.
+     */
+    LLBC_CString GetName() const;
 
 private:
     // The wrapped TypedObjPool structure encapsulation.
@@ -857,6 +872,9 @@ private:
     // ReleaseObj() method offset in _WrappedTypedObjPool.
     static constexpr size_t _releaseObjMethOffset =
         offsetof(_WrappedTypedObjPool, typedObjPool) - offsetof(_WrappedTypedObjPool, ReleaseObj);
+
+    // objpool name default is 'ObjPool_<thread_id>_<safe/unsafe>_<inc-id>'
+    LLBC_String _name;
 };
 
 __LLBC_NS_END
