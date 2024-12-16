@@ -74,9 +74,9 @@ public:
      * @param[in] key - the std::string key.
      * @return const LLBC_Variant & - the event param.
      */
-    template<typename T>
-    std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, const LLBC_Variant &>
-    GetParams(const T &key) const;
+    template<typename KeyType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
+    GetParams(const KeyType &key) const;
 
     /**
      * Get LLBC_Variant key indexed event param.
@@ -91,7 +91,16 @@ public:
      * @param[in] param - the param.
      * @return LLBC_Event & - this reference.
      */
-    LLBC_Event &SetParam(const LLBC_CString &key, const LLBC_Variant &param);
+    void SetParam(const LLBC_CString &key, const LLBC_Variant &param);
+
+    /**
+     * Set LLBC_CString key indexed event param(template version).
+     * @param[in] key   - the param key.
+     * @param[in] param - the param.
+     * @return LLBC_Event & - this reference.
+     */
+    template <typename ParamType>
+    void SetParam(const LLBC_CString &key, const ParamType &param);
 
     /**
      * Set std::string key indexed event param.
@@ -99,9 +108,13 @@ public:
      * @param[in] param - the param.
      * @return LLBC_Event & - this reference.
      */
-    template<typename T>
-    std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, LLBC_Variant &>
-    SetParam(const T &key, const LLBC_Variant &param) const;
+    template<typename KeyType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
+    SetParam(const KeyType &key, const LLBC_Variant &param);
+
+    template<typename KeyType, typename ParamType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
+    SetParam(const KeyType &key, const ParamType &param);
 
     /**
      * Set int key indexed event param.
@@ -109,7 +122,16 @@ public:
      * @param[in] param - the param.
      * @return LLBC_Event & - this reference.
      */
-    LLBC_Event &SetParam(const int &key, const LLBC_Variant &param);
+    void SetParam(const int &key, const LLBC_Variant &param);
+
+    /**
+     * Set int key indexed event param(template version).
+     * @param[in] key   - the param key.
+     * @param[in] param - the param.
+     * @return LLBC_Event & - this reference.
+     */
+    template <typename ParamType>
+    void SetParam(const int &key, const ParamType &param);
 
 public:
     /**
@@ -147,12 +169,6 @@ public:
      * @return std::map<int, LLBC_Variant> & - the int key indexed params mutable reference.
      */
     std::map<int, LLBC_Variant> &GetMutableIntKeyParams();
-
-    /**
-     * Get all variant key indexed params.
-     * @return const std::map<LLBC_Variant, LLBC_Variant> & - the variant key indexed params const reference.
-     */
-    const std::map<LLBC_Variant, LLBC_Variant> &GetParams() const;
 
     /**
      * Get all variant key indexed params(mutable).
@@ -194,12 +210,12 @@ public:
     LLBC_Variant &operator[](const LLBC_CString &key);
     const LLBC_Variant &operator[](const LLBC_CString &key) const;
 
-    template<typename T>
-    std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, LLBC_Variant &>
-    operator[](const T &key);
-    template<typename T>
-    std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, const LLBC_Variant &>
-    operator[](const T &key) const;
+    template<typename KeyType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, LLBC_Variant &>
+    operator[](const KeyType &key);
+    template<typename KeyType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
+    operator[](const KeyType &key) const;
 
     LLBC_Variant &operator[](const int &key);
     const LLBC_Variant &operator[](const int &key) const;

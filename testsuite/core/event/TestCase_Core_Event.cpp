@@ -66,10 +66,6 @@ int TestCase_Core_Event::BasicTest()
         LLBC_PrintLn("- Fire Event2...");
         evMgr.BeginFire(EventIds::Event2)
             .SetParam("Event2_Key1", "The value")
-            .SetParam(false, true)
-            .SetParam(1.3, 2.6)
-            .SetParam(std::vector<int>{}, LLBC_Variant::nil)
-            .SetParam(std::set<LLBC_String>{}, LLBC_Variant::nil)
             .Fire();
     });
 
@@ -128,13 +124,15 @@ int TestCase_Core_Event::BasicTest()
         // Fire Event1 again.
         LLBC_PrintLn("- Fire Event1 again..");
         evMgr.BeginFire(EventIds::Event1)
-            .Fire();
+             .Fire();
         LLBC_PrintLn("- Fire Event1 finished");
     });
 
     // Fire Event1.
     LLBC_PrintLn("Fire Event1...");
     evMgr.BeginFire(EventIds::Event1)
+        .SetParam("cstring", "cstring: hello world")
+        .SetParam(std::string("string"), "string: hello world")
         .SetParam("Event1_Key1", LLBC_Rand())
         .Fire();
 
@@ -196,7 +194,12 @@ int TestCase_Core_Event::InfiniteEventFireTest()
 
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
-    const auto &params = ev.GetParams();
-    for(const auto &[key, value] : params)
-        LLBC_PrintLn("- %s: %s", key.ValueToString().c_str(), value.ToString().c_str());
+    for(const auto &[key, value] : ev.GetCStringKeyParams())
+        LLBC_PrintLn("CString key params - key: %s, value: %s", key.c_str(), value.ToString().c_str());
+
+    for(const auto &[key, value] : ev.GetStringKeyParams())
+        LLBC_PrintLn("String key params - key: %s, value: %s", key.c_str(), value.ToString().c_str());
+
+    for(const auto &[key, value] : ev.GetIntKeyParams())
+        LLBC_PrintLn("Int key params - key:%d: value:%s", key, value.ToString().c_str());
 }

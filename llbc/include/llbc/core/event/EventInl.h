@@ -49,37 +49,54 @@ inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
     _dontDelAfterFire = dontDelAfterFire;
 }
 
-template<typename T>
-std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, const LLBC_Variant &>
-LLBC_Event::GetParams(const T &key) const
+template<typename KeyType>
+std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
+LLBC_Event::GetParams(const KeyType &key) const
 {
     const auto it = _stringKeyParams.find(key);
     return it != _stringKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-template<typename T>
-std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, LLBC_Variant &>
-LLBC_Event::SetParam(const T &key, const LLBC_Variant &param) const
+template<typename KeyType>
+std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
+LLBC_Event::SetParam(const KeyType &key, const LLBC_Variant &param)
 {
     if (const auto it = _stringKeyParams.find(key); it == _stringKeyParams.end())
         _stringKeyParams.insert(std::make_pair(key, param));
     else
         it->second = param;
-
-    return *this;
 }
 
-template<typename T>
-std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, LLBC_Variant &>
-LLBC_Event::operator[](const T &key)
+template <typename ParamType>
+void LLBC_Event::SetParam(const LLBC_CString &key, const ParamType &param)
+{
+    return SetParam(key, LLBC_Variant(param));
+}
+
+template<typename KeyType, typename ParamType>
+std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
+LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
+{
+    return SetParam(key, LLBC_Variant(param));
+}
+
+template <typename ParamType>
+void LLBC_Event::SetParam(const int &key, const ParamType &param)
+{
+    return SetParam(key, LLBC_Variant(param));
+}
+
+template<typename KeyType>
+std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, LLBC_Variant &>
+LLBC_Event::operator[](const KeyType &key)
 {
     const auto it = _stringKeyParams.find(key);
     return it != _stringKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-template<typename T>
-std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value, const LLBC_Variant &>
-LLBC_Event::operator[](const T &key) const
+template<typename KeyType>
+std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
+LLBC_Event::operator[](const KeyType &key) const
 {
     const auto it = _stringKeyParams.find(key);
     return it != _stringKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;

@@ -53,24 +53,20 @@ const LLBC_Variant &LLBC_Event::GetParams(const int &key) const
     return it != _intKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-LLBC_Event & LLBC_Event::SetParam(const LLBC_CString &key, const LLBC_Variant &param)
+void LLBC_Event::SetParam(const LLBC_CString &key, const LLBC_Variant &param)
 {
     if (const auto it = _cStringKeyParams.find(key); it == _cStringKeyParams.end())
         _cStringKeyParams.insert(std::make_pair(key, param));
     else
         it->second = param;
-
-    return *this;
 }
 
-LLBC_Event & LLBC_Event::SetParam(const int &key, const LLBC_Variant &param)
+void LLBC_Event::SetParam(const int &key, const LLBC_Variant &param)
 {
     if (const auto it = _intKeyParams.find(key); it == _intKeyParams.end())
         _intKeyParams.insert(std::make_pair(key, param));
     else
         it->second = param;
-
-    return *this;
 }
 
 const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetCStringKeyParams() const
@@ -83,12 +79,12 @@ std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableCStringKeyParams()
     return _cStringKeyParams;
 }
 
-const std::map<std::string, LLBC_Variant> & LLBC_Event::GetStringKeyParams() const
+const std::map<std::string, LLBC_Variant> &LLBC_Event::GetStringKeyParams() const
 {
     return _stringKeyParams;
 }
 
-std::map<std::string, LLBC_Variant> & LLBC_Event::GetMutableStringKeyParams()
+std::map<std::string, LLBC_Variant> &LLBC_Event::GetMutableStringKeyParams()
 {
     return _stringKeyParams;
 }
@@ -112,25 +108,25 @@ LLBC_Event * LLBC_Event::Clone() const
     return clone;
 }
 
-LLBC_Variant & LLBC_Event::operator[](const LLBC_CString &key)
+LLBC_Variant &LLBC_Event::operator[](const LLBC_CString &key)
 {
     const auto it = _cStringKeyParams.find(key);
     return it == _cStringKeyParams.end() ? _cStringKeyParams.insert(std::make_pair(key, LLBC_Variant())).first->second : it->second;
 }
 
-const LLBC_Variant & LLBC_Event::operator[](const LLBC_CString &key) const
+const LLBC_Variant &LLBC_Event::operator[](const LLBC_CString &key) const
 {
     const auto it = _cStringKeyParams.find(key);
     return it != _cStringKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-LLBC_Variant & LLBC_Event::operator[](const int &key)
+LLBC_Variant &LLBC_Event::operator[](const int &key)
 {
     const auto it = _intKeyParams.find(key);
     return it == _intKeyParams.end() ? _intKeyParams.insert(std::make_pair(key, LLBC_Variant())).first->second : it->second;
 }
 
-const LLBC_Variant & LLBC_Event::operator[](const int &key) const
+const LLBC_Variant &LLBC_Event::operator[](const int &key) const
 {
     const auto it = _intKeyParams.find(key);
     return it != _intKeyParams.end() ? it->second : LLBC_INL_NS __nilVariant;
