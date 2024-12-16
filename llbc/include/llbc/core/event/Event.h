@@ -67,7 +67,7 @@ public:
      * @param[in] key - the LLBC_CString key.
      * @return const LLBC_Variant & - the event param.
      */
-    const LLBC_Variant &GetParams(const LLBC_CString &key) const;
+    const LLBC_Variant &GetParam(const LLBC_CString &key) const;
 
     /**
      * Get LLBC_Variant key indexed event param.
@@ -76,14 +76,7 @@ public:
      */
     template<typename KeyType>
     std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
-    GetParams(const KeyType &key) const;
-
-    /**
-     * Get LLBC_Variant key indexed event param.
-     * @param[in] key - the int key.
-     * @return const LLBC_Variant & - the event param.
-     */
-    const LLBC_Variant &GetParams(const int &key) const;
+    GetParam(const KeyType &key) const;
 
     /**
      * Set LLBC_CString key indexed event param.
@@ -116,65 +109,18 @@ public:
     std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
     SetParam(const KeyType &key, const ParamType &param);
 
-    /**
-     * Set int key indexed event param.
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    void SetParam(const int &key, const LLBC_Variant &param);
-
-    /**
-     * Set int key indexed event param(template version).
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    template <typename ParamType>
-    void SetParam(const int &key, const ParamType &param);
-
 public:
     /**
-     * Get all LLBC_CString key indexed params.
+     * Get all key indexed params.
      * @return const std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params const reference.
      */
-    const std::map<LLBC_CString, LLBC_Variant> &GetCStringKeyParams() const;
+    const std::map<LLBC_CString, LLBC_Variant> &GetParams() const;
 
     /**
-     * Get all LLBC_CString key indexed params(mutable).
+     * Get all key indexed params(mutable).
      * @return std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params mutable reference.
      */
-    std::map<LLBC_CString, LLBC_Variant> &GetMutableCStringKeyParams();
-
-    /**
-    * Get all std::string key indexed params.
-    * @return const std::map<std::string, LLBC_Variant> & - the std::string key indexed params const reference.
-    */
-    const std::map<std::string, LLBC_Variant> &GetStringKeyParams() const;
-
-    /**
-    * Get all std::string key indexed params(mutable).
-    * @return std::map<std::string, LLBC_Variant> & - the std::string key indexed params mutable reference.
-    */
-    std::map<std::string, LLBC_Variant> &GetMutableStringKeyParams();
-
-    /**
-     * Get all int key indexed params.
-     * @return const std::map<int, LLBC_Variant> & - the int key indexed params const reference.
-     */
-    const std::map<int, LLBC_Variant> &GetIntKeyParams() const;
-
-    /**
-     * Get all int key indexed params(mutable).
-     * @return std::map<int, LLBC_Variant> & - the int key indexed params mutable reference.
-     */
-    std::map<int, LLBC_Variant> &GetMutableIntKeyParams();
-
-    /**
-     * Get all variant key indexed params(mutable).
-     * @return std::map<LLBC_Variant, LLBC_Variant> & - the variant key indexed params mutable reference.
-     */
-    std::map<LLBC_Variant, LLBC_Variant> &GetMutableParams();
+    std::map<LLBC_CString, LLBC_Variant> &GetMutableParams();
 
     /**
      * Clone event.
@@ -235,9 +181,7 @@ protected:
     int _id;
     bool _dontDelAfterFire;
 
-    std::map<LLBC_CString, LLBC_Variant> _cStringKeyParams;
-    std::map<std::string, LLBC_Variant> _stringKeyParams;
-    std::map<int, LLBC_Variant> _intKeyParams;
+    std::map<LLBC_CString, LLBC_Variant> _params;
 
     void *_extData;
     LLBC_Delegate<void(void *)> _extDataClearDeleg;

@@ -194,12 +194,6 @@ int TestCase_Core_Event::InfiniteEventFireTest()
 
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
-    for(const auto &[key, value] : ev.GetCStringKeyParams())
-        LLBC_PrintLn("CString key params - key: %s, value: %s", key.c_str(), value.ToString().c_str());
-
-    for(const auto &[key, value] : ev.GetStringKeyParams())
-        LLBC_PrintLn("String key params - key: %s, value: %s", key.c_str(), value.ToString().c_str());
-
-    for(const auto &[key, value] : ev.GetIntKeyParams())
-        LLBC_PrintLn("Int key params - key:%d: value:%s", key, value.ToString().c_str());
+    for(const auto &[key, value] : ev.GetParams())
+        LLBC_PrintLn("key params - key: %s, value: %s", key.c_str(), value.ToString().c_str());
 }

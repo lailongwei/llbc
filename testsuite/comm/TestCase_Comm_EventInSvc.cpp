@@ -131,7 +131,7 @@ public:
     void HandleEvent3(LLBC_Event &_)
     {
         TestEvent &ev = static_cast<TestEvent &>(_);
-        std::cout << "handle event 3, data: " << ev.GetParams("aa") << std::endl;
+        std::cout << "handle event 3, data: " << ev.GetParam("aa") << std::endl;
         GetService()->UnsubscribeEvent(_ev3HandlerStub); 
     }
 
