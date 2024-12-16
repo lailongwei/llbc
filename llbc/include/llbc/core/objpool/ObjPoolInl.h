@@ -577,7 +577,7 @@ inline LLBC_String LLBC_ObjPool::GetStatistics(int statFmt) const
     if ((statFmt & LLBC_ObjPoolStatFormat::CSV) != 0)
     {
         LLBC_String stat;
-        if ((statFmt & LLBC_ObjPoolStatFormat::CSVWithoutHead) >> 1 != 0)
+        if (statFmt != LLBC_ObjPoolStatFormat::CSVWithoutHead)
         {
             // Add headline 
             stat.append("pool_name;name;reusable;"
@@ -646,7 +646,7 @@ inline LLBC_String LLBC_ObjPool::GetStatistics(int statFmt) const
 
         // Format.
         LLBC_Json::StringBuffer jsonSB;
-        if ((statFmt & LLBC_ObjPoolStatFormat::PrettyJson) != 0)
+        if (statFmt == LLBC_ObjPoolStatFormat::PrettyJson)
         {
             LLBC_Json::PrettyWriter<LLBC_Json::StringBuffer> jsonWritter(jsonSB);
             jsonDoc.Accept(jsonWritter);
