@@ -389,6 +389,14 @@ public:
 
 public:
     /**
+     * Add collaborative event mgr.
+     * @param[in] evMgr - event mgr object.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddCollaborativeEventMgr(LLBC_EventMgr *evMgr) override;
+
+public:
+    /**
      * Post lazy task to service.
      * @param[in] runnable - the runnable obj.
      * @return int - return 0 if success, otherwise return -1.
@@ -586,6 +594,45 @@ private:
                      bool checkSessionValidity = true);
 
 private:
+    /**
+     * Event manager added listener by stub.
+     * @param[in] evMgr - the event manager object.
+     * @param[in] stub  - the listener stub.
+     */
+    void OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
+
+    /**
+     * Event manager will remove listener by stub.
+     * @param[in] evMgr - the event manager object.
+     * @param[in] stub  - the listener stub.
+     */
+    void OnEventMgrWillRemoveListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub);
+
+    /**
+     * When event manager destroy remove related stub and event manager's hook.
+     * @param[in] evMgr - the event manager object.
+     */
+    void OnWillRemoveEventMgrHook(llbc::LLBC_EventMgr *evMgr);
+
+    /**
+     * Remove listener stub by component and it's phase.
+     * @param[in] comp  - the component.
+     * @param[in] phase - the component running phase.
+     */
+    void RemoveListenerStubByCompAndPhase(LLBC_Component *comp, int phase);
+
+    /**
+     * Really remove listener stub.
+     * @param[in] evMgr      - the event manager object.
+     * @param[in] stub       - the listener stub.
+     * @param[in] removeStub - the remove stub flag.
+     */
+    void RemoveEventListenerStub(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub, bool removeStub = true);
+
+private:
+    // Component running phase.
+    using _CompRunningPhase = LLBC_Component::_CompRunningPhase;
+
     static int _maxId; // Max service Id.
 
     int _id; // Service Id.
@@ -617,7 +664,9 @@ private:
     bool _suppressedCoderNotFoundWarning; // Suppress coder not found warning flag.
     LLBC_IProtocolFactory *_dftProtocolFactory; // Default protocol factory.
     std::map<int, LLBC_IProtocolFactory *> _sessionProtoFactory; // Specific protocol factory.
-    class _ReadySessionInfo // Ready session information.
+
+    // Ready session information.
+    class _ReadySessionInfo
     {
     public:
         int sessionId;
@@ -632,6 +681,7 @@ private:
                           LLBC_ProtocolStack *codecStack = nullptr);
         ~_ReadySessionInfo();
     };
+
     std::map<int, _ReadySessionInfo *> _readySessionInfos; // Ready sessions set.
     mutable LLBC_SpinLock _readySessionInfosLock; // Ready session set lock.
 
@@ -642,11 +692,11 @@ private:
 
 private:
     // Components about members.
-    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
     std::list<LLBC_Component *> _willRegComps; // Will register component list.
     std::vector<LLBC_Component *> _compList; // Component list.
     std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
     std::map<LLBC_String, LLBC_Library *> _compLibraries; // Component libraries(if is dynamic load component).
+    LLBC_Component * _curPreparingComp; // Current preparing component.
 
     // Coder & Handler about members.
     std::map<int, LLBC_CoderFactory *> _coderFactories; // Coder Factories.
@@ -678,6 +728,29 @@ private:
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
     std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
+
+    // Managed event listener stub info.
+    class _ManagedStubInfo
+    {
+    public:
+        int phase;
+        LLBC_Component * const comp;
+        LLBC_EventMgr * const evMgr;
+        LLBC_ListenerStub stub;
+
+    public:
+        _ManagedStubInfo(int phase,
+                         LLBC_Component *comp,
+                         LLBC_EventMgr *evMgr,
+                         LLBC_ListenerStub &stub);
+    };
+
+    LLBC_ListenerStub _removingStub; // Stub who is removing.
+    std::set<const LLBC_EventMgr *> _destroyingEvMgrs; // Destroying event managers.
+    std::map<const LLBC_EventMgr *, std::map<LLBC_ListenerStub, _ManagedStubInfo> > _evMgr2StubInfos; // All stub info.
+
+    std::map<const LLBC_Component *, std::set<const _ManagedStubInfo *> >
+        _phaseCompStubInfos[static_cast<size_t>(_CompRunningPhase::End)]; // Phase for comp managed stub infos.
 };
 
 __LLBC_NS_END
