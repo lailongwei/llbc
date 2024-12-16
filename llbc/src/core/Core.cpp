@@ -43,6 +43,8 @@ int __LLBC_CoreStartup()
 
     // Set timezone.
     LLBC_TZSet();
+    // Init TSC support flags.
+    LLBC_InitTSCSupportFlags();
     // initialize performance frequency.
     LLBC_Stopwatch::InitFrequency();
     // Set entry thread timer scheduler.
