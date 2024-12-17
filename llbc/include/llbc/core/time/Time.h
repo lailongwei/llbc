@@ -336,6 +336,17 @@ public:
                               const LLBC_Time &to,
                               const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
 
+
+    /**
+     * Get crossed days between from and to time.
+     * @param[in] from - from time.
+     * @param[in] to   - to time.
+     * @param[in] diffHours - diff time from daily zero time.
+     * @return uint32 - crossed days.
+     */
+    static uint32 GetCrossedDays(const LLBC_Time &from, 
+                                 const LLBC_Time &to,
+                                 const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
 public:
     /**
      * Time span operations.
@@ -403,6 +414,11 @@ private:
                           const LLBC_Time &to,
                           const LLBC_TimeSpan &timeCycle,
                           LLBC_TimeSpan timeOfTimeCycle);
+
+    static LLBC_TimeSpan GetCrossTime(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeCycle,
+                                      LLBC_TimeSpan timeOfTimeCycle);
 
 private:
     sint64 _time;
