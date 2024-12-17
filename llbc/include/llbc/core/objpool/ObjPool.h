@@ -497,7 +497,6 @@ public:
     {
         Json = 0x00,
         PrettyJson = 0x01,
-
         CSV = 0x10,
         CSVWithoutHead = 0x11,
     };
@@ -878,7 +877,7 @@ private:
     static constexpr size_t _releaseObjMethOffset =
         offsetof(_WrappedTypedObjPool, typedObjPool) - offsetof(_WrappedTypedObjPool, ReleaseObj);
 
-    // objpool name default is 'ObjPool_<thread_id>_<safe/unsafe>_<inc-id>'
+    // Objpool name, default is 'ObjPool_<thread_id>_<safe/unsafe>_<inc-id>'
     LLBC_String _name;
 };
 
