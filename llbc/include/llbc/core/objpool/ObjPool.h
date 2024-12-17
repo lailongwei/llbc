@@ -492,12 +492,13 @@ private:
 class LLBC_ObjPoolStatFormat
 {
 public:
+    // Use 4~7 bits as format type, 0~3 bits as specified type
     enum ENUM
     {
-        Json = 0,
-        PrettyJson,
-        CSV = 2,
-        CSVWithoutHead,
+        Json = 0x00,
+        PrettyJson = 0x01,
+        CSV = 0x10,
+        CSVWithoutHead = 0x11,
     };
 };
 
@@ -785,13 +786,13 @@ public:
      * Set name for objPool
      * @param[in] poolName - the name of this objPool.
      */
-    void SetName(const LLBC_CString& poolName);
+    void SetName(const LLBC_CString &poolName);
 
     /**
      * Get name of objPool
      * @return LLBC_CString - the name of this objPool.
      */
-    LLBC_CString GetName() const;
+    LLBC_String GetName() const;
 
 private:
     // The wrapped TypedObjPool structure encapsulation.
@@ -873,7 +874,7 @@ private:
     static constexpr size_t _releaseObjMethOffset =
         offsetof(_WrappedTypedObjPool, typedObjPool) - offsetof(_WrappedTypedObjPool, ReleaseObj);
 
-    // objpool name default is 'ObjPool_<thread_id>_<safe/unsafe>_<inc-id>'
+    // Objpool name, default is 'ObjPool_<thread_id>_<safe/unsafe>_<inc-id>'
     LLBC_String _name;
 };
 
