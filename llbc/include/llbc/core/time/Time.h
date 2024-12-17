@@ -346,7 +346,7 @@ public:
      */
     static uint32 GetCrossedDays(const LLBC_Time &from, 
                                  const LLBC_Time &to,
-                                 const LLBC_TimeSpan &difftime = LLBC_TimeSpan::zero);
+                                 const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
 public:
     /**
      * Time span operations.
@@ -414,6 +414,11 @@ private:
                           const LLBC_Time &to,
                           const LLBC_TimeSpan &timeCycle,
                           LLBC_TimeSpan timeOfTimeCycle);
+
+    static LLBC_TimeSpan GetCrossTime(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeCycle,
+                                      LLBC_TimeSpan timeOfTimeCycle);
 
 private:
     sint64 _time;

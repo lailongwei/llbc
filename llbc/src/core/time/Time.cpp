@@ -579,30 +579,74 @@ bool LLBC_Time::IsCrossed(const LLBC_Time &from,
 
 uint32 LLBC_Time::GetCrossedDays(const LLBC_Time &from, 
                                  const LLBC_Time &to,
-                                 const LLBC_TimeSpan &difftime)
+                                 const LLBC_TimeSpan &timeOfDay)
+{
+    return GetCrossTime(from, to, LLBC_TimeSpan::oneDay, timeOfDay).GetDays(); 
+}
+
+LLBC_TimeSpan LLBC_Time::GetCrossTime(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeCycle,
+                                      LLBC_TimeSpan timeOfTimeCycle)
 {
     // If span < 0, return false.
     const LLBC_TimeSpan diff = to - from;
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
-        return 0;
+        return LLBC_TimeSpan::zero;
 
-    if (difftime != LLBC_TimeSpan::zero) 
+    auto newFrom = from - timeOfTimeCycle;
+    auto newTo = to - timeOfTimeCycle;
+
+    int fromHour = 0, fromMinute = 0, toHour = 0, toMinute = 0;
+    if (timeCycle == LLBC_TimeSpan::oneMin)
     {
-        auto newFrom = from - difftime;
-        auto newTo = to - difftime;
+        fromHour = newFrom.GetHour();
+        fromMinute = newFrom.GetMinute();
+        toHour  = newTo.GetHour();
+        toMinute = newTo.GetMinute();
+    }
+    else if (timeCycle == LLBC_TimeSpan::oneHour)
+    {
+        fromHour = newFrom.GetHour();
+        toHour  = newTo.GetHour();
+    }
+    else if (timeCycle == LLBC_TimeSpan::oneDay)
+    {
+        // nothing
+    }
+    else if (timeCycle == LLBC_TimeSpan::oneWeek)
+    {
+        auto fromDayOfWeek = newFrom.GetDayOfWeek();
+        if (fromDayOfWeek == 0)
+            fromDayOfWeek = 7;
 
-        auto fromZero = LLBC_Time::FromTimeParts(newFrom.GetYear(), newFrom.GetMonth(), newFrom.GetDayOfMonth(), 0, 0, 0);
-        auto toZero = LLBC_Time::FromTimeParts(newTo.GetYear(), newTo.GetMonth(), newTo.GetDayOfMonth(), 0, 0, 0);
+        auto toDayOfWeek = newTo.GetDayOfWeek();
+        if (toDayOfWeek == 0)
+            toDayOfWeek = 7;
 
-        return (toZero - fromZero).GetDays();
-    } 
+        newFrom = newFrom - LLBC_TimeSpan::oneDay*fromDayOfWeek;
+        newTo = newTo - LLBC_TimeSpan::oneDay*toDayOfWeek;
+    }
     else 
     {
-        auto fromZero = LLBC_Time::FromTimeParts(from.GetYear(), from.GetMonth(), from.GetDayOfMonth(), 0, 0, 0);
-        auto toZero = LLBC_Time::FromTimeParts(to.GetYear(), to.GetMonth(), to.GetDayOfMonth(), 0, 0, 0);
-
-        return (toZero - fromZero).GetDays();
+        ASSERT(false && "unsupported time cycle");
+        return LLBC_TimeSpan::zero;
     }
+
+    auto fromZero = LLBC_Time::FromTimeParts(newFrom.GetYear(), 
+                                             newFrom.GetMonth(), 
+                                             newFrom.GetDayOfMonth(),
+                                             fromHour,
+                                             fromMinute,
+                                             0);
+
+    auto toZero = LLBC_Time::FromTimeParts(newTo.GetYear(), 
+                                           newTo.GetMonth(), 
+                                           newTo.GetDayOfMonth(),
+                                           toHour,
+                                           toMinute,
+                                           0);
+    return toZero - fromZero;
 }
 
 __LLBC_NS_END
