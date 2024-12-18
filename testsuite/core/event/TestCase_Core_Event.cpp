@@ -133,6 +133,11 @@ int TestCase_Core_Event::BasicTest()
     evMgr.BeginFire(EventIds::Event1)
         .SetParam("cstring", "cstring: hello world")
         .SetParam(std::string("string"), "string: hello world")
+        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(std::string("string"), "string: hello world")
         .SetParam("Event1_Key1", LLBC_Rand())
         .Fire();
 
@@ -196,4 +201,6 @@ void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
     for(const auto &[key, value] : ev.GetParams())
         LLBC_PrintLn("key params - key: %s, value: %s", key.c_str(), value.ToString().c_str());
+
+    LLBC_PrintLn("key params - params num: %lu", ev.GetParams().size());
 }

@@ -163,9 +163,6 @@ public:
     std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
     operator[](const KeyType &key) const;
 
-    LLBC_Variant &operator[](const int &key);
-    const LLBC_Variant &operator[](const int &key) const;
-
 public:
     /**
      * Object-Pool reflection support: Reuse Event object.
@@ -181,7 +178,8 @@ protected:
     int _id;
     bool _dontDelAfterFire;
 
-    std::map<LLBC_CString, LLBC_Variant> _params;
+    std::map<LLBC_CString, LLBC_Variant> _slimParams;
+    std::map<LLBC_CString, std::string*> _heavyKeys;
 
     void *_extData;
     LLBC_Delegate<void(void *)> _extDataClearDeleg;
