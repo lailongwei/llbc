@@ -64,48 +64,63 @@ public:
 public:
     /**
      * Get LLBC_Variant key indexed event param.
-     * @param[in] key - the LLBC_Variant key.
+     * @param[in] key - the LLBC_CString key.
      * @return const LLBC_Variant & - the event param.
      */
-    const LLBC_Variant &GetParam(const LLBC_Variant &key) const;
+    const LLBC_Variant &GetParam(const LLBC_CString &key) const;
 
     /**
-     * Get LLBC_Variant key indexed event param(template version).
-     * @param[in] key - the key.
+     * Get LLBC_Variant key indexed event param.
+     * @param[in] key - the std::string key.
      * @return const LLBC_Variant & - the event param.
      */
-    template <typename KeyType>
-    const LLBC_Variant &GetParam(const KeyType &key) const;
+    template<typename KeyType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
+    GetParam(const KeyType &key) const;
 
     /**
-     * Set LLBC_Variant key indexed event param.
+     * Set LLBC_CString key indexed event param.
      * @param[in] key   - the param key.
      * @param[in] param - the param.
      * @return LLBC_Event & - this reference.
      */
-    LLBC_Event &SetParam(const LLBC_Variant &key, const LLBC_Variant &param);
+    void SetParam(const LLBC_CString &key, const LLBC_Variant &param);
 
     /**
-     * Set LLBC_Variant key indexed event param(template version).
+     * Set LLBC_CString key indexed event param(template version).
      * @param[in] key   - the param key.
      * @param[in] param - the param.
      * @return LLBC_Event & - this reference.
      */
-    template <typename KeyType, typename ParamType>
-    LLBC_Event &SetParam(const KeyType &key, const ParamType &param);
+    template <typename ParamType>
+    void SetParam(const LLBC_CString &key, const ParamType &param);
+
+    /**
+     * Set std::string key indexed event param.
+     * @param[in] key   - the param key.
+     * @param[in] param - the param.
+     * @return LLBC_Event & - this reference.
+     */
+    template<typename KeyType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
+    SetParam(const KeyType &key, const LLBC_Variant &param);
+
+    template<typename KeyType, typename ParamType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
+    SetParam(const KeyType &key, const ParamType &param);
 
 public:
     /**
-     * Get all variant key indexed params.
-     * @return const std::map<LLBC_Variant, LLBC_Variant> & - the variant key indexed params const reference.
+     * Get all key indexed params.
+     * @return const std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params const reference.
      */
-    const std::map<LLBC_Variant, LLBC_Variant> &GetParams() const;
+    const std::map<LLBC_CString, LLBC_Variant> &GetParams() const;
 
     /**
-     * Get all variant key indexed params(mutable).
-     * @return std::map<LLBC_Variant, LLBC_Variant> & - the variant key indexed params mutable reference.
+     * Get all key indexed params(mutable).
+     * @return std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params mutable reference.
      */
-    std::map<LLBC_Variant, LLBC_Variant> &GetMutableParams();
+    std::map<LLBC_CString, LLBC_Variant> &GetMutableParams();
 
     /**
      * Clone event.
@@ -138,13 +153,15 @@ public:
     /**
      * Subscript supports.
      */
-    LLBC_Variant &operator[](const LLBC_Variant &key);
-    const LLBC_Variant &operator[](const LLBC_Variant &key) const;
+    LLBC_Variant &operator[](const LLBC_CString &key);
+    const LLBC_Variant &operator[](const LLBC_CString &key) const;
 
-    template <typename KeyType>
-    LLBC_Variant &operator[](const KeyType &key);
-    template <typename KeyType>
-    const LLBC_Variant &operator[](const KeyType &key) const;
+    template<typename KeyType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, LLBC_Variant &>
+    operator[](const KeyType &key);
+    template<typename KeyType>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
+    operator[](const KeyType &key) const;
 
 public:
     /**
@@ -161,7 +178,8 @@ protected:
     int _id;
     bool _dontDelAfterFire;
 
-    std::map<LLBC_Variant, LLBC_Variant> _params;
+    std::map<LLBC_CString, LLBC_Variant> _slimParams;
+    std::map<LLBC_CString, std::string*> _heavyKeys;
 
     void *_extData;
     LLBC_Delegate<void(void *)> _extDataClearDeleg;
