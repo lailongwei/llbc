@@ -792,7 +792,7 @@ public:
      * Get name of objPool
      * @return LLBC_CString - the name of this objPool.
      */
-    LLBC_String GetName() const;
+    const LLBC_String &GetName() const;
 
 private:
     // The wrapped TypedObjPool structure encapsulation.
