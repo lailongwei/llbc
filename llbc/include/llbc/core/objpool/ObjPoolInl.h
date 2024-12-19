@@ -495,7 +495,7 @@ inline LLBC_ObjPool::LLBC_ObjPool(bool threadSafe)
 , _orderedDeleteNodes(nullptr)
 , _orderedDeleteNodeTree(nullptr)
 {
-    // Init pool name
+    // Init pool name.
     thread_local int id = 0;
     _name.format("ObjPool_%d_%s_%d", LLBC_GetCurrentThreadId(), threadSafe ? "safe" : "unsafe", ++id);
 
@@ -581,7 +581,7 @@ inline LLBC_String LLBC_ObjPool::GetStatistics(int statFmt) const
         LLBC_String stat;
         if (statFmt != LLBC_ObjPoolStatFormat::CSVWithoutHead)
         {
-            // Add headline 
+            // Add headline.
             stat.append("pool_name;name;reusable;"
                         "obj_size;wrapped_obj_size;obj_count;"
                         "using_obj_count;using_obj_rate;"
@@ -995,11 +995,15 @@ inline void LLBC_ObjPool::OperateOneOrderedDeleteNode(_OrderedDeleteNode *ordere
 
 inline void LLBC_ObjPool::SetName(const LLBC_CString &poolName)
 {
+    __LLBC_INL_LockObjPool();
+    LLBC_Defer(__LLBC_INL_UnlockObjPool());
     _name = poolName;
 }
 
-inline const LLBC_String &LLBC_ObjPool::GetName() const
+inline LLBC_String LLBC_ObjPool::GetName() const
 {
+    __LLBC_INL_LockObjPool();
+    LLBC_Defer(__LLBC_INL_UnlockObjPool());
     return _name;
 }
 __LLBC_NS_END

@@ -783,16 +783,16 @@ public:
     LLBC_String GetOrderedDeleteTree(bool pretty = false) const;
 
      /**
-     * Set name for objPool
+     * Set name for objPool.
      * @param[in] poolName - the name of this objPool.
      */
     void SetName(const LLBC_CString &poolName);
 
     /**
-     * Get name of objPool
+     * Get name of objPool.
      * @return LLBC_CString - the name of this objPool.
      */
-    const LLBC_String &GetName() const;
+    LLBC_String GetName() const;
 
 private:
     // The wrapped TypedObjPool structure encapsulation.

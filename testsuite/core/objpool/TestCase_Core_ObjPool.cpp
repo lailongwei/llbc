@@ -21,6 +21,7 @@
 
 
 #include "core/objpool/TestCase_Core_ObjPool.h"
+#include <thread>
 
 namespace
 {
@@ -61,6 +62,7 @@ int TestCase_Core_ObjPool::Run(int argc, char *argv[])
     LLBC_ReturnIf(LibSupportedObjPoolClassesTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(CommonClassTest_Stream() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(RecycleTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(AsyncSetNameTest() != LLBC_OK, LLBC_FAILED)
 
     return LLBC_OK;
 }
@@ -848,5 +850,27 @@ int TestCase_Core_ObjPool::RecycleTest()
     auto poolStack = reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack);
     poolStack->Purge();
 
+    return LLBC_OK;
+}
+
+int TestCase_Core_ObjPool::AsyncSetNameTest()
+{
+    LLBC_ObjPool objPool(true);
+    LLBC_PrintLn("safe-obj-pool: %s ", objPool.GetName().c_str());
+
+    std::thread t1([&objPool](){
+        for (int i = 0; i < 100; i++)
+        {
+            LLBC_PrintLn("GetName: %s ", objPool.GetName().c_str());
+        }
+    });
+
+    LLBC_String poolName;
+    for (int i = 0; i < 100; i++)
+    {
+        LLBC_PrintLn("SetName: %s ", poolName.format("test_%d", i).c_str());
+        objPool.SetName(poolName);
+    }
+    t1.join();
     return LLBC_OK;
 }
