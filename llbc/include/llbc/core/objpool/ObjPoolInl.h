@@ -1001,7 +1001,7 @@ inline void LLBC_ObjPool::SetName(const LLBC_CString &poolName)
     __LLBC_INL_UnlockObjPool();
 }
 
-inline const LLBC_String &LLBC_ObjPool::GetName() const
+inline LLBC_String LLBC_ObjPool::GetName() const
 {
     LLBC_String retName;
 
