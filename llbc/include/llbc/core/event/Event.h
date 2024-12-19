@@ -150,7 +150,7 @@ public:
     /**
      * Object-Pool reflection support: Reuse Event object.
      */
-    virtual void Reuse() override;
+    virtual void Reuse();
 
     /**
      * Disable assignment.

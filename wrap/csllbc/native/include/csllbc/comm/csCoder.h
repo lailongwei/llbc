@@ -63,7 +63,7 @@ public:
     /**
      * Coder reuse support.
      */
-    void Reuse() override;
+    void Reuse();
 
     /**
      * Packet encode/decode methods.

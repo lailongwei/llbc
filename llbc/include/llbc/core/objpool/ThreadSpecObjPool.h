@@ -89,6 +89,11 @@ public:
      */
     template <typename Obj>
     static void UnsafeRelease(Obj *obj) { GetUnsafeObjPool()->Release(obj); }
-};
 
+    template<typename T>
+    static LLBC_GuardedPoolObj<T> GuardedSafeAcquire() { return GetSafeObjPool()->AcquireGuarded<T>(); }
+
+    template<typename T>
+    static LLBC_GuardedPoolObj<T> GuardedUnsafeAcquire() { return GetUnsafeObjPool()->AcquireGuarded<T>(); }
+};
 __LLBC_NS_END

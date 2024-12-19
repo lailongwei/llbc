@@ -21,6 +21,7 @@
 
 
 #include "core/objpool/TestCase_Core_ObjPool.h"
+#include <thread>
 
 namespace
 {
@@ -36,13 +37,13 @@ class DerivedCls final : public BaseCls
 public:
 };
 
-class _OD_A final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_A() override { LLBC_PrintLn("_OD_A destruct"); } };
-class _OD_B final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_B() override { LLBC_PrintLn("_OD_B destruct"); } };
-class _OD_C final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_C() override { LLBC_PrintLn("_OD_C destruct"); } };
-class _OD_D final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_D() override { LLBC_PrintLn("_OD_D destruct"); } };
-class _OD_E final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_E() override { LLBC_PrintLn("_OD_E destruct"); } };
-class _OD_F final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_F() override { LLBC_PrintLn("_OD_F destruct"); } };
-class _OD_G final : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_G() override { LLBC_PrintLn("_OD_G destruct"); } };
+class _OD_A final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_A() override { LLBC_PrintLn("_OD_A destruct"); } };
+class _OD_B final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_B() override { LLBC_PrintLn("_OD_B destruct"); } };
+class _OD_C final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_C() override { LLBC_PrintLn("_OD_C destruct"); } };
+class _OD_D final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_D() override { LLBC_PrintLn("_OD_D destruct"); } };
+class _OD_E final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_E() override { LLBC_PrintLn("_OD_E destruct"); } };
+class _OD_F final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_F() override { LLBC_PrintLn("_OD_F destruct"); } };
+class _OD_G final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_G() override { LLBC_PrintLn("_OD_G destruct"); } };
 class _OD_H final : public LLBC_Object { public: ~_OD_H() override { LLBC_PrintLn("_OD_H destruct");}};
 }
 
@@ -61,6 +62,7 @@ int TestCase_Core_ObjPool::Run(int argc, char *argv[])
     LLBC_ReturnIf(LibSupportedObjPoolClassesTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(CommonClassTest_Stream() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(RecycleTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(AsyncSetNameTest() != LLBC_OK, LLBC_FAILED)
 
     return LLBC_OK;
 }
@@ -446,7 +448,7 @@ int TestCase_Core_ObjPool::MultiThreadThread()
         void Cleanup() override
         {
             LLBC_PrintLn("All threads test finished, objPool stat:\n%s",
-                         _objPool.GetStatistics(LLBC_ObjPoolStatFormat::Json, true).c_str());
+                         _objPool.GetStatistics(LLBC_ObjPoolStatFormat::PrettyJson).c_str());
         }
 
     public:
@@ -848,5 +850,27 @@ int TestCase_Core_ObjPool::RecycleTest()
     auto poolStack = reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack);
     poolStack->Purge();
 
+    return LLBC_OK;
+}
+
+int TestCase_Core_ObjPool::AsyncSetNameTest()
+{
+    LLBC_ObjPool objPool(true);
+    LLBC_PrintLn("safe-obj-pool: %s ", objPool.GetName().c_str());
+
+    std::thread t1([&objPool](){
+        for (int i = 0; i < 100; i++)
+        {
+            LLBC_PrintLn("GetName: %s ", objPool.GetName().c_str());
+        }
+    });
+
+    LLBC_String poolName;
+    for (int i = 0; i < 100; i++)
+    {
+        LLBC_PrintLn("SetName: %s ", poolName.format("test_%d", i).c_str());
+        objPool.SetName(poolName);
+    }
+    t1.join();
     return LLBC_OK;
 }

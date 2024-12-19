@@ -62,7 +62,7 @@ struct TestData final : public LLBC_Coder
         return true;
     }
 
-    void Reuse() override
+    void Reuse()
     {
         iVal = 0;
         strVal.clear();
