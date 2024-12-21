@@ -64,6 +64,9 @@ inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
 template<typename KeyType>
 std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
                  (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                 (std::is_array_v<KeyType> && std::is_same_v<const char, std::remove_extent_t<KeyType>>) ||
+                 std::is_same_v<KeyType, char*> ||
+                 std::is_same_v<KeyType, const char*> ||
                  std::is_same_v<KeyType, LLBC_CString>, const LLBC_Variant &>
 LLBC_Event::GetParam(const KeyType &key) const
 {
@@ -74,6 +77,9 @@ LLBC_Event::GetParam(const KeyType &key) const
 template<typename KeyType, typename ParamType>
 std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
                  (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                 (std::is_array_v<KeyType> && std::is_same_v<const char, std::remove_extent_t<KeyType>>) ||
+                 std::is_same_v<KeyType, char*> ||
+                 std::is_same_v<KeyType, const char*> ||
                  std::is_same_v<KeyType, LLBC_CString>, void>
 LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
 {
@@ -88,8 +94,7 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
 
         _slimParams[heavyIt->first] = std::is_same_v<ParamType, LLBC_Variant> ? param : LLBC_Variant(param);
     }
-    else if constexpr((std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
-                      std::is_same_v<KeyType, LLBC_CString>)
+    else
     {
         _slimParams[key] = std::is_same_v<ParamType, LLBC_Variant> ? param : LLBC_Variant(param);
     }

@@ -130,14 +130,20 @@ int TestCase_Core_Event::BasicTest()
 
     // Fire Event1.
     LLBC_PrintLn("Fire Event1...");
+    char charArray[] = "char array: hello world";
+    const char constCharArray[] = "const char array: hello world";
+    const char *constCharPointer = "const char pointer: hello world";
     evMgr.BeginFire(EventIds::Event1)
+        .SetParam("cstring", "cstring: hello world")
         .SetParam("cstring", "cstring: hello world")
         .SetParam(std::string("string"), "string: hello world")
         .SetParam(std::string("string"), "string: hello world")
-        .SetParam(std::string("string"), "string: hello world")
-        .SetParam(std::string("string"), "string: hello world")
-        .SetParam(std::string("string"), "string: hello world")
-        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(charArray, "char array: hello world")
+        .SetParam(charArray, "char array: hello world")
+        .SetParam(constCharArray, "const char array: hello world")
+        .SetParam(constCharArray, "const char array: hello world")
+        .SetParam(constCharPointer, "const char pointer: hello world")
+        .SetParam(constCharPointer, "const char pointer: hello world")
         .SetParam("Event1_Key1", LLBC_Rand())
         .Fire();
 

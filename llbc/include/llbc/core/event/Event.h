@@ -70,6 +70,9 @@ public:
     template<typename KeyType>
     std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
                      (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                     (std::is_array_v<KeyType> && std::is_same_v<const char, std::remove_extent_t<KeyType>>) ||
+                     std::is_same_v<KeyType, char*> ||
+                     std::is_same_v<KeyType, const char*> ||
                      std::is_same_v<KeyType, LLBC_CString>, const LLBC_Variant &>
     GetParam(const KeyType &key) const;
 
@@ -82,6 +85,9 @@ public:
     template<typename KeyType, typename ParamType>
     std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
                      (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                     (std::is_array_v<KeyType> && std::is_same_v<const char, std::remove_extent_t<KeyType>>) ||
+                     std::is_same_v<KeyType, char*> ||
+                     std::is_same_v<KeyType, const char*> ||
                      std::is_same_v<KeyType, LLBC_CString>, void>
     SetParam(const KeyType &key, const ParamType &param);
 
