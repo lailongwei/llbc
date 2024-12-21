@@ -63,50 +63,26 @@ public:
 
 public:
     /**
-     * Get LLBC_Variant key indexed event param.
-     * @param[in] key - the LLBC_CString key.
-     * @return const LLBC_Variant & - the event param.
-     */
-    const LLBC_Variant &GetParam(const LLBC_CString &key) const;
-
-    /**
-     * Get LLBC_Variant key indexed event param.
-     * @param[in] key - the std::string key.
-     * @return const LLBC_Variant & - the event param.
-     */
+    * Get LLBC_Variant key indexed event param.
+    * @param[in] key - the key.
+    * @return const LLBC_Variant & - the event param.
+    */
     template<typename KeyType>
-    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
+                     (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                     std::is_same_v<KeyType, LLBC_CString>, const LLBC_Variant &>
     GetParam(const KeyType &key) const;
 
     /**
-     * Set LLBC_CString key indexed event param.
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    void SetParam(const LLBC_CString &key, const LLBC_Variant &param);
-
-    /**
-     * Set LLBC_CString key indexed event param(template version).
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    template <typename ParamType>
-    void SetParam(const LLBC_CString &key, const ParamType &param);
-
-    /**
-     * Set std::string key indexed event param.
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    template<typename KeyType>
-    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
-    SetParam(const KeyType &key, const LLBC_Variant &param);
-
+    * Get LLBC_CString key indexed event param.
+    * @param[in] key - the key.
+    * @param[in] param - the param.
+    * @return LLBC_Event & - this reference.
+    */
     template<typename KeyType, typename ParamType>
-    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
+    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
+                     (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                     std::is_same_v<KeyType, LLBC_CString>, void>
     SetParam(const KeyType &key, const ParamType &param);
 
 public:

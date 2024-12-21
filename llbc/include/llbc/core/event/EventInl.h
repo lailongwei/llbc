@@ -61,15 +61,39 @@ inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
     _dontDelAfterFire = dontDelAfterFire;
 }
 
-inline const LLBC_Variant &LLBC_Event::GetParam(const LLBC_CString &key) const
+template<typename KeyType>
+std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
+                 (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                 std::is_same_v<KeyType, LLBC_CString>, const LLBC_Variant &>
+LLBC_Event::GetParam(const KeyType &key) const
 {
-    const auto it = _slimParams.find(key);
+    auto it = _slimParams.find(key);
     return it != _slimParams.end() ? it->second : LLBC_INL_NS __nilVariant;
 }
 
-inline void LLBC_Event::SetParam(const LLBC_CString &key, const LLBC_Variant &param)
+template<typename KeyType, typename ParamType>
+std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
+                 (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                 std::is_same_v<KeyType, LLBC_CString>, void>
+LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
 {
-    _slimParams[key] = param;
+    if constexpr(LLBC_IsTemplSpec<KeyType, std::basic_string>::value)
+    {
+        std::map<LLBC_CString, std::string*>::iterator heavyIt = _heavyKeys.find(key);
+        if (heavyIt == _heavyKeys.end())
+        {
+            auto heavyKey = new std::string(key);
+            heavyIt = _heavyKeys.insert(std::make_pair(heavyKey->c_str(), heavyKey)).first;
+        }
+
+        _slimParams[heavyIt->first] = std::is_same_v<ParamType, LLBC_Variant> ? param : LLBC_Variant(param);
+    }
+    else if constexpr((std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
+                      std::is_same_v<KeyType, LLBC_CString>)
+    {
+        _slimParams[key] = std::is_same_v<ParamType, LLBC_Variant> ? param : LLBC_Variant(param);
+    }
+    return ;
 }
 
 inline const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetParams() const
@@ -88,41 +112,6 @@ inline LLBC_Event * LLBC_Event::Clone() const
     clone->_slimParams = _slimParams;
     for(auto&[_, heavyKey] : _heavyKeys) clone->_heavyKeys[_.c_str()] = new std::string(*heavyKey);
     return clone;
-}
-
-template<typename KeyType>
-std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
-LLBC_Event::GetParam(const KeyType &key) const
-{
-    return GetParam(key);
-}
-
-template<typename KeyType>
-std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
-LLBC_Event::SetParam(const KeyType &key, const LLBC_Variant &param)
-{
-    std::map<LLBC_CString, std::string*>::iterator heavyIt = _heavyKeys.find(key);
-    if (heavyIt == _heavyKeys.end())
-    {
-        auto heavyKey = new std::string(key);
-        heavyIt = _heavyKeys.insert(std::make_pair(heavyKey->c_str(), heavyKey)).first;
-    }
-
-    const LLBC_CString slimKey(heavyIt->first);
-    return SetParam(slimKey, param);
-}
-
-template <typename ParamType>
-void LLBC_Event::SetParam(const LLBC_CString &key, const ParamType &param)
-{
-    return SetParam(key, LLBC_Variant(param));
-}
-
-template<typename KeyType, typename ParamType>
-std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, void>
-LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
-{
-    return SetParam(key, LLBC_Variant(param));
 }
 
 inline void * LLBC_Event::GetExtData() const
