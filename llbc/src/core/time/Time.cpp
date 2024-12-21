@@ -535,65 +535,17 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
     return diff < LLBC_TimeSpan::zero ? diff + timeCycle : diff;
 }
 
-bool LLBC_Time::IsCrossed(const LLBC_Time &from,
-                          const LLBC_Time &to,
-                          const LLBC_TimeSpan &timeCycle,
-                          LLBC_TimeSpan timeOfTimeCycle)
+LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
+                                          const LLBC_Time &to,
+                                          const LLBC_TimeSpan &timeCycle,
+                                          LLBC_TimeSpan timeOfTimeCycle)
 {
-    // If span < 0, return false.
-    const LLBC_TimeSpan diff = to - from;
-    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
-        return false;
-
-    // If span >= timeCycle, return true.
-    if (diff >= timeCycle)
-        return true;
-
-    // Normalize timeOfTimeCycle[0, timeCycle)
-    if (UNLIKELY(timeOfTimeCycle < LLBC_TimeSpan::zero))
-        timeOfTimeCycle = timeOfTimeCycle % timeCycle + timeCycle;
-    else if (UNLIKELY(timeOfTimeCycle >= timeCycle))
-        timeOfTimeCycle %= timeCycle;
-
-    // Crossed timeCycle judge: toTimeOfTimeCycle judge.
-    // => toTimeOfTimeCycle must be >= timeOfTimeCycle.
-    int methIdx;
-    LLBC_TimeSpan toTimeOfTimeCycle;
-    if (timeCycle == LLBC_TimeSpan::oneHour)
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 0])();
-    else if (timeCycle == LLBC_TimeSpan::oneDay)
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 1])();
-    else // oneWeek
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 2])();
-
-    if (toTimeOfTimeCycle < timeOfTimeCycle)
-        return false;
-
-    // Crossed timeCycle judge: fromTimeOfTimeCycle judge.
-    const LLBC_TimeSpan fromTimeOfTimeCycle =
-        (from.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx])();
-    return (fromTimeOfTimeCycle < timeOfTimeCycle) ||
-         (fromTimeOfTimeCycle > timeOfTimeCycle &&
-          toTimeOfTimeCycle < fromTimeOfTimeCycle);
-}
-
-uint32 LLBC_Time::GetCrossedDays(const LLBC_Time &from, 
-                                 const LLBC_Time &to,
-                                 const LLBC_TimeSpan &timeOfDay)
-{
-    return GetCrossTime(from, to, LLBC_TimeSpan::oneDay, timeOfDay).GetDays(); 
-}
-
-LLBC_TimeSpan LLBC_Time::GetCrossTime(const LLBC_Time &from,
-                                      const LLBC_Time &to,
-                                      const LLBC_TimeSpan &timeCycle,
-                                      LLBC_TimeSpan timeOfTimeCycle)
-{
-    // If span < 0, return false.
+    // If span <= 0, return false.
     const LLBC_TimeSpan diff = to - from;
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
         return LLBC_TimeSpan::zero;
 
+    timeOfTimeCycle %= timeCycle;
     auto newFrom = from - timeOfTimeCycle;
     auto newTo = to - timeOfTimeCycle;
 
@@ -624,8 +576,8 @@ LLBC_TimeSpan LLBC_Time::GetCrossTime(const LLBC_Time &from,
         if (toDayOfWeek == 0)
             toDayOfWeek = 7;
 
-        newFrom = newFrom - LLBC_TimeSpan::oneDay*fromDayOfWeek;
-        newTo = newTo - LLBC_TimeSpan::oneDay*toDayOfWeek;
+        newFrom = newFrom - LLBC_TimeSpan::oneDay * fromDayOfWeek;
+        newTo = newTo - LLBC_TimeSpan::oneDay * toDayOfWeek;
     }
     else 
     {
@@ -634,14 +586,14 @@ LLBC_TimeSpan LLBC_Time::GetCrossTime(const LLBC_Time &from,
     }
 
     auto fromZero = LLBC_Time::FromTimeParts(newFrom.GetYear(), 
-                                             newFrom.GetMonth(), 
+                                             newFrom.GetMonth() + 1, 
                                              newFrom.GetDayOfMonth(),
                                              fromHour,
                                              fromMinute,
                                              0);
 
     auto toZero = LLBC_Time::FromTimeParts(newTo.GetYear(), 
-                                           newTo.GetMonth(), 
+                                           newTo.GetMonth() + 1, 
                                            newTo.GetDayOfMonth(),
                                            toHour,
                                            toMinute,
