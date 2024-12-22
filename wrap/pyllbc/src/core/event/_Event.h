@@ -76,7 +76,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_SetItem(PyObject *self, PyObject *args)
     if (pyllbc_ObjUtil::Obj2Variant(evParamValue, nativeEvParamValue) != LLBC_OK)
         return nullptr;
 
-    (*ev)[LLBC_String(evParamKey)] = nativeEvParamValue;
+    (*ev)[evParamKey] = nativeEvParamValue;
 
     Py_RETURN_NONE;
 }
