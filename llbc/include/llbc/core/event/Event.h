@@ -62,18 +62,19 @@ public:
     void SetDontDelAfterFire(bool dontDelAfterFire);
 
 public:
+
+#define __LLBC_Inl_EventKeyMatch \
+        (LLBC_IsTemplSpec<KeyType, std::basic_string>::value || \
+        std::is_same_v<std::remove_extent_t<KeyType>, char> || \
+        (std::is_pointer_v<KeyType> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<KeyType>>, char>))
+
     /**
     * Get LLBC_Variant key indexed event param.
     * @param[in] key - the key.
     * @return const LLBC_Variant & - the event param.
     */
     template<typename KeyType>
-    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
-                     (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
-                     (std::is_array_v<KeyType> && std::is_same_v<const char, std::remove_extent_t<KeyType>>) ||
-                     std::is_same_v<KeyType, char*> ||
-                     std::is_same_v<KeyType, const char*> ||
-                     std::is_same_v<KeyType, LLBC_CString>, const LLBC_Variant &>
+    std::enable_if_t<__LLBC_Inl_EventKeyMatch, const LLBC_Variant &>
     GetParam(const KeyType &key) const;
 
     /**
@@ -83,12 +84,7 @@ public:
     * @return LLBC_Event & - this reference.
     */
     template<typename KeyType, typename ParamType>
-    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value ||
-                     (std::is_array_v<KeyType> && std::is_same_v<char, std::remove_extent_t<KeyType>>) ||
-                     (std::is_array_v<KeyType> && std::is_same_v<const char, std::remove_extent_t<KeyType>>) ||
-                     std::is_same_v<KeyType, char*> ||
-                     std::is_same_v<KeyType, const char*> ||
-                     std::is_same_v<KeyType, LLBC_CString>, void>
+    std::enable_if_t<__LLBC_Inl_EventKeyMatch, void>
     SetParam(const KeyType &key, const ParamType &param);
 
 public:
@@ -135,15 +131,10 @@ public:
     /**
      * Subscript supports.
      */
-    LLBC_Variant &operator[](const LLBC_CString &key);
-    const LLBC_Variant &operator[](const LLBC_CString &key) const;
-
     template<typename KeyType>
-    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, LLBC_Variant &>
-    operator[](const KeyType &key);
+    LLBC_Variant &operator[](const KeyType &key);
     template<typename KeyType>
-    std::enable_if_t<LLBC_IsTemplSpec<KeyType, std::basic_string>::value, const LLBC_Variant &>
-    operator[](const KeyType &key) const;
+    const LLBC_Variant &operator[](const KeyType &key) const;
 
 public:
     /**
@@ -160,7 +151,7 @@ protected:
     int _id;
     bool _dontDelAfterFire;
 
-    std::map<LLBC_CString, LLBC_Variant> _slimParams;
+    std::map<LLBC_CString, LLBC_Variant> _params;
     std::map<LLBC_CString, std::string*> _heavyKeys;
 
     void *_extData;
