@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/core/thread/Guard.h"
+#include "llbc/core/os/OS_Thread.h"
 
 // The object pool lock operation macros define.
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -996,15 +997,17 @@ inline void LLBC_ObjPool::OperateOneOrderedDeleteNode(_OrderedDeleteNode *ordere
 inline void LLBC_ObjPool::SetName(const LLBC_CString &poolName)
 {
     __LLBC_INL_LockObjPool();
-    LLBC_Defer(__LLBC_INL_UnlockObjPool());
     _name = poolName;
+    __LLBC_INL_UnlockObjPool();
 }
 
 inline LLBC_String LLBC_ObjPool::GetName() const
 {
+    LLBC_String retName;
     __LLBC_INL_LockObjPool();
-    LLBC_Defer(__LLBC_INL_UnlockObjPool());
-    return _name;
+    retName.assign(_name.c_str(), _name.size());
+    __LLBC_INL_UnlockObjPool();
+    return retName;
 }
 __LLBC_NS_END
 

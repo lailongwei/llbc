@@ -21,7 +21,6 @@
 
 
 #include "core/objpool/TestCase_Core_ObjPool.h"
-#include <thread>
 
 namespace
 {
@@ -47,6 +46,31 @@ class _OD_G final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_G() over
 class _OD_H final : public LLBC_Object { public: ~_OD_H() override { LLBC_PrintLn("_OD_H destruct");}};
 }
 
+class SafeObjPoolPrintNameTask : public LLBC_Task 
+{
+public:
+    SafeObjPoolPrintNameTask(int testTimes) 
+    : _testTimes(testTimes)
+    , _objPool(true)
+    {}
+public:
+    void Svc() override
+    {
+        for (int i = 0; i < _testTimes; i++)
+        {
+            LLBC_PrintLn("GetName: %s ", _objPool.GetName().c_str());
+        }
+    }
+
+    void Cleanup() override {}
+
+    LLBC_ObjPool &GetObjPool() { return _objPool; }
+
+  protected:
+    int _testTimes = 10;
+    LLBC_ObjPool _objPool;
+};
+
 int TestCase_Core_ObjPool::Run(int argc, char *argv[])
 {
     LLBC_ReturnIf(BaseTest() != LLBC_OK, LLBC_FAILED);
@@ -62,7 +86,7 @@ int TestCase_Core_ObjPool::Run(int argc, char *argv[])
     LLBC_ReturnIf(LibSupportedObjPoolClassesTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(CommonClassTest_Stream() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(RecycleTest() != LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIf(AsyncSetNameTest() != LLBC_OK, LLBC_FAILED)
+    LLBC_ReturnIf(SafeObjPoolSetNameTest() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -853,17 +877,14 @@ int TestCase_Core_ObjPool::RecycleTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::AsyncSetNameTest()
+int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
 {
-    LLBC_ObjPool objPool(true);
+    SafeObjPoolPrintNameTask printNametask(100);
+
+    auto& objPool = getNametask.GetObjPool();
     LLBC_PrintLn("safe-obj-pool: %s ", objPool.GetName().c_str());
 
-    std::thread t1([&objPool](){
-        for (int i = 0; i < 100; i++)
-        {
-            LLBC_PrintLn("GetName: %s ", objPool.GetName().c_str());
-        }
-    });
+    getNametask.Activate();
 
     LLBC_String poolName;
     for (int i = 0; i < 100; i++)
@@ -871,6 +892,6 @@ int TestCase_Core_ObjPool::AsyncSetNameTest()
         LLBC_PrintLn("SetName: %s ", poolName.format("test_%d", i).c_str());
         objPool.SetName(poolName);
     }
-    t1.join();
+    getNametask.Wait();
     return LLBC_OK;
 }
