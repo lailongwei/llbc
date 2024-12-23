@@ -90,11 +90,11 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
             heavyIt = _heavyKeys.insert(std::make_pair(heavyKey->c_str(), heavyKey)).first;
         }
 
-        _params[heavyIt->first] = param;
+        _params.emplace(heavyIt->first, param);
     }
     else
     {
-        _params[key] = param;
+        _params.emplace(key, param);
     }
 }
 
