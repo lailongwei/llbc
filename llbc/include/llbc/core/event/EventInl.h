@@ -33,6 +33,7 @@ inline LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 , _dontDelAfterFire(dontDelAfterFire)
 
 , _extData(nullptr)
+, _extDataClearDeleg(nullptr)
 {
 
 }
@@ -118,6 +119,8 @@ inline LLBC_Event *LLBC_Event::Clone()
         else
             clone->SetParam(slimKey, param);
     }
+    if(_extDataClearDeleg != nullptr)
+        clone->_extDataClearDeleg = new LLBC_Delegate(*_extDataClearDeleg);
     return clone;
 }
 
@@ -130,7 +133,7 @@ inline void LLBC_Event::SetExtData(void *extData, const LLBC_Delegate<void(void 
 {
     ClearExtData();
     _extData = extData;
-    _extDataClearDeleg = clearDeleg;
+    _extDataClearDeleg = new LLBC_Delegate(clearDeleg);
 }
 
 inline void LLBC_Event::ClearExtData()
@@ -138,11 +141,11 @@ inline void LLBC_Event::ClearExtData()
     if (_extData)
     {
         if (_extDataClearDeleg)
-            _extDataClearDeleg(_extData);
+            (*_extDataClearDeleg)(_extData);
         _extData = nullptr;
     }
 
-    _extDataClearDeleg = nullptr;
+    LLBC_XDelete(_extDataClearDeleg);
 }
 
 template<typename KeyType>

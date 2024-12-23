@@ -155,7 +155,7 @@ protected:
     std::map<LLBC_CString, std::string *> _heavyKeys;
 
     void *_extData;
-    LLBC_Delegate<void(void *)> _extDataClearDeleg;
+    LLBC_Delegate<void(void *)>* _extDataClearDeleg;
 };
 
 /**
