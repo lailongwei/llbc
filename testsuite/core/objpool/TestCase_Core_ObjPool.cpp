@@ -881,10 +881,10 @@ int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
 {
     SafeObjPoolPrintNameTask printNametask(100);
 
-    auto& objPool = getNametask.GetObjPool();
+    auto& objPool = printNametask.GetObjPool();
     LLBC_PrintLn("safe-obj-pool: %s ", objPool.GetName().c_str());
 
-    getNametask.Activate();
+    printNametask.Activate();
 
     LLBC_String poolName;
     for (int i = 0; i < 100; i++)
@@ -892,6 +892,6 @@ int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
         LLBC_PrintLn("SetName: %s ", poolName.format("test_%d", i).c_str());
         objPool.SetName(poolName);
     }
-    getNametask.Wait();
+    printNametask.Wait();
     return LLBC_OK;
 }
