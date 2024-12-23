@@ -33,7 +33,6 @@ inline LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 , _dontDelAfterFire(dontDelAfterFire)
 
 , _extData(nullptr)
-, _extDataClearDeleg(nullptr)
 {
 
 }
@@ -75,6 +74,13 @@ template<typename KeyType, typename ParamType>
 std::enable_if_t<__LLBC_Inl_EventKeyMatch, void>
 LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
 {
+    auto paramIt = _params.find(key);
+    if (paramIt != _params.end())
+    {
+        paramIt->second = param;
+        return ;
+    }
+
     if constexpr (LLBC_IsTemplSpec<KeyType, std::basic_string>::value)
     {
         auto heavyIt = _heavyKeys.find(key);
@@ -85,10 +91,11 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
         }
 
         _params[heavyIt->first] = param;
-        return ;
     }
-
-    _params[key] = param;
+    else
+    {
+        _params[key] = param;
+    }
 }
 
 inline const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetParams() const
