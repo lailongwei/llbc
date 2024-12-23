@@ -21,7 +21,6 @@
 
 
 #include "core/objpool/TestCase_Core_ObjPool.h"
-#include <thread>
 
 namespace
 {
