@@ -147,6 +147,14 @@ int TestCase_Core_Event::BasicTest()
         .SetParam("Event1_Key1", LLBC_Rand())
         .Fire();
 
+    std::cout << "===================== Test Clone =====================" << std::endl;
+    auto* ev = new LLBC_Event(EventIds::Event1);
+    ev->SetParam(std::string("copy string"), "copy string: hello world");
+    LLBC_Event *cloneEv = ev->Clone();
+    delete ev;
+    evMgr.Fire(cloneEv);
+    std::cout << "===================== Test Clone =====================" << std::endl;
+
     // Test finished, remove all listeners.
     evMgr.RemoveListener(ev1Stub1);
     evMgr.RemoveListener(ev1Stub2);

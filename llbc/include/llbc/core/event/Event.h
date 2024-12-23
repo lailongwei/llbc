@@ -62,11 +62,12 @@ public:
     void SetDontDelAfterFire(bool dontDelAfterFire);
 
 public:
-
 #define __LLBC_Inl_EventKeyMatch \
         (LLBC_IsTemplSpec<KeyType, std::basic_string>::value || \
-        std::is_same_v<std::remove_extent_t<KeyType>, char> || \
-        (std::is_pointer_v<KeyType> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<KeyType>>, char>))
+         std::is_same_v<std::remove_extent_t<KeyType>, char> || \
+         std::is_same_v<KeyType, LLBC_CString> || \
+         (std::is_pointer_v<KeyType> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<KeyType>>, char>) \
+        )
 
     /**
     * Get LLBC_Variant key indexed event param.
@@ -79,7 +80,7 @@ public:
 
     /**
     * Get LLBC_CString key indexed event param.
-    * @param[in] key - the key.
+    * @param[in] key   - the key.
     * @param[in] param - the param.
     * @return LLBC_Event & - this reference.
     */
@@ -107,7 +108,7 @@ public:
      *      - the clone event extend data always nullptr.
      * @return LLBC_Event * - the clone event.
      */
-    LLBC_Event *Clone() const;
+    LLBC_Event *Clone();
 
     /**
      * Get extend data.
@@ -150,9 +151,8 @@ public:
 protected:
     int _id;
     bool _dontDelAfterFire;
-
     std::map<LLBC_CString, LLBC_Variant> _params;
-    std::map<LLBC_CString, std::string*> _heavyKeys;
+    std::map<LLBC_CString, std::string *> _heavyKeys;
 
     void *_extData;
     LLBC_Delegate<void(void *)> _extDataClearDeleg;

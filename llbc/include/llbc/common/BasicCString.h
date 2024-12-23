@@ -49,7 +49,7 @@ public:
      * Default constructor when value_type == char.
      */
     template <typename _CtorElem = _Elem,
-              typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
+              typename = std::enable_if_t<std::is_same_v<_CtorElem, char>, _CtorElem>>
     #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_BasicCString(nullptr_t _ = nullptr)
     #else
@@ -64,7 +64,7 @@ public:
      * Default constructor when value_type == wchar_t.
      */
     template <typename _CtorElem = _Elem,
-              typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
+              typename = std::enable_if_t<std::is_same_v<_CtorElem, wchar_t>, _CtorElem>,
               typename = _CtorElem>
     #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_BasicCString(nullptr_t _ = nullptr)
@@ -89,10 +89,8 @@ public:
      * Parameter constructor when parameter type is char pointer.
      */
     template <typename _Ptr,
-              typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
-                                                 std::is_same<
-                                                     typename std::remove_const<
-                                                         typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type>
+              typename = std::enable_if_t<std::is_pointer_v<_Ptr> &&
+                         std::is_same_v<std::remove_const_t<std::remove_pointer_t<_Ptr>>, char>, _Ptr>>
     LLBC_BasicCString(_Ptr cstr, size_type size = npos)
     {
         if (cstr == nullptr || size == 0)
@@ -110,11 +108,8 @@ public:
      * Parameter constructor when parameter type is wchar_t pointer.
      */
     template <typename _Ptr,
-              typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
-                                                 std::is_same<
-                                                     typename std::remove_const<
-                                                         typename std::remove_pointer<_Ptr>::type>::type, wchar_t>::value, _Ptr>::type,
-
+              typename = std::enable_if_t<std::is_pointer_v<_Ptr> &&
+                                          std::is_same_v<std::remove_const_t<std::remove_pointer_t<_Ptr>>, wchar_t>, _Ptr>,
               typename = _Ptr>
     LLBC_BasicCString(_Ptr cstr, size_type size = npos)
     {
@@ -198,7 +193,7 @@ public:
      * nullptr_t assignment operator when value_type == char.
      */
     template <typename _CtorElem = _Elem,
-              typename = typename std::enable_if<std::is_same<_CtorElem, char>::value, _CtorElem>::type>
+              typename = std::enable_if_t<std::is_same_v<_CtorElem, char>, _CtorElem>>
     #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_BasicCString &operator=(nullptr_t _)
     #else
@@ -215,7 +210,7 @@ public:
      * nullptr_t assignment operator when value_type == wchar_t.
      */
     template <typename _CtorElem = _Elem,
-              typename = typename std::enable_if<std::is_same<_CtorElem, wchar_t>::value, _CtorElem>::type,
+              typename = std::enable_if_t<std::is_same_v<_CtorElem, wchar_t>, _CtorElem>,
               typename = _CtorElem>
     #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_BasicCString &operator=(nullptr_t _)
@@ -245,10 +240,8 @@ public:
      * String pointer assignment operator when value_type == char.
      */
     template <typename _Ptr,
-              typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
-                                                 std::is_same<
-                                                     typename std::remove_const<
-                                                         typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type>
+              typename = std::enable_if_t<std::is_pointer_v<_Ptr> &&
+                                          std::is_same_v<std::remove_const_t<std::remove_pointer_t<_Ptr>>, char>, _Ptr>>
     LLBC_BasicCString &operator=(_Ptr cstr)
     {
         if (LIKELY(cstr))
@@ -269,10 +262,8 @@ public:
      * String pointer assignment operator when value_type == char.
      */
     template <typename _Ptr,
-              typename = typename std::enable_if<std::is_pointer<_Ptr>::value &&
-                                                 std::is_same<
-                                                     typename std::remove_const<
-                                                         typename std::remove_pointer<_Ptr>::type>::type, char>::value, _Ptr>::type,
+              typename = std::enable_if_t<std::is_pointer_v<_Ptr> &&
+                                          std::is_same_v<std::remove_const_t<std::remove_pointer_t<_Ptr>>, char>, _Ptr>,
               typename = _Ptr>
     LLBC_BasicCString &operator=(_Ptr cstr)
     {
@@ -342,14 +333,14 @@ public:
 public:
     // operator<
     template <typename _Other>
-    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<!std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator<(const _Other &other) const
     {
         return *this < LLBC_BasicCString(other);
     }
 
     template <typename _Other>
-    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator<(const _Other &other) const
     {
         return _cstr != other._cstr &&
@@ -360,14 +351,14 @@ public:
 
     // operator==
     template <typename _Other>
-    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<!std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator==(const _Other &other) const
     {
         return this->operator==(LLBC_BasicCString(other));
     }
 
     template <typename _Other>
-    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator==(const _Other &other) const
     {
         return _cstr == other._cstr ||
@@ -384,14 +375,14 @@ public:
 
     // operator<=
     template <typename _Other>
-    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<!std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator<=(const _Other &other) const
     {
         return !(LLBC_BasicCString(other) < *this);
     }
 
     template <typename _Other>
-    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator<=(const _Other &other) const
     {
         return !(other < *this);
@@ -399,14 +390,14 @@ public:
 
     // operator>
     template <typename _Other>
-    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<!std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator>(const _Other &other) const
     {
         return LLBC_BasicCString(other) < *this;
     }
 
     template <typename _Other>
-    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator>(const _Other &other) const
     {
         return other < *this;
@@ -414,14 +405,14 @@ public:
 
     // operator>=
     template <typename _Other>
-    typename std::enable_if<!std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<!std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator>=(const _Other &other) const
     {
         return !(*this < LLBC_BasicCString(other));
     }
 
     template <typename _Other>
-    typename std::enable_if<std::is_same<_Other, LLBC_BasicCString>::value, bool>::type
+    std::enable_if_t<std::is_same_v<_Other, LLBC_BasicCString>, bool>
     operator>=(const _Other &other) const
     {
         return !(*this < other);

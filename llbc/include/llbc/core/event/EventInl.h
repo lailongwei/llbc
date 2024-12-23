@@ -31,10 +31,12 @@ __LLBC_NS_BEGIN
 inline LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 : _id(id)
 , _dontDelAfterFire(dontDelAfterFire)
-, _params()
-, _heavyKeys()
+
 , _extData(nullptr)
-, _extDataClearDeleg(nullptr) {}
+, _extDataClearDeleg(nullptr)
+{
+
+}
 
 inline LLBC_Event::~LLBC_Event()
 {
@@ -82,12 +84,11 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
             heavyIt = _heavyKeys.insert(std::make_pair(heavyKey->c_str(), heavyKey)).first;
         }
 
-        _params[heavyIt->first] = std::is_same_v<ParamType, LLBC_Variant> ? param : LLBC_Variant(param);
+        _params[heavyIt->first] = param;
+        return ;
     }
-    else
-    {
-        _params[key] = std::is_same_v<ParamType, LLBC_Variant> ? param : LLBC_Variant(param);
-    }
+
+    _params[key] = param;
 }
 
 inline const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetParams() const
@@ -100,15 +101,20 @@ inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableParams()
     return _params;
 }
 
-inline LLBC_Event * LLBC_Event::Clone() const
+inline LLBC_Event *LLBC_Event::Clone()
 {
     auto *clone = new LLBC_Event(_id, false);
-    clone->_params = _params;
-    for(auto&[_, heavyKey] : _heavyKeys) clone->_heavyKeys[_.c_str()] = new std::string(*heavyKey);
+    for(auto &[slimKey, param] : _params)
+    {
+        if (auto heavyKeyIt = _heavyKeys.find(slimKey); heavyKeyIt != _heavyKeys.end())
+            clone->SetParam(*heavyKeyIt->second, param);
+        else
+            clone->SetParam(slimKey, param);
+    }
     return clone;
 }
 
-inline void * LLBC_Event::GetExtData() const
+inline void *LLBC_Event::GetExtData() const
 {
     return _extData;
 }
@@ -135,7 +141,7 @@ inline void LLBC_Event::ClearExtData()
 template<typename KeyType>
 LLBC_Variant &LLBC_Event::operator[](const KeyType &key)
 {
-    return const_cast<LLBC_Variant&>(GetParam(key));
+    return const_cast<LLBC_Variant &>(GetParam(key));
 }
 
 template<typename KeyType>
@@ -146,12 +152,15 @@ const LLBC_Variant &LLBC_Event::operator[](const KeyType &key) const
 
 inline void LLBC_Event::Reuse()
 {
-    _id = 0;
-    _dontDelAfterFire = false;
-    _params.clear();
-    for(auto&[_, heavyKey] : _heavyKeys) delete heavyKey;
-    _heavyKeys.clear();
     ClearExtData();
+
+    LLBC_STLHelper::DeleteContainer(_heavyKeys);
+    _params.clear();
+
+    _dontDelAfterFire = false;
+    _id = 0;
 }
+
+#undef __LLBC_Inl_EventKeyMatch
 
 __LLBC_NS_END
