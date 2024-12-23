@@ -564,7 +564,7 @@ LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
     }
     else if (timeCycle == LLBC_TimeSpan::oneDay)
     {
-        // nothing
+        // nothing.
     }
     else if (timeCycle == LLBC_TimeSpan::oneWeek)
     {
@@ -581,23 +581,13 @@ LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
     }
     else 
     {
-        ASSERT(false && "unsupported time cycle");
+        // GetCrossedCycles() is private method, Sould not goto here.
         return LLBC_TimeSpan::zero;
     }
 
-    auto fromZero = LLBC_Time::FromTimeParts(newFrom.GetYear(), 
-                                             newFrom.GetMonth() + 1, 
-                                             newFrom.GetDayOfMonth(),
-                                             fromHour,
-                                             fromMinute,
-                                             0);
+    const auto fromZero = newFrom.GetDate() + LLBC_TimeSpan::FromHours(fromHour, fromMinute);
+    const auto toZero = newTo.GetDate() + LLBC_TimeSpan::FromHours(toHour, toMinute);
 
-    auto toZero = LLBC_Time::FromTimeParts(newTo.GetYear(), 
-                                           newTo.GetMonth() + 1, 
-                                           newTo.GetDayOfMonth(),
-                                           toHour,
-                                           toMinute,
-                                           0);
     return toZero - fromZero;
 }
 

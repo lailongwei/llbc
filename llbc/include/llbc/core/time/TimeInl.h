@@ -220,14 +220,14 @@ inline int LLBC_Time::GetCrossedDays(const LLBC_Time &from,
                                      const LLBC_Time &to,
                                      const LLBC_TimeSpan &timeOfDay)
 {
-    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneDay, timeOfDay).GetDays(); 
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneDay, timeOfDay).GetTotalDays(); 
 }
 
 inline int LLBC_Time::GetCrossedWeeks(const LLBC_Time &from,
                                       const LLBC_Time &to,
                                       const LLBC_TimeSpan &timeOfWeek)
 {
-    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek).GetTotalDays()/7;
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek).GetTotalDays() / 7;
 }
 
 inline bool LLBC_Time::operator==(const LLBC_Time &time) const
