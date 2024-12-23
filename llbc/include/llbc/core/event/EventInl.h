@@ -40,7 +40,7 @@ inline LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 
 inline LLBC_Event::~LLBC_Event()
 {
-    ClearExtData();
+    ClearExtData(true);
 }
 
 inline int LLBC_Event::GetId() const
@@ -88,7 +88,7 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
         if (heavyIt == _heavyKeys.end())
         {
             auto heavyKey = new std::string(key);
-            heavyIt = _heavyKeys.insert(std::make_pair(heavyKey->c_str(), heavyKey)).first;
+            heavyIt = _heavyKeys.emplace(heavyKey->c_str(), heavyKey).first;
         }
 
         _params.emplace(heavyIt->first, param);
@@ -119,8 +119,10 @@ inline LLBC_Event *LLBC_Event::Clone()
         else
             clone->SetParam(slimKey, param);
     }
+
     if(_extDataClearDeleg != nullptr)
         clone->_extDataClearDeleg = new LLBC_Delegate(*_extDataClearDeleg);
+
     return clone;
 }
 
@@ -131,12 +133,16 @@ inline void *LLBC_Event::GetExtData() const
 
 inline void LLBC_Event::SetExtData(void *extData, const LLBC_Delegate<void(void *)> &clearDeleg)
 {
-    ClearExtData();
+    ClearExtData(false);
     _extData = extData;
-    _extDataClearDeleg = new LLBC_Delegate(clearDeleg);
+    if (clearDeleg)
+    {
+        delete _extDataClearDeleg;
+        _extDataClearDeleg = new LLBC_Delegate(clearDeleg);
+    }
 }
 
-inline void LLBC_Event::ClearExtData()
+inline void LLBC_Event::ClearExtData(bool delDeleg)
 {
     if (_extData)
     {
@@ -145,7 +151,8 @@ inline void LLBC_Event::ClearExtData()
         _extData = nullptr;
     }
 
-    LLBC_XDelete(_extDataClearDeleg);
+    if (delDeleg)
+        LLBC_XDelete(_extDataClearDeleg);
 }
 
 template<typename KeyType>
@@ -162,7 +169,7 @@ const LLBC_Variant &LLBC_Event::operator[](const KeyType &key) const
 
 inline void LLBC_Event::Reuse()
 {
-    ClearExtData();
+    ClearExtData(true);
 
     LLBC_STLHelper::DeleteContainer(_heavyKeys);
     _params.clear();

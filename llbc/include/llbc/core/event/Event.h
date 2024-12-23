@@ -63,10 +63,10 @@ public:
 
 public:
 #define __LLBC_Inl_EventKeyMatch \
-        (LLBC_IsTemplSpec<KeyType, std::basic_string>::value || \
-         std::is_same_v<std::remove_extent_t<KeyType>, char> || \
+        (std::is_same_v<std::remove_extent_t<KeyType>, char> || \
+         (std::is_pointer_v<KeyType> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<KeyType>>, char>) || \
          std::is_same_v<KeyType, LLBC_CString> || \
-         (std::is_pointer_v<KeyType> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<KeyType>>, char>) \
+         LLBC_IsTemplSpec<KeyType, std::basic_string>::value \
         )
 
     /**
@@ -125,8 +125,9 @@ public:
 
     /**
      * Clear extend data.
+     * @param[in] delDeleg - the flag to indicate whether delete delegate.
      */
-    void ClearExtData();
+    void ClearExtData(bool delDeleg = false);
 
 public:
     /**
@@ -155,7 +156,7 @@ protected:
     std::map<LLBC_CString, std::string *> _heavyKeys;
 
     void *_extData;
-    LLBC_Delegate<void(void *)>* _extDataClearDeleg;
+    LLBC_Delegate<void(void *)> *_extDataClearDeleg;
 };
 
 /**

@@ -90,7 +90,7 @@ public:
      */
     template <typename _Ptr,
               typename = std::enable_if_t<std::is_pointer_v<_Ptr> &&
-                         std::is_same_v<std::remove_const_t<std::remove_pointer_t<_Ptr>>, char>, _Ptr>>
+                                          std::is_same_v<std::remove_const_t<std::remove_pointer_t<_Ptr>>, char>, _Ptr>>
     LLBC_BasicCString(_Ptr cstr, size_type size = npos)
     {
         if (cstr == nullptr || size == 0)
