@@ -76,7 +76,7 @@ public:
     */
     template<typename KeyType>
     std::enable_if_t<__LLBC_Inl_EventKeyMatch, const LLBC_Variant &>
-    GetParam(const KeyType &key) const;
+    GetParam(const KeyType &key);
 
     /**
     * Get LLBC_CString key indexed event param.
@@ -140,14 +140,18 @@ public:
 
 public:
     /**
+     * Copy constructor and assignment operator.
+     */
+    LLBC_Event(const LLBC_Event &other);
+    LLBC_Event(LLBC_Event &&other) noexcept;
+    LLBC_Event &operator=(const LLBC_Event &other);
+    LLBC_Event &operator=(LLBC_Event &&other) noexcept;
+
+public:
+    /**
      * Object-Pool reflection support: Reuse Event object.
      */
     virtual void Reuse() override;
-
-    /**
-     * Disable assignment.
-     */
-    LLBC_DISABLE_ASSIGNMENT(LLBC_Event);
 
 protected:
     int _id;
@@ -158,6 +162,11 @@ protected:
     void *_extData;
     LLBC_Delegate<void(void *)> *_extDataClearDeleg;
 };
+
+/**
+ * Stream output operator support.
+ */
+std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev);
 
 /**
  * \brief The event deleg class encapsulation.

@@ -65,10 +65,10 @@ inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
 
 template<typename KeyType>
 std::enable_if_t<__LLBC_Inl_EventKeyMatch, const LLBC_Variant &>
-LLBC_Event::GetParam(const KeyType &key) const
+LLBC_Event::GetParam(const KeyType &key)
 {
     auto it = _params.find(key);
-    return it != _params.end() ? it->second : LLBC_INL_NS __nilVariant;
+    return it != _params.end() ? it->second : _params.emplace(key, LLBC_Variant()).first->second;
 }
 
 template<typename KeyType, typename ParamType>
@@ -165,6 +165,108 @@ template<typename KeyType>
 const LLBC_Variant &LLBC_Event::operator[](const KeyType &key) const
 {
     return GetParam(key);
+}
+
+inline LLBC_Event::LLBC_Event(const LLBC_Event &other)
+{
+    _id = other._id;
+    _dontDelAfterFire = other._dontDelAfterFire;
+
+    for (auto &[slimKey, param] : other._params)
+    {
+        if (auto heavyKeyIt = other._heavyKeys.find(slimKey); heavyKeyIt != other._heavyKeys.end())
+            SetParam(*heavyKeyIt->second, param);
+        else
+            SetParam(slimKey, param);
+    }
+
+    if (other._extData)
+        _extData = other._extData;
+    if (other._extDataClearDeleg)
+        _extDataClearDeleg = new LLBC_Delegate(*other._extDataClearDeleg);
+}
+
+inline LLBC_Event::LLBC_Event(LLBC_Event &&other) noexcept
+{
+    _id = other._id;
+    _dontDelAfterFire = other._dontDelAfterFire;
+
+    _params = std::move(other._params);
+    _heavyKeys = std::move(other._heavyKeys);
+
+    _extData = other._extData;
+    _extDataClearDeleg = other._extDataClearDeleg;
+
+    other._id = 0;
+    other._dontDelAfterFire = false;
+    other._extData = nullptr;
+    other._extDataClearDeleg = nullptr;
+}
+
+inline LLBC_Event &LLBC_Event::operator=(const LLBC_Event &other)
+{
+    if (this == &other)
+        return *this;
+
+    Reuse();
+
+    _id = other._id;
+    _dontDelAfterFire = other._dontDelAfterFire;
+
+    for (auto &[slimKey, param] : other._params)
+    {
+        if (auto heavyKeyIt = other._heavyKeys.find(slimKey); heavyKeyIt != other._heavyKeys.end())
+            SetParam(*heavyKeyIt->second, param);
+        else
+            SetParam(slimKey, param);
+    }
+
+    if (other._extData)
+        _extData = other._extData;
+    if (other._extDataClearDeleg)
+        _extDataClearDeleg = new LLBC_Delegate(*other._extDataClearDeleg);
+
+    return *this;
+}
+
+inline LLBC_Event &LLBC_Event::operator=(LLBC_Event &&other) noexcept
+{
+    if (this == &other)
+        return *this;
+
+    Reuse();
+
+    _id = other._id;
+    _dontDelAfterFire = other._dontDelAfterFire;
+
+    _params = std::move(other._params);
+    _heavyKeys = std::move(other._heavyKeys);
+
+    _extData = other._extData;
+    _extDataClearDeleg = other._extDataClearDeleg;
+
+    other._id = 0;
+    other._dontDelAfterFire = false;
+    other._extData = nullptr;
+    other._extDataClearDeleg = nullptr;
+
+    return *this;
+}
+
+inline std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev)
+{
+    o << "LLBC_Event("
+    "id:" << ev.GetId() << ", "
+    "dontDelAfterFire:" << ev.IsDontDelAfterFire() << ", "
+    "ExtData:" << ev.GetExtData() << ", "
+    "Params:{";
+    for (auto it = ev.GetParams().begin(); it != ev.GetParams().end(); ++it)
+    {
+        const auto &[key, val] = *it;
+        o << "[" << key << ":" << val.ToString() << "]" << (std::next(it) != ev.GetParams().end() ? ", " : "");
+    }
+    o << "})";
+    return o;
 }
 
 inline void LLBC_Event::Reuse()

@@ -429,7 +429,7 @@ private:
 template <typename _Elem>
 std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_BasicCString<_Elem> &cstr)
 {
-    return o <<cstr.c_str();
+    return o << cstr.c_str();
 }
 
 __LLBC_NS_END

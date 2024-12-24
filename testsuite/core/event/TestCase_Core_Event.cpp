@@ -44,6 +44,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
     LLBC_ErrorAndReturnIf(BasicTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ErrorAndReturnIf(InfiniteEventFireTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(CopyEventTest() != LLBC_OK, LLBC_FAILED);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -149,6 +150,8 @@ int TestCase_Core_Event::BasicTest()
 
     auto* ev = new LLBC_Event(EventIds::Event1);
     ev->SetParam(std::string("copy string"), "copy string: hello world");
+    (*ev)["empty"] = 111;
+    LLBC_PrintLn("Empty key params - param:%d", (*ev)["empty"].AsInt32());
     LLBC_Event *cloneEv = ev->Clone();
     delete ev;
     evMgr.Fire(cloneEv);
@@ -209,10 +212,57 @@ int TestCase_Core_Event::InfiniteEventFireTest()
     return LLBC_OK;
 }
 
+int TestCase_Core_Event::CopyEventTest()
+{
+    LLBC_PrintLn("==================================");
+    LLBC_PrintLn("Event copy test:");
+
+
+    LLBC_Event originEv(1);
+    originEv.SetParam("origin_key1", "origin_value1");
+    originEv.SetParam("origin_key2", "origin_value2");
+
+    LLBC_Event copyEv(originEv);
+    LLBC_PrintLn("Copy event, origin event:");
+    DumpEvParams(originEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event assignEv;
+    assignEv = originEv;
+    LLBC_PrintLn("Assign event, origin event:");
+    DumpEvParams(assignEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event copyRightEv([]()
+    {
+        LLBC_Event ev(2);
+        ev.SetParam("copy_right_key1", "copy_right_value1");
+        ev.SetParam("copy_right_key2", "copy_right_value2");
+        return ev;
+    }());
+    LLBC_PrintLn("Copy right event:");
+    DumpEvParams(copyRightEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event assignRightEv;
+    assignRightEv = []()
+    {
+        LLBC_Event ev(3);
+        ev.SetParam("assign_right_key1", "assign_right_value1");
+        ev.SetParam("assign_right_key2", "assign_right_value2");
+        return ev;
+    }();
+    LLBC_PrintLn("Assign right event:");
+    DumpEvParams(assignRightEv);
+
+    LLBC_PrintLn("Event copy test finished");
+    LLBC_PrintLn("==================================");
+    return LLBC_OK;
+}
+
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
-    for(const auto &[key, value] : ev.GetParams())
-        LLBC_PrintLn("key params - key: %s, value: %s", key.c_str(), value.ToString().c_str());
-
-    LLBC_PrintLn("key params - params num: %lu", ev.GetParams().size());
+    std::stringstream s;
+    s << ev;
+    LLBC_PrintLn("LLBC Event info:%s", s.str().c_str());
 }
