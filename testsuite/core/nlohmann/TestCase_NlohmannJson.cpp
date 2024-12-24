@@ -291,6 +291,7 @@ int TestCase_NlohmannJson::Run(int argc, char *argv[])
       const auto tmp = j[0].template get<std::string>();
       j[1] = 42;
       bool foo = j.at(2);
+      std::cout << "foo:" << foo << std::endl;
 
       // comparison
       j == R"(["foo", 1, true, 1.78])"_json;  // true
@@ -347,6 +348,8 @@ int TestCase_NlohmannJson::Run(int argc, char *argv[])
       // or simpler using count()
       auto foo_present = o.count("foo"); // 1
       auto fob_present = o.count("fob"); // 0
+      std::cout << "foo_present:" << foo_present << std::endl;
+      std::cout << "fob_present:" << fob_present << std::endl;
 
       // delete an entry
       o.erase("foo");
@@ -483,15 +486,20 @@ int TestCase_NlohmannJson::Run(int argc, char *argv[])
       bool b1 = true;
       LLBCJson jb = b1;
       auto b2 = jb.template get<bool>();
+      std::cout << "b2:" << b2 << std::endl;
+      
       // NOT RECOMMENDED
       bool b3 = jb;
       bool b4;
       b4 = jb;
+      std::cout << "b3:" << b3 << std::endl;
+      std::cout << "b4:" << b4 << std::endl;
 
       // numbers
       int i = 42;
       LLBCJson jn = i;
       auto f = jn.template get<double>();
+      std::cout << "f:" << f << std::endl;
       // NOT RECOMMENDED
       // double f2 = jb;
       // double f3;
@@ -507,11 +515,12 @@ int TestCase_NlohmannJson::Run(int argc, char *argv[])
       {"name", "hello llbc json"},
         {"age", 11}
       };
+      std::cout << "j:" << j << std::endl;
+      
       auto person = j.template get<Person>();
-
       // 从自定义数据序列化成json
       LLBCJson dump = person;
-      std::cout << "person:" << dump.dump() << std::endl;
+      std::cout << "person:" << dump << std::endl;
 
       // 更多高级的用法可以见官方稳定, 比如: adl_serializer
     }
