@@ -535,9 +535,9 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
     return diff < LLBC_TimeSpan::zero ? diff + timeCycle : diff;
 }
 
-LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time& from,
-                                          const LLBC_Time& to,
-                                          const LLBC_TimeSpan& timeCycle,
+LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
+                                          const LLBC_Time &to,
+                                          const LLBC_TimeSpan &timeCycle,
                                           LLBC_TimeSpan timeOfTimeCycle)
 {
     // If span <= 0, return zero.
