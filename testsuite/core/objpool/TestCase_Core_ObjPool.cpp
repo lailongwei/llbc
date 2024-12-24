@@ -49,12 +49,25 @@ class _OD_H final : public LLBC_Object { public: ~_OD_H() override { LLBC_PrintL
 class SafeObjPoolPrintNameTask : public LLBC_Task 
 {
 public:
-    SafeObjPoolPrintNameTask(int testTimes) 
-    : _testTimes(testTimes)
-    , _objPool(true)
+    SafeObjPoolPrintNameTask(int testTimes)
+    : _objPool(true)
+    , _testTimes(testTimes)
     {}
 public:
     void Svc() override
+    {
+        int curId = LLBC_AtomicFetchAndAdd(&_subThreadId, 1);
+
+        if ((curId % 2) == 0) { _GetName(); }
+        else { _SetName(); }
+    }
+
+    void Cleanup() override {}
+
+    LLBC_ObjPool &GetObjPool() { return _objPool; }
+
+protected:
+    void _GetName()
     {
         for (int i = 0; i < _testTimes; i++)
         {
@@ -62,13 +75,20 @@ public:
         }
     }
 
-    void Cleanup() override {}
+    void _SetName()
+    {
+        LLBC_String objPoolName;
+        for (int i = 0; i < _testTimes; i++)
+        {
+            LLBC_PrintLn("SetName: %s ", objPoolName.format("test_%d", i).c_str());
+            _objPool.SetName(objPoolName);
+        }
+    }
 
-    LLBC_ObjPool &GetObjPool() { return _objPool; }
-
-  protected:
-    int _testTimes = 10;
+protected:
     LLBC_ObjPool _objPool;
+    int _subThreadId = 0;
+    int _testTimes = 10;
 };
 
 int TestCase_Core_ObjPool::Run(int argc, char *argv[])
@@ -879,19 +899,21 @@ int TestCase_Core_ObjPool::RecycleTest()
 
 int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
 {
-    SafeObjPoolPrintNameTask printNametask(100);
+    const int testTimes = 20;
+
+    LLBC_String expectedName;
+    expectedName.format("test_%d", testTimes - 1);
+
+    SafeObjPoolPrintNameTask printNametask(testTimes);
 
     auto& objPool = printNametask.GetObjPool();
     LLBC_PrintLn("safe-obj-pool: %s ", objPool.GetName().c_str());
 
-    printNametask.Activate();
+    printNametask.Activate(8);
 
-    LLBC_String poolName;
-    for (int i = 0; i < 100; i++)
-    {
-        LLBC_PrintLn("SetName: %s ", poolName.format("test_%d", i).c_str());
-        objPool.SetName(poolName);
-    }
     printNametask.Wait();
+
+    LLBC_ReturnIf(expectedName != objPool.GetName(), LLBC_FAILED);
+
     return LLBC_OK;
 }

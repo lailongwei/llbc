@@ -496,9 +496,9 @@ inline LLBC_ObjPool::LLBC_ObjPool(bool threadSafe)
 , _orderedDeleteNodes(nullptr)
 , _orderedDeleteNodeTree(nullptr)
 {
-    // Init pool name.
-    thread_local int id = 0;
-    _name.format("ObjPool_%d_%s_%d", LLBC_GetCurrentThreadId(), threadSafe ? "safe" : "unsafe", ++id);
+    // Init objPool name.
+    thread_local int curSubId = 0;
+    _name.format("ObjPool_%d_%s_%d", LLBC_GetCurrentThreadId(), threadSafe ? "safe" : "unsafe", ++curSubId);
 
     // Init lock.
     __LLBC_INL_InitObjPoolLock();
@@ -1004,9 +1004,11 @@ inline void LLBC_ObjPool::SetName(const LLBC_CString &poolName)
 inline LLBC_String LLBC_ObjPool::GetName() const
 {
     LLBC_String retName;
+
     __LLBC_INL_LockObjPool();
     retName.assign(_name.c_str(), _name.size());
     __LLBC_INL_UnlockObjPool();
+
     return retName;
 }
 __LLBC_NS_END
