@@ -906,14 +906,20 @@ int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
 
     SafeObjPoolPrintNameTask printNametask(testTimes);
 
-    auto& objPool = printNametask.GetObjPool();
+    auto &objPool = printNametask.GetObjPool();
     LLBC_PrintLn("safe-obj-pool: %s ", objPool.GetName().c_str());
 
     printNametask.Activate(8);
 
     printNametask.Wait();
 
-    LLBC_ReturnIf(expectedName != objPool.GetName(), LLBC_FAILED);
+    auto objPoolFinalName = objPool.GetName();
+
+    LLBC_ErrorAndReturnIf(expectedName != objPoolFinalName, 
+                          LLBC_FAILED, 
+                          "objPoolFinalName(%s) is not expected(%s) ", 
+                          objPoolFinalName.c_str(), 
+                          expectedName.c_str());
 
     return LLBC_OK;
 }
