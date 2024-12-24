@@ -52,10 +52,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_GetItem(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "ls", &ev, &evParamKey))
         return nullptr;
 
-    // Try find event param from constant string_key params.
-    auto value = ev->GetParam(evParamKey);
-    if (value.IsNil() == false)
-        return pyllbc_ObjUtil::Variant2Obj(value);
+    // Try find event param from key.
+    const auto &it = ev->GetParams().find(evParamKey);
+    if(it != ev->GetParams().end())
+        return pyllbc_ObjUtil::Variant2Obj(it->second);
 
     // Not found, set index error.
     LLBC_String errDesc;

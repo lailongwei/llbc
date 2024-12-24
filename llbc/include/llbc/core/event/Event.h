@@ -34,7 +34,9 @@ class LLBC_EXPORT LLBC_Event : public LLBC_PoolObj
 {
 public:
     explicit LLBC_Event(int id = 0, bool dontDelAfterFire = false);
-    virtual ~LLBC_Event() override;
+    LLBC_Event(const LLBC_Event &other);
+    LLBC_Event(LLBC_Event &&other) noexcept;
+    ~LLBC_Event() override;
 
 public:
     /**
@@ -102,15 +104,6 @@ public:
     std::map<LLBC_CString, LLBC_Variant> &GetMutableParams();
 
     /**
-     * Clone event.
-     * Note:
-     *      - the clone event don't delete after handle flag always false.
-     *      - the clone event extend data always nullptr.
-     * @return LLBC_Event * - the clone event.
-     */
-    LLBC_Event *Clone();
-
-    /**
      * Get extend data.
      * @return void * - the extend data.
      */
@@ -142,8 +135,7 @@ public:
     /**
      * Copy constructor and assignment operator.
      */
-    LLBC_Event(const LLBC_Event &other);
-    LLBC_Event(LLBC_Event &&other) noexcept;
+
     LLBC_Event &operator=(const LLBC_Event &other);
     LLBC_Event &operator=(LLBC_Event &&other) noexcept;
 
@@ -151,7 +143,7 @@ public:
     /**
      * Object-Pool reflection support: Reuse Event object.
      */
-    virtual void Reuse() override;
+    void Reuse() override;
 
 protected:
     int _id;

@@ -38,6 +38,37 @@ inline LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 
 }
 
+inline LLBC_Event::LLBC_Event(const LLBC_Event &other)
+{
+    _id = other._id;
+    _dontDelAfterFire = other._dontDelAfterFire;
+
+    for (auto &[slimKey, param] : other._params)
+    {
+        if (auto heavyKeyIt = other._heavyKeys.find(slimKey); heavyKeyIt != other._heavyKeys.end())
+            SetParam(*heavyKeyIt->second, param);
+        else
+            SetParam(slimKey, param);
+    }
+}
+
+inline LLBC_Event::LLBC_Event(LLBC_Event &&other) noexcept
+{
+    _id = other._id;
+    _dontDelAfterFire = other._dontDelAfterFire;
+
+    _params = std::move(other._params);
+    _heavyKeys = std::move(other._heavyKeys);
+
+    _extData = other._extData;
+    _extDataClearDeleg = other._extDataClearDeleg;
+
+    other._id = 0;
+    other._dontDelAfterFire = false;
+    other._extData = nullptr;
+    other._extDataClearDeleg = nullptr;
+}
+
 inline LLBC_Event::~LLBC_Event()
 {
     ClearExtData(true);
@@ -109,23 +140,6 @@ inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableParams()
     return _params;
 }
 
-inline LLBC_Event *LLBC_Event::Clone()
-{
-    auto *clone = new LLBC_Event(_id, false);
-    for(auto &[slimKey, param] : _params)
-    {
-        if (auto heavyKeyIt = _heavyKeys.find(slimKey); heavyKeyIt != _heavyKeys.end())
-            clone->SetParam(*heavyKeyIt->second, param);
-        else
-            clone->SetParam(slimKey, param);
-    }
-
-    if(_extDataClearDeleg != nullptr)
-        clone->_extDataClearDeleg = new LLBC_Delegate(*_extDataClearDeleg);
-
-    return clone;
-}
-
 inline void *LLBC_Event::GetExtData() const
 {
     return _extData;
@@ -137,8 +151,10 @@ inline void LLBC_Event::SetExtData(void *extData, const LLBC_Delegate<void(void 
     _extData = extData;
     if (clearDeleg)
     {
-        delete _extDataClearDeleg;
-        _extDataClearDeleg = new LLBC_Delegate(clearDeleg);
+        if (_extDataClearDeleg)
+            *_extDataClearDeleg = clearDeleg;
+        else
+            delete _extDataClearDeleg;
     }
 }
 
@@ -158,49 +174,13 @@ inline void LLBC_Event::ClearExtData(bool delDeleg)
 template<typename KeyType>
 LLBC_Variant &LLBC_Event::operator[](const KeyType &key)
 {
-    return const_cast<LLBC_Variant &>(GetParam(key));
+    return GetParam(key);
 }
 
 template<typename KeyType>
 const LLBC_Variant &LLBC_Event::operator[](const KeyType &key) const
 {
     return GetParam(key);
-}
-
-inline LLBC_Event::LLBC_Event(const LLBC_Event &other)
-{
-    _id = other._id;
-    _dontDelAfterFire = other._dontDelAfterFire;
-
-    for (auto &[slimKey, param] : other._params)
-    {
-        if (auto heavyKeyIt = other._heavyKeys.find(slimKey); heavyKeyIt != other._heavyKeys.end())
-            SetParam(*heavyKeyIt->second, param);
-        else
-            SetParam(slimKey, param);
-    }
-
-    if (other._extData)
-        _extData = other._extData;
-    if (other._extDataClearDeleg)
-        _extDataClearDeleg = new LLBC_Delegate(*other._extDataClearDeleg);
-}
-
-inline LLBC_Event::LLBC_Event(LLBC_Event &&other) noexcept
-{
-    _id = other._id;
-    _dontDelAfterFire = other._dontDelAfterFire;
-
-    _params = std::move(other._params);
-    _heavyKeys = std::move(other._heavyKeys);
-
-    _extData = other._extData;
-    _extDataClearDeleg = other._extDataClearDeleg;
-
-    other._id = 0;
-    other._dontDelAfterFire = false;
-    other._extData = nullptr;
-    other._extDataClearDeleg = nullptr;
 }
 
 inline LLBC_Event &LLBC_Event::operator=(const LLBC_Event &other)
@@ -220,11 +200,6 @@ inline LLBC_Event &LLBC_Event::operator=(const LLBC_Event &other)
         else
             SetParam(slimKey, param);
     }
-
-    if (other._extData)
-        _extData = other._extData;
-    if (other._extDataClearDeleg)
-        _extDataClearDeleg = new LLBC_Delegate(*other._extDataClearDeleg);
 
     return *this;
 }
@@ -256,9 +231,9 @@ inline LLBC_Event &LLBC_Event::operator=(LLBC_Event &&other) noexcept
 inline std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev)
 {
     o << "LLBC_Event("
-    "id:" << ev.GetId() << ", "
+    "id:"               << ev.GetId()              << ", "
     "dontDelAfterFire:" << ev.IsDontDelAfterFire() << ", "
-    "ExtData:" << ev.GetExtData() << ", "
+    "ExtData:"          << ev.GetExtData()         << ", "
     "Params:{";
     for (auto it = ev.GetParams().begin(); it != ev.GetParams().end(); ++it)
     {
@@ -266,6 +241,7 @@ inline std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev)
         o << "[" << key << ":" << val.ToString() << "]" << (std::next(it) != ev.GetParams().end() ? ", " : "");
     }
     o << "})";
+
     return o;
 }
 
