@@ -133,9 +133,8 @@ public:
 
 public:
     /**
-     * Copy constructor and assignment operator.
+     * Assignment operator.
      */
-
     LLBC_Event &operator=(const LLBC_Event &other);
     LLBC_Event &operator=(LLBC_Event &&other) noexcept;
 

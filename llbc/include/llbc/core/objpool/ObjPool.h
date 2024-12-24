@@ -65,11 +65,6 @@ public:
      */
     void SetTypedObjPool(void *typedObjPool) { _typedObjPool = typedObjPool; }
 
-    /**
-     * Object reuse method.
-     */
-    virtual void Reuse() = 0;
-
 public:
     // Assignment supported(skip _typedObjPool assignment).
     LLBC_PoolObj &operator=(const LLBC_PoolObj &other) { return *this; }
@@ -114,10 +109,6 @@ public:
 
 public:
     // IsReusable implement.
-    template <typename Obj>
-    static constexpr
-    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, bool>::type
-    IsReusable() { return true; }
 
     template <typename Obj>
     static constexpr
@@ -127,8 +118,7 @@ public:
 
     template <typename Obj>
     static constexpr
-    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value &&
-                            !LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
+    typename std::enable_if<!LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
                             !LLBC_IsTemplSpec<Obj, std::unordered_map>::value, bool>::type
     IsReusable() { return IsReusableInl<Obj>(0); }
 
@@ -206,10 +196,6 @@ private:
 
 public:
     // Reuse implement.
-    template <typename Obj>
-    static
-    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
-    Reuse(void *mem) { reinterpret_cast<LLBC_PoolObj *>(mem)->Reuse(); }
 
     template <typename Obj>
     static
@@ -219,8 +205,7 @@ public:
 
     template <typename Obj>
     static
-    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value &&
-                            !LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
+    typename std::enable_if<!LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
                             !LLBC_IsTemplSpec<Obj, std::unordered_map>::value, void>::type
     Reuse(void *mem) { ReuseInl<Obj>(mem, 0); }
 
@@ -446,6 +431,7 @@ public:
     typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
     Recycle(Obj *obj)
     {
+        LLBC_ReturnIf(UNLIKELY(obj == nullptr), void());
         if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
         {
             // add obj to gc-pool, if already do nothing
@@ -466,6 +452,7 @@ public:
     typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
     Recycle(Obj *obj)
     {
+        LLBC_ReturnIf(UNLIKELY(obj == nullptr), void());
         if constexpr (std::is_base_of_v<LLBC_Object, Obj>)
         {
             // add obj to gc-pool, if already do nothing
@@ -503,10 +490,14 @@ private:
 class LLBC_ObjPoolStatFormat
 {
 public:
+    // Use 4~7 bits as format type, 0~3 bits as specified type.
     enum ENUM
     {
-        Json,
-        CSV,
+        Json = 0x00,
+        PrettyJson = 0x01,
+
+        CSV = 0x10,
+        CSVWithoutHead = 0x11,
     };
 };
 
@@ -772,8 +763,7 @@ public:
      * @param[in] pretty  - pretty flag.
      * @return LLBC_String - the object pool statistics.
      */
-    LLBC_String GetStatistics(int statFmt = LLBC_ObjPoolStatFormat::CSV,
-                              bool pretty = false) const;
+    LLBC_String GetStatistics(int statFmt = LLBC_ObjPoolStatFormat::CSV) const;
 
     /**
      * Ensure <ObjA> deletion before <ObjB>.
@@ -790,6 +780,18 @@ public:
      * @return LLBC_String - the ensure deletion tree.
      */
     LLBC_String GetOrderedDeleteTree(bool pretty = false) const;
+
+    /**
+     * Get name of objPool.
+     * @return LLBC_String - the name of this objPool.
+     */
+    LLBC_String GetName() const;
+
+     /**
+     * Set name for objPool.
+     * @param[in] poolName - the name of this objPool.
+     */
+    void SetName(const LLBC_CString &poolName);
 
 private:
     // The wrapped TypedObjPool structure encapsulation.
@@ -856,6 +858,9 @@ private:
                                      bool deepCollect);
 
 private:
+    // Objpool name, default is 'ObjPool_<thread_id>_<safe/unsafe>_<inc-id>'
+    LLBC_String _name;
+
     // Thread safe about variables.
     bool _threadSafe;
     mutable LLBC_SpinLockHandle _lock;

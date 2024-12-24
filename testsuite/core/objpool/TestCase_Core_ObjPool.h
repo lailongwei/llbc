@@ -46,6 +46,7 @@ public:
     int LibSupportedObjPoolClassesTest();
     int CommonClassTest_Stream();
     int RecycleTest();
+    int SafeObjPoolSetNameTest();
 
     template <typename Obj>
     static void RandAllocAndRelease(LLBC_ObjPool &objPool,
