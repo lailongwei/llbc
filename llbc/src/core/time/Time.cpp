@@ -554,8 +554,10 @@ LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time& from,
     auto normalizedFrom = from - timeOfTimeCycle;
     auto normalizedTo = to - timeOfTimeCycle;
 
-    normalizedFrom = LLBC_Time(normalizedFrom.GetTimestampInMicros() - (normalizedFrom.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
-    normalizedTo = LLBC_Time(normalizedTo.GetTimestampInMicros() - (normalizedTo.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
+    normalizedFrom = LLBC_Time(
+        normalizedFrom.GetTimestampInMicros() - (normalizedFrom.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
+    normalizedTo = LLBC_Time(
+        normalizedTo.GetTimestampInMicros() - (normalizedTo.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
 
     return normalizedTo - normalizedFrom;
 }
