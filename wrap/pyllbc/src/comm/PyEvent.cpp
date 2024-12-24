@@ -136,7 +136,7 @@ void pyllbc_EventListener::Invoke(LLBC_Event &ev)
     PyObject *pyEv = reinterpret_cast<PyObject *>(ev.GetExtData());
     if (!pyEv) // Not python layer generate event, fire from native layer or other language wrap, clone native event object to create new python layer event object.
     {
-        cloneEv = ev.Clone();
+        cloneEv = ev;
         cloneEv->SetDontDelAfterFire(true);
         PyObject *pyEvId = PyInt_FromLong(ev.GetId());
         PyObject *pyCObj = PyLong_FromUnsignedLongLong(reinterpret_cast<uint64>(cloneEv));
