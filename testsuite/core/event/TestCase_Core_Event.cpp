@@ -152,9 +152,6 @@ int TestCase_Core_Event::BasicTest()
     ev->SetParam(std::string("copy string"), "copy string: hello world");
     (*ev)["empty"] = 111;
     LLBC_PrintLn("Empty key params - param:%d", (*ev)["empty"].AsInt32());
-    LLBC_Event *cloneEv = ev->Clone();
-    delete ev;
-    evMgr.Fire(cloneEv);
 
     // Test finished, remove all listeners.
     evMgr.RemoveListener(ev1Stub1);

@@ -142,7 +142,7 @@ public:
     /**
      * Object-Pool reflection support: Reuse Event object.
      */
-    void Reuse() override;
+    void Reuse();
 
 protected:
     int _id;

@@ -38,7 +38,7 @@ inline LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 
 }
 
-inline LLBC_Event::LLBC_Event(const LLBC_Event &other)
+inline LLBC_Event::LLBC_Event(const LLBC_Event &other) : LLBC_PoolObj(other)
 {
     _id = other._id;
     _dontDelAfterFire = other._dontDelAfterFire;
@@ -50,6 +50,9 @@ inline LLBC_Event::LLBC_Event(const LLBC_Event &other)
         else
             SetParam(slimKey, param);
     }
+
+    _extData = nullptr;
+    _extDataClearDeleg = nullptr;
 }
 
 inline LLBC_Event::LLBC_Event(LLBC_Event &&other) noexcept
@@ -174,7 +177,7 @@ inline void LLBC_Event::ClearExtData(bool delDeleg)
 template<typename KeyType>
 LLBC_Variant &LLBC_Event::operator[](const KeyType &key)
 {
-    return GetParam(key);
+    return const_cast<LLBC_Variant &>(GetParam(key));
 }
 
 template<typename KeyType>
