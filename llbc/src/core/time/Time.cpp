@@ -535,60 +535,29 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
     return diff < LLBC_TimeSpan::zero ? diff + timeCycle : diff;
 }
 
-LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
-                                          const LLBC_Time &to,
-                                          const LLBC_TimeSpan &timeCycle,
+LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time& from,
+                                          const LLBC_Time& to,
+                                          const LLBC_TimeSpan& timeCycle,
                                           LLBC_TimeSpan timeOfTimeCycle)
 {
-    // If span <= 0, return false.
+    // If span <= 0, return zero.
     const LLBC_TimeSpan diff = to - from;
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
         return LLBC_TimeSpan::zero;
 
+    timeOfTimeCycle += LLBC_TimeSpan(LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond);
     timeOfTimeCycle %= timeCycle;
-    auto newFrom = from - timeOfTimeCycle;
-    auto newTo = to - timeOfTimeCycle;
 
-    int fromHour = 0, fromMinute = 0, toHour = 0, toMinute = 0;
-    if (timeCycle == LLBC_TimeSpan::oneMin)
-    {
-        fromHour = newFrom.GetHour();
-        fromMinute = newFrom.GetMinute();
-        toHour  = newTo.GetHour();
-        toMinute = newTo.GetMinute();
-    }
-    else if (timeCycle == LLBC_TimeSpan::oneHour)
-    {
-        fromHour = newFrom.GetHour();
-        toHour  = newTo.GetHour();
-    }
-    else if (timeCycle == LLBC_TimeSpan::oneDay)
-    {
-        // nothing.
-    }
-    else if (timeCycle == LLBC_TimeSpan::oneWeek)
-    {
-        auto fromDayOfWeek = newFrom.GetDayOfWeek();
-        if (fromDayOfWeek == 0)
-            fromDayOfWeek = 7;
+    if (timeCycle == LLBC_TimeSpan::oneWeek)
+        timeOfTimeCycle = (timeOfTimeCycle + (LLBC_TimeSpan::oneDay * 4)) % LLBC_TimeSpan::oneWeek;
 
-        auto toDayOfWeek = newTo.GetDayOfWeek();
-        if (toDayOfWeek == 0)
-            toDayOfWeek = 7;
+    auto normalizedFrom = from - timeOfTimeCycle;
+    auto normalizedTo = to - timeOfTimeCycle;
 
-        newFrom = newFrom - LLBC_TimeSpan::oneDay * fromDayOfWeek;
-        newTo = newTo - LLBC_TimeSpan::oneDay * toDayOfWeek;
-    }
-    else 
-    {
-        // GetCrossedCycles() is private method, Sould not goto here.
-        return LLBC_TimeSpan::zero;
-    }
+    normalizedFrom = LLBC_Time(normalizedFrom.GetTimestampInMicros() - (normalizedFrom.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
+    normalizedTo = LLBC_Time(normalizedTo.GetTimestampInMicros() - (normalizedTo.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
 
-    const auto fromZero = newFrom.GetDate() + LLBC_TimeSpan::FromHours(fromHour, fromMinute);
-    const auto toZero = newTo.GetDate() + LLBC_TimeSpan::FromHours(toHour, toMinute);
-
-    return toZero - fromZero;
+    return normalizedTo - normalizedFrom;
 }
 
 __LLBC_NS_END
