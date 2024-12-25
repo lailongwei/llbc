@@ -542,7 +542,11 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
     LLBC_SetErrAndReturnIf(checkAppStarted && !IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
     LLBC_SetErrAndReturnIf(_loading > 0, LLBC_ERROR_REENTRY, LLBC_FAILED);
 
-    // Reload config.
+    // - Reload detail: Reload logger mgr(ignore error).
+    if (LLBC_LoggerMgrSingleton->IsInited())
+        LLBC_LoggerMgrSingleton->Reload();
+
+    // - Reload detail: Reload config.
     LLBC_AtomicFetchAndAdd(&_loading, 1);
     LLBC_Defer(LLBC_AtomicFetchAndSub(&_loading, 1));
     LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadConfig() != LLBC_OK, LLBC_FAILED);

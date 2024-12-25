@@ -34,7 +34,9 @@ class LLBC_EXPORT LLBC_Event : public LLBC_PoolObj
 {
 public:
     explicit LLBC_Event(int id = 0, bool dontDelAfterFire = false);
-    virtual ~LLBC_Event() override;
+    LLBC_Event(const LLBC_Event &other);
+    LLBC_Event(LLBC_Event &&other) noexcept;
+    ~LLBC_Event() override;
 
 public:
     /**
@@ -62,59 +64,43 @@ public:
     void SetDontDelAfterFire(bool dontDelAfterFire);
 
 public:
-    /**
-     * Get LLBC_Variant key indexed event param.
-     * @param[in] key - the LLBC_Variant key.
-     * @return const LLBC_Variant & - the event param.
-     */
-    const LLBC_Variant &GetParam(const LLBC_Variant &key) const;
+#define __LLBC_Inl_EventKeyMatch \
+        (std::is_same_v<std::remove_extent_t<KeyType>, char> || \
+         (std::is_pointer_v<KeyType> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<KeyType>>, char>) || \
+         std::is_same_v<KeyType, LLBC_CString> || \
+         LLBC_IsTemplSpec<KeyType, std::basic_string>::value \
+        )
 
     /**
-     * Get LLBC_Variant key indexed event param(template version).
-     * @param[in] key - the key.
-     * @return const LLBC_Variant & - the event param.
-     */
-    template <typename KeyType>
-    const LLBC_Variant &GetParam(const KeyType &key) const;
+    * Get LLBC_Variant key indexed event param.
+    * @param[in] key - the key.
+    * @return const LLBC_Variant & - the event param.
+    */
+    template<typename KeyType>
+    std::enable_if_t<__LLBC_Inl_EventKeyMatch, const LLBC_Variant &>
+    GetParam(const KeyType &key);
 
     /**
-     * Set LLBC_Variant key indexed event param.
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    LLBC_Event &SetParam(const LLBC_Variant &key, const LLBC_Variant &param);
+    * Get LLBC_CString key indexed event param.
+    * @param[in] key   - the key.
+    * @param[in] param - the param.
+    * @return LLBC_Event & - this reference.
+    */
+    template<typename KeyType, typename ParamType>
+    std::enable_if_t<__LLBC_Inl_EventKeyMatch, void>
+    SetParam(const KeyType &key, const ParamType &param);
 
     /**
-     * Set LLBC_Variant key indexed event param(template version).
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
+     * Get all key indexed params.
+     * @return const std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params const reference.
      */
-    template <typename KeyType, typename ParamType>
-    LLBC_Event &SetParam(const KeyType &key, const ParamType &param);
-
-public:
-    /**
-     * Get all variant key indexed params.
-     * @return const std::map<LLBC_Variant, LLBC_Variant> & - the variant key indexed params const reference.
-     */
-    const std::map<LLBC_Variant, LLBC_Variant> &GetParams() const;
+    const std::map<LLBC_CString, LLBC_Variant> &GetParams() const;
 
     /**
-     * Get all variant key indexed params(mutable).
-     * @return std::map<LLBC_Variant, LLBC_Variant> & - the variant key indexed params mutable reference.
+     * Get all key indexed params(mutable).
+     * @return std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params mutable reference.
      */
-    std::map<LLBC_Variant, LLBC_Variant> &GetMutableParams();
-
-    /**
-     * Clone event.
-     * Note:
-     *      - the clone event don't delete after handle flag always false.
-     *      - the clone event extend data always nullptr.
-     * @return LLBC_Event * - the clone event.
-     */
-    LLBC_Event *Clone() const;
+    std::map<LLBC_CString, LLBC_Variant> &GetMutableParams();
 
     /**
      * Get extend data.
@@ -131,41 +117,45 @@ public:
 
     /**
      * Clear extend data.
+     * @param[in] delDeleg - the flag to indicate whether delete delegate.
      */
-    void ClearExtData();
+    void ClearExtData(bool delDeleg = false);
 
 public:
     /**
      * Subscript supports.
      */
-    LLBC_Variant &operator[](const LLBC_Variant &key);
-    const LLBC_Variant &operator[](const LLBC_Variant &key) const;
-
-    template <typename KeyType>
+    template<typename KeyType>
     LLBC_Variant &operator[](const KeyType &key);
-    template <typename KeyType>
+    template<typename KeyType>
     const LLBC_Variant &operator[](const KeyType &key) const;
+
+    /**
+     * Assignment operator.
+     */
+    LLBC_Event &operator=(const LLBC_Event &other);
+    LLBC_Event &operator=(LLBC_Event &&other) noexcept;
 
 public:
     /**
      * Object-Pool reflection support: Reuse Event object.
      */
-    virtual void Reuse();
-
-    /**
-     * Disable assignment.
-     */
-    LLBC_DISABLE_ASSIGNMENT(LLBC_Event);
+    void Reuse();
 
 protected:
     int _id;
     bool _dontDelAfterFire;
-
-    std::map<LLBC_Variant, LLBC_Variant> _params;
+    std::map<LLBC_CString, LLBC_Variant> _params;
+    std::map<LLBC_CString, std::string *> _heavyKeys;
 
     void *_extData;
-    LLBC_Delegate<void(void *)> _extDataClearDeleg;
+    LLBC_Delegate<void(void *)> *_extDataClearDeleg;
 };
+
+/**
+ * Stream output operator support.
+ */
+std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev);
 
 /**
  * \brief The event deleg class encapsulation.

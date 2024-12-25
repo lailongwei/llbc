@@ -304,37 +304,37 @@ public:
 
 public:
     /**
-     * Verify that the given time(to) has been crossed hour or not.
+     * Get crossed hours between from and to time.
      * @param[in] from       - from time.
      * @param[in] to         - to time.
      * @param[in] timeOfHour - cross time of hour point.
-     * @return bool - return true if crossed day, otherwise return false.
+     * @return int - crossed hours.
      */
-    static bool IsCrossedHour(const LLBC_Time &from,
+    static int GetCrossedHours(const LLBC_Time &from,
+                               const LLBC_Time &to,
+                               const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
+
+    /**
+     * Get crossed days between from and to time.
+     * @param[in] from - from time.
+     * @param[in] to   - to time.
+     * @param[in] diffHours - diff time from daily zero time.
+     * @return int - crossed days.
+     */
+    static int GetCrossedDays(const LLBC_Time &from, 
                               const LLBC_Time &to,
-                              const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
+                              const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
 
     /**
-     * Verify that the given time(to) has been crossed day or not.
-     * @param[in] from      - from time.
-     * @param[in] to        - to time.
-     * @param[in] timeOfDay - cross time of day point.
-     * @return bool - return true if crossed day, otherwise return false.
-     */
-    static bool IsCrossedDay(const LLBC_Time &from,
-                             const LLBC_Time &to,
-                             const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
-
-    /**
-     * Verify that the given time(to) has been crossed week or not.
+     * Get crossed weeks between from and to time.
      * @param[in] from       - from time.
      * @param[in] to         - to time.
      * @param[in] timeOfWeek - cross time of week point.
-     * @return bool - return true if crossed week, otherwise return false.
+     * @return int - crossed weeks.
      */
-    static bool IsCrossedWeek(const LLBC_Time &from,
-                              const LLBC_Time &to,
-                              const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
+    static int GetCrossedWeeks(const LLBC_Time &from,
+                               const LLBC_Time &to,
+                               const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
 
 public:
     /**
@@ -399,10 +399,10 @@ private:
     /**
      * Crossed time-cycle internal implement. 
      */
-    static bool IsCrossed(const LLBC_Time &from,
-                          const LLBC_Time &to,
-                          const LLBC_TimeSpan &timeCycle,
-                          LLBC_TimeSpan timeOfTimeCycle);
+    static LLBC_TimeSpan GetCrossedCycles(const LLBC_Time &from,
+                                         const LLBC_Time &to,
+                                         const LLBC_TimeSpan &timeCycle,
+                                         LLBC_TimeSpan timeOfTimeCycle);
 
 private:
     sint64 _time;

@@ -209,25 +209,25 @@ inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toT
     return GetIntervalTo(LLBC_TimeSpan::oneWeek, toTimeOfWeek);
 }
 
-inline bool LLBC_Time::IsCrossedHour(const LLBC_Time &from,
-                                     const LLBC_Time &to,
-                                     const LLBC_TimeSpan &timeOfHour)
+inline int LLBC_Time::GetCrossedHours(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeOfHour)
 {
-    return IsCrossed(from, to, LLBC_TimeSpan::oneHour, timeOfHour);
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneHour, timeOfHour).GetTotalHours();
 }
 
-inline bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
-                                    const LLBC_Time &to,
-                                    const LLBC_TimeSpan &timeOfDay)
+inline int LLBC_Time::GetCrossedDays(const LLBC_Time &from, 
+                                     const LLBC_Time &to,
+                                     const LLBC_TimeSpan &timeOfDay)
 {
-    return IsCrossed(from, to, LLBC_TimeSpan::oneDay, timeOfDay);
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneDay, timeOfDay).GetTotalDays(); 
 }
 
-inline bool LLBC_Time::IsCrossedWeek(const LLBC_Time &from,
-                                     const LLBC_Time &to,
-                                     const LLBC_TimeSpan &timeOfWeek)
+inline int LLBC_Time::GetCrossedWeeks(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeOfWeek)
 {
-    return IsCrossed(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek);
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek).GetTotalDays() / 7;
 }
 
 inline bool LLBC_Time::operator==(const LLBC_Time &time) const

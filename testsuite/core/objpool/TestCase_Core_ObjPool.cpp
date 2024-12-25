@@ -46,6 +46,53 @@ class _OD_G final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_G() over
 class _OD_H final : public LLBC_Object { public: ~_OD_H() override { LLBC_PrintLn("_OD_H destruct");}};
 }
 
+class SafeObjPoolPrintNameTask : public LLBC_Task 
+{
+public:
+    SafeObjPoolPrintNameTask(int testTimes)
+    : _objPool(true)
+    , _testTimes(testTimes)
+    {
+    }
+
+public:
+    void Svc() override
+    {
+        int curId = LLBC_AtomicFetchAndAdd(&_subThreadId, 1);
+
+        if ((curId % 2) == 0)
+            _GetName();
+        else 
+            _SetName();
+    }
+
+    void Cleanup() override {  }
+
+    LLBC_ObjPool &GetObjPool() { return _objPool; }
+
+protected:
+    void _GetName()
+    {
+        for (int i = 0; i < _testTimes; i++)
+            LLBC_PrintLn("GetName: %s", _objPool.GetName().c_str());
+    }
+
+    void _SetName()
+    {
+        LLBC_String objPoolName;
+        for (int i = 0; i < _testTimes; i++)
+        {
+            LLBC_PrintLn("SetName: %s", objPoolName.format("test_%d", i).c_str());
+            _objPool.SetName(objPoolName);
+        }
+    }
+
+protected:
+    LLBC_ObjPool _objPool;
+    int _subThreadId = 0;
+    int _testTimes = 10;
+};
+
 int TestCase_Core_ObjPool::Run(int argc, char *argv[])
 {
     LLBC_ReturnIf(BaseTest() != LLBC_OK, LLBC_FAILED);
@@ -61,6 +108,7 @@ int TestCase_Core_ObjPool::Run(int argc, char *argv[])
     LLBC_ReturnIf(LibSupportedObjPoolClassesTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(CommonClassTest_Stream() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(RecycleTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(SafeObjPoolSetNameTest() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -446,7 +494,7 @@ int TestCase_Core_ObjPool::MultiThreadThread()
         void Cleanup() override
         {
             LLBC_PrintLn("All threads test finished, objPool stat:\n%s",
-                         _objPool.GetStatistics(LLBC_ObjPoolStatFormat::Json, true).c_str());
+                         _objPool.GetStatistics(LLBC_ObjPoolStatFormat::PrettyJson).c_str());
         }
 
     public:
@@ -847,6 +895,33 @@ int TestCase_Core_ObjPool::RecycleTest()
     __LLBC_LibTls *tls = __LLBC_GetLibTls();
     auto poolStack = reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack);
     poolStack->Purge();
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
+{
+    const int testTimes = 20;
+
+    LLBC_String expectedName;
+    expectedName.format("test_%d", testTimes - 1);
+
+    SafeObjPoolPrintNameTask printNametask(testTimes);
+
+    auto &objPool = printNametask.GetObjPool();
+    LLBC_PrintLn("safe-obj-pool: %s", objPool.GetName().c_str());
+
+    printNametask.Activate(8);
+
+    printNametask.Wait();
+
+    auto objPoolFinalName = objPool.GetName();
+
+    LLBC_ErrorAndReturnIf(expectedName != objPoolFinalName, 
+                          LLBC_FAILED, 
+                          "objPoolFinalName(%s) is not expected(%s)", 
+                          objPoolFinalName.c_str(), 
+                          expectedName.c_str());
 
     return LLBC_OK;
 }

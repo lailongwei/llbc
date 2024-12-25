@@ -490,10 +490,14 @@ private:
 class LLBC_ObjPoolStatFormat
 {
 public:
+    // Use 4~7 bits as format type, 0~3 bits as specified type.
     enum ENUM
     {
-        Json,
-        CSV,
+        Json = 0x00,
+        PrettyJson = 0x01,
+
+        CSV = 0x10,
+        CSVWithoutHead = 0x11,
     };
 };
 
@@ -759,8 +763,7 @@ public:
      * @param[in] pretty  - pretty flag.
      * @return LLBC_String - the object pool statistics.
      */
-    LLBC_String GetStatistics(int statFmt = LLBC_ObjPoolStatFormat::CSV,
-                              bool pretty = false) const;
+    LLBC_String GetStatistics(int statFmt = LLBC_ObjPoolStatFormat::CSV) const;
 
     /**
      * Ensure <ObjA> deletion before <ObjB>.
@@ -777,6 +780,18 @@ public:
      * @return LLBC_String - the ensure deletion tree.
      */
     LLBC_String GetOrderedDeleteTree(bool pretty = false) const;
+
+    /**
+     * Get name of objPool.
+     * @return LLBC_String - the name of this objPool.
+     */
+    LLBC_String GetName() const;
+
+     /**
+     * Set name for objPool.
+     * @param[in] poolName - the name of this objPool.
+     */
+    void SetName(const LLBC_CString &poolName);
 
 private:
     // The wrapped TypedObjPool structure encapsulation.
@@ -843,6 +858,9 @@ private:
                                      bool deepCollect);
 
 private:
+    // Objpool name, default is 'ObjPool_<thread_id>_<safe/unsafe>_<inc-id>'
+    LLBC_String _name;
+
     // Thread safe about variables.
     bool _threadSafe;
     mutable LLBC_SpinLockHandle _lock;
