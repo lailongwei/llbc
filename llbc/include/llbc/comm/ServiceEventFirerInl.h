@@ -37,7 +37,7 @@ inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(const LLBC_ServiceEventFir
     other._ev = nullptr;
 }
 
-inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(LLBC_ServiceEventFirer &&other)
+inline LLBC_ServiceEventFirer::LLBC_ServiceEventFirer(LLBC_ServiceEventFirer &&other) noexcept
 : _svc(other._svc)
 , _ev(other._ev)
 {
@@ -83,7 +83,7 @@ inline LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::operator=(const LLBC_Serv
     return *this;
 }
 
-inline LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::operator=(LLBC_ServiceEventFirer &&other)
+inline LLBC_ServiceEventFirer &LLBC_ServiceEventFirer::operator=(LLBC_ServiceEventFirer &&other) noexcept
 {
     if (UNLIKELY(&other == this))
         return *this;
