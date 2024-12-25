@@ -153,11 +153,6 @@ protected:
 };
 
 /**
- * Stream output operator support.
- */
-std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev);
-
-/**
  * \brief The event deleg class encapsulation.
  */
 class LLBC_EXPORT LLBC_EventListener
@@ -178,5 +173,10 @@ public:
 };
 
 __LLBC_NS_END
+
+/**
+ * Stream output operator support.
+ */
+std::ostream &operator<<(std::ostream &o, const llbc::LLBC_Event &ev);
 
 #include "llbc/core/event/EventInl.h"
