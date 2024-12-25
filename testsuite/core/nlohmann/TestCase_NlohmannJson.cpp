@@ -294,7 +294,8 @@ int TestCase_NlohmannJson::Run(int argc, char *argv[])
       std::cout << "foo:" << foo << std::endl;
 
       // comparison
-      j == R"(["foo", 1, true, 1.78])"_json;  // true
+      auto equal = j == R"(["foo", 1, true, 1.78])"_json;  // true
+      std::cout << "j equal r value?:" << equal << std::endl;
 
       // other stuff
       j.size();     // 4 entries
