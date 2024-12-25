@@ -90,7 +90,6 @@ public:
     std::enable_if_t<__LLBC_Inl_EventKeyMatch, void>
     SetParam(const KeyType &key, const ParamType &param);
 
-public:
     /**
      * Get all key indexed params.
      * @return const std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params const reference.
