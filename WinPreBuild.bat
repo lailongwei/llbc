@@ -5,12 +5,12 @@ Rem This file is a part of llbc library
 
 echo Visual Studio solution and project files generate tool.
 echo For now supported Visual Studio versions:
-echo    vs2005
-echo    vs2008
-echo    vs2010
-echo    vs2012
-echo    vs2013
-echo    vs2015
+echo    vs2005<unsupported>
+echo    vs2008<unsupported>
+echo    vs2010<unsupported>
+echo    vs2012<unsupported>
+echo    vs2013<unsupported>
+echo    vs2015<unsupported>
 echo    vs2017
 echo    vs2019
 echo    vs2022
