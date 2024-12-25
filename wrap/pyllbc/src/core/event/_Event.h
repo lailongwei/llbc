@@ -53,7 +53,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Event_GetItem(PyObject *self, PyObject *args)
         return nullptr;
 
     // Try find event param from key.
-    const auto &it = ev->GetParams().find(evParamKey);
+    const auto it = ev->GetParams().find(evParamKey);
     if(it != ev->GetParams().end())
         return pyllbc_ObjUtil::Variant2Obj(it->second);
 

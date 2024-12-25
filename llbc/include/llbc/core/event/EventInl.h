@@ -113,7 +113,7 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
     if (paramIt != _params.end())
     {
         paramIt->second = param;
-        return ;
+        return;
     }
 
     if constexpr (LLBC_IsTemplSpec<KeyType, std::basic_string>::value)
