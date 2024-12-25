@@ -234,15 +234,17 @@ inline LLBC_Event &LLBC_Event::operator=(LLBC_Event &&other) noexcept
 inline std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev)
 {
     o << "LLBC_Event("
-    "id:"               << ev.GetId()              << ", "
-    "dontDelAfterFire:" << ev.IsDontDelAfterFire() << ", "
-    "ExtData:"          << ev.GetExtData()         << ", "
-    "Params:{";
+      << "id:" << ev.GetId()
+      << ", dontDelAfterFire:" << ev.IsDontDelAfterFire()
+      << ", ExtData:" << ev.GetExtData()
+      << ", Params:{";
+
     for (auto it = ev.GetParams().begin(); it != ev.GetParams().end(); ++it)
     {
-        const auto &[key, val] = *it;
-        o << "[" << key << ":" << val.ToString() << "]" << (std::next(it) != ev.GetParams().end() ? ", " : "");
+        o << "[" << it->first << ":" << it->second.ToString() << "]"
+          << (std::next(it) != ev.GetParams().end() ? ", " : "");
     }
+
     o << "})";
 
     return o;

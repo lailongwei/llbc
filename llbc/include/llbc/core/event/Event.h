@@ -131,7 +131,6 @@ public:
     template<typename KeyType>
     const LLBC_Variant &operator[](const KeyType &key) const;
 
-public:
     /**
      * Assignment operator.
      */
