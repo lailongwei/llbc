@@ -28,6 +28,7 @@ static const LLBC_NS LLBC_Variant __nilVariant;
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
+
 inline LLBC_Event::LLBC_Event(int id, bool dontDelAfterFire)
 : _id(id)
 , _dontDelAfterFire(dontDelAfterFire)
