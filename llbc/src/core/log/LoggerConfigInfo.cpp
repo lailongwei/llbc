@@ -29,6 +29,7 @@
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogRollingMode.h"
+#include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 
 /*
@@ -228,6 +229,24 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         _notConfigUseRoot = notCfgUseOpt.strip().tolower() == "root";
 
     return LLBC_OK;
+}
+
+int LLBC_LoggerConfigInfo::GetAppenderLogLevel(int appenderType) const
+{
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    if (appenderType == LLBC_LogAppenderType::Console)
+    {
+        return GetConsoleLogLevel();
+    }
+    else if (appenderType == LLBC_LogAppenderType::File)
+    {
+        return GetFileLogLevel();
+    }
+    else
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_LogLevel::End;
+    }
 }
 
 void LLBC_LoggerConfigInfo::NormalizeLogFileName()
