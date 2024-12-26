@@ -336,6 +336,20 @@ public:
                                const LLBC_Time &to,
                                const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
 
+    /**
+     * Get crossed months between from and to time.
+     * @param[in] from        - from time.
+     * @param[in] to          - to time.
+     * @param[in] timeOfMonth - cross time of month point.
+     * @return int - crossed months.
+     * @note: timeOfMonth must be less than 27 days old, otherwise will return 0.
+     *        if timeOfMonth=oneDay, it means it's the second day of month.
+     */
+    static int GetCrossedMonths(const LLBC_Time &from,
+                                const LLBC_Time &to,
+                                const LLBC_TimeSpan &timeOfMonth = LLBC_TimeSpan::zero);
+     
+
 public:
     /**
      * Time span operations.
