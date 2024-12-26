@@ -79,7 +79,7 @@ public:
         return *this;
     }
 
-    _This &operator=(_This &&rhs)
+    _This &operator=(_This &&rhs) noexcept
     {
         _Base::operator=(std::move(rhs));
         return *this;
@@ -91,7 +91,7 @@ public:
         return *this;
     }
 
-    _This &operator=(_Base &&rhs)
+    _This &operator=(_Base &&rhs) noexcept
     {
         _Base::operator=(std::move(rhs));
         return *this;

@@ -44,7 +44,7 @@ private:
     LLBC_EventFirer(LLBC_EventMgr *evMgr, LLBC_Event *ev);
 public:
     LLBC_EventFirer(const LLBC_EventFirer &other);
-    LLBC_EventFirer(LLBC_EventFirer &&other);
+    LLBC_EventFirer(LLBC_EventFirer &&other) noexcept;
     ~LLBC_EventFirer();
 
 public:
@@ -67,7 +67,7 @@ public:
 public:
     // Copy assignment & Move assignment.
     LLBC_EventFirer &operator=(const LLBC_EventFirer &other);
-    LLBC_EventFirer &operator=(LLBC_EventFirer &&other);
+    LLBC_EventFirer &operator=(LLBC_EventFirer &&other) noexcept;
 
 private:
     friend class LLBC_EventMgr;

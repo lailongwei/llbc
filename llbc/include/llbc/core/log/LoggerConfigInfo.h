@@ -76,6 +76,15 @@ public:
     int GetLogLevel() const;
 
     /**
+     * Get appender log level.
+     * 
+     * @param[in] appenderType - log appender type.
+     * @return int - the appender log level, if return End and LLBC_GetLastError() != LLBC_ERROR_SUCCESS, 
+     *               means error occurred.
+     */
+    int GetAppenderLogLevel(int appenderType) const;
+
+    /**
      * Get asynchronous mode switch.
      * @return bool - asynchronous mode switch.
      */

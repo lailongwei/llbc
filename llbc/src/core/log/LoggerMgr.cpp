@@ -52,18 +52,20 @@ LLBC_LoggerMgr::~LLBC_LoggerMgr()
     Finalize();
 }
 
-int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFile)
+int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath)
 {
     LLBC_LockGuard guard(_lock);
 
+    // Reinit check.
     if (_rootLogger)
     {
         LLBC_SetLastError(LLBC_ERROR_REENTRY);
         return LLBC_FAILED;
     }
 
+    // Initialize logger configurator.
     _configurator = new LLBC_LoggerConfigurator;
-    if (_configurator->Initialize(cfgFile) != LLBC_OK)
+    if (_configurator->Initialize(cfgFilePath) != LLBC_OK)
     {
         LLBC_XDelete(_configurator);
         return LLBC_FAILED;
@@ -89,8 +91,7 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFile)
 
     // Config other loggers.
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
-    std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator cfgIter = configs.begin();
-    for (; cfgIter != configs.end(); ++cfgIter)
+    for (auto cfgIter = configs.begin(); cfgIter != configs.end(); ++cfgIter)
     {
         if (cfgIter->first == rootLoggerName)
             continue;
@@ -112,6 +113,36 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFile)
     // Startup shared log runnable.
     if (_sharedLogRunnable)
         _sharedLogRunnable->Activate(1, LLBC_ThreadPriority::BelowNormal);
+
+    return LLBC_OK;
+}
+
+int LLBC_LoggerMgr::Reload()
+{
+    LLBC_LockGuard guard(_lock);
+
+    // Not init check.
+    if (!_rootLogger)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    // Load config file(use temporary LoggerConfigurator).
+    auto logConfigurator = new LLBC_LoggerConfigurator;
+    LLBC_Defer(delete logConfigurator);
+    if (logConfigurator->Initialize(_configurator->GetConfigFilePath()) != LLBC_OK)
+        return LLBC_FAILED;
+
+    // Re-Config root logger.
+    if (logConfigurator->ReConfig(_rootLogger) != LLBC_OK)
+        return LLBC_FAILED;
+    // Re-Config other loggers.
+    for (auto &loggerItem : _cstr2Loggers)
+    {
+        if (logConfigurator->ReConfig(loggerItem.second) != LLBC_OK)
+            return LLBC_FAILED;
+    }
 
     return LLBC_OK;
 }

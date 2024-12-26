@@ -68,7 +68,7 @@ LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(Obj *obj, Rtn(Obj::*constMeth)(Args..
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(LLBC_Delegate &&another)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(LLBC_Delegate &&another) noexcept
 : _cfunc(another._cfunc)
 , _stlFunc(std::move(another._stlFunc))
 {
@@ -137,7 +137,7 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const CFunc 
 
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(StlFunc &&stlFunc)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(StlFunc &&stlFunc) noexcept
 {
     _cfunc = nullptr;
     _stlFunc = std::move(stlFunc);
@@ -155,7 +155,7 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const StlFun
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(LLBC_Delegate<Rtn(Args...)> &&another)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(LLBC_Delegate<Rtn(Args...)> &&another) noexcept
 {
     if (UNLIKELY(&another == this))
         return *this;

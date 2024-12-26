@@ -72,7 +72,7 @@ LLBC_FORCE_INLINE LLBC_GuardedPoolObj<Obj>::LLBC_GuardedPoolObj(const LLBC_Guard
 }
 
 template <typename Obj>
-LLBC_FORCE_INLINE LLBC_GuardedPoolObj<Obj>::LLBC_GuardedPoolObj(LLBC_GuardedPoolObj &&other)
+LLBC_FORCE_INLINE LLBC_GuardedPoolObj<Obj>::LLBC_GuardedPoolObj(LLBC_GuardedPoolObj &&other) noexcept
 : _obj(other._obj)
 , _typedObjPool(other._typedObjPool)
 {
@@ -114,7 +114,7 @@ LLBC_GuardedPoolObj<Obj> &LLBC_GuardedPoolObj<Obj>::operator=(const LLBC_Guarded
 }
 
 template <typename Obj>
-LLBC_GuardedPoolObj<Obj> &LLBC_GuardedPoolObj<Obj>::operator=(LLBC_GuardedPoolObj &&other)
+LLBC_GuardedPoolObj<Obj> &LLBC_GuardedPoolObj<Obj>::operator=(LLBC_GuardedPoolObj &&other) noexcept
 {
     if (UNLIKELY(this == &other))
         return *this;

@@ -44,6 +44,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
 
     LLBC_ErrorAndReturnIf(BasicTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ErrorAndReturnIf(InfiniteEventFireTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(CopyEventTest() != LLBC_OK, LLBC_FAILED);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -66,10 +67,6 @@ int TestCase_Core_Event::BasicTest()
         LLBC_PrintLn("- Fire Event2...");
         evMgr.BeginFire(EventIds::Event2)
             .SetParam("Event2_Key1", "The value")
-            .SetParam(false, true)
-            .SetParam(1.3, 2.6)
-            .SetParam(std::vector<int>{}, LLBC_Variant::nil)
-            .SetParam(std::set<LLBC_String>{}, LLBC_Variant::nil)
             .Fire();
     });
 
@@ -128,15 +125,33 @@ int TestCase_Core_Event::BasicTest()
         // Fire Event1 again.
         LLBC_PrintLn("- Fire Event1 again..");
         evMgr.BeginFire(EventIds::Event1)
-            .Fire();
+             .Fire();
         LLBC_PrintLn("- Fire Event1 finished");
     });
 
     // Fire Event1.
     LLBC_PrintLn("Fire Event1...");
+    char charArray[] = "char array: hello world";
+    const char constCharArray[] = "const char array: hello world";
+    const char *constCharPointer = "const char pointer: hello world";
     evMgr.BeginFire(EventIds::Event1)
+        .SetParam("cstring", "cstring: hello world")
+        .SetParam("cstring", "cstring: hello world")
+        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(charArray, "char array: hello world")
+        .SetParam(charArray, "char array: hello world")
+        .SetParam(constCharArray, "const char array: hello world")
+        .SetParam(constCharArray, "const char array: hello world")
+        .SetParam(constCharPointer, "const char pointer: hello world")
+        .SetParam(constCharPointer, "const char pointer: hello world")
         .SetParam("Event1_Key1", LLBC_Rand())
         .Fire();
+
+    auto* ev = new LLBC_Event(EventIds::Event1);
+    ev->SetParam(std::string("copy string"), "copy string: hello world");
+    (*ev)["empty"] = 111;
+    LLBC_PrintLn("Empty key params - param:%d", (*ev)["empty"].AsInt32());
 
     // Test finished, remove all listeners.
     evMgr.RemoveListener(ev1Stub1);
@@ -194,9 +209,57 @@ int TestCase_Core_Event::InfiniteEventFireTest()
     return LLBC_OK;
 }
 
+int TestCase_Core_Event::CopyEventTest()
+{
+    LLBC_PrintLn("==================================");
+    LLBC_PrintLn("Event copy test:");
+
+
+    LLBC_Event originEv(1);
+    originEv.SetParam("origin_key1", "origin_value1");
+    originEv.SetParam("origin_key2", "origin_value2");
+
+    LLBC_Event copyEv(originEv);
+    LLBC_PrintLn("Copy event, origin event:");
+    DumpEvParams(originEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event assignEv;
+    assignEv = originEv;
+    LLBC_PrintLn("Assign event, origin event:");
+    DumpEvParams(assignEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event copyRightEv([]()
+    {
+        LLBC_Event ev(2);
+        ev.SetParam("copy_right_key1", "copy_right_value1");
+        ev.SetParam("copy_right_key2", "copy_right_value2");
+        return ev;
+    }());
+    LLBC_PrintLn("Copy right event:");
+    DumpEvParams(copyRightEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event assignRightEv;
+    assignRightEv = []()
+    {
+        LLBC_Event ev(3);
+        ev.SetParam("assign_right_key1", "assign_right_value1");
+        ev.SetParam("assign_right_key2", "assign_right_value2");
+        return ev;
+    }();
+    LLBC_PrintLn("Assign right event:");
+    DumpEvParams(assignRightEv);
+
+    LLBC_PrintLn("Event copy test finished");
+    LLBC_PrintLn("==================================");
+    return LLBC_OK;
+}
+
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
-    const auto &params = ev.GetParams();
-    for(const auto &[key, value] : params)
-        LLBC_PrintLn("- %s: %s", key.ValueToString().c_str(), value.ToString().c_str());
+    std::stringstream s;
+    s << ev;
+    LLBC_PrintLn("LLBC Event info:%s", s.str().c_str());
 }

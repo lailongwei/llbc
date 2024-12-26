@@ -52,17 +52,21 @@ public:
     SafeObjPoolPrintNameTask(int testTimes)
     : _objPool(true)
     , _testTimes(testTimes)
-    {}
+    {
+    }
+
 public:
     void Svc() override
     {
         int curId = LLBC_AtomicFetchAndAdd(&_subThreadId, 1);
 
-        if ((curId % 2) == 0) { _GetName(); }
-        else { _SetName(); }
+        if ((curId % 2) == 0)
+            _GetName();
+        else 
+            _SetName();
     }
 
-    void Cleanup() override {}
+    void Cleanup() override {  }
 
     LLBC_ObjPool &GetObjPool() { return _objPool; }
 
@@ -70,9 +74,7 @@ protected:
     void _GetName()
     {
         for (int i = 0; i < _testTimes; i++)
-        {
-            LLBC_PrintLn("GetName: %s ", _objPool.GetName().c_str());
-        }
+            LLBC_PrintLn("GetName: %s", _objPool.GetName().c_str());
     }
 
     void _SetName()
@@ -80,7 +82,7 @@ protected:
         LLBC_String objPoolName;
         for (int i = 0; i < _testTimes; i++)
         {
-            LLBC_PrintLn("SetName: %s ", objPoolName.format("test_%d", i).c_str());
+            LLBC_PrintLn("SetName: %s", objPoolName.format("test_%d", i).c_str());
             _objPool.SetName(objPoolName);
         }
     }
@@ -907,7 +909,7 @@ int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
     SafeObjPoolPrintNameTask printNametask(testTimes);
 
     auto &objPool = printNametask.GetObjPool();
-    LLBC_PrintLn("safe-obj-pool: %s ", objPool.GetName().c_str());
+    LLBC_PrintLn("safe-obj-pool: %s", objPool.GetName().c_str());
 
     printNametask.Activate(8);
 
@@ -917,7 +919,7 @@ int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
 
     LLBC_ErrorAndReturnIf(expectedName != objPoolFinalName, 
                           LLBC_FAILED, 
-                          "objPoolFinalName(%s) is not expected(%s) ", 
+                          "objPoolFinalName(%s) is not expected(%s)", 
                           objPoolFinalName.c_str(), 
                           expectedName.c_str());
 

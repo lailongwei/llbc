@@ -39,5 +39,10 @@ private:
     void DoUninitLogTest();
     void SyncLoggerMultiThreadTest();
     void DoConditionMacroLogTest();
+    int DoLoggerMgrReloadTest();
+
     void OnLogHook(const LLBC_LogData *logData);
+
+private:
+    LLBC_String _logCfgFilePath;
 };

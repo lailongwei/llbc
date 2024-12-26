@@ -223,7 +223,6 @@ int LLBC_Logger::SetAppenderLogLevel(int appenderType, int logLevel)
     LLBC_BaseLogAppender *appender = _appenders;
     while (appender && appender->GetType() != appenderType)
         appender = appender->GetAppenderNext();
-
     if (!appender)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);

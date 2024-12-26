@@ -56,10 +56,17 @@ public:
 public:
     /**
      * Initialize logger manager using config file.
-     * @param[in] cfgFile - config file, for now, supported property/xml format.
+     * @param[in] cfgFilePath - config file, for now, supported properties/xml format.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_String &cfgFile);
+    int Initialize(const LLBC_String &cfgFilePath);
+
+    /**
+     * Reload logger manager using config file.
+     * Note: logger reload only support existing logger(s) reload.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Reload();
 
     /**
      * Finalize logger manager.

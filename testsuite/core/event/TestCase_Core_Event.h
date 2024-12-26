@@ -37,6 +37,7 @@ public:
 private:
     int BasicTest();
     int InfiniteEventFireTest();
+    int CopyEventTest();
 
 private:
     void DumpEvParams(const LLBC_Event &ev);

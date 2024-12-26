@@ -174,7 +174,7 @@ struct MovableCls
         LLBC_PrintLn("- MovableCls::MovableCls(const MovableCls &) called!");
     }
 
-    MovableCls(MovableCls &&other)
+    MovableCls(MovableCls &&other) noexcept
     : intVal(other.intVal)
     , strVal(std::move(other.strVal))
     {
@@ -192,7 +192,7 @@ struct MovableCls
         return *this;
     }
 
-    MovableCls &operator=(MovableCls &&other)
+    MovableCls &operator=(MovableCls &&other) noexcept
     {
         intVal = other.intVal;
         other.intVal = 0;
