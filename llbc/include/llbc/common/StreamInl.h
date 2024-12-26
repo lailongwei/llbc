@@ -102,7 +102,7 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(size_t cap)
 {
 }
 
-LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(LLBC_Stream &&rhs)
+LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(LLBC_Stream &&rhs) noexcept
 : _buf(rhs._buf)
 , _readPos(rhs._readPos)
 , _writePos(rhs._writePos)
@@ -1300,7 +1300,7 @@ LLBC_FORCE_INLINE LLBC_Stream &LLBC_Stream::operator=(const LLBC_Stream &rhs)
     return *this;
 }
 
-LLBC_FORCE_INLINE LLBC_Stream &LLBC_Stream::operator=(LLBC_Stream &&rhs)
+LLBC_FORCE_INLINE LLBC_Stream &LLBC_Stream::operator=(LLBC_Stream &&rhs) noexcept
 {
     if (_buf && !_attach)
         free(_buf);

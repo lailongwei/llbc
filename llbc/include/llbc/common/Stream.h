@@ -129,7 +129,7 @@ public:
     /**
      * Move constructor.
      */
-    LLBC_Stream(LLBC_Stream &&rhs);
+    LLBC_Stream(LLBC_Stream &&rhs) noexcept;
 
     /**
      * Copy right side stream, and can determine attach attribute, if
@@ -977,7 +977,7 @@ public:
     /**
      * Move assignment.
      */
-    LLBC_Stream &operator=(LLBC_Stream &&rhs);
+    LLBC_Stream &operator=(LLBC_Stream &&rhs) noexcept;
 
 private:
     bool ReserveWritableSize(size_t writableSize);

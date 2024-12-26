@@ -179,7 +179,7 @@ LLBC_Variant::LLBC_Variant(const LLBC_Variant &var)
     LLBC_VariantTraits::assign(*this, var);
 }
 
-LLBC_Variant::LLBC_Variant(LLBC_Variant &&var)
+LLBC_Variant::LLBC_Variant(LLBC_Variant &&var) noexcept
 : _holder(var._holder)
 {
     var._holder.type = LLBC_VariantType::NIL;
@@ -918,7 +918,7 @@ LLBC_Variant &LLBC_Variant::operator=(const Dict &dict)
     return *this;
 }
 
-LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var)
+LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var) noexcept
 {
     if (this == &var)
         return *this;

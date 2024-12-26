@@ -50,7 +50,7 @@ public:
      */
     LLBC_PoolObj(): _typedObjPool(nullptr) {  }
     LLBC_PoolObj(const LLBC_PoolObj &other): _typedObjPool(nullptr) {  }
-    LLBC_PoolObj(LLBC_PoolObj &&other): _typedObjPool(nullptr) {  }
+    LLBC_PoolObj(LLBC_PoolObj &&other) noexcept: _typedObjPool(nullptr) {  }
     virtual ~LLBC_PoolObj() = default;
 
     /**
@@ -68,7 +68,7 @@ public:
 public:
     // Assignment supported(skip _typedObjPool assignment).
     LLBC_PoolObj &operator=(const LLBC_PoolObj &other) { return *this; }
-    LLBC_PoolObj &operator=(LLBC_PoolObj &&other) { return *this; }
+    LLBC_PoolObj &operator=(LLBC_PoolObj &&other) noexcept { return *this; }
 
 private:
     void *_typedObjPool;
@@ -514,7 +514,7 @@ private:
     LLBC_GuardedPoolObj(Obj *obj, LLBC_TypedObjPool<Obj> *typedObjPool);
 public:
     LLBC_GuardedPoolObj(const LLBC_GuardedPoolObj &other);
-    LLBC_GuardedPoolObj(LLBC_GuardedPoolObj &&other);
+    LLBC_GuardedPoolObj(LLBC_GuardedPoolObj &&other) noexcept;
     ~LLBC_GuardedPoolObj();
 
 public:
@@ -564,7 +564,7 @@ public:
      * Copy assignment/Move assignment impl.
      */
     LLBC_GuardedPoolObj &operator=(const LLBC_GuardedPoolObj &other);
-    LLBC_GuardedPoolObj &operator=(LLBC_GuardedPoolObj &&other);
+    LLBC_GuardedPoolObj &operator=(LLBC_GuardedPoolObj &&other) noexcept;
 
 private:
     friend class LLBC_TypedObjPool<Obj>;

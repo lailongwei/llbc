@@ -46,7 +46,7 @@ private:
     LLBC_ServiceEventFirer(LLBC_Service *svc, LLBC_Event *ev);
 public:
     LLBC_ServiceEventFirer(const LLBC_ServiceEventFirer &other);
-    LLBC_ServiceEventFirer(LLBC_ServiceEventFirer &&other);
+    LLBC_ServiceEventFirer(LLBC_ServiceEventFirer &&other) noexcept;
     ~LLBC_ServiceEventFirer();
 
 public:
@@ -68,7 +68,7 @@ public:
 public:
     // Copy assignment & Move assignment.
     LLBC_ServiceEventFirer &operator=(const LLBC_ServiceEventFirer &other);
-    LLBC_ServiceEventFirer &operator=(LLBC_ServiceEventFirer &&other);
+    LLBC_ServiceEventFirer &operator=(LLBC_ServiceEventFirer &&other) noexcept;
 
 private:
     friend class LLBC_ServiceImpl;
