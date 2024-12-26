@@ -246,8 +246,8 @@ inline int LLBC_Time::GetCrossedMonths(const LLBC_Time &from,
 
     const auto normalizedFrom = from - timeOfMonth;
     const auto normalizedTo = to - timeOfMonth;
-    const auto diffYears = normalizedFrom.GetYear() - normalizedTo.GetYear();
-    const auto diffMonths = normalizedFrom.GetMonth() - normalizedTo.GetMonth();
+    const auto diffYears = normalizedTo.GetYear() - normalizedFrom.GetYear();
+    const auto diffMonths = normalizedTo.GetMonth() - normalizedFrom.GetMonth();
 
     return diffYears * 12 + diffMonths;
 }
