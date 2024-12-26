@@ -35,9 +35,21 @@ __LLBC_NS_BEGIN
 #endif // x86 or x86_64
 
 /**
+ * The rdtscp support flag.
+ */
+#if LLBC_SUPPORT_RDTSC
+extern LLBC_EXPORT bool __LLBC_supportedRdtscp;
+#endif // LLBC_SUPPORT_RDTSC
+
+/**
  * Set timezone.
  */
 LLBC_EXPORT void LLBC_TZSet();
+
+/**
+ * Init TSC(Real Time-Stamp Counter) support flags(eg: RDTSCP/...).
+ */
+LLBC_EXPORT void LLBC_InitTSCSupportFlags();
 
 /**
  * Get timezone value, the value is difference in seconds between coordinated universal 

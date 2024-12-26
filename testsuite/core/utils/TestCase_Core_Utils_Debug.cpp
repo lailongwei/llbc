@@ -39,6 +39,13 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     // Stopwatch test.
     LLBC_PrintLn("Test Stopwatch:");
 
+    // - RDTSCP support flag.
+    #if LLBC_SUPPORT_RDTSC
+    LLBC_PrintLn("- __LLBC_supportedRdtscp: %s", __LLBC_supportedRdtscp ? "true" : "false");
+    #else
+    LLBC_PrintLn("- __LLBC_supportedRdtscp: false");
+    #endif
+
     // - Output basic information.
     {
         LLBC_PrintLn("- IsHighResolution: %d", LLBC_Stopwatch::IsHighResolution());

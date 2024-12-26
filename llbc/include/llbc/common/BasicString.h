@@ -923,7 +923,7 @@ public:
 
     int compare(const LLBC_BasicCString<_Elem> &cstr) const
     {
-        return _Base::compare(0, cstr.size(), cstr.c_str());
+        return _Base::compare(0, this->size(), cstr.c_str(), cstr.size());
     }
 
     int compare(size_type p0, size_type n0, const _This &str)
