@@ -177,6 +177,6 @@ __LLBC_NS_END
 /**
  * Stream output operator support.
  */
-std::ostream &operator<<(std::ostream &o, const llbc::LLBC_Event &ev);
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Event &ev);
 
 #include "llbc/core/event/EventInl.h"

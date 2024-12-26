@@ -247,7 +247,7 @@ inline void LLBC_Event::Reuse()
 
 __LLBC_NS_END
 
-inline std::ostream &operator<<(std::ostream &o, const llbc::LLBC_Event &ev)
+inline std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Event &ev)
 {
     o << "LLBC_Event("
       << "id:" << ev.GetId()
