@@ -342,7 +342,7 @@ public:
      * @param[in] to          - to time.
      * @param[in] timeOfMonth - cross time of month point.
      * @return int - crossed months.
-     * @note: timeOfMonth must be less than 27 days old, otherwise will return 0.
+     * @note: timeOfMonth must be less than 31 days old, otherwise will return 0.
      *        if timeOfMonth=oneDay, it means it's the second day of month.
      */
     static int GetCrossedMonths(const LLBC_Time &from,

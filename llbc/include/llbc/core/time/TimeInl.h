@@ -230,28 +230,6 @@ inline int LLBC_Time::GetCrossedWeeks(const LLBC_Time &from,
     return GetCrossedCycles(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek).GetTotalDays() / 7;
 }
 
-inline int LLBC_Time::GetCrossedMonths(const LLBC_Time &from,
-                                       const LLBC_Time &to,
-                                       const LLBC_TimeSpan &timeOfMonth)
-{
-    // If span <= 0, return zero.
-    const LLBC_TimeSpan diff = to - from;
-    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
-        return 0;
-
-    if (UNLIKELY(timeOfMonth > LLBC_TimeSpan::oneDay*27)) {
-        ASSERT(false && "timeOfMonth must <= 27 days");
-        return 0;
-    }
-
-    const auto normalizedFrom = from - timeOfMonth;
-    const auto normalizedTo = to - timeOfMonth;
-    const auto diffYears = normalizedTo.GetYear() - normalizedFrom.GetYear();
-    const auto diffMonths = normalizedTo.GetMonth() - normalizedFrom.GetMonth();
-
-    return diffYears * 12 + diffMonths;
-}
-
 inline bool LLBC_Time::operator==(const LLBC_Time &time) const
 {
     return _time == time._time;

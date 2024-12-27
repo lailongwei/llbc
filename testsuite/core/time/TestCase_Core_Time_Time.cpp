@@ -648,6 +648,18 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
                           LLBC_Time::FromTimeStr("2024-07-15 00:59:59"),
                           LLBC_TimeSpan::FromDays(14, 1),
                           0);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(31),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(28, 59, 59, 59),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(29),
+                          0);
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
