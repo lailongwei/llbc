@@ -659,7 +659,11 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
     crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
                           LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
                           LLBC_TimeSpan::FromDays(29),
-                          0);
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-30 00:00:00"),
+                          LLBC_TimeSpan::FromDays(29),
+                          2);
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
