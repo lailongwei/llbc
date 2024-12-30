@@ -291,6 +291,12 @@
 #define LLBC_CFG_APP_TRY_STOP_INTERVAL              5
 // Application idle sleep time, in milli-seconds.
 #define LLBC_CFG_APP_IDLE_SLEEP_TIME                5
+// Default application FPS value.
+#define LLBC_CFG_APP_DFT_FPS                        200
+// Min application FPS value.
+#define LLBC_CFG_APP_MIN_FPS                        1
+// Max application FPS value.
+#define LLBC_CFG_APP_MAX_FPS                        1000
 // Application stop signals.
 #if LLBC_TARGET_PLATFORM_WIN32
  #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM}
