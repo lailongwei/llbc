@@ -572,7 +572,8 @@ int LLBC_Time::GetCrossedMonths(const LLBC_Time &from,
     if (UNLIKELY(timeOfMonth >= LLBC_TimeSpan::oneDay*31)) 
         return 0;
 
-    const static auto preMonthMaxDays = [](int year, int month) {
+    const static auto preMonthMaxDays = [](int year, int month) 
+    {
         month  = (month == 0) ? 11 : month - 1;
         if (month == 1)
             return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) ? 29 : 28;
