@@ -116,7 +116,7 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::difference_type n0, Obj *o)
 
 LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, Obj *o)
 {
-    if (UNLIKELY(o))
+    if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return End();

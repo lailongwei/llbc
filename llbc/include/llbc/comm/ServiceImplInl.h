@@ -65,7 +65,8 @@ inline int LLBC_ServiceImpl::GetFPS() const
 
 inline int LLBC_ServiceImpl::GetFrameInterval() const
 {
-    return _frameInterval;
+
+    return _fps != static_cast<int>(LLBC_INFINITE) ? 1000 / _fps : 0;
 }
 
 inline LLBC_EventMgr &LLBC_ServiceImpl::GetEventManager()

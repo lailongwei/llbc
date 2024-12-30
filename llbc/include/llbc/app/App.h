@@ -169,9 +169,8 @@ public:
 
     /**
      * Application main-loop event method, when application running, will call this event method per-tick.
-     * @param[out] doNothing - if event method do nothing, set to true(default is true), otherwise set to false.
      */
-    virtual void OnUpdate(bool &doNothing) {  }
+    virtual void OnUpdate() {  }
 
     /**
      * Application reloaded event method, please override this method in your project.
@@ -186,6 +185,25 @@ public:
     template <typename App>
     static App *ThisApp() { return static_cast<App *>(_thisApp); }
     static LLBC_App *ThisApp() { return _thisApp; }
+
+public:
+    /**
+     * Get application FPS.
+     * @return int - the application FPS.
+     */
+    int GetFps() const;
+
+    /**
+     * Set application FPS.
+     * @return int - return 0 if success, ohterwise return -1.
+     */
+    int SetFPS(int fps);
+
+    /**
+     * Get application frame interval, in milli-seconds.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int GetFrameInterval() const;
 
 public:
     /**
@@ -364,7 +382,7 @@ private:
     int ReloadPropertyConfig();
 
 private:
-    void HandleEvents(bool &doNothing);
+    void HandleEvents();
     void HandleEvent_Stop(const LLBC_AppEvent &ev);
     void HandleEvent_Reload(const LLBC_AppEvent &ev);
 
@@ -387,6 +405,9 @@ private:
     bool _llbcLibStartupInApp; // llbc library startup in App flag.
     bool _requireStop; // Stop flag, when App processed Stop event, will set to true.
     LLBC_ServiceMgr &_services; // Service manager.
+    LLBC_SpinLock _fpsLock; // FPS lock.
+    volatile int _fps; // App FPS.
+    sint64 _begRunTime; // Begin heartbeat time, update on every heartbeat begin.
 
     // Load/Reload data members.
     volatile int _loading; // Loading flag.

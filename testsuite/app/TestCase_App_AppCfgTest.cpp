@@ -90,6 +90,7 @@ public:
     TestApp(LLBC_TimeSpan startNeedTime, LLBC_TimeSpan stopNeedTime)
     : _startNeedTime(startNeedTime)
     , _stopNeedTime(stopNeedTime)
+    , _lastRunTime(0)
     {
     }
 
@@ -153,6 +154,7 @@ public:
     void OnLateStart(int argc, char *argv[]) override
     {
         std::cout << "App " <<GetName() <<"late start finished" <<std::endl;
+        _lastRunTime = LLBC_GetMilliseconds();
     }
 
     void OnStop(bool &stopFinished) override
@@ -172,10 +174,12 @@ public:
         }
     }
 
-    void OnUpdate(bool &doNothing) override
+    void OnUpdate() override
     {
-        std::cout <<"TestApp::OnUpdate()..." <<std::endl;
-        LLBC_Sleep(500);
+        sint64 now = LLBC_GetMilliseconds();
+        std::cout <<"TestApp::OnUpdate()... interval:" << now - _lastRunTime <<std::endl;
+        _lastRunTime = now;
+        LLBC_Sleep(200);
     }
 
 private:
@@ -183,6 +187,7 @@ private:
     LLBC_Time _stopTime;
     LLBC_TimeSpan _startNeedTime;
     LLBC_TimeSpan _stopNeedTime;
+    sint64 _lastRunTime;
 };
 
 }
