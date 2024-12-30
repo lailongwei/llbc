@@ -228,10 +228,10 @@ void pyllbc_Timer::SetIgnoredDeadRef(bool flag)
 {
     _ignoredDeadRef = flag;
 }
-
-int pyllbc_Timer::Schedule(sint64 dueTime, sint64 period)
+    
+int pyllbc_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
 {
-    if (Base::Schedule(LLBC_TimeSpan::FromMillis(dueTime), LLBC_TimeSpan::FromMillis(period)) != LLBC_OK)
+    if (Base::Schedule(dueTime, period) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, ToString());
         return LLBC_FAILED;

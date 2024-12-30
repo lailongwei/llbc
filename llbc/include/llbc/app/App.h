@@ -349,7 +349,7 @@ private:
     /**
      * Application reload implement method.
      * @param[in] checkAppStarted - Check Application started flag.
-     * @param callEvMeth          - Call event method flag.
+     * @param[in] callEvMeth      - Call event method flag.
      * @return int - return 0 if success, otherwise return -1.
      */
     int ReloadImpl(bool checkAppStarted, bool callEvMeth);

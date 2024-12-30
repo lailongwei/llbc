@@ -89,7 +89,7 @@ LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep, size_t li
 
         if (lineWidth > 0 &&
             byteIdx % lineWidth == 0)
-            hexStr[hexStrIdx++] = LLBC_LF_A;
+            hexStr[hexStrIdx++] = '\n';
     }
 
     #if LLBC_DEBUG

@@ -87,7 +87,7 @@ const LLBC_Variant &LLBC_Timer::GetTimerData() const
     return _data ? *_data : LLBC_Variant::nil;
 }
 
-int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
+int LLBC_Timer::Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &period)
 {
     // Note: Allow reschedule in <OnCancel> event meth.
     // if (_timerData && _timerData->cancelling)
@@ -110,12 +110,12 @@ int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &peri
         }
     }
 
-    const sint64 dueTimeMillis = MAX(0ll, dueTime.GetTotalMillis());
+    const sint64 firstPeriodInMillis = MAX(0ll, firstPeriod.GetTotalMillis());
     sint64 periodMillis = MAX(0ll, period.GetTotalMillis());
     if (periodMillis == 0ll)
-        periodMillis = dueTimeMillis;
+        periodMillis = firstPeriodInMillis;
 
-    return _scheduler->Schedule(this, dueTimeMillis, periodMillis);
+    return _scheduler->Schedule(this, firstPeriodInMillis, periodMillis);
 }
 
 int LLBC_Timer::Cancel()

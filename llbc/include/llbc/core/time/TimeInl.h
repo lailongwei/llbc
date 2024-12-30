@@ -37,6 +37,21 @@ inline LLBC_Time::LLBC_Time(const LLBC_Time &time)
     memcpy(&_localTimeStruct, &time._localTimeStruct, sizeof(tm));
 }
 
+inline time_t LLBC_Time::NowTimestampInSecs()
+{
+    return time(nullptr);
+}
+
+inline sint64 LLBC_Time::NowTimestampInMillis()
+{
+    return LLBC_GetMilliseconds();
+}
+
+inline sint64 LLBC_Time::NowTimestampInMicros()
+{
+    return LLBC_GetMicroseconds();
+}
+
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
 {
     return LLBC_Time(clanderTimeInSeconds * LLBC_TimeConst::numOfMicrosPerSecond);
@@ -93,12 +108,7 @@ inline int LLBC_Time::GetYear() const
 
 inline int LLBC_Time::GetMonth() const
 {
-    return _localTimeStruct.tm_mon + 1; // start by 1
-}
-
-inline int LLBC_Time::GetDay() const
-{
-    return _localTimeStruct.tm_mday;
+    return _localTimeStruct.tm_mon;
 }
 
 inline int LLBC_Time::GetDayOfWeek() const
@@ -108,12 +118,12 @@ inline int LLBC_Time::GetDayOfWeek() const
 
 inline int LLBC_Time::GetDayOfMonth() const
 {
-        return GetDayOfYear() - GetMonthSpanDays(GetYear(), GetMonth() - 1);
+    return _localTimeStruct.tm_mday;
 }
 
 inline int LLBC_Time::GetDayOfYear() const
 {
-    return _localTimeStruct.tm_yday + 1; // start by 1
+    return _localTimeStruct.tm_yday;
 }
 
 inline int LLBC_Time::GetHour() const
@@ -199,25 +209,25 @@ inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toT
     return GetIntervalTo(LLBC_TimeSpan::oneWeek, toTimeOfWeek);
 }
 
-inline bool LLBC_Time::IsCrossedHour(const LLBC_Time &from,
-                                     const LLBC_Time &to,
-                                     const LLBC_TimeSpan &timeOfHour)
+inline int LLBC_Time::GetCrossedHours(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeOfHour)
 {
-    return IsCrossed(from, to, LLBC_TimeSpan::oneHour, timeOfHour);
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneHour, timeOfHour).GetTotalHours();
 }
 
-inline bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
-                                    const LLBC_Time &to,
-                                    const LLBC_TimeSpan &timeOfDay)
+inline int LLBC_Time::GetCrossedDays(const LLBC_Time &from, 
+                                     const LLBC_Time &to,
+                                     const LLBC_TimeSpan &timeOfDay)
 {
-    return IsCrossed(from, to, LLBC_TimeSpan::oneDay, timeOfDay);
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneDay, timeOfDay).GetTotalDays(); 
 }
 
-inline bool LLBC_Time::IsCrossedWeek(const LLBC_Time &from,
-                                     const LLBC_Time &to,
-                                     const LLBC_TimeSpan &timeOfWeek)
+inline int LLBC_Time::GetCrossedWeeks(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeOfWeek)
 {
-    return IsCrossed(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek);
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek).GetTotalDays() / 7;
 }
 
 inline bool LLBC_Time::operator==(const LLBC_Time &time) const
@@ -272,3 +282,9 @@ inline void LLBC_Time::FillTimeStruct()
 }
 
 __LLBC_NS_END
+
+inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
+{
+    return stream << t.ToString();
+}
+

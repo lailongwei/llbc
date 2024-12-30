@@ -336,12 +336,6 @@ int LLBC_ServiceImpl::Stop()
     }
 }
 
-int LLBC_ServiceImpl::GetFPS() const
-{
-    LLBC_LockGuard guard(_lock);
-    return _fps;
-}
-
 int LLBC_ServiceImpl::SetFPS(int fps)
 {
     if (fps != static_cast<int>(LLBC_INFINITE) &&
@@ -355,21 +349,11 @@ int LLBC_ServiceImpl::SetFPS(int fps)
 
     _fps = fps;
     if (_fps != static_cast<int>(LLBC_INFINITE))
-    {
         _frameInterval = 1000 / _fps;
-    }
     else
-    {
         _frameInterval = 0;
-    }
 
     return LLBC_OK;
-}
-
-int LLBC_ServiceImpl::GetFrameInterval() const
-{
-    LLBC_LockGuard guard(_lock);
-    return _frameInterval;
 }
 
 int LLBC_ServiceImpl::Listen(const char *ip,
@@ -1349,7 +1333,12 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
     _cfgType = appCfgType;
     _cfg.BecomeNil();
 
+    if (_cfgType < LLBC_AppConfigType::Begin ||
+        _cfgType >= LLBC_AppConfigType::End)
+        return;
+
     // Update service config.
+    bool isXmlCfg = false;
     if (_cfgType == LLBC_AppConfigType::Property)
     {
         // Service config prop name:
@@ -1359,42 +1348,63 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
         // <svc_name>.xxx.xxx.xxx....
         _cfg = appCfg[GetName()];
     }
-    else
+    else if (_cfgType == LLBC_AppConfigType::Ini)
     {
-        if (_cfgType == LLBC_AppConfigType::Ini)
+        // Service config section: [<svc_name>]
+        // Comp config section(s): [<svc_name>.<comp_name>]
+        for (auto it = appCfg.DictBegin(); it != appCfg.DictEnd(); ++it)
         {
-            // Service config section: [<svc_name>]
-            // Comp config section(s): [<svc_name>.<comp_name>]
-            for (auto it = appCfg.DictBegin(); it != appCfg.DictEnd(); ++it)
+            const auto iniSectionName = it->first.AsStr();
+            if (iniSectionName == GetName())
             {
-                const auto iniSectionName = it->first.AsStr();
-                if (iniSectionName == GetName() ||
-                    (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1))
-                    _cfg[iniSectionName] = it->second;
+                for (auto &iniCfgItem : it->second.AsDict())
+                    _cfg.DictInsert(iniCfgItem.first, iniCfgItem.second);
             }
-        }
-        else if (_cfgType == LLBC_AppConfigType::Xml)
-        {
-            auto &svcCfgs = appCfg[LLBC_XMLKeys::Children];
-            for (auto &svcCfg : svcCfgs.AsSeq())
+            else if (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1)
             {
-                const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].AsStr();
-                if (svcCfgName != "Service" &&
-                    svcCfgName != "service" &&
-                    svcCfgName != "Svc" &&
-                    svcCfgName != "svc")
-                    continue;
-
-                const auto &svcCfgAttrs = svcCfg[LLBC_XMLKeys::Attrs];
-                if (svcCfgAttrs["Name"] == GetName() ||
-                    svcCfgAttrs["name"] == GetName())
-                {
-                    _cfg = svcCfg;
-                    break;
-                }
+                auto &compCfg = _cfg[iniSectionName.substr(GetName().size() + 1)];
+                for (auto &compCfgItem : it->second.AsDict())
+                    compCfg.DictInsert(compCfgItem.first, compCfgItem.second);
             }
         }
     }
+    else // if (_cfgType == LLBC_AppConfigType::Xml)
+    {
+        isXmlCfg = true;
+        auto &svcCfgs = appCfg[LLBC_XMLKeys::Children];
+        for (auto &svcCfg : svcCfgs.AsSeq())
+        {
+            const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].AsStr();
+            if (svcCfgName != "Service" &&
+                svcCfgName != "service" &&
+                svcCfgName != "Svc" &&
+                svcCfgName != "svc")
+                continue;
+
+            const auto &svcCfgAttrs = svcCfg[LLBC_XMLKeys::Attrs];
+            if (svcCfgAttrs["Name"] == GetName() ||
+                svcCfgAttrs["name"] == GetName())
+            {
+                _cfg = svcCfg;
+                break;
+            }
+        }
+    }
+
+    // After config update, read recognizable service config.
+    // - Update service fps:
+    for (auto cfgItem : _cfg.AsDict())
+    {
+        if (cfgItem.first.AsStr().tolower() == "fps")
+        {
+            const auto fps = isXmlCfg ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
+            SetFPS(fps);
+            break;
+        }
+    }
+
+    // - Update other service configs.
+    // ... ...
 }
 
 void LLBC_ServiceImpl::AddServiceToTls()
@@ -2149,7 +2159,7 @@ void LLBC_ServiceImpl::UpdateComps()
 {
     for(auto &comp : _compList)
     {
-        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+        if (comp->_runningPhase >= _CompRunningPhase::Started)
             comp->OnUpdate();
     }
 }
@@ -2158,7 +2168,7 @@ void LLBC_ServiceImpl::LateUpdateComps()
 {
     for(auto &comp : _compList)
     {
-        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+        if (comp->_runningPhase >= _CompRunningPhase::Started)
             comp->OnLateUpdate();
     }
 }

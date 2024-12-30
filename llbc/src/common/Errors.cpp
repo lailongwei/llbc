@@ -23,7 +23,6 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/common/OSHeader.h"
-#include "llbc/common/Define.h"
 #include "llbc/common/Errno.h"
 #include "llbc/common/LibTlsInl.h"
 #include "llbc/common/StringDataType.h"
@@ -145,6 +144,10 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "application early start failed", // 0x0032
     // application start failed.
     "application start failed", // 0x0033
+    // timer scheduler destroying.
+    "timer scheduler destroying", // 0x0034
+    // timer scheduler canceling all.
+    "timer scheduler canceling all", // 0x0035
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;
@@ -322,8 +325,8 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
             bool hasCRLF = false;
             const size_t sysErrLen = strlen(sysErr);
             if (sysErrLen >= 2)
-                if (sysErr[sysErrLen - 2] == LLBC_CR_A &&
-                    sysErr[sysErrLen - 1] == LLBC_LF_A)
+                if (sysErr[sysErrLen - 2] == '\r' &&
+                    sysErr[sysErrLen - 1] == '\n')
                         hasCRLF = true;
 
             if (hasCRLF)

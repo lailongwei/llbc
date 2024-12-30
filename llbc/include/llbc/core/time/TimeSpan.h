@@ -160,12 +160,6 @@ public:
 
 public:
     /**
-     * Stream output operator support.
-     */
-    friend std::ostream & ::operator<<(std::ostream &o, const LLBC_TimeSpan &s);
-
-public:
-    /**
      * Serialize&Deserialize support.
      */
     void Serialize(LLBC_Stream &stream) const;
@@ -191,6 +185,11 @@ private:
 };
 
 __LLBC_NS_END
+
+/**
+ * Stream output operator support.
+ */
+std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
 
 #include "llbc/core/time/TimeSpanInl.h"
 

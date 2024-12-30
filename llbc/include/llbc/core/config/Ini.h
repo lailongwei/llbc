@@ -135,7 +135,7 @@ typedef std::map<LLBC_String, LLBC_IniSection *> LLBC_IniSections;
 /**
 * \brief The Ini file operation class encapsulation.
 */
-class LLBC_EXPORT LLBC_Ini
+class LLBC_EXPORT LLBC_Ini final
 {
     static const char SectionBegin;
     static const char SectionEnd;
@@ -162,7 +162,7 @@ public:
     /**
     * @Destructor.
     */
-    virtual ~LLBC_Ini();
+    ~LLBC_Ini();
 
 public:
     /**

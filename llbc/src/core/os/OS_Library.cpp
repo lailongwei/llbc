@@ -99,7 +99,7 @@ LLBC_LibraryHandle LLBC_LoadLibrary(const char *fileName)
 #else // LLBC_TARGET_PLATFORM_WIN32
     // Note, WIN32 API ::GetProcAddress not support slashes(/), so replace it.
     LLBC_String libName(fileName);
-    libName.findreplace(LLBC_SLASH_A, LLBC_BACKLASH_A);
+    libName.findreplace('/', '\\');
     if (libName.empty())
         libName = LLBC_Directory::ModuleFilePath();
 

@@ -165,7 +165,7 @@ inline int LLBC_IniSection::SetValue(const LLBC_String &key, const _ValueType &v
 
 inline void LLBC_Ini::EndLine(LLBC_String &str)
 {
-    str.append(1, LLBC_LF_A);
+    str.append(1, '\n');
 }
 
 template <typename _ValueType>

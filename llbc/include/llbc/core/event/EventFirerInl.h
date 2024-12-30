@@ -39,7 +39,7 @@ inline LLBC_EventFirer::LLBC_EventFirer(const LLBC_EventFirer &other)
     other._ev = nullptr;
 }
 
-inline LLBC_EventFirer::LLBC_EventFirer(LLBC_EventFirer &&other)
+inline LLBC_EventFirer::LLBC_EventFirer(LLBC_EventFirer &&other) noexcept
 : _evMgr(other._evMgr)
 , _ev(other._ev)
 {
@@ -62,7 +62,7 @@ inline LLBC_EventFirer & LLBC_EventFirer::operator=(const LLBC_EventFirer &other
     return *this;
 }
 
-inline LLBC_EventFirer & LLBC_EventFirer::operator=(LLBC_EventFirer &&other)
+inline LLBC_EventFirer & LLBC_EventFirer::operator=(LLBC_EventFirer &&other) noexcept
 {
     if (UNLIKELY(&other == this))
         return *this;

@@ -34,7 +34,7 @@ public:
      * Delegate ctor&dtor.
      */
     pyllbc_EventListener();
-    virtual ~pyllbc_EventListener();
+    ~pyllbc_EventListener() override;
 
 public:
     /**
@@ -48,7 +48,7 @@ public:
      * Listener invoke method.
      * @param[in] ev - the event object.
      */
-    virtual void Invoke(LLBC_Event &ev);
+    void Invoke(LLBC_Event &ev) override;
 
 private:
     PyObject *_pyListenerObj;

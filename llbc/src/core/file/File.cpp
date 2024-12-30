@@ -370,18 +370,18 @@ LLBC_String LLBC_File::ReadLine()
     while (Read(ch) != LLBC_FAILED)
     {
         hasBeenRead = true;
-        if (ch != LLBC_CR && ch != LLBC_LF)
+        if (ch != '\r' && ch != '\n')
         {
             line.append(1, ch);
             continue;
         }
 
-        if (ch == LLBC_CR)
+        if (ch == '\r')
         {
             // Read linefeed.
             if (ReadRawObj<char>(ch) == LLBC_OK)
             {
-                if (ch != LLBC_LF)
+                if (ch != '\n')
                     OffsetFilePosition(-1);
             }
         }
@@ -430,7 +430,7 @@ LLBC_Strings LLBC_File::ReadLines()
     // Strip CR character(\r).
     for (auto &line : lines)
     {
-        if (!line.empty() && line[line.size() - 1] == LLBC_CR)
+        if (!line.empty() && line[line.size() - 1] == '\r')
             line.erase(line.size() - 1);
     }
 
@@ -525,17 +525,13 @@ int LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
     if (newLineFormat == LLBC_FileNewLineFormat::WindowsStyle)
     {
         requireRet = 2;
-        lineEndingRet = Write(LLBC_CRLF, 2);
+        lineEndingRet = Write("\r\n", 2);
     }
-    else if (newLineFormat == LLBC_FileNewLineFormat::MacStyle)
+    else  //  if (newLineFormat == LLBC_FileNewLineFormat::MacStyle ||
+         //       newLineFormat == LLBC_FileNewLineFormat::UnixStyle)
     {
         requireRet = 1;
-        lineEndingRet = Write(LLBC_LF) == LLBC_OK ? 1 : 0;
-    }
-    else
-    {
-        requireRet = 1;
-        lineEndingRet = Write(LLBC_LF) == LLBC_OK ? 1 : 0;
+        lineEndingRet = Write('\n') == LLBC_OK ? 1 : 0;
     }
 
     return lineEndingRet != requireRet ? LLBC_FAILED : LLBC_OK;

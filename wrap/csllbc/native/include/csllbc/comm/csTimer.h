@@ -38,19 +38,19 @@ class CSLLBC_EXPORT csllbc_Timer : public LLBC_Timer
 
 public:
     csllbc_Timer(_TimeoutDeleg timeoutDeleg, _CancelDeleg cancelDeleg);
-    virtual ~csllbc_Timer();
+    ~csllbc_Timer() override;
 
 public:
     /**
      * Timeout event handler.
      * @return bool - return true means continuing schedule, otherwise means stop this timer.
      */
-    virtual void OnTimeout();
+    void OnTimeout() override;
 
     /**
      * Timer cancel event handler.
      */
-    virtual void OnCancel();
+    void OnCancel() override;
 
 private:
     _TimeoutDeleg _timeoutDeleg;

@@ -41,7 +41,7 @@ int LLBC_LogNewLineToken::GetType() const
 void LLBC_LogNewLineToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
     const int index = static_cast<int>(formattedData.size());
-    formattedData.append(1, LLBC_LF_A);
+    formattedData.append(1, '\n');
 
     GetFormatter().Format(formattedData, index);
 }

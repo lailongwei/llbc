@@ -8,7 +8,7 @@ llbc开发过程中，使用了以下JetBrains产品：
 > 欢迎加入Discord交流: Discord: https://discord.gg/YmtjKkNgaN
 
 ## 简述
-一个简洁、高效、跨平台、多语言支持的服务端开发框架，面向Service及Component，底层c++实现。
+一个简洁、高性能、跨平台、多语言支持的服务端开发框架，面向Service及Component，底层c++实现。
 *Note：llbc框架不包含具体组件实现，所有较为通用的组件支持将由[llbc_comps](https://github.com/lailongwei/llbc_comps)仓库提供, llbc_comps仓库处于初建阶段，欢迎大家贡献组件。*
 
 ## 构建状态
@@ -39,9 +39,9 @@ llbc开发过程中，使用了以下JetBrains产品：
 |![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/showcases/showcase_37wan_天启之门.png)|||||
 
 ## 使用此框架的公司：
-|[37wan](https://www.37.com/)|[ONEMT](http://www.onemt.com/)|[西山居](https://www.xishanju.com/)|[祺曜互娱](http://www.7yao.top/)|[腾讯](https://www.tencent.com/zh-cn/)|
+|[腾讯](https://www.tencent.com/zh-cn/)|[ONEMT](http://www.onemt.com/)|[西山居](https://www.xishanju.com/)|[祺曜互娱](http://www.7yao.top/)|[37wan](https://www.37.com/)|
 |:--------------------------:|:----------------------------:|:--------------------------------:|:------------------------------:|:----------------------:|
-|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/37-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/onemt-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/seasun-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/qiyao-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/tencent-logo.jpg)|
+|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/tencent-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/onemt-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/seasun-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/qiyao-logo.jpg)|![](https://raw.githubusercontent.com/wiki/lailongwei/llbc/static/company_logos/37-logo.jpg)|
 
 ## 支持：
 llbc欢迎大家使用、提出问题及贡献代码。  

@@ -42,7 +42,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~pyllbc_Component();
+    ~pyllbc_Component() override;
 
 public:
     /**
@@ -50,45 +50,44 @@ public:
      * @return PyObject * - python component.
      */
     const PyObject *GetPyComp() const { return _pyComp; }
+
 public:
     /**
      * When service start and not not init comp before, will call then event handler function.
      */
-    virtual int OnInit(bool &initFinished);
+    int OnInit(bool &initFinished) override;
 
     /**
      * When service destroy, will call this event handler function.
      */
-    virtual void OnDestroy(bool &destroyFinished);
+    void OnDestroy(bool &destroyFinished) override;
 
     /**
      * When service start, will call this event handler function.
      */
-    virtual int OnStart(bool &startFinished);
+    int OnStart(bool &startFinished) override;
 
     /**
      * When service stop, will call this event handler function.
      */
-    virtual void OnStop(bool &stopFinished);
+    void OnStop(bool &stopFinished) override;
 
 public:
     /**
      * Heartbeat function.
      */
-    virtual void OnUpdate();
+    void OnUpdate() override;
 
     /**
      * Idle event handler.
      * @param[in] idleTime - idle time.
      */
-    virtual void OnIdle(const LLBC_TimeSpan &idleTime);
+    void OnIdle(const LLBC_TimeSpan &idleTime) override;
 
     /**
      * Process components' events.
-     * @param[in] evIndex
-     * @param[in] evArgs
      */
-    virtual void OnEvent(int eventType, const LLBC_Variant &eventParams);
+    void OnEvent(int eventType, const LLBC_Variant &eventParams) override;
 
 private:
     /**
@@ -117,7 +116,7 @@ private:
 
     /**
      * When service receive a unhandled packet, will call this event handler.
-     * @param[in] opcode - the opcode.
+     * @param[in] packet - the packet.
      */
     void OnUnHandledPacket(const LLBC_Packet &packet);
 

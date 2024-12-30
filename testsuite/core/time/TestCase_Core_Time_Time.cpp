@@ -88,6 +88,11 @@ void TestCase_Core_Time_Time::TimeClassTest()
     LLBC_Time defaultTime;
     std::cout <<"Default time: " <<defaultTime <<std::endl;
 
+    // NowTimeStampInXXX() tet.
+    std::cout << "LLBC_Time::NowTimestampInSecs(): " << LLBC_Time::NowTimestampInSecs() << std::endl;
+    std::cout << "LLBC_Time::NowTimestampInMillis(): " << LLBC_Time::NowTimestampInMillis() << std::endl;
+    std::cout << "LLBC_Time::NowTimestampInMicros(): " << LLBC_Time::NowTimestampInMicros() << std::endl;
+
     // Now(), GetTimeTick(), Format(), FormatAsGmt() test.
     LLBC_Time now = LLBC_Time::Now();
     std::cout <<"now time: " <<now 
@@ -99,7 +104,7 @@ void TestCase_Core_Time_Time::TimeClassTest()
 
     // Get Time parts test.
     std::cout <<"Now year:" <<now.GetYear() 
-        <<", month:" <<now.GetMonth() <<", day:" <<now.GetDay() <<std::endl;
+        <<", month:" <<now.GetMonth() <<", day:" <<now.GetDayOfMonth() <<std::endl;
     std::cout <<"Now hour:" <<now.GetHour() 
         <<", minute:" <<now.GetMinute() <<", second:" <<now.GetSecond() <<std::endl;
     std::cout <<"Now millisecond: " <<now.GetMillisecond() 
@@ -413,13 +418,13 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
     auto crossedHourTestLbda = [](const LLBC_Time &from,
                                   const LLBC_Time &to,
                                   const LLBC_TimeSpan &timeOfHour,
-                                  bool exceptCrossed)
+                                  int exceptCrossed)
     {
         std::cout << "- Crossed hour test:" << std::endl;
         std::cout << "  - from: " << from << std::endl;
         std::cout << "  - to:   " << to << std::endl;
         std::cout << "  - timeOfHour: " << timeOfHour << std::endl;
-        const bool crossed = LLBC_Time::IsCrossedHour(from, to, timeOfHour);
+        const int crossed = LLBC_Time::GetCrossedHours(from, to, timeOfHour);
         std::cout << "  - crossed: " << crossed << std::endl;
         if (crossed != exceptCrossed)
             std::cerr << "  - !!!!!!!!! Test failed, except:" << exceptCrossed << std::endl;
@@ -428,36 +433,37 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
     crossedHourTestLbda(LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                         LLBC_Time::FromTimeStr("2020-12-03 00:00:00"),
                         LLBC_TimeSpan::zero,
-                        true);
+                        48);
     crossedHourTestLbda(LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                         LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                         LLBC_TimeSpan::zero,
-                        false);
+                        0);
     crossedHourTestLbda(LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                         LLBC_Time::FromTimeStr("2020-12-01 00:40:00"),
                         LLBC_TimeSpan::FromMinutes(30),
-                        true);
+                        1);
     crossedHourTestLbda(LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                         LLBC_Time::FromTimeStr("2020-12-01 00:40:00"),
                         LLBC_TimeSpan::FromMinutes(-30), // => 30 minutes
-                        true);
+                        1);
     crossedHourTestLbda(LLBC_Time::FromTimeStr("2020-12-01 00:50:00"),
                         LLBC_Time::FromTimeStr("2020-12-01 01:40:00"),
                         LLBC_TimeSpan::FromMinutes(30),
-                        true);
+                        1);
 
     // IsCrossedDay() test:
     auto crossedDayTestLbda = [](const LLBC_Time &from,
                                  const LLBC_Time &to,
                                  const LLBC_TimeSpan &timeOfDay,
-                                 bool exceptCrossed)
+                                 int exceptCrossed)
     {
         std::cout << "- Crossed day test:" << std::endl;
         std::cout << "  - from: " << from << std::endl;
         std::cout << "  - to:   " << to << std::endl;
         std::cout << "  - timeOfDay: " << timeOfDay << std::endl;
-        const bool crossed = LLBC_Time::IsCrossedDay(from, to, timeOfDay);
+        const int crossed = LLBC_Time::GetCrossedDays(from, to, timeOfDay);
         std::cout << "   - crossed: " << crossed << std::endl;
+
         if (crossed != exceptCrossed)
             std::cerr << "  - !!!!!!!!! Test failed, except:" << exceptCrossed << std::endl;
     };
@@ -465,41 +471,57 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
     crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                        LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                        LLBC_TimeSpan::zero,
-                       false);
+                       0);
     crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                        LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                        LLBC_TimeSpan::oneDay * 2,
-                       false);
+                       0);
     crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-02 00:00:00"),
                        LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                        LLBC_TimeSpan::zero,
-                       false);
+                       0);
     crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 00:00:00"),
                        LLBC_Time::FromTimeStr("2020-12-01 01:00:00"),
                        LLBC_TimeSpan::zero,
-                       false);
+                       0);
     crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 01:00:00"),
                        LLBC_Time::FromTimeStr("2020-12-03 00:00:00"),
                        LLBC_TimeSpan::zero,
-                       true);
+                       2);
     crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 23:00:00"),
                        LLBC_Time::FromTimeStr("2020-12-02 00:00:00"),
                        LLBC_TimeSpan::zero,
-                       true);
+                       1);
     crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 23:00:00"),
                        LLBC_Time::FromTimeStr("2020-12-02 01:00:00"),
                        LLBC_TimeSpan::zero,
-                       true);
+                       1);
     crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 02:00:00"),
                        LLBC_Time::FromTimeStr("2020-12-02 01:00:00"),
                        LLBC_TimeSpan::oneHour,
-                       true);
+                       1);
+    crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 02:00:00"),
+                       LLBC_Time::FromTimeStr("2020-12-01 02:59:59"),
+                       LLBC_TimeSpan::FromHours(3),
+                       0);
+    crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 02:59:59"),
+                       LLBC_Time::FromTimeStr("2020-12-01 03:00:00"),
+                       LLBC_TimeSpan::FromHours(3),
+                       1);
+    crossedDayTestLbda(LLBC_Time::FromTimeStr("2020-12-01 02:59:59"),
+                       LLBC_Time::FromTimeStr("2020-12-02 03:00:00"),
+                       LLBC_TimeSpan::FromHours(3),
+                       2);
+    crossedDayTestLbda(LLBC_Time::FromTimeStr("2023-01-01 00:00:00"),
+                       LLBC_Time::FromTimeStr("2024-01-01 00:00:00"),
+                       LLBC_TimeSpan::zero,
+                       365);
 
     // IsCrossedWeek() test:
     auto crossedWeekTestLbda = [](const LLBC_Time &from,
                                   const LLBC_Time &to,
                                   const LLBC_TimeSpan &timeOfWeek,
-                                  bool exceptCrossed)
+                                  int exceptCrossed)
     {
         std::cout << "- Crossed week test:" << std::endl;
         std::cout << "  - from: " << from
@@ -508,7 +530,7 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
             << "(" << LLBC_TimeConst::dayOfWeekDesc[to.GetDayOfWeek()] << ")" << std::endl;
         std::cout << "  - timeOfWeek: " << timeOfWeek
             << "(" << LLBC_TimeConst::GetDayOfWeekDesc(timeOfWeek.GetTotalDays()) << ")" << std::endl;
-        const bool crossed = LLBC_Time::IsCrossedWeek(from, to, timeOfWeek);
+        const int crossed = LLBC_Time::GetCrossedWeeks(from, to, timeOfWeek);
         std::cout <<"   - crossed: " << crossed << std::endl;
         if (crossed != exceptCrossed)
             std::cerr << "  - !!!!!!!!! Test failed, except:" << exceptCrossed << std::endl;
@@ -517,43 +539,63 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_TimeSpan::zero,
-                        false);
-    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
-                        LLBC_Time::FromTimeStr("2023-07-15 00:00:00"),
+                        0);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-15 00:00:00"),
+                        LLBC_Time::FromTimeStr("2023-07-16 00:00:00"),
                         LLBC_TimeSpan::negOneDay, // -1 days => 6 ays => Saturday
-                        true);
+                        1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-13 00:00:00"),
                         LLBC_TimeSpan::zero,
-                        false);
+                        0);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-15 00:00:00"),
                         LLBC_TimeSpan::zero,
-                        false);
+                        0);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-21 00:00:00"),
                         LLBC_TimeSpan::zero,
-                        true);
+                        1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-21 01:00:00"),
                         LLBC_TimeSpan::zero,
-                        true);
+                        1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
-                        LLBC_Time::FromTimeStr("2023-07-16 01:00:00"),
+                        LLBC_Time::FromTimeStr("2023-07-17 01:00:00"),
                         LLBC_TimeSpan::zero,
-                        true);
-    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-16 00:00:00"),
-                        LLBC_Time::FromTimeStr("2023-07-16 01:00:00"),
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-17 00:00:00"),
+                        LLBC_Time::FromTimeStr("2023-07-17 01:00:00"),
                         LLBC_TimeSpan::zero,
-                        false);
-    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-16 01:00:00"),
-                        LLBC_Time::FromTimeStr("2023-07-23 00:00:00"),
+                        0);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-17 01:00:00"),
+                        LLBC_Time::FromTimeStr("2023-07-24 00:00:00"),
                         LLBC_TimeSpan::zero,
-                        true);
+                        1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-16 01:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-23 02:00:00"),
                         LLBC_TimeSpan::zero,
-                        true);
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-16 00:00:00"),
+                        LLBC_TimeSpan::zero,
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-16 00:00:00"),
+                        LLBC_TimeSpan::oneHour,
+                        0);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-16 01:00:00"),
+                        LLBC_TimeSpan::oneHour,
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-22 00:00:00"),
+                        LLBC_TimeSpan::oneHour,
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-23 01:00:00"),
+                        LLBC_TimeSpan::oneHour,
+                        2);
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)

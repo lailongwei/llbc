@@ -39,6 +39,13 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     // Stopwatch test.
     LLBC_PrintLn("Test Stopwatch:");
 
+    // - RDTSCP support flag.
+    #if LLBC_SUPPORT_RDTSC
+    LLBC_PrintLn("- __LLBC_supportedRdtscp: %s", __LLBC_supportedRdtscp ? "true" : "false");
+    #else
+    LLBC_PrintLn("- __LLBC_supportedRdtscp: false");
+    #endif
+
     // - Output basic information.
     {
         LLBC_PrintLn("- IsHighResolution: %d", LLBC_Stopwatch::IsHighResolution());
@@ -70,6 +77,17 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         sw.Resume();
         LLBC_Sleep(618);
         LLBC_PrintLn("- After Resume & sleep 618ms, watcher: %s", sw.ToString().c_str());
+    }
+
+    // - Construct from ticks test.
+    {
+        LLBC_PrintLn("Construct from ticks test:");
+        const auto beginTick = LLBC_RdTsc();
+        LLBC_Sleep(618);
+        const auto elapsedTick = LLBC_RdTsc() - beginTick;
+
+        LLBC_Stopwatch sw(elapsedTick);
+        LLBC_PrintLn("- After sleep 618ms, watcher: %s", sw.ToString().c_str());
     }
 
     LLBC_Print("\n");

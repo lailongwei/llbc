@@ -29,11 +29,6 @@ class LLBC_Time;
 
 __LLBC_NS_END
 
-/**
- * Time class stream output operators previous declare.
- */
-LLBC_EXPORT std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t);
-
 __LLBC_NS_BEGIN
 
 /**
@@ -66,6 +61,24 @@ public:
      * Get current time.
      */
     static LLBC_Time Now();
+
+    /**
+     * Get now timestamp, in seconds.
+     * @return time_t - now timestamp, in seconds.
+     */
+    static time_t NowTimestampInSecs();
+
+    /**
+     * Get now timestamp, in milli-seconds.
+     * @return time_t - now timestamp, in milli-seconds.
+     */
+    static sint64 NowTimestampInMillis();
+
+    /**
+     * Get now timestamp, in micro-seconds.
+     * @return time_t - now timestamp, in micro-seconds.
+     */
+    static sint64 NowTimestampInMicros();
 
 public:
     /**
@@ -103,20 +116,63 @@ public:
 
 public:
     /**
-     * Get local time parts(year, month, day, hour, minute, second, dayofweek).
-     * Notes: GetMonth() start by 1, GetDayOfWeek() start by 0(sunday), GetDayOfYear() start by 1.
-     * @return int - the specified time parts.
+     * Get year.
+     * @return int - year.
      */
     int GetYear() const;
+
+    /**
+     * Get month, started by 0.
+     * \return int - month.
+     */
     int GetMonth() const;
-    int GetDay() const;
+
+    /**
+     * Get day of week, started by 0(sunday).
+     * @return int - day of week.
+     */
     int GetDayOfWeek() const;
-    int GetDayOfMonth() const;
+
+    /**
+     * Get day of month, started by 1.
+     * @return int - day of month.
+     */
+     int GetDayOfMonth() const;
+
+    /**
+     * Get day of year, started by 0.
+     * @return int - day of year.
+     */
     int GetDayOfYear() const;
+
+    /**
+     * Get hour in day, range: [0, 23].
+     * @return int - hour in day.
+     */
     int GetHour() const;
+
+    /**
+     * Get minute in day, range: [0, 59].
+     * @return int - minute in day.
+     */
     int GetMinute() const;
+
+    /**
+     * Get second in day, range: [0, 59].
+     * @return int - second in day.
+     */
     int GetSecond() const;
+
+    /**
+     * Get milli-second in second, range: [0, 999]
+     * @return int - milli-second in second.
+     */
     int GetMillisecond() const;
+
+    /**
+     * Get micro-second in milli-second, range: [0, 999]
+     * @return int - micro-second in milli-second.
+     */
     int GetMicrosecond() const;
 
     /**
@@ -248,37 +304,37 @@ public:
 
 public:
     /**
-     * Verify that the given time(to) has been crossed hour or not.
+     * Get crossed hours between from and to time.
      * @param[in] from       - from time.
      * @param[in] to         - to time.
      * @param[in] timeOfHour - cross time of hour point.
-     * @return bool - return true if crossed day, otherwise return false.
+     * @return int - crossed hours.
      */
-    static bool IsCrossedHour(const LLBC_Time &from,
+    static int GetCrossedHours(const LLBC_Time &from,
+                               const LLBC_Time &to,
+                               const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
+
+    /**
+     * Get crossed days between from and to time.
+     * @param[in] from - from time.
+     * @param[in] to   - to time.
+     * @param[in] diffHours - diff time from daily zero time.
+     * @return int - crossed days.
+     */
+    static int GetCrossedDays(const LLBC_Time &from, 
                               const LLBC_Time &to,
-                              const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
+                              const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
 
     /**
-     * Verify that the given time(to) has been crossed day or not.
-     * @param[in] from      - from time.
-     * @param[in] to        - to time.
-     * @param[in] timeOfDay - cross time of day point.
-     * @return bool - return true if crossed day, otherwise return false.
-     */
-    static bool IsCrossedDay(const LLBC_Time &from,
-                             const LLBC_Time &to,
-                             const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
-
-    /**
-     * Verify that the given time(to) has been crossed week or not.
+     * Get crossed weeks between from and to time.
      * @param[in] from       - from time.
      * @param[in] to         - to time.
      * @param[in] timeOfWeek - cross time of week point.
-     * @return bool - return true if crossed week, otherwise return false.
+     * @return int - crossed weeks.
      */
-    static bool IsCrossedWeek(const LLBC_Time &from,
-                              const LLBC_Time &to,
-                              const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
+    static int GetCrossedWeeks(const LLBC_Time &from,
+                               const LLBC_Time &to,
+                               const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
 
 public:
     /**
@@ -305,12 +361,6 @@ public:
      * @return LLBC_String - the object string representation.
      */
     LLBC_String ToString() const;
-
-public:
-    /**
-     * Stream output operatorsupport.
-     */
-    friend std::ostream & ::operator<<(std::ostream &stream, const LLBC_Time &t);
 
 public:
     /**
@@ -349,10 +399,10 @@ private:
     /**
      * Crossed time-cycle internal implement. 
      */
-    static bool IsCrossed(const LLBC_Time &from,
-                          const LLBC_Time &to,
-                          const LLBC_TimeSpan &timeCycle,
-                          LLBC_TimeSpan timeOfTimeCycle);
+    static LLBC_TimeSpan GetCrossedCycles(const LLBC_Time &from,
+                                         const LLBC_Time &to,
+                                         const LLBC_TimeSpan &timeCycle,
+                                         LLBC_TimeSpan timeOfTimeCycle);
 
 private:
     sint64 _time;
@@ -360,6 +410,11 @@ private:
 };
 
 __LLBC_NS_END
+
+/**
+ * Stream output operator support.
+ */
+std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t);
 
 #include "llbc/core/time/TimeInl.h"
 

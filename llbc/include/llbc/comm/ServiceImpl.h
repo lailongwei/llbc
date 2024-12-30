@@ -48,8 +48,8 @@ public:
      * @param[in] fullStack          - the full stack option, default is true.
      */
     LLBC_ServiceImpl(const LLBC_String &name = "",
-                 LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
-                 bool fullStack = true);
+                     LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
+                     bool fullStack = true);
 
     /**
      * Service destructor.
@@ -686,8 +686,8 @@ private:
     mutable LLBC_SpinLock _readySessionInfosLock; // Ready session set lock.
 
     // FPS about members.
-    int _fps; // Service FPS.
-    int _frameInterval; // Frame interval, 1000/_fps.
+    volatile int _fps; // Service FPS.
+    volatile int _frameInterval; // Frame interval, 1000/_fps.
     sint64 _begSvcTime; // Begin heartbeat time, update on every heartbeat begin.
 
 private:

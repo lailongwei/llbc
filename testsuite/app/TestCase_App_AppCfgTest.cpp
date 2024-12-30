@@ -136,12 +136,16 @@ public:
         svc1->AddComponent(new TestCompA);
         svc1->AddComponent(new TestCompB);
         svc1->Start();
+        std::cout << "- TestSvc1 started, fps:" << svc1->GetFPS()
+                  << ", interval:" << svc1->GetFrameInterval() << std::endl;
 
         std::cout << "Create service <TestSvc2>..." << std::endl;
         auto svc2 = LLBC_Service::Create("TestSvc2");
         svc2->AddComponent(new TestCompA);
         svc2->AddComponent(new TestCompB);
         svc2->Start();
+        std::cout << "- TestSvc2 started, fps:" << svc2->GetFPS()
+                  << ", interval:" << svc2->GetFrameInterval() << std::endl;
 
         return LLBC_OK;
     }
@@ -198,10 +202,12 @@ int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
 
     // Set config path.
     // If not specific config path, application will auto reload config(order Ini->Cfg->Xml).
+    // - ini format config.
     // app.SetConfigPath("./AppCfgTest.ini");
-    app.SetConfigPath("./AppCfgTest.cfg");
-    app.SetConfigPath("./AppCfgTest.properties");
-    // app.SetConfigPath("./AppCfgTest.xml");
+    // properties format config.
+    // app.SetConfigPath("./AppCfgTest.cfg");
+    // xml format config.
+    app.SetConfigPath("./AppCfgTest.xml");
 
     // Startup app object.
     std::cout <<"Start app..." <<std::endl;

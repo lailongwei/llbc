@@ -31,11 +31,6 @@
 #pragma warning(disable:4996)
 #endif
 
-std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
-{
-    return stream << t.ToString();
-}
-
 __LLBC_INTERNAL_NS_BEGIN
 
 static constexpr LLBC_NS LLBC_TimeSpan (LLBC_NS LLBC_Time::*__g_GetTimeOfTimeCycleMeths[4])() const {
@@ -196,7 +191,7 @@ LLBC_Time LLBC_Time::AddYears(int years) const
     newTimeStruct.tm_year += years;
     bool isLeap = IsLeapYear(GetYear());
     if (isLeap && 
-        GetMonth() == 2 && GetDay() == 29)
+        GetMonth() == 2 && GetDayOfMonth() == 29)
     {
         if (!IsLeapYear(GetYear() + years))
             newTimeStruct.tm_mday -= 1;
@@ -540,46 +535,31 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
     return diff < LLBC_TimeSpan::zero ? diff + timeCycle : diff;
 }
 
-bool LLBC_Time::IsCrossed(const LLBC_Time &from,
-                          const LLBC_Time &to,
-                          const LLBC_TimeSpan &timeCycle,
-                          LLBC_TimeSpan timeOfTimeCycle)
+LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
+                                          const LLBC_Time &to,
+                                          const LLBC_TimeSpan &timeCycle,
+                                          LLBC_TimeSpan timeOfTimeCycle)
 {
-    // If span < 0, return false.
+    // If span <= 0, return zero.
     const LLBC_TimeSpan diff = to - from;
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
-        return false;
+        return LLBC_TimeSpan::zero;
 
-    // If span >= timeCycle, return true.
-    if (diff >= timeCycle)
-        return true;
+    timeOfTimeCycle += LLBC_TimeSpan(LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond);
+    timeOfTimeCycle %= timeCycle;
 
-    // Normalize timeOfTimeCycle[0, timeCycle)
-    if (UNLIKELY(timeOfTimeCycle < LLBC_TimeSpan::zero))
-        timeOfTimeCycle = timeOfTimeCycle % timeCycle + timeCycle;
-    else if (UNLIKELY(timeOfTimeCycle >= timeCycle))
-        timeOfTimeCycle %= timeCycle;
+    if (timeCycle == LLBC_TimeSpan::oneWeek)
+        timeOfTimeCycle = (timeOfTimeCycle + (LLBC_TimeSpan::oneDay * 4)) % LLBC_TimeSpan::oneWeek;
 
-    // Crossed timeCycle judge: toTimeOfTimeCycle judge.
-    // => toTimeOfTimeCycle must be >= timeOfTimeCycle.
-    int methIdx;
-    LLBC_TimeSpan toTimeOfTimeCycle;
-    if (timeCycle == LLBC_TimeSpan::oneHour)
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 0])();
-    else if (timeCycle == LLBC_TimeSpan::oneDay)
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 1])();
-    else // oneWeek
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 2])();
+    auto normalizedFrom = from - timeOfTimeCycle;
+    auto normalizedTo = to - timeOfTimeCycle;
 
-    if (toTimeOfTimeCycle < timeOfTimeCycle)
-        return false;
+    normalizedFrom = LLBC_Time(
+        normalizedFrom.GetTimestampInMicros() - (normalizedFrom.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
+    normalizedTo = LLBC_Time(
+        normalizedTo.GetTimestampInMicros() - (normalizedTo.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
 
-    // Crossed timeCycle judge: fromTimeOfTimeCycle judge.
-    const LLBC_TimeSpan fromTimeOfTimeCycle =
-        (from.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx])();
-    return (fromTimeOfTimeCycle < timeOfTimeCycle) ||
-         (fromTimeOfTimeCycle > timeOfTimeCycle &&
-          toTimeOfTimeCycle < fromTimeOfTimeCycle);
+    return normalizedTo - normalizedFrom;
 }
 
 __LLBC_NS_END

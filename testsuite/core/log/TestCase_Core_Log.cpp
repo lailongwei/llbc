@@ -45,15 +45,18 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    const LLBC_String logCfgFile = "LogTestCfg.cfg";
-    // const LLBC_String logCfgFile = "LogTestCfg.xml";
-    if(LLBC_LoggerMgrSingleton->Initialize(logCfgFile) != LLBC_OK)
+    _logCfgFilePath = "LogTestCfg.cfg";
+    // _logCfgFilePath  = "LogTestCfg.xml";
+    if(LLBC_LoggerMgrSingleton->Initialize(_logCfgFilePath) != LLBC_OK)
 #endif
     {
         LLBC_FilePrintLn(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
         LLBC_FilePrintLn(stderr, "Forgot copy LogTestCfg.cfg test config file to test dir?");
         return -1;
     }
+
+    // Defer finalize logger mgr.
+    LLBC_Defer(LLBC_LoggerMgrSingleton->Finalize());
 
     // Set log hook(to root logger).
     LLBC_Logger *rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
@@ -72,9 +75,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Sync logger multi-thread test.
     SyncLoggerMultiThreadTest();
 
-    // Test condition macro log
+    // Test condition macro log.
     DoConditionMacroLogTest();
-    
+
 #if LLBC_CFG_LOG_USING_WITH_STREAM
     LSLOG_DEBUG("Message type test, char: " <<'a' <<", bool: " <<true <<", uint8: " <<(uint8)8
         <<", sint16: " <<(sint16)-16 << ", uint16: " <<(uint16)16 <<", sint32: " <<-32
@@ -160,12 +163,8 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Test json styled log.
     DoJsonLogTest();
 
-    int jsonLogTestTimes = 30;
-    for (int i = 0; i < jsonLogTestTimes; ++i)
-        DoJsonLogTest();
-
-    // Finalize logger.
-    LLBC_LoggerMgrSingleton->Finalize();
+    // Test logger mgr reload.
+    LLBC_ErrorAndReturnIf(DoLoggerMgrReloadTest() != LLBC_OK, LLBC_FAILED);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -435,6 +434,34 @@ void TestCase_Core_Log::DoConditionMacroLogTest()
                                                    1, 3.14, "hello world"); }();
 }
 
+int TestCase_Core_Log::DoLoggerMgrReloadTest()
+{
+    LLBC_PrintLn("LoggerMgr reload test, please modify logger config file, "
+                 "then press any key to continue ...");
+    LLBC_PrintLn("- logger config file path:%s", _logCfgFilePath.c_str());
+
+    // Reload.
+    getchar();
+    LLBC_ErrorAndReturnIf(LLBC_LoggerMgrSingleton->Reload() != LLBC_OK,
+                          LLBC_FAILED,
+                          "Reload logger mgr failed, err:%s",
+                          LLBC_FormatLastError());
+
+    for (auto &loggerName : {"root", "test"})
+    {
+        LLBC_PrintLn("After reload logger mgr, output %s logger all levers log:", loggerName);
+        for (int logLevel = LLBC_LogLevel::Begin; logLevel != LLBC_LogLevel::End; ++logLevel)
+        {
+            LLOG(loggerName, nullptr, logLevel,
+                 "This is a <%s> level log for %s logger",
+                 LLBC_LogLevel::GetLevelStr(logLevel).c_str(), loggerName);
+        }
+        LLBC_PrintLn("All levels log has been output, please check console/file output");
+    }
+
+    return LLBC_OK;
+}
+
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
     LLBC_PrintLn("Log hook, loggerName: %s, level: %s, message: %s",
@@ -442,4 +469,3 @@ void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
                    LLBC_LogLevel::GetLevelStr(logData->level).c_str(),
                    logData->msg);
 }
-

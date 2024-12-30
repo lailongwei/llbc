@@ -32,6 +32,12 @@ inline LLBC_Stopwatch::LLBC_Stopwatch(bool autoStart)
 {
 }
 
+inline LLBC_Stopwatch::LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring)
+: _beginTime(continueMeasuring ? LLBC_RdTsc() : 0llu)
+, _elapsedTime(elapsedTicks)
+{
+}
+
 inline void LLBC_Stopwatch::Resume()
 {
     if (_beginTime == 0)

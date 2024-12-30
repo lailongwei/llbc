@@ -65,9 +65,9 @@ public:
 public:
     /**
      * Compile pack-lemma string expression.
-     * @param[in] expr      - the expression.
-     * @param[in] force     - indicate compiler force compile expression or use cached expression(if has), default is false.
-     * @param[in] callerEnv - the compile environment.
+     * @param[in] expr       - the expression.
+     * @param[in] force      - indicate compiler force compile expression or use cached expression(if has), default is false.
+     * @param[in] compileEnv - the compile environment.
      * @return pyllbc_PackLemma * - the compiled pack-lemma object.
      */
     pyllbc_PackLemma *Compile(const LLBC_String &expr, bool force = false, PyObject *compileEnv = nullptr);

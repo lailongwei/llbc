@@ -80,7 +80,7 @@ public:
     /**
      * @brief Construct delegate object by another delegate object.
      */
-    LLBC_Delegate(LLBC_Delegate &&another);
+    LLBC_Delegate(LLBC_Delegate &&another) noexcept;
     LLBC_Delegate(const LLBC_Delegate &another);
 
     /**
@@ -138,13 +138,13 @@ public:
     /**
      * @brief Assignment by stl function.
      */
-    LLBC_Delegate &operator=(StlFunc &&stlFunc);
+    LLBC_Delegate &operator=(StlFunc &&stlFunc) noexcept;
     LLBC_Delegate &operator=(const StlFunc &stlFunc);
 
     /**
      * @brief Assignment by another delegate object.
      */
-    LLBC_Delegate &operator=(LLBC_Delegate &&another);
+    LLBC_Delegate &operator=(LLBC_Delegate &&another) noexcept;
     LLBC_Delegate &operator=(const LLBC_Delegate &another);
 
     /**

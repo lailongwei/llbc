@@ -2,6 +2,7 @@
 <b b_attr1 = "5" b_attr2 = "6" />
 
 <Service Name = "TestSvc1">
+    <FPS>88</FPS>
     <Component Name = "TestCompA">
         <X>333</X>
         <Y>444</Y>
