@@ -616,6 +616,14 @@ public:
 
 public:
     /**
+     * Add collaborative event mgr.
+     * @param[in] evMgr - event mgr object.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int AddCollaborativeEventMgr(LLBC_EventMgr *evMgr) = 0;
+
+public:
+    /**
      * Post runnable to service.
      * @param[in] obj    - the runnable object.
      * @param[in] method - the runnable method.
