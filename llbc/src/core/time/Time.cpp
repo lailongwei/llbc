@@ -569,13 +569,20 @@ int LLBC_Time::GetCrossedMonths(const LLBC_Time &from,
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
         return 0;
 
-    if (UNLIKELY(timeOfMonth > LLBC_TimeSpan::FromDays(30,23,59,59,999999L))) {
-        ASSERT(false && "timeOfMonth must be less than 30 days");
+    if (UNLIKELY(timeOfMonth >= LLBC_TimeSpan::oneDay*31)) 
         return 0;
-    }
 
-    const auto fromMaxCycle = LLBC_TimeSpan::FromDays(LLBC_GetMonthMaxDays(from.GetYear(), from.GetMonth()));
-    const auto toMaxCycle = LLBC_TimeSpan::FromDays(LLBC_GetMonthMaxDays(to.GetYear(), to.GetMonth()));
+    const static auto preMonthMaxDays = [](int year, int month) {
+        month  = (month == 0) ? 11 : month - 1;
+        if (month == 1)
+            return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) ? 29 : 28;
+
+        const static int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        return daysInMonth[month];
+    };
+
+    const auto fromMaxCycle = LLBC_TimeSpan::FromDays(preMonthMaxDays(from.GetYear(), from.GetMonth()));
+    const auto toMaxCycle = LLBC_TimeSpan::FromDays(preMonthMaxDays(to.GetYear(), to.GetMonth()));
 
     const auto normalizedFrom = from - ((timeOfMonth > fromMaxCycle) ? fromMaxCycle: timeOfMonth);
     const auto normalizedTo = to - ((timeOfMonth > toMaxCycle) ? toMaxCycle: timeOfMonth);
