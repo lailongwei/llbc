@@ -179,7 +179,7 @@ public:
         sint64 now = LLBC_GetMilliseconds();
         std::cout <<"TestApp::OnUpdate()... interval:" << now - _lastRunTime <<std::endl;
         _lastRunTime = now;
-        LLBC_Sleep(200);
+        LLBC_Sleep(13);
     }
 
 private:
@@ -208,11 +208,11 @@ int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
     // Set config path.
     // If not specific config path, application will auto reload config(order Ini->Cfg->Xml).
     // - ini format config.
-    // app.SetConfigPath("./AppCfgTest.ini");
-    // properties format config.
+    app.SetConfigPath("./AppCfgTest.ini");
+    // - properties format config.
     // app.SetConfigPath("./AppCfgTest.cfg");
-    // xml format config.
-    app.SetConfigPath("./AppCfgTest.xml");
+    // - xml format config.
+    // app.SetConfigPath("./AppCfgTest.xml");
 
     // Startup app object.
     std::cout <<"Start app..." <<std::endl;

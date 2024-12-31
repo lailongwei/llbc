@@ -191,7 +191,7 @@ public:
      * Get application FPS.
      * @return int - the application FPS.
      */
-    int GetFps() const;
+    int GetFPS() const;
 
     /**
      * Set application FPS.
@@ -405,9 +405,7 @@ private:
     bool _llbcLibStartupInApp; // llbc library startup in App flag.
     bool _requireStop; // Stop flag, when App processed Stop event, will set to true.
     LLBC_ServiceMgr &_services; // Service manager.
-    LLBC_SpinLock _fpsLock; // FPS lock.
     volatile int _fps; // App FPS.
-    sint64 _begRunTime; // Begin heartbeat time, update on every heartbeat begin.
 
     // Load/Reload data members.
     volatile int _loading; // Loading flag.

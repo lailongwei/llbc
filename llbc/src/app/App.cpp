@@ -70,7 +70,6 @@ LLBC_App::LLBC_App()
 , _services(*LLBC_ServiceMgrSingleton)
 
 , _fps(LLBC_CFG_APP_DFT_FPS)
-, _begRunTime(0)
 
 , _loading(0)
 , _cfgType(LLBC_AppConfigType::End)
@@ -91,21 +90,14 @@ LLBC_App::~LLBC_App()
     _thisApp = nullptr;
 }
 
-int LLBC_App::GetFps() const
-{
-    return _fps;
-}
-
 int LLBC_App::SetFPS(int fps)
 {
     if (fps != static_cast<int>(LLBC_INFINITE) &&
-            (fps < LLBC_CFG_APP_MIN_FPS || fps > LLBC_CFG_APP_MAX_FPS))
+        (fps < LLBC_CFG_APP_MIN_FPS || fps > LLBC_CFG_APP_MAX_FPS))
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
         return LLBC_FAILED;
     }
-
-    LLBC_LockGuard guard(_fpsLock);
 
     _fps = fps;
 
@@ -114,7 +106,7 @@ int LLBC_App::SetFPS(int fps)
 
 int LLBC_App::GetFrameInterval() const
 {
-    return 1000 / (_fps != static_cast<int>(LLBC_INFINITE) ? _fps : LLBC_CFG_APP_MAX_FPS);
+    return _fps != static_cast<int>(LLBC_INFINITE) ? 1000 / _fps : 0;
 }
 
 bool LLBC_App::HasConfig() const
@@ -332,9 +324,10 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     FireAppPhaseChangeEvToServices(false, false, true, false);
 
     // Enter app loop.
+    sint64 begRunTime = 0;
     while (true)
     {
-        _begRunTime = LLBC_GetMilliseconds();
+        begRunTime = LLBC_GetMilliseconds();
         // Call OnUpdate event method.
         OnUpdate();
         // Handle events.
@@ -351,9 +344,9 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
 
         // Execute sleep, if need.
         const auto frameInterval = GetFrameInterval();
-        const sint64 elapsed = LLBC_GetMilliseconds() - _begRunTime;
+        const sint64 elapsed = LLBC_GetMilliseconds() - begRunTime;
         if (elapsed >= 0 && elapsed < frameInterval)
-            LLBC_Sleep(static_cast<int>(GetFrameInterval() - elapsed));
+            LLBC_Sleep(static_cast<int>(frameInterval - elapsed));
     }
 }
 
@@ -580,26 +573,27 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
     LLBC_Defer(LLBC_AtomicFetchAndSub(&_loading, 1));
     LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadConfig() != LLBC_OK, LLBC_FAILED);
 
-    // - Set application fps
+    // - Reload application fps.
     for (auto cfgItem : _cfg.AsDict())
     {
         if (_cfgType == LLBC_AppConfigType::Ini)
         {
-            if (cfgItem.first.AsStr().tolower() == "app")
-            {
-                for (auto cfgSecItem : cfgItem.second.AsDict())
-                {
-                    if (cfgSecItem.first.AsStr().tolower() == "fps")
-                    {
-                        const auto fps = cfgSecItem.second;
-                        SetFPS(fps);
-                        break;
-                    }
-                }
+            auto sectionName = cfgItem.first.AsStr().tolower();
+            if (sectionName != "app" && sectionName != "application")
                 break;
+            for (auto cfgSecItem : cfgItem.second.AsDict())
+            {
+                if (cfgSecItem.first.AsStr().tolower() == "fps")
+                {
+                    const auto fps = cfgSecItem.second;
+                    SetFPS(fps);
+                    break;
+                }
             }
+            break;
         }
-        else if (cfgItem.first.AsStr().tolower() == "fps")
+
+        if (cfgItem.first.AsStr().tolower() == "fps")
         {
             const auto fps = _cfgType == LLBC_AppConfigType::Xml ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
             SetFPS(fps);
