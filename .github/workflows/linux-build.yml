@@ -45,7 +45,7 @@ jobs:
           make core_lib config=debug64 -j4
           make core_lib config=release64 -j4
 
-      - name: Compile test code
+      - name: Compile testsuite
         run: |
           make test config=debug64 -j4
           make test config=release64 -j4
