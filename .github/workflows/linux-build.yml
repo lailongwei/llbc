@@ -50,6 +50,11 @@ jobs:
           make test config=debug64 -j4
           make test config=release64 -j4
 
+      - name: Compile quick_start
+        run: |
+          make quick_start config=debug64 -j4
+          make quick_start config=release64 -j4
+
       - name: Compile pyllbc lib code
         run: |
           make py_wrap config=debug64 -j4

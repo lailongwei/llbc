@@ -32,6 +32,10 @@ jobs:
         run: |
           make test config=release64 -j4
 
+      - name: Compile quick_start
+        run: |
+          make quick_start config=release64 -j4
+
       - name: Build all target by cmake
         run: |
           mkdir cmake_build
