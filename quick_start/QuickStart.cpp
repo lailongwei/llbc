@@ -21,17 +21,9 @@
 
 #pragma once
 
-#include "llbc.h"
-#include "QuickStartTraits.h"
-
 #include "hello_world/QuickStart_HelloWorld.h"
 #include "stream/QuickStart_Stream.h"
-
-// Quick starts define.
-__QUICK_STARTS_BEGIN()
-__DEFINE_QUICK_START("Hello World", QuickStart_HelloWorld)
-__DEFINE_QUICK_START("Stream", QuickStart_Stream);
-__QUICK_STARTS_END()
+#include "QuickStartTraits.h"
 
 int main(int argc, char *argv[])
 {

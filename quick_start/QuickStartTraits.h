@@ -83,6 +83,8 @@ struct __QuickStartTraits
         LLBC_SetConsoleColor(stdout, oldColor); \
     } while (false)
 
+#include "QuickStartDef.h"
+
 // The quick start traits generate loop encapsulation.
 template <int index>
 struct __QuickStartTraitsLoop
