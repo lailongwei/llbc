@@ -121,12 +121,12 @@ public:
     sint64 GetTotalMillis() const;
     sint64 GetTotalMicros() const;
 
-    LLBC_TimeSpan AddDays(int days);
-    LLBC_TimeSpan AddHours(int hours);
-    LLBC_TimeSpan AddMinutes(int minutes);
-    LLBC_TimeSpan AddSeconds(int seconds);
-    LLBC_TimeSpan AddMillis(sint64 millis);
-    LLBC_TimeSpan AddMicros(sint64 micros);
+    LLBC_TimeSpan AddDays(int days) const;
+    LLBC_TimeSpan AddHours(int hours) const;
+    LLBC_TimeSpan AddMinutes(int minutes) const;
+    LLBC_TimeSpan AddSeconds(int seconds) const;
+    LLBC_TimeSpan AddMillis(sint64 millis) const;
+    LLBC_TimeSpan AddMicros(sint64 micros) const;
 
     LLBC_TimeSpan operator+(const LLBC_TimeSpan &span) const;
     LLBC_TimeSpan operator-(const LLBC_TimeSpan &span) const;

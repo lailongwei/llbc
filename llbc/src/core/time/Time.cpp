@@ -562,6 +562,40 @@ LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
     return normalizedTo - normalizedFrom;
 }
 
+int LLBC_Time::GetCrossedMonths(const LLBC_Time &from,
+                                const LLBC_Time &to,
+                                const LLBC_TimeSpan &timeOfMonth)
+{
+    // If span <= 0, return zero.
+    const LLBC_TimeSpan diff = to - from;
+    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
+        return 0;
+
+    if (UNLIKELY(timeOfMonth >= LLBC_TimeSpan::oneDay * 31)) 
+        return 0;
+
+    const static auto preMonthMaxDays = [](int year, int month) 
+    {
+        month  = (month == 0) ? 11 : month - 1;
+        if (month == 1)
+            return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) ? 29 : 28;
+
+        const static int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        return daysInMonth[month];
+    };
+
+    const auto fromMaxCycle = LLBC_TimeSpan::FromDays(preMonthMaxDays(from.GetYear(), from.GetMonth()));
+    const auto toMaxCycle = LLBC_TimeSpan::FromDays(preMonthMaxDays(to.GetYear(), to.GetMonth()));
+
+    const auto normalizedFrom = from - ((timeOfMonth > fromMaxCycle) ? fromMaxCycle: timeOfMonth);
+    const auto normalizedTo = to - ((timeOfMonth > toMaxCycle) ? toMaxCycle: timeOfMonth);
+
+    const auto diffYears = normalizedTo.GetYear() - normalizedFrom.GetYear();
+    const auto diffMonths = normalizedTo.GetMonth() - normalizedFrom.GetMonth();
+
+    return diffYears * 12 + diffMonths;
+}
+
 __LLBC_NS_END
 
 #if LLBC_TARGET_PLATFORM_WIN32

@@ -596,6 +596,74 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
                         LLBC_Time::FromTimeStr("2024-12-23 01:00:00"),
                         LLBC_TimeSpan::oneHour,
                         2);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-25 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-26 00:00:00"),
+                        LLBC_TimeSpan::FromDays(3),
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-25 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-26 00:00:00"),
+                        LLBC_TimeSpan::FromDays(3, 1),
+                        0);
+
+    auto crossedMonthsTestLbda = [](const LLBC_Time &from,
+                                  const LLBC_Time &to,
+                                  const LLBC_TimeSpan &timeOfDay,
+                                  int exceptCrossed)
+    {
+        std::cout << "- Crossed month test:" << std::endl;
+        std::cout << "  - from: " << from << std::endl;
+        std::cout << "  - to:   " << to << std::endl;
+        std::cout << "  - timeOfDay: " << timeOfDay << std::endl;
+        const int crossed = LLBC_Time::GetCrossedMonths(from, to, timeOfDay);
+        std::cout <<"   - crossed: " << crossed << std::endl;
+        if (crossed != exceptCrossed)
+            std::cerr << "  - !!!!!!!!! Test failed, except:" << exceptCrossed << std::endl;
+    };
+
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-07-14 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-07-14 00:00:00"),
+                          LLBC_TimeSpan::zero,
+                          0);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-01-14 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-12-14 00:00:00"),
+                          LLBC_TimeSpan::zero,
+                          11);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2023-12-31 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-01-01 00:00:00"),
+                          LLBC_TimeSpan::zero,
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2023-01-14 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-12-14 00:00:00"),
+                          LLBC_TimeSpan::zero,
+                          23);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-07-14 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-07-15 00:00:00"),
+                          LLBC_TimeSpan::FromDays(14),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-07-15 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-07-15 01:00:00"),
+                          LLBC_TimeSpan::FromDays(14, 1),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-07-15 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-07-15 00:59:59"),
+                          LLBC_TimeSpan::FromDays(14, 1),
+                          0);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(30),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(28, 59, 59, 59),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(29),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-30 00:00:00"),
+                          LLBC_TimeSpan::FromDays(29),
+                          2);
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
