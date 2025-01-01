@@ -100,7 +100,7 @@ help:
 	@echo "  make all      - make core library, testsuite and all wrapped libraries"
 	@echo "  make $(CORELIB_TARGET)     - make c++ core library"
 	@echo "  make $(TEST_TARGET)        - make c++ core library testsuite"
-	@echo "  make $(QUICK_START_TARGET) - make c++ core library testsuite"
+	@echo "  make $(QUICK_START_TARGET) - make c++ core library quick start demos"
 	@echo "  make $(WRAPS_TARGET)       - make all language specificed warpped libraries"
 	@echo "                               now supported languages: python, csharp, lua"
 	@echo "  make $(PYWRAP_TARGET)      - make python wrapped library"
