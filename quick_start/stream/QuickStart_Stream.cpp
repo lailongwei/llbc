@@ -92,13 +92,13 @@ int QuickStart_Stream::Run(int argc, char *argv[])
     LLBC_PrintLn("Basic datatypes serialize/deserialize:");
     // 序列化numbers/string数据
     stream << true // bool
-        << -32 // int32
-        << 32u // uint32
-        << -64ll // int64
-        << 64llu // uint64
-        << 3.14f // float
-        << 6.28 // double
-        << "Hello World!"; // string
+           << -32 // int32
+           << 32u // uint32
+           << -64ll // int64
+           << 64llu // uint64
+           << 3.14f // float
+           << 6.28 // double
+           << "Hello World!"; // string
     // 打印stream信息
     LLBC_PrintLn("- After serialize numbers/string, stream: %s", stream.ToString().c_str());
 
