@@ -43,11 +43,12 @@ const LLBC_Strings &LLBC_AppConfigType::GetConfigSuffixes(int cfgType)
 {
     if (cfgType == Ini)
         return LLBC_INL_NS __cfgSuffixes_Ini;
-    if (cfgType == Xml)
+    else if (cfgType == Xml)
         return LLBC_INL_NS __cfgSuffixes_Xml;
-    if (cfgType == Property)
+    else if (cfgType == Property)
         return LLBC_INL_NS __cfgSuffixes_Property;
-    return LLBC_INL_NS __cfgSuffixes_Unknown;
+    else
+        return LLBC_INL_NS __cfgSuffixes_Unknown;
 }
 
 auto LLBC_AppConfigType::GetConfigType(const LLBC_String &cfgSuffix) -> ENUM
@@ -64,7 +65,6 @@ LLBC_App *LLBC_App::_thisApp = nullptr;
 
 LLBC_App::LLBC_App()
 : _fps(LLBC_CFG_APP_DFT_FPS)
-
 , _startPhase(LLBC_AppStartPhase::Stopped)
 , _startThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
 , _llbcLibStartupInApp(false)
@@ -328,6 +328,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     while (true)
     {
         sint64 begRunTime = LLBC_GetMilliseconds();
+
         // Call OnUpdate event method.
         OnUpdate();
         // Handle events.
