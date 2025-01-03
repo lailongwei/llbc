@@ -188,6 +188,34 @@ public:
 
 public:
     /**
+     * Start application.
+     * @param[in] argc - the application startup argument number.
+     * @param[in] argv - the application startup arguments.
+     * @param[in] name - the application name, default is executable file name(has been trim extension name).
+     * @return int - return 0 if start success, otherwise return -1.
+     */
+    virtual int Start(int argc, char *argv[], const LLBC_String &name = "");
+
+    /**
+     * Stop application.
+     */
+    virtual void Stop();
+
+    /**
+     * Check application start phase.
+     */
+    bool IsStarting() const;
+    bool IsStarted() const;
+    bool IsStopping() const;
+    bool IsStopped() const;
+
+    /**
+     * Get application start phase.
+     * @return int - the application start phase.
+     */
+    int GetStartPhase() const { return _startPhase; }
+
+    /**
      * Get application FPS.
      * @return int - the application FPS.
      */
@@ -260,35 +288,6 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int CancelPreventReload();
-
-public:
-    /**
-     * Start application.
-     * @param[in] argc - the application startup argument number.
-     * @param[in] argv - the application startup arguments.
-     * @param[in] name - the application name, default is executable file name(has been trim extension name).
-     * @return int - return 0 if start success, otherwise return -1.
-     */
-    virtual int Start(int argc, char *argv[], const LLBC_String &name = "");
-
-    /**
-     * Stop application.
-     */
-    virtual void Stop();
-
-    /**
-     * Check application start phase.
-     */
-    bool IsStarting() const;
-    bool IsStarted() const;
-    bool IsStopping() const;
-    bool IsStopped() const;
-
-    /**
-     * Get application start phase.
-     * @return int - the application start phase.
-     */
-    int GetStartPhase() const { return _startPhase; }
 
 public:
     /**
@@ -399,13 +398,13 @@ private:
     // Application core data members.
     static LLBC_App *_thisApp; //!!! application singleton instance.
     LLBC_String _name; // Application name.
+    volatile int _fps; // Application FPS.
     volatile int _startPhase; // Application start phase.
     LLBC_StartArgs _startArgs; // Application start args.
     volatile LLBC_ThreadId _startThreadId; // Call Start() thread Id.
     bool _llbcLibStartupInApp; // llbc library startup in App flag.
     bool _requireStop; // Stop flag, when App processed Stop event, will set to true.
     LLBC_ServiceMgr &_services; // Service manager.
-    volatile int _fps; // App FPS.
 
     // Load/Reload data members.
     volatile int _loading; // Loading flag.

@@ -2211,14 +2211,14 @@ void LLBC_ServiceImpl::ProcessIdle()
     for(auto &comp : _compList)
     {
         sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
-        if (LIKELY(elapsed >= 0))
-        {
-            if (elapsed >= frameInterval)
-                break;
+        if (UNLIKELY(elapsed < 0))
+            break;
 
-            if (comp->_runningPhase == _CompRunningPhase::LateStarted)
-                comp->OnIdle(LLBC_TimeSpan::FromMillis(frameInterval - elapsed));
-        }
+        if (elapsed >= frameInterval)
+            break;
+
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnIdle(LLBC_TimeSpan::FromMillis(frameInterval - elapsed));
     }
 }
 

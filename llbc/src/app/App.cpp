@@ -63,13 +63,13 @@ auto LLBC_AppConfigType::GetConfigType(const LLBC_String &cfgSuffix) -> ENUM
 LLBC_App *LLBC_App::_thisApp = nullptr;
 
 LLBC_App::LLBC_App()
-: _startPhase(LLBC_AppStartPhase::Stopped)
+: _fps(LLBC_CFG_APP_DFT_FPS)
+
+, _startPhase(LLBC_AppStartPhase::Stopped)
 , _startThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
 , _llbcLibStartupInApp(false)
 , _requireStop(false)
 , _services(*LLBC_ServiceMgrSingleton)
-
-, _fps(LLBC_CFG_APP_DFT_FPS)
 
 , _loading(0)
 , _cfgType(LLBC_AppConfigType::End)
@@ -106,7 +106,8 @@ int LLBC_App::SetFPS(int fps)
 
 int LLBC_App::GetFrameInterval() const
 {
-    return _fps != static_cast<int>(LLBC_INFINITE) ? 1000 / _fps : 0;
+    const auto fps = _fps;
+    return fps != static_cast<int>(LLBC_INFINITE) ? 1000 / fps : 0;
 }
 
 bool LLBC_App::HasConfig() const
@@ -324,10 +325,9 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     FireAppPhaseChangeEvToServices(false, false, true, false);
 
     // Enter app loop.
-    sint64 begRunTime = 0;
     while (true)
     {
-        begRunTime = LLBC_GetMilliseconds();
+        sint64 begRunTime = LLBC_GetMilliseconds();
         // Call OnUpdate event method.
         OnUpdate();
         // Handle events.
@@ -581,21 +581,22 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
             auto sectionName = cfgItem.first.AsStr().tolower();
             if (sectionName != "app" && sectionName != "application")
                 break;
+
             for (auto cfgSecItem : cfgItem.second.AsDict())
             {
                 if (cfgSecItem.first.AsStr().tolower() == "fps")
                 {
-                    const auto fps = cfgSecItem.second;
-                    SetFPS(fps);
+                    SetFPS(cfgSecItem.second);
                     break;
                 }
             }
+
             break;
         }
 
         if (cfgItem.first.AsStr().tolower() == "fps")
         {
-            const auto fps = _cfgType == LLBC_AppConfigType::Xml ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
+            const auto& fps = _cfgType == LLBC_AppConfigType::Xml ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
             SetFPS(fps);
             break;
         }
