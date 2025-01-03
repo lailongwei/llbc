@@ -637,7 +637,6 @@ private:
 
     // FPS about members.
     volatile int _fps; // Service FPS.
-    volatile int _frameInterval; // Frame interval, 1000/_fps.
     sint64 _begSvcTime; // Begin heartbeat time, update on every heartbeat begin.
 
 private:
