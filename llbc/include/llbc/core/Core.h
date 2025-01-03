@@ -144,6 +144,9 @@
 #include "llbc/core/objpool/ObjPool.h"
 #include "llbc/core/objpool/ThreadSpecObjPool.h"
 
+// core/json/nlohmann
+#include "llbc/core/json/nlohmann/LLBCJsonInl.h"
+
 __LLBC_NS_BEGIN
 
 /**

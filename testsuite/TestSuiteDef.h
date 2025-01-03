@@ -74,6 +74,7 @@ __DEFINE_TEST_CASE(TestCase_App_AppTest)
 __DEFINE_TEST_CASE(TestCase_App_AppCfgTest)
 __DEFINE_TEST_CASE(TestCase_App_AppPhaseWaitingTest)
 __DEFINE_TEST_CASE(TestCase_App_AppTimer)
+__DEFINE_TEST_CASE(TestCase_NlohmannJson)
 __DEF_TEST_CASE_END
 
 #undef __DEF_TEST_CASE_BEGIN
