@@ -111,10 +111,10 @@ inline int LLBC_Time::GetMonth() const
     return _localTimeStruct.tm_mon;
 }
 
-inline int LLBC_Time::GetDayOfWeek(bool beginIsSunday) const
+inline int LLBC_Time::GetDayOfWeek(bool startBySunday) const
 {
     int wday = _localTimeStruct.tm_wday;
-    return beginIsSunday ? wday : ((wday - 1) + 7) % 7;
+    return startBySunday ? wday : ((wday - 1) + 7) % 7;
 }
 
 inline int LLBC_Time::GetDayOfMonth() const
@@ -140,6 +140,26 @@ inline int LLBC_Time::GetMinute() const
 inline int LLBC_Time::GetSecond() const
 {
     return _localTimeStruct.tm_sec;
+}
+
+inline LLBC_Time LLBC_Time::GetBeginTimeOfHour() const
+{
+    return *this - GetOffsetTimeOfHour();
+}
+
+inline LLBC_Time LLBC_Time::GetBeginTimeOfDay() const
+{
+    return *this - GetOffsetTimeOfDay();
+}
+
+inline LLBC_Time LLBC_Time::GetBeginTimeOfWeek(int startBySunday) const
+{
+    return *this - GetOffsetTimeOfWeek(startBySunday);
+}
+
+inline LLBC_Time LLBC_Time::GetBeginTimeOfMonth() const
+{
+    return *this - GetOffsetTimeOfMonth();
 }
 
 inline time_t LLBC_Time::GetTimestampInSecs() const
@@ -205,9 +225,9 @@ inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfDay(const LLBC_TimeSpan &toTi
     return GetIntervalTo(LLBC_TimeSpan::oneDay, toTimeOfDay, false);
 }
 
-inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek, bool beginIsSunday) const
+inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek, bool startBySunday) const
 {
-    return GetIntervalTo(LLBC_TimeSpan::oneWeek, toTimeOfWeek, beginIsSunday);
+    return GetIntervalTo(LLBC_TimeSpan::oneWeek, toTimeOfWeek, startBySunday);
 }
 
 inline int LLBC_Time::GetCrossedHours(const LLBC_Time &from,

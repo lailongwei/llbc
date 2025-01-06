@@ -103,37 +103,23 @@ int LLBC_Time::GetMicrosecond() const
         nowLocalMicros % LLBC_TimeConst::numOfMicrosPerMillisecond);
 }
 
-LLBC_Time LLBC_Time::GetDate() const
-{
-    sint64 timeZone = LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond;
-
-    sint64 localTime = _time - timeZone;
-    sint64 datePart = localTime /
-        LLBC_TimeConst::numOfMicrosPerDay *
-        LLBC_TimeConst::numOfMicrosPerDay;
-
-    datePart += timeZone;
-
-    return LLBC_Time(datePart);
-}
-
-LLBC_TimeSpan LLBC_Time::GetTimeOfHour() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfHour() const
 {
     return LLBC_TimeSpan(
         (_time - (LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond)) %
             LLBC_TimeConst::numOfMicrosPerHour);
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfDay() const
 {
     return LLBC_TimeSpan(
         (_time - (LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond)) %
             LLBC_TimeConst::numOfMicrosPerDay);
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfWeek(bool beginIsSunday) const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfWeek(bool startBySunday) const
 {
-    return LLBC_TimeSpan::FromDays(GetDayOfWeek(beginIsSunday),
+    return LLBC_TimeSpan::FromDays(GetDayOfWeek(startBySunday),
                                    GetHour(),
                                    GetMinute(),
                                    GetSecond(),
@@ -141,7 +127,7 @@ LLBC_TimeSpan LLBC_Time::GetTimeOfWeek(bool beginIsSunday) const
                                    GetMicrosecond());
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfMonth() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfMonth() const
 {
     return LLBC_TimeSpan::FromDays(GetDayOfMonth() - 1,
                                    GetHour(),
@@ -495,18 +481,18 @@ LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
                                        LLBC_TimeSpan toTimeOfTimeCycle,
-                                       bool beginIsSunday) const
+                                       bool startBySunday) const
 {
     // !For now, GetIntervalToTimeOfMonth() is not supported.
 
     // Calc fromTimeOfTimeCycle.
     LLBC_TimeSpan fromTimeOfTimeCycle;
     if (timeCycle == LLBC_TimeSpan::oneHour)
-        fromTimeOfTimeCycle = GetTimeOfHour();
+        fromTimeOfTimeCycle = GetOffsetTimeOfHour();
     else if (timeCycle == LLBC_TimeSpan::oneDay)
-        fromTimeOfTimeCycle = GetTimeOfDay();
+        fromTimeOfTimeCycle = GetOffsetTimeOfDay();
     else // oneWeek
-        fromTimeOfTimeCycle = GetTimeOfWeek(beginIsSunday);
+        fromTimeOfTimeCycle = GetOffsetTimeOfWeek(startBySunday);
 
     // Normalize toTimeOfTimeCycle.
     if (UNLIKELY(toTimeOfTimeCycle < LLBC_TimeSpan::zero))

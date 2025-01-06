@@ -113,9 +113,23 @@ void TestCase_Core_Time_Time::TimeClassTest()
     std::cout <<"Now millisecond: " <<now.GetMillisecond() 
         <<", microsecond: " <<now.GetMicrosecond() <<std::endl;
 
-    // GetDate(), GetTimeOfDay() test.
-    std::cout <<"GetDate(): " <<now.GetDate() <<std::endl;
-    std::cout <<"GetTimeOfDay(): " <<now.GetTimeOfDay() <<std::endl;
+    // GetBeginTimeOfHour(), GetOffsetTimeOfHour() tet.
+    std::cout << "GetBeginTimeOfHour(): " << now.GetBeginTimeOfHour() << std::endl;
+    std::cout << "GetOffsetTimeOfHour(): " << now.GetOffsetTimeOfHour() << std::endl;
+
+    // GetBeginTimeOfDay(), GetOffsetTimeOfDay() test.
+    std::cout << "GetBeginTimeOfDay(): " << now.GetBeginTimeOfDay() << std::endl;
+    std::cout << "GetOffsetTimeOfDay(): " << now.GetOffsetTimeOfDay() << std::endl;
+
+    // GetBeginTimeOfWeek(), GetOffsetTimeOfWeek() tet.
+    std::cout << "GetBeginTimeOfWeek(true): " << now.GetBeginTimeOfWeek(true) << std::endl;
+    std::cout << "GetOffsetTimeOfWeek(true): " << now.GetOffsetTimeOfWeek(true) << std::endl;
+    std::cout << "GetBeginTimeOfWeek(false): " << now.GetBeginTimeOfWeek(false) << std::endl;
+    std::cout << "GetOffsetTimeOfWeek(false): " << now.GetOffsetTimeOfWeek(false) << std::endl;
+
+    // GetBeginTimeOfMonth(), GetOffsetTimeOfMonth() test.
+    std::cout << "GetBeginTimeOfMonth(): " << now.GetBeginTimeOfMonth() << std::endl;
+    std::cout << "GetOffsetTimeOfMonth(): " << now.GetOffsetTimeOfMonth() << std::endl;
 
     // GetGmtTime(), GetLocalTime() test.
     std::cout <<"GetGmtTime():" <<std::endl;
@@ -674,15 +688,15 @@ void TestCase_Core_Time_Time::WeekTest()
     std::cout << "Week test:" << std::endl;
     LLBC_Time now = LLBC_Time::Now();
     std::cout << "- Now: " << now << std::endl;
-    std::cout << "- GetTimeOfWeek(beginIsSunday = true): " << now.GetTimeOfWeek(true) << std::endl;
-    std::cout << "- GetTimeOfWeek(beginIsSunday = false): " << now.GetTimeOfWeek(false) << std::endl;
-    auto timeOfWeekDiff = (now.GetTimeOfWeek(true) - now.GetTimeOfWeek(false));
+    std::cout << "- GetOffsetTimeOfWeek(beginIsSunday = true): " << now.GetOffsetTimeOfWeek(true) << std::endl;
+    std::cout << "- GetOffsetTimeOfWeek(beginIsSunday = false): " << now.GetOffsetTimeOfWeek(false) << std::endl;
+    auto timeOfWeekDiff = (now.GetOffsetTimeOfWeek(true) - now.GetOffsetTimeOfWeek(false));
     LLBC_DoIf(timeOfWeekDiff < LLBC_TimeSpan::zero, timeOfWeekDiff += (LLBC_TimeSpan::oneDay * 7));
-    std::cout << "   - GetTimeOfWeek(beginIsSunday = true) - GetTimeOfWeek(beginIsMonday = false): " << timeOfWeekDiff << std::endl;
+    std::cout << "   - GetOffsetTimeOfWeek(beginIsSunday = true) - GetOffsetTimeOfWeek(beginIsMonday = false): " << timeOfWeekDiff << std::endl;
     LLBC_ErrorAndReturnIf(timeOfWeekDiff != LLBC_TimeSpan::oneDay, void(), "time off week diff test failed");
 
-    std::cout << "- Begin time of week(beginIsSunday = true): " << now - now.GetTimeOfWeek(true) << std::endl;
-    std::cout << "- Begin time of week(beginIsSunday = false): " << now - now.GetTimeOfWeek(false) << std::endl;
+    std::cout << "- Begin time of week(beginIsSunday = true): " << now - now.GetOffsetTimeOfWeek(true) << std::endl;
+    std::cout << "- Begin time of week(beginIsSunday = false): " << now - now.GetOffsetTimeOfWeek(false) << std::endl;
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
