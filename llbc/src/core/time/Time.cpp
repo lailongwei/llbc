@@ -117,9 +117,9 @@ LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfDay() const
             LLBC_TimeConst::numOfMicrosPerDay);
 }
 
-LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfWeek(bool startBySunday) const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfWeek(bool startOnSunday) const
 {
-    return LLBC_TimeSpan::FromDays(GetDayOfWeek(startBySunday),
+    return LLBC_TimeSpan::FromDays(GetDayOfWeek(startOnSunday),
                                    GetHour(),
                                    GetMinute(),
                                    GetSecond(),
@@ -481,7 +481,7 @@ LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
                                        LLBC_TimeSpan toTimeOfTimeCycle,
-                                       bool startBySunday) const
+                                       bool startOnSunday) const
 {
     // !For now, GetIntervalToTimeOfMonth() is not supported.
 
@@ -492,7 +492,7 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
     else if (timeCycle == LLBC_TimeSpan::oneDay)
         fromTimeOfTimeCycle = GetOffsetTimeOfDay();
     else // oneWeek
-        fromTimeOfTimeCycle = GetOffsetTimeOfWeek(startBySunday);
+        fromTimeOfTimeCycle = GetOffsetTimeOfWeek(startOnSunday);
 
     // Normalize toTimeOfTimeCycle.
     if (UNLIKELY(toTimeOfTimeCycle < LLBC_TimeSpan::zero))
