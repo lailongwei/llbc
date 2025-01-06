@@ -52,6 +52,9 @@ int TestCase_Core_Time_Time::Run(int argc, char *argv[])
     CrossTimePeriodTest();
     std::cout << std::endl;
 
+    WeekTest();
+    std::cout << std::endl;
+
     std::cout << "Press any key to continue ... ..." << std::endl;
     getchar();
 
@@ -664,6 +667,22 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
                           LLBC_Time::FromTimeStr("2024-03-30 00:00:00"),
                           LLBC_TimeSpan::FromDays(29),
                           2);
+}
+
+void TestCase_Core_Time_Time::WeekTest()
+{
+    std::cout << "Week test:" << std::endl;
+    LLBC_Time now = LLBC_Time::Now();
+    std::cout << "- Now: " << now << std::endl;
+    std::cout << "- GetTimeOfWeek(beginIsSunday = true): " << now.GetTimeOfWeek(true) << std::endl;
+    std::cout << "- GetTimeOfWeek(beginIsSunday = false): " << now.GetTimeOfWeek(false) << std::endl;
+    auto timeOfWeekDiff = (now.GetTimeOfWeek(true) - now.GetTimeOfWeek(false));
+    LLBC_DoIf(timeOfWeekDiff < LLBC_TimeSpan::zero, timeOfWeekDiff += (LLBC_TimeSpan::oneDay * 7));
+    std::cout << "   - GetTimeOfWeek(beginIsSunday = true) - GetTimeOfWeek(beginIsMonday = false): " << timeOfWeekDiff << std::endl;
+    LLBC_ErrorAndReturnIf(timeOfWeekDiff != LLBC_TimeSpan::oneDay, void(), "time off week diff test failed");
+
+    std::cout << "- Begin time of week(beginIsSunday = true): " << now - now.GetTimeOfWeek(true) << std::endl;
+    std::cout << "- Begin time of week(beginIsSunday = false): " << now - now.GetTimeOfWeek(false) << std::endl;
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)

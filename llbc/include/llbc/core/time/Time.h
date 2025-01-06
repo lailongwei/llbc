@@ -129,9 +129,10 @@ public:
 
     /**
      * Get day of week, started by 0(sunday).
+     * @param[in] beginIsSunday - if true, span begin at sunday, otherwise is monday.
      * @return int - day of week.
      */
-    int GetDayOfWeek() const;
+    int GetDayOfWeek(bool beginIsSunday = true) const;
 
     /**
      * Get day of month, started by 1.
@@ -192,9 +193,10 @@ public:
     LLBC_TimeSpan GetTimeOfDay() const;
     /**
      * Get current time of week.
+     * @param[in] beginIsSunday - if true, span begin at sunday, otherwise is monday.
      * @return LLBC_TimeSpan - the current time of week.
      */
-    LLBC_TimeSpan GetTimeOfWeek() const;
+    LLBC_TimeSpan GetTimeOfWeek(bool beginIsSunday = true) const;
     /**
      * Get current time of month.
      * @return LLBC_TimeSpan - the current time of month.
@@ -297,10 +299,11 @@ public:
 
     /**
      * Get interval to time of week.
-     * @param[in] toTimeOfWeek - to time of week.
+     * @param[in] toTimeOfWeek  - to time of week.
+     * @param[in] beginIsSunday - if true, span begin at sunday, otherwise is monday.
      * @return LLBC_TimeSpan - interval value.
      */
-    LLBC_TimeSpan GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek) const;
+    LLBC_TimeSpan GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek, bool beginIsSunday = true) const;
 
 public:
     /**
@@ -408,7 +411,8 @@ private:
      * Get interval to time internal implement.
      */
     LLBC_TimeSpan GetIntervalTo(const LLBC_TimeSpan &timeCycle,
-                                LLBC_TimeSpan toTimeOfTimeCycle) const;
+                                LLBC_TimeSpan toTimeOfTimeCycle,
+                                bool beginIsSunday) const;
 
     /**
      * Crossed time-cycle internal implement. 

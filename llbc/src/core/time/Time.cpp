@@ -31,17 +31,6 @@
 #pragma warning(disable:4996)
 #endif
 
-__LLBC_INTERNAL_NS_BEGIN
-
-static constexpr LLBC_NS LLBC_TimeSpan (LLBC_NS LLBC_Time::*__g_GetTimeOfTimeCycleMeths[4])() const {
-    &LLBC_NS LLBC_Time::GetTimeOfHour,
-    &LLBC_NS LLBC_Time::GetTimeOfDay,
-    &LLBC_NS LLBC_Time::GetTimeOfWeek,
-    &LLBC_NS LLBC_Time::GetTimeOfMonth,
-};
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 const LLBC_Time LLBC_Time::utcBegin;
@@ -142,9 +131,9 @@ LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
             LLBC_TimeConst::numOfMicrosPerDay);
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfWeek() const
+LLBC_TimeSpan LLBC_Time::GetTimeOfWeek(bool beginIsSunday) const
 {
-    return LLBC_TimeSpan::FromDays(GetDayOfWeek(),
+    return LLBC_TimeSpan::FromDays(GetDayOfWeek(beginIsSunday),
                                    GetHour(),
                                    GetMinute(),
                                    GetSecond(),
@@ -505,18 +494,19 @@ LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
 #undef __LLBC_INL_TIME_PARSE_SEPARATORS
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
-                                       LLBC_TimeSpan toTimeOfTimeCycle) const
+                                       LLBC_TimeSpan toTimeOfTimeCycle,
+                                       bool beginIsSunday) const
 {
     // !For now, GetIntervalToTimeOfMonth() is not supported.
 
     // Calc fromTimeOfTimeCycle.
     LLBC_TimeSpan fromTimeOfTimeCycle;
     if (timeCycle == LLBC_TimeSpan::oneHour)
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[0])();
+        fromTimeOfTimeCycle = GetTimeOfHour();
     else if (timeCycle == LLBC_TimeSpan::oneDay)
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[1])();
+        fromTimeOfTimeCycle = GetTimeOfDay();
     else // oneWeek
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[2])();
+        fromTimeOfTimeCycle = GetTimeOfWeek(beginIsSunday);
 
     // Normalize toTimeOfTimeCycle.
     if (UNLIKELY(toTimeOfTimeCycle < LLBC_TimeSpan::zero))
