@@ -321,13 +321,8 @@ inline LLBC_TimeSpan &LLBC_TimeSpan::operator=(const LLBC_TimeSpan &span)
 
 inline LLBC_String LLBC_TimeSpan::ToString() const
 {
-    int days = GetDays();
-    if (days != 0)
-        return LLBC_String().format("%d %02d:%02d:%02d.%06d", 
-            days, GetHours(), GetMinutes(), GetSeconds(), GetMillis() * 1000 + GetMicros());
-    else
-        return LLBC_String().format("%02d:%02d:%02d.%06d",
-            GetHours(), GetMinutes(), GetSeconds(), GetMillis() * 1000 + GetMicros());
+    return LLBC_String().format("%02d %02d:%02d:%02d.%06d", 
+    GetDays(), GetHours(), GetMinutes(), GetSeconds(), GetMillis() * 1000 + GetMicros());
 }
 
 inline void LLBC_TimeSpan::Serialize(LLBC_Stream &stream) const
