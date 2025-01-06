@@ -21,62 +21,11 @@
 
 #pragma once
 
-__LLBC_NS_BEGIN
+#include "llbc.h"
+using namespace llbc;
 
-inline LLBC_AppEvent::LLBC_AppEvent(int evType)
-: evType(evType)
+class QuickStart_Stream : public LLBC_BaseTestCase
 {
-}
-
-
-inline int LLBC_App::GetFPS() const
-{
-    return _fps;
-}
-
-inline bool LLBC_App::IsStopped() const
-{
-    return _startPhase == LLBC_AppStartPhase::Stopped;
-}
-
-inline bool LLBC_App::IsStarting() const
-{
-    return _startPhase == LLBC_AppStartPhase::Starting;
-}
-
-inline bool LLBC_App::IsStarted() const
-{
-    return _startPhase == LLBC_AppStartPhase::Started;
-}
-
-inline bool LLBC_App::IsStopping() const
-{
-    return _startPhase == LLBC_AppStartPhase::Stopping;
-}
-
-inline int LLBC_App::PushEvent(int evType)
-{
-    return PushEvent(new LLBC_AppEvent(evType));
-}
-
-inline LLBC_Service *LLBC_App::GetService(int id) const
-{
-    return _services.GetService(id);
-}
-
-inline LLBC_Service *LLBC_App::GetService(const LLBC_CString &name) const
-{
-    return _services.GetService(name);
-}
-
-inline int LLBC_App::StopService(int id, bool del)
-{
-    return _services.Stop(id, del);
-}
-
-inline int LLBC_App::StopService(const LLBC_CString &name, bool del)
-{
-    return _services.Stop(name, del);
-}
-
-__LLBC_NS_END
+public:
+    int Run(int argc, char *argv[]) override;
+};

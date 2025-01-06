@@ -41,6 +41,7 @@ private:
     void CpuTimeTest();
     void GetIntervalToTest();
     void CrossTimePeriodTest();
+    void WeekTest();
 
     void PrintTimeStruct(const LLBC_TimeStruct &ts);
     void PrintCLibTimeStruct(const struct tm &ts);

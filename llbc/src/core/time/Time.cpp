@@ -31,17 +31,6 @@
 #pragma warning(disable:4996)
 #endif
 
-__LLBC_INTERNAL_NS_BEGIN
-
-static constexpr LLBC_NS LLBC_TimeSpan (LLBC_NS LLBC_Time::*__g_GetTimeOfTimeCycleMeths[4])() const {
-    &LLBC_NS LLBC_Time::GetTimeOfHour,
-    &LLBC_NS LLBC_Time::GetTimeOfDay,
-    &LLBC_NS LLBC_Time::GetTimeOfWeek,
-    &LLBC_NS LLBC_Time::GetTimeOfMonth,
-};
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 const LLBC_Time LLBC_Time::utcBegin;
@@ -114,37 +103,23 @@ int LLBC_Time::GetMicrosecond() const
         nowLocalMicros % LLBC_TimeConst::numOfMicrosPerMillisecond);
 }
 
-LLBC_Time LLBC_Time::GetDate() const
-{
-    sint64 timeZone = LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond;
-
-    sint64 localTime = _time - timeZone;
-    sint64 datePart = localTime /
-        LLBC_TimeConst::numOfMicrosPerDay *
-        LLBC_TimeConst::numOfMicrosPerDay;
-
-    datePart += timeZone;
-
-    return LLBC_Time(datePart);
-}
-
-LLBC_TimeSpan LLBC_Time::GetTimeOfHour() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfHour() const
 {
     return LLBC_TimeSpan(
         (_time - (LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond)) %
             LLBC_TimeConst::numOfMicrosPerHour);
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfDay() const
 {
     return LLBC_TimeSpan(
         (_time - (LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond)) %
             LLBC_TimeConst::numOfMicrosPerDay);
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfWeek() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfWeek(bool startBySunday) const
 {
-    return LLBC_TimeSpan::FromDays(GetDayOfWeek(),
+    return LLBC_TimeSpan::FromDays(GetDayOfWeek(startBySunday),
                                    GetHour(),
                                    GetMinute(),
                                    GetSecond(),
@@ -152,7 +127,7 @@ LLBC_TimeSpan LLBC_Time::GetTimeOfWeek() const
                                    GetMicrosecond());
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfMonth() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfMonth() const
 {
     return LLBC_TimeSpan::FromDays(GetDayOfMonth() - 1,
                                    GetHour(),
@@ -505,18 +480,19 @@ LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
 #undef __LLBC_INL_TIME_PARSE_SEPARATORS
 
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
-                                       LLBC_TimeSpan toTimeOfTimeCycle) const
+                                       LLBC_TimeSpan toTimeOfTimeCycle,
+                                       bool startBySunday) const
 {
     // !For now, GetIntervalToTimeOfMonth() is not supported.
 
     // Calc fromTimeOfTimeCycle.
     LLBC_TimeSpan fromTimeOfTimeCycle;
     if (timeCycle == LLBC_TimeSpan::oneHour)
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[0])();
+        fromTimeOfTimeCycle = GetOffsetTimeOfHour();
     else if (timeCycle == LLBC_TimeSpan::oneDay)
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[1])();
+        fromTimeOfTimeCycle = GetOffsetTimeOfDay();
     else // oneWeek
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[2])();
+        fromTimeOfTimeCycle = GetOffsetTimeOfWeek(startBySunday);
 
     // Normalize toTimeOfTimeCycle.
     if (UNLIKELY(toTimeOfTimeCycle < LLBC_TimeSpan::zero))
@@ -560,6 +536,40 @@ LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
         normalizedTo.GetTimestampInMicros() - (normalizedTo.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
 
     return normalizedTo - normalizedFrom;
+}
+
+int LLBC_Time::GetCrossedMonths(const LLBC_Time &from,
+                                const LLBC_Time &to,
+                                const LLBC_TimeSpan &timeOfMonth)
+{
+    // If span <= 0, return zero.
+    const LLBC_TimeSpan diff = to - from;
+    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
+        return 0;
+
+    if (UNLIKELY(timeOfMonth >= LLBC_TimeSpan::oneDay * 31)) 
+        return 0;
+
+    const static auto preMonthMaxDays = [](int year, int month) 
+    {
+        month  = (month == 0) ? 11 : month - 1;
+        if (month == 1)
+            return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) ? 29 : 28;
+
+        const static int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        return daysInMonth[month];
+    };
+
+    const auto fromMaxCycle = LLBC_TimeSpan::FromDays(preMonthMaxDays(from.GetYear(), from.GetMonth()));
+    const auto toMaxCycle = LLBC_TimeSpan::FromDays(preMonthMaxDays(to.GetYear(), to.GetMonth()));
+
+    const auto normalizedFrom = from - ((timeOfMonth > fromMaxCycle) ? fromMaxCycle: timeOfMonth);
+    const auto normalizedTo = to - ((timeOfMonth > toMaxCycle) ? toMaxCycle: timeOfMonth);
+
+    const auto diffYears = normalizedTo.GetYear() - normalizedFrom.GetYear();
+    const auto diffMonths = normalizedTo.GetMonth() - normalizedFrom.GetMonth();
+
+    return diffYears * 12 + diffMonths;
 }
 
 __LLBC_NS_END

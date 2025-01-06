@@ -32,9 +32,9 @@
     {                                                                \
         int olcClr = LLBC_GetConsoleColor(stdout);                   \
         LLBC_SetConsoleColor(stdout, color);                         \
-        LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
+        __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__);         \
         LLBC_SetConsoleColor(stdout, olcClr);                        \
-        LLBC_NS __LLBC_FilePrint(false, stdout, "\n");               \
+        __LLBC_FilePrint(false, stdout, "\n");                       \
     } while (0);
 
 #define __ClearInputBuf()                           \

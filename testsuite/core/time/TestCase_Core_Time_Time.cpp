@@ -52,6 +52,9 @@ int TestCase_Core_Time_Time::Run(int argc, char *argv[])
     CrossTimePeriodTest();
     std::cout << std::endl;
 
+    WeekTest();
+    std::cout << std::endl;
+
     std::cout << "Press any key to continue ... ..." << std::endl;
     getchar();
 
@@ -110,9 +113,23 @@ void TestCase_Core_Time_Time::TimeClassTest()
     std::cout <<"Now millisecond: " <<now.GetMillisecond() 
         <<", microsecond: " <<now.GetMicrosecond() <<std::endl;
 
-    // GetDate(), GetTimeOfDay() test.
-    std::cout <<"GetDate(): " <<now.GetDate() <<std::endl;
-    std::cout <<"GetTimeOfDay(): " <<now.GetTimeOfDay() <<std::endl;
+    // GetBeginTimeOfHour(), GetOffsetTimeOfHour() tet.
+    std::cout << "GetBeginTimeOfHour(): " << now.GetBeginTimeOfHour() << std::endl;
+    std::cout << "GetOffsetTimeOfHour(): " << now.GetOffsetTimeOfHour() << std::endl;
+
+    // GetBeginTimeOfDay(), GetOffsetTimeOfDay() test.
+    std::cout << "GetBeginTimeOfDay(): " << now.GetBeginTimeOfDay() << std::endl;
+    std::cout << "GetOffsetTimeOfDay(): " << now.GetOffsetTimeOfDay() << std::endl;
+
+    // GetBeginTimeOfWeek(), GetOffsetTimeOfWeek() tet.
+    std::cout << "GetBeginTimeOfWeek(true): " << now.GetBeginTimeOfWeek(true) << std::endl;
+    std::cout << "GetOffsetTimeOfWeek(true): " << now.GetOffsetTimeOfWeek(true) << std::endl;
+    std::cout << "GetBeginTimeOfWeek(false): " << now.GetBeginTimeOfWeek(false) << std::endl;
+    std::cout << "GetOffsetTimeOfWeek(false): " << now.GetOffsetTimeOfWeek(false) << std::endl;
+
+    // GetBeginTimeOfMonth(), GetOffsetTimeOfMonth() test.
+    std::cout << "GetBeginTimeOfMonth(): " << now.GetBeginTimeOfMonth() << std::endl;
+    std::cout << "GetOffsetTimeOfMonth(): " << now.GetOffsetTimeOfMonth() << std::endl;
 
     // GetGmtTime(), GetLocalTime() test.
     std::cout <<"GetGmtTime():" <<std::endl;
@@ -596,6 +613,90 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
                         LLBC_Time::FromTimeStr("2024-12-23 01:00:00"),
                         LLBC_TimeSpan::oneHour,
                         2);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-25 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-26 00:00:00"),
+                        LLBC_TimeSpan::FromDays(3),
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-25 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-26 00:00:00"),
+                        LLBC_TimeSpan::FromDays(3, 1),
+                        0);
+
+    auto crossedMonthsTestLbda = [](const LLBC_Time &from,
+                                  const LLBC_Time &to,
+                                  const LLBC_TimeSpan &timeOfDay,
+                                  int exceptCrossed)
+    {
+        std::cout << "- Crossed month test:" << std::endl;
+        std::cout << "  - from: " << from << std::endl;
+        std::cout << "  - to:   " << to << std::endl;
+        std::cout << "  - timeOfDay: " << timeOfDay << std::endl;
+        const int crossed = LLBC_Time::GetCrossedMonths(from, to, timeOfDay);
+        std::cout <<"   - crossed: " << crossed << std::endl;
+        if (crossed != exceptCrossed)
+            std::cerr << "  - !!!!!!!!! Test failed, except:" << exceptCrossed << std::endl;
+    };
+
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-07-14 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-07-14 00:00:00"),
+                          LLBC_TimeSpan::zero,
+                          0);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-01-14 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-12-14 00:00:00"),
+                          LLBC_TimeSpan::zero,
+                          11);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2023-12-31 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-01-01 00:00:00"),
+                          LLBC_TimeSpan::zero,
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2023-01-14 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-12-14 00:00:00"),
+                          LLBC_TimeSpan::zero,
+                          23);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-07-14 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-07-15 00:00:00"),
+                          LLBC_TimeSpan::FromDays(14),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-07-15 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-07-15 01:00:00"),
+                          LLBC_TimeSpan::FromDays(14, 1),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-07-15 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-07-15 00:59:59"),
+                          LLBC_TimeSpan::FromDays(14, 1),
+                          0);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(30),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(28, 59, 59, 59),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-01 00:00:00"),
+                          LLBC_TimeSpan::FromDays(29),
+                          1);
+    crossedMonthsTestLbda(LLBC_Time::FromTimeStr("2024-02-29 00:00:00"),
+                          LLBC_Time::FromTimeStr("2024-03-30 00:00:00"),
+                          LLBC_TimeSpan::FromDays(29),
+                          2);
+}
+
+void TestCase_Core_Time_Time::WeekTest()
+{
+    std::cout << "Week test:" << std::endl;
+    LLBC_Time now = LLBC_Time::Now();
+    std::cout << "- Now: " << now << std::endl;
+    std::cout << "- GetOffsetTimeOfWeek(beginIsSunday = true): " << now.GetOffsetTimeOfWeek(true) << std::endl;
+    std::cout << "- GetOffsetTimeOfWeek(beginIsSunday = false): " << now.GetOffsetTimeOfWeek(false) << std::endl;
+    auto timeOfWeekDiff = (now.GetOffsetTimeOfWeek(true) - now.GetOffsetTimeOfWeek(false));
+    LLBC_DoIf(timeOfWeekDiff < LLBC_TimeSpan::zero, timeOfWeekDiff += (LLBC_TimeSpan::oneDay * 7));
+    std::cout << "   - GetOffsetTimeOfWeek(beginIsSunday = true) - GetOffsetTimeOfWeek(beginIsMonday = false): " << timeOfWeekDiff << std::endl;
+    LLBC_ErrorAndReturnIf(timeOfWeekDiff != LLBC_TimeSpan::oneDay, void(), "time off week diff test failed");
+
+    std::cout << "- Begin time of week(beginIsSunday = true): " << now - now.GetOffsetTimeOfWeek(true) << std::endl;
+    std::cout << "- Begin time of week(beginIsSunday = false): " << now - now.GetOffsetTimeOfWeek(false) << std::endl;
 }
 
 void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)

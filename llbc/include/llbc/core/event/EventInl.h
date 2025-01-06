@@ -232,7 +232,22 @@ inline LLBC_Event &LLBC_Event::operator=(LLBC_Event &&other) noexcept
     return *this;
 }
 
-inline std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev)
+inline void LLBC_Event::Reuse()
+{
+    ClearExtData(true);
+
+    LLBC_STLHelper::DeleteContainer(_heavyKeys);
+    _params.clear();
+
+    _dontDelAfterFire = false;
+    _id = 0;
+}
+
+#undef __LLBC_Inl_EventKeyMatch
+
+__LLBC_NS_END
+
+inline std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Event &ev)
 {
     o << "LLBC_Event("
       << "id:" << ev.GetId()
@@ -250,18 +265,3 @@ inline std::ostream &operator<<(std::ostream &o, const LLBC_Event &ev)
 
     return o;
 }
-
-inline void LLBC_Event::Reuse()
-{
-    ClearExtData(true);
-
-    LLBC_STLHelper::DeleteContainer(_heavyKeys);
-    _params.clear();
-
-    _dontDelAfterFire = false;
-    _id = 0;
-}
-
-#undef __LLBC_Inl_EventKeyMatch
-
-__LLBC_NS_END
