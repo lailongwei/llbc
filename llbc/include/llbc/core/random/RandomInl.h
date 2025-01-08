@@ -24,7 +24,7 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_Random::LLBC_Random(int seed)
-: _mtRand(seed != 0 ? seed : static_cast<int>(time(nullptr)))
+: _mtRand(seed != 0 ? seed : std::random_device()())
 {
 }
 
