@@ -475,8 +475,7 @@ T LLBC_Stream::Read()
 }
 
 template <typename T>
-typename std::enable_if<std::is_arithmetic<T>::value ||
-                        std::is_enum<T>::value, bool>::type
+std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>, bool>
 LLBC_Stream::Read(T &obj)
 {
     if (UNLIKELY(!Read(&obj, sizeof(T))))
@@ -489,35 +488,35 @@ LLBC_Stream::Read(T &obj)
 }
 
 template <typename T>
-typename std::enable_if<std::is_pointer<T>::value &&
-                            std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value,
-                        bool>::type
+std::enable_if_t<std::is_pointer_v<T> &&
+                   std::is_same_v<typename LLBC_ExtractPureType<T>::type, char>,
+                 bool>
 LLBC_Stream::Read(T &obj)
 {
-    ASSERT(false && "Unsupported stream read operation(for char *)!");
+    static_assert(false && "Unsupported stream read operation(for char *)!");
     return false;
 }
 
 template <typename T>
-typename std::enable_if<std::is_pointer<T>::value &&
-                            std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
-                        bool>::type
+std::enable_if_t<std::is_pointer_v<T> &&
+                    std::is_same_v<typename LLBC_ExtractPureType<T>::type, void>,
+                 bool>
 LLBC_Stream::Read(T &voidPtr)
 {
     uint64 ptrVal;
     if (UNLIKELY(!Read(ptrVal)))
         return false;
 
-    memcpy(&voidPtr, &ptrVal, MIN(sizeof(voidPtr), sizeof(ptrVal)));
+    memcpy(&voidPtr, &ptrVal, std::min(sizeof(voidPtr), sizeof(ptrVal)));
 
     return true;
 }
 
 template <typename T>
-typename std::enable_if<std::is_pointer<T>::value &&
-                            !std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value &&
-                            !std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
-                        bool>::type
+std::enable_if_t<std::is_pointer_v<T> &&
+                    !std::is_same_v<typename LLBC_ExtractPureType<T>::type, char> &&
+                    !std::is_same_v<typename LLBC_ExtractPureType<T>::type, void>,
+                 bool>
 LLBC_Stream::Read(T &ptr)
 {
     bool innerCreate = false;
@@ -538,9 +537,8 @@ LLBC_Stream::Read(T &ptr)
 }
 
 template <typename T, size_t _ArrLen>
-typename std::enable_if<std::is_arithmetic<T>::value &&
-                            std::is_same<T, char>::value,
-                        bool>::type
+std::enable_if_t<std::is_arithmetic_v<T> && std::is_same_v<T, char>,
+                 bool>
 LLBC_Stream::Read(T (&arr)[_ArrLen])
 {
     uint32 size;
@@ -554,24 +552,22 @@ LLBC_Stream::Read(T (&arr)[_ArrLen])
         return true;
     }
 
-    if (size > _ArrLen ||
+    if (size >= _ArrLen ||
         !Read(&arr[0], size))
     {
         _readPos -= sizeof(uint32);
         return false;
     }
 
-    if (size < _ArrLen)
-        arr[size] = T();
+    arr[size] = T();
 
     return true;
 }
 
 template <typename T, size_t _ArrLen>
-typename std::enable_if<std::is_arithmetic<T>::value &&
-                            (std::is_same<T, uint8>::value ||
-                             std::is_same<T, bool>::value),
-                        bool>::type
+std::enable_if_t<std::is_arithmetic_v<T> &&
+                    (std::is_same_v<T, uint8> || std::is_same_v<T, bool>),
+                 bool>
 LLBC_Stream::Read(T (&arr)[_ArrLen])
 {
     uint32 size;
@@ -592,12 +588,10 @@ LLBC_Stream::Read(T (&arr)[_ArrLen])
 }
 
 template <typename T, size_t _ArrLen>
-typename std::enable_if<(std::is_arithmetic<T>::value &&
-                         (!std::is_same<T, char>::value &&
-                          !std::is_same<T, uint8>::value &&
-                          !std::is_same<T, bool>::value)) ||
-                            std::is_enum<T>::value,
-                        bool>::type
+std::enable_if_t<(std::is_arithmetic_v<T> &&
+                  (!std::is_same_v<T, char> && !std::is_same_v<T, uint8> && !std::is_same_v<T, bool>)) ||
+                 std::is_enum_v<T>,
+                 bool>
 LLBC_Stream::Read(T (&arr)[_ArrLen])
 {
     uint32 size;
@@ -624,8 +618,7 @@ LLBC_Stream::Read(T (&arr)[_ArrLen])
 }
 
 template <typename T, size_t _ArrLen>
-typename std::enable_if<!std::is_arithmetic<T>::value &&
-                        !std::is_enum<T>::value, bool>::type
+std::enable_if_t<!std::is_arithmetic_v<T> && !std::is_enum_v<T>, bool>
 LLBC_Stream::Read(T(&arr)[_ArrLen])
 {
     uint32 size;
@@ -651,9 +644,9 @@ LLBC_Stream::Read(T(&arr)[_ArrLen])
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::basic_string>::value ||
-                            LLBC_IsTemplSpec<T, LLBC_BasicString>::value,
-                        bool>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                    LLBC_IsTemplSpec<T, LLBC_BasicString>::value,
+                 bool>
 LLBC_Stream::Read(T &str)
 {
     uint32 size;
@@ -677,10 +670,10 @@ LLBC_Stream::Read(T &str)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::vector>::value ||
-                            LLBC_IsTemplSpec<T, std::list>::value ||
-                            LLBC_IsTemplSpec<T, std::deque>::value,
-                        bool>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::vector>::value ||
+                    LLBC_IsTemplSpec<T, std::list>::value ||
+                    LLBC_IsTemplSpec<T, std::deque>::value,
+                 bool>
 LLBC_Stream::Read(T &container)
 {
     uint32 size;
@@ -712,9 +705,9 @@ LLBC_Stream::Read(T &container)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::queue>::value ||
-                            LLBC_IsTemplSpec<T, std::stack>::value,
-                        bool>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::queue>::value ||
+                    LLBC_IsTemplSpec<T, std::stack>::value,
+                 bool>
 LLBC_Stream::Read(T &container)
 {
     uint32 size;
@@ -738,9 +731,9 @@ LLBC_Stream::Read(T &container)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::set>::value ||
-                            LLBC_IsTemplSpec<T, std::unordered_set>::value,
-                        bool>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::set>::value ||
+                    LLBC_IsTemplSpec<T, std::unordered_set>::value,
+                 bool>
 LLBC_Stream::Read(T &container)
 {
     uint32 size;
@@ -764,9 +757,9 @@ LLBC_Stream::Read(T &container)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::map>::value ||
-                            LLBC_IsTemplSpec<T, std::unordered_map>::value,
-                        bool>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::map>::value ||
+                    LLBC_IsTemplSpec<T, std::unordered_map>::value,
+                 bool>
 LLBC_Stream::Read(T &container)
 {
     uint32 size;
@@ -791,7 +784,7 @@ LLBC_Stream::Read(T &container)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, bool>::type
+std::enable_if_t<LLBC_IsSTLArraySpec<T, std::array>::value, bool>
 LLBC_Stream::Read(T &arr)
 {
     uint32 arrSize;
@@ -803,7 +796,7 @@ LLBC_Stream::Read(T &arr)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, bool>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::tuple>::value, bool>
 LLBC_Stream::Read(T &tup)
 {
     uint32 tupSize;
@@ -815,32 +808,32 @@ LLBC_Stream::Read(T &tup)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::pair>::value, bool>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::pair>::value, bool>
 LLBC_Stream::Read(T &p)
 {
     return Read(p.first) && Read(p.second);
 }
 
 template <typename T>
-typename std::enable_if<!std::is_arithmetic<T>::value &&
-                            !std::is_enum<T>::value &&
-                            !std::is_pointer<T>::value &&
-                            !std::is_array<T>::value &&
-                            !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
-                              LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
-                            !LLBC_IsTemplSpec<T, std::vector>::value &&
-                            !LLBC_IsTemplSpec<T, std::list>::value &&
-                            !LLBC_IsTemplSpec<T, std::deque>::value &&
-                            !LLBC_IsTemplSpec<T, std::queue>::value &&
-                            !LLBC_IsTemplSpec<T, std::stack>::value &&
-                            !LLBC_IsTemplSpec<T, std::set>::value &&
-                            !LLBC_IsTemplSpec<T, std::unordered_set>::value &&
-                            !LLBC_IsTemplSpec<T, std::map>::value &&
-                            !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
-                            !LLBC_IsSTLArraySpec<T, std::array>::value &&
-                            !LLBC_IsTemplSpec<T, std::tuple>::value &&
-                            !LLBC_IsTemplSpec<T, std::pair>::value,
-                        bool>::type
+std::enable_if_t<!std::is_arithmetic_v<T> &&
+                    !std::is_enum_v<T> &&
+                    !std::is_pointer_v<T> &&
+                    !std::is_array_v<T> &&
+                    !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                      LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
+                    !LLBC_IsTemplSpec<T, std::vector>::value &&
+                    !LLBC_IsTemplSpec<T, std::list>::value &&
+                    !LLBC_IsTemplSpec<T, std::deque>::value &&
+                    !LLBC_IsTemplSpec<T, std::queue>::value &&
+                    !LLBC_IsTemplSpec<T, std::stack>::value &&
+                    !LLBC_IsTemplSpec<T, std::set>::value &&
+                    !LLBC_IsTemplSpec<T, std::unordered_set>::value &&
+                    !LLBC_IsTemplSpec<T, std::map>::value &&
+                    !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
+                    !LLBC_IsSTLArraySpec<T, std::array>::value &&
+                    !LLBC_IsTemplSpec<T, std::tuple>::value &&
+                    !LLBC_IsTemplSpec<T, std::pair>::value,
+                 bool>
 LLBC_Stream::Read(T &obj)
 {
     return ReadImpl<T>(obj, 0);
@@ -923,15 +916,22 @@ bool LLBC_Stream::ReadImpl(T &obj, protobuf3_type<T, &T::IsInitialized, &T::Byte
 }
 
 template <typename T>
-bool LLBC_Stream::ReadImpl(T &obj, ...)
+std::enable_if_t<std::is_trivial_v<T>, bool>
+LLBC_Stream::ReadImpl(T &obj, ...)
 {
     return Read(&obj, sizeof(T));
 }
 
 template <typename T>
-typename std::enable_if<std::is_arithmetic<T>::value ||
-                            std::is_enum<T>::value,
-                        void>::type
+std::enable_if_t<!std::is_trivial_v<T>, bool>
+LLBC_Stream::ReadImpl(T &obj, ...)
+{
+    static_assert(false && "Read non-trivial object is unsupported for now!");
+    return false;
+}
+
+template <typename T>
+std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T> >
 LLBC_Stream::Write(const T &obj)
 {
     if (_endian != LLBC_MachineEndian)
@@ -946,9 +946,8 @@ LLBC_Stream::Write(const T &obj)
 }
 
 template <typename T>
-typename std::enable_if<std::is_pointer<T>::value &&
-                            std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value,
-                        void>::type
+std::enable_if_t<std::is_pointer_v<T> &&
+                 std::is_same_v<typename LLBC_ExtractPureType<T>::type, char> >
 LLBC_Stream::Write(const T &str)
 {
     if (UNLIKELY(!str))
@@ -964,9 +963,8 @@ LLBC_Stream::Write(const T &str)
 }
 
 template <typename T>
-typename std::enable_if<std::is_pointer<T>::value &&
-                            std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
-                        void>::type
+std::enable_if_t<std::is_pointer_v<T> &&
+                 std::is_same_v<typename LLBC_ExtractPureType<T>::type, void> >
 LLBC_Stream::Write(const T &voidPtr)
 {
     uint64 pointVal = 0;
@@ -976,10 +974,9 @@ LLBC_Stream::Write(const T &voidPtr)
 }
 
 template <typename T>
-typename std::enable_if<std::is_pointer<T>::value &&
-                            !std::is_same<typename LLBC_ExtractPureType<T>::type, char>::value &&
-                            !std::is_same<typename LLBC_ExtractPureType<T>::type, void>::value,
-                        void>::type
+std::enable_if_t<std::is_pointer<T>::value &&
+                 !std::is_same_v<typename LLBC_ExtractPureType<T>::type, char> &&
+                 !std::is_same_v<typename LLBC_ExtractPureType<T>::type, void> >
 LLBC_Stream::Write(const T &ptr)
 {
     LIKELY(ptr) ?
@@ -988,9 +985,7 @@ LLBC_Stream::Write(const T &ptr)
 }
 
 template <typename T, size_t _ArrLen>
-typename std::enable_if<std::is_arithmetic<T>::value &&
-                            std::is_same<T, char>::value,
-                        void>::type
+std::enable_if_t<std::is_arithmetic_v<T> && std::is_same_v<T, char> >
 LLBC_Stream::Write(const T (&arr)[_ArrLen])
 {
     if (_ArrLen == 0)
@@ -1017,10 +1012,7 @@ LLBC_Stream::Write(const T (&arr)[_ArrLen])
 }
 
 template <typename T, size_t _ArrLen>
-typename std::enable_if<std::is_arithmetic<T>::value &&
-                            (std::is_same<T, uint8>::value ||
-                             std::is_same<T, bool>::value),
-                        void>::type
+std::enable_if_t<std::is_arithmetic_v<T> && (std::is_same_v<T, uint8>|| std::is_same_v<T, bool>)>
 LLBC_Stream::Write(const T (&arr)[_ArrLen])
 {
     if (_ArrLen == 0)
@@ -1035,12 +1027,11 @@ LLBC_Stream::Write(const T (&arr)[_ArrLen])
 }
 
 template <typename T, size_t _ArrLen>
-typename std::enable_if<(std::is_arithmetic<T>::value &&
-                         (!std::is_same<T, char>::value &&
-                          !std::is_same<T, uint8>::value &&
-                          !std::is_same<T, bool>::value)) ||
-                            !std::is_arithmetic<T>::value,
-                        void>::type
+std::enable_if_t<(std::is_arithmetic_v<T> &&
+                  (!std::is_same_v<T, char> &&
+                   !std::is_same_v<T, uint8> &&
+                   !std::is_same_v<T, bool>)) ||
+                 !std::is_arithmetic_v<T> >
 LLBC_Stream::Write(const T (&arr)[_ArrLen])
 {
     Write(static_cast<uint32>(_ArrLen));
@@ -1049,9 +1040,8 @@ LLBC_Stream::Write(const T (&arr)[_ArrLen])
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::basic_string>::value ||
-                            LLBC_IsTemplSpec<T, LLBC_BasicString>::value,
-                        void>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                 LLBC_IsTemplSpec<T, LLBC_BasicString>::value>
 LLBC_Stream::Write(const T &str)
 {
     Write(static_cast<uint32>(str.size()));
@@ -1059,12 +1049,11 @@ LLBC_Stream::Write(const T &str)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::vector>::value ||
-                            LLBC_IsTemplSpec<T, std::list>::value ||
-                            LLBC_IsTemplSpec<T, std::deque>::value ||
-                            LLBC_IsTemplSpec<T, std::set>::value ||
-                            LLBC_IsTemplSpec<T, std::unordered_set>::value,
-                        void>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::vector>::value ||
+                 LLBC_IsTemplSpec<T, std::list>::value ||
+                 LLBC_IsTemplSpec<T, std::deque>::value ||
+                 LLBC_IsTemplSpec<T, std::set>::value ||
+                 LLBC_IsTemplSpec<T, std::unordered_set>::value>
 LLBC_Stream::Write(const T &container)
 {
     Write(static_cast<uint32>(container.size()));
@@ -1079,18 +1068,16 @@ LLBC_Stream::Write(const T &container)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::queue>::value ||
-                            LLBC_IsTemplSpec<T, std::stack>::value,
-                        void>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::queue>::value ||
+                 LLBC_IsTemplSpec<T, std::stack>::value>
 LLBC_Stream::Write(const T &container)
 {
-    ASSERT(false && "Write std::queue/std::stack is not supported for now");
+    static_assert(false && "Write std::queue/std::stack is not supported for now");
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::map>::value ||
-                            LLBC_IsTemplSpec<T, std::unordered_map>::value,
-                        void>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::map>::value ||
+                 LLBC_IsTemplSpec<T, std::unordered_map>::value>
 LLBC_Stream::Write(const T &container)
 {
     Write(static_cast<uint32>(container.size()));
@@ -1108,7 +1095,7 @@ LLBC_Stream::Write(const T &container)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsSTLArraySpec<T, std::array>::value, void>::type
+std::enable_if_t<LLBC_IsSTLArraySpec<T, std::array>::value>
 LLBC_Stream::Write(const T &arr)
 {
     Write(static_cast<uint32>(std::tuple_size<T>::value));
@@ -1116,7 +1103,7 @@ LLBC_Stream::Write(const T &arr)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::tuple>::value, void>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::tuple>::value>
 LLBC_Stream::Write(const T &tup)
 {
     Write(static_cast<uint32>(std::tuple_size<T>::value));
@@ -1124,7 +1111,7 @@ LLBC_Stream::Write(const T &tup)
 }
 
 template <typename T>
-typename std::enable_if<LLBC_IsTemplSpec<T, std::pair>::value, void>::type
+std::enable_if_t<LLBC_IsTemplSpec<T, std::pair>::value>
 LLBC_Stream::Write(const T &p)
 {
     Write(p.first);
@@ -1132,25 +1119,24 @@ LLBC_Stream::Write(const T &p)
 }
 
 template <typename T>
-typename std::enable_if<!std::is_arithmetic<T>::value &&
-                            !std::is_enum<T>::value &&
-                            !std::is_pointer<T>::value &&
-                            !std::is_array<T>::value &&
-                            !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
-                              LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
-                            !LLBC_IsTemplSpec<T, std::vector>::value &&
-                            !LLBC_IsTemplSpec<T, std::list>::value &&
-                            !LLBC_IsTemplSpec<T, std::deque>::value &&
-                            !LLBC_IsTemplSpec<T, std::queue>::value &&
-                            !LLBC_IsTemplSpec<T, std::stack>::value &&
-                            !LLBC_IsTemplSpec<T, std::set>::value &&
-                            !LLBC_IsTemplSpec<T, std::unordered_set>::value &&
-                            !LLBC_IsTemplSpec<T, std::map>::value &&
-                            !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
-                            !LLBC_IsTemplSpec<T, std::tuple>::value &&
-                            !LLBC_IsSTLArraySpec<T, std::array>::value &&
-                            !LLBC_IsTemplSpec<T, std::pair>::value,
-                        void>::type
+std::enable_if_t<!std::is_arithmetic_v<T> &&
+                 !std::is_enum_v<T> &&
+                 !std::is_pointer_v<T> &&
+                 !std::is_array_v<T> &&
+                 !(LLBC_IsTemplSpec<T, std::basic_string>::value ||
+                   LLBC_IsTemplSpec<T, LLBC_BasicString>::value) &&
+                 !LLBC_IsTemplSpec<T, std::vector>::value &&
+                 !LLBC_IsTemplSpec<T, std::list>::value &&
+                 !LLBC_IsTemplSpec<T, std::deque>::value &&
+                 !LLBC_IsTemplSpec<T, std::queue>::value &&
+                 !LLBC_IsTemplSpec<T, std::stack>::value &&
+                 !LLBC_IsTemplSpec<T, std::set>::value &&
+                 !LLBC_IsTemplSpec<T, std::unordered_set>::value &&
+                 !LLBC_IsTemplSpec<T, std::map>::value &&
+                 !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
+                 !LLBC_IsTemplSpec<T, std::tuple>::value &&
+                 !LLBC_IsSTLArraySpec<T, std::array>::value &&
+                 !LLBC_IsTemplSpec<T, std::pair>::value>
 LLBC_Stream::Write(const T &obj)
 {
     WriteImpl<T>(obj, 0);
@@ -1213,9 +1199,17 @@ void LLBC_Stream::WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &
 }
 
 template <typename T>
-void LLBC_Stream::WriteImpl(const T &obj, ...)
+std::enable_if_t<std::is_trivial_v<T> >
+LLBC_Stream::WriteImpl(const T &obj, ...)
 {
     Write(&obj, sizeof(obj));
+}
+
+template <typename T>
+std::enable_if_t<!std::is_trivial_v<T> >
+LLBC_Stream::WriteImpl(const T &obj, ...)
+{
+    static_assert(false && "Write non-trivial object is unsupported for now!");
 }
 
 template <typename T>

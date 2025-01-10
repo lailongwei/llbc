@@ -40,6 +40,7 @@ private:
     int EndianTest();
     int PODTypeSerTest();
     int TrivialClsSerTest();
+    int NonTrivialClsSerTest();
     int SerializableClsSerTest();
     int MovableReadTest();
 
