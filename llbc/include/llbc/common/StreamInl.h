@@ -493,7 +493,7 @@ std::enable_if_t<std::is_pointer_v<T> &&
                  bool>
 LLBC_Stream::Read(T &obj)
 {
-    static_assert(false && "Unsupported stream read operation(for char *)!");
+    ASSERT(false && "Unsupported stream read operation(for char *)!");
     return false;
 }
 
@@ -926,7 +926,7 @@ template <typename T>
 std::enable_if_t<!std::is_trivial_v<T>, bool>
 LLBC_Stream::ReadImpl(T &obj, ...)
 {
-    static_assert(false && "Read non-trivial object is unsupported for now!");
+    ASSERT(false && "Read non-trivial object is unsupported for now!");
     return false;
 }
 
@@ -1072,7 +1072,7 @@ std::enable_if_t<LLBC_IsTemplSpec<T, std::queue>::value ||
                  LLBC_IsTemplSpec<T, std::stack>::value>
 LLBC_Stream::Write(const T &container)
 {
-    static_assert(false && "Write std::queue/std::stack is not supported for now");
+    ASSERT(false && "Write std::queue/std::stack is not supported for now");
 }
 
 template <typename T>
@@ -1209,7 +1209,7 @@ template <typename T>
 std::enable_if_t<!std::is_trivial_v<T> >
 LLBC_Stream::WriteImpl(const T &obj, ...)
 {
-    static_assert(false && "Write non-trivial object is unsupported for now!");
+    ASSERT(false && "Write non-trivial object is unsupported for now!");
 }
 
 template <typename T>
