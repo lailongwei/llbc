@@ -36,12 +36,19 @@ jobs:
           msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:llbc
           msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
         
-      - name: Compile test code
+      - name: Compile testsuite
         run: |
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:testsuite
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:testsuite
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:testsuite
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:testsuite
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests\testsuite
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:tests\testsuite
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests\testsuite
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\testsuite
+
+      - name: Compile quick_start
+        run: |
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests\quick_start
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:tests\quick_start
+          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests\quick_start
+          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\quick_start
 
 #      - name: Compile pyllbc lib code
 #        run: |

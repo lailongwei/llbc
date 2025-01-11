@@ -55,6 +55,11 @@ struct TrivialCls
     }
 };
 
+struct NonTrivialCls
+{
+    LLBC_String str;
+};
+
 struct SerializableCls
 {
     bool bVal;
@@ -230,6 +235,7 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     LLBC_ReturnIf(EndianTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(PODTypeSerTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(TrivialClsSerTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(NonTrivialClsSerTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(SerializableClsSerTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(MovableReadTest() != LLBC_OK, LLBC_FAILED);
 
@@ -651,6 +657,18 @@ int TestCase_Com_Stream::TrivialClsSerTest()
     memset(&trivialObj, 0, sizeof(trivialObj));
     stream >> trivialObj;
     LLBC_PrintLn("- After deserialize, trivial obj:%s", trivialObj.ToString().c_str());
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_Stream::NonTrivialClsSerTest()
+{
+    LLBC_PrintLn("Non-Trivial type ser test:");
+
+    // Uncomment below code, will raise compile error.
+    // LLBC_Stream stream;
+    // NonTrivialCls nonTrivialObj;
+    // stream << nonTrivialObj >> nonTrivialObj;
 
     return LLBC_OK;
 }

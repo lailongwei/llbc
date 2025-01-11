@@ -110,6 +110,7 @@ end
 llbc_sln_path = "../.."
 llbc_core_lib_path = llbc_sln_path .. "/llbc"
 llbc_testsuite_path = llbc_sln_path .. "/testsuite"
+llbc_quick_start_path = llbc_sln_path .. "/quick_start"
 llbc_wraps_path = llbc_sln_path .. "/wrap"
 llbc_py_wrap_path = llbc_wraps_path .. "/pyllbc"
 llbc_lu_wrap_path = llbc_wraps_path .. "/lullbc"
@@ -153,7 +154,7 @@ print(string.format(
     '-------- system type: %s, arch type: %s --------', llbc_system_type, llbc_arch_type))
 
 -- #########################################################################
-
+-- llbc workspace define.
 workspace ("llbc_" .. _ACTION)
     -- location define.
     location (llbc_sln_path .. "/build/" .. _ACTION)
@@ -338,6 +339,49 @@ project "llbc"
     prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
 
+-- llbc project fast include function.
+function include_llbc_core_lib()
+    -- includedirs.
+    includedirs {
+        llbc_core_lib_path .. "/include",
+    }
+
+    -- links.
+    libdirs { llbc_output_dir }
+    filter { "system:linux" }
+        links {
+            "dl",
+			"pthread",
+        }
+
+    filter { "system:not windows", "configurations:debug*" }
+        links {
+            "llbc_debug",
+        }
+
+    filter { "system:not windows", "configurations:release*" }
+        links {
+            "llbc",
+        }
+
+    filter { "system:windows" }
+        links {
+            "ws2_32",
+        }
+
+    filter { "system:windows", "configurations:debug*" }
+        links {
+            "libllbc_debug",
+        }
+
+    filter { "system:windows", "configurations:release*" }
+        links {
+            "libllbc",
+        }
+    filter {}
+end
+
+group "tests"
 -- ****************************************************************************
 -- core library testsuite compile setting.
 project "testsuite"
@@ -364,50 +408,13 @@ project "testsuite"
         llbc_testsuite_path .. "/**.ini",
     }
 
-    -- includedirswrap\csllbc\csharp\script_tools.
+    -- include llbc core lib.
+    include_llbc_core_lib()
+
+    -- includedirs.
     includedirs {
-        llbc_core_lib_path .. "/include",
         llbc_testsuite_path,
     }
-
-    -- links.
-    libdirs { llbc_output_dir }
-    filter { "system:linux" }
-        links {
-            "dl",
-			"pthread",
-        }
-    filter {}
-
-    filter { "system:not windows", "configurations:debug*" }
-        links {
-            "llbc_debug",
-        }
-    filter {}
-
-    filter { "system:not windows", "configurations:release*" }
-        links {
-            "llbc",
-        }
-    filter {}
-
-    filter { "system:windows" }
-        links {
-            "ws2_32",
-        }
-    filter {}
-
-    filter { "system:windows", "configurations:debug*" }
-        links {
-            "libllbc_debug",
-        }
-    filter {}
-
-    filter { "system:windows", "configurations:release*" }
-        links {
-            "libllbc",
-        }
-    filter {}
 
     -- Enable c++17 support.
     filter { "system:not windows" }
@@ -445,8 +452,51 @@ project "testsuite"
         end
     filter {}
 
-group "wrap"
+-- ****************************************************************************
+-- quick start project compile setting.
+project "quick_start"
+    -- laugnage, kind.
+    language "c++"
+    kind "ConsoleApp"
 
+    -- toolset.
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
+
+    -- dependents.
+    dependson {
+        "llbc",
+    }
+
+    -- files.
+    files {
+        llbc_quick_start_path .. "/**.h",
+        llbc_quick_start_path .. "/**.cpp",
+        llbc_quick_start_path .. "/**.xml",
+        llbc_quick_start_path .. "/**.cfg",
+        llbc_quick_start_path .. "/**.ini",
+    }
+
+    -- include llbc core lib.
+    include_llbc_core_lib()
+
+    -- includedirs.
+    includedirs {
+        llbc_quick_start_path,
+    }
+
+    -- Enable c++17 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++17",
+        }
+    filter {}
+
+    -- Specific debug directory.
+    debugdir(llbc_output_dir)
+
+group "wrap"
 -- ****************************************************************************
 -- python wrap library(pyllbc) compile setting.
 -- import pylib_setting.

@@ -19,64 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "hello_world/QuickStart_HelloWorld.h"
 
-__LLBC_NS_BEGIN
-
-inline LLBC_AppEvent::LLBC_AppEvent(int evType)
-: evType(evType)
+int QuickStart_HelloWorld::Run(int argc, char *argv[])
 {
+    // 初始化llbc框架
+    LLBC_Startup();
+    // Defer清理llbc框架
+    LLBC_Defer(LLBC_Cleanup());
+
+    // Print hello world, 你也可以用std::cout/printf, 用LLBC_PrintLn省去你打\n
+    LLBC_PrintLn("Hello World!");
+
+    return LLBC_OK;
 }
-
-
-inline int LLBC_App::GetFPS() const
-{
-    return _fps;
-}
-
-inline bool LLBC_App::IsStopped() const
-{
-    return _startPhase == LLBC_AppStartPhase::Stopped;
-}
-
-inline bool LLBC_App::IsStarting() const
-{
-    return _startPhase == LLBC_AppStartPhase::Starting;
-}
-
-inline bool LLBC_App::IsStarted() const
-{
-    return _startPhase == LLBC_AppStartPhase::Started;
-}
-
-inline bool LLBC_App::IsStopping() const
-{
-    return _startPhase == LLBC_AppStartPhase::Stopping;
-}
-
-inline int LLBC_App::PushEvent(int evType)
-{
-    return PushEvent(new LLBC_AppEvent(evType));
-}
-
-inline LLBC_Service *LLBC_App::GetService(int id) const
-{
-    return _services.GetService(id);
-}
-
-inline LLBC_Service *LLBC_App::GetService(const LLBC_CString &name) const
-{
-    return _services.GetService(name);
-}
-
-inline int LLBC_App::StopService(int id, bool del)
-{
-    return _services.Stop(id, del);
-}
-
-inline int LLBC_App::StopService(const LLBC_CString &name, bool del)
-{
-    return _services.Stop(name, del);
-}
-
-__LLBC_NS_END

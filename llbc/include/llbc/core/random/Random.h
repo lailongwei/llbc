@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_Random
 {
 public:
-    explicit LLBC_Random(int seed = 0);
+    explicit LLBC_Random(uint32 seed = 0);
 
 public:
     /**
@@ -104,7 +104,7 @@ private:
 /**
  * Some global random support functions definition.
  */
-LLBC_EXPORT void LLBC_SeedRand(int seed);
+LLBC_EXPORT void LLBC_SeedRand(uint32 seed);
 LLBC_EXPORT int LLBC_Rand();
 LLBC_EXPORT int LLBC_Rand(int end);
 LLBC_EXPORT int LLBC_Rand(int begin, int end);

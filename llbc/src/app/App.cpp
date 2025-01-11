@@ -64,7 +64,8 @@ auto LLBC_AppConfigType::GetConfigType(const LLBC_String &cfgSuffix) -> ENUM
 LLBC_App *LLBC_App::_thisApp = nullptr;
 
 LLBC_App::LLBC_App()
-: _startPhase(LLBC_AppStartPhase::Stopped)
+: _fps(LLBC_CFG_APP_DFT_FPS)
+, _startPhase(LLBC_AppStartPhase::Stopped)
 , _startThreadId(LLBC_INVALID_NATIVE_THREAD_ID)
 , _llbcLibStartupInApp(false)
 , _requireStop(false)
@@ -87,6 +88,26 @@ LLBC_App::~LLBC_App()
     ASSERT(!IsStarted() && "Please stop application before destruct");
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup());
     _thisApp = nullptr;
+}
+
+int LLBC_App::SetFPS(int fps)
+{
+    if (fps != static_cast<int>(LLBC_INFINITE) &&
+        (fps < LLBC_CFG_APP_MIN_FPS || fps > LLBC_CFG_APP_MAX_FPS))
+    {
+        LLBC_SetLastError(LLBC_ERROR_LIMIT);
+        return LLBC_FAILED;
+    }
+
+    _fps = fps;
+
+    return LLBC_OK;
+}
+
+int LLBC_App::GetFrameInterval() const
+{
+    const auto fps = _fps;
+    return fps != static_cast<int>(LLBC_INFINITE) ? 1000 / fps : 0;
 }
 
 bool LLBC_App::HasConfig() const
@@ -306,12 +327,12 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     // Enter app loop.
     while (true)
     {
+        sint64 begRunTime = LLBC_GetMilliseconds();
+
         // Call OnUpdate event method.
-        bool runDoNothing = true;
-        OnUpdate(runDoNothing);
+        OnUpdate();
         // Handle events.
-        bool handleEvsDoNothing = true;
-        HandleEvents(handleEvsDoNothing);
+        HandleEvents();
         // Update timer scheduler.
         timerScheduler->Update();
 
@@ -322,9 +343,11 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
             return ret = LLBC_OK;
         }
 
-        // Execute sleep, if not do anything.
-        if (runDoNothing && handleEvsDoNothing)
-            LLBC_Sleep(LLBC_CFG_APP_IDLE_SLEEP_TIME);
+        // Execute sleep, if need.
+        const auto frameInterval = GetFrameInterval();
+        const sint64 elapsed = LLBC_GetMilliseconds() - begRunTime;
+        if (elapsed >= 0 && elapsed < frameInterval)
+            LLBC_Sleep(static_cast<int>(frameInterval - elapsed));
     }
 }
 
@@ -551,6 +574,35 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
     LLBC_Defer(LLBC_AtomicFetchAndSub(&_loading, 1));
     LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadConfig() != LLBC_OK, LLBC_FAILED);
 
+    // - Reload application fps.
+    for (auto cfgItem : _cfg.AsDict())
+    {
+        if (_cfgType == LLBC_AppConfigType::Ini)
+        {
+            auto sectionName = cfgItem.first.AsStr().tolower();
+            if (sectionName != "app" && sectionName != "application")
+                break;
+
+            for (auto cfgSecItem : cfgItem.second.AsDict())
+            {
+                if (cfgSecItem.first.AsStr().tolower() == "fps")
+                {
+                    SetFPS(cfgSecItem.second);
+                    break;
+                }
+            }
+
+            break;
+        }
+
+        if (cfgItem.first.AsStr().tolower() == "fps")
+        {
+            const auto& fps = _cfgType == LLBC_AppConfigType::Xml ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
+            SetFPS(fps);
+            break;
+        }
+    }
+
     // Note: Execute other application level resource(s) reload.
     // ... ...
 
@@ -616,7 +668,7 @@ int LLBC_App::ReloadPropertyConfig()
     return LLBC_Properties::LoadFromFile(_cfgPath, _cfg);
 }
 
-void LLBC_App::HandleEvents(bool &doNothing)
+void LLBC_App::HandleEvents()
 {
     _eventLock.Lock();
     _events[0].swap(_events[1]);
@@ -626,7 +678,6 @@ void LLBC_App::HandleEvents(bool &doNothing)
     if (events.empty())
         return;
 
-    LLBC_Defer(doNothing = false);
     LLBC_Defer(LLBC_STLHelper::RecycleContainer(events));
     for (auto &ev : events)
     {
