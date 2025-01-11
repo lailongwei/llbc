@@ -1,23 +1,10 @@
-// The MIT License (MIT)
-
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -32,7 +19,7 @@
 #include <llbc/core/json/nlohmann/detail/meta/type_traits.hpp>
 #include <llbc/core/json/nlohmann/detail/value_t.hpp>
 
-LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -320,7 +307,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
             case value_t::discarded:
             default:
             {
-                if (LLBC_JSON_HEDLEY_LIKELY(m_it.primitive_iterator.is_begin()))
+                if (JSON_HEDLEY_LIKELY(m_it.primitive_iterator.is_begin()))
                 {
                     return *m_object;
                 }
@@ -362,7 +349,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
             case value_t::discarded:
             default:
             {
-                if (LLBC_JSON_HEDLEY_LIKELY(m_it.primitive_iterator.is_begin()))
+                if (JSON_HEDLEY_LIKELY(m_it.primitive_iterator.is_begin()))
                 {
                     return m_object;
                 }
@@ -482,7 +469,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
     bool operator==(const IterImpl& other) const
     {
         // if objects are not the same, the comparison is undefined
-        if (LLBC_JSON_HEDLEY_UNLIKELY(m_object != other.m_object))
+        if (JSON_HEDLEY_UNLIKELY(m_object != other.m_object))
         {
             JSON_THROW(invalid_iterator::create(212, "cannot compare iterators of different containers", m_object));
         }
@@ -527,7 +514,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
     bool operator<(const iter_impl& other) const
     {
         // if objects are not the same, the comparison is undefined
-        if (LLBC_JSON_HEDLEY_UNLIKELY(m_object != other.m_object))
+        if (JSON_HEDLEY_UNLIKELY(m_object != other.m_object))
         {
             JSON_THROW(invalid_iterator::create(212, "cannot compare iterators of different containers", m_object));
         }
@@ -718,7 +705,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
             case value_t::discarded:
             default:
             {
-                if (LLBC_JSON_HEDLEY_LIKELY(m_it.primitive_iterator.get_value() == -n))
+                if (JSON_HEDLEY_LIKELY(m_it.primitive_iterator.get_value() == -n))
                 {
                     return *m_object;
                 }
@@ -736,7 +723,7 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
     {
         JSON_ASSERT(m_object != nullptr);
 
-        if (LLBC_JSON_HEDLEY_LIKELY(m_object->is_object()))
+        if (JSON_HEDLEY_LIKELY(m_object->is_object()))
         {
             return m_it.object_iterator->first;
         }
@@ -761,4 +748,4 @@ class iter_impl // NOLINT(cppcoreguidelines-special-member-functions,hicpp-speci
 };
 
 }  // namespace detail
-LLBC_NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_JSON_NAMESPACE_END

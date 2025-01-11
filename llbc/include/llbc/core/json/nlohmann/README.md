@@ -6,7 +6,7 @@
 
 # LLBC简单实用
 
-* 只需要使用LLBCJson对象即可
+* 只需要使用LLBC_Json或者LLBC_AutoJson(自动回收)对象即可
 
 * 详情见测试用例：TestCase_NlohmannJson
 
@@ -14,7 +14,7 @@
 
   * ```
           // instead, you could also write (which looks very similar to the JSON above)
-          LLBCJson j2 = {
+          LLBC_Json j2 = {
             {"pi", 3.141},
             {"happy", true},
             {"name", "Niels"},
@@ -28,7 +28,7 @@
           {"value", 42.99}
             }}
           };
-    
+      
           std::cout <<"json j2:" << j2 <<std::endl;
           
           // 自定义类和json之间的序列化反序列化
@@ -41,7 +41,7 @@
                 int age;
                 std::string name;
               };
-    
+      
               // 使用该宏, 并定义需要的字段, 可以实现Person 与 json之间的序列化反序列化(该宏实现了to_json/from_json方法)
               LLBC_NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Person, age, name)
             }
@@ -49,19 +49,19 @@
             // official demo13 Arbitrary types conversions(自定义类型数据添加宏：LLBC_NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE)
             {
               // 从json 反序列化数据
-              LLBCJson j = {
+              LLBC_Json j = {
               {"name", "hello llbc json"},
                 {"age", 11}
               };
               auto person = j.template get<Person>();
-    
+      
               // 从自定义数据序列化成json
-              LLBCJson dump = person;
+              LLBC_Json dump = person;
               std::cout << "person:" << dump.dump() << std::endl;
-    
+      
               // 更多高级的用法可以见官方稳定, 比如: adl_serializer
             }
-    
+      
     ```
 
 # 官方部分文档
@@ -85,7 +85,7 @@ The `json` class provides an API for manipulating a JSON value. To create a `jso
 
 ```cpp
 #include <fstream>
-#include <nlohmann/json.hpp>
+#include <llbc/core/json/nlohmann/json.hpp>
 using json = nlohmann::json;
 
 // ...
@@ -1179,7 +1179,7 @@ The following compilers are currently used in continuous integration at [AppVeyo
 [`json.hpp`](https://github.com/nlohmann/json/blob/develop/single_include/nlohmann/json.hpp) is the single required file in `single_include/nlohmann` or [released here](https://github.com/nlohmann/json/releases). You need to add
 
 ```cpp
-#include <nlohmann/json.hpp>
+#include <llbc/core/json/nlohmann/json.hpp>
 
 // for convenience
 using json = nlohmann::json;

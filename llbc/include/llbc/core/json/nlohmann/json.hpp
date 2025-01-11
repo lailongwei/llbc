@@ -1,23 +1,10 @@
-// The MIT License (MIT)
-
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
 
 /****************************************************************************\
  * Note on documentation: The source files contain links to the online      *
@@ -28,8 +15,8 @@
  * file docs/README.md.                                                     *
 \****************************************************************************/
 
-#ifndef INCLUDE_LLBC_NLOHMANN_JSON_HPP_
-#define INCLUDE_LLBC_NLOHMANN_JSON_HPP_
+#ifndef INCLUDE_NLOHMANN_JSON_HPP_
+#define INCLUDE_NLOHMANN_JSON_HPP_
 
 #include <algorithm> // all_of, find, for_each
 #include <cstddef> // nullptr_t, ptrdiff_t, size_t
@@ -86,7 +73,7 @@
 @see https://github.com/nlohmann
 @since version 1.0.0
 */
-LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /*!
 @brief a class to store JSON values
@@ -106,7 +93,7 @@ The invariants are checked by member function assert_invariant().
 
 @nosubgrouping
 */
-LLBC_NLOHMANN_BASIC_JSON_TPL_DECLARATION
+NLOHMANN_BASIC_JSON_TPL_DECLARATION
 class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
     : public LLBC_NLOHMANN_NS::detail::json_base_class<CustomBaseClass>
 {
@@ -116,7 +103,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     template<typename>
     friend class LLBC_NLOHMANN_NS::json_pointer;
     // can be restored when json_pointer backwards compatibility is removed
-    // friend ::nlohmann::json_pointer<StringType>;
+    // friend LLBC_NLOHMANN_NS::json_pointer<StringType>;
 
     template<typename BasicJsonType, typename InputType>
     friend class LLBC_NLOHMANN_NS::detail::parser;
@@ -134,7 +121,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     friend class LLBC_NLOHMANN_NS::detail::exception;
 
     /// workaround type for MSVC
-    using basic_json_t = LLBC_NLOHMANN_BASIC_JSON_TPL;
+    using basic_json_t = NLOHMANN_BASIC_JSON_TPL;
     using json_base_class_t = LLBC_NLOHMANN_NS::detail::json_base_class<CustomBaseClass>;
 
   JSON_PRIVATE_UNLESS_TESTED:
@@ -175,7 +162,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
   public:
     using value_t = detail::value_t;
-    /// JSON Pointer, see @ref nlohmann::json_pointer
+    /// JSON Pointer, see @ref LLBC_NLOHMANN_NS::json_pointer
     using json_pointer = LLBC_NLOHMANN_NS::json_pointer<StringType>;
     template<typename T, typename SFINAE>
     using json_serializer = JSONSerializer<T, SFINAE>;
@@ -187,7 +174,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     using initializer_list_t = std::initializer_list<detail::json_ref<basic_json>>;
 
     using input_format_t = detail::input_format_t;
-    /// SAX interface type, see @ref nlohmann::json_sax
+    /// SAX interface type, see @ref LLBC_NLOHMANN_NS::json_sax
     using json_sax_t = json_sax<basic_json>;
 
     ////////////////
@@ -257,7 +244,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief returns version information on the library
     /// @sa https://json.nlohmann.me/api/basic_json/meta/
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json meta()
     {
         basic_json result;
@@ -266,12 +253,12 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         result["name"] = "JSON for Modern C++";
         result["url"] = "https://github.com/nlohmann/json";
         result["version"]["string"] =
-            detail::concat(std::to_string(LLBC_NLOHMANN_JSON_VERSION_MAJOR), '.',
-                           std::to_string(LLBC_NLOHMANN_JSON_VERSION_MINOR), '.',
-                           std::to_string(LLBC_NLOHMANN_JSON_VERSION_PATCH));
-        result["version"]["major"] = LLBC_NLOHMANN_JSON_VERSION_MAJOR;
-        result["version"]["minor"] = LLBC_NLOHMANN_JSON_VERSION_MINOR;
-        result["version"]["patch"] = LLBC_NLOHMANN_JSON_VERSION_PATCH;
+            detail::concat(std::to_string(NLOHMANN_JSON_VERSION_MAJOR), '.',
+                           std::to_string(NLOHMANN_JSON_VERSION_MINOR), '.',
+                           std::to_string(NLOHMANN_JSON_VERSION_PATCH));
+        result["version"]["major"] = NLOHMANN_JSON_VERSION_MAJOR;
+        result["version"]["minor"] = NLOHMANN_JSON_VERSION_MINOR;
+        result["version"]["patch"] = NLOHMANN_JSON_VERSION_PATCH;
 
 #ifdef _WIN32
         result["platform"] = "win32";
@@ -387,7 +374,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// helper for exception-safe object creation
     template<typename T, typename... Args>
-    LLBC_JSON_HEDLEY_RETURNS_NON_NULL
+    JSON_HEDLEY_RETURNS_NON_NULL
     static T* create(Args&& ... args)
     {
         AllocatorType<T> alloc;
@@ -525,7 +512,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                 default:
                 {
                     object = nullptr;  // silence warning, see #821
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(t == value_t::null))
+                    if (JSON_HEDLEY_UNLIKELY(t == value_t::null))
                     {
                         JSON_THROW(other_error::create(500, "961c151d2e87f2686a955a9be24d316f1362bf21 3.11.3", nullptr)); // LCOV_EXCL_LINE
                     }
@@ -770,7 +757,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         {
             // see https://github.com/nlohmann/json/issues/2838
             JSON_ASSERT(type() == value_t::array);
-            if (LLBC_JSON_HEDLEY_UNLIKELY(m_data.m_value.array->capacity() != old_capacity))
+            if (JSON_HEDLEY_UNLIKELY(m_data.m_value.array->capacity() != old_capacity))
             {
                 // capacity has changed: update all parents
                 set_parents();
@@ -780,7 +767,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
         // ordered_json uses a vector internally, so pointers could have
         // been invalidated; see https://github.com/nlohmann/json/issues/2962
-#ifdef LLBC_JSON_HEDLEY_MSVC_VERSION
+#ifdef JSON_HEDLEY_MSVC_VERSION
 #pragma warning(push )
 #pragma warning(disable : 4127) // ignore warning to replace if with if constexpr
 #endif
@@ -789,7 +776,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             set_parents();
             return j;
         }
-#ifdef LLBC_JSON_HEDLEY_MSVC_VERSION
+#ifdef JSON_HEDLEY_MSVC_VERSION
 #pragma warning( pop )
 #endif
 
@@ -937,7 +924,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             }
 
             // if object is wanted but impossible, throw an exception
-            if (LLBC_JSON_HEDLEY_UNLIKELY(manual_type == value_t::object && !is_an_object))
+            if (JSON_HEDLEY_UNLIKELY(manual_type == value_t::object && !is_an_object))
             {
                 JSON_THROW(type_error::create(301, "cannot create object from initializer list", nullptr));
             }
@@ -970,7 +957,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief explicitly create a binary array (without subtype)
     /// @sa https://json.nlohmann.me/api/basic_json/binary/
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json binary(const typename binary_t::container_type& init)
     {
         auto res = basic_json();
@@ -981,7 +968,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief explicitly create a binary array (with subtype)
     /// @sa https://json.nlohmann.me/api/basic_json/binary/
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json binary(const typename binary_t::container_type& init, typename binary_t::subtype_type subtype)
     {
         auto res = basic_json();
@@ -992,7 +979,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief explicitly create a binary array
     /// @sa https://json.nlohmann.me/api/basic_json/binary/
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json binary(typename binary_t::container_type&& init)
     {
         auto res = basic_json();
@@ -1003,7 +990,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief explicitly create a binary array (with subtype)
     /// @sa https://json.nlohmann.me/api/basic_json/binary/
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json binary(typename binary_t::container_type&& init, typename binary_t::subtype_type subtype)
     {
         auto res = basic_json();
@@ -1014,7 +1001,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief explicitly create an array from an initializer list
     /// @sa https://json.nlohmann.me/api/basic_json/array/
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json array(initializer_list_t init = {})
     {
         return basic_json(init, false, value_t::array);
@@ -1022,7 +1009,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief explicitly create an object from an initializer list
     /// @sa https://json.nlohmann.me/api/basic_json/object/
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json object(initializer_list_t init = {})
     {
         return basic_json(init, false, value_t::object);
@@ -1048,7 +1035,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         JSON_ASSERT(last.m_object != nullptr);
 
         // make sure iterator fits the current value
-        if (LLBC_JSON_HEDLEY_UNLIKELY(first.m_object != last.m_object))
+        if (JSON_HEDLEY_UNLIKELY(first.m_object != last.m_object))
         {
             JSON_THROW(invalid_iterator::create(201, "iterators are not compatible", nullptr));
         }
@@ -1065,7 +1052,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             case value_t::number_unsigned:
             case value_t::string:
             {
-                if (LLBC_JSON_HEDLEY_UNLIKELY(!first.m_it.primitive_iterator.is_begin()
+                if (JSON_HEDLEY_UNLIKELY(!first.m_it.primitive_iterator.is_begin()
                                          || !last.m_it.primitive_iterator.is_end()))
                 {
                     JSON_THROW(invalid_iterator::create(204, "iterators out of range", first.m_object));
@@ -1417,7 +1404,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// get a boolean (explicit)
     boolean_t get_impl(boolean_t* /*unused*/) const
     {
-        if (LLBC_JSON_HEDLEY_LIKELY(is_boolean()))
+        if (JSON_HEDLEY_LIKELY(is_boolean()))
         {
             return m_data.m_value.boolean;
         }
@@ -1538,7 +1525,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         // delegate the call to get_ptr<>()
         auto* ptr = obj.template get_ptr<typename std::add_pointer<ReferenceType>::type>();
 
-        if (LLBC_JSON_HEDLEY_LIKELY(ptr != nullptr))
+        if (JSON_HEDLEY_LIKELY(ptr != nullptr))
         {
             return *ptr;
         }
@@ -1951,7 +1938,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     reference at(size_type idx)
     {
         // at only works for arrays
-        if (LLBC_JSON_HEDLEY_LIKELY(is_array()))
+        if (JSON_HEDLEY_LIKELY(is_array()))
         {
             JSON_TRY
             {
@@ -1974,7 +1961,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     const_reference at(size_type idx) const
     {
         // at only works for arrays
-        if (LLBC_JSON_HEDLEY_LIKELY(is_array()))
+        if (JSON_HEDLEY_LIKELY(is_array()))
         {
             JSON_TRY
             {
@@ -1997,7 +1984,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     reference at(const typename object_t::key_type& key)
     {
         // at only works for objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!is_object()))
         {
             JSON_THROW(type_error::create(304, detail::concat("cannot use at() with ", type_name()), this));
         }
@@ -2017,7 +2004,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     reference at(KeyType && key)
     {
         // at only works for objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!is_object()))
         {
             JSON_THROW(type_error::create(304, detail::concat("cannot use at() with ", type_name()), this));
         }
@@ -2035,7 +2022,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     const_reference at(const typename object_t::key_type& key) const
     {
         // at only works for objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!is_object()))
         {
             JSON_THROW(type_error::create(304, detail::concat("cannot use at() with ", type_name()), this));
         }
@@ -2055,7 +2042,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     const_reference at(KeyType && key) const
     {
         // at only works for objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!is_object()))
         {
             JSON_THROW(type_error::create(304, detail::concat("cannot use at() with ", type_name()), this));
         }
@@ -2081,7 +2068,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         }
 
         // operator[] only works for arrays
-        if (LLBC_JSON_HEDLEY_LIKELY(is_array()))
+        if (JSON_HEDLEY_LIKELY(is_array()))
         {
             // fill up array with null values if given idx is outside range
             if (idx >= m_data.m_value.array->size())
@@ -2094,7 +2081,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                 m_data.m_value.array->resize(idx + 1);
 
 #if JSON_DIAGNOSTICS
-                if (LLBC_JSON_HEDLEY_UNLIKELY(m_data.m_value.array->capacity() != old_capacity))
+                if (JSON_HEDLEY_UNLIKELY(m_data.m_value.array->capacity() != old_capacity))
                 {
                     // capacity has changed: update all parents
                     set_parents();
@@ -2119,7 +2106,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     const_reference operator[](size_type idx) const
     {
         // const operator[] only works for arrays
-        if (LLBC_JSON_HEDLEY_LIKELY(is_array()))
+        if (JSON_HEDLEY_LIKELY(is_array()))
         {
             return m_data.m_value.array->operator[](idx);
         }
@@ -2140,7 +2127,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         }
 
         // operator[] only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             auto result = m_data.m_value.object->emplace(std::move(key), nullptr);
             return set_parent(result.first->second);
@@ -2154,7 +2141,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     const_reference operator[](const typename object_t::key_type& key) const
     {
         // const operator[] only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             auto it = m_data.m_value.object->find(key);
             JSON_ASSERT(it != m_data.m_value.object->end());
@@ -2193,7 +2180,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         }
 
         // operator[] only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             auto result = m_data.m_value.object->emplace(std::forward<KeyType>(key), nullptr);
             return set_parent(result.first->second);
@@ -2209,7 +2196,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     const_reference operator[](KeyType && key) const
     {
         // const operator[] only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             auto it = m_data.m_value.object->find(std::forward<KeyType>(key));
             JSON_ASSERT(it != m_data.m_value.object->end());
@@ -2239,7 +2226,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ValueType value(const typename object_t::key_type& key, const ValueType& default_value) const
     {
         // value only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             // if key is found, return value and given default value otherwise
             const auto it = find(key);
@@ -2264,7 +2251,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ReturnType value(const typename object_t::key_type& key, ValueType && default_value) const
     {
         // value only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             // if key is found, return value and given default value otherwise
             const auto it = find(key);
@@ -2290,7 +2277,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ValueType value(KeyType && key, const ValueType& default_value) const
     {
         // value only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             // if key is found, return value and given default value otherwise
             const auto it = find(std::forward<KeyType>(key));
@@ -2317,7 +2304,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ReturnType value(KeyType && key, ValueType && default_value) const
     {
         // value only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             // if key is found, return value and given default value otherwise
             const auto it = find(std::forward<KeyType>(key));
@@ -2340,7 +2327,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ValueType value(const json_pointer& ptr, const ValueType& default_value) const
     {
         // value only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             // if pointer resolves a value, return it or use default value
             JSON_TRY
@@ -2365,7 +2352,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ReturnType value(const json_pointer& ptr, ValueType && default_value) const
     {
         // value only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             // if pointer resolves a value, return it or use default value
             JSON_TRY
@@ -2385,7 +2372,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                    detail::is_basic_json<BasicJsonType>::value
                    && detail::is_getable<basic_json_t, ValueType>::value
                    && !std::is_same<value_t, detail::uncvref_t<ValueType>>::value, int > = 0 >
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
     ValueType value(const LLBC_NLOHMANN_NS::json_pointer<BasicJsonType>& ptr, const ValueType& default_value) const
     {
         return value(ptr.convert(), default_value);
@@ -2396,7 +2383,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                    detail::is_basic_json<BasicJsonType>::value
                    && detail::is_getable<basic_json_t, ReturnType>::value
                    && !std::is_same<value_t, detail::uncvref_t<ValueType>>::value, int > = 0 >
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
     ReturnType value(const LLBC_NLOHMANN_NS::json_pointer<BasicJsonType>& ptr, ValueType && default_value) const
     {
         return value(ptr.convert(), std::forward<ValueType>(default_value));
@@ -2442,7 +2429,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     IteratorType erase(IteratorType pos)
     {
         // make sure iterator fits the current value
-        if (LLBC_JSON_HEDLEY_UNLIKELY(this != pos.m_object))
+        if (JSON_HEDLEY_UNLIKELY(this != pos.m_object))
         {
             JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));
         }
@@ -2458,7 +2445,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             case value_t::string:
             case value_t::binary:
             {
-                if (LLBC_JSON_HEDLEY_UNLIKELY(!pos.m_it.primitive_iterator.is_begin()))
+                if (JSON_HEDLEY_UNLIKELY(!pos.m_it.primitive_iterator.is_begin()))
                 {
                     JSON_THROW(invalid_iterator::create(205, "iterator out of range", this));
                 }
@@ -2512,7 +2499,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     IteratorType erase(IteratorType first, IteratorType last)
     {
         // make sure iterator fits the current value
-        if (LLBC_JSON_HEDLEY_UNLIKELY(this != first.m_object || this != last.m_object))
+        if (JSON_HEDLEY_UNLIKELY(this != first.m_object || this != last.m_object))
         {
             JSON_THROW(invalid_iterator::create(203, "iterators do not fit current value", this));
         }
@@ -2528,7 +2515,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             case value_t::string:
             case value_t::binary:
             {
-                if (LLBC_JSON_HEDLEY_LIKELY(!first.m_it.primitive_iterator.is_begin()
+                if (JSON_HEDLEY_LIKELY(!first.m_it.primitive_iterator.is_begin()
                                        || !last.m_it.primitive_iterator.is_end()))
                 {
                     JSON_THROW(invalid_iterator::create(204, "iterators out of range", this));
@@ -2583,7 +2570,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     size_type erase_internal(KeyType && key)
     {
         // this erase only works for objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!is_object()))
         {
             JSON_THROW(type_error::create(307, detail::concat("cannot use erase() with ", type_name()), this));
         }
@@ -2596,7 +2583,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     size_type erase_internal(KeyType && key)
     {
         // this erase only works for objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!is_object()))
         {
             JSON_THROW(type_error::create(307, detail::concat("cannot use erase() with ", type_name()), this));
         }
@@ -2635,9 +2622,9 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void erase(const size_type idx)
     {
         // this erase only works for arrays
-        if (LLBC_JSON_HEDLEY_LIKELY(is_array()))
+        if (JSON_HEDLEY_LIKELY(is_array()))
         {
-            if (LLBC_JSON_HEDLEY_UNLIKELY(idx >= size()))
+            if (JSON_HEDLEY_UNLIKELY(idx >= size()))
             {
                 JSON_THROW(out_of_range::create(401, detail::concat("array index ", std::to_string(idx), " is out of range"), this));
             }
@@ -2761,7 +2748,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
     bool contains(const typename LLBC_NLOHMANN_NS::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.contains(this);
@@ -2874,7 +2861,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @deprecated This function is deprecated since 3.1.0 and will be removed in
     ///             version 4.0.0 of the library. Please use @ref items() instead;
     ///             that is, replace `json::iterator_wrapper(j)` with `j.items()`.
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.1.0, items())
+    JSON_HEDLEY_DEPRECATED_FOR(3.1.0, items())
     static iteration_proxy<iterator> iterator_wrapper(reference ref) noexcept
     {
         return ref.items();
@@ -2885,7 +2872,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @deprecated This function is deprecated since 3.1.0 and will be removed in
     ///         version 4.0.0 of the library. Please use @ref items() instead;
     ///         that is, replace `json::iterator_wrapper(j)` with `j.items()`.
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.1.0, items())
+    JSON_HEDLEY_DEPRECATED_FOR(3.1.0, items())
     static iteration_proxy<const_iterator> iterator_wrapper(const_reference ref) noexcept
     {
         return ref.items();
@@ -3101,7 +3088,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void push_back(basic_json&& val)
     {
         // push_back only works for null objects or arrays
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!(is_null() || is_array())))
+        if (JSON_HEDLEY_UNLIKELY(!(is_null() || is_array())))
         {
             JSON_THROW(type_error::create(308, detail::concat("cannot use push_back() with ", type_name()), this));
         }
@@ -3134,7 +3121,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void push_back(const basic_json& val)
     {
         // push_back only works for null objects or arrays
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!(is_null() || is_array())))
+        if (JSON_HEDLEY_UNLIKELY(!(is_null() || is_array())))
         {
             JSON_THROW(type_error::create(308, detail::concat("cannot use push_back() with ", type_name()), this));
         }
@@ -3166,7 +3153,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void push_back(const typename object_t::value_type& val)
     {
         // push_back only works for null objects or objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!(is_null() || is_object())))
+        if (JSON_HEDLEY_UNLIKELY(!(is_null() || is_object())))
         {
             JSON_THROW(type_error::create(308, detail::concat("cannot use push_back() with ", type_name()), this));
         }
@@ -3222,7 +3209,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     reference emplace_back(Args&& ... args)
     {
         // emplace_back only works for null objects or arrays
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!(is_null() || is_array())))
+        if (JSON_HEDLEY_UNLIKELY(!(is_null() || is_array())))
         {
             JSON_THROW(type_error::create(311, detail::concat("cannot use emplace_back() with ", type_name()), this));
         }
@@ -3247,7 +3234,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     std::pair<iterator, bool> emplace(Args&& ... args)
     {
         // emplace only works for null objects or arrays
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!(is_null() || is_object())))
+        if (JSON_HEDLEY_UNLIKELY(!(is_null() || is_object())))
         {
             JSON_THROW(type_error::create(311, detail::concat("cannot use emplace() with ", type_name()), this));
         }
@@ -3298,10 +3285,10 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     iterator insert(const_iterator pos, const basic_json& val)
     {
         // insert only works for arrays
-        if (LLBC_JSON_HEDLEY_LIKELY(is_array()))
+        if (JSON_HEDLEY_LIKELY(is_array()))
         {
             // check if iterator pos fits to this JSON value
-            if (LLBC_JSON_HEDLEY_UNLIKELY(pos.m_object != this))
+            if (JSON_HEDLEY_UNLIKELY(pos.m_object != this))
             {
                 JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));
             }
@@ -3325,10 +3312,10 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     iterator insert(const_iterator pos, size_type cnt, const basic_json& val)
     {
         // insert only works for arrays
-        if (LLBC_JSON_HEDLEY_LIKELY(is_array()))
+        if (JSON_HEDLEY_LIKELY(is_array()))
         {
             // check if iterator pos fits to this JSON value
-            if (LLBC_JSON_HEDLEY_UNLIKELY(pos.m_object != this))
+            if (JSON_HEDLEY_UNLIKELY(pos.m_object != this))
             {
                 JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));
             }
@@ -3345,24 +3332,24 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     iterator insert(const_iterator pos, const_iterator first, const_iterator last)
     {
         // insert only works for arrays
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_array()))
+        if (JSON_HEDLEY_UNLIKELY(!is_array()))
         {
             JSON_THROW(type_error::create(309, detail::concat("cannot use insert() with ", type_name()), this));
         }
 
         // check if iterator pos fits to this JSON value
-        if (LLBC_JSON_HEDLEY_UNLIKELY(pos.m_object != this))
+        if (JSON_HEDLEY_UNLIKELY(pos.m_object != this))
         {
             JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));
         }
 
         // check if range iterators belong to the same JSON object
-        if (LLBC_JSON_HEDLEY_UNLIKELY(first.m_object != last.m_object))
+        if (JSON_HEDLEY_UNLIKELY(first.m_object != last.m_object))
         {
             JSON_THROW(invalid_iterator::create(210, "iterators do not fit", this));
         }
 
-        if (LLBC_JSON_HEDLEY_UNLIKELY(first.m_object == this))
+        if (JSON_HEDLEY_UNLIKELY(first.m_object == this))
         {
             JSON_THROW(invalid_iterator::create(211, "passed iterators may not belong to container", this));
         }
@@ -3376,13 +3363,13 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     iterator insert(const_iterator pos, initializer_list_t ilist)
     {
         // insert only works for arrays
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_array()))
+        if (JSON_HEDLEY_UNLIKELY(!is_array()))
         {
             JSON_THROW(type_error::create(309, detail::concat("cannot use insert() with ", type_name()), this));
         }
 
         // check if iterator pos fits to this JSON value
-        if (LLBC_JSON_HEDLEY_UNLIKELY(pos.m_object != this))
+        if (JSON_HEDLEY_UNLIKELY(pos.m_object != this))
         {
             JSON_THROW(invalid_iterator::create(202, "iterator does not fit current value", this));
         }
@@ -3396,19 +3383,19 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void insert(const_iterator first, const_iterator last)
     {
         // insert only works for objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!is_object()))
         {
             JSON_THROW(type_error::create(309, detail::concat("cannot use insert() with ", type_name()), this));
         }
 
         // check if range iterators belong to the same JSON object
-        if (LLBC_JSON_HEDLEY_UNLIKELY(first.m_object != last.m_object))
+        if (JSON_HEDLEY_UNLIKELY(first.m_object != last.m_object))
         {
             JSON_THROW(invalid_iterator::create(210, "iterators do not fit", this));
         }
 
         // passed iterators must belong to objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!first.m_object->is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!first.m_object->is_object()))
         {
             JSON_THROW(invalid_iterator::create(202, "iterators first and last must point to objects", this));
         }
@@ -3435,19 +3422,19 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             assert_invariant();
         }
 
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!is_object()))
         {
             JSON_THROW(type_error::create(312, detail::concat("cannot use update() with ", type_name()), this));
         }
 
         // check if range iterators belong to the same JSON object
-        if (LLBC_JSON_HEDLEY_UNLIKELY(first.m_object != last.m_object))
+        if (JSON_HEDLEY_UNLIKELY(first.m_object != last.m_object))
         {
             JSON_THROW(invalid_iterator::create(210, "iterators do not fit", this));
         }
 
         // passed iterators must belong to objects
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!first.m_object->is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!first.m_object->is_object()))
         {
             JSON_THROW(type_error::create(312, detail::concat("cannot use update() with ", first.m_object->type_name()), first.m_object));
         }
@@ -3504,7 +3491,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void swap(array_t& other) // NOLINT(bugprone-exception-escape,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
     {
         // swap only works for arrays
-        if (LLBC_JSON_HEDLEY_LIKELY(is_array()))
+        if (JSON_HEDLEY_LIKELY(is_array()))
         {
             using std::swap;
             swap(*(m_data.m_value.array), other);
@@ -3520,7 +3507,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void swap(object_t& other) // NOLINT(bugprone-exception-escape,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
     {
         // swap only works for objects
-        if (LLBC_JSON_HEDLEY_LIKELY(is_object()))
+        if (JSON_HEDLEY_LIKELY(is_object()))
         {
             using std::swap;
             swap(*(m_data.m_value.object), other);
@@ -3536,7 +3523,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void swap(string_t& other) // NOLINT(bugprone-exception-escape,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
     {
         // swap only works for strings
-        if (LLBC_JSON_HEDLEY_LIKELY(is_string()))
+        if (JSON_HEDLEY_LIKELY(is_string()))
         {
             using std::swap;
             swap(*(m_data.m_value.string), other);
@@ -3552,7 +3539,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void swap(binary_t& other) // NOLINT(bugprone-exception-escape,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
     {
         // swap only works for strings
-        if (LLBC_JSON_HEDLEY_LIKELY(is_binary()))
+        if (JSON_HEDLEY_LIKELY(is_binary()))
         {
             using std::swap;
             swap(*(m_data.m_value.binary), other);
@@ -3568,7 +3555,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     void swap(typename binary_t::container_type& other) // NOLINT(bugprone-exception-escape)
     {
         // swap only works for strings
-        if (LLBC_JSON_HEDLEY_LIKELY(is_binary()))
+        if (JSON_HEDLEY_LIKELY(is_binary()))
         {
             using std::swap;
             swap(*(m_data.m_value.binary), other);
@@ -3753,7 +3740,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief comparison: less than or equal
     /// @sa https://json.nlohmann.me/api/basic_json/operator_le/
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
     bool operator<=(const_reference rhs) const noexcept
     {
         if (compares_unordered(rhs, true))
@@ -3774,7 +3761,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief comparison: greater than or equal
     /// @sa https://json.nlohmann.me/api/basic_json/operator_ge/
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
     bool operator>=(const_reference rhs) const noexcept
     {
         if (compares_unordered(rhs, true))
@@ -4006,7 +3993,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ///             version 4.0.0 of the library. Please use
     ///             operator<<(std::ostream&, const basic_json&) instead; that is,
     ///             replace calls like `j >> o;` with `o << j;`.
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.0.0, operator<<(std::ostream&, const basic_json&))
+    JSON_HEDLEY_DEPRECATED_FOR(3.0.0, operator<<(std::ostream&, const basic_json&))
     friend std::ostream& operator>>(const basic_json& j, std::ostream& o)
     {
         return o << j;
@@ -4024,7 +4011,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief deserialize from a compatible input
     /// @sa https://json.nlohmann.me/api/basic_json/parse/
     template<typename InputType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json parse(InputType&& i,
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true,
@@ -4038,7 +4025,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief deserialize from a pair of character iterators
     /// @sa https://json.nlohmann.me/api/basic_json/parse/
     template<typename IteratorType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json parse(IteratorType first,
                             IteratorType last,
                             const parser_callback_t cb = nullptr,
@@ -4050,8 +4037,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return result;
     }
 
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, parse(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, parse(ptr, ptr + len))
     static basic_json parse(detail::span_input_adapter&& i,
                             const parser_callback_t cb = nullptr,
                             const bool allow_exceptions = true,
@@ -4080,8 +4067,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return parser(detail::input_adapter(std::move(first), std::move(last)), nullptr, false, ignore_comments).accept(true);
     }
 
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, accept(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, accept(ptr, ptr + len))
     static bool accept(detail::span_input_adapter&& i,
                        const bool ignore_comments = false)
     {
@@ -4091,7 +4078,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief generate SAX events
     /// @sa https://json.nlohmann.me/api/basic_json/sax_parse/
     template <typename InputType, typename SAX>
-    LLBC_JSON_HEDLEY_NON_NULL(2)
+    JSON_HEDLEY_NON_NULL(2)
     static bool sax_parse(InputType&& i, SAX* sax,
                           input_format_t format = input_format_t::json,
                           const bool strict = true,
@@ -4106,7 +4093,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief generate SAX events
     /// @sa https://json.nlohmann.me/api/basic_json/sax_parse/
     template<class IteratorType, class SAX>
-    LLBC_JSON_HEDLEY_NON_NULL(3)
+    JSON_HEDLEY_NON_NULL(3)
     static bool sax_parse(IteratorType first, IteratorType last, SAX* sax,
                           input_format_t format = input_format_t::json,
                           const bool strict = true,
@@ -4124,8 +4111,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ///             version 4.0.0 of the library. Please use
     ///             sax_parse(ptr, ptr + len) instead.
     template <typename SAX>
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, sax_parse(ptr, ptr + len, ...))
-    LLBC_JSON_HEDLEY_NON_NULL(2)
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, sax_parse(ptr, ptr + len, ...))
+    JSON_HEDLEY_NON_NULL(2)
     static bool sax_parse(detail::span_input_adapter&& i, SAX* sax,
                           input_format_t format = input_format_t::json,
                           const bool strict = true,
@@ -4145,7 +4132,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     ///             version 4.0.0 of the library. Please use
     ///             operator>>(std::istream&, basic_json&) instead; that is,
     ///             replace calls like `j << i;` with `i >> j;`.
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.0.0, operator>>(std::istream&, basic_json&))
+    JSON_HEDLEY_DEPRECATED_FOR(3.0.0, operator>>(std::istream&, basic_json&))
     friend std::istream& operator<<(basic_json& j, std::istream& i)
     {
         return operator>>(i, j);
@@ -4167,7 +4154,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief return the type as string
     /// @sa https://json.nlohmann.me/api/basic_json/type_name/
-    LLBC_JSON_HEDLEY_RETURNS_NON_NULL
+    JSON_HEDLEY_RETURNS_NON_NULL
     const char* type_name() const noexcept
     {
         switch (m_data.m_type)
@@ -4371,7 +4358,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in CBOR format
     /// @sa https://json.nlohmann.me/api/basic_json/from_cbor/
     template<typename InputType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_cbor(InputType&& i,
                                 const bool strict = true,
                                 const bool allow_exceptions = true,
@@ -4387,7 +4374,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in CBOR format
     /// @sa https://json.nlohmann.me/api/basic_json/from_cbor/
     template<typename IteratorType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_cbor(IteratorType first, IteratorType last,
                                 const bool strict = true,
                                 const bool allow_exceptions = true,
@@ -4401,8 +4388,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename T>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_cbor(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_cbor(ptr, ptr + len))
     static basic_json from_cbor(const T* ptr, std::size_t len,
                                 const bool strict = true,
                                 const bool allow_exceptions = true,
@@ -4411,8 +4398,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return from_cbor(ptr, ptr + len, strict, allow_exceptions, tag_handler);
     }
 
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_cbor(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_cbor(ptr, ptr + len))
     static basic_json from_cbor(detail::span_input_adapter&& i,
                                 const bool strict = true,
                                 const bool allow_exceptions = true,
@@ -4429,7 +4416,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in MessagePack format
     /// @sa https://json.nlohmann.me/api/basic_json/from_msgpack/
     template<typename InputType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_msgpack(InputType&& i,
                                    const bool strict = true,
                                    const bool allow_exceptions = true)
@@ -4444,7 +4431,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in MessagePack format
     /// @sa https://json.nlohmann.me/api/basic_json/from_msgpack/
     template<typename IteratorType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_msgpack(IteratorType first, IteratorType last,
                                    const bool strict = true,
                                    const bool allow_exceptions = true)
@@ -4457,8 +4444,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename T>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_msgpack(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_msgpack(ptr, ptr + len))
     static basic_json from_msgpack(const T* ptr, std::size_t len,
                                    const bool strict = true,
                                    const bool allow_exceptions = true)
@@ -4466,8 +4453,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return from_msgpack(ptr, ptr + len, strict, allow_exceptions);
     }
 
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_msgpack(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_msgpack(ptr, ptr + len))
     static basic_json from_msgpack(detail::span_input_adapter&& i,
                                    const bool strict = true,
                                    const bool allow_exceptions = true)
@@ -4483,7 +4470,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in UBJSON format
     /// @sa https://json.nlohmann.me/api/basic_json/from_ubjson/
     template<typename InputType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_ubjson(InputType&& i,
                                   const bool strict = true,
                                   const bool allow_exceptions = true)
@@ -4498,7 +4485,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in UBJSON format
     /// @sa https://json.nlohmann.me/api/basic_json/from_ubjson/
     template<typename IteratorType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_ubjson(IteratorType first, IteratorType last,
                                   const bool strict = true,
                                   const bool allow_exceptions = true)
@@ -4511,8 +4498,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename T>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_ubjson(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_ubjson(ptr, ptr + len))
     static basic_json from_ubjson(const T* ptr, std::size_t len,
                                   const bool strict = true,
                                   const bool allow_exceptions = true)
@@ -4520,8 +4507,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return from_ubjson(ptr, ptr + len, strict, allow_exceptions);
     }
 
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_ubjson(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_ubjson(ptr, ptr + len))
     static basic_json from_ubjson(detail::span_input_adapter&& i,
                                   const bool strict = true,
                                   const bool allow_exceptions = true)
@@ -4537,7 +4524,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in BJData format
     /// @sa https://json.nlohmann.me/api/basic_json/from_bjdata/
     template<typename InputType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_bjdata(InputType&& i,
                                   const bool strict = true,
                                   const bool allow_exceptions = true)
@@ -4552,7 +4539,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in BJData format
     /// @sa https://json.nlohmann.me/api/basic_json/from_bjdata/
     template<typename IteratorType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_bjdata(IteratorType first, IteratorType last,
                                   const bool strict = true,
                                   const bool allow_exceptions = true)
@@ -4567,7 +4554,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in BSON format
     /// @sa https://json.nlohmann.me/api/basic_json/from_bson/
     template<typename InputType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_bson(InputType&& i,
                                 const bool strict = true,
                                 const bool allow_exceptions = true)
@@ -4582,7 +4569,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     /// @brief create a JSON value from an input in BSON format
     /// @sa https://json.nlohmann.me/api/basic_json/from_bson/
     template<typename IteratorType>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json from_bson(IteratorType first, IteratorType last,
                                 const bool strict = true,
                                 const bool allow_exceptions = true)
@@ -4595,8 +4582,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename T>
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_bson(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_bson(ptr, ptr + len))
     static basic_json from_bson(const T* ptr, std::size_t len,
                                 const bool strict = true,
                                 const bool allow_exceptions = true)
@@ -4604,8 +4591,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return from_bson(ptr, ptr + len, strict, allow_exceptions);
     }
 
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_bson(ptr, ptr + len))
+    JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_DEPRECATED_FOR(3.8.0, from_bson(ptr, ptr + len))
     static basic_json from_bson(detail::span_input_adapter&& i,
                                 const bool strict = true,
                                 const bool allow_exceptions = true)
@@ -4634,7 +4621,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
     reference operator[](const LLBC_NLOHMANN_NS::json_pointer<BasicJsonType>& ptr)
     {
         return ptr.get_unchecked(this);
@@ -4648,7 +4635,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
     const_reference operator[](const LLBC_NLOHMANN_NS::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.get_unchecked(this);
@@ -4662,7 +4649,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
     reference at(const LLBC_NLOHMANN_NS::json_pointer<BasicJsonType>& ptr)
     {
         return ptr.get_checked(this);
@@ -4676,7 +4663,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     }
 
     template<typename BasicJsonType, detail::enable_if_t<detail::is_basic_json<BasicJsonType>::value, int> = 0>
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, basic_json::json_pointer or LLBC_NLOHMANN_NS::json_pointer<basic_json::string_t>) // NOLINT(readability/alt_tokens)
     const_reference at(const LLBC_NLOHMANN_NS::json_pointer<BasicJsonType>& ptr) const
     {
         return ptr.get_checked(this);
@@ -4788,7 +4775,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                     else
                     {
                         const auto idx = json_pointer::template array_index<basic_json_t>(last_path);
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(idx > parent.size()))
+                        if (JSON_HEDLEY_UNLIKELY(idx > parent.size()))
                         {
                             // avoid undefined behavior
                             JSON_THROW(out_of_range::create(401, detail::concat("array index ", std::to_string(idx), " is out of range"), &parent));
@@ -4826,7 +4813,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             {
                 // perform range check
                 auto it = parent.find(last_path);
-                if (LLBC_JSON_HEDLEY_LIKELY(it != parent.end()))
+                if (JSON_HEDLEY_LIKELY(it != parent.end()))
                 {
                     parent.erase(it);
                 }
@@ -4843,7 +4830,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         };
 
         // type check: top level value must be an array
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!json_patch.is_array()))
+        if (JSON_HEDLEY_UNLIKELY(!json_patch.is_array()))
         {
             JSON_THROW(parse_error::create(104, 0, "JSON patch must be an array of objects", &json_patch));
         }
@@ -4863,14 +4850,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                 const auto error_msg = (op == "op") ? "operation" : detail::concat("operation '", op, '\'');
 
                 // check if desired value is present
-                if (LLBC_JSON_HEDLEY_UNLIKELY(it == val.m_data.m_value.object->end()))
+                if (JSON_HEDLEY_UNLIKELY(it == val.m_data.m_value.object->end()))
                 {
                     // NOLINTNEXTLINE(performance-inefficient-string-concatenation)
                     JSON_THROW(parse_error::create(105, 0, detail::concat(error_msg, " must have member '", member, "'"), &val));
                 }
 
                 // check if result is of type string
-                if (LLBC_JSON_HEDLEY_UNLIKELY(string_type && !it->second.is_string()))
+                if (JSON_HEDLEY_UNLIKELY(string_type && !it->second.is_string()))
                 {
                     // NOLINTNEXTLINE(performance-inefficient-string-concatenation)
                     JSON_THROW(parse_error::create(105, 0, detail::concat(error_msg, " must have string member '", member, "'"), &val));
@@ -4881,7 +4868,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             };
 
             // type check: every element of the array must be an object
-            if (LLBC_JSON_HEDLEY_UNLIKELY(!val.is_object()))
+            if (JSON_HEDLEY_UNLIKELY(!val.is_object()))
             {
                 JSON_THROW(parse_error::create(104, 0, "JSON patch must be an array of objects", &val));
             }
@@ -4959,7 +4946,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                     }
 
                     // throw an exception if test fails
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(!success))
+                    if (JSON_HEDLEY_UNLIKELY(!success))
                     {
                         JSON_THROW(other_error::create(501, detail::concat("unsuccessful: ", val.dump()), &val));
                     }
@@ -4989,7 +4976,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief creates a diff as a JSON patch
     /// @sa https://json.nlohmann.me/api/basic_json/diff/
-    LLBC_JSON_HEDLEY_WARN_UNUSED_RESULT
+    JSON_HEDLEY_WARN_UNUSED_RESULT
     static basic_json diff(const basic_json& source, const basic_json& target,
                            const std::string& path = "")
     {
@@ -5163,8 +5150,8 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
 /// @brief user-defined to_string function for JSON values
 /// @sa https://json.nlohmann.me/api/basic_json/to_string/
-LLBC_NLOHMANN_BASIC_JSON_TPL_DECLARATION
-std::string to_string(const LLBC_NLOHMANN_BASIC_JSON_TPL& j)
+NLOHMANN_BASIC_JSON_TPL_DECLARATION
+std::string to_string(const NLOHMANN_BASIC_JSON_TPL& j)
 {
     return j.dump();
 }
@@ -5176,20 +5163,20 @@ inline namespace json_literals
 
 /// @brief user-defined string literal for JSON values
 /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json/
-LLBC_JSON_HEDLEY_NON_NULL(1)
-#if !defined(LLBC_JSON_HEDLEY_GCC_VERSION) || LLBC_JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
-    inline LLBC_NS LLBCJson operator ""_json(const char* s, std::size_t n)
+JSON_HEDLEY_NON_NULL(1)
+#if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
+    inline LLBC_NLOHMANN_NS::json operator ""_json(const char* s, std::size_t n)
 #else
-    inline LLBC_NS LLBCJson operator "" _json(const char* s, std::size_t n)
+    inline LLBC_NLOHMANN_NS::json operator "" _json(const char* s, std::size_t n)
 #endif
 {
-    return LLBC_NS LLBCJson::parse(s, s + n);
+    return LLBC_NLOHMANN_NS::json::parse(s, s + n);
 }
 
 /// @brief user-defined string literal for JSON pointer
 /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json_pointer/
-LLBC_JSON_HEDLEY_NON_NULL(1)
-#if !defined(LLBC_JSON_HEDLEY_GCC_VERSION) || LLBC_JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
+JSON_HEDLEY_NON_NULL(1)
+#if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
     inline LLBC_NLOHMANN_NS::json::json_pointer operator ""_json_pointer(const char* s, std::size_t n)
 #else
     inline LLBC_NLOHMANN_NS::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
@@ -5200,7 +5187,7 @@ LLBC_JSON_HEDLEY_NON_NULL(1)
 
 }  // namespace json_literals
 }  // namespace literals
-LLBC_NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_JSON_NAMESPACE_END
 
 ///////////////////////
 // nonmember support //
@@ -5211,10 +5198,10 @@ namespace std // NOLINT(cert-dcl58-cpp)
 
 /// @brief hash value for JSON objects
 /// @sa https://json.nlohmann.me/api/basic_json/std_hash/
-LLBC_NLOHMANN_BASIC_JSON_TPL_DECLARATION
-struct hash<LLBC_NLOHMANN_NS::LLBC_NLOHMANN_BASIC_JSON_TPL> // NOLINT(cert-dcl58-cpp)
+NLOHMANN_BASIC_JSON_TPL_DECLARATION
+struct hash<LLBC_NLOHMANN_NS::NLOHMANN_BASIC_JSON_TPL> // NOLINT(cert-dcl58-cpp)
 {
-    std::size_t operator()(const LLBC_NLOHMANN_NS::LLBC_NLOHMANN_BASIC_JSON_TPL& j) const
+    std::size_t operator()(const LLBC_NLOHMANN_NS::NLOHMANN_BASIC_JSON_TPL& j) const
     {
         return LLBC_NLOHMANN_NS::detail::hash(j);
     }
@@ -5244,10 +5231,10 @@ struct less< LLBC_NLOHMANN_NS::detail::value_t> // do not remove the space after
 
 /// @brief exchanges the values of two JSON objects
 /// @sa https://json.nlohmann.me/api/basic_json/std_swap/
-LLBC_NLOHMANN_BASIC_JSON_TPL_DECLARATION
-inline void swap(LLBC_NLOHMANN_NS::LLBC_NLOHMANN_BASIC_JSON_TPL& j1, LLBC_NLOHMANN_NS::LLBC_NLOHMANN_BASIC_JSON_TPL& j2) noexcept(  // NOLINT(readability-inconsistent-declaration-parameter-name, cert-dcl58-cpp)
-    is_nothrow_move_constructible<LLBC_NLOHMANN_NS::LLBC_NLOHMANN_BASIC_JSON_TPL>::value&&                          // NOLINT(misc-redundant-expression,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
-    is_nothrow_move_assignable<LLBC_NLOHMANN_NS::LLBC_NLOHMANN_BASIC_JSON_TPL>::value)
+NLOHMANN_BASIC_JSON_TPL_DECLARATION
+inline void swap(LLBC_NLOHMANN_NS::NLOHMANN_BASIC_JSON_TPL& j1, LLBC_NLOHMANN_NS::NLOHMANN_BASIC_JSON_TPL& j2) noexcept(  // NOLINT(readability-inconsistent-declaration-parameter-name, cert-dcl58-cpp)
+    is_nothrow_move_constructible<LLBC_NLOHMANN_NS::NLOHMANN_BASIC_JSON_TPL>::value&&                          // NOLINT(misc-redundant-expression,cppcoreguidelines-noexcept-swap,performance-noexcept-swap)
+    is_nothrow_move_assignable<LLBC_NLOHMANN_NS::NLOHMANN_BASIC_JSON_TPL>::value)
 {
     j1.swap(j2);
 }
@@ -5257,7 +5244,7 @@ inline void swap(LLBC_NLOHMANN_NS::LLBC_NLOHMANN_BASIC_JSON_TPL& j1, LLBC_NLOHMA
 }  // namespace std
 
 #if JSON_USE_GLOBAL_UDLS
-    #if !defined(LLBC_JSON_HEDLEY_GCC_VERSION) || LLBC_JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
+    #if !defined(JSON_HEDLEY_GCC_VERSION) || JSON_HEDLEY_GCC_VERSION_CHECK(4,9,0)
         using LLBC_NLOHMANN_NS::literals::json_literals::operator ""_json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
         using LLBC_NLOHMANN_NS::literals::json_literals::operator ""_json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
     #else
@@ -5268,4 +5255,4 @@ inline void swap(LLBC_NLOHMANN_NS::LLBC_NLOHMANN_BASIC_JSON_TPL& j1, LLBC_NLOHMA
 
 #include <llbc/core/json/nlohmann/detail/macro_unscope.hpp>
 
-#endif  // INCLUDE_LLBC_NLOHMANN_JSON_HPP_
+#endif  // INCLUDE_NLOHMANN_JSON_HPP_

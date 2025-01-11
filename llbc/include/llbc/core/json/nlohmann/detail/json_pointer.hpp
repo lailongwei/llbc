@@ -1,23 +1,10 @@
-// The MIT License (MIT)
-
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -40,7 +27,7 @@
 #include <llbc/core/json/nlohmann/detail/string_escape.hpp>
 #include <llbc/core/json/nlohmann/detail/value_t.hpp>
 
-LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /// @brief JSON Pointer defines a string syntax for identifying a specific value within a JSON document
 /// @sa https://json.nlohmann.me/api/json_pointer/
@@ -48,7 +35,7 @@ template<typename RefStringType>
 class json_pointer
 {
     // allow basic_json to access private members
-    LLBC_NLOHMANN_BASIC_JSON_TPL_DECLARATION
+    NLOHMANN_BASIC_JSON_TPL_DECLARATION
     friend class basic_json;
 
     template<typename>
@@ -60,8 +47,8 @@ class json_pointer
         using type = T;
     };
 
-    LLBC_NLOHMANN_BASIC_JSON_TPL_DECLARATION
-    struct string_t_helper<LLBC_NLOHMANN_BASIC_JSON_TPL>
+    NLOHMANN_BASIC_JSON_TPL_DECLARATION
+    struct string_t_helper<NLOHMANN_BASIC_JSON_TPL>
     {
         using type = StringType;
     };
@@ -90,7 +77,7 @@ class json_pointer
 
     /// @brief return a string representation of the JSON pointer
     /// @sa https://json.nlohmann.me/api/json_pointer/operator_string/
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.0, to_string())
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, to_string())
     operator string_t() const
     {
         return to_string();
@@ -171,7 +158,7 @@ class json_pointer
     /// @sa https://json.nlohmann.me/api/json_pointer/pop_back/
     void pop_back()
     {
-        if (LLBC_JSON_HEDLEY_UNLIKELY(empty()))
+        if (JSON_HEDLEY_UNLIKELY(empty()))
         {
             JSON_THROW(detail::out_of_range::create(405, "JSON pointer has no parent", nullptr));
         }
@@ -183,7 +170,7 @@ class json_pointer
     /// @sa https://json.nlohmann.me/api/json_pointer/back/
     const string_t& back() const
     {
-        if (LLBC_JSON_HEDLEY_UNLIKELY(empty()))
+        if (JSON_HEDLEY_UNLIKELY(empty()))
         {
             JSON_THROW(detail::out_of_range::create(405, "JSON pointer has no parent", nullptr));
         }
@@ -229,13 +216,13 @@ class json_pointer
         using size_type = typename BasicJsonType::size_type;
 
         // error condition (cf. RFC 6901, Sect. 4)
-        if (LLBC_JSON_HEDLEY_UNLIKELY(s.size() > 1 && s[0] == '0'))
+        if (JSON_HEDLEY_UNLIKELY(s.size() > 1 && s[0] == '0'))
         {
             JSON_THROW(detail::parse_error::create(106, 0, detail::concat("array index '", s, "' must not begin with '0'"), nullptr));
         }
 
         // error condition (cf. RFC 6901, Sect. 4)
-        if (LLBC_JSON_HEDLEY_UNLIKELY(s.size() > 1 && !(s[0] >= '1' && s[0] <= '9')))
+        if (JSON_HEDLEY_UNLIKELY(s.size() > 1 && !(s[0] >= '1' && s[0] <= '9')))
         {
             JSON_THROW(detail::parse_error::create(109, 0, detail::concat("array index '", s, "' is not a number"), nullptr));
         }
@@ -246,7 +233,7 @@ class json_pointer
         const unsigned long long res = std::strtoull(p, &p_end, 10); // NOLINT(runtime/int)
         if (p == p_end // invalid input or empty string
                 || errno == ERANGE // out of range
-                || LLBC_JSON_HEDLEY_UNLIKELY(static_cast<std::size_t>(p_end - p) != s.size())) // incomplete read
+                || JSON_HEDLEY_UNLIKELY(static_cast<std::size_t>(p_end - p) != s.size())) // incomplete read
         {
             JSON_THROW(detail::out_of_range::create(404, detail::concat("unresolved reference token '", s, "'"), nullptr));
         }
@@ -264,7 +251,7 @@ class json_pointer
   JSON_PRIVATE_UNLESS_TESTED:
     json_pointer top() const
     {
-        if (LLBC_JSON_HEDLEY_UNLIKELY(empty()))
+        if (JSON_HEDLEY_UNLIKELY(empty()))
         {
             JSON_THROW(detail::out_of_range::create(405, "JSON pointer has no parent", nullptr));
         }
@@ -447,7 +434,7 @@ class json_pointer
 
                 case detail::value_t::array:
                 {
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(reference_token == "-"))
+                    if (JSON_HEDLEY_UNLIKELY(reference_token == "-"))
                     {
                         // "-" always fails the range check
                         JSON_THROW(detail::out_of_range::create(402, detail::concat(
@@ -505,7 +492,7 @@ class json_pointer
 
                 case detail::value_t::array:
                 {
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(reference_token == "-"))
+                    if (JSON_HEDLEY_UNLIKELY(reference_token == "-"))
                     {
                         // "-" cannot be used for const access
                         JSON_THROW(detail::out_of_range::create(402, detail::concat("array index '-' (", std::to_string(ptr->m_data.m_value.array->size()), ") is out of range"), ptr));
@@ -554,7 +541,7 @@ class json_pointer
 
                 case detail::value_t::array:
                 {
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(reference_token == "-"))
+                    if (JSON_HEDLEY_UNLIKELY(reference_token == "-"))
                     {
                         // "-" always fails the range check
                         JSON_THROW(detail::out_of_range::create(402, detail::concat(
@@ -608,26 +595,26 @@ class json_pointer
 
                 case detail::value_t::array:
                 {
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(reference_token == "-"))
+                    if (JSON_HEDLEY_UNLIKELY(reference_token == "-"))
                     {
                         // "-" always fails the range check
                         return false;
                     }
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(reference_token.size() == 1 && !("0" <= reference_token && reference_token <= "9")))
+                    if (JSON_HEDLEY_UNLIKELY(reference_token.size() == 1 && !("0" <= reference_token && reference_token <= "9")))
                     {
                         // invalid char
                         return false;
                     }
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(reference_token.size() > 1))
+                    if (JSON_HEDLEY_UNLIKELY(reference_token.size() > 1))
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!('1' <= reference_token[0] && reference_token[0] <= '9')))
+                        if (JSON_HEDLEY_UNLIKELY(!('1' <= reference_token[0] && reference_token[0] <= '9')))
                         {
                             // first char should be between '1' and '9'
                             return false;
                         }
                         for (std::size_t i = 1; i < reference_token.size(); i++)
                         {
-                            if (LLBC_JSON_HEDLEY_UNLIKELY(!('0' <= reference_token[i] && reference_token[i] <= '9')))
+                            if (JSON_HEDLEY_UNLIKELY(!('0' <= reference_token[i] && reference_token[i] <= '9')))
                             {
                                 // other char should be between '0' and '9'
                                 return false;
@@ -687,7 +674,7 @@ class json_pointer
         }
 
         // check if nonempty reference string begins with slash
-        if (LLBC_JSON_HEDLEY_UNLIKELY(reference_string[0] != '/'))
+        if (JSON_HEDLEY_UNLIKELY(reference_string[0] != '/'))
         {
             JSON_THROW(detail::parse_error::create(107, 1, detail::concat("JSON pointer must be empty or begin with '/' - was: '", reference_string, "'"), nullptr));
         }
@@ -720,7 +707,7 @@ class json_pointer
                 JSON_ASSERT(reference_token[pos] == '~');
 
                 // ~ must be followed by 0 or 1
-                if (LLBC_JSON_HEDLEY_UNLIKELY(pos == reference_token.size() - 1 ||
+                if (JSON_HEDLEY_UNLIKELY(pos == reference_token.size() - 1 ||
                                          (reference_token[pos + 1] != '0' &&
                                           reference_token[pos + 1] != '1')))
                 {
@@ -819,7 +806,7 @@ class json_pointer
     static BasicJsonType
     unflatten(const BasicJsonType& value)
     {
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!value.is_object()))
+        if (JSON_HEDLEY_UNLIKELY(!value.is_object()))
         {
             JSON_THROW(detail::type_error::create(314, "only objects can be unflattened", &value));
         }
@@ -829,7 +816,7 @@ class json_pointer
         // iterate the JSON object values
         for (const auto& element : *value.m_data.m_value.object)
         {
-            if (LLBC_JSON_HEDLEY_UNLIKELY(!element.second.is_primitive()))
+            if (JSON_HEDLEY_UNLIKELY(!element.second.is_primitive()))
             {
                 JSON_THROW(detail::type_error::create(315, "values in object must be primitive", &element.second));
             }
@@ -871,7 +858,7 @@ class json_pointer
 
     /// @brief compares JSON pointer and string for equality
     /// @sa https://json.nlohmann.me/api/json_pointer/operator_eq/
-    LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator==(json_pointer))
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator==(json_pointer))
     bool operator==(const string_t& rhs) const
     {
         return *this == json_pointer(rhs);
@@ -949,7 +936,7 @@ inline bool operator==(const json_pointer<RefStringTypeLhs>& lhs,
 
 template<typename RefStringTypeLhs,
          typename StringType = typename json_pointer<RefStringTypeLhs>::string_t>
-LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator==(json_pointer, json_pointer))
+JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator==(json_pointer, json_pointer))
 inline bool operator==(const json_pointer<RefStringTypeLhs>& lhs,
                        const StringType& rhs)
 {
@@ -958,7 +945,7 @@ inline bool operator==(const json_pointer<RefStringTypeLhs>& lhs,
 
 template<typename RefStringTypeRhs,
          typename StringType = typename json_pointer<RefStringTypeRhs>::string_t>
-LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator==(json_pointer, json_pointer))
+JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator==(json_pointer, json_pointer))
 inline bool operator==(const StringType& lhs,
                        const json_pointer<RefStringTypeRhs>& rhs)
 {
@@ -974,7 +961,7 @@ inline bool operator!=(const json_pointer<RefStringTypeLhs>& lhs,
 
 template<typename RefStringTypeLhs,
          typename StringType = typename json_pointer<RefStringTypeLhs>::string_t>
-LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator!=(json_pointer, json_pointer))
+JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator!=(json_pointer, json_pointer))
 inline bool operator!=(const json_pointer<RefStringTypeLhs>& lhs,
                        const StringType& rhs)
 {
@@ -983,7 +970,7 @@ inline bool operator!=(const json_pointer<RefStringTypeLhs>& lhs,
 
 template<typename RefStringTypeRhs,
          typename StringType = typename json_pointer<RefStringTypeRhs>::string_t>
-LLBC_JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator!=(json_pointer, json_pointer))
+JSON_HEDLEY_DEPRECATED_FOR(3.11.2, operator!=(json_pointer, json_pointer))
 inline bool operator!=(const StringType& lhs,
                        const json_pointer<RefStringTypeRhs>& rhs)
 {
@@ -998,4 +985,4 @@ inline bool operator<(const json_pointer<RefStringTypeLhs>& lhs,
 }
 #endif
 
-LLBC_NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_JSON_NAMESPACE_END

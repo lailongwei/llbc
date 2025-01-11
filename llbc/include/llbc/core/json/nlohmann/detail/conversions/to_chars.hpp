@@ -1,23 +1,11 @@
-// The MIT License (MIT)
-
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2009 Florian Loitsch <https://florian.loitsch.com/>
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -30,8 +18,7 @@
 
 #include <llbc/core/json/nlohmann/detail/macro_scope.hpp>
 
-LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
-
+NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -837,7 +824,7 @@ v = buf * 10^decimal_exponent
 len is the length of the buffer (number of decimal digits)
 The buffer must be large enough, i.e. >= max_digits10.
 */
-LLBC_JSON_HEDLEY_NON_NULL(1)
+JSON_HEDLEY_NON_NULL(1)
 inline void grisu2(char* buf, int& len, int& decimal_exponent,
                    diyfp m_minus, diyfp v, diyfp m_plus)
 {
@@ -897,7 +884,7 @@ len is the length of the buffer (number of decimal digits)
 The buffer must be large enough, i.e. >= max_digits10.
 */
 template<typename FloatType>
-LLBC_JSON_HEDLEY_NON_NULL(1)
+JSON_HEDLEY_NON_NULL(1)
 void grisu2(char* buf, int& len, int& decimal_exponent, FloatType value)
 {
     static_assert(diyfp::kPrecision >= std::numeric_limits<FloatType>::digits + 3,
@@ -936,8 +923,8 @@ void grisu2(char* buf, int& len, int& decimal_exponent, FloatType value)
 @return a pointer to the element following the exponent.
 @pre -1000 < e < 1000
 */
-LLBC_JSON_HEDLEY_NON_NULL(1)
-LLBC_JSON_HEDLEY_RETURNS_NON_NULL
+JSON_HEDLEY_NON_NULL(1)
+JSON_HEDLEY_RETURNS_NON_NULL
 inline char* append_exponent(char* buf, int e)
 {
     JSON_ASSERT(e > -1000);
@@ -988,8 +975,8 @@ notation. Otherwise it will be printed in exponential notation.
 @pre min_exp < 0
 @pre max_exp > 0
 */
-LLBC_JSON_HEDLEY_NON_NULL(1)
-LLBC_JSON_HEDLEY_RETURNS_NON_NULL
+JSON_HEDLEY_NON_NULL(1)
+JSON_HEDLEY_RETURNS_NON_NULL
 inline char* format_buffer(char* buf, int len, int decimal_exponent,
                            int min_exp, int max_exp)
 {
@@ -1073,8 +1060,8 @@ format. Returns an iterator pointing past-the-end of the decimal representation.
 @note The result is NOT null-terminated.
 */
 template<typename FloatType>
-LLBC_JSON_HEDLEY_NON_NULL(1, 2)
-LLBC_JSON_HEDLEY_RETURNS_NON_NULL
+JSON_HEDLEY_NON_NULL(1, 2)
+JSON_HEDLEY_RETURNS_NON_NULL
 char* to_chars(char* first, const char* last, FloatType value)
 {
     static_cast<void>(last); // maybe unused - fix warning
@@ -1128,5 +1115,4 @@ char* to_chars(char* first, const char* last, FloatType value)
 }
 
 }  // namespace detail
-
-LLBC_NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_JSON_NAMESPACE_END

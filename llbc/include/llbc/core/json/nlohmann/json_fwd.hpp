@@ -1,28 +1,13 @@
-// The MIT License (MIT)
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
 
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-#ifndef INCLUDE_LLBC_NLOHMANN_JSON_FWD_HPP_
-#define INCLUDE_LLBC_NLOHMANN_JSON_FWD_HPP_
-
-#include "llbc/common/Common.h"
+#ifndef INCLUDE_NLOHMANN_JSON_FWD_HPP_
+#define INCLUDE_NLOHMANN_JSON_FWD_HPP_
 
 #include <cstdint> // int64_t, uint64_t
 #include <map> // map
@@ -37,7 +22,7 @@
 @see https://github.com/nlohmann
 @since version 1.0.0
 */
-LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
+NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /*!
 @brief default JSONSerializer template argument
@@ -85,15 +70,9 @@ struct ordered_map;
 /// @sa https://json.nlohmann.me/api/ordered_json/
 using ordered_json = basic_json<LLBC_NLOHMANN_NS::ordered_map>;
 
-LLBC_NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_JSON_NAMESPACE_END
 
-__LLBC_NS_BEGIN
-
-// nlohmann json
-using LLBCJson = LLBC_NLOHMANN_NS::json;
-// nlohmann ordered json
-using LLBCOrderedJson = nlohmann::ordered_json;
-
-__LLBC_NS_END
+// nlohmann json, 初始默认类型是null
+using LLBC_Json = LLBC_NLOHMANN_NS::json;
 
 #endif  // INCLUDE_NLOHMANN_JSON_FWD_HPP_

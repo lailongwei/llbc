@@ -31,6 +31,8 @@
 
 #include "llbc/core/log/LogJsonMsg.h"
 
+#include "llbc/core/json/nlohmann/json_fwd.hpp"
+
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(disable:4996)
 #endif
@@ -50,9 +52,9 @@ LLBC_LogJsonMsg::LLBC_LogJsonMsg(LLBC_Logger *logger,
 , _line(line)
 , _func(func)
 
-, _doc(*LLBC_ThreadSpecObjPool::UnsafeAcquire<LLBC_Json::Document>())
+, _doc(*LLBC_ThreadSpecObjPool::UnsafeAcquire<LLBC_Json>())
 {
-    _doc.SetObject();
+    _doc = LLBC_Json::object();
 }
 
 LLBC_LogJsonMsg::~LLBC_LogJsonMsg()
@@ -79,18 +81,20 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     if (UNLIKELY(len < 0))
         return;
 
+    // zero tail string
+    const auto fmtLen = len > LLBC_CFG_LOG_FORMAT_BUF_SIZE ? LLBC_CFG_LOG_FORMAT_BUF_SIZE : len;
+    libTls->coreTls.loggerFmtBuf[fmtLen] = '\0';
+
     // Add time.
     const sint64 now = LLBC_GetMicroseconds();
     if (LIKELY(_logger) && _logger->IsAddTimestampInJsonLog())
         this->Add("timestamp", now);
 
     // Doc add string with not copy.
-    _doc.AddMember("msg", LLBC_JsonValue(libTls->coreTls.loggerFmtBuf, len).Move(), _doc.GetAllocator());
+    _doc["msg"] = std::string(libTls->coreTls.loggerFmtBuf, fmtLen);
 
     // _doc stringify
-    LLBC_Json::StringBuffer buffer;
-    LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
-    _doc.Accept(writer);
+    const auto &dumpFmt =_doc.dump();
 
     // Output json log.
     if (LIKELY(_logger))
@@ -100,11 +104,11 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
                                  _line,
                                  _func,
                                  now,
-                                 buffer.GetString(),
-                                 buffer.GetLength());
+                                 dumpFmt.c_str(),
+                                 dumpFmt.length());
     else
         LLBC_LoggerMgrSingleton->UnInitOutput(
-            _lv, _tag, nullptr, 0, nullptr, "%s", buffer.GetString());
+            _lv, _tag, nullptr, 0, nullptr, "%s", dumpFmt.c_str());
 }
 
 __LLBC_NS_END

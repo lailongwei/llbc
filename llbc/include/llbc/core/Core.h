@@ -68,9 +68,6 @@
 // core/variant
 #include "llbc/core/variant/Variant.h"
 
-// core/rapidjson
-#include "llbc/core/rapidjson/json.h"
-
 // core/tinyxml2
 #include "llbc/core/tinyxml2/tinyxml2.h"
 
@@ -145,7 +142,7 @@
 #include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 // core/json/nlohmann
-#include "llbc/core/json/nlohmann/LLBCJsonInl.h"
+#include "llbc/core/json/nlohmann/LLBC_JsonInl.h"
 
 __LLBC_NS_BEGIN
 

@@ -367,10 +367,9 @@ void LLBC_TypedObjPool<Obj>::Collect_s(void *typedObjPool, bool deep)
 }
 
 template <typename Obj>
-LLBC_Json::Value LLBC_TypedObjPool<Obj>::GetStatistics_s(void *typedObjPool,
-                                                         LLBC_Json::MemoryPoolAllocator<> &jsonAlloc)
+LLBC_Json LLBC_TypedObjPool<Obj>::GetStatistics_s(void *typedObjPool)
 {
-    return reinterpret_cast<LLBC_TypedObjPool<Obj> *>(typedObjPool)->GetStatistics(jsonAlloc);
+    return reinterpret_cast<LLBC_TypedObjPool<Obj> *>(typedObjPool)->GetStatistics();
 }
 
 template <typename Obj>
@@ -414,78 +413,69 @@ void LLBC_TypedObjPool<Obj>::DeleteStripe(_ObjStripe *stripe)
 }
 
 template <typename Obj>
-LLBC_Json::Value LLBC_TypedObjPool<Obj>::GetStatistics(LLBC_Json::MemoryPoolAllocator<> &jsonAlloc) const
+LLBC_Json LLBC_TypedObjPool<Obj>::GetStatistics() const
 {
     __LLBC_INL_LockObjPool();
     LLBC_Defer(__LLBC_INL_UnlockObjPool());
 
     // Meta info:
     // - name.
-    LLBC_Json::Value stat(LLBC_Json::kObjectType);
-    stat.AddMember("name",
-                   LLBC_Json::Value().SetString(LLBC_GetTypeName(Obj), jsonAlloc),
-                   jsonAlloc);
+    LLBC_Json stat = LLBC_Json::object();
+    const auto nameStr = LLBC_GetTypeName(Obj);
+    stat["name"] = std::string(nameStr, strlen(nameStr));
     // - reusable.
-    stat.AddMember("reusable",
-                   LLBC_ObjReflector::IsReusable<Obj>(),
-                   jsonAlloc);
+    stat["reusable"] = LLBC_ObjReflector::IsReusable<Obj>();
 
     // Object info:
     // - obj_size: object size, in bytes.
-    stat.AddMember("obj_size", static_cast<uint32>(sizeof(Obj)), jsonAlloc);
+    stat["obj_size"] = static_cast<uint32>(sizeof(Obj));
     // - wrapped_obj_size: wrapped object size, in bytes.
-    stat.AddMember("wrapped_obj_size", static_cast<uint32>(sizeof(_WrappedObj)), jsonAlloc);
+    stat["wrapped_obj_size"]  = static_cast<uint32>(sizeof(_WrappedObj));
     // - obj_count.
     const auto objCountPerStripe = LLBC_ObjReflector::GetStripeCapacity<Obj>();
     const auto objCount = objCountPerStripe * _stripes.size();
-    stat.AddMember("obj_count", static_cast<uint32>(objCount), jsonAlloc);
+    stat["obj_count"] = static_cast<uint32>(objCount);
     // - using_obj_count.
-    stat.AddMember("using_obj_count", static_cast<uint32>(_usingObjCount), jsonAlloc);
+    stat["using_obj_count"] = static_cast<uint32>(_usingObjCount);
     // - using_obj_rate.
-    stat.AddMember("using_obj_rate",
-                   objCount != 0 ? static_cast<double>(_usingObjCount) / objCount : 0.0,
-                   jsonAlloc);
+    stat["using_obj_rate"] = objCount != 0 ? static_cast<double>(_usingObjCount) / objCount : 0.0;
     // - reusable_obj_count.
-    stat.AddMember("reusable_obj_count", _reusableObjCount, jsonAlloc);
+    stat["reusable_obj_count"] = _reusableObjCount;
     // - reusable_obj_rate.
-    stat.AddMember("reusable_obj_rate",
-                   objCount != 0 ? static_cast<double>(_reusableObjCount) / objCount : 0.0,
-                   jsonAlloc);
+    stat["reusable_obj_rate"] = objCount != 0 ? static_cast<double>(_reusableObjCount) / objCount : 0.0;
     // - free_obj_count.
     const auto freeObjCount = objCount - _usingObjCount - _reusableObjCount;
-    stat.AddMember("free_obj_count", static_cast<uint32>(freeObjCount), jsonAlloc);
+    stat["free_obj_count"] = static_cast<uint32>(freeObjCount);
     // - free_obj_rate.
-    stat.AddMember("free_obj_rate",
-                   objCount != 0 ? static_cast<double>(freeObjCount) / objCount : 0.0,
-                   jsonAlloc);
+    stat["free_obj_rate"] = objCount != 0 ? static_cast<double>(freeObjCount) / objCount : 0.0;
 
     // Stripe info:
     // - stripe_size: stripe size, in bytes.
     const auto stripeSize = sizeof(_ObjStripe) + sizeof(_WrappedObj) * objCountPerStripe;
-    stat.AddMember("stripe_size", static_cast<uint32>(stripeSize), jsonAlloc);
+    stat["stripe_size"] = static_cast<uint32>(stripeSize);
     // - obj_count_per_stripe.
-    stat.AddMember("obj_count_per_stripe", static_cast<uint32>(objCountPerStripe), jsonAlloc);
+    stat["obj_count_per_stripe"] = static_cast<uint32>(objCountPerStripe);
     // - stripe_count.
-    stat.AddMember("stripe_count", static_cast<uint32>(_stripes.size()), jsonAlloc);
+    stat["stripe_count"] = static_cast<uint32>(_stripes.size());
 
     // Memory info:
     // - using_mem: using memory, in bytes
     const auto usingMem = sizeof(Obj) * _usingObjCount;
-    stat.AddMember("using_mem", static_cast<uint32>(usingMem), jsonAlloc);
+    stat["using_mem"] = static_cast<uint32>(usingMem);
     // - reusable_mem: reusable memory, in bytes.
     const auto reusableMem = sizeof(Obj) * _reusableObjCount;
-    stat.AddMember("reusable_mem", static_cast<uint32>(reusableMem), jsonAlloc);
+    stat["reusable_mem"] = static_cast<uint32>(reusableMem);
     // - free_mem: free memory, in bytes.
     const auto totalMem = sizeof(Obj) * objCount;
-    stat.AddMember("free_mem", static_cast<uint32>(totalMem - usingMem - reusableMem), jsonAlloc);
+    stat["free_mem"] = static_cast<uint32>(totalMem - usingMem - reusableMem);
     // - total_mem: total memory, in bytes.
-    stat.AddMember("total_mem", static_cast<uint32>(totalMem), jsonAlloc);
+    stat["total_mem"] = static_cast<uint32>(totalMem);
     // - total_mem2: total memory, included objpool manage cost.
-    stat.AddMember("total_mem2",
+    stat["total_mem2"] =
                    static_cast<uint32>(sizeof(LLBC_ObjPool) + // LLBC_ObjPool memory
                                            sizeof(_ObjStripe) * _stripes.size() + // stripes memory
-                                           sizeof(_WrappedObj) * objCount), // wrapped object memory
-                   jsonAlloc);
+                                           sizeof(_WrappedObj) * objCount) // wrapped object memory
+    ;
 
     return stat;
 }
@@ -593,74 +583,70 @@ inline LLBC_String LLBC_ObjPool::GetStatistics(int statFmt) const
         }
 
          // Add typed object pools stat.
-        LLBC_Json::Document jsonDoc;
+        LLBC_Json jsonDoc;
         for (auto &typedObjPoolItem : _typedObjPools)
         {
             auto &wrappedTypedObjPool = typedObjPoolItem.second;
-            auto typedObjPoolStat = wrappedTypedObjPool->GetStatistics(wrappedTypedObjPool->typedObjPool,
-                                                                       jsonDoc.GetAllocator());
+            LLBC_Json typedObjPoolStat = wrappedTypedObjPool->GetStatistics(wrappedTypedObjPool->typedObjPool);
             stat.append_format("\n%s;%s;%d;"
                                "%u;%u;%u;%u;%.3f;%u;%.3f;%u;%.3f;"
                                "%u;%u;%u;"
                                "%u;%u;%u;%u;%u",
                                // Meta info:
                                _name.c_str(),
-                               typedObjPoolStat["name"].GetString(),
-                               typedObjPoolStat["reusable"].GetBool(),
+                               typedObjPoolStat["name"].get<std::string>().c_str(),
+                               typedObjPoolStat["reusable"].get<bool>(),
                                // Object info:
-                               typedObjPoolStat["obj_size"].GetUint(),
-                               typedObjPoolStat["wrapped_obj_size"].GetUint(),
-                               typedObjPoolStat["obj_count"].GetUint(),
-                               typedObjPoolStat["using_obj_count"].GetUint(),
-                               typedObjPoolStat["using_obj_rate"].GetDouble(),
-                               typedObjPoolStat["reusable_obj_count"].GetUint(),
-                               typedObjPoolStat["reusable_obj_rate"].GetDouble(),
-                               typedObjPoolStat["free_obj_count"].GetUint(),
-                               typedObjPoolStat["free_obj_rate"].GetDouble(),
+                               typedObjPoolStat["obj_size"].get<uint32>(),
+                               typedObjPoolStat["wrapped_obj_size"].get<uint32>(),
+                               typedObjPoolStat["obj_count"].get<uint32>(),
+                               typedObjPoolStat["using_obj_count"].get<uint32>(),
+                               typedObjPoolStat["using_obj_rate"].get<double>(),
+                               typedObjPoolStat["reusable_obj_count"].get<uint32>(),
+                               typedObjPoolStat["reusable_obj_rate"].get<double>(),
+                               typedObjPoolStat["free_obj_count"].get<uint32>(),
+                               typedObjPoolStat["free_obj_rate"].get<double>(),
                                // Stripe info:
-                               typedObjPoolStat["stripe_size"].GetUint(),
-                               typedObjPoolStat["obj_count_per_stripe"].GetUint(),
-                               typedObjPoolStat["stripe_count"].GetUint(),
+                               typedObjPoolStat["stripe_size"].get<uint32>(),
+                               typedObjPoolStat["obj_count_per_stripe"].get<uint32>(),
+                               typedObjPoolStat["stripe_count"].get<uint32>(),
                                // Memory info:
-                               typedObjPoolStat["using_mem"].GetUint(),
-                               typedObjPoolStat["reusable_mem"].GetUint(),
-                               typedObjPoolStat["free_mem"].GetUint(),
-                               typedObjPoolStat["total_mem"].GetUint(),
-                               typedObjPoolStat["total_mem2"].GetUint());
+                               typedObjPoolStat["using_mem"].get<uint32>(),
+                               typedObjPoolStat["reusable_mem"].get<uint32>(),
+                               typedObjPoolStat["free_mem"].get<uint32>(),
+                               typedObjPoolStat["total_mem"].get<uint32>(),
+                               typedObjPoolStat["total_mem2"].get<uint32>());
         }
 
         return stat;
     }
     else // Generate default format(json) stat.
     {
-        LLBC_Json::Document jsonDoc(LLBC_Json::kObjectType);
-        auto &jsonAlloc = jsonDoc.GetAllocator();
+        LLBC_Json jsonDoc = LLBC_Json::object();
 
         // Get typed object pools stat.
-        LLBC_Json::Value typedObjPoolStats(LLBC_Json::kArrayType);
+        LLBC_Json typedObjPoolStats = LLBC_Json::array();
         for (auto &item : _typedObjPools)
         {
             auto &wrappedTypedObjPool = item.second;
             auto &typedObjPool = wrappedTypedObjPool->typedObjPool;
-            typedObjPoolStats.PushBack(wrappedTypedObjPool->GetStatistics(typedObjPool, jsonAlloc),
-                                       jsonAlloc);
+            typedObjPoolStats.push_back(wrappedTypedObjPool->GetStatistics(typedObjPool));
         }
-        jsonDoc.AddMember("typed_obj_pools", typedObjPoolStats.Move(), jsonAlloc);
+        jsonDoc["typed_obj_pools"] = std::move(typedObjPoolStats);
 
         // Format.
-        LLBC_Json::StringBuffer jsonSB;
+        LLBC_String jsonSB;
         if (statFmt == LLBC_ObjPoolStatFormat::PrettyJson)
         {
-            LLBC_Json::PrettyWriter<LLBC_Json::StringBuffer> jsonWritter(jsonSB);
-            jsonDoc.Accept(jsonWritter);
+            // 缩进
+            jsonSB = jsonDoc.dump(4);
         }
         else
         {
-            LLBC_Json::Writer<LLBC_Json::StringBuffer> jsonWritter(jsonSB);
-            jsonDoc.Accept(jsonWritter);
+            jsonSB = jsonDoc.dump();
         }
 
-        return LLBC_String(jsonSB.GetString(), jsonSB.GetLength());
+        return jsonSB;
     }
 }
 
@@ -817,8 +803,7 @@ int LLBC_ObjPool::EnsureDeletionBefore()
 
 inline LLBC_String LLBC_ObjPool::GetOrderedDeleteTree(bool pretty) const
 {
-    LLBC_Json::Document jsonDoc(LLBC_Json::kArrayType);
-    auto &jsonAlloc = jsonDoc.GetAllocator();
+    LLBC_Json jsonDoc = LLBC_Json::array();
 
     __LLBC_INL_LockObjPool();
     if (_orderedDeleteNodeTree)
@@ -826,25 +811,22 @@ inline LLBC_String LLBC_ObjPool::GetOrderedDeleteTree(bool pretty) const
         for (auto it = _orderedDeleteNodeTree->begin();
              it != _orderedDeleteNodeTree->end();
              ++it)
-            jsonDoc.PushBack(
-                             it->second->GetOrderedDeleteTree( jsonDoc),
-                             jsonAlloc);
+            jsonDoc.push_back(
+                             it->second->GetOrderedDeleteTree( jsonDoc));
     }
     __LLBC_INL_UnlockObjPool();
 
-    LLBC_Json::StringBuffer jsonSB;
+    LLBC_String jsonSB;
     if (pretty)
     {
-        LLBC_Json::PrettyWriter<LLBC_Json::StringBuffer> jsonWritter(jsonSB);
-        jsonDoc.Accept(jsonWritter);
+        jsonSB = jsonDoc.dump(4);
     }
     else
     {
-        LLBC_Json::Writer<LLBC_Json::StringBuffer> jsonWriter(jsonSB);
-        jsonDoc.Accept(jsonWriter);
+        jsonSB = jsonDoc.dump();
     }
 
-    return LLBC_String(jsonSB.GetString(), jsonSB.GetLength());
+    return jsonSB;
 }
 
 inline LLBC_ObjPool::_OrderedDeleteNode::_OrderedDeleteNode(const LLBC_CString &name)
@@ -942,21 +924,17 @@ inline bool LLBC_ObjPool::_OrderedDeleteNode::IsBack(const LLBC_String &name) co
     return false;
 }
 
-inline LLBC_Json::Value LLBC_ObjPool::_OrderedDeleteNode::GetOrderedDeleteTree(LLBC_Json::Document &jsonDoc) const
+inline LLBC_Json LLBC_ObjPool::_OrderedDeleteNode::GetOrderedDeleteTree(LLBC_Json &jsonDoc) const
 {
-    LLBC_Json::Value nodeJson(LLBC_Json::kObjectType);
-    nodeJson.AddMember("type",
-                       LLBC_Json::Value().SetString(_name.c_str(),
-                                                    _name.size(), 
-                                                    jsonDoc.GetAllocator()),
-                       jsonDoc.GetAllocator());
+    LLBC_Json nodeJson = LLBC_Json::object();
+    nodeJson["type"] = std::string(_name.c_str(), _name.size());
 
     if (_backs && !_backs->empty())
     {
-        LLBC_Json::Value postNodesJson(LLBC_Json::kArrayType);
+        LLBC_Json postNodesJson = LLBC_Json::array();
         for (auto it = _backs->begin(); it != _backs->end(); ++it)
-            postNodesJson.PushBack(it->second->GetOrderedDeleteTree(jsonDoc), jsonDoc.GetAllocator());
-        nodeJson.AddMember("post_delete_types", postNodesJson, jsonDoc.GetAllocator());
+            postNodesJson.push_back(it->second->GetOrderedDeleteTree(jsonDoc));
+        nodeJson["post_delete_types"] = std::move(postNodesJson);
     }
 
     return nodeJson;

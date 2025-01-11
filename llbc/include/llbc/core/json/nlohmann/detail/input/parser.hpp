@@ -1,23 +1,10 @@
-// The MIT License (MIT)
-
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -37,8 +24,7 @@
 #include <llbc/core/json/nlohmann/detail/string_concat.hpp>
 #include <llbc/core/json/nlohmann/detail/value_t.hpp>
 
-LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
-
+NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 ////////////
@@ -171,7 +157,7 @@ class parser
     }
 
     template<typename SAX>
-    LLBC_JSON_HEDLEY_NON_NULL(2)
+    JSON_HEDLEY_NON_NULL(2)
     bool sax_parse(SAX* sax, const bool strict = true)
     {
         (void)detail::is_sax_static_asserts<SAX, BasicJsonType> {};
@@ -190,7 +176,7 @@ class parser
 
   private:
     template<typename SAX>
-    LLBC_JSON_HEDLEY_NON_NULL(2)
+    JSON_HEDLEY_NON_NULL(2)
     bool sax_parse_internal(SAX* sax)
     {
         // stack to remember the hierarchy of structured values we are parsing
@@ -208,7 +194,7 @@ class parser
                 {
                     case token_type::begin_object:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->start_object(static_cast<std::size_t>(-1))))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->start_object(static_cast<std::size_t>(-1))))
                         {
                             return false;
                         }
@@ -216,7 +202,7 @@ class parser
                         // closing } -> we are done
                         if (get_token() == token_type::end_object)
                         {
-                            if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->end_object()))
+                            if (JSON_HEDLEY_UNLIKELY(!sax->end_object()))
                             {
                                 return false;
                             }
@@ -224,19 +210,19 @@ class parser
                         }
 
                         // parse key
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(last_token != token_type::value_string))
+                        if (JSON_HEDLEY_UNLIKELY(last_token != token_type::value_string))
                         {
                             return sax->parse_error(m_lexer.get_position(),
                                                     m_lexer.get_token_string(),
                                                     parse_error::create(101, m_lexer.get_position(), exception_message(token_type::value_string, "object key"), nullptr));
                         }
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->key(m_lexer.get_string())))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->key(m_lexer.get_string())))
                         {
                             return false;
                         }
 
                         // parse separator (:)
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(get_token() != token_type::name_separator))
+                        if (JSON_HEDLEY_UNLIKELY(get_token() != token_type::name_separator))
                         {
                             return sax->parse_error(m_lexer.get_position(),
                                                     m_lexer.get_token_string(),
@@ -253,7 +239,7 @@ class parser
 
                     case token_type::begin_array:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->start_array(static_cast<std::size_t>(-1))))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->start_array(static_cast<std::size_t>(-1))))
                         {
                             return false;
                         }
@@ -261,7 +247,7 @@ class parser
                         // closing ] -> we are done
                         if (get_token() == token_type::end_array)
                         {
-                            if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->end_array()))
+                            if (JSON_HEDLEY_UNLIKELY(!sax->end_array()))
                             {
                                 return false;
                             }
@@ -279,14 +265,14 @@ class parser
                     {
                         const auto res = m_lexer.get_number_float();
 
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!std::isfinite(res)))
+                        if (JSON_HEDLEY_UNLIKELY(!std::isfinite(res)))
                         {
                             return sax->parse_error(m_lexer.get_position(),
                                                     m_lexer.get_token_string(),
                                                     out_of_range::create(406, concat("number overflow parsing '", m_lexer.get_token_string(), '\''), nullptr));
                         }
 
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->number_float(res, m_lexer.get_string())))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->number_float(res, m_lexer.get_string())))
                         {
                             return false;
                         }
@@ -296,7 +282,7 @@ class parser
 
                     case token_type::literal_false:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->boolean(false)))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->boolean(false)))
                         {
                             return false;
                         }
@@ -305,7 +291,7 @@ class parser
 
                     case token_type::literal_null:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->null()))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->null()))
                         {
                             return false;
                         }
@@ -314,7 +300,7 @@ class parser
 
                     case token_type::literal_true:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->boolean(true)))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->boolean(true)))
                         {
                             return false;
                         }
@@ -323,7 +309,7 @@ class parser
 
                     case token_type::value_integer:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->number_integer(m_lexer.get_number_integer())))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->number_integer(m_lexer.get_number_integer())))
                         {
                             return false;
                         }
@@ -332,7 +318,7 @@ class parser
 
                     case token_type::value_string:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->string(m_lexer.get_string())))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->string(m_lexer.get_string())))
                         {
                             return false;
                         }
@@ -341,7 +327,7 @@ class parser
 
                     case token_type::value_unsigned:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->number_unsigned(m_lexer.get_number_unsigned())))
+                        if (JSON_HEDLEY_UNLIKELY(!sax->number_unsigned(m_lexer.get_number_unsigned())))
                         {
                             return false;
                         }
@@ -357,7 +343,7 @@ class parser
                     }
                     case token_type::end_of_input:
                     {
-                        if (LLBC_JSON_HEDLEY_UNLIKELY(m_lexer.get_position().chars_read_total == 1))
+                        if (JSON_HEDLEY_UNLIKELY(m_lexer.get_position().chars_read_total == 1))
                         {
                             return sax->parse_error(m_lexer.get_position(),
                                                     m_lexer.get_token_string(),
@@ -406,9 +392,9 @@ class parser
                 }
 
                 // closing ]
-                if (LLBC_JSON_HEDLEY_LIKELY(last_token == token_type::end_array))
+                if (JSON_HEDLEY_LIKELY(last_token == token_type::end_array))
                 {
-                    if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->end_array()))
+                    if (JSON_HEDLEY_UNLIKELY(!sax->end_array()))
                     {
                         return false;
                     }
@@ -434,20 +420,20 @@ class parser
             if (get_token() == token_type::value_separator)
             {
                 // parse key
-                if (LLBC_JSON_HEDLEY_UNLIKELY(get_token() != token_type::value_string))
+                if (JSON_HEDLEY_UNLIKELY(get_token() != token_type::value_string))
                 {
                     return sax->parse_error(m_lexer.get_position(),
                                             m_lexer.get_token_string(),
                                             parse_error::create(101, m_lexer.get_position(), exception_message(token_type::value_string, "object key"), nullptr));
                 }
 
-                if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->key(m_lexer.get_string())))
+                if (JSON_HEDLEY_UNLIKELY(!sax->key(m_lexer.get_string())))
                 {
                     return false;
                 }
 
                 // parse separator (:)
-                if (LLBC_JSON_HEDLEY_UNLIKELY(get_token() != token_type::name_separator))
+                if (JSON_HEDLEY_UNLIKELY(get_token() != token_type::name_separator))
                 {
                     return sax->parse_error(m_lexer.get_position(),
                                             m_lexer.get_token_string(),
@@ -460,9 +446,9 @@ class parser
             }
 
             // closing }
-            if (LLBC_JSON_HEDLEY_LIKELY(last_token == token_type::end_object))
+            if (JSON_HEDLEY_LIKELY(last_token == token_type::end_object))
             {
-                if (LLBC_JSON_HEDLEY_UNLIKELY(!sax->end_object()))
+                if (JSON_HEDLEY_UNLIKELY(!sax->end_object()))
                 {
                     return false;
                 }
@@ -530,4 +516,4 @@ class parser
 };
 
 }  // namespace detail
-LLBC_NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_JSON_NAMESPACE_END

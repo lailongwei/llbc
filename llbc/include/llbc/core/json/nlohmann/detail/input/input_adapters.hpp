@@ -1,23 +1,10 @@
-// The MIT License (MIT)
-
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -40,8 +27,7 @@
 #include <llbc/core/json/nlohmann/detail/macro_scope.hpp>
 #include <llbc/core/json/nlohmann/detail/meta/type_traits.hpp>
 
-LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
-
+NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -62,7 +48,7 @@ class file_input_adapter
   public:
     using char_type = char;
 
-    LLBC_JSON_HEDLEY_NON_NULL(2)
+    JSON_HEDLEY_NON_NULL(2)
     explicit file_input_adapter(std::FILE* f) noexcept
         : m_file(f)
     {
@@ -133,7 +119,7 @@ class input_stream_adapter
     {
         auto res = sb->sbumpc();
         // set eof manually, as we don't use the istream interface.
-        if (LLBC_JSON_HEDLEY_UNLIKELY(res == std::char_traits<char>::eof()))
+        if (JSON_HEDLEY_UNLIKELY(res == std::char_traits<char>::eof()))
         {
             is->clear(is->rdstate() | std::ios::eofbit);
         }
@@ -161,7 +147,7 @@ class iterator_input_adapter
 
     typename char_traits<char_type>::int_type get_character()
     {
-        if (LLBC_JSON_HEDLEY_LIKELY(current != end))
+        if (JSON_HEDLEY_LIKELY(current != end))
         {
             auto result = char_traits<char_type>::to_int_type(*current);
             std::advance(current, 1);
@@ -198,7 +184,7 @@ struct wide_string_input_helper<BaseInputAdapter, 4>
     {
         utf8_bytes_index = 0;
 
-        if (LLBC_JSON_HEDLEY_UNLIKELY(input.empty()))
+        if (JSON_HEDLEY_UNLIKELY(input.empty()))
         {
             utf8_bytes[0] = std::char_traits<char>::eof();
             utf8_bytes_filled = 1;
@@ -256,7 +242,7 @@ struct wide_string_input_helper<BaseInputAdapter, 2>
     {
         utf8_bytes_index = 0;
 
-        if (LLBC_JSON_HEDLEY_UNLIKELY(input.empty()))
+        if (JSON_HEDLEY_UNLIKELY(input.empty()))
         {
             utf8_bytes[0] = std::char_traits<char>::eof();
             utf8_bytes_filled = 1;
@@ -287,7 +273,7 @@ struct wide_string_input_helper<BaseInputAdapter, 2>
             }
             else
             {
-                if (LLBC_JSON_HEDLEY_UNLIKELY(!input.empty()))
+                if (JSON_HEDLEY_UNLIKELY(!input.empty()))
                 {
                     const auto wc2 = static_cast<unsigned int>(input.get_character());
                     const auto charcode = 0x10000u + (((static_cast<unsigned int>(wc) & 0x3FFu) << 10u) | (wc2 & 0x3FFu));
@@ -503,5 +489,4 @@ class span_input_adapter
 };
 
 }  // namespace detail
-
-LLBC_NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_JSON_NAMESPACE_END

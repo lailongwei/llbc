@@ -1,23 +1,10 @@
-// The MIT License (MIT)
-
-// Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
-// subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
-// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//     __ _____ _____ _____
+//  __|  |   __|     |   | |  JSON for Modern C++
+// |  |  |__   |  |  | | | |  version 3.11.3
+// |_____|_____|_____|_|___|  https://github.com/nlohmann/json
+//
+// SPDX-FileCopyrightText: 2013-2023 Niels Lohmann <https://nlohmann.me>
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -42,15 +29,14 @@
 #include <llbc/core/json/nlohmann/detail/string_concat.hpp>
 #include <llbc/core/json/nlohmann/detail/value_t.hpp>
 
-LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
-
+NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
 template<typename BasicJsonType>
 inline void from_json(const BasicJsonType& j, typename std::nullptr_t& n)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_null()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_null()))
     {
         JSON_THROW(type_error::create(302, concat("type must be null, but is ", j.type_name()), &j));
     }
@@ -97,7 +83,7 @@ void get_arithmetic_value(const BasicJsonType& j, ArithmeticType& val)
 template<typename BasicJsonType>
 inline void from_json(const BasicJsonType& j, typename BasicJsonType::boolean_t& b)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_boolean()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_boolean()))
     {
         JSON_THROW(type_error::create(302, concat("type must be boolean, but is ", j.type_name()), &j));
     }
@@ -107,7 +93,7 @@ inline void from_json(const BasicJsonType& j, typename BasicJsonType::boolean_t&
 template<typename BasicJsonType>
 inline void from_json(const BasicJsonType& j, typename BasicJsonType::string_t& s)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_string()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_string()))
     {
         JSON_THROW(type_error::create(302, concat("type must be string, but is ", j.type_name()), &j));
     }
@@ -123,7 +109,7 @@ template <
         && !is_json_ref<StringType>::value, int > = 0 >
 inline void from_json(const BasicJsonType& j, StringType& s)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_string()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_string()))
     {
         JSON_THROW(type_error::create(302, concat("type must be string, but is ", j.type_name()), &j));
     }
@@ -165,7 +151,7 @@ template<typename BasicJsonType, typename T, typename Allocator,
          enable_if_t<is_getable<BasicJsonType, T>::value, int> = 0>
 inline void from_json(const BasicJsonType& j, std::forward_list<T, Allocator>& l)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_array()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_array()))
     {
         JSON_THROW(type_error::create(302, concat("type must be array, but is ", j.type_name()), &j));
     }
@@ -182,7 +168,7 @@ template<typename BasicJsonType, typename T,
          enable_if_t<is_getable<BasicJsonType, T>::value, int> = 0>
 inline void from_json(const BasicJsonType& j, std::valarray<T>& l)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_array()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_array()))
     {
         JSON_THROW(type_error::create(302, concat("type must be array, but is ", j.type_name()), &j));
     }
@@ -279,7 +265,7 @@ auto from_json(const BasicJsonType& j, ConstructibleArrayType& arr)
 j.template get<typename ConstructibleArrayType::value_type>(),
 void())
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_array()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_array()))
     {
         JSON_THROW(type_error::create(302, concat("type must be array, but is ", j.type_name()), &j));
     }
@@ -298,7 +284,7 @@ template < typename BasicJsonType, typename T, std::size_t N >
 auto from_json(BasicJsonType&& j, identity_tag<std::array<T, N>> tag)
 -> decltype(from_json_inplace_array_impl(std::forward<BasicJsonType>(j), tag, make_index_sequence<N> {}))
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_array()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_array()))
     {
         JSON_THROW(type_error::create(302, concat("type must be array, but is ", j.type_name()), &j));
     }
@@ -309,7 +295,7 @@ auto from_json(BasicJsonType&& j, identity_tag<std::array<T, N>> tag)
 template<typename BasicJsonType>
 inline void from_json(const BasicJsonType& j, typename BasicJsonType::binary_t& bin)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_binary()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_binary()))
     {
         JSON_THROW(type_error::create(302, concat("type must be binary, but is ", j.type_name()), &j));
     }
@@ -321,7 +307,7 @@ template<typename BasicJsonType, typename ConstructibleObjectType,
          enable_if_t<is_constructible_object_type<BasicJsonType, ConstructibleObjectType>::value, int> = 0>
 inline void from_json(const BasicJsonType& j, ConstructibleObjectType& obj)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_object()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_object()))
     {
         JSON_THROW(type_error::create(302, concat("type must be object, but is ", j.type_name()), &j));
     }
@@ -422,7 +408,7 @@ template<typename BasicJsonType, typename TupleRelated>
 auto from_json(BasicJsonType&& j, TupleRelated&& t)
 -> decltype(from_json_tuple_impl(std::forward<BasicJsonType>(j), std::forward<TupleRelated>(t), priority_tag<3> {}))
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_array()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_array()))
     {
         JSON_THROW(type_error::create(302, concat("type must be array, but is ", j.type_name()), &j));
     }
@@ -435,14 +421,14 @@ template < typename BasicJsonType, typename Key, typename Value, typename Compar
                                         typename BasicJsonType::string_t, Key >::value >>
 inline void from_json(const BasicJsonType& j, std::map<Key, Value, Compare, Allocator>& m)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_array()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_array()))
     {
         JSON_THROW(type_error::create(302, concat("type must be array, but is ", j.type_name()), &j));
     }
     m.clear();
     for (const auto& p : j)
     {
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!p.is_array()))
+        if (JSON_HEDLEY_UNLIKELY(!p.is_array()))
         {
             JSON_THROW(type_error::create(302, concat("type must be array, but is ", p.type_name()), &j));
         }
@@ -455,14 +441,14 @@ template < typename BasicJsonType, typename Key, typename Value, typename Hash, 
                                         typename BasicJsonType::string_t, Key >::value >>
 inline void from_json(const BasicJsonType& j, std::unordered_map<Key, Value, Hash, KeyEqual, Allocator>& m)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_array()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_array()))
     {
         JSON_THROW(type_error::create(302, concat("type must be array, but is ", j.type_name()), &j));
     }
     m.clear();
     for (const auto& p : j)
     {
-        if (LLBC_JSON_HEDLEY_UNLIKELY(!p.is_array()))
+        if (JSON_HEDLEY_UNLIKELY(!p.is_array()))
         {
             JSON_THROW(type_error::create(302, concat("type must be array, but is ", p.type_name()), &j));
         }
@@ -474,7 +460,7 @@ inline void from_json(const BasicJsonType& j, std::unordered_map<Key, Value, Has
 template<typename BasicJsonType>
 inline void from_json(const BasicJsonType& j, std_fs::path& p)
 {
-    if (LLBC_JSON_HEDLEY_UNLIKELY(!j.is_string()))
+    if (JSON_HEDLEY_UNLIKELY(!j.is_string()))
     {
         JSON_THROW(type_error::create(302, concat("type must be string, but is ", j.type_name()), &j));
     }
@@ -508,4 +494,4 @@ JSON_INLINE_VARIABLE constexpr const auto& from_json = // NOLINT(misc-definition
 }  // namespace
 #endif
 
-LLBC_NLOHMANN_JSON_NAMESPACE_END
+NLOHMANN_JSON_NAMESPACE_END
