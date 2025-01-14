@@ -21,8 +21,8 @@
 
 #pragma once
 
+#include "llbc/core/algo/Hash.h"
 #include "llbc/core/variant/VariantTraits.h"
-#include "llbc/core/objbase/KeyHashAlgorithm.h"
 
 __LLBC_NS_BEGIN
 
@@ -1285,7 +1285,9 @@ struct hash<LLBC_NS LLBC_Variant>
         else if (var.IsStr())
         {
             const LLBC_NS LLBC_Variant::Str * const &str = var.GetHolder().data.obj.str;
-            return str && !str->empty() ? LLBC_Hash(str->data(), str->size()) : LLBC_Hash(nullptr, 0);
+            return str && !str->empty() ?
+                LLBC_NS LLBC_Hash(str->data(), str->size()) :
+                    LLBC_NS LLBC_Hash(nullptr, 0);
         }
         else if (var.IsSeq())
         {

@@ -26,7 +26,6 @@ distribution.
 
 #include "llbc/common/Common.h"
 
-
 #if defined(ANDROID_NDK) || defined(__BORLANDC__) || defined(__QNXNTO__)
 #   include <ctype.h>
 #   include <limits.h>
@@ -44,6 +43,19 @@ distribution.
 #endif
 #include <stdint.h>
 
+// The inner llbc tinyxml2 namespace define.
+#define LLBC_TINYXML2_NS                 LLBC_Concat(LLBC_NS, tinyxml2::)
+
+// The inner llbc tinyxml2 namespace begin define.
+#define __LLBC_TINYXML2_NS_BEGIN         \
+    namespace LLBC_NS_NAME {             \
+        namespace tinyxml2 {             \
+
+// The inner llbc tinyxml2 namespace end define.
+#define __LLBC_TINYXML2_NS_END           \
+        }                                \
+    }                                    \
+
 /*
    TODO: intern strings instead of allocation.
 */
@@ -55,7 +67,7 @@ distribution.
         AStyle.exe --style=1tbs --indent-switches --break-closing-brackets --indent-preprocessor tinyxml2.cpp tinyxml2.h
 */
 
-__LLBC_NS_BEGIN
+__LLBC_TINYXML2_NS_BEGIN
 
 #if defined(LLBC_DEBUG)
 #   ifndef TINYXML2_DEBUG
@@ -105,8 +117,6 @@ static const int TIXML2_PATCH_VERSION = 0;
 // so there needs to be a limit in place.
 static const int TINYXML2_MAX_ELEMENT_DEPTH = 100;
 
-namespace tinyxml2
-{
 class XMLDocument;
 class XMLElement;
 class XMLAttribute;
@@ -2361,13 +2371,10 @@ private:
     XMLPrinter& operator=( const XMLPrinter& );
 };
 
-
-}	// tinyxml2
-
 #if defined(_MSC_VER)
 #   pragma warning(pop)
 #endif
 
-__LLBC_NS_END
+__LLBC_TINYXML2_NS_END
 
 #endif // TINYXML2_INCLUDED
