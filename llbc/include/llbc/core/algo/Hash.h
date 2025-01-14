@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/singleton/Singleton.h"
+#include "llbc/common/Common.h"
 
 __LLBC_NS_BEGIN
 
@@ -31,37 +31,37 @@ __LLBC_NS_BEGIN
 class LLBC_EXPORT LLBC_HashAlgo
 {
 public:
-    enum
+    enum ENUM
     {
         Begin,
-
         BKDR = Begin,
         DJB,
         SDBM,
         RS,
         JS,
-        PJ,
+        PJW,
         ELF,
         AP,
+        MurmurHash3,
 
         End,
 
         Default = LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO
     };
+
+    /**
+     * Get hash algorithm enum string.
+     * @param[in] hashAlgo - the hash algorithm.
+     * @return LLBC_CString - the enum string.
+     */
+    static LLBC_CString GetEnumStr(int hashAlgo);
 };
 
 /**
  * \brief The hash algorithms encapsulation.
  */
-class LLBC_EXPORT __LLBC_Hash
+class LLBC_EXPORT LLBC_Hasher
 {
-public:
-    /**
-     * @brief Ctor&Dtor
-     */
-    __LLBC_Hash() = default;
-    ~__LLBC_Hash() = default;
-
 public:
     /**
      * Hash specific bytes.
@@ -69,106 +69,75 @@ public:
      * @param size  - the will has bytes length.
      * @return uint32 - the hash value.
      */
-    template <int Algo = LLBC_HashAlgo::Default>
-    uint32 operator()(const void *bytes, size_t size);
+    template <LLBC_HashAlgo::ENUM HashAlgo = LLBC_HashAlgo::Default>
+    static uint32 Hash(const void *bytes, size_t size);
 
     /**
      * Hash specific bytes.
-     * @param[in] algo  - the key hash algorithm type.
-     * @param[in] bytes - the will has bytes.
-     * @param[in] size  - the will hash bytes length.
+     * @param[in] hashAlgo  - the hash algorithm type.
+     * @param[in] bytes     - the will has bytes.
+     * @param[in] size      - the will hash bytes length.
      * @return uint32 - the hash value.
      */
-    uint32 operator()(int algo, const void *bytes, size_t size);
+    static uint32 Hash(LLBC_HashAlgo::ENUM hashAlgo, const void *bytes, size_t size);
 
 private:
     /**
      * BKDR hash algorithm.
      */
-    struct _BKDRHash
-    {
-        uint32 operator()(const void *buf, size_t size) const;
-    };
+    static uint32 BKDRHash(const void *bytes, size_t size);
 
     /**
      * DJB hash algorithm.
      */
-    struct _DJBHash
-    {
-        uint32 operator()(const void *buf, size_t size) const;
-    };
+    static uint32 DJBHash(const void *bytes, size_t size);
 
     /**
      * SDBM hash algorithm.
      */
-    struct _SDBMHash
-    {
-        uint32 operator()(const void *buf, size_t size) const;
-    };
+    static uint32 SDBMHash(const void *bytes, size_t size);
 
     /**
      * RS hash algorithm.
      */
-    struct _RSHash
-    {
-        uint32 operator()(const void *buf, size_t size) const;
-    };
+    static uint32 RSHash(const void *bytes, size_t size);
 
     /**
      * JS hash algorithm.
      */
-    struct _JSHash
-    {
-        uint32 operator()(const void *buf, size_t size) const;
-    };
+    static uint32 JSHash(const void *bytes, size_t size);
 
     /**
-     * P. J. Weinberger hash algorithm.
+     * Peter J. Weinberger hash algorithm.
      */
-    struct _PJHash
-    {
-        uint32 operator()(const void *buf, size_t size) const;
-    };
+    static uint32 PJWHash(const void *bytes, size_t size);
 
     /**
      * ELF hash algorithm.
      */
-    struct _ELFHash
-    {
-        uint32 operator()(const void *buf, size_t size) const;
-    };
+    static uint32 ELFHash(const void *bytes, size_t size);
 
     /**
      * AP hash algorithm.
      */
-    struct _APHash
-    {
-        uint32 operator()(const void *buf, size_t size) const;
-    };
+    static uint32 APHash(const void *bytes, size_t size);
 
-private:
     /**
-     * Disable assignment. 
+     * MurmurHash3 hash algorithm.
      */
-    LLBC_DISABLE_ASSIGNMENT(__LLBC_Hash);
-
-private:
-    const _BKDRHash _bkdrHash{};
-    const _DJBHash _djbHash{};
-    const _SDBMHash _sdbmHash{};
-    const _RSHash _rsHash{};
-    const _JSHash _jsHash{};
-    const _PJHash _pjHash{};
-    const _ELFHash _elfHash{};
-    const _APHash _apHash{};
+    static uint32 MurmurHash3Hash(const void *bytes, size_t size);
 };
+
+/**
+ * Hash bytes.
+ * @tparam HashAlgo - the hash algorithm.
+ * @param[in] bytes - the will hash bytes.
+ * @param[in] size  - the byte size.
+ * @return - hash code.
+ */
+template <LLBC_HashAlgo::ENUM HashAlgo = LLBC_HashAlgo::MurmurHash3>
+uint32 LLBC_Hash(const void *bytes, size_t size);
 
 __LLBC_NS_END
 
-#include "llbc/core/objbase/KeyHashAlgorithmInl.h"
-
-// Singleton macro define.
-template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS __LLBC_Hash>;
-#define LLBC_Hash (*(LLBC_NS LLBC_Singleton<LLBC_NS __LLBC_Hash>::Instance()))
-
-
+#include "llbc/core/algo/HashInl.h"

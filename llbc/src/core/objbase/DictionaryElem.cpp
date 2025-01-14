@@ -24,11 +24,11 @@
 
 #include "llbc/common/Config.h"
 
+#include "llbc/core/algo/Hash.h"
 #include "llbc/core/os/OS_Console.h"
 #include "llbc/core/utils/Util_Debug.h"
 
 #include "llbc/core/objbase/Object.h"
-#include "llbc/core/objbase/KeyHashAlgorithm.h"
 #include "llbc/core/objbase/DictionaryElem.h"
 
 __LLBC_INTERNAL_NS_BEGIN

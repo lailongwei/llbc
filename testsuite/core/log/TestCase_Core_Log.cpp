@@ -81,7 +81,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
 #if LLBC_CFG_LOG_USING_WITH_STREAM
     LSLOG_DEBUG("Message type test, char: " <<'a' <<", bool: " <<true <<", uint8: " <<(uint8)8
         <<", sint16: " <<(sint16)-16 << ", uint16: " <<(uint16)16 <<", sint32: " <<-32
-        <<", uint32: " <<(uint32)32 <<", long: " <<(long)-1 <<", ulong: " <<(llbc::ulong)1
+        <<", uint32: " <<(uint32)32 <<", long: " <<(long)-1 <<", ulong: " <<(LLBC_NS ulong)1
         <<", sint64: " <<(sint64)-64 <<", uint64: " <<(uint64)64 <<", float: " <<(float)1.0
         <<", double: " <<2.0 <<", ldouble: " <<(ldouble)3.0);
 

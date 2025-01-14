@@ -24,7 +24,7 @@
 #include "llbc.h"
 
 // Define quick start factory.
-typedef ::llbc::LLBC_ITestCase *(*__QuickStartFactoryFunc)();
+typedef LLBC_NS LLBC_ITestCase *(*__QuickStartFactoryFunc)();
 typedef std::pair<const char *, __QuickStartFactoryFunc> __QuickStartFactory;
 
 // The quick start traits template class encapsulation.
@@ -35,7 +35,7 @@ struct __QuickStartTraits
     static const char *Name() { return nullptr; }
 
     // Get quick start testcase.
-    static ::llbc::LLBC_ITestCase *Create() { return nullptr; }
+    static LLBC_NS LLBC_ITestCase *Create() { return nullptr; }
 };
 
 // Quick start macros define.
@@ -65,7 +65,7 @@ struct __QuickStartTraits
             return name "(" # cls ")";                              \
         }                                                           \
                                                                     \
-        static ::llbc::LLBC_ITestCase *Create() {                   \
+        static LLBC_NS LLBC_ITestCase *Create() {                   \
             return new cls;                                         \
         }                                                           \
     };

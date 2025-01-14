@@ -91,21 +91,6 @@ LLBC_String LLBC_NumToStr(T val);
 template <typename T>
 LLBC_String LLBC_NumToStrInHex(T val);
 
-/**
- * Hash specific string.
- * @param[in] str    - the string pointer.
- * @param[in] strLen - the string length.
- * @return int - the string hash code.
- */
-LLBC_EXPORT int LLBC_HashString(const char *str, size_t strLen = -1);
-
-/**
-* Hash specific string.
-* @param[in] str    - the string.
-* @return int - the string hash code.
-*/
-LLBC_EXPORT int LLBC_HashString(const LLBC_String &str);
-
 __LLBC_NS_END
 
 #include "llbc/core/utils/Util_TextInl.h"
