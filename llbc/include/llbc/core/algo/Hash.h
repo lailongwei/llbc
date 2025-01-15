@@ -46,7 +46,7 @@ public:
 
         End,
 
-        Default = LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO
+        Default = LLBC_CFG_DEFAULT_HASH_ALGO
     };
 
     /**
