@@ -474,7 +474,7 @@ def pyllbc_forsend(opcode):
     """
     # callable opcode, it means opcode is coder
     if callable(opcode):
-        hashed_opcode = llbc.inl.HashString(opcode.__name__)
+        hashed_opcode = llbc.inl.Hash(opcode.__name__)
         return pyllbc_forsend(hashed_opcode)(opcode)
 
     # not callable, it means opcode is real opcode, parse it
@@ -498,7 +498,7 @@ def pyllbc_forrecv(*opcodes):
     """
     # opcodes[0] callable, it means opcodes[0] is coder
     if len(opcodes) == 1 and callable(opcodes[0]):
-        hashed_opcode = llbc.inl.HashString(opcodes[0].__name__)
+        hashed_opcode = llbc.inl.Hash(opcodes[0].__name__)
         return pyllbc_forrecv(hashed_opcode)(opcodes[0])
 
     # not callable, parse opcode
@@ -521,7 +521,7 @@ def pyllbc_packet(opcode):
     """
     # callable opcode, means this opcode is coder
     if callable(opcode):
-        hashed_opcode = llbc.inl.HashString(opcode.__name__)
+        hashed_opcode = llbc.inl.Hash(opcode.__name__)
         return pyllbc_packet(hashed_opcode)(opcode)
 
     # opcode not callable, parse opcode
