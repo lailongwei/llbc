@@ -52,6 +52,10 @@
 /**
  * \brief core/algo about config options define.
  */
+// string hash algorithm(case insensitive).
+// Supports: SDBM, RS, JS, PJW, ELF, BKDR, DJB, AP, MurmurHash3
+// Default: MurmurHash3
+#define LLBC_CFG_DEFAULT_HASH_ALGO                          MurmurHash3
 // Define RingBuffer init capacity.
 #define LLBC_CFG_CORE_ALGO_RING_BUFFER_DEFAULT_CAP          32
 
@@ -200,10 +204,6 @@
  */
 // Dictionary default bucket size.
 #define LLBC_CFG_OBJBASE_DICT_DFT_BUCKET_SIZE               100
-// Dictionary string key hash algorithm(case insensitive).
-// Supports: SDBM, RS, JS, PJW, ELF, BKDR, DJB, AP
-// Default: BKDR
-#define LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO                 BKDR
 
 /**
  * \brief Communication about configs.
