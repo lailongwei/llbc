@@ -23,28 +23,28 @@
 
 #include "llbc/common/PFConfig.h"
 
-// The llbc namespace define.
-#define LLBC_NAMESPACE ::llbc::
-#define LLBC_NS        LLBC_NAMESPACE
+// The llbc/llbc-internal namespace name define.
+#define LLBC_NS_NAME                  llbc
+#define LLBC_INTERNAL_NS_NAME         LLBC_Concat(__, LLBC_NS_NAME)
 
-// The llbc internal namespace  define.
-#define LLBC_INTERNAL_NAMESPACE ::__llbc::
-#define LLBC_INTERNAL_NS        LLBC_INTERNAL_NAMESPACE
-#define LLBC_INL_NS             LLBC_INTERNAL_NAMESPACE
+// The llbc/llbc-internal namespace define.
+#define LLBC_NS                       ::LLBC_NS_NAME::
+#define LLBC_INTERNAL_NS              ::LLBC_INTERNAL_NS_NAME::
+#define LLBC_INL_NS                   LLBC_INTERNAL_NS
 
-// llbc library namespace macros(begin/end) define.
-#define __LLBC_NS_BEGIN \
-    namespace llbc {    \
+// llbc library namespace begin&end macros define.
+#define __LLBC_NS_BEGIN               \
+    namespace LLBC_NS_NAME {          \
 
-#define __LLBC_NS_END   \
-    }                   \
+#define __LLBC_NS_END                 \
+    }                                 \
 
-// llbc library internal namespace macros(begin/end) define.
-#define __LLBC_INTERNAL_NS_BEGIN \
-    namespace __llbc {           \
+// llbc library internal namespace begin&end macros define.
+#define __LLBC_INTERNAL_NS_BEGIN      \
+    namespace LLBC_INTERNAL_NS_NAME { \
 
-#define __LLBC_INTERNAL_NS_END   \
-    }                            \
+#define __LLBC_INTERNAL_NS_END        \
+    }                                 \
 
 // Common return values define.
 #define LLBC_OK     (0)
@@ -75,7 +75,7 @@
 
 // NDebug/Release macro define.
 #ifndef LLBC_DEBUG
- #define LLBC_NDEBUG 1
+ #define LLBC_NDEBUG  1
  #define LLBC_RELEASE 1
 #endif
 

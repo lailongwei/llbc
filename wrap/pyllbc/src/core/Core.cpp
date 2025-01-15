@@ -76,7 +76,7 @@ void pyllbc_AddCoreMethods()
 
     // core/utils
     top->AddMethod(methods.refcnt);
-    inl->AddMethod(methods.HashString);
+    inl->AddMethod(methods.Hash);
 
     // core/event
     inl->AddMethod(methods.Event_New);

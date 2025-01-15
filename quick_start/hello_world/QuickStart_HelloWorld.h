@@ -21,8 +21,11 @@
 
 #pragma once
 
-#include "csllbc/common/Common.h"
+#include "llbc.h"
+using namespace llbc;
 
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Utils_String_Hash(const char *str, int strLen);
-
-
+class QuickStart_HelloWorld : public LLBC_BaseTestCase
+{
+public:
+    int Run(int argc, char *argv[]) override;
+};

@@ -36,6 +36,7 @@
 #include "core/os/TestCase_Core_OS_Thread.h"
 #include "core/os/TestCase_Core_OS_Console.h"
 #include "core/os/TestCase_Core_OS_Process.h"
+#include "core/algo/TestCase_Core_Algo_Hash.h"
 #include "core/algo/TestCase_Core_Algo_RingBuffer.h"
 #include "core/bundle/TestCase_Core_Bundle.h"
 #include "core/utils/TestCase_Core_Utils_Text.h"

@@ -226,35 +226,6 @@ double LLBC_Str2Double(const char *str)
 #endif
 }
 
-int LLBC_HashString(const LLBC_String &str)
-{
-    return LLBC_HashString(str.c_str(), str.length());
-}
-
-int LLBC_HashString(const char *str, size_t strLen)
-{
-    if (UNLIKELY(str == nullptr || strLen == 0))
-        return 0;
-
-    if (strLen == static_cast<size_t>(-1))
-        strLen = strlen(str);
-
-    int hashVal = 0;
-    for (size_t i = 0; i < strLen; ++i)
-    {
-#if LLBC_64BIT_PROCESSOR
-        hashVal += static_cast<int>(i * 0x31 * str[i]);
-#else
-        hashVal += i * 0x31 * str[i];
-#endif
-    }
-
-    hashVal += static_cast<int>(strLen) * str[0];
-    hashVal *= str[strLen - 1];
-
-    return hashVal;
-}
-
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)
 #endif

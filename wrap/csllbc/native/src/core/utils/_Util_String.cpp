@@ -25,9 +25,9 @@
 
 LLBC_BEGIN_C_DECL
 
-int csllbc_Utils_String_HashString(const char *str, int strLen)
+int csllbc_Utils_String_Hash(const char *str, int strLen)
 {
-    return LLBC_HashString(str, strLen);
+    return LLBC_Hash(str, strLen);
 }
 
 LLBC_END_C_DECL

@@ -19,10 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "hello_world/QuickStart_HelloWorld.h"
 
-#include "csllbc/common/Common.h"
+int QuickStart_HelloWorld::Run(int argc, char *argv[])
+{
+    // 初始化llbc框架
+    LLBC_Startup();
+    // Defer清理llbc框架
+    LLBC_Defer(LLBC_Cleanup());
 
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Utils_String_Hash(const char *str, int strLen);
+    // Print hello world, 你也可以用std::cout/printf, 用LLBC_PrintLn省去你打\n
+    LLBC_PrintLn("Hello World!");
 
-
+    return LLBC_OK;
+}

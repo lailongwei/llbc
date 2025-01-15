@@ -28,6 +28,12 @@ inline LLBC_AppEvent::LLBC_AppEvent(int evType)
 {
 }
 
+
+inline int LLBC_App::GetFPS() const
+{
+    return _fps;
+}
+
 inline bool LLBC_App::IsStopped() const
 {
     return _startPhase == LLBC_AppStartPhase::Stopped;

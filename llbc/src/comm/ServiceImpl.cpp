@@ -116,7 +116,6 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _dftProtocolFactory(dftProtocolFactory)
 
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
-, _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _begSvcTime(0)
 
 , _curPreparingComp(nullptr)
@@ -348,10 +347,6 @@ int LLBC_ServiceImpl::SetFPS(int fps)
     LLBC_LockGuard guard(_lock);
 
     _fps = fps;
-    if (_fps != static_cast<int>(LLBC_INFINITE))
-        _frameInterval = 1000 / _fps;
-    else
-        _frameInterval = 0;
 
     return LLBC_OK;
 }
@@ -1036,14 +1031,15 @@ const LLBC_ProtocolStack *LLBC_ServiceImpl::GetCodecProtocolStack(int sessionId)
 
 void LLBC_ServiceImpl::OnSvc(bool fullFrame)
 {
-    if (fullFrame && _frameInterval == 0)
+    const auto frameInterval = GetFrameInterval();
+    if (fullFrame && frameInterval == 0)
         fullFrame = false;
 
     while (UNLIKELY(_runningPhase != LLBC_ServiceRunningPhase::Started &&
                     _runningPhase != LLBC_ServiceRunningPhase::StartingComps &&
                     _runningPhase != LLBC_ServiceRunningPhase::StoppingComps))
     {
-        LLBC_DoIf(fullFrame, LLBC_Sleep(_frameInterval));
+        LLBC_DoIf(fullFrame, LLBC_Sleep(frameInterval));
         return;
     }
 
@@ -1081,8 +1077,8 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
     if (fullFrame)
     {
         const sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
-        if (elapsed >= 0 && elapsed < _frameInterval)
-            LLBC_Sleep(static_cast<int>(_frameInterval - elapsed));
+        if (elapsed >= 0 && elapsed < frameInterval)
+            LLBC_Sleep(static_cast<int>(frameInterval - elapsed));
     }
 
     // If in stopping phases(StoppingComp/Stopping) and is ExternalDrive mode, Exec cleanup.
@@ -2262,17 +2258,18 @@ void LLBC_ServiceImpl::ClearTimerScheduler()
 
 void LLBC_ServiceImpl::ProcessIdle()
 {
+    const auto frameInterval = GetFrameInterval();
     for(auto &comp : _compList)
     {
         sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
-        if (LIKELY(elapsed >= 0))
-        {
-            if (elapsed >= _frameInterval)
-                break;
+        if (UNLIKELY(elapsed < 0))
+            break;
 
-            if (comp->_runningPhase == _CompRunningPhase::LateStarted)
-                comp->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
-        }
+        if (elapsed >= frameInterval)
+            break;
+
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnIdle(LLBC_TimeSpan::FromMillis(frameInterval - elapsed));
     }
 }
 
