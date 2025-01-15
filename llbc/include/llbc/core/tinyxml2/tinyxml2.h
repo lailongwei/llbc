@@ -44,7 +44,7 @@ distribution.
 #include <stdint.h>
 
 // The inner llbc tinyxml2 namespace define.
-#define LLBC_TINYXML2_NS                 LLBC_Concat(LLBC_NS, tinyxml2::)
+#define LLBC_TINYXML2_NS                 ::LLBC_NS_NAME::tinyxml2::
 
 // The inner llbc tinyxml2 namespace begin define.
 #define __LLBC_TINYXML2_NS_BEGIN         \
