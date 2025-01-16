@@ -135,7 +135,7 @@ private:
  * @param[in] size  - the byte size.
  * @return - hash code.
  */
-template <LLBC_HashAlgo::ENUM HashAlgo = LLBC_HashAlgo::MurmurHash3>
+template <LLBC_HashAlgo::ENUM HashAlgo = LLBC_HashAlgo::Default>
 uint32 LLBC_Hash(const void *bytes, size_t size);
 
 __LLBC_NS_END
