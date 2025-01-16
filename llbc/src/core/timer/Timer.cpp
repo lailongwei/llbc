@@ -26,13 +26,14 @@
 #include "llbc/core/variant/Variant.h"
 
 #include "llbc/core/timer/Timer.h"
+#include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/TimerScheduler.h"
 
 __LLBC_NS_BEGIN
 
 LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
                        const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg,
-                       LLBC_Timer::Scheduler *scheduler)
+                       LLBC_TimerScheduler *scheduler)
 : _scheduler(scheduler)
 , _timerData(nullptr)
 
@@ -87,6 +88,13 @@ const LLBC_Variant &LLBC_Timer::GetTimerData() const
     return _data ? *_data : LLBC_Variant::nil;
 }
 
+LLBC_Time LLBC_Timer::GetTimeoutTime() const
+{
+    return _timerData ?
+        LLBC_Time::FromMillis(_timerData->timeoutTime) :
+            LLBC_Time::utcBegin;
+}
+
 int LLBC_Timer::Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &period)
 {
     // Note: Allow reschedule in <OnCancel> event meth.
@@ -102,7 +110,8 @@ int LLBC_Timer::Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &
 
     if (UNLIKELY(!_scheduler))
     {
-        _scheduler = reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler);
+        _scheduler = reinterpret_cast<LLBC_TimerScheduler *>(
+            __LLBC_GetLibTls()->coreTls.timerScheduler);
         if (UNLIKELY(!_scheduler))
         {
             LLBC_SetLastError(LLBC_ERROR_INVALID);
