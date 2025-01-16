@@ -40,8 +40,6 @@ __LLBC_NS_BEGIN
  */
 class LLBC_EXPORT LLBC_Timer
 {
-    typedef LLBC_TimerScheduler Scheduler;
-
 public:
     /**
      * Default constructor.
@@ -62,7 +60,7 @@ public:
      */
     explicit LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
                         const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg = nullptr,
-                        Scheduler *scheduler = nullptr);
+                        LLBC_TimerScheduler *scheduler = nullptr);
     virtual ~LLBC_Timer();
 
 public:
@@ -139,6 +137,12 @@ public:
     LLBC_Variant &GetTimerData();
     const LLBC_Variant &GetTimerData() const;
 
+    /**
+     * Get timeout time(only available in timeout processing).
+     * @return LLBC_Time - timeout time.
+     */
+    LLBC_Time GetTimeoutTime() const;
+
 public:
     /**
      * Timeout event handler.
@@ -208,7 +212,7 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_Timer);
 
 private:
-    Scheduler *_scheduler;
+    LLBC_TimerScheduler *_scheduler;
     LLBC_TimerData *_timerData;
 
     LLBC_Variant *_data;
