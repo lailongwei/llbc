@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/objbase/KeyHashAlgorithm.h"
+#include "llbc/common/Common.h"
 
 /**
  * Previous declare some classes.

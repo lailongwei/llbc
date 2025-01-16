@@ -21,12 +21,12 @@
 
 #include "pyllbc/common/Common.h"
 
-LLBC_EXTERN_C PyObject *_pyllbc_HashString(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_Hash(PyObject *self, PyObject *args)
 {
     char *cstr; int strLen;
     if (!PyArg_ParseTuple(args, "s#", &cstr, &strLen))
         return NULL;
 
-    int hashVal = LLBC_HashString(cstr, strLen);
+    int hashVal = LLBC_Hash(cstr, strLen);
     return PyInt_FromLong(hashVal);
 }

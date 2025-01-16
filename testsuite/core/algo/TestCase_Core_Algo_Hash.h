@@ -21,8 +21,18 @@
 
 #pragma once
 
-#include "csllbc/common/Common.h"
+#include "llbc.h"
+using namespace llbc;
 
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Utils_String_Hash(const char *str, int strLen);
+class TestCase_Core_Algo_Hash final : public LLBC_BaseTestCase
+{
+public:
+    TestCase_Core_Algo_Hash();
+    ~TestCase_Core_Algo_Hash() override;
 
+public:
+    int Run(int argc, char *argv[]) override;
 
+private:
+    int SimpleTest();
+};

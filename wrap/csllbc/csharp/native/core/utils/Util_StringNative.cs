@@ -33,6 +33,6 @@ namespace llbc
     internal partial class LLBCNative
     {
         [DllImport(NativeLibName, CallingConvention = CallingConvention.Cdecl)]
-        public extern static int csllbc_Utils_String_HashString(IntPtr str, int strLen);
+        public extern static int csllbc_Utils_String_Hash(IntPtr str, int strLen);
     }
 }

@@ -25,6 +25,7 @@
 #include "llbc/core/os/OS_Time.h"
 
 #include "llbc/core/timer/Timer.h"
+#include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/TimerScheduler.h"
 
 __LLBC_NS_BEGIN
@@ -97,6 +98,7 @@ void LLBC_TimerScheduler::Update()
         while (pseudoNow >= data->handle)
 #endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
         {
+            data->timeoutTime = now;
             ++data->repeatTimes;
             timer->OnTimeout();
 

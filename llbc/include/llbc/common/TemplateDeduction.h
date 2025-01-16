@@ -51,9 +51,7 @@ struct LLBC_IsSTLArraySpec<ArrayClassTemplate<ValueType, N>, ArrayClassTemplate>
 template <typename T>
 struct LLBC_ExtractPureType
 {
-    typedef typename std::remove_const<
-                typename std::remove_pointer<
-                    typename std::remove_reference<T>::type>::type>::type type;
+    typedef std::remove_const_t<std::remove_pointer_t< std::remove_reference_t<T>>> type;
 };
 
 /**

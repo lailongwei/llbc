@@ -81,9 +81,9 @@ const LLBC_String &LLBC_VariantType::Type2Str(int type)
 
 __LLBC_NS_END
 
-std::ostream &operator<<(std::ostream &o, const LLBC_NAMESPACE LLBC_Variant &variant)
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Variant &variant)
 {
-    LLBC_NAMESPACE LLBC_String str = variant.ToString();
+    LLBC_NS LLBC_String str = variant.ToString();
     o.write(str.c_str(), str.length());
     return o;
 }

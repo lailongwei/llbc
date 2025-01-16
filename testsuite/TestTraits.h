@@ -3,7 +3,7 @@
 
 #include "llbc.h"
 
-typedef ::llbc::LLBC_ITestCase * (*__TestCaseFactoryFunc)();
+typedef LLBC_NS LLBC_ITestCase * (*__TestCaseFactoryFunc)();
 typedef std::pair<const char*, __TestCaseFactoryFunc> __TestCaseFactory;
 
 template <class ObjType>
@@ -19,7 +19,7 @@ struct __TestCaseTraits
     {
         return nullptr;
     }
-    static ::llbc::LLBC_ITestCase* CreateTestCaseIns()
+    static LLBC_NS LLBC_ITestCase* CreateTestCaseIns()
     {
         return nullptr;
     }
@@ -46,7 +46,7 @@ struct __TestCaseTraits
     template <>                                            \
     struct __TestCaseTraits<__E_##cls>                     \
     {                                                      \
-        static ::llbc::LLBC_ITestCase* CreateTestCaseIns() \
+        static LLBC_NS LLBC_ITestCase* CreateTestCaseIns() \
         {                                                  \
             return __CreateTestCaseIns<cls>();             \
         }                                                  \

@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // API: Util_String_HashString
-LULLBC_LUA_METH int _lullbc_Util_String_HashString(lua_State *l)
+LULLBC_LUA_METH int _lullbc_Util_String_Hash(lua_State *l)
 {
     if (lua_gettop(l) < 1)
         lullbc_SetError(l, LLBC_ERROR_ARG);
@@ -33,6 +33,6 @@ LULLBC_LUA_METH int _lullbc_Util_String_HashString(lua_State *l)
         return 1;
     }
 
-    lua_pushinteger(l, LLBC_HashString(str, strLen));
+    lua_pushinteger(l, LLBC_Hash(str, strLen));
     return 1;
 }

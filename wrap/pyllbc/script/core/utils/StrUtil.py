@@ -7,9 +7,9 @@ class pyllbcStrUtil(object):
     pyllbc string util class encapcsulation.
     """
 
-    __native_hash_meth = llbc.inl.HashString
+    __native_hash_meth = llbc.inl.Hash
     @classmethod
-    def hash_string(cls, s):
+    def hash(cls, s):
         """
         hash string value
         """

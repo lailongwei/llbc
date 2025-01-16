@@ -97,7 +97,7 @@ int TestSuite_Main(int argc, char* argv[])
             continue;
         }
 
-        ::llbc::LLBC_ITestCase* test = testcaseFactory();
+        LLBC_NS LLBC_ITestCase* test = testcaseFactory();
         if (!test)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
@@ -125,7 +125,7 @@ int TestSuite_Main(int argc, char* argv[])
         }
     }
 
-    ::llbc::LLBC_Cleanup();
+    LLBC_NS LLBC_Cleanup();
     return 0;
 }
 

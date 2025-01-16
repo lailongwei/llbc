@@ -647,9 +647,9 @@ int LLBC_App::ReloadIniConfig()
 
 int LLBC_App::ReloadXmlConfig()
 {
-    ::llbc::tinyxml2::XMLDocument doc;
+    LLBC_TINYXML2_NS XMLDocument doc;
     const auto xmlLoadRet = doc.LoadFile(_cfgPath.c_str());
-    if (xmlLoadRet != ::llbc::tinyxml2::XML_SUCCESS)
+    if (xmlLoadRet != LLBC_TINYXML2_NS XML_SUCCESS)
     {
         LLBC_String customErrStr;
         customErrStr.format("load xml config file failed, file:%s, errno(tinyxml2):%d, error str:%s",
