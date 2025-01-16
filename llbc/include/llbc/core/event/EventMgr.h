@@ -33,6 +33,57 @@ __LLBC_NS_BEGIN
 /**
  * \brief The event manager class encapsulation.
  */
+class LLBC_EXPORT LLBC_EventMgrHook
+{
+public:
+    LLBC_EventMgrHook() : _evMgr(nullptr) {}
+    virtual ~LLBC_EventMgrHook() {}
+
+public:
+    /**
+     * Event manager added a listener.
+     * @param[in] evId - event Id.
+     * @param[in] stub - event deleg stub.
+     */
+    virtual void OnAddedListener(int evId, LLBC_ListenerStub stub) = 0;
+
+    /**
+     * Event manager will remove a listener.
+     * @param[in] evId - event Id.
+     * @param[in] stub - event deleg stub.
+     */
+    virtual void OnWillRemoveListener(int evId, LLBC_ListenerStub stub) = 0;
+
+    /**
+     * Event manager hook will remove.
+     */
+    virtual void OnWillRemoveEventMgrHook() = 0;
+
+protected:
+    /**
+     * Get event manager object.
+     * @return LLBC_EventMgr* - event manager object pointer.
+     */
+    LLBC_EventMgr* GetEventMgr() { return _evMgr ? _evMgr : nullptr; }
+
+private:
+    /**
+     * Associated event manager.
+     * @param[in] evMgr - event manager object.
+     */
+    void SetEventMgr(LLBC_EventMgr *evMgr) { _evMgr = evMgr; }
+
+private:
+    // Friend class.
+    friend class LLBC_EventMgr;
+
+private:
+    LLBC_EventMgr *_evMgr; // Related event manager.
+};
+
+/**
+ * \brief The event manager class encapsulation.
+ */
 class LLBC_EXPORT LLBC_EventMgr
 {
 public:
@@ -41,6 +92,21 @@ public:
      */
     LLBC_EventMgr();
     virtual ~LLBC_EventMgr();
+
+public:
+    /**
+     * Set event mgr hook.
+     * @param[in] name  - the name for hook.
+     * @param[in] hook  - event mgr hook object.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddEventMgrHook(const LLBC_CString &name, LLBC_EventMgrHook *hook);
+
+    /**
+     * Remove event mgr hook.
+     * @param[in] name  - the name for hook.
+     */
+    void RemoveEventMgrHook(const LLBC_CString &name);
 
 public:
     /**
@@ -205,7 +271,6 @@ protected:
 
     int _firing; // Firing flag.
     std::vector<int> _firingEventIds; // Firing event ids, used for prevent event fire endless loop.
-    static sint64 _maxListenerStub; // Max listener stub.
 
     std::map<int, _ListenerInfos> _id2ListenerInfos; // event id 2 listeners.
     std::map<LLBC_ListenerStub, std::pair<int, _ListenerInfos::iterator> > _stub2ListenerInfos; // stub id 2 listeners.
@@ -219,6 +284,9 @@ protected:
     std::set<int> _pendingRemoveEventIds_;
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
+
+    // Event manager hooks.
+    std::map<LLBC_String, LLBC_EventMgrHook *> _evMgrHooks;
 };
 
 __LLBC_NS_END
