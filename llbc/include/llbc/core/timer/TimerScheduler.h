@@ -22,11 +22,11 @@
 #pragma once
 
 #include "llbc/core/timer/Heap.h"
-#include "llbc/core/timer/TimerData.h"
 
 __LLBC_NS_BEGIN
 
 class LLBC_Timer;
+struct LLBC_TimerData;
 
 __LLBC_NS_END
 

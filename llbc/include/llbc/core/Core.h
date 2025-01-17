@@ -40,6 +40,7 @@
 #endif
 
 // core/algo
+#include "llbc/core/algo/Hash.h"
 #include "llbc/core/algo/RingBuffer.h"
 
 // core/bundle

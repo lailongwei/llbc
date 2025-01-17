@@ -34,7 +34,7 @@
 #define LLBC_STREAM_BEGIN_READ(stream, failRetType, failRetVal) \
     do {                                                        \
         failRetType __r_failRet = (failRetVal);                 \
-        LLBC_NAMESPACE LLBC_Stream &__r_stream = (stream)       \
+        LLBC_NS LLBC_Stream &__r_stream = (stream)              \
 
 // Deserialize macro define.
 #define LLBC_STREAM_READ(field)                                 \
@@ -73,7 +73,7 @@
 // Begin write macro define, use to simple begin write object.
 #define LLBC_STREAM_BEGIN_WRITE(stream)                         \
     do {                                                        \
-        LLBC_NAMESPACE LLBC_Stream &__w_stream = (stream)       \
+        LLBC_NS LLBC_Stream &__w_stream = (stream)              \
 
 // Serialize macro define.
 #define LLBC_STREAM_WRITE(field)                                \

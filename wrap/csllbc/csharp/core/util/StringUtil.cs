@@ -45,7 +45,7 @@ namespace llbc
             {
                 fixed (byte* ptr = &bytes[0])
                 {
-                    return LLBCNative.csllbc_Utils_String_HashString(new IntPtr(ptr), bytes.Length);
+                    return LLBCNative.csllbc_Utils_String_Hash(new IntPtr(ptr), bytes.Length);
                 }
             }
         }
