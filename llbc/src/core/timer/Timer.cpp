@@ -91,7 +91,7 @@ const LLBC_Variant &LLBC_Timer::GetTimerData() const
 LLBC_Time LLBC_Timer::GetTimeoutTime() const
 {
     return _timerData ?
-        LLBC_Time::FromMillis(_timerData->timeoutTime) :
+        LLBC_Time::FromMillis(_timerData->handle) :
             LLBC_Time::utcBegin;
 }
 
