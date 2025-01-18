@@ -40,10 +40,6 @@ struct LLBC_HIDDEN LLBC_TimerData
     // Timer handle, use to build timer heap.
     sint64 handle;
 
-    // Timeout time, in milli-seconds, valid only in
-    // timeout processing(Calling OnTimeout or timeout delegate).
-    sint64 timeoutTime;
-
     // Timer Id.
     LLBC_TimerId timerId;
 
