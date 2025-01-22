@@ -566,7 +566,7 @@ int LLBC_SetExclusive(const LLBC_String &pidFilePath)
     ssize_t readLinkRet = readlink(runingExe.c_str(), runningExeFilePath, PATH_MAX);
     LLBC_DoIf(readLinkRet != -1, runningExeFilePath[readLinkRet] = '\0');
 #endif
-    LLBC_ReturnIf(selfExeFilePath == runningExeFilePath, LLBC_FAILED);
+    LLBC_ReturnIf(strcmp(selfExeFilePath.c_str(), runningExeFilePath) == 0, LLBC_FAILED);
 
     // Try to lock pid file
     struct flock fl;
