@@ -500,7 +500,7 @@ int LLBC_SetExclusive(const LLBC_String &pidFilePath)
     pidFile.append(".pid");
 
     // Create or read-lock .pid file
-    HANDLE file = CreateFileA(pidFile.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE file = CreateFileA(pidFile.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_HIDDEN, NULL);
     LLBC_ReturnIf(file == INVALID_HANDLE_VALUE, LLBC_FAILED);
     LLBC_Defer(CloseHandle(file));
 
