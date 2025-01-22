@@ -558,7 +558,7 @@ int LLBC_SetExclusive(const LLBC_String &pidFilePath)
 
     // Open executable file by pid.
 #if LLBC_TARGET_PLATFORM_MAC
-    pidPathRet = proc_pidpath(atoi(pidBuf), runningExeFilePath, PATH_MAX);
+    int pidPathRet = proc_pidpath(atoi(pidBuf), runningExeFilePath, PATH_MAX);
     LLBC_DoIf(pidPathRet != -1, runningExeFilePath[pidPathRet] = '\0');
 #else
     llbc::LLBC_String runingExe;
