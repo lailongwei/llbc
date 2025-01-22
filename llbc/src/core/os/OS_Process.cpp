@@ -487,26 +487,15 @@ int LLBC_SetExclusive(const LLBC_String &pidFilePath)
 #if LLBC_TARGET_PLATFORM_WIN32
     static char pidBuf[MAX_FORM_KEYWORD_LENGTH + 1] = { 0 };
     static char runningExeFilePath[MAX_PATH + 1] = { 0 };
-    static char selfExeFilePath[MAX_PATH + 1] = { 0 };
 
-    // Get current exe file name
-    DWORD getModuleFileNameRet = GetModuleFileNameA(NULL, selfExeFilePath, MAX_PATH);
-    LLBC_ReturnIf(getModuleFileNameRet == 0, LLBC_FAILED);
-    selfExeFilePath[getModuleFileNameRet] = '\0';
+    // Get current execute file path
+    LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
 
-    // Set .pid file store path
-    LLBC_String exePidFilePath = pidFilePath;
-    if (exePidFilePath == "")
+    // Set .pid file path
+    LLBC_String pidFile = LLBC_Directory::Join(pidFilePath, LLBC_Directory::ModuleFileName()).append(".pid");
+    if (pidFilePath == "")
     {
-        exePidFilePath.format("%s.pid", selfExeFilePath);
-    }
-    else
-    {
-        char exeFileName[MAX_PATH];
-        int getBaseNameRet = GetModuleBaseNameA(GetCurrentProcess(), NULL, exeFileName,
-                         MAX_PATH);
-        exeFileName[getBaseNameRet] = '\0';
-        exePidFilePath.format("%s/%s.pid", pidFilePath.c_str(), exeFileName);
+        pidFile = selfExeFilePath.append(".pid");
     }
 
     // Create or read-lock .pid file
@@ -543,54 +532,40 @@ int LLBC_SetExclusive(const LLBC_String &pidFilePath)
     LPDWORD writeSize = 0;
     WriteFile(file, pidBuf, strlen(pidBuf), writeSize, NULL);
 #else // linux and macos
-    static char readBuf[MAX_INPUT];
-    static char selfExeFilePath[PATH_MAX + 1];
+    static char pidBuf[MAX_INPUT];
     static char runningExeFilePath[PATH_MAX + 1];
 
     // Get current execute file path
-#if LLBC_TARGET_PLATFORM_MAC
-    int pidPathRet = proc_pidpath(getpid(), selfExeFilePath, PATH_MAX);
-    LLBC_ReturnIf(pidPathRet == -1, LLBC_FAILED);
-    selfExeFilePath[pidPathRet] = '\0';
-#else
-    ssize_t readLinkRet = readlink("/proc/self/exe", selfExeFilePath, PATH_MAX);
-    LLBC_ReturnIf(readLinkRet == -1, LLBC_FAILED);
-    selfExeFilePath[readLinkRet] = '\0';
-#endif
+    LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
+
     // Set .pid file path
-    LLBC_String pidFile;
+    LLBC_String pidFile = LLBC_Directory::Join(pidFilePath, LLBC_Directory::ModuleFileName());
     if (pidFilePath == "")
     {
-        pidFile.format("%s.pid", selfExeFilePath);
+        pidFile = selfExeFilePath;
     }
-    else
-    {
-        const char *exeFileName = basename(selfExeFilePath);
-        LLBC_ReturnIf(!exeFileName, LLBC_FAILED);
-
-        pidFile.format("%s/%s.pid", pidFilePath.c_str(), exeFileName);
-    }
+    pidFile.append(".pid");
 
     // Open .pid file and read pid.
     int fd = open(pidFile.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR); // 可读可写，不存在时创建
     LLBC_ReturnIf(fd < 0, LLBC_FAILED);
     LLBC_Defer(close(fd););
 
-    int readRet = read(fd, readBuf, MAX_INPUT);
+    int readRet = read(fd, pidBuf, MAX_INPUT);
     LLBC_ReturnIf(readRet == -1, LLBC_FAILED);
-    readBuf[readRet] = '\0';
+    pidBuf[readRet] = '\0';
 
     // Open executable file by pid.
 #if LLBC_TARGET_PLATFORM_MAC
-    pidPathRet = proc_pidpath(atoi(readBuf), runningExeFilePath, PATH_MAX);
+    pidPathRet = proc_pidpath(atoi(pidBuf), runningExeFilePath, PATH_MAX);
     LLBC_DoIf(pidPathRet != -1, runningExeFilePath[pidPathRet] = '\0');
 #else
     llbc::LLBC_String runingExe;
-    runingExe.format("/proc/%s/exe", readBuf);
-    readLinkRet = readlink(runingExe.c_str(), runningExeFilePath, PATH_MAX);
+    runingExe.format("/proc/%s/exe", pidBuf);
+    ssize_t readLinkRet = readlink(runingExe.c_str(), runningExeFilePath, PATH_MAX);
     LLBC_DoIf(readLinkRet != -1, runningExeFilePath[readLinkRet] = '\0');
 #endif
-    LLBC_ReturnIf(strcmp(runningExeFilePath, selfExeFilePath) == 0, LLBC_FAILED);
+    LLBC_ReturnIf(selfExeFilePath == runningExeFilePath, LLBC_FAILED);
 
     // Try to lock pid file
     struct flock fl;
@@ -604,8 +579,8 @@ int LLBC_SetExclusive(const LLBC_String &pidFilePath)
     // Clear .pid file and write pid into it
     ftruncate(fd, 0);
     lseek(fd, 0, SEEK_SET);
-    snprintf(readBuf, MAX_INPUT, "%ld", (long)getpid());
-    write(fd, readBuf, strlen(readBuf) + 1);
+    snprintf(pidBuf, MAX_INPUT, "%ld", (long)getpid());
+    write(fd, pidBuf, strlen(pidBuf) + 1);
 #endif
     return LLBC_OK;
 }
