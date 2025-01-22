@@ -492,14 +492,15 @@ int LLBC_SetExclusive(const LLBC_String &pidFilePath)
     LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
 
     // Set .pid file path
-    LLBC_String pidFile = LLBC_Directory::Join(pidFilePath, LLBC_Directory::ModuleFileName()).append(".pid");
+    LLBC_String pidFile = LLBC_Directory::Join(pidFilePath, LLBC_Directory::ModuleFileName());
     if (pidFilePath == "")
     {
-        pidFile = selfExeFilePath.append(".pid");
+        pidFile = selfExeFilePath;
     }
+    pidFile.append(".pid");
 
     // Create or read-lock .pid file
-    HANDLE file = CreateFileA(exePidFilePath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE file = CreateFileA(pidFile.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     LLBC_ReturnIf(file == INVALID_HANDLE_VALUE, LLBC_FAILED);
     LLBC_Defer(CloseHandle(file));
 
@@ -515,14 +516,14 @@ int LLBC_SetExclusive(const LLBC_String &pidFilePath)
     if (processHandle != NULL)
     {
         // Get executable file path refer to pid.
-        getModuleFileNameRet = GetModuleFileNameExA(processHandle, NULL, runningExeFilePath, MAX_PATH);
+        DWORD getModuleFileNameRet = GetModuleFileNameExA(processHandle, NULL, runningExeFilePath, MAX_PATH);
         CloseHandle(processHandle);
         LLBC_ReturnIf(getModuleFileNameRet == 0, LLBC_FAILED);
         runningExeFilePath[getModuleFileNameRet] = '\0';
     }
 
     // Compare self name and running process path
-    LLBC_ReturnIf(strcmp(runningExeFilePath, selfExeFilePath) == 0, LLBC_FAILED);
+    LLBC_ReturnIf(runningExeFilePath == selfExeFilePath, LLBC_FAILED);
 
     // Clear .pid file and write pid into it
     SetFilePointer(file, 0, NULL, FILE_BEGIN);
