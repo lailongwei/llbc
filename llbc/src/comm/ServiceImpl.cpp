@@ -489,7 +489,7 @@ int LLBC_ServiceImpl::Broadcast(int opcode,
     }
 
     // Get all non-listen sessionIds.
-    static thread_local LLBC_SessionIds sessionIds;
+    thread_local LLBC_SessionIds sessionIds;
 
     _readySessionInfosLock.Lock();
     const auto readySessionInfosEndIt = _readySessionInfos.end();
