@@ -962,26 +962,26 @@ int LLBC_ServiceImpl::AddCollaborativeEventMgr(LLBC_EventMgr *evMgr)
     class _SvcEvMgrHook : public LLBC_EventMgrHook
     {
     public:
-        explicit _SvcEvMgrHook(LLBC_ServiceImpl *svc) : _service(svc) {}
+        explicit _SvcEvMgrHook(LLBC_ServiceImpl *svc) : _svc(svc) {}
 
     public:
         void OnAddedListener(int evId, LLBC_ListenerStub stub) override
         {
-            _service->OnEventMgrAddListener(GetEventMgr(), stub);
+            _svc->OnEventMgrAddListener(GetEventMgr(), stub);
         }
 
         void OnWillRemoveListener(int evId, LLBC_ListenerStub stub) override
         {
-            _service->OnEventMgrWillRemoveListener(GetEventMgr(), stub);
+            _svc->OnEventMgrWillRemoveListener(GetEventMgr(), stub);
         }
 
         void OnWillRemoveEventMgrHook() override
         {
-            _service->OnWillRemoveEventMgrHook(GetEventMgr());
+            _svc->OnWillRemoveEventMgrHook(GetEventMgr());
         }
 
     private:
-        LLBC_ServiceImpl *_service;
+        LLBC_ServiceImpl *_svc;
     };
 
     auto hook = new _SvcEvMgrHook(this);

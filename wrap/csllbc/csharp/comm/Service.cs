@@ -966,14 +966,14 @@ namespace llbc
                 if (handlePhase == PacketHandlePhase.Handle)
                 {
                     if (_excHandlers.ContainsKey(opcode))
-                        throw new LLBCException("Could not repeat set service '{0}' packet exception handler, opcode:{��}, phase: {2}", 
+                        throw new LLBCException("Could not repeat set service '{0}' packet exception handler, opcode:{1}, phase: {2}",
                             svcName, opcode, handlePhase);
                     _excHandlers.Add(opcode, excHandler);
                 }
                 else if (handlePhase == PacketHandlePhase.PreHandle)
                 {
                     if (_preExcHandlers.ContainsKey(opcode))
-                        throw new LLBCException("Could not repeat set service '{0}' packet exception handler, opcode:{��}, phase: {2}",
+                        throw new LLBCException("Could not repeat set service '{0}' packet exception handler, opcode:{1}, phase: {2}",
                             svcName, opcode, handlePhase);
                     _preExcHandlers.Add(opcode, excHandler);
                 }
