@@ -350,7 +350,7 @@ inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, const long &val)
 }
 
 template <>
-inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, const ::llbc::ulong &val)
+inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, const LLBC_NS ulong &val)
 {
     return this->SetAttr(name, static_cast<uint64>(val));
 }
@@ -364,7 +364,7 @@ inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, const sint32 &va
 template <>
 inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, const uint32 &val)
 {
-    return this->SetAttr(name, static_cast< ::llbc::ulong>(val));
+    return this->SetAttr(name, static_cast<LLBC_NS ulong>(val));
 }
 
 template <>

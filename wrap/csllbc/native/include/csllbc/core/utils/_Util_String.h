@@ -23,6 +23,6 @@
 
 #include "csllbc/common/Common.h"
 
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Utils_String_HashString(const char *str, int strLen);
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_Utils_String_Hash(const char *str, int strLen);
 
 

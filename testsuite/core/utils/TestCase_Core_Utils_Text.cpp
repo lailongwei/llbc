@@ -98,7 +98,7 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
         long longVal = -1;
         LLBC_PrintLn("LLBC_Num2Str<long>()[%ld] -> string(base:10): %s",
             longVal, LLBC_NumToStr(longVal).c_str());
-        llbc::ulong ulongVal = -1;
+        LLBC_NS ulong ulongVal = -1;
         LLBC_PrintLn("LLBC_Num2Str<ulong>()[%lu] -> string(base:10): %s",
             ulongVal, LLBC_NumToStr(ulongVal).c_str());
 

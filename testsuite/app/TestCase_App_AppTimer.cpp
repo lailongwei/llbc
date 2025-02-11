@@ -113,7 +113,16 @@ private:
         {
             _phaseBeginTime = now;
             phaseTimer.SetTimeoutHandler([phaseName](LLBC_Timer *timer) {
-                LLBC_PrintLn("- %s %s timer timeout...", LLBC_Time::Now().ToString().c_str(), phaseName);
+                const int sleepMs = LLBC_Rand(1, 5);
+                LLBC_PrintLn("- %s %s timer timeout, sleep %d ms...",
+                             LLBC_Time::Now().ToString().c_str(), phaseName, sleepMs);
+
+                LLBC_Sleep(sleepMs);
+                LLBC_PrintLn("- %s %s timer timeout, timeout time:%s, now - timeout:%s ...",
+                             LLBC_Time::Now().ToString().c_str(),
+                             phaseName,
+                             timer->GetTimeoutTime().ToString().c_str(),
+                             (LLBC_Time::Now() - timer->GetTimeoutTime()).ToString().c_str());
             });
 
             phaseTimer.Schedule(LLBC_TimeSpan::oneMillisec * 500);

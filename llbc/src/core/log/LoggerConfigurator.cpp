@@ -59,9 +59,9 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath)
     else if (ext == ".xml")
     {
         // Load xml file.
-        ::llbc::tinyxml2::XMLDocument xmlDoc;
+        LLBC_TINYXML2_NS XMLDocument xmlDoc;
         const auto xmlLoadRet = xmlDoc.LoadFile(cfgFilePath.c_str());
-        if (xmlLoadRet != ::llbc::tinyxml2::XML_SUCCESS)
+        if (xmlLoadRet != LLBC_TINYXML2_NS XML_SUCCESS)
         {
             LLBC_String customErrStr;
             customErrStr.format("load log config file failed(xml format), "
@@ -139,7 +139,7 @@ bool LLBC_LoggerConfigurator::HasSharedAsyncLoggerConfigs() const
     for (auto &configItem : _configs)
     {
         if (configItem.second->IsAsyncMode() && 
-            configItem.second->IsIndependentThread())
+            !configItem.second->IsIndependentThread())
             return true;
     }
 

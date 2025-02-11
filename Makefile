@@ -6,7 +6,7 @@
 # Determine platform name
 #****************************************************************************
 SUPPORTED_SYSTEMS := linux,darwin
-SYSTEM_NAME		  ?= $(shell echo $(shell uname) | tr "[:upper:]" "[:lower:]")
+SYSTEM_NAME       ?= $(shell echo $(shell uname) | tr "[:upper:]" "[:lower:]")
 ARCHITECTURE_NAME ?= $(shell echo $(shell uname -m) | tr "[:upper:]" "[:lower:]")
 $(if $(findstring $(SYSTEM_NAME),$(SUPPORTED_SYSTEMS)),,$(error "Unsupported system, must be one of '$(SUPPORTED_SYSTEMS)'"))
 
@@ -28,17 +28,18 @@ endif
 # some useful variables
 #****************************************************************************
 # Parse debug option
-CONFIG_OPT		?= $(shell echo $(config) | tr "[:upper:]" "[:lower:]")
+CONFIG_OPT          ?= $(shell echo $(config) | tr "[:upper:]" "[:lower:]")
 SUPPORTED_CONFIGS   :=debug32,release32,debug64,release64
 $(if $(findstring $(CONFIG_OPT),$(SUPPORTED_CONFIGS)),,$(error "Unsupported config, must be one of'$(SUPPORTED_CONFIGS)'))
-DEBUG_OPT			:= $(shell echo $(CONFIG_OPT) | tr -d "[:digit:]" | tr "[:lower:]" "[:upper:]")
+DEBUG_OPT           := $(shell echo $(CONFIG_OPT) | tr -d "[:digit:]" | tr "[:lower:]" "[:upper:]")
 
 # All make targets define
 PREMAKE_TARGET  := build_makefiles
 
-CORELIB_TARGET  := core_lib
-TEST_TARGET     := test
-WRAPS_TARGET    := wraps
+CORELIB_TARGET    := core_lib
+TEST_TARGET       := test
+QUICK_START_TARGET:= quick_start
+WRAPS_TARGET      := wraps
 
 PYWRAP_TARGET       := py_wrap
 CSWRAP_TARGET       := cs_wrap
@@ -63,25 +64,28 @@ EXE_SUFFIX      :=
 
 # Target names/paths define
 ifeq ($(DEBUG_OPT),RELEASE)
-  CORELIB_TARGET_NAME   := libllbc$(DYNLIB_SUFFIX)
-  TESTSUITE_TARGET_NAME := testsuite$(EXE_SUFFIX)
-  PYWRAP_TARGET_NAME    := llbc$(DYNLIB_SUFFIX)
-  LUWRAP_TARGET_NAME	:= lullbc$(DYNLIB_SUFFIX)
+  CORELIB_TARGET_NAME    := libllbc$(DYNLIB_SUFFIX)
+  TESTSUITE_TARGET_NAME  := testsuite$(EXE_SUFFIX)
+  QUICK_START_TARGET_NAME:= quick_start$(EXE_SUFFIX)
+  PYWRAP_TARGET_NAME     := llbc$(DYNLIB_SUFFIX)
+  LUWRAP_TARGET_NAME     := lullbc$(DYNLIB_SUFFIX)
 else
-  CORELIB_TARGET_NAME   := libllbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
-  TESTSUITE_TARGET_NAME := testsuite$(DEBUG_SUFFIX)$(EXE_SUFFIX)
-  PYWRAP_TARGET_NAME    := llbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
-  LUWRAP_TARGET_NAME	:= lullbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
+  CORELIB_TARGET_NAME    := libllbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
+  TESTSUITE_TARGET_NAME  := testsuite$(DEBUG_SUFFIX)$(EXE_SUFFIX)
+  QUICK_START_TARGET_NAME:=quick_start$(DEBUG_SUFFIX)$(EXE_SUFFIX)
+  PYWRAP_TARGET_NAME     := llbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
+  LUWRAP_TARGET_NAME     := lullbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
 endif
 
 CORELIB_TARGET_PATH    := $(ALL_TARGETS_OUTPUT)/$(CORELIB_TARGET_NAME)
 TESTSUITE_TARGET_PATH  := $(ALL_TARGETS_OUTPUT)/$(TESTSUITE_TARGET_NAME)
+QUICK_START_TARGET_PATH:= $(ALL_TARGETS_OUTPUT)/$(QUICK_START_TARGET_NAME)
 PYWRAP_TARGET_PATH     := $(ALL_TARGETS_OUTPUT)/$(PYWRAP_TARGET_NAME)
 LUWRAP_TARGET_PATH     := $(ALL_TARGETS_OUTPUT)/$(LUWRAP_TARGET_NAME)
 
 # Some variables define
-PREMAKE_PATH	:= "tools/premake"
-PREMAKE_NAME	:= "premake5_$(SYSTEM_NAME)_$(ARCHITECTURE_NAME)"
+PREMAKE_PATH := "tools/premake"
+PREMAKE_NAME := "premake5_$(SYSTEM_NAME)_$(ARCHITECTURE_NAME)"
 
 #****************************************************************************
 # all real make commands
@@ -93,22 +97,24 @@ help:
 	@echo "========================================================================="
 	@echo "  make [help]   - display this help information"
 	@echo "========================================================================="
-	@echo "  make all      - make core library, testsuite and all wrapped libraries"
-	@echo "  make $(CORELIB_TARGET) - make c++ core library"
-	@echo "  make $(TEST_TARGET)     - make c++ core library testsuite"
-	@echo "  make $(WRAPS_TARGET)    - make all language specificed warpped libraries"
-	@echo "                  now supported languages: python, csharp, lua"
-	@echo "  make $(PYWRAP_TARGET)  - make python wrapped library"
-	@echo "  make $(CSWRAP_TARGET)  - make csharp wrapped library"
-	@echo "  make $(LUWRAP_TARGET)  - make lua wrapped library"
+	@echo "  make all         - make core library, testsuite and all wrapped libraries"
+	@echo "  make $(CORELIB_TARGET)    - make c++ core library"
+	@echo "  make $(TEST_TARGET)        - make c++ core library testsuite"
+	@echo "  make $(QUICK_START_TARGET) - make c++ core library quick start demos"
+	@echo "  make $(WRAPS_TARGET)       - make all language specificed warpped libraries"
+	@echo "                               now supported languages: python, csharp, lua"
+	@echo "  make $(PYWRAP_TARGET)     - make python wrapped library"
+	@echo "  make $(CSWRAP_TARGET)     - make csharp wrapped library"
+	@echo "  make $(LUWRAP_TARGET)     - make lua wrapped library"
 	@echo "========================================================================="
-	@echo "  make clean          - remove all object directories and target files"
-	@echo "  make clean_$(CORELIB_TARGET) - remove all '$(CORELIB_TARGET)' object directories and target files"
-	@echo "  make clean_$(TEST_TARGET)     - remove all '$(TEST_TARGET)' object directories and target files"
-	@echo "  make clean_$(WRAPS_TARGET)    - remove all '$(WRAPS_TARGET)' object directories and target files"
-	@echo "  make clean_$(PYWRAP_TARGET)  - remove all '$(PYWRAP_TARGET)' object directories and target files"
-	@echo "  make clean_$(CSWRAP_TARGET)  - remove all '$(CSWRAP_TARGET)' object directories and target files"
-	@echo "  make clean_$(LUWRAP_TARGET)  - remove all '$(LUWRAP_TARGET)' object directories and target files"
+	@echo "  make clean             - remove all object directories and target files"
+	@echo "  make clean_$(CORELIB_TARGET)    - remove all '$(CORELIB_TARGET)' object directories and target files"
+	@echo "  make clean_$(TEST_TARGET)        - remove all '$(TEST_TARGET)' object directories and target files"
+	@echo "  make clean_$(QUICK_START_TARGET) - remove all '$(QUICK_START_TARGET)' object directories and target files"
+	@echo "  make clean_$(WRAPS_TARGET)       - remove all '$(WRAPS_TARGET)' object directories and target files"
+	@echo "  make clean_$(PYWRAP_TARGET)     - remove all '$(PYWRAP_TARGET)' object directories and target files"
+	@echo "  make clean_$(CSWRAP_TARGET)     - remove all '$(CSWRAP_TARGET)' object directories and target files"
+	@echo "  make clean_$(LUWRAP_TARGET)     - remove all '$(LUWRAP_TARGET)' object directories and target files"
 	@echo "========================================================================="
 	@echo "  make install          - install c++ core library and all wrapped libraries to system directory"
 	@echo "  make install_$(CORELIB_TARGET) - install c++ core library to system directory"
@@ -120,7 +126,7 @@ help:
 	@echo "  make tar      - tarball llbc framework(included core library, testsuite"
 	@echo "                  codes and all language specificed wrapped libraries)"
 
-all: $(PREMAKE_TARGET) $(CORELIB_TARGET) $(TEST_TARGET) $(ALL_WRAP_TARGETS)
+all: $(PREMAKE_TARGET) $(CORELIB_TARGET) $(TEST_TARGET) $(QUICK_START_TARGET) $(ALL_WRAP_TARGETS)
 
 $(PREMAKE_TARGET):
 	@(cd $(PREMAKE_PATH) && ./$(PREMAKE_NAME) $(PREMAKE_ACTION))
@@ -130,6 +136,9 @@ $(CORELIB_TARGET): $(PREMAKE_TARGET)
 
 $(TEST_TARGET): $(CORELIB_TARGET)
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f testsuite.make
+
+$(QUICK_START_TARGET): $(CORELIB_TARGET)
+	$(MAKE) -C build/$(PREMAKE_ACTION) -f quick_start.make
 
 $(WRAPS_TARGET): $(ALL_WRAP_TARGETS)
 $(PYWRAP_TARGET): $(CORELIB_TARGET)
@@ -145,7 +154,7 @@ $(LUWRAP_LUAEXE_TARGET): $(LUWRAP_LUALIB_TARGET)
 $(LUWRAP_TARGET): $(CORELIB_TARGET) $(LUWRAP_LUALIB_TARGET) $(LUWRAP_LUAEXE_TARGET)
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc.make
 
-clean: $(addprefix clean_,$(CORELIB_TARGET) $(TEST_TARGET) $(WRAPS_TARGET))
+clean: $(addprefix clean_,$(CORELIB_TARGET) $(TEST_TARGET) $(QUICK_START_TARGET) $(WRAPS_TARGET))
 	@$(shell find ./ -name "._*" -exec rm {} \;)
 	@$(shell find ./ -name ".DS_Store" -exec rm {} \;)
 	@$(shell find ./ -type f -name "*.buildlog" -exec rm {} \;)
@@ -155,6 +164,9 @@ clean_$(CORELIB_TARGET):
 
 clean_$(TEST_TARGET):
 	@(if [ -e build/$(PREMAKE_ACTION)/testsuite.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f testsuite.make clean; fi)
+
+clean_$(QUICK_START_TARGET):
+	@(if [ -e build/$(PREMAKE_ACTION)/quick_start.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f quick_start.make clean; fi)
 
 clean_$(WRAPS_TARGET): $(addprefix clean_,$(ALL_WRAP_TARGETS))
 clean_$(PYWRAP_TARGET):

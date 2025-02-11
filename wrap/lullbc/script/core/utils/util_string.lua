@@ -8,6 +8,6 @@ function llbc.hash(obj)
     elseif objType == 'nil' then
         return 0
     else
-        return _llbc.Util_String_HashString(obj)
+        return _llbc.Util_String_Hash(obj)
     end
 end

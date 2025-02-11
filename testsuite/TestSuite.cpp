@@ -32,9 +32,9 @@
     {                                                                \
         int olcClr = LLBC_GetConsoleColor(stdout);                   \
         LLBC_SetConsoleColor(stdout, color);                         \
-        LLBC_NS __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__); \
+        __LLBC_FilePrint(false, stdout, fmt, ##__VA_ARGS__);         \
         LLBC_SetConsoleColor(stdout, olcClr);                        \
-        LLBC_NS __LLBC_FilePrint(false, stdout, "\n");               \
+        __LLBC_FilePrint(false, stdout, "\n");                       \
     } while (0);
 
 #define __ClearInputBuf()                           \
@@ -97,7 +97,7 @@ int TestSuite_Main(int argc, char* argv[])
             continue;
         }
 
-        ::llbc::LLBC_ITestCase* test = testcaseFactory();
+        LLBC_NS LLBC_ITestCase* test = testcaseFactory();
         if (!test)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red, "unimplemented test case.");
@@ -125,7 +125,7 @@ int TestSuite_Main(int argc, char* argv[])
         }
     }
 
-    ::llbc::LLBC_Cleanup();
+    LLBC_NS LLBC_Cleanup();
     return 0;
 }
 

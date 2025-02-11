@@ -47,7 +47,7 @@ void LLBC_VariantUtil::Ini2Variant(const LLBC_Ini &ini, LLBC_Variant &var)
     }
 }
 
-void LLBC_VariantUtil::Xml2Variant(const ::llbc::tinyxml2::XMLDocument &doc, LLBC_Variant &var)
+void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLDocument &doc, LLBC_Variant &var)
 {
     if (var.IsDict())
         var.Clear();
@@ -69,7 +69,7 @@ void LLBC_VariantUtil::Xml2Variant(const ::llbc::tinyxml2::XMLDocument &doc, LLB
     }
 }
 
-void LLBC_VariantUtil::Xml2Variant(const ::llbc::tinyxml2::XMLElement &elem, LLBC_Variant &var)
+void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLElement &elem, LLBC_Variant &var)
 {
     if (var.IsDict())
         var.Clear();
