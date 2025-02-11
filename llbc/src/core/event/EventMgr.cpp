@@ -32,7 +32,38 @@
 #include "llbc/core/event/EventMgr.h"
 
 __LLBC_NS_BEGIN
-    sint64 LLBC_EventMgr::_maxListenerStub = 1;
+static sint64 _maxListenerStub = 1;
+
+int LLBC_EventMgr::AddEventMgrHook(const LLBC_CString &name, LLBC_EventMgrHook *hook)
+{
+    if (name.empty() || !hook)
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    if (hook->GetEventMgr() || !_evMgrHooks.emplace(name, hook).second)
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+
+    hook->SetEventMgr(this);
+    return LLBC_OK;
+}
+
+void LLBC_EventMgr::RemoveEventMgrHook(const LLBC_CString &name)
+{
+    auto it = _evMgrHooks.find(name);
+    if (it == _evMgrHooks.end())
+        return;
+
+    auto hook = it->second;
+    _evMgrHooks.erase(it);
+
+    hook->OnWillRemoveEventMgrHook();
+    delete hook;
+}
 
 LLBC_EventMgr::_ListenerInfo::_ListenerInfo()
 : evId(0)
@@ -49,7 +80,6 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
 
 LLBC_EventMgr::LLBC_EventMgr()
 : _firing(0)
-
 , _pendingRemoveAllListeners(false)
 {
 }
@@ -60,6 +90,13 @@ LLBC_EventMgr::~LLBC_EventMgr()
     ASSERT(!IsFiring() && "Not allow delete LLBC_EventMgr when event firing");
     // Assert: Make sure pending event operations is empty.
     ASSERT(_pendingEventOps.empty() && "llbc framework internal error: _pendingEventOps is not empty!");
+
+    // Recycle all hooks.
+    for (auto &item : _evMgrHooks)
+    {
+        item.second->OnWillRemoveEventMgrHook();
+        delete item.second;
+    }
 
     // Recycle all listener infos.
     for (auto it = _id2ListenerInfos.begin(); it != _id2ListenerInfos.end(); ++it)
@@ -146,7 +183,11 @@ int LLBC_EventMgr::RemoveListener(int id)
 
     _ListenerInfos &listenerInfos = idIt->second;
     for (auto it = listenerInfos.begin(); it != listenerInfos.end(); ++it)
+    {
+        for (auto &item : _evMgrHooks)
+            item.second->OnWillRemoveListener(id, (*it)->stub);
         _stub2ListenerInfos.erase((*it)->stub);
+    }
 
     LLBC_STLHelper::RecycleContainer(listenerInfos);
     _id2ListenerInfos.erase(idIt);
@@ -187,6 +228,9 @@ int LLBC_EventMgr::RemoveListener(const LLBC_ListenerStub &stub)
     const int evId = stubIt->second.first;
     const auto idIt = _id2ListenerInfos.find(evId);
     _ListenerInfos &listenerInfos = idIt->second;
+
+    for (auto &item : _evMgrHooks)
+        item.second->OnWillRemoveListener(evId, stub);
 
     _ListenerInfos::iterator &listenerIt = stubIt->second.second;
     LLBC_Recycle(*listenerIt);
@@ -398,6 +442,9 @@ int LLBC_EventMgr::AddListenerInfo(_ListenerInfo *listenerInfo)
 
     _stub2ListenerInfos[listenerInfo->stub] = std::make_pair(listenerInfo->evId, --listenerInfos.end());
 
+    for (auto &item : _evMgrHooks)
+        item.second->OnAddedListener(listenerInfo->evId, listenerInfo->stub);
+  
     return LLBC_OK;
 }
 

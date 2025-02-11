@@ -118,6 +118,8 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _begSvcTime(0)
 
+, _curPreparingComp(nullptr)
+
 // Service extend functions about members.
 , _releasePoolStack(nullptr)
 
@@ -949,6 +951,45 @@ int LLBC_ServiceImpl::AddComponentEvent(int eventType, const LLBC_Variant &event
     }
 
     return Push(LLBC_SvcEvUtil::BuildComponentEventEv(eventType, eventParams));
+}
+
+int LLBC_ServiceImpl::AddCollaborativeEventMgr(LLBC_EventMgr *evMgr)
+{
+    // Check service running phase.
+    __LLBC_INL_CHECK_RUNNING_PHASE_EQ(NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+
+    // Service event manager hook.
+    class _SvcEvMgrHook : public LLBC_EventMgrHook
+    {
+    public:
+        explicit _SvcEvMgrHook(LLBC_ServiceImpl *svc) : _svc(svc) {}
+
+    public:
+        void OnAddedListener(int evId, LLBC_ListenerStub stub) override
+        {
+            _svc->OnEventMgrAddListener(GetEventMgr(), stub);
+        }
+
+        void OnWillRemoveListener(int evId, LLBC_ListenerStub stub) override
+        {
+            _svc->OnEventMgrWillRemoveListener(GetEventMgr(), stub);
+        }
+
+        void OnWillRemoveEventMgrHook() override
+        {
+            _svc->OnWillRemoveEventMgrHook(GetEventMgr());
+        }
+
+    private:
+        LLBC_ServiceImpl *_svc;
+    };
+
+    auto hook = new _SvcEvMgrHook(this);
+    auto ret = evMgr->AddEventMgrHook(GetName(), hook);
+    if (ret != LLBC_OK)
+        delete hook;
+
+    return ret;
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
@@ -1876,36 +1917,38 @@ void LLBC_ServiceImpl::HandleEv_ComponentEvent(LLBC_ServiceEvent &_)
 }
 
 // Define comp init macro.
-#define __LLBC_Inl_InitComp(comp, initMeth, toPhase, failSetErrno)        \
-    {                                                                     \
-        while (true) {                                                    \
-            bool initFinished = true;                                     \
-            LLBC_SetLastError(LLBC_ERROR_SUCCESS);                        \
-            if (comp->initMeth(initFinished) != LLBC_OK) {                \
-                if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)            \
-                    LLBC_SetLastError(failSetErrno);                      \
-                                                                          \
-                _startErrNo = LLBC_GetLastError();                        \
-                _startSubErrNo = LLBC_GetSubErrorNo();                    \
-                                                                          \
-                break;                                                    \
-            }                                                             \
-                                                                          \
-            if (initFinished) {                                           \
-                comp->_runningPhase = _CompRunningPhase::toPhase;         \
-                break;                                                    \
-            }                                                             \
-                                                                          \
-            if (_CompRunningPhase::toPhase >= _CompRunningPhase::Started) \
-                OnSvc(false);                                             \
-            LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);                  \
-        }                                                                 \
-                                                                          \
-        if (comp->_runningPhase != _CompRunningPhase::toPhase) {          \
-            compsInitSucc = false;                                        \
-            break;                                                        \
-        }                                                                 \
-    }                                                                     \
+#define __LLBC_Inl_InitComp(comp, initMeth, toPhase, failSetErrno)                          \
+    {                                                                                       \
+        while (true) {                                                                      \
+            bool initFinished = true;                                                       \
+            LLBC_SetLastError(LLBC_ERROR_SUCCESS);                                          \
+            _curPreparingComp = comp;                                                       \
+            if (comp->initMeth(initFinished) != LLBC_OK) {                                  \
+                if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)                              \
+                    LLBC_SetLastError(failSetErrno);                                        \
+                                                                                            \
+                _startErrNo = LLBC_GetLastError();                                          \
+                _startSubErrNo = LLBC_GetSubErrorNo();                                      \
+                                                                                            \
+                break;                                                                      \
+            }                                                                               \
+            _curPreparingComp = nullptr;                                                    \
+                                                                                            \
+            if (initFinished) {                                                             \
+                comp->_runningPhase = _CompRunningPhase::toPhase;                           \
+                break;                                                                      \
+            }                                                                               \
+                                                                                            \
+            if (_CompRunningPhase::toPhase >= _CompRunningPhase::Started)                   \
+                OnSvc(false);                                                               \
+            LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);                                    \
+        }                                                                                   \
+        if (comp->_runningPhase != _CompRunningPhase::toPhase) {                            \
+            compsInitSucc = false;                                                          \
+            RemoveListenerStubByCompAndPhase(comp, static_cast<int>(comp->_runningPhase));  \
+            break;                                                                          \
+        }                                                                                   \
+    }                                                                                       \
 
 int LLBC_ServiceImpl::InitComps()
 {
@@ -1958,17 +2001,18 @@ int LLBC_ServiceImpl::InitComps()
 }
 
 // Define component destroy macro.
-#define __LLBC_Inl_DestoryComp(comp, destroyMeth, toPhase)    \
-    while (true) {                                            \
-        bool destroyFinished = true;                          \
-        comp->destroyMeth(destroyFinished);                   \
-        if (destroyFinished) {                                \
-            comp->_runningPhase = _CompRunningPhase::toPhase; \
-            break;                                            \
-        }                                                     \
-                                                              \
-        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);           \
-    }                                                         \
+#define __LLBC_Inl_DestoryComp(comp, destroyMeth, toPhase)                                      \
+    while (true) {                                                                              \
+        RemoveListenerStubByCompAndPhase(comp, static_cast<int>(_CompRunningPhase::toPhase));   \
+        bool destroyFinished = true;                                                            \
+        comp->destroyMeth(destroyFinished);                                                     \
+        if (destroyFinished) {                                                                  \
+            comp->_runningPhase = _CompRunningPhase::toPhase;                                   \
+            break;                                                                              \
+        }                                                                                       \
+                                                                                                \
+        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);                                             \
+    }                                                                                           \
 
 void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
 {
@@ -2070,6 +2114,9 @@ int LLBC_ServiceImpl::StartComps()
 
 void LLBC_ServiceImpl::StopComps()
 {
+    // Before before-stop.
+    RemoveListenerStubByCompAndPhase(nullptr, static_cast<int>(_CompRunningPhase::LateStarted));
+
     // Before-Stop comps.
     for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
     {
@@ -2087,8 +2134,12 @@ void LLBC_ServiceImpl::StopComps()
     }
 
     // Update _runningPhase to <Stopping> phase, if in <StoppingComps> phase.
+    // And clean up the remaining listener stub.
     if (_runningPhase == LLBC_ServiceRunningPhase::StoppingComps)
+    {
         _runningPhase = LLBC_ServiceRunningPhase::Stopping;
+        RemoveListenerStubByCompAndPhase(nullptr, static_cast<int>(_CompRunningPhase::LateStarted));
+    }
 
     // Stop poller mgr.
     _pollerMgr.Stop();
@@ -2348,6 +2399,110 @@ LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(int sessionId,
     return LockableSend(packet, lock, checkRunningPhase, checkSessionValidity);
 }
 
+void LLBC_ServiceImpl::OnEventMgrAddListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub)
+{
+    // Only phase in [InitingComps, StoppingComps] can add listener.
+    if (_runningPhase < LLBC_ServiceRunningPhase::InitingComps ||
+        _runningPhase > LLBC_ServiceRunningPhase::StoppingComps)
+        return;
+
+    if (_destroyingEvMgrs.find(evMgr) != _destroyingEvMgrs.end())
+        return;
+
+    auto &stub2Infos = _evMgr2StubInfos[evMgr];
+    ASSERT(stub2Infos.find(stub) == stub2Infos.end() && "llbc framework internal error");
+
+    auto curPhase = static_cast<int>(_curPreparingComp ?
+            _curPreparingComp->_runningPhase :
+            _CompRunningPhase::LateStarted);
+    auto it = stub2Infos.emplace(stub, _ManagedStubInfo(curPhase, _curPreparingComp, evMgr, stub));
+    _phaseCompStubInfos[curPhase][_curPreparingComp].emplace(&it.first->second);
+}
+
+void LLBC_ServiceImpl::OnEventMgrWillRemoveListener(LLBC_EventMgr *evMgr, LLBC_ListenerStub stub)
+{
+    // Only phase in [InitingComps, StoppingComps] can remove listener.
+    if (_runningPhase < LLBC_ServiceRunningPhase::InitingComps ||
+        _runningPhase > LLBC_ServiceRunningPhase::StoppingComps)
+        return;
+
+    if (stub == _removingStub || _destroyingEvMgrs.find(evMgr) != _destroyingEvMgrs.end())
+        return;
+
+    // Check this event manager and stub in _evMgr2StubInfos.
+    auto itStub2Info = _evMgr2StubInfos.find(evMgr);
+    if (itStub2Info == _evMgr2StubInfos.end())
+        return;
+    auto &stub2Info = itStub2Info->second;
+    auto itInfo = stub2Info.find(stub);
+    if (itInfo == stub2Info.end())
+        return;
+
+    // Remove stub info from _phaseCompStubInfos.
+    auto info = itInfo->second;
+    auto &comp2Info = _phaseCompStubInfos[info.phase];
+    auto itInfos = comp2Info.find(info.comp);
+    itInfos->second.erase(&info);
+    if (itInfos->second.empty())
+        comp2Info.erase(itInfos);
+
+    stub2Info.erase(itInfo);
+    if (stub2Info.empty())
+        _evMgr2StubInfos.erase(itStub2Info);
+}
+
+void LLBC_ServiceImpl::OnWillRemoveEventMgrHook(llbc::LLBC_EventMgr *evMgr)
+{
+    auto itStub2Info = _evMgr2StubInfos.find(evMgr);
+    if (itStub2Info == _evMgr2StubInfos.end())
+        return;
+
+    _destroyingEvMgrs.emplace(evMgr);
+
+    for (auto &itStubInfo : itStub2Info->second)
+    {
+        auto &stubInfo = itStubInfo.second;
+        auto &comp2Info = _phaseCompStubInfos[stubInfo.phase];
+        auto itInfos = comp2Info.find(stubInfo.comp);
+        itInfos->second.erase(&stubInfo);
+        if (itInfos->second.empty())
+            comp2Info.erase(itInfos);
+    }
+
+    itStub2Info->second.clear();
+    if (itStub2Info->second.empty())
+        _evMgr2StubInfos.erase(itStub2Info);
+}
+
+void LLBC_ServiceImpl::RemoveListenerStubByCompAndPhase(LLBC_Component *comp, int phase)
+{
+    auto &comp2Info = _phaseCompStubInfos[phase];
+    if (comp2Info.empty())
+        return;
+
+    auto itComp = comp2Info.find(comp);
+    if (itComp == comp2Info.end())
+        return;
+
+    for(const auto &stubInfo : itComp->second)
+    {
+        if (_destroyingEvMgrs.find(stubInfo->evMgr) != _destroyingEvMgrs.end())
+            continue;
+
+        auto stub = _removingStub = stubInfo->stub;
+
+        auto itStub2Infos = _evMgr2StubInfos.find(stubInfo->evMgr);
+        itStub2Infos->second.erase(stub);
+        if (itStub2Infos->second.empty())
+            _evMgr2StubInfos.erase(itStub2Infos);
+
+        stubInfo->evMgr->RemoveListener(stub);
+
+        _removingStub = 0;
+    }
+    comp2Info.erase(itComp);
+}
+
 LLBC_ServiceImpl::_ReadySessionInfo::_ReadySessionInfo(int sessionId,
                                                        int acceptSessionId,
                                                        bool isListenSession,
@@ -2363,6 +2518,17 @@ LLBC_ServiceImpl::_ReadySessionInfo::~_ReadySessionInfo()
 {
     if (codecStack)
         delete codecStack;
+}
+
+LLBC_ServiceImpl::_ManagedStubInfo::_ManagedStubInfo(int phase,
+                                                     LLBC_Component *comp,
+                                                     LLBC_EventMgr *evMgr,
+                                                     LLBC_ListenerStub &stub)
+: phase(phase)
+, comp(comp)
+, evMgr(evMgr)
+, stub(stub)
+{
 }
 
 __LLBC_NS_END
