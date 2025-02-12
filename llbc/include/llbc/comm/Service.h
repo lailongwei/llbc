@@ -227,9 +227,10 @@ public:
 
     /**
      * Stop the service.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return failed.
      */
-    virtual int Stop() = 0;
+    virtual int Stop(bool destroyComp = false) = 0;
 
 public:
     /**

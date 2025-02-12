@@ -343,16 +343,18 @@ public:
      * Stop service by service Id.
      * @param[in] id  - service Id.
      * @param[in] del - delete service or not, default is true.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int StopService(int id, bool del = true);
+    int StopService(int id, bool del = true, bool destroyComp = false);
     /**
      * Stop service by service name.
      * @param[in] name - service name.
      * @param[in] del  - delete service or not, default is true.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int StopService(const LLBC_CString &name, bool del = true);
+    int StopService(const LLBC_CString &name, bool del = true, bool destroyComp = false);
 
 private:
     /**

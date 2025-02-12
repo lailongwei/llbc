@@ -104,6 +104,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 , _serviceBeginLoop(false)
 , _runningPhase(LLBC_ServiceRunningPhase::NotStarted)
+, _destroyCompWhenStop(false)
 
 , _startErrNo(0)
 , _startSubErrNo(0)
@@ -155,9 +156,9 @@ LLBC_ServiceImpl::~LLBC_ServiceImpl()
         ASSERT(_runningPhase == LLBC_ServiceRunningPhase::NotStarted ||
                LLBC_GetCurrentThreadId() == _svcThreadId);
 
-    // Stop service and destroy comps).
-    Stop();
-    DestroyComps(false);
+    // Stop service and destroy comps.
+    Stop(_destroyCompWhenStop);
+    LLBC_DoIf(_destroyCompWhenStop == false, DestroyComps(false));
 
     // Clear members.
     LLBC_STLHelper::DeleteContainer(_coderFactories);
@@ -288,7 +289,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     return LLBC_OK;
 }
 
-int LLBC_ServiceImpl::Stop()
+int LLBC_ServiceImpl::Stop(bool destroyComp)
 {
     // If service not in <Started> phase, return failed.
     _lock.Lock();
@@ -306,6 +307,8 @@ int LLBC_ServiceImpl::Stop()
 
     // Update service phase to <Stopping>.
     _runningPhase = LLBC_ServiceRunningPhase::StoppingComps;
+    _destroyCompWhenStop = destroyComp;
+
     _lock.Unlock();
 
     // Exec stop logic.
@@ -1271,6 +1274,9 @@ void LLBC_ServiceImpl::Cleanup()
 
     // Stop comps.
     StopComps();
+
+    // Destroy comps if needed.
+    LLBC_DoIf(_destroyCompWhenStop, DestroyComps());
 
     // Post-Stop.
     PostStop();

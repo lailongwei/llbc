@@ -69,14 +69,14 @@ inline LLBC_Service *LLBC_App::GetService(const LLBC_CString &name) const
     return _services.GetService(name);
 }
 
-inline int LLBC_App::StopService(int id, bool del)
+inline int LLBC_App::StopService(int id, bool del, bool destroyComp)
 {
-    return _services.Stop(id, del);
+    return _services.Stop(id, del, destroyComp);
 }
 
-inline int LLBC_App::StopService(const LLBC_CString &name, bool del)
+inline int LLBC_App::StopService(const LLBC_CString &name, bool del, bool destroyComp)
 {
-    return _services.Stop(name, del);
+    return _services.Stop(name, del, destroyComp);
 }
 
 __LLBC_NS_END
