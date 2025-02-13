@@ -1958,17 +1958,19 @@ int LLBC_ServiceImpl::InitComps()
 }
 
 // Define component destroy macro.
-#define __LLBC_Inl_DestoryComp(comp, destroyMeth, toPhase)    \
-    while (true) {                                            \
-        bool destroyFinished = true;                          \
-        comp->destroyMeth(destroyFinished);                   \
-        if (destroyFinished) {                                \
-            comp->_runningPhase = _CompRunningPhase::toPhase; \
-            break;                                            \
-        }                                                     \
-                                                              \
-        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);           \
-    }                                                         \
+#define __LLBC_Inl_DestroyComp(comp, destroyMeth, toPhase)               \
+    while (true) {                                                       \
+        bool destroyFinished = true;                                     \
+        comp->destroyMeth(destroyFinished);                              \
+        if (destroyFinished) {                                           \
+            comp->_runningPhase = _CompRunningPhase::toPhase;            \
+            break;                                                       \
+        }                                                                \
+                                                                         \
+        if (_CompRunningPhase::toPhase >= _CompRunningPhase::LateInited) \
+            OnSvc(false);                                                \
+        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);                      \
+    }                                                                    \
 
 void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
 {
@@ -1977,7 +1979,7 @@ void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
     {
         LLBC_Component *comp = *it;
         if (comp->_runningPhase == _CompRunningPhase::LateInited)
-            __LLBC_Inl_DestoryComp(comp, OnEarlyDestroy, Inited);
+            __LLBC_Inl_DestroyComp(comp, OnEarlyDestroy, Inited);
     }
 
     // Destroy comps.
@@ -1985,7 +1987,7 @@ void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
     {
         LLBC_Component *comp = *it;
         if (comp->_runningPhase == _CompRunningPhase::Inited)
-            __LLBC_Inl_DestoryComp(comp, OnDestroy, NotInit);
+            __LLBC_Inl_DestroyComp(comp, OnDestroy, NotInit);
     }
 
     if (onlyCallEvMeth)
@@ -2075,7 +2077,7 @@ void LLBC_ServiceImpl::StopComps()
     {
         LLBC_Component *comp = *it;
         if (comp->_runningPhase == _CompRunningPhase::LateStarted)
-            __LLBC_Inl_DestoryComp(comp, OnEarlyStop, Started);
+            __LLBC_Inl_DestroyComp(comp, OnEarlyStop, Started);
     }
 
     // Stop comps.
@@ -2083,7 +2085,7 @@ void LLBC_ServiceImpl::StopComps()
     {
         LLBC_Component *comp = *it;
         if (comp->_runningPhase == _CompRunningPhase::Started)
-            __LLBC_Inl_DestoryComp(comp, OnStop, LateInited);
+            __LLBC_Inl_DestroyComp(comp, OnStop, LateInited);
     }
 
     // Update _runningPhase to <Stopping> phase, if in <StoppingComps> phase.
