@@ -593,7 +593,7 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
 
                 if (cfgSecItem.first.AsStr().tolower() == "exclusive" && cfgSecItem.second.AsLooseBool())
                 {
-                    LLBC_ReturnIf(LLBC_SetExclusive() != LLBC_OK, LLBC_FAILED);
+                    LLBC_ReturnIf(LLBC_SetProcessExclusive() != LLBC_OK, LLBC_FAILED);
                     break;
                 }
             }
@@ -613,7 +613,7 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
             const auto& isExclusive = _cfgType == LLBC_AppConfigType::Xml ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
             if (isExclusive.AsLooseBool())
             {
-                LLBC_ReturnIf(LLBC_SetExclusive() != LLBC_OK, LLBC_FAILED);
+                LLBC_ReturnIf(LLBC_SetProcessExclusive() != LLBC_OK, LLBC_FAILED);
             }
             break;
         }

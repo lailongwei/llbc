@@ -59,5 +59,5 @@ LLBC_EXPORT int LLBC_HandleCrash(const LLBC_String &dumpFilePath = "",
  *                            in Non-Windows platform, is a core pattern, if is empty, will use system default config.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_SetExclusive(const LLBC_String &pidFilePath = "");
+LLBC_EXPORT int LLBC_SetProcessExclusive(const LLBC_String &pidFilePath = "");
 __LLBC_NS_END

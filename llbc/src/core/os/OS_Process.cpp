@@ -482,7 +482,7 @@ __LLBC_NS_END
 #include <libproc.h>
 #endif
 __LLBC_NS_BEGIN
-int LLBC_SetExclusive(const LLBC_String &pidFilePath)
+int LLBC_SetProcessExclusive(const LLBC_String &pidFilePath)
 {
 #if LLBC_TARGET_PLATFORM_WIN32
     static char pidBuf[MAX_FORM_KEYWORD_LENGTH + 1] = { 0 };
