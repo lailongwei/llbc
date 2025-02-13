@@ -92,7 +92,7 @@ int TestCase_Core_OS_Process::TestSetExclusive()
 {
     std::cout << "Set exclusive test:" << std::endl;
 
-#if LLBC_SUPPORT_SET_EXCLUSIVE
+#if LLBC_SUPPORT_SET_PROCESS_EXCLUSIVE
     // Set exclusive
     std::cout << "Set exclusive..." << std::endl;
     if (LLBC_SetProcessExclusive() != LLBC_OK)
