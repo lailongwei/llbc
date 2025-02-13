@@ -26,6 +26,7 @@
 #include "llbc/core/os/OS_Process.h"
 #if LLBC_SUPPORT_HANDLE_CRASH
 #include "llbc/core/file/Directory.h"
+#include "cxxabi.h"
 #endif
 #include "llbc/core/log/LoggerMgr.h"
 
@@ -257,6 +258,46 @@ static int __catchSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
+
+static void __DumpStackFrameInfo(int coreDescFileFd)
+{
+    int size = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
+
+    char **strings;
+    strings = backtrace_symbols(__frames, size);
+    if (strings == NULL)
+    {
+        dprintf(coreDescFileFd, "backtrace_symbols failed");
+        return;
+    }
+    LLBC_Defer(free(strings));
+
+    const int beginIndex = 3;
+    for (int j = beginIndex; j < size; j++)
+    {
+        llbc::LLBC_String callStack = strings[j];
+
+        auto tmp = callStack.split("(");
+        LLBC_DoIf(tmp.size() >= 2, callStack = tmp[1]);
+
+        tmp =  callStack.split("+");
+        LLBC_DoIf(tmp.size(), callStack = tmp[0]);
+
+        int status = 0;
+        char *realName = nullptr;
+        realName = abi::__cxa_demangle(callStack.c_str(), 0, 0, &status);
+        if (status == 0)
+        {
+            dprintf(coreDescFileFd, " [%02d] \t %.*s \n", j - beginIndex, 128, realName);
+        }
+        else
+        {
+            dprintf(coreDescFileFd, " [%02d] \t %s \n", j - beginIndex, callStack.c_str());
+        }
+    }
+}
+
+
 static void __NonWin32CrashHandler(int sig)
 {
     // Uninstall this signal's hook.
@@ -336,8 +377,8 @@ static void __NonWin32CrashHandler(int sig)
         fsync(coreDescFileFd);
     }
 
-    const auto framesCnt = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
-    backtrace_symbols_fd(__frames, framesCnt, coreDescFileFd);
+    __DumpStackFrameInfo(coreDescFileFd);
+
     fsync(coreDescFileFd);
 
     // Call callback delegate.
