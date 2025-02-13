@@ -157,8 +157,8 @@ LLBC_ServiceImpl::~LLBC_ServiceImpl()
                LLBC_GetCurrentThreadId() == _svcThreadId);
 
     // Stop service and destroy comps.
-    Stop(_destroyCompWhenStop);
-    LLBC_DoIf(_destroyCompWhenStop == false, DestroyComps(false));
+    Stop(true);
+    DestroyComps(false);
 
     // Clear members.
     LLBC_STLHelper::DeleteContainer(_coderFactories);
@@ -305,9 +305,10 @@ int LLBC_ServiceImpl::Stop(bool destroyComp)
     const int driveMode = _driveMode;
     const LLBC_ThreadId svcThreadId = _svcThreadId;
 
+    _destroyCompWhenStop = destroyComp;
+
     // Update service phase to <Stopping>.
     _runningPhase = LLBC_ServiceRunningPhase::StoppingComps;
-    _destroyCompWhenStop = destroyComp;
 
     _lock.Unlock();
 
@@ -1276,7 +1277,7 @@ void LLBC_ServiceImpl::Cleanup()
     StopComps();
 
     // Destroy comps if needed.
-    LLBC_DoIf(_destroyCompWhenStop, DestroyComps());
+    LLBC_DoIf(_destroyCompWhenStop, DestroyComps(); _destroyCompWhenStop = false);
 
     // Post-Stop.
     PostStop();

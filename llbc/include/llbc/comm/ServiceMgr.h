@@ -71,10 +71,10 @@ public:
     /**
      * Stop specific id service.
      * Note:
-     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *  1. Not allow to remove self thread drive's service, if try to call,
      *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
-     * @param[in] id  - the service Id.
-     * @param[in] del - delete service or not, default is true.
+     * @param[in] id          - the service Id.
+     * @param[in] del         - delete service or not, default is true.
      * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
@@ -83,10 +83,10 @@ public:
     /**
      * Stop specified name service, like Remove(int id) method.
      * Note:
-     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *  1. Not allow to remove self thread drive's service, if try to call,
      *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
-     * @param[in] name - the service name.
-     * @param[in] del  - delete service or not, default is true.
+     * @param[in] name        - the service name.
+     * @param[in] del         - delete service or not, default is true.
      * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
@@ -95,9 +95,9 @@ public:
     /**
      * Stop all services.
      * Note:
-     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *  1. Not allow to remove self thread drive's service, if try to call,
      *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
-     * @param[in] del - delete service or not, default is true.
+     * @param[in] del         - delete service or not, default is true.
      * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */

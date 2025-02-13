@@ -97,8 +97,8 @@ int LLBC_ServiceMgr::StopAll(bool del, bool destroyComp)
     _lock.Unlock();
 
     // Foreach stop services.
-    for (auto [serviceId, _] : svcs)
-        Stop(serviceId, del, destroyComp);
+    for (auto it = svcs.begin(); it != svcs.end(); ++it)
+        Stop(it->first, del);
 
     return LLBC_OK;
 }
