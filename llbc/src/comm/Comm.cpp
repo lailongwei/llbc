@@ -33,7 +33,7 @@ int __LLBC_CommStartup()
 
 void __LLBC_CommCleanup()
 {
-    LLBC_ServiceMgrSingleton->StopAll();
+    LLBC_ServiceMgrSingleton->StopAll(true, false);
 }
 
 __LLBC_NS_END
