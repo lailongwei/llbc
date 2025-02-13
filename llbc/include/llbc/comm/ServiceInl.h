@@ -224,7 +224,7 @@ LLBC_FORCE_INLINE int LLBC_Service::Multicast(const LLBC_SessionIds &sessionIds,
 
     // Encode coder.
     // TODO: Temporary code, will be optimized in later.
-    static thread_local LLBC_Packet pkt;
+    thread_local LLBC_Packet pkt;
     if (UNLIKELY(!pkt.GetPayload()))
         pkt.SetPayload(new LLBC_MessageBlock);
 
@@ -266,7 +266,7 @@ LLBC_FORCE_INLINE int LLBC_Service::Broadcast(int opcode, LLBC_Coder *coder, int
 
     // Encode coder.
     // TODO: Temporary code, will be optimized in later.
-    static thread_local LLBC_Packet pkt;
+    thread_local LLBC_Packet pkt;
     if (UNLIKELY(!pkt.GetPayload()))
         pkt.SetPayload(new LLBC_MessageBlock);
 
