@@ -51,10 +51,11 @@ public:
 public:
     /**
      * Get specific log level string representation.
-     * @param[in] level - log level.
+     * @param[in] level         - log level.
+     * @param[in] shortLevelStr - return short level string, default is false.
      * @return const LLBC_String & - level representation.
      */
-    static const LLBC_CString &GetLevelStr(int level);
+    static const LLBC_CString &GetLevelStr(int level, bool shortLevelStr = false);
 
 public:
     /**

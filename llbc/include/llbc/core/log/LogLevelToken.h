@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
 class LLBC_HIDDEN LLBC_LogLevelToken : public LLBC_BaseLogToken
 {
 public:
-    LLBC_LogLevelToken() = default;
+    LLBC_LogLevelToken();
     ~LLBC_LogLevelToken() override = default;
 
 public:
@@ -55,6 +55,9 @@ public:
      * @param[out] formattedData - store location for formatted log string.
      */
     void Format(const LLBC_LogData &data, LLBC_String &formattedData) const override;
+
+private:
+    bool _shortLevelStr;
 };
 
 __LLBC_NS_END
