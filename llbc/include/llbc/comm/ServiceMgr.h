@@ -101,7 +101,7 @@ public:
      * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int StopAll(bool del = true, bool destroyComp = true);
+    int StopAll(bool del = true, bool destroyComp = false);
 
 public:
     /**
