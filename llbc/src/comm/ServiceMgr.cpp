@@ -53,7 +53,7 @@ LLBC_Service *LLBC_ServiceMgr::GetService(const LLBC_CString &name)
     return GetServiceNonLock(name);
 }
 
-int LLBC_ServiceMgr::Stop(int id, bool del)
+int LLBC_ServiceMgr::Stop(int id, bool del, bool destroyComp)
 {
     // Find service.
     _lock.Lock();
@@ -68,10 +68,10 @@ int LLBC_ServiceMgr::Stop(int id, bool del)
     _lock.Unlock();
 
     // Exec service stop.
-    return Stop(svc, del);
+    return Stop(svc, del, destroyComp);
 }
 
-int LLBC_ServiceMgr::Stop(const LLBC_CString &name, bool del)
+int LLBC_ServiceMgr::Stop(const LLBC_CString &name, bool del, bool destroyComp)
 {
     // Find service.
     _lock.Lock();
@@ -86,10 +86,10 @@ int LLBC_ServiceMgr::Stop(const LLBC_CString &name, bool del)
     _lock.Unlock();
 
     // Exec service stop.
-    return Stop(svc, del);
+    return Stop(svc, del, destroyComp);
 }
 
-int LLBC_ServiceMgr::StopAll(bool del)
+int LLBC_ServiceMgr::StopAll(bool del, bool destroyComp)
 {
     // Fetch all services.
     _lock.Lock();
@@ -97,17 +97,15 @@ int LLBC_ServiceMgr::StopAll(bool del)
     _lock.Unlock();
 
     // Foreach stop services.
-    for (Id2Services::iterator it = svcs.begin();
-         it != svcs.end();
-         ++it)
+    for (auto it = svcs.begin(); it != svcs.end(); ++it)
         Stop(it->first, del);
 
     return LLBC_OK;
 }
 
-int LLBC_ServiceMgr::Stop(LLBC_Service *svc, bool del)
+int LLBC_ServiceMgr::Stop(LLBC_Service *svc, bool del, bool destroyComp)
 {
-    svc->Stop();
+    svc->Stop(destroyComp);
     if (del)
         delete svc;
 

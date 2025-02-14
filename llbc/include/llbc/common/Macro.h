@@ -229,19 +229,6 @@
     name(name &&) = delete;                \
     name &operator=(name &&) = delete      \
 
-// Thread local macro define.
-#if LLBC_TARGET_PLATFORM_LINUX
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_WIN32
-#define LLBC_THREAD_LOCAL __declspec(thread)
-#elif LLBC_TARGET_PLATFORM_IPHONE
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_MAC
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_ANDROID
-#define LLBC_THREAD_LOCAL __thread
-#endif
-
 // Deprecated attribute macro define.
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
 #define LLBC_DEPRECATED __attribute__((deprecated))
