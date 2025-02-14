@@ -239,7 +239,7 @@ private:
     {
         timer.SetTimeoutHandler([this, phaseDesc, exceptTimeout](LLBC_Timer *timer) {
             assert(exceptTimeout);
-            LLBC_PrintLn("%s-%s Timeout: timeout times:%lu",
+            LLBC_PrintLn("%s-%s Timeout: timeout times:%lld",
                          LLBC_GetTypeName(*this), phaseDesc, timer->GetTimeoutTimes());
         });
 
