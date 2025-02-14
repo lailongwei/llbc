@@ -54,10 +54,9 @@ LLBC_EXPORT int LLBC_HandleCrash(const LLBC_String &dumpFilePath = "",
 
 /**
  * Set process exclusive(only one instance of process can run).
- * @param[in] pidFilePath - the pid file path.
- *                          in Windows platform, is a dump file path, if is empty, dump file path is <your_app_path>.dmp.
- *                          in Non-Windows platform, is a core pattern, if is empty, will use system default config.
+ * @param[in] pidFileDirectoryPath - the pid file directory path.
+ *                                   if is empty, pid file directory is <your_app_path>
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_SetProcessExclusive(const LLBC_CString &pidFilePath = "");
+LLBC_EXPORT int LLBC_SetProcessExclusive(const LLBC_CString &pidFileDirectoryPath = "");
 __LLBC_NS_END
