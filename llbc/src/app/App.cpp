@@ -590,8 +590,6 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
                     SetFPS(cfgSecItem.second);
                 else if (cfgSecItemKey == "exclusive" && cfgSecItem.second.AsLooseBool())
                     LLBC_ReturnIf(LLBC_SetProcessExclusive() != LLBC_OK, LLBC_FAILED);
-
-                continue;
             }
 
             break;
@@ -605,8 +603,6 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
                 SetFPS(cfgItemValue);
             else if (cfgItemKey == "exclusive" && cfgItemValue.AsLooseBool())
                 LLBC_ReturnIf(LLBC_SetProcessExclusive() != LLBC_OK, LLBC_FAILED);
-
-            continue;
         }
     }
 
