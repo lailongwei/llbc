@@ -14,7 +14,7 @@
 #include <llbc/core/json/nlohmann/detail/meta/void_t.hpp>
 #include <llbc/core/json/nlohmann/detail/meta/cpp_future.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -58,4 +58,4 @@ struct iterator_traits<T*, enable_if_t<std::is_object<T>::value>>
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

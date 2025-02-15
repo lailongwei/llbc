@@ -27,7 +27,7 @@
 #include <llbc/core/json/nlohmann/detail/string_escape.hpp>
 #include <llbc/core/json/nlohmann/detail/value_t.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /// @brief JSON Pointer defines a string syntax for identifying a specific value within a JSON document
 /// @sa https://json.nlohmann.me/api/json_pointer/
@@ -985,4 +985,4 @@ inline bool operator<(const json_pointer<RefStringTypeLhs>& lhs,
 }
 #endif
 
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

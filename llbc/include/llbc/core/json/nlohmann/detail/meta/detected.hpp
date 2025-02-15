@@ -12,7 +12,7 @@
 
 #include <llbc/core/json/nlohmann/detail/meta/void_t.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -67,4 +67,4 @@ using is_detected_convertible =
     std::is_convertible<detected_t<Op, Args...>, To>;
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

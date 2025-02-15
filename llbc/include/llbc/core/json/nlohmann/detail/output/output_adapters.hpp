@@ -22,7 +22,8 @@
 
 #include <llbc/core/json/nlohmann/detail/macro_scope.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
+
 namespace detail
 {
 
@@ -144,4 +145,5 @@ class output_adapter
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+
+LLBC_NLOHMANN_JSON_NAMESPACE_END

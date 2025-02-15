@@ -15,7 +15,7 @@
 #include <llbc/core/json/nlohmann/detail/conversions/to_json.hpp>
 #include <llbc/core/json/nlohmann/detail/meta/identity_tag.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /// @sa https://json.nlohmann.me/api/adl_serializer/
 template<typename ValueType, typename>
@@ -52,4 +52,4 @@ struct adl_serializer
     }
 };
 
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

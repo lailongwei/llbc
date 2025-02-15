@@ -39,7 +39,7 @@
     #undef JSON_HAS_THREE_WAY_COMPARISON
     #undef JSON_HAS_RANGES
     #undef JSON_HAS_STATIC_RTTI
-    #undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
+    #undef LLBC_JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
 #endif
 
 #include <llbc/core/json/nlohmann/thirdparty/hedley/hedley_undef.hpp>

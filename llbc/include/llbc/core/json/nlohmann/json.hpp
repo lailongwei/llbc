@@ -73,7 +73,7 @@
 @see https://github.com/nlohmann
 @since version 1.0.0
 */
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /*!
 @brief a class to store JSON values
@@ -253,12 +253,12 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         result["name"] = "JSON for Modern C++";
         result["url"] = "https://github.com/nlohmann/json";
         result["version"]["string"] =
-            detail::concat(std::to_string(NLOHMANN_JSON_VERSION_MAJOR), '.',
-                           std::to_string(NLOHMANN_JSON_VERSION_MINOR), '.',
-                           std::to_string(NLOHMANN_JSON_VERSION_PATCH));
-        result["version"]["major"] = NLOHMANN_JSON_VERSION_MAJOR;
-        result["version"]["minor"] = NLOHMANN_JSON_VERSION_MINOR;
-        result["version"]["patch"] = NLOHMANN_JSON_VERSION_PATCH;
+            detail::concat(std::to_string(LLBC_NLOHMANN_JSON_VERSION_MAJOR), '.',
+                           std::to_string(LLBC_NLOHMANN_JSON_VERSION_MINOR), '.',
+                           std::to_string(LLBC_NLOHMANN_JSON_VERSION_PATCH));
+        result["version"]["major"] = LLBC_NLOHMANN_JSON_VERSION_MAJOR;
+        result["version"]["minor"] = LLBC_NLOHMANN_JSON_VERSION_MINOR;
+        result["version"]["patch"] = LLBC_NLOHMANN_JSON_VERSION_PATCH;
 
 #ifdef _WIN32
         result["platform"] = "win32";
@@ -686,7 +686,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         JSON_ASSERT(m_data.m_type != value_t::string || m_data.m_value.string != nullptr);
         JSON_ASSERT(m_data.m_type != value_t::binary || m_data.m_value.binary != nullptr);
 
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
         JSON_TRY
         {
             // cppcheck-suppress assertWithSideEffect
@@ -702,7 +702,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     void set_parents()
     {
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
         switch (m_data.m_type)
         {
             case value_t::array:
@@ -739,7 +739,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     iterator set_parents(iterator it, typename iterator::difference_type count_set_parents)
     {
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
         for (typename iterator::difference_type i = 0; i < count_set_parents; ++i)
         {
             (it + i)->m_parent = this;
@@ -752,7 +752,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     reference set_parent(reference j, std::size_t old_capacity = static_cast<std::size_t>(-1))
     {
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
         if (old_capacity != static_cast<std::size_t>(-1))
         {
             // see https://github.com/nlohmann/json/issues/2838
@@ -2073,14 +2073,14 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
             // fill up array with null values if given idx is outside range
             if (idx >= m_data.m_value.array->size())
             {
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
                 // remember array size & capacity before resizing
                 const auto old_size = m_data.m_value.array->size();
                 const auto old_capacity = m_data.m_value.array->capacity();
 #endif
                 m_data.m_value.array->resize(idx + 1);
 
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
                 if (JSON_HEDLEY_UNLIKELY(m_data.m_value.array->capacity() != old_capacity))
                 {
                     // capacity has changed: update all parents
@@ -3451,7 +3451,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
                 }
             }
             m_data.m_value.object->operator[](it.key()) = it.value();
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
             m_data.m_value.object->operator[](it.key()).m_parent = this;
 #endif
         }
@@ -3661,7 +3661,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         {
             return true;
         }
-#if JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
+#if LLBC_JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
         return (lhs.is_discarded() || rhs.is_discarded()) && !inverse;
 #else
         static_cast<void>(inverse);
@@ -3734,13 +3734,13 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         return *this <=> basic_json(rhs); // *NOPAD*
     }
 
-#if JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
+#if LLBC_JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON
     // all operators that are computed as an odd number of inverses of others
     // need to be overloaded to emulate the legacy comparison behavior
 
     /// @brief comparison: less than or equal
     /// @sa https://json.nlohmann.me/api/basic_json/operator_le/
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef LLBC_JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
     bool operator<=(const_reference rhs) const noexcept
     {
         if (compares_unordered(rhs, true))
@@ -3761,7 +3761,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     /// @brief comparison: greater than or equal
     /// @sa https://json.nlohmann.me/api/basic_json/operator_ge/
-    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
+    JSON_HEDLEY_DEPRECATED_FOR(3.11.0, undef LLBC_JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON)
     bool operator>=(const_reference rhs) const noexcept
     {
         if (compares_unordered(rhs, true))
@@ -4219,7 +4219,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
 
     data m_data = {};
 
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
     /// a pointer to a parent value (for debugging purposes)
     basic_json* m_parent = nullptr;
 #endif
@@ -5187,7 +5187,8 @@ JSON_HEDLEY_NON_NULL(1)
 
 }  // namespace json_literals
 }  // namespace literals
-NLOHMANN_JSON_NAMESPACE_END
+
+LLBC_NLOHMANN_JSON_NAMESPACE_END
 
 ///////////////////////
 // nonmember support //

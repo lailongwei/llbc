@@ -10,7 +10,7 @@
 
 #include <cstddef> // nullptr_t
 #include <exception> // exception
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
     #include <numeric> // accumulate
 #endif
 #include <stdexcept> // runtime_error
@@ -25,7 +25,7 @@
 #include <llbc/core/json/nlohmann/detail/meta/type_traits.hpp>
 #include <llbc/core/json/nlohmann/detail/string_concat.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -64,7 +64,7 @@ class exception : public std::exception
     template<typename BasicJsonType>
     static std::string diagnostics(const BasicJsonType* leaf_element)
     {
-#if JSON_DIAGNOSTICS
+#if LLBC_JSON_DIAGNOSTICS
         std::vector<std::string> tokens;
         for (const auto* current = leaf_element; current != nullptr && current->m_parent != nullptr; current = current->m_parent)
         {
@@ -254,4 +254,4 @@ class other_error : public exception
 };
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

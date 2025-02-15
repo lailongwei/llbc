@@ -22,7 +22,7 @@
 #include <llbc/core/json/nlohmann/detail/meta/type_traits.hpp>
 #include <llbc/core/json/nlohmann/detail/value_t.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -204,7 +204,7 @@ auto get(const LLBC_NLOHMANN_NS::detail::iteration_proxy_value<IteratorType>& i)
 }
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END
 
 // The Addition to the STD Namespace is required to add
 // Structured Bindings Support to the iteration_proxy_value class

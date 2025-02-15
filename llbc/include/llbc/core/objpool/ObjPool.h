@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "llbc/core/json/nlohmann/LLBC_JsonInl.h"
+#include "llbc/common/Common.h"
+#include "llbc/core/json/nlohmann/json.hpp"
 
 // Disable some warnings.
 #if LLBC_TARGET_PLATFORM_WIN32

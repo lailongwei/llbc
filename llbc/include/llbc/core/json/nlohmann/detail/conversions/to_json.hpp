@@ -24,7 +24,7 @@
 #include <llbc/core/json/nlohmann/detail/meta/type_traits.hpp>
 #include <llbc/core/json/nlohmann/detail/value_t.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -443,4 +443,4 @@ JSON_INLINE_VARIABLE constexpr const auto& to_json = // NOLINT(misc-definitions-
 }  // namespace
 #endif
 
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

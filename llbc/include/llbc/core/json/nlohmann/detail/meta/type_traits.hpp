@@ -22,7 +22,7 @@
 #include <llbc/core/json/nlohmann/detail/meta/detected.hpp>
 #include <llbc/core/json/nlohmann/json_fwd.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 /*!
 @brief detail namespace with internal helper functions
 
@@ -792,4 +792,4 @@ struct is_transparent : bool_constant<impl::is_transparent<T>()> {};
 ///////////////////////////////////////////////////////////////////////////////
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

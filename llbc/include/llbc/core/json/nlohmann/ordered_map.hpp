@@ -20,7 +20,7 @@
 #include <llbc/core/json/nlohmann/detail/macro_scope.hpp>
 #include <llbc/core/json/nlohmann/detail/meta/type_traits.hpp>
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /// ordered_map: a minimal map-like container that preserves insertion order
 /// for use within LLBC_NLOHMANN_NS::basic_json<ordered_map>
@@ -356,4 +356,4 @@ private:
     JSON_NO_UNIQUE_ADDRESS key_compare m_compare = key_compare();
 };
 
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

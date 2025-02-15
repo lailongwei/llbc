@@ -31,8 +31,9 @@ namespace
 
 int pyllbc_ObjCoder::Encode(PyObject *in, std::string &out)
 {
-    LLBC_AutoJson autoJson = new LLBC_Json();
-    if (This::Encode(in, autoJson._json) != LLBC_OK)
+    std::shared_ptr<LLBC_Json> autoJson(new LLBC_Json());
+    LLBC_Json *ptr = autoJson.get();
+    if (This::Encode(in, ptr) != LLBC_OK)
     {
         return LLBC_FAILED;
     }
@@ -252,8 +253,9 @@ int pyllbc_ObjCoder::EncodeSeq(PyObject *in, LLBC_Json &out)
             return LLBC_FAILED;
         }
 
-        LLBC_AutoJson elemJson = new LLBC_Json();
-        if (This::Encode(elemObj, elemJson._json) != LLBC_OK)
+        std::shared_ptr<LLBC_Json> elemJson(new LLBC_Json());
+        LLBC_Json *ptr = elemJson.get();
+        if (This::Encode(elemObj, ptr) != LLBC_OK)
         {
             Py_DECREF(fastSeq);
             return LLBC_FAILED;
@@ -280,8 +282,9 @@ int pyllbc_ObjCoder::EncodeDict(PyObject *in, LLBC_Json &out)
             return LLBC_FAILED;
         }
 
-        LLBC_AutoJson valJson = new LLBC_Json();
-        if (This::Encode(val, valJson._json) != LLBC_OK)
+        std::shared_ptr<LLBC_Json> valJson(new LLBC_Json());
+        LLBC_Json *ptr = valJson.get();
+        if (This::Encode(val, ptr) != LLBC_OK)
         {
             return LLBC_FAILED;
         }
@@ -317,8 +320,9 @@ int pyllbc_ObjCoder::EncodeInst(PyObject *in, LLBC_Json &out)
         PyObject *slotVal = PyObject_GetAttr(in, slotItem);
         if (slotVal)
         {
-            LLBC_AutoJson slotValJson = new LLBC_Json();
-            if (This::Encode(slotVal, slotValJson._json) != LLBC_OK)
+            std::shared_ptr<LLBC_Json> slotValJson(new LLBC_Json());
+            LLBC_Json *ptr = slotValJson.get();
+            if (This::Encode(slotVal, ptr) != LLBC_OK)
             {
                 Py_DECREF(slotVal);
                 Py_DECREF(slotItem);

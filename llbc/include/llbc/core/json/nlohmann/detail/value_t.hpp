@@ -18,7 +18,7 @@
     #include <compare> // partial_ordering
 #endif
 
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
@@ -115,4 +115,4 @@ inline bool operator<(const value_t lhs, const value_t rhs) noexcept
 #endif
 
 }  // namespace detail
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END

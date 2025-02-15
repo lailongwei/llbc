@@ -22,7 +22,7 @@
 @see https://github.com/nlohmann
 @since version 1.0.0
 */
-NLOHMANN_JSON_NAMESPACE_BEGIN
+LLBC_NLOHMANN_JSON_NAMESPACE_BEGIN
 
 /*!
 @brief default JSONSerializer template argument
@@ -70,7 +70,7 @@ struct ordered_map;
 /// @sa https://json.nlohmann.me/api/ordered_json/
 using ordered_json = basic_json<LLBC_NLOHMANN_NS::ordered_map>;
 
-NLOHMANN_JSON_NAMESPACE_END
+LLBC_NLOHMANN_JSON_NAMESPACE_END
 
 // nlohmann json, 初始默认类型是null
 using LLBC_Json = LLBC_NLOHMANN_NS::json;

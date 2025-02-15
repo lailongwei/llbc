@@ -143,7 +143,7 @@
 #include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 // core/json/nlohmann
-#include "llbc/core/json/nlohmann/LLBC_JsonInl.h"
+#include "llbc/core/json/nlohmann/json.hpp"
 
 __LLBC_NS_BEGIN
 

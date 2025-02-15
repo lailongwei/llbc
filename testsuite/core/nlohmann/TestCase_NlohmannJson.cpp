@@ -56,7 +56,7 @@ int TestCase_NlohmannJson::Run(int argc, char *argv[])
 
     // 自动回收json
     {
-        LLBC_AutoJson autoJson = new LLBC_Json(LLBC_Json::object());
+        std::shared_ptr<LLBC_Json> autoJson(new LLBC_Json(LLBC_Json::object()));
         *autoJson = LLBC_Json::parse(raw);
         std::cout << "dump auto json:" << autoJson->dump() << std::endl;
     }
@@ -67,9 +67,9 @@ int TestCase_NlohmannJson::Run(int argc, char *argv[])
 
     // 序列化
     LLBC_String &&dumpData = json.dump();
-    LLBC_JsonToString(json, dumpData);
     std::cout <<"dumpData:" << dumpData <<std::endl;
-    LLBC_JsonToString(json, dumpData, true);
+    // 缩进4个空格
+    dumpData = json.dump(4);
     std::cout <<"pretty dump dumpData:" << dumpData <<std::endl;
 
     // 设置空
