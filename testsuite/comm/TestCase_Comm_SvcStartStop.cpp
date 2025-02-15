@@ -27,29 +27,33 @@ namespace
     class SvcStartStopTestComp final : public LLBC_Component
     {
     public:
+        SvcStartStopTestComp() = default;
+        ~SvcStartStopTestComp() override = default;
+
+    public:
         int OnInit(bool &initFinished) override
         {
-            LLBC_PrintLn("Service initialize");
+            LLBC_PrintLn("Service initialize, current thread id: %d", LLBC_GetCurrentThreadId());
             return LLBC_OK;
         }
 
         void OnDestroy(bool &destroyFinished) override
         {
-            LLBC_PrintLn("Service destroy");
+            LLBC_PrintLn("Service destroy, current thread id: %d", LLBC_GetCurrentThreadId());
         }
 
         int OnStart(bool &startFinished) override
         {
             _updateOutputTimes = 0;
             _idleOutputTimes = 0;
-            LLBC_PrintLn("Service start");
+            LLBC_PrintLn("Service start, current thread id: %d", LLBC_GetCurrentThreadId());
 
             return LLBC_OK;
         }
 
         void OnStop(bool &stopFinished) override
         {
-            LLBC_PrintLn("Service stop");
+            LLBC_PrintLn("Service stop, current thread id: %d", LLBC_GetCurrentThreadId());
         }
 
         void OnUpdate() override
@@ -70,14 +74,6 @@ namespace
     };
 }
 
-TestCase_Comm_SvcStartStop::TestCase_Comm_SvcStartStop()
-{
-}
-
-TestCase_Comm_SvcStartStop::~TestCase_Comm_SvcStartStop()
-{
-}
-
 int TestCase_Comm_SvcStartStop::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Service start/stop test:");
@@ -85,6 +81,20 @@ int TestCase_Comm_SvcStartStop::Run(int argc, char *argv[])
     svc->AddComponent(new SvcStartStopTestComp);
     svc->Start();
 
+    LLBC_PrintLn("Stop service and Destroy component...");
+    svc->Stop(true);
+    delete svc;
+
+    svc = LLBC_Service::Create("SvcStartStopTest");
+    svc->AddComponent(new SvcStartStopTestComp);
+    svc->Start();
+    LLBC_PrintLn("Stop service and Not destroy component...");
+    svc->Stop(false);
+    delete svc;
+
+    svc = LLBC_Service::Create("SvcStartStopTest");
+    svc->AddComponent(new SvcStartStopTestComp);
+    svc->Start();
     LLBC_PrintLn("Service started, sleep 2 sectonds...");
     LLBC_Sleep(2000);
 

@@ -123,9 +123,10 @@ public:
 
     /**
      * Stop the service.
+     * @param[in] destroyComp - destroy service components or not.
      * @return int - return 0 if success, otherwise return failed.
      */
-    int Stop() override;
+    int Stop(bool destroyComp = false) override;
 
 public:
     /**
@@ -598,6 +599,7 @@ private:
     mutable LLBC_RecursiveLock _lock; // Service lock.
     volatile bool _serviceBeginLoop; // Service begin loop flag.
     volatile LLBC_ServiceRunningPhase::ENUM _runningPhase; // Service running phase.
+    bool _destroyCompWhenStop; // Destroy components when stop service.
     typedef void (LLBC_ServiceImpl::*_EvHandler)(LLBC_ServiceEvent &);
     static _EvHandler _evHandlers[LLBC_ServiceEventType::End]; // Service event handlers slot.
 

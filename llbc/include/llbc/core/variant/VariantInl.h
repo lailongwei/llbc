@@ -577,7 +577,7 @@ LLBC_Variant::operator _Ty *() const
 template <>
 inline LLBC_Variant::operator char *() const
 {
-    static thread_local char emptyMutableEmptyStr[1] = {'\0'};
+    thread_local char emptyMutableEmptyStr[1] = {'\0'};
     return IsStrX() ?  const_cast<char *>(_holder.data.obj.str->c_str()) : emptyMutableEmptyStr;
 }
 

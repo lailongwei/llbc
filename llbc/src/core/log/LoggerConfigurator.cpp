@@ -139,7 +139,7 @@ bool LLBC_LoggerConfigurator::HasSharedAsyncLoggerConfigs() const
     for (auto &configItem : _configs)
     {
         if (configItem.second->IsAsyncMode() && 
-            configItem.second->IsIndependentThread())
+            !configItem.second->IsIndependentThread())
             return true;
     }
 
