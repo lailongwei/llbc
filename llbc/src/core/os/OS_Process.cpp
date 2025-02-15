@@ -473,6 +473,141 @@ int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
 __LLBC_NS_END
 #endif // Supp hook process crash
 
+#if LLBC_SUPPORT_SET_PROCESS_EXCLUSIVE
+#if LLBC_TARGET_PLATFORM_WIN32
+#include <psapi.h>
+#elif LLBC_TARGET_PLATFORM_MAC
+#include <libproc.h>
+#endif
+
+__LLBC_NS_BEGIN
+
+int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    static char exclusiveInfoBuf[32] = {0};
+    static char runningExeFilePath[MAX_PATH + 1] = {0};
+
+    // Get current execute file path.
+    LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
+
+    // Set exclusive info file path.
+    LLBC_String nmlExclusiveInfoFilePath = exclusiveInfoFilePath;
+    if (nmlExclusiveInfoFilePath.empty())
+    {
+        nmlExclusiveInfoFilePath = LLBC_Directory::Join(selfExeFilePath, LLBC_Directory::ModuleFileName());
+        nmlExclusiveInfoFilePath.append(".pid");
+    }
+
+    // Create then read-lock exclusive info file.
+    HANDLE exclusiveInfoFile = CreateFileA(nmlExclusiveInfoFilePath.c_str(),
+                                           GENERIC_READ | GENERIC_WRITE,
+                                           FILE_SHARE_READ,
+                                           NULL,
+                                           OPEN_ALWAYS,
+                                           FILE_ATTRIBUTE_HIDDEN,
+                                           NULL);
+    LLBC_SetErrAndReturnIf(exclusiveInfoFile == INVALID_HANDLE_VALUE, LLBC_ERROR_OSAPI, LLBC_FAILED);
+    LLBC_Defer(CloseHandle(exclusiveInfoFile));
+
+    // Read pid from exclusive info file.
+    DWORD fileSize = GetFileSize(exclusiveInfoFile, NULL);
+    LLBC_ReturnIf(fileSize == -1, LLBC_FAILED);
+
+    bool readSucc = ReadFile(exclusiveInfoFile, exclusiveInfoBuf, fileSize, &fileSize, NULL);
+    LLBC_SetErrAndReturnIf(!readSucc, LLBC_ERROR_OSAPI, LLBC_FAILED);
+    exclusiveInfoBuf[fileSize] = '\0';
+
+    // Deal with exclusive info.
+    long exclusiveInfoPid = atoi(exclusiveInfoBuf);
+    if (strlen(exclusiveInfoBuf) != 0 && exclusiveInfoPid != getpid())
+    {
+        // Open executable process by pid.
+        HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+                                           FALSE, exclusiveInfoPid);
+        if (processHandle != NULL)
+        {
+            // Get executable file path refer to pid.
+            DWORD getModuleFileNameRet = GetModuleFileNameExA(processHandle, NULL, runningExeFilePath, MAX_PATH);
+            CloseHandle(processHandle);
+            LLBC_SetErrAndReturnIf(getModuleFileNameRet == 0, LLBC_ERROR_OSAPI, LLBC_FAILED);
+            runningExeFilePath[getModuleFileNameRet] = '\0';
+        }
+
+        // Compare self name and running process path.
+        LLBC_ReturnIf(runningExeFilePath == selfExeFilePath, LLBC_FAILED);
+    }
+
+    // Clear .pid file and write pid into it.
+    SetFilePointer(exclusiveInfoFile, 0, NULL, FILE_BEGIN);
+    SetEndOfFile(exclusiveInfoFile);
+    int printRet = snprintf(exclusiveInfoBuf, 32, "%ld", GetCurrentProcessId());
+    exclusiveInfoBuf[printRet] = '\0';
+    LPDWORD writeSize = 0;
+    WriteFile(exclusiveInfoFile, exclusiveInfoBuf, strlen(exclusiveInfoBuf), writeSize, NULL);
+#else // linux and macos
+    static char exclusiveInfoBuf[32];
+    static char runningExeFilePath[PATH_MAX + 1];
+
+    // Get current execute file path.
+    LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
+
+    // Set exclusive info file path.
+    LLBC_String nmlExclusiveInfoFilePath = exclusiveInfoFilePath;
+    if (nmlExclusiveInfoFilePath.empty())
+    {
+        nmlExclusiveInfoFilePath = LLBC_Directory::Join(selfExeFilePath, LLBC_Directory::ModuleFileName());
+        nmlExclusiveInfoFilePath.append(".pid");
+    }
+
+    // Open exclusive info file and read pid.
+    int exclusiveInfoFd = open(nmlExclusiveInfoFilePath.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
+    LLBC_SetErrAndReturnIf(exclusiveInfoFd < 0, LLBC_ERROR_OSAPI, LLBC_FAILED);
+    LLBC_Defer(close(exclusiveInfoFd););
+
+    int readRet = read(exclusiveInfoFd, exclusiveInfoBuf, MAX_INPUT);
+    LLBC_SetErrAndReturnIf(readRet == -1, LLBC_ERROR_OSAPI, LLBC_FAILED);
+    exclusiveInfoBuf[readRet] = '\0';
+
+    // Deal with exclusive info.
+    long exclusiveInfoPid = atoi(exclusiveInfoBuf);
+    if (strlen(exclusiveInfoBuf) != 0 && exclusiveInfoPid != getpid())
+    {
+        // Get executable file by pid.
+#if LLBC_TARGET_PLATFORM_MAC
+        int pidPathRet = proc_pidpath(exclusiveInfoPid, runningExeFilePath, PATH_MAX);
+        LLBC_DoIf(pidPathRet != -1, runningExeFilePath[pidPathRet] = '\0');
+#else
+        llbc::LLBC_String runingExe;
+        runingExe.format("/proc/%d/exe", exclusiveInfoPid);
+        ssize_t readLinkRet = readlink(runingExe.c_str(), runningExeFilePath, PATH_MAX);
+        LLBC_DoIf(readLinkRet != -1, runningExeFilePath[readLinkRet] = '\0');
+#endif
+
+        // Compare self name and running process path.
+        LLBC_ReturnIf(selfExeFilePath == runningExeFilePath, LLBC_FAILED);
+    }
+
+    // Try to lock exclusive info file.
+    struct flock fl;
+    fl.l_type = F_WRLCK;
+    fl.l_start = 0;
+    fl.l_whence = SEEK_SET;
+    fl.l_len = 0;
+    fl.l_pid = -1;
+    LLBC_SetErrAndReturnIf(fcntl(exclusiveInfoFd, F_SETLK, &fl) == -1, LLBC_ERROR_OSAPI, LLBC_FAILED);
+
+    // Clear exclusive info file and write info into it.
+    ftruncate(exclusiveInfoFd, 0);
+    lseek(exclusiveInfoFd, 0, SEEK_SET);
+    snprintf(exclusiveInfoBuf, 32, "%ld", (long)getpid());
+    write(exclusiveInfoFd, exclusiveInfoBuf, strlen(exclusiveInfoBuf) + 1);
+#endif
+    return LLBC_OK;
+}
+__LLBC_NS_END
+#endif // Supp set process exclusive
+
 #if LLBC_CUR_COMP == LLBC_COMP_GCC
 #pragma GCC diagnostic pop
 #endif // GCC compiler

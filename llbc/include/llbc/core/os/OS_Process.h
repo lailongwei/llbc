@@ -26,8 +26,10 @@
 // Handle crash support macro define.
 #if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
  #define LLBC_SUPPORT_HANDLE_CRASH 1
+ #define LLBC_SUPPORT_SET_PROCESS_EXCLUSIVE 1
 #else // Non Win32 and Linux
  #define LLBC_SUPPORT_HANDLE_CRASH 0
+ #define LLBC_SUPPORT_SET_PROCESS_EXCLUSIVE 0
 #endif
 
 __LLBC_NS_BEGIN
@@ -50,4 +52,12 @@ LLBC_EXPORT int LLBC_HandleCrash(const LLBC_String &dumpFilePath = "",
                                  const LLBC_Delegate<void(const char *stackBacktrace,
                                                           int sig)> &crashCallback = nullptr);
 
+/**
+ * Set process exclusive(only one instance of process can run).
+ * @param[in] exclusiveInfoFilePath - the exclusive info file path.
+ *                                    contains exclusive info, currently only contain pid.
+ *                                    if is empty, exclusive file path is <your_app_path>.pid.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXPORT int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath = "");
 __LLBC_NS_END
