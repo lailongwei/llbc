@@ -98,7 +98,7 @@ int LLBC_ServiceMgr::StopAll(bool del, bool destroyComp)
 
     // Foreach stop services.
     for (auto it = svcs.begin(); it != svcs.end(); ++it)
-        Stop(it->first, del);
+        Stop(it->first, del, destroyComp);
 
     return LLBC_OK;
 }
