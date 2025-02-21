@@ -1522,7 +1522,7 @@ void LLBC_ServiceImpl::PostStop()
     _pollerCount = 0;
 }
 
-void LLBC_ServiceImpl::HandlePosts()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::HandlePosts()
 {
     LLBC_ReturnIf(_posts.empty(), void());
 
@@ -2109,7 +2109,7 @@ void LLBC_ServiceImpl::StopComps()
 // Undef component destroy macro.
 #undef __LLBC_Inl_DestroyComp
 
-void LLBC_ServiceImpl::UpdateComps()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateComps()
 {
     for(auto &comp : _compList)
     {
@@ -2118,7 +2118,7 @@ void LLBC_ServiceImpl::UpdateComps()
     }
 }
 
-void LLBC_ServiceImpl::LateUpdateComps()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::LateUpdateComps()
 {
     for(auto &comp : _compList)
     {
@@ -2176,7 +2176,7 @@ void LLBC_ServiceImpl::CloseCompLibrary(const LLBC_String &libPath)
     _releasePoolStack = LLBC_AutoReleasePoolStack::GetCurrentThreadReleasePoolStack();
 }
 
-void LLBC_ServiceImpl::UpdateAutoReleasePool()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateAutoReleasePool()
 {
     if (_driveMode == LLBC_ServiceDriveMode::SelfDrive)
         _releasePoolStack->Purge();
@@ -2200,7 +2200,7 @@ void LLBC_ServiceImpl::InitTimerScheduler()
     }
 }
 
-void LLBC_ServiceImpl::UpdateTimerScheduler()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateTimerScheduler()
 {
     _timerScheduler->Update();
 }
