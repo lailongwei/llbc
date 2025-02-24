@@ -638,7 +638,14 @@ LLBC_Variant &LLBC_Variant::operator[](const LLBC_Variant &key)
         if (!_holder.data.obj.seq)
             _holder.data.obj.seq = new Seq;
 
-        return (*_holder.data.obj.seq)[key];
+        const size_t idx = key;
+        if (UNLIKELY(idx >= _holder.data.obj.seq->size()))
+        {
+            for (size_t i = _holder.data.obj.seq->size(); i <= idx; ++i)
+                _holder.data.obj.seq->push_back(LLBC_Variant::nil);
+        }
+
+        return (*_holder.data.obj.seq)[idx];
     }
 
     BecomeDictX();
