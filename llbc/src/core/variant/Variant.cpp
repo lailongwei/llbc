@@ -640,10 +640,7 @@ LLBC_Variant &LLBC_Variant::operator[](const LLBC_Variant &key)
 
         const size_t idx = key;
         if (UNLIKELY(idx >= _holder.data.obj.seq->size()))
-        {
-            for (size_t i = _holder.data.obj.seq->size(); i <= idx; ++i)
-                _holder.data.obj.seq->push_back(LLBC_Variant::nil);
-        }
+            _holder.data.obj.seq->resize(idx + 1);
 
         return (*_holder.data.obj.seq)[idx];
     }
