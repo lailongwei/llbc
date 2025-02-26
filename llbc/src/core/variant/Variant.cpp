@@ -395,9 +395,9 @@ bool LLBC_Variant::IsEmpty() const
     if (_holder.type == LLBC_VariantType::STR_DFT)
         return _holder.data.obj.str ? _holder.data.obj.str->empty() : true;
     if (_holder.type == LLBC_VariantType::SEQ_DFT)
-        return _holder.data.obj.seq->empty();
+        return _holder.data.obj.seq ? _holder.data.obj.seq->empty() : true;
     if (_holder.type == LLBC_VariantType::DICT_DFT)
-        return _holder.data.obj.dict->empty();
+        return _holder.data.obj.dict ? _holder.data.obj.dict->empty() : true;
 
     return true;
 }
@@ -419,9 +419,9 @@ size_t LLBC_Variant::Capacity() const
     if (_holder.type == LLBC_VariantType::STR_DFT)
         return _holder.data.obj.str ? _holder.data.obj.str->capacity() : 0;
     if (_holder.type == LLBC_VariantType::SEQ_DFT)
-        return _holder.data.obj.seq->capacity();
+        return _holder.data.obj.seq ? _holder.data.obj.seq->capacity() : 0;
     if (_holder.type == LLBC_VariantType::DICT_DFT)
-        return _holder.data.obj.dict->size();
+        return _holder.data.obj.dict ? _holder.data.obj.dict->size() : 0;
 
     return 0;
 }
@@ -638,7 +638,11 @@ LLBC_Variant &LLBC_Variant::operator[](const LLBC_Variant &key)
         if (!_holder.data.obj.seq)
             _holder.data.obj.seq = new Seq;
 
-        return (*_holder.data.obj.seq)[key];
+        const size_t idx = key;
+        if (UNLIKELY(idx >= _holder.data.obj.seq->size()))
+            _holder.data.obj.seq->resize(idx + 1);
+
+        return (*_holder.data.obj.seq)[idx];
     }
 
     BecomeDictX();
