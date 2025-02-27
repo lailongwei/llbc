@@ -25,8 +25,11 @@
 #include "llbc/core/time/Time.h"
 #include "llbc/core/os/OS_Process.h"
 #if LLBC_SUPPORT_HANDLE_CRASH
+#include <dlfcn.h>
+#include <libgen.h>
+#include <execinfo.h>
+#include <cxxabi.h> 
 #include "llbc/core/file/Directory.h"
-#include "cxxabi.h"
 #endif
 #include "llbc/core/log/LoggerMgr.h"
 
@@ -259,44 +262,52 @@ static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
 
-static void __DumpStackFrameInfo(int coreDescFileFd)
+static void __DumpStackTrace(int outputFd)
 {
-    int size = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
-
-    char **strings;
-    strings = backtrace_symbols(__frames, size);
-    if (strings == NULL)
-    {
-        dprintf(coreDescFileFd, "backtrace_symbols failed");
+    // Get stack trace frames
+    const int frameCount = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
+    if (frameCount == 0)
         return;
-    }
-    LLBC_Defer(free(strings));
 
-    const int beginIndex = 3;
-    for (int j = beginIndex; j < size; j++)
+    // Pre-allocate buffer for demangled names
+    char demangledNameBuf[512];
+    size_t demangledNameBufLen = sizeof(demangledNameBuf);
+
+    // Process each frame directly using dladdr
+    for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
     {
-        llbc::LLBC_String callStack = strings[j];
-
-        auto tmp = callStack.split("(");
-        LLBC_DoIf(tmp.size() >= 2, callStack = tmp[1]);
-
-        tmp =  callStack.split("+");
-        LLBC_DoIf(tmp.size(), callStack = tmp[0]);
-
-        int status = 0;
-        char *realName = nullptr;
-        realName = abi::__cxa_demangle(callStack.c_str(), 0, 0, &status);
-        if (status == 0)
+        Dl_info dlInfo;
+        if (dladdr(__frames[frameIndex], &dlInfo))
         {
-            dprintf(coreDescFileFd, " [%02d] \t %.*s \n", j - beginIndex, 128, realName);
+            const char *symName = dlInfo.dli_sname ? dlInfo.dli_sname : "<unknown>";
+            const void *symAddr = dlInfo.dli_saddr ? dlInfo.dli_saddr : __frames[frameIndex];
+            const char *objName = dlInfo.dli_fname ? basename((char *)dlInfo.dli_fname) : "<unknown>";
+            
+            // Try to demangle the symbol name if available
+            const char *displayName = symName;
+            if (symName != nullptr && symName[0] != '\0' && symName[0] != '?')
+            {
+                int status = 0;
+                char *demangled = abi::__cxa_demangle(symName, 
+                                                     demangledNameBuf,
+                                                     &demangledNameBufLen, 
+                                                     &status);
+                if (status == 0 && demangled == demangledNameBuf)
+                    displayName = demangledNameBuf;
+            }
+            
+            dprintf(outputFd, " [%02d] \t %s(%s+%p)\n", 
+                frameIndex,
+                objName,
+                displayName,
+                (void *)((char *)__frames[frameIndex] - (char *)symAddr));
         }
         else
         {
-            dprintf(coreDescFileFd, " [%02d] \t %s \n", j - beginIndex, callStack.c_str());
+            dprintf(outputFd, " [%02d] \t <unknown function>\n", frameIndex);
         }
     }
 }
-
 
 static void __NonWin32CrashHandler(int sig)
 {
@@ -377,7 +388,7 @@ static void __NonWin32CrashHandler(int sig)
         fsync(coreDescFileFd);
     }
 
-    __DumpStackFrameInfo(coreDescFileFd);
+    __DumpStackTrace(coreDescFileFd);
 
     fsync(coreDescFileFd);
 
