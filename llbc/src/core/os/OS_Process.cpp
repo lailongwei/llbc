@@ -25,10 +25,6 @@
 #include "llbc/core/time/Time.h"
 #include "llbc/core/os/OS_Process.h"
 #if LLBC_SUPPORT_HANDLE_CRASH
-#include <dlfcn.h>
-#include <libgen.h>
-#include <execinfo.h>
-#include <cxxabi.h> 
 #include "llbc/core/file/Directory.h"
 #endif
 #include "llbc/core/log/LoggerMgr.h"
@@ -246,6 +242,8 @@ __LLBC_INTERNAL_NS_END
 #include <libgen.h>
 #include <signal.h>
 #include <execinfo.h>
+#include <dlfcn.h>     // for dladdr
+#include <cxxabi.h>    // for abi::__cxa_demangle
 
 #include "llbc/core/file/File.h"
 
