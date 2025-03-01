@@ -259,7 +259,6 @@ static int __catchSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
-
 static void __DumpStackTrace(int outputFd)
 {
     // Get stack trace frames
@@ -280,25 +279,19 @@ static void __DumpStackTrace(int outputFd)
             const char *symName = dlInfo.dli_sname ? dlInfo.dli_sname : "<unknown>";
             const void *symAddr = dlInfo.dli_saddr ? dlInfo.dli_saddr : __frames[frameIndex];
             const char *objName = dlInfo.dli_fname ? basename((char *)dlInfo.dli_fname) : "<unknown>";
-            
+
             // Try to demangle the symbol name if available
             const char *displayName = symName;
             if (symName != nullptr && symName[0] != '\0' && symName[0] != '?')
             {
                 int status = 0;
-                char *demangled = abi::__cxa_demangle(symName, 
-                                                     demangledNameBuf,
-                                                     &demangledNameBufLen, 
-                                                     &status);
+                char *demangled = abi::__cxa_demangle(symName, demangledNameBuf, &demangledNameBufLen, &status);
                 if (status == 0 && demangled == demangledNameBuf)
                     displayName = demangledNameBuf;
             }
-            
-            dprintf(outputFd, " [%02d] \t %s(%s+%p)\n", 
-                frameIndex,
-                objName,
-                displayName,
-                (void *)((char *)__frames[frameIndex] - (char *)symAddr));
+
+            dprintf(outputFd, " [%02d] \t %s(%s+%p)\n", frameIndex, objName, displayName,
+                    (void *)((char *)__frames[frameIndex] - (char *)symAddr));
         }
         else
         {
