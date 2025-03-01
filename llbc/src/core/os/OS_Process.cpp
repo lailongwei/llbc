@@ -242,8 +242,8 @@ __LLBC_INTERNAL_NS_END
 #include <libgen.h>
 #include <signal.h>
 #include <execinfo.h>
-#include <dlfcn.h>     // for dladdr
-#include <cxxabi.h>    // for abi::__cxa_demangle
+#include <dlfcn.h>
+#include <cxxabi.h>
 
 #include "llbc/core/file/File.h"
 
@@ -261,17 +261,17 @@ static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
 
 static void __DumpStackTrace(int outputFd)
 {
-    // Get stack trace frames
+    // Get stack trace frames.
     const int frameCount = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
     if (frameCount == 0)
         return;
 
-    // Pre-allocate buffer for demangled names
+    // Pre-allocate buffer for demangled names.
     char demangledNameBuf[512];
     size_t demangledNameBufLen = sizeof(demangledNameBuf);
 
-    // Process each frame directly using dladdr
-    for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+    // Process each frame directly using dladdr.
+    for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
     {
         Dl_info dlInfo;
         if (dladdr(__frames[frameIndex], &dlInfo))
@@ -280,7 +280,7 @@ static void __DumpStackTrace(int outputFd)
             const void *symAddr = dlInfo.dli_saddr ? dlInfo.dli_saddr : __frames[frameIndex];
             const char *objName = dlInfo.dli_fname ? basename((char *)dlInfo.dli_fname) : "<unknown>";
 
-            // Try to demangle the symbol name if available
+            // Try to demangle the symbol name if available.
             const char *displayName = symName;
             if (symName != nullptr && symName[0] != '\0' && symName[0] != '?')
             {
