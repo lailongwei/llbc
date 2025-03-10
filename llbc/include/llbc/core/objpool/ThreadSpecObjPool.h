@@ -32,7 +32,7 @@ public:
      * Initialize thread-spec object pool.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int Initialize();
+    LLBC_WARN_UNUSED_RESULT static int Initialize();
 
     /**
      * Finalize thread-spec object pool.
@@ -44,7 +44,7 @@ public:
      * Get current thread thread-safe object pool.
      * @return LLBC_ObjPool * - the current thread thread-safe object pool.
      */
-    static LLBC_ObjPool *GetSafeObjPool()
+    LLBC_WARN_UNUSED_RESULT static LLBC_ObjPool *GetSafeObjPool()
     {
         return reinterpret_cast<LLBC_ObjPool *>(__LLBC_GetLibTls()->coreTls.safeObjPool);
     }
@@ -53,7 +53,7 @@ public:
      * Get current thread thread-unsafe object pool.
      * @return LLBC_ObjPool * - the current thread thread-unsafe object pool.
      */
-    static LLBC_ObjPool *GetUnsafeObjPool()
+    LLBC_WARN_UNUSED_RESULT static LLBC_ObjPool *GetUnsafeObjPool()
     {
         return reinterpret_cast<LLBC_ObjPool *>(__LLBC_GetLibTls()->coreTls.unsafeObjPool);
     }
@@ -64,7 +64,7 @@ public:
      * @return Obj * - the object.
      */
     template <typename Obj>
-    static Obj *SafeAcquire() { return GetSafeObjPool()->Acquire<Obj>(); }
+    LLBC_WARN_UNUSED_RESULT static Obj *SafeAcquire() { return GetSafeObjPool()->Acquire<Obj>(); }
 
     /**
      * Acquire object in thread-unsafe object pool.
@@ -72,7 +72,7 @@ public:
      * @return Obj * - the object.
      */
     template <typename Obj>
-    static Obj *UnsafeAcquire() { return GetUnsafeObjPool()->Acquire<Obj>(); }
+    LLBC_WARN_UNUSED_RESULT static Obj *UnsafeAcquire() { return GetUnsafeObjPool()->Acquire<Obj>(); }
 
     /**
      * Release object to thread-unsafe object pool.
@@ -95,13 +95,13 @@ public:
      * @return LLBC_GuardedPoolObj<T> - the guarded object.
      */
     template<typename T>
-    static LLBC_GuardedPoolObj<T> GuardedSafeAcquire() { return GetSafeObjPool()->AcquireGuarded<T>(); }
+    LLBC_WARN_UNUSED_RESULT static LLBC_GuardedPoolObj<T> GuardedSafeAcquire() { return GetSafeObjPool()->AcquireGuarded<T>(); }
 
     /**
      * Acquire guarded object in thread-unsafe object pool.
      * @return LLBC_GuardedPoolObj<T> - the guarded object.
      */
     template<typename T>
-    static LLBC_GuardedPoolObj<T> GuardedUnsafeAcquire() { return GetUnsafeObjPool()->AcquireGuarded<T>(); }
+    LLBC_WARN_UNUSED_RESULT static LLBC_GuardedPoolObj<T> GuardedUnsafeAcquire() { return GetUnsafeObjPool()->AcquireGuarded<T>(); }
 };
 __LLBC_NS_END

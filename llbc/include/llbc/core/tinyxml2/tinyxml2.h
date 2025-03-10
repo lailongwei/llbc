@@ -552,7 +552,7 @@ enum XMLError {
 class LLBC_TINYXML2_LIB XMLUtil
 {
 public:
-    static const char* SkipWhiteSpace( const char* p, int* curLineNumPtr )	{
+    LLBC_WARN_UNUSED_RESULT static const char* SkipWhiteSpace( const char* p, int* curLineNumPtr )	{
         TIXMLASSERT( p );
 
         while( IsWhiteSpace(*p) ) {
@@ -564,13 +564,13 @@ public:
         TIXMLASSERT( p );
         return p;
     }
-    static char* SkipWhiteSpace( char* const p, int* curLineNumPtr ) {
+    LLBC_WARN_UNUSED_RESULT static char* SkipWhiteSpace( char* const p, int* curLineNumPtr ) {
         return const_cast<char*>( SkipWhiteSpace( const_cast<const char*>(p), curLineNumPtr ) );
     }
 
     // Anything in the high order range of UTF-8 is assumed to not be whitespace. This isn't
     // correct, but simple, and usually works.
-    static bool IsWhiteSpace( char p )					{
+    LLBC_WARN_UNUSED_RESULT static bool IsWhiteSpace( char p )					{
         return !IsUTF8Continuation(p) && isspace( static_cast<unsigned char>(p) );
     }
 
@@ -611,10 +611,10 @@ public:
         return ( p & 0x80 ) != 0;
     }
 
-    static const char* ReadBOM( const char* p, bool* hasBOM );
+    LLBC_WARN_UNUSED_RESULT static const char* ReadBOM( const char* p, bool* hasBOM );
     // p is the starting location,
     // the UTF-8 value of the entity will be placed in value, and length filled in.
-    static const char* GetCharacterRef( const char* p, char* value, int* length );
+    LLBC_WARN_UNUSED_RESULT static const char* GetCharacterRef( const char* p, char* value, int* length );
     static void ConvertUTF32ToUTF8( unsigned long input, char* output, int* length );
 
     // converts primitive types to strings
@@ -627,13 +627,13 @@ public:
     static void ToStr(uint64_t v, char* buffer, int bufferSize);
 
     // converts strings to primitive types
-    static bool	ToInt( const char* str, int* value );
-    static bool ToUnsigned( const char* str, unsigned* value );
-    static bool	ToBool( const char* str, bool* value );
-    static bool	ToFloat( const char* str, float* value );
-    static bool ToDouble( const char* str, double* value );
-	static bool ToInt64(const char* str, int64_t* value);
-    static bool ToUnsigned64(const char* str, uint64_t* value);
+    LLBC_WARN_UNUSED_RESULT static bool	ToInt( const char* str, int* value );
+    LLBC_WARN_UNUSED_RESULT static bool ToUnsigned( const char* str, unsigned* value );
+    LLBC_WARN_UNUSED_RESULT static bool	ToBool( const char* str, bool* value );
+    LLBC_WARN_UNUSED_RESULT static bool	ToFloat( const char* str, float* value );
+    LLBC_WARN_UNUSED_RESULT static bool ToDouble( const char* str, double* value );
+	LLBC_WARN_UNUSED_RESULT static bool ToInt64(const char* str, int64_t* value);
+    LLBC_WARN_UNUSED_RESULT static bool ToUnsigned64(const char* str, uint64_t* value);
 	// Changes what is serialized for a boolean value.
 	// Default to "true" and "false". Shouldn't be changed
 	// unless you have a special testing or compatibility need.
@@ -1887,7 +1887,7 @@ public:
         return _errorID;
     }
 	const char* ErrorName() const;
-    static const char* ErrorIDToName(XMLError errorID);
+    LLBC_WARN_UNUSED_RESULT static const char* ErrorIDToName(XMLError errorID);
 
     /** Returns a "long form" error description. A hopefully helpful
         diagnostic with location, line number, and/or additional info.

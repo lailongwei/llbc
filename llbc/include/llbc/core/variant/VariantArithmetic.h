@@ -81,7 +81,7 @@ private:
      * Implementation function.
      */
     template <typename RawType>
-    static RawType Performs_raw_operation(RawType left, RawType right, int type);
+    LLBC_WARN_UNUSED_RESULT static RawType Performs_raw_operation(RawType left, RawType right, int type);
 };
 
 __LLBC_NS_END

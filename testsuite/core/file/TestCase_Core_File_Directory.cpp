@@ -82,7 +82,7 @@ int TestCase_Core_File_Directory::CurDirTest()
     }
 
     LLBC_PrintLn("After set, current directory: %s", LLBC_Directory::CurDir().c_str());
-    LLBC_Directory::SetCurDir(curDir);
+    assert(LLBC_Directory::SetCurDir(curDir) == LLBC_OK);
 
     LLBC_Print("\n");
 
@@ -237,31 +237,31 @@ int TestCase_Core_File_Directory::GetFilesTest()
     LLBC_PrintLn("GetFiles test:");
 
     LLBC_PrintLn("Create some directories and files for test:");
-    LLBC_Directory::Create("a/b");
-    LLBC_Directory::Create("a/c");
-    LLBC_Directory::Create("a/d");
-    LLBC_File::TouchFile("a/z");
+    assert(LLBC_Directory::Create("a/b") == LLBC_OK);
+    assert(LLBC_Directory::Create("a/c") == LLBC_OK);
+    assert(LLBC_Directory::Create("a/d") == LLBC_OK);
+    assert(LLBC_File::TouchFile("a/z") == LLBC_OK);
 
-    LLBC_File::TouchFile("a/b/bb");
-    LLBC_File::TouchFile("a/c/cc");
-    LLBC_File::TouchFile("a/d/dd");
-    LLBC_Directory::Create("a/b/zz");
+    assert(LLBC_File::TouchFile("a/b/bb") == LLBC_OK);
+    assert(LLBC_File::TouchFile("a/c/cc") == LLBC_OK);
+    assert(LLBC_File::TouchFile("a/d/dd") == LLBC_OK);
+    assert(LLBC_Directory::Create("a/b/zz") == LLBC_OK);
 
     LLBC_PrintLn("Get files from directory a(recursive = false)");
     if (GetFilesTest("a", false) != LLBC_OK)
     {
-        LLBC_Directory::Remove("a");
+        assert(LLBC_Directory::Remove("a") == LLBC_OK);
         return LLBC_FAILED;
     }
 
     LLBC_PrintLn("Get files from directory a(recursive = true)");
     if (GetFilesTest("a", true) != LLBC_OK)
     {
-        LLBC_Directory::Remove("a");
+        assert(LLBC_Directory::Remove("a") == LLBC_OK);
         return LLBC_FAILED;
     }
 
-    LLBC_Directory::Remove("a");
+    assert(LLBC_Directory::Remove("a") == LLBC_OK);
     LLBC_Print("\n");
 
     return LLBC_OK;
@@ -272,31 +272,31 @@ int TestCase_Core_File_Directory::GetDirectoriesTest()
     LLBC_PrintLn("GetDirectories test:");
 
     LLBC_PrintLn("Create some directories and files for test:");
-    LLBC_Directory::Create("a/b");
-    LLBC_Directory::Create("a/c");
-    LLBC_Directory::Create("a/d");
-    LLBC_File::TouchFile("a/z");
+    assert(LLBC_Directory::Create("a/b") == LLBC_OK);
+    assert(LLBC_Directory::Create("a/c") == LLBC_OK);
+    assert(LLBC_Directory::Create("a/d") == LLBC_OK);
+    assert(LLBC_File::TouchFile("a/z") == LLBC_OK);
 
-    LLBC_File::TouchFile("a/b/bb");
-    LLBC_File::TouchFile("a/c/cc");
-    LLBC_File::TouchFile("a/d/dd");
-    LLBC_Directory::Create("a/b/zz");
+    assert(LLBC_File::TouchFile("a/b/bb") == LLBC_OK);
+    assert(LLBC_File::TouchFile("a/c/cc") == LLBC_OK);
+    assert(LLBC_File::TouchFile("a/d/dd") == LLBC_OK);
+    assert(LLBC_Directory::Create("a/b/zz") == LLBC_OK);
 
     LLBC_PrintLn("Get directories from directory a(recursive = false)");
     if (GetDirectoriesTest("a", false) != LLBC_OK)
     {
-        LLBC_Directory::Remove("a");
+        assert(LLBC_Directory::Remove("a") == LLBC_OK);
         return LLBC_FAILED;
     }
 
     LLBC_PrintLn("Get directories from directory a(recursive = true)");
     if (GetDirectoriesTest("a", true) != LLBC_OK)
     {
-        LLBC_Directory::Remove("a");
+        assert(LLBC_Directory::Remove("a") == LLBC_OK);
         return LLBC_FAILED;
     }
 
-    LLBC_Directory::Remove("a");
+    assert(LLBC_Directory::Remove("a") == LLBC_OK);
     LLBC_Print("\n");
 
     return LLBC_OK;

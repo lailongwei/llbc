@@ -47,20 +47,20 @@ public:
      * @param[in] mode - the rolling mode.
      * @return const LLBC_CString & - the rolling mode string representation.
      */
-    static const LLBC_CString &GetModeStr(int mode);
+    LLBC_WARN_UNUSED_RESULT static const LLBC_CString &GetModeStr(int mode);
 
     /**
      * Get rolling mode by rolling mode string.
      * @param[in] modeStr - the rolling mode string.
      * @return int - the rolling mode.
      */
-    static int Str2Mode(const LLBC_CString &modeStr);
+    LLBC_WARN_UNUSED_RESULT static int Str2Mode(const LLBC_CString &modeStr);
 
     /**
      * Check given rolling mode is validate or not.
      * @param[in] mode - the rolling mode.
      */
-    static bool IsValid(int mode);
+    LLBC_WARN_UNUSED_RESULT static bool IsValid(int mode);
 };
 
 __LLBC_NS_END

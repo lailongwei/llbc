@@ -181,7 +181,7 @@ private:
     /**
      * Get address info from given ip and port.
      */
-    static int GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr);
+    LLBC_WARN_UNUSED_RESULT static int GetAddr(const char *ip, uint16 port, LLBC_SockAddr_IN &addr);
 
 private:
     /**

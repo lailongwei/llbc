@@ -44,10 +44,10 @@ public:
      * @param[out] destFile - wide-character string file.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int MultiByteToWideChar(const LLBC_String &fromCode, const LLBC_String &src, LLBC_WString &dest);
-    static int MultiByteFileToWideChar(const LLBC_String &fromCode, const LLBC_String &srcFile, LLBC_WString &dest);
-    static int MultiByteToWideCharFile(const LLBC_String &fromCode, const LLBC_String &src, const LLBC_String &destFile);
-    static int MultiByteFileToWideCharFile(const LLBC_String &fromCode, const LLBC_String &srcFile, const LLBC_String &destFile);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteToWideChar(const LLBC_String &fromCode, const LLBC_String &src, LLBC_WString &dest);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteFileToWideChar(const LLBC_String &fromCode, const LLBC_String &srcFile, LLBC_WString &dest);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteToWideCharFile(const LLBC_String &fromCode, const LLBC_String &src, const LLBC_String &destFile);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteFileToWideCharFile(const LLBC_String &fromCode, const LLBC_String &srcFile, const LLBC_String &destFile);
 
     /**
      * Map a wide-character(Unicode) to a character string.
@@ -58,10 +58,10 @@ public:
      * @param[out] destFile - multi-byte character string file.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int WideCharToMultiByte(const LLBC_String &toCode, const LLBC_WString &src, LLBC_String &dest);
-    static int WideCharFileToMultiByte(const LLBC_String &toCode, const LLBC_String &srcFile, LLBC_String &dest);
-    static int WideCharToMultiByteFile(const LLBC_String &toCode, const LLBC_WString &src, const LLBC_String &destFile);
-    static int WideCharFileToMultiByteFile(const LLBC_String &toCode, const LLBC_String &srcFile, const LLBC_String &destFile);
+    LLBC_WARN_UNUSED_RESULT static int WideCharToMultiByte(const LLBC_String &toCode, const LLBC_WString &src, LLBC_String &dest);
+    LLBC_WARN_UNUSED_RESULT static int WideCharFileToMultiByte(const LLBC_String &toCode, const LLBC_String &srcFile, LLBC_String &dest);
+    LLBC_WARN_UNUSED_RESULT static int WideCharToMultiByteFile(const LLBC_String &toCode, const LLBC_WString &src, const LLBC_String &destFile);
+    LLBC_WARN_UNUSED_RESULT static int WideCharFileToMultiByteFile(const LLBC_String &toCode, const LLBC_String &srcFile, const LLBC_String &destFile);
 
     /**
      * Map a multi-byte character string to another character-set's multi-byte character string.
@@ -73,22 +73,22 @@ public:
      * @param[out] destFile - multi-byte character string file.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int MultiByteToMultiByte(const LLBC_String &fromCode,
-                                    const LLBC_String &src,
-                                    const LLBC_String &toCode,
-                                    LLBC_String &dest);
-    static int MultiByteFileToMultiByte(const LLBC_String &fromCode,
-                                        const LLBC_String &srcFile,
-                                        const LLBC_String &toCode,
-                                        LLBC_String &dest);
-    static int MultiByteToMultiByteFile(const LLBC_String &fromCode,
-                                        const LLBC_String &src,
-                                        const LLBC_String &toCode,
-                                        const LLBC_String &destFile);
-    static int MultiByteFileToMultiByteFile(const LLBC_String &fromCode,
-                                            const LLBC_String &srcFile,
-                                            const LLBC_String &toCode,
-                                            const LLBC_String &destFile);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteToMultiByte(const LLBC_String &fromCode,
+                                                            const LLBC_String &src,
+                                                            const LLBC_String &toCode,
+                                                            LLBC_String &dest);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteFileToMultiByte(const LLBC_String &fromCode,
+                                                                const LLBC_String &srcFile,
+                                                                const LLBC_String &toCode,
+                                                                LLBC_String &dest);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteToMultiByteFile(const LLBC_String &fromCode,
+                                                                const LLBC_String &src,
+                                                                const LLBC_String &toCode,
+                                                                const LLBC_String &destFile);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteFileToMultiByteFile(const LLBC_String &fromCode,
+                                                                    const LLBC_String &srcFile,
+                                                                    const LLBC_String &toCode,
+                                                                    const LLBC_String &destFile);
 
     /**
      * Map a character string to a wide-character(Unicode) string.
@@ -96,7 +96,7 @@ public:
      * @param[in] src      - string to map.
      * @return LLBC_WString - the wide-character string.
      */
-    static LLBC_WString MultiByteToWideChar(const LLBC_String &fromCode, const LLBC_String &src);
+    LLBC_WARN_UNUSED_RESULT static LLBC_WString MultiByteToWideChar(const LLBC_String &fromCode, const LLBC_String &src);
 
     /**
      * Map a wide-character(Unicode) to a character string.
@@ -104,7 +104,7 @@ public:
      * @param[in] src    - string to map.
      * @return LLBC_String - the character string.
      */
-    static LLBC_String WideCharToMultiByte(const LLBC_String &toCode, const LLBC_WString &src);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String WideCharToMultiByte(const LLBC_String &toCode, const LLBC_WString &src);
 
     /**
      * Map a multi-byte character string to another character-set's multi-byte character string.
@@ -113,7 +113,7 @@ public:
      * @param[in]  toCode   - another codepage name.
      * @return LLBC_String - the another character-set's multi-byte character string.
      */
-    static LLBC_String MultiByteToMultiByte(const LLBC_String &fromCode, const LLBC_String &src, const LLBC_String &toCode);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String MultiByteToMultiByte(const LLBC_String &fromCode, const LLBC_String &src, const LLBC_String &toCode);
 
 private:
     /**
@@ -122,8 +122,8 @@ private:
      * @param[out] content  - file content.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int ReadMultiByteFile(const LLBC_String &fileName, LLBC_String &content);
-    static int ReadWideCharFile(const LLBC_String &fileName, LLBC_WString &content);
+    LLBC_WARN_UNUSED_RESULT static int ReadMultiByteFile(const LLBC_String &fileName, LLBC_String &content);
+    LLBC_WARN_UNUSED_RESULT static int ReadWideCharFile(const LLBC_String &fileName, LLBC_WString &content);
 
     /**
      * Save multi-byte/wide-char content to file.
@@ -131,8 +131,8 @@ private:
      * @param[in] fileName - will save file name.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int WriteMultiByteToFile(const LLBC_String &content, const LLBC_String &fileName);
-    static int WriteWideCharToFile(const LLBC_WString &content, const LLBC_String &fileName);
+    LLBC_WARN_UNUSED_RESULT static int WriteMultiByteToFile(const LLBC_String &content, const LLBC_String &fileName);
+    LLBC_WARN_UNUSED_RESULT static int WriteWideCharToFile(const LLBC_WString &content, const LLBC_String &fileName);
 };
 
 __LLBC_NS_END

@@ -43,12 +43,12 @@ public:
     /**
      * Convert flow type to string format.
      */
-    static const char *Type2Str(int type);
+    LLBC_WARN_UNUSED_RESULT static const char *Type2Str(int type);
 
     /**
      * Convert flow string format to flow type.
      */
-    static int Str2Type(const char *type);
+    LLBC_WARN_UNUSED_RESULT static int Str2Type(const char *type);
 
     LLBC_DISABLE_ASSIGNMENT(LLBC_FlowType);
 };

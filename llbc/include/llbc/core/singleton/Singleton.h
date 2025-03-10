@@ -46,7 +46,7 @@ public:
      * Get the instance of singleton.
      * @return T * - singleton instance.
      */
-    static T *Instance();
+    LLBC_WARN_UNUSED_RESULT static T *Instance();
 
     /**
      *  Release instance object.
