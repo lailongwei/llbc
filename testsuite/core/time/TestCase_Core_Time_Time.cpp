@@ -258,7 +258,7 @@ void TestCase_Core_Time_Time::TimeClassTest()
     for (size_t i = 0; i < fromTimeStrPerfTestTimes; ++i)
     {
         for (size_t j = 0; j < testTimeStrs.size(); ++j)
-            LLBC_Time::FromTimeStr(testTimeStrs[j]);
+            auto temp_time = LLBC_Time::FromTimeStr(testTimeStrs[j]);
     }
     const auto costTime = LLBC_GetMicroseconds() - begTime;
     std::cout << "LLBC_Time::FromTimeStr() perf test finished"
