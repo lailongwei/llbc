@@ -36,21 +36,21 @@ public:
      * @param[in] path - the given path.
      * @return bool - return true if given path exists and is directory.
      */
-    static bool Exists(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static bool Exists(const LLBC_String &path);
 
     /**
      * Recursive create directory.
      * @param[in] path - the will create directory path.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int Create(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static int Create(const LLBC_String &path);
 
     /**
      * Recursive remove directory.
      * @param[in] path - the will remove path.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int Remove(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static int Remove(const LLBC_String &path);
 
 public:
     /**
@@ -58,13 +58,13 @@ public:
      * @param[in] path - the path.
      * @return bool - return true if given path is abs path, otherwise return false.
      */
-    static bool IsAbsPath(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static bool IsAbsPath(const LLBC_String &path);
 
     /**
      * Convert path to normalized absolutize path.
      * @return LLBC_String - the normalized absolutize path.
      */
-    static LLBC_String AbsPath(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String AbsPath(const LLBC_String &path);
 
     /**
      * Join one or more path components intelligently.
@@ -72,22 +72,22 @@ public:
      * @param[in] paths   - the paths list.
      * @return LLBC_String - the joined path.
      */
-    static LLBC_String Join(const LLBC_String &path1,
-                            const LLBC_String &path2);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String Join(const LLBC_String &path1,
+                                                    const LLBC_String &path2);
 
-    static LLBC_String Join(const LLBC_Strings &paths);
-    static LLBC_String Join(const LLBC_String &path1,
-                            const LLBC_Strings &paths);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String Join(const LLBC_Strings &paths);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String Join(const LLBC_String &path1,
+                                                    const LLBC_Strings &paths);
 
     template<typename ...Args>
-    static LLBC_String Join(const LLBC_String &path1, const LLBC_String &path2, Args... args);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String Join(const LLBC_String &path1, const LLBC_String &path2, Args... args);
 
     /**
      * Split file extension, always success.
      * @param[in] path - the file path.
      * @return LLBC_Strings - the splited parts, patrts[0] is not has extension path, parts[1] is the file extension.
      */
-    static LLBC_Strings SplitExt(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Strings SplitExt(const LLBC_String &path);
 
     /**
      * Get specific path's files, not include directory type files.
@@ -96,7 +96,7 @@ public:
      * @param[in] recursive  - recursive flag, if set to true, function will recursive scan path, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int GetFiles(const LLBC_String &path, LLBC_Strings &files, bool recursive = false);
+    LLBC_WARN_UNUSED_RESULT static int GetFiles(const LLBC_String &path, LLBC_Strings &files, bool recursive = false);
 
     /**
      * Get specific path's files, not include directory type files.
@@ -106,7 +106,7 @@ public:
      * @param[in] recursive  - recursive flag, if set to true, function will recursive scan path, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &ext, bool recursive = false);
+    LLBC_WARN_UNUSED_RESULT static int GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &ext, bool recursive = false);
 
     /**
      * Recursive specific path's directories.
@@ -115,78 +115,78 @@ public:
      * @param[in] recursive    - recursive flag, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int GetDirectories(const LLBC_String &path, LLBC_Strings &directories, bool recursive = false);
+    LLBC_WARN_UNUSED_RESULT static int GetDirectories(const LLBC_String &path, LLBC_Strings &directories, bool recursive = false);
 
 public:
     /**
      * Get current executable module file directory.
      * @return LLBC_String - the module file directory.
      */
-    static LLBC_String ModuleFileDir();
+    LLBC_WARN_UNUSED_RESULT static LLBC_String ModuleFileDir();
 
     /**
      * Get current executable module file name.
      * @return LLBC_String - the module file name.
      */
-    static LLBC_String ModuleFileName();
+    LLBC_WARN_UNUSED_RESULT static LLBC_String ModuleFileName();
 
     /**
      * Get current executable module file path(dir + name).
      * @return LLBC_String - the module file path.
      */
-    static LLBC_String ModuleFilePath();
+    LLBC_WARN_UNUSED_RESULT static LLBC_String ModuleFilePath();
 
     /**
      * Get given path directory name.
      * @param[in] path - the path.
      * @return LLBC_String - the directory name for the path.
      */
-    static LLBC_String DirName(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String DirName(const LLBC_String &path);
 
     /**
      * Get given path base name.
      * @param[in] path - the path.
      * @return LLBC_String - the base name for the path.
      */
-    static LLBC_String BaseName(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String BaseName(const LLBC_String &path);
 
 public:
     /**
      * Get current directory.
      * @return LLBC_String - current directory.
      */
-    static LLBC_String CurDir();
+    LLBC_WARN_UNUSED_RESULT static LLBC_String CurDir();
 
     /**
      * Set current directory.
      * @param[in] path - the new current directory.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int SetCurDir(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static int SetCurDir(const LLBC_String &path);
 
     /**
      * Get document directory.
      * @return LLBC_String - document directory.
      */
-    static LLBC_String DocDir();
+    LLBC_WARN_UNUSED_RESULT static LLBC_String DocDir();
 
     /**
      * Get home directory.
      * @return LLBC_String - the home directory.
      */
-    static LLBC_String HomeDir();
+    LLBC_WARN_UNUSED_RESULT static LLBC_String HomeDir();
 
     /**
      * Get temporary directory.
      * @return LLBC_String - the temporary directory.
      */
-    static LLBC_String TempDir();
+    LLBC_WARN_UNUSED_RESULT static LLBC_String TempDir();
 
     /**
      * Get cache directory.
      * @return LLBC_String - the cache directory.
      */
-    static LLBC_String CacheDir();
+    LLBC_WARN_UNUSED_RESULT static LLBC_String CacheDir();
 };
 
 __LLBC_NS_END

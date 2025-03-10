@@ -33,7 +33,7 @@ template <>
 struct LLBC_Stream::__LLBC_STLArrayReader<0>
 {
     template <typename Arr>
-    static bool Read(Arr &arr, LLBC_NS LLBC_Stream &stream)
+    LLBC_WARN_UNUSED_RESULT static bool Read(Arr &arr, LLBC_NS LLBC_Stream &stream)
     {
         return true;
     }
@@ -58,7 +58,7 @@ template <>
 struct LLBC_Stream::__LLBC_TupleReader<0>
 {
     template <typename Tup>
-    static bool Read(Tup &tup, LLBC_Stream &stream)
+    LLBC_WARN_UNUSED_RESULT static bool Read(Tup &tup, LLBC_Stream &stream)
     {
         return true;
     }

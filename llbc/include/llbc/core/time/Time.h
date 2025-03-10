@@ -60,25 +60,25 @@ public:
     /**
      * Get current time.
      */
-    static LLBC_Time Now();
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time Now();
 
     /**
      * Get now timestamp, in seconds.
      * @return time_t - now timestamp, in seconds.
      */
-    static time_t NowTimestampInSecs();
+    LLBC_WARN_UNUSED_RESULT static time_t NowTimestampInSecs();
 
     /**
      * Get now timestamp, in milli-seconds.
      * @return time_t - now timestamp, in milli-seconds.
      */
-    static sint64 NowTimestampInMillis();
+    LLBC_WARN_UNUSED_RESULT static sint64 NowTimestampInMillis();
 
     /**
      * Get now timestamp, in micro-seconds.
      * @return time_t - now timestamp, in micro-seconds.
      */
-    static sint64 NowTimestampInMicros();
+    LLBC_WARN_UNUSED_RESULT static sint64 NowTimestampInMicros();
 
 public:
     /**
@@ -90,29 +90,29 @@ public:
      * @param[in] <time parts>     - the all time parts(year, month, day, ...). 
      * @return LLBC_Time - Time object.
      */
-    static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
-    static LLBC_Time FromMillis(sint64 clanderTimeInMillis);
-    static LLBC_Time FromMicros(sint64 clanderTimeInMicros);
-    static LLBC_Time FromTimeVal(const timeval &timeVal);
-    static LLBC_Time FromTimeSpec(const timespec &timeSpec);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromMillis(sint64 clanderTimeInMillis);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromMicros(sint64 clanderTimeInMicros);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeVal(const timeval &timeVal);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeSpec(const timespec &timeSpec);
     template <size_t _StrArrLen>
-    static LLBC_Time FromTimeStr(const char (&timeStr)[_StrArrLen]);
-    static LLBC_Time FromTimeStr(const char *timeStr);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStr(const char (&timeStr)[_StrArrLen]);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStr(const char *timeStr);
     template <typename _StrType>
-    static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
+    LLBC_WARN_UNUSED_RESULT static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
     FromTimeStr(const _StrType &timeStr);
-    static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
-    static LLBC_Time FromTimeStruct(const tm &timeStruct,
-                                    int milliSec = 0,
-                                    int microSec = 0);
-    static LLBC_Time FromTimeParts(int year,
-                                   int month,
-                                   int day,
-                                   int hour,
-                                   int minute,
-                                   int second,
-                                   int milliSec = 0,
-                                   int microSec = 0);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStruct(const tm &timeStruct,
+                                                            int milliSec = 0,
+                                                            int microSec = 0);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeParts(int year,
+                                                           int month,
+                                                           int day,
+                                                           int hour,
+                                                           int minute,
+                                                           int second,
+                                                           int milliSec = 0,
+                                                           int microSec = 0);
 
 public:
     /**
@@ -255,13 +255,13 @@ public:
      * Format local time, see strftime() api.
      */
     LLBC_String Format(const char *format = nullptr) const;
-    static LLBC_String Format(const time_t &clanderTimeInSeconds, const char *format);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String Format(const time_t &clanderTimeInSeconds, const char *format);
 
     /**
      * Format gmt time, see strftime() api.
      */
     LLBC_String FormatAsGmt(const char *format = nullptr) const;
-    static LLBC_String FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format);
 
 public:
     /**
@@ -285,7 +285,7 @@ public:
      * @param[in] year - the given year.
       *@return bool - return true it means given year is leap year, otherwise not.
      */
-    static bool IsLeapYear(int year);
+    LLBC_WARN_UNUSED_RESULT static bool IsLeapYear(int year);
 
     /**
      * Get specific month max days.
@@ -293,7 +293,7 @@ public:
      * @param[in] month - the month.
      * @return int - the specific month max days, if failed, return 0.
      */
-    static int GetMonthMaxDays(int year, int month);
+    LLBC_WARN_UNUSED_RESULT static int GetMonthMaxDays(int year, int month);
 
     /**
      * Get specific month span days.
@@ -301,7 +301,7 @@ public:
      * @param[in] month - the month - [1, 12].
      * @return int - the month span days(not included giving month).
      */
-    static int GetMonthSpanDays(int year, int month);
+    LLBC_WARN_UNUSED_RESULT static int GetMonthSpanDays(int year, int month);
 
 public:
     /**
@@ -334,9 +334,9 @@ public:
      * @param[in] timeOfHour - cross time of hour point.
      * @return int - crossed hours.
      */
-    static int GetCrossedHours(const LLBC_Time &from,
-                               const LLBC_Time &to,
-                               const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
+    LLBC_WARN_UNUSED_RESULT static int GetCrossedHours(const LLBC_Time &from,
+                                                       const LLBC_Time &to,
+                                                       const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
 
     /**
      * Get crossed days between from and to time.
@@ -345,9 +345,9 @@ public:
      * @param[in] diffHours - diff time from daily zero time.
      * @return int - crossed days.
      */
-    static int GetCrossedDays(const LLBC_Time &from, 
-                              const LLBC_Time &to,
-                              const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
+    LLBC_WARN_UNUSED_RESULT static int GetCrossedDays(const LLBC_Time &from,
+                                                      const LLBC_Time &to,
+                                                      const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
 
     /**
      * Get crossed weeks between from and to time.
@@ -356,9 +356,9 @@ public:
      * @param[in] timeOfWeek - cross time of week point.
      * @return int - crossed weeks.
      */
-    static int GetCrossedWeeks(const LLBC_Time &from,
-                               const LLBC_Time &to,
-                               const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
+    LLBC_WARN_UNUSED_RESULT static int GetCrossedWeeks(const LLBC_Time &from,
+                                                       const LLBC_Time &to,
+                                                       const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
 
     /**
      * Get crossed months between from and to time.
@@ -369,9 +369,9 @@ public:
      * @note: timeOfMonth must be less than 31 days old, otherwise will return 0.
      *        if timeOfMonth=oneDay, it means it's the second day of month.
      */
-    static int GetCrossedMonths(const LLBC_Time &from,
-                                const LLBC_Time &to,
-                                const LLBC_TimeSpan &timeOfMonth = LLBC_TimeSpan::zero);
+    LLBC_WARN_UNUSED_RESULT static int GetCrossedMonths(const LLBC_Time &from,
+                                                        const LLBC_Time &to,
+                                                        const LLBC_TimeSpan &timeOfMonth = LLBC_TimeSpan::zero);
      
 
 public:
@@ -415,7 +415,7 @@ private:
      * @param[in] timeStrLen - the time string length, not included '\0'.
      * @return LLBC_Time - time obuect.
      */
-    static LLBC_Time FromTimeStr(const char *timeStr, size_t timeStrLen);
+    LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStr(const char *timeStr, size_t timeStrLen);
 
     /**
      * Internal constructor.
@@ -438,10 +438,10 @@ private:
     /**
      * Crossed time-cycle internal implement. 
      */
-    static LLBC_TimeSpan GetCrossedCycles(const LLBC_Time &from,
-                                         const LLBC_Time &to,
-                                         const LLBC_TimeSpan &timeCycle,
-                                         LLBC_TimeSpan timeOfTimeCycle);
+    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan GetCrossedCycles(const LLBC_Time &from,
+                                                                  const LLBC_Time &to,
+                                                                  const LLBC_TimeSpan &timeCycle,
+                                                                  LLBC_TimeSpan timeOfTimeCycle);
 
 private:
     sint64 _time;

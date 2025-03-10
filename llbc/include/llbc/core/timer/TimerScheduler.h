@@ -52,7 +52,7 @@ public:
      * Get current thread timer scheduler, thread must be LLBC style thread.
      * @return _This * - timer scheduler pointer.
      */
-    static _This *GetCurrentThreadScheduler();
+    LLBC_WARN_UNUSED_RESULT static _This *GetCurrentThreadScheduler();
 
 public:
     /**

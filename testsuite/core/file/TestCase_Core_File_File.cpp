@@ -32,7 +32,7 @@ TestCase_Core_File_File::TestCase_Core_File_File()
 
 TestCase_Core_File_File::~TestCase_Core_File_File()
 {
-    LLBC_File::DeleteFile(_testFileName);
+    if (LLBC_File::DeleteFile(_testFileName) != LLBC_OK);
 }
 
 int TestCase_Core_File_File::Run(int argc, char *argv[])
@@ -341,23 +341,23 @@ bool TestCase_Core_File_File::FileAttributeTest()
     }
 
     LLBC_PrintLn("Touched, attributes:");
-    LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
+    assert(LLBC_File::GetFileAttributes(_testFileName, fileAttrs) == LLBC_OK);
     PrintFileAttributes(fileAttrs);
 
     LLBC_PrintLn("Sleep 2 seconds...");
     LLBC_Sleep(2000);
     LLBC_PrintLn("Touch last access time to now");
-    LLBC_File::TouchFile(_testFileName, true, nullptr, false, nullptr);
+    assert(LLBC_File::TouchFile(_testFileName, true, nullptr, false, nullptr) == LLBC_OK);
     LLBC_PrintLn("Touched, attributes:");
-    LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
+    assert(LLBC_File::GetFileAttributes(_testFileName, fileAttrs) == LLBC_OK);
     PrintFileAttributes(fileAttrs);
 
     LLBC_PrintLn("Sleep 2 seconds...");
     LLBC_Sleep(2000);
     LLBC_PrintLn("Touch last modify time to now");
-    LLBC_File::TouchFile(_testFileName, false, nullptr, true, nullptr);
+    assert(LLBC_File::TouchFile(_testFileName, false, nullptr, true, nullptr) == LLBC_OK);
     LLBC_PrintLn("Touched, attributes:");
-    LLBC_File::GetFileAttributes(_testFileName, fileAttrs);
+    assert(LLBC_File::GetFileAttributes(_testFileName, fileAttrs) == LLBC_OK);
     PrintFileAttributes(fileAttrs);
 
     LLBC_Print("\n");
@@ -402,7 +402,7 @@ bool TestCase_Core_File_File::CopyFileTest()
     if (file.CopyFile(copyFileName, false) == LLBC_OK)
     {
         LLBC_PrintLn("Copy success, failed. check your code!");
-        LLBC_File::DeleteFile(copyFileName);
+        assert(LLBC_File::DeleteFile(copyFileName) == LLBC_OK);
 
         return false;
     }
@@ -412,7 +412,7 @@ bool TestCase_Core_File_File::CopyFileTest()
     }
 
     LLBC_PrintLn("Delete copy file");
-    LLBC_File::DeleteFile(copyFileName);
+    assert(LLBC_File::DeleteFile(copyFileName) == LLBC_OK);
 
     LLBC_Print("\n");
 
@@ -453,13 +453,13 @@ bool TestCase_Core_File_File::MoveFileTest()
     moveFile.Close();
 
     const LLBC_String copyFileName = _testFileName + ".copy";
-    LLBC_File::CopyFile(moveFileName, copyFileName, true);
+    assert(LLBC_File::CopyFile(moveFileName, copyFileName, true) == LLBC_OK);
     LLBC_PrintLn("Copy move file and move again(don't overlapped): %s ---> %s", copyFileName.c_str(), copyFileName.c_str());
     if (LLBC_File::MoveFile(copyFileName, moveFileName, false) == LLBC_OK)
     {
         LLBC_PrintLn("Move success, failed. check your code!");
-        LLBC_File::DeleteFile(copyFileName);
-        LLBC_File::DeleteFile(moveFileName);
+        assert(LLBC_File::DeleteFile(copyFileName) == LLBC_OK);
+        assert(LLBC_File::DeleteFile(moveFileName) == LLBC_OK);
 
         return false;
     }
@@ -469,8 +469,8 @@ bool TestCase_Core_File_File::MoveFileTest()
     }
 
     LLBC_PrintLn("Delete copy file and move file");
-    LLBC_File::DeleteFile(copyFileName);
-    LLBC_File::DeleteFile(moveFileName);
+    assert(LLBC_File::DeleteFile(copyFileName) == LLBC_OK);
+    assert(LLBC_File::DeleteFile(moveFileName) == LLBC_OK);
 
     LLBC_Print("\n");
 

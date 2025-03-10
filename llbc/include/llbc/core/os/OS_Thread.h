@@ -69,7 +69,7 @@ public:
      * @param[in] threadPriority - the thread priority.
      * @return bool - the valid flag.
      */
-    static bool IsValid(int threadPriority);
+    LLBC_WARN_UNUSED_RESULT static bool IsValid(int threadPriority);
 };
 
 /**

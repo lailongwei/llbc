@@ -236,7 +236,7 @@ private:
         digits_[count_++] = digit;
     }
 
-    static uint64_t ParseUint64(const char* begin, const char* end) {
+    LLBC_WARN_UNUSED_RESULT static uint64_t ParseUint64(const char* begin, const char* end) {
         uint64_t r = 0;
         for (const char* p = begin; p != end; ++p) {
             LLBC_RAPIDJSON_ASSERT(*p >= '0' && *p <= '9');
@@ -246,7 +246,7 @@ private:
     }
 
     // Assume a * b + k < 2^128
-    static uint64_t MulAdd64(uint64_t a, uint64_t b, uint64_t k, uint64_t* outHigh) {
+    LLBC_WARN_UNUSED_RESULT static uint64_t MulAdd64(uint64_t a, uint64_t b, uint64_t k, uint64_t* outHigh) {
 #if defined(_MSC_VER) && defined(_M_AMD64)
         uint64_t low = _umul128(a, b, outHigh) + k;
         if (low < k)

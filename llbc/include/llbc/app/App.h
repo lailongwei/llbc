@@ -57,14 +57,14 @@ public:
      * @param[in] cfgType - the application config type.
      * @return const LLBC_Strings & - the config suffixex.
      */
-    static const LLBC_Strings &GetConfigSuffixes(int cfgType);
+    LLBC_WARN_UNUSED_RESULT static const LLBC_Strings &GetConfigSuffixes(int cfgType);
 
     /**
      * Get config type. 
      * @param cfgSuffix - the config suffix, case insensitive.
      * @return ENUM - the config type, if unsupported application config, return End.
      */
-    static ENUM GetConfigType(const LLBC_String &cfgSuffix);
+    LLBC_WARN_UNUSED_RESULT static ENUM GetConfigType(const LLBC_String &cfgSuffix);
 };
 
 /**
@@ -183,8 +183,8 @@ public:
      * @return App * - this application.
      */
     template <typename App>
-    static App *ThisApp() { return static_cast<App *>(_thisApp); }
-    static LLBC_App *ThisApp() { return _thisApp; }
+    LLBC_WARN_UNUSED_RESULT static App *ThisApp() { return static_cast<App *>(_thisApp); }
+    LLBC_WARN_UNUSED_RESULT static LLBC_App *ThisApp() { return _thisApp; }
 
 public:
     /**
@@ -363,7 +363,7 @@ private:
      * @param[out] cfgType - the application config type.
      * @return LLBC_String - the application config path, return empty string if failed.
      */
-    static LLBC_String LocateConfigPath(const LLBC_String &appName, int &cfgType);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String LocateConfigPath(const LLBC_String &appName, int &cfgType);
 
     /**
      * Application reload implement method.

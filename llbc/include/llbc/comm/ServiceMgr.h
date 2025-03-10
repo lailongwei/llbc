@@ -143,9 +143,9 @@ private:
     LLBC_Service *GetServiceNonLock(int id);
     LLBC_Service *GetServiceNonLock(const LLBC_CString &name);
 
-    static bool InTls(const LLBC_Service *svc);
-    static bool InTls(const Id2Services &svcs);
-    static bool InTls(const Name2Services &svcs);
+    LLBC_WARN_UNUSED_RESULT static bool InTls(const LLBC_Service *svc);
+    LLBC_WARN_UNUSED_RESULT static bool InTls(const Id2Services &svcs);
+    LLBC_WARN_UNUSED_RESULT static bool InTls(const Name2Services &svcs);
 
 private:
     mutable LLBC_SpinLock _lock;

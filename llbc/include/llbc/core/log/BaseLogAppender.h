@@ -59,7 +59,7 @@ public:
      * Check givin appender type is valid or not.
      * @return bool - reutrn true if valid, otherwise return false.
      */
-    static constexpr bool IsValid(int appenderType) { return appenderType >= Begin && appenderType < End; }
+    LLBC_WARN_UNUSED_RESULT static constexpr bool IsValid(int appenderType) { return appenderType >= Begin && appenderType < End; }
 };
 
 /**

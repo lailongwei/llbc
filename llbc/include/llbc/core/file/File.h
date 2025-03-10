@@ -62,7 +62,7 @@ public:
      * @param[in] fileMode - the file mode.
      * @return LLBC_String - The file mode string representation.
      */
-    static LLBC_String GetFileModeDesc(int fileMode);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String GetFileModeDesc(int fileMode);
 };
 
 /**
@@ -206,7 +206,7 @@ public:
      * @return int - the file no, if failed, return -1.
      */
     int GetFileNo() const;
-    static int GetFileNo(LLBC_FileHandle handle);
+    LLBC_WARN_UNUSED_RESULT static int GetFileNo(LLBC_FileHandle handle);
 
     /**
      * Get file object wrapped file system level file handle, unsafe.
@@ -309,7 +309,7 @@ public:
      *                       otherwise return error a special error code.
      */
     LLBC_String ReadToEnd();
-    static LLBC_String ReadToEnd(const LLBC_String &filePath);
+    LLBC_WARN_UNUSED_RESULT static LLBC_String ReadToEnd(const LLBC_String &filePath);
 
     /**
      * File bytes read method.
@@ -386,7 +386,7 @@ public:
      * @param[in] path - the file path.
      * @return bool - return true if the file exist, otherwise return false.
      */
-    static bool Exists(const LLBC_String &path);
+    LLBC_WARN_UNUSED_RESULT static bool Exists(const LLBC_String &path);
 
     /**
      * Get file attributes.
@@ -395,7 +395,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int GetFileAttributes(LLBC_FileAttributes &attrs);
-    static int GetFileAttributes(const LLBC_String &path, LLBC_FileAttributes &attrs);
+    LLBC_WARN_UNUSED_RESULT static int GetFileAttributes(const LLBC_String &path, LLBC_FileAttributes &attrs);
 
     /**
      * Touch file.
@@ -409,11 +409,11 @@ public:
      * @param[in] lastModifyTime       - the last modify time, if nullptr, will update to now.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int TouchFile(const LLBC_String &filePath,
-                         bool updateLastAccessTime = true,
-                         const timespec *lastAccessTime = nullptr,
-                         bool updateLastModifyTime = true,
-                         const timespec *lastModifyTime = nullptr);
+    LLBC_WARN_UNUSED_RESULT static int TouchFile(const LLBC_String &filePath,
+                                                 bool updateLastAccessTime = true,
+                                                 const timespec *lastAccessTime = nullptr,
+                                                 bool updateLastModifyTime = true,
+                                                 const timespec *lastModifyTime = nullptr);
 
 public:
     /**
@@ -426,7 +426,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int CopyFile(const LLBC_String &destFilePath, bool overlapped = false);
-    static int CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destFilePath, bool overlapped = false);
+    LLBC_WARN_UNUSED_RESULT static int CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destFilePath, bool overlapped = false);
 
     /**
      * Move file.
@@ -437,7 +437,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int MoveFile(const LLBC_String &toFilePath, bool overlapped = false);
-    static int MoveFile(const LLBC_String &fromFilePath, const LLBC_String &toFilePath, bool overlapped = false);
+    LLBC_WARN_UNUSED_RESULT static int MoveFile(const LLBC_String &fromFilePath, const LLBC_String &toFilePath, bool overlapped = false);
 
     /**
      * Delete file.
@@ -445,14 +445,14 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int DeleteFile();
-    static int DeleteFile(const LLBC_String &filePath);
+    LLBC_WARN_UNUSED_RESULT static int DeleteFile(const LLBC_String &filePath);
 
 private:
     /**
      * Parse file mode to system file access mode.
      * @return const char * - the system file string access mode.
      */
-    static const char *ParseFileMode(int mode);
+    LLBC_WARN_UNUSED_RESULT static const char *ParseFileMode(int mode);
 
     template <typename T>
     int ReadRawObj(T &obj);
