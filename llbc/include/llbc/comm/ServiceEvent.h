@@ -282,12 +282,14 @@ public:
     /**
      * Build unsubscribe-event event.
      */
-    static LLBC_MessageBlock *BuildUnsubscribeEventEv(int id, const LLBC_ListenerStub &stub);
+    static LLBC_MessageBlock *BuildUnsubscribeEventEv(int id,
+                                                      const LLBC_ListenerStub &stub);
 
     /**
      * Build fire-event event.
      */
-    static LLBC_MessageBlock *BuildFireEventEv(LLBC_Event *ev, const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
+    static LLBC_MessageBlock *BuildFireEventEv(LLBC_Event *ev,
+                                               const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
 
     /**
      * Build application phase event.
@@ -302,12 +304,14 @@ public:
     /**
      * Build application reloaded event.
      */
-    static LLBC_MessageBlock *BuildAppReloadedEv(int cfgType, const LLBC_Variant &cfg);
+    static LLBC_MessageBlock *BuildAppReloadedEv(int cfgType,
+                                                 const LLBC_Variant &cfg);
 
     /**
      * Build component event ev.
      */
-    static LLBC_MessageBlock *BuildComponentEventEv(int eventType, const LLBC_Variant &eventParams);
+    static LLBC_MessageBlock *BuildComponentEventEv(int eventType,
+                                                    const LLBC_Variant &eventParams);
 
 public:
     /**
