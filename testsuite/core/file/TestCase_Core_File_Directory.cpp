@@ -275,7 +275,7 @@ int TestCase_Core_File_Directory::GetDirectoriesTest()
     LLBC_Directory::Create("a/b");
     LLBC_Directory::Create("a/c");
     LLBC_Directory::Create("a/d");
-    LLBC_File::TouchFile("a/z")
+    LLBC_File::TouchFile("a/z");
 
     LLBC_File::TouchFile("a/b/bb");
     LLBC_File::TouchFile("a/c/cc");
