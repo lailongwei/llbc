@@ -314,7 +314,7 @@ public:
      *                       otherwise return error a special error code.
      */
     LLBC_String ReadToEnd();
-    static LLBC_String ReadToEnd(const LLBC_String &filePath);
+    LLBC_NO_DISCARD static LLBC_String ReadToEnd(const LLBC_String &filePath);
 
     /**
      * File bytes read method.
