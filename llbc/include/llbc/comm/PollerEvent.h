@@ -92,7 +92,9 @@ public:
     /**
      * Build AddSock event.
      */
-    static LLBC_MessageBlock *BuildAddSockEv(LLBC_Socket *sock, int sessionId, const LLBC_SessionOpts &sessionOpts);
+    static LLBC_MessageBlock *BuildAddSockEv(LLBC_Socket *sock,
+                                             int sessionId,
+                                             const LLBC_SessionOpts &sessionOpts);
     
     /**
      * Build Async-Conn event.
@@ -109,7 +111,8 @@ public:
     /**
      * Build close event.
      */
-    static LLBC_MessageBlock *BuildCloseEv(int sessionId, const char *reason);
+    static LLBC_MessageBlock *BuildCloseEv(int sessionId,
+                                           const char *reason);
 
     /**
      * Build Iocp monitor event.
@@ -121,7 +124,8 @@ public:
      * Build Epoll monitor event.
      */
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    static LLBC_MessageBlock *BuildEpollMonitorEv(const LLBC_EpollEvent *evs, int count);
+    static LLBC_MessageBlock *BuildEpollMonitorEv(const LLBC_EpollEvent *evs,
+                                                  int count);
 #endif
 
     /**
@@ -132,7 +136,9 @@ public:
     /**
      * Build control protocol stack event.
      */
-    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData);
+    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId,
+                                                       int ctrlCmd,
+                                                       const LLBC_Variant &ctrlData);
 
 public:
     /**
