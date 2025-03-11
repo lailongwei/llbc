@@ -116,8 +116,7 @@ private:
     /**
      * Escape property value.
      */
-    static void EscapeValue(const LLBC_String &rawValue,
-                            LLBC_String &escapedValue);
+    static void EscapeValue(const LLBC_String &rawValue, LLBC_String &escapedValue);
     /**
      * Unescape property value.
      */
