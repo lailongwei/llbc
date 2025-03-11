@@ -46,22 +46,22 @@ public:
      * Relational operators.
      * ==, !=, <, >, <=, >=
      */
-    LLBC_NO_DISCARD static bool eq(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static bool ne(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static bool lt(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static bool gt(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static bool le(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static bool ge(const LLBC_Variant &left, const LLBC_Variant &right);
+    static bool eq(const LLBC_Variant &left, const LLBC_Variant &right);
+    static bool ne(const LLBC_Variant &left, const LLBC_Variant &right);
+    static bool lt(const LLBC_Variant &left, const LLBC_Variant &right);
+    static bool gt(const LLBC_Variant &left, const LLBC_Variant &right);
+    static bool le(const LLBC_Variant &left, const LLBC_Variant &right);
+    static bool ge(const LLBC_Variant &left, const LLBC_Variant &right);
 
     /**
      * Arithmetic operators.
      * +, -, *, /, %
      */
-    LLBC_NO_DISCARD static LLBC_Variant add(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static LLBC_Variant sub(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static LLBC_Variant mul(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static LLBC_Variant div(const LLBC_Variant &left, const LLBC_Variant &right);
-    LLBC_NO_DISCARD static LLBC_Variant mod(const LLBC_Variant &left, const LLBC_Variant &right);
+    static LLBC_Variant add(const LLBC_Variant &left, const LLBC_Variant &right);
+    static LLBC_Variant sub(const LLBC_Variant &left, const LLBC_Variant &right);
+    static LLBC_Variant mul(const LLBC_Variant &left, const LLBC_Variant &right);
+    static LLBC_Variant div(const LLBC_Variant &left, const LLBC_Variant &right);
+    static LLBC_Variant mod(const LLBC_Variant &left, const LLBC_Variant &right);
 
     /**
      * Arithmetic operators.

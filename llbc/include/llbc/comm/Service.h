@@ -93,21 +93,21 @@ public:
      * @param[in] runningPhase - the running phase.
      * @return bool - failed phase flag.
      */
-    LLBC_NO_DISCARD static constexpr bool IsFailedPhase(int runningPhase);
+    static constexpr bool IsFailedPhase(int runningPhase);
 
     /**
      * Check given running phase is stopping phase or not.
      * @param[in] runningPhase - the running phase.
      * @return bool - stopping phase flag.
      */
-    LLBC_NO_DISCARD static constexpr bool IsStoppingPhase(int runningPhase);
+    static constexpr bool IsStoppingPhase(int runningPhase);
 
     /**
      * Check given running phase is failed/stopping phase or not.
      * @param[in] runningPhase - the running phase.
      * @return bool - failed/stopping phase flag.
      */
-    LLBC_NO_DISCARD static constexpr bool IsFailedOrStoppingPhase(int runningPhase);
+    static constexpr bool IsFailedOrStoppingPhase(int runningPhase);
 };
 
 /**
@@ -132,7 +132,7 @@ public:
      * @param[in] driveMode - the service drive mode.
      * @return bool - return true if validate, otherwise return false.
      */
-    LLBC_NO_DISCARD static constexpr bool IsValid(int driveMode);
+    static constexpr bool IsValid(int driveMode);
 };
 
 /**

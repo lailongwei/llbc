@@ -431,184 +431,129 @@ struct TypeHelper {};
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, bool> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsBool(); }
-    LLBC_NO_DISCARD static
-    bool Get(const ValueType& v) { return v.GetBool(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, bool data) { return v.SetBool(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, bool data, typename ValueType::AllocatorType&) { return v.SetBool(data); }
+    static bool Is(const ValueType& v) { return v.IsBool(); }
+    static bool Get(const ValueType& v) { return v.GetBool(); }
+    static ValueType& Set(ValueType& v, bool data) { return v.SetBool(data); }
+    static ValueType& Set(ValueType& v, bool data, typename ValueType::AllocatorType&) { return v.SetBool(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, int> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsInt(); }
-    LLBC_NO_DISCARD static
-    int Get(const ValueType& v) { return v.GetInt(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, int data) { return v.SetInt(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, int data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
+    static bool Is(const ValueType& v) { return v.IsInt(); }
+    static int Get(const ValueType& v) { return v.GetInt(); }
+    static ValueType& Set(ValueType& v, int data) { return v.SetInt(data); }
+    static ValueType& Set(ValueType& v, int data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, unsigned> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsUint(); }
-    LLBC_NO_DISCARD static
-    unsigned Get(const ValueType& v) { return v.GetUint(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, unsigned data) { return v.SetUint(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, unsigned data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
+    static bool Is(const ValueType& v) { return v.IsUint(); }
+    static unsigned Get(const ValueType& v) { return v.GetUint(); }
+    static ValueType& Set(ValueType& v, unsigned data) { return v.SetUint(data); }
+    static ValueType& Set(ValueType& v, unsigned data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
 };
 
 #ifdef _MSC_VER
 LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(long) == sizeof(int));
 template<typename ValueType>
 struct TypeHelper<ValueType, long> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsInt(); }
-    LLBC_NO_DISCARD static
-    long Get(const ValueType& v) { return v.GetInt(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, long data) { return v.SetInt(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, long data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
+    static bool Is(const ValueType& v) { return v.IsInt(); }
+    static long Get(const ValueType& v) { return v.GetInt(); }
+    static ValueType& Set(ValueType& v, long data) { return v.SetInt(data); }
+    static ValueType& Set(ValueType& v, long data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
 };
 
 LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(unsigned long) == sizeof(unsigned));
 template<typename ValueType>
 struct TypeHelper<ValueType, unsigned long> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsUint(); }
-    LLBC_NO_DISCARD static
-    unsigned long Get(const ValueType& v) { return v.GetUint(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, unsigned long data) { return v.SetUint(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, unsigned long data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
+    static bool Is(const ValueType& v) { return v.IsUint(); }
+    static unsigned long Get(const ValueType& v) { return v.GetUint(); }
+    static ValueType& Set(ValueType& v, unsigned long data) { return v.SetUint(data); }
+    static ValueType& Set(ValueType& v, unsigned long data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
 };
 #endif
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, int64_t> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsInt64(); }
-    LLBC_NO_DISCARD static
-    int64_t Get(const ValueType& v) { return v.GetInt64(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, int64_t data) { return v.SetInt64(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, int64_t data, typename ValueType::AllocatorType&) { return v.SetInt64(data); }
+    static bool Is(const ValueType& v) { return v.IsInt64(); }
+    static int64_t Get(const ValueType& v) { return v.GetInt64(); }
+    static ValueType& Set(ValueType& v, int64_t data) { return v.SetInt64(data); }
+    static ValueType& Set(ValueType& v, int64_t data, typename ValueType::AllocatorType&) { return v.SetInt64(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, uint64_t> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsUint64(); }
-    LLBC_NO_DISCARD static
-    uint64_t Get(const ValueType& v) { return v.GetUint64(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, uint64_t data) { return v.SetUint64(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, uint64_t data, typename ValueType::AllocatorType&) { return v.SetUint64(data); }
+    static bool Is(const ValueType& v) { return v.IsUint64(); }
+    static uint64_t Get(const ValueType& v) { return v.GetUint64(); }
+    static ValueType& Set(ValueType& v, uint64_t data) { return v.SetUint64(data); }
+    static ValueType& Set(ValueType& v, uint64_t data, typename ValueType::AllocatorType&) { return v.SetUint64(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, double> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsDouble(); }
-    LLBC_NO_DISCARD static
-    double Get(const ValueType& v) { return v.GetDouble(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, double data) { return v.SetDouble(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, double data, typename ValueType::AllocatorType&) { return v.SetDouble(data); }
+    static bool Is(const ValueType& v) { return v.IsDouble(); }
+    static double Get(const ValueType& v) { return v.GetDouble(); }
+    static ValueType& Set(ValueType& v, double data) { return v.SetDouble(data); }
+    static ValueType& Set(ValueType& v, double data, typename ValueType::AllocatorType&) { return v.SetDouble(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, float> {
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsFloat(); }
-    LLBC_NO_DISCARD static
-    float Get(const ValueType& v) { return v.GetFloat(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, float data) { return v.SetFloat(data); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, float data, typename ValueType::AllocatorType&) { return v.SetFloat(data); }
+    static bool Is(const ValueType& v) { return v.IsFloat(); }
+    static float Get(const ValueType& v) { return v.GetFloat(); }
+    static ValueType& Set(ValueType& v, float data) { return v.SetFloat(data); }
+    static ValueType& Set(ValueType& v, float data, typename ValueType::AllocatorType&) { return v.SetFloat(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, const typename ValueType::Ch*> {
     typedef const typename ValueType::Ch* StringType;
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsString(); }
-    LLBC_NO_DISCARD static
-    StringType Get(const ValueType& v) { return v.GetString(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, const StringType data) { return v.SetString(typename ValueType::StringRefType(data)); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, const StringType data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
+    static bool Is(const ValueType& v) { return v.IsString(); }
+    static StringType Get(const ValueType& v) { return v.GetString(); }
+    static ValueType& Set(ValueType& v, const StringType data) { return v.SetString(typename ValueType::StringRefType(data)); }
+    static ValueType& Set(ValueType& v, const StringType data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
 };
 
 #if LLBC_RAPIDJSON_HAS_STDSTRING
 template<typename ValueType> 
 struct TypeHelper<ValueType, std::basic_string<typename ValueType::Ch> > {
     typedef std::basic_string<typename ValueType::Ch> StringType;
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsString(); }
-    LLBC_NO_DISCARD static
-    StringType Get(const ValueType& v) { return StringType(v.GetString(), v.GetStringLength()); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, const StringType& data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
+    static bool Is(const ValueType& v) { return v.IsString(); }
+    static StringType Get(const ValueType& v) { return StringType(v.GetString(), v.GetStringLength()); }
+    static ValueType& Set(ValueType& v, const StringType& data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
 };
 #endif
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::Array> {
     typedef typename ValueType::Array ArrayType;
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsArray(); }
-    LLBC_NO_DISCARD static
-    ArrayType Get(ValueType& v) { return v.GetArray(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, ArrayType data) { return v = data; }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, ArrayType data, typename ValueType::AllocatorType&) { return v = data; }
+    static bool Is(const ValueType& v) { return v.IsArray(); }
+    static ArrayType Get(ValueType& v) { return v.GetArray(); }
+    static ValueType& Set(ValueType& v, ArrayType data) { return v = data; }
+    static ValueType& Set(ValueType& v, ArrayType data, typename ValueType::AllocatorType&) { return v = data; }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::ConstArray> {
     typedef typename ValueType::ConstArray ArrayType;
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsArray(); }
-    LLBC_NO_DISCARD static
-    ArrayType Get(const ValueType& v) { return v.GetArray(); }
+    static bool Is(const ValueType& v) { return v.IsArray(); }
+    static ArrayType Get(const ValueType& v) { return v.GetArray(); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::Object> {
     typedef typename ValueType::Object ObjectType;
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsObject(); }
-    LLBC_NO_DISCARD static
-    ObjectType Get(ValueType& v) { return v.GetObject(); }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, ObjectType data) { return v = data; }
-    LLBC_NO_DISCARD static
-    ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v = data; }
+    static bool Is(const ValueType& v) { return v.IsObject(); }
+    static ObjectType Get(ValueType& v) { return v.GetObject(); }
+    static ValueType& Set(ValueType& v, ObjectType data) { return v = data; }
+    static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v = data; }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::ConstObject> {
     typedef typename ValueType::ConstObject ObjectType;
-    LLBC_NO_DISCARD static
-    bool Is(const ValueType& v) { return v.IsObject(); }
-    LLBC_NO_DISCARD static
-    ObjectType Get(const ValueType& v) { return v.GetObject(); }
+    static bool Is(const ValueType& v) { return v.IsObject(); }
+    static ObjectType Get(const ValueType& v) { return v.GetObject(); }
 };
 
 } // namespace internal

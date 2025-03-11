@@ -100,7 +100,7 @@ public:
      * @param[in] type - the variant type enumeration.
      * @return const LLBC_String & - the type string representation.
      */
-    LLBC_NO_DISCARD static const LLBC_String &Type2Str(int type);
+    static const LLBC_String &Type2Str(int type);
 };
 
 __LLBC_NS_END

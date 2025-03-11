@@ -50,13 +50,13 @@ public:
      * Check given endian type validate or not.
      * @return bool - return true if validate, otherwise return false.
      */
-    LLBC_NO_DISCARD static constexpr bool IsValid(int endianType);
+    static constexpr bool IsValid(int endianType);
 
     /**
      * Endian type/type describe convert support.
      */
-    LLBC_NO_DISCARD static const char *Type2Str(int endianType);
-    LLBC_NO_DISCARD static int Str2Type(const char *endianTypeStr);
+    static const char *Type2Str(int endianType);
+    static int Str2Type(const char *endianTypeStr);
 };
 
 /**

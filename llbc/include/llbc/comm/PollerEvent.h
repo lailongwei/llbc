@@ -92,52 +92,47 @@ public:
     /**
      * Build AddSock event.
      */
-    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildAddSockEv(LLBC_Socket *sock,
-                                                             int sessionId,
-                                                             const LLBC_SessionOpts &sessionOpts);
+    static LLBC_MessageBlock *BuildAddSockEv(LLBC_Socket *sock, int sessionId, const LLBC_SessionOpts &sessionOpts);
     
     /**
      * Build Async-Conn event.
      */
-    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId,
-                                                               const LLBC_SessionOpts &sessionOpts,
-                                                               const LLBC_SockAddr_IN &peerAddr);
+    static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId,
+                                               const LLBC_SessionOpts &sessionOpts,
+                                               const LLBC_SockAddr_IN &peerAddr);
 
     /**
      * Build Send event.
      */
-    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildSendEv(LLBC_Packet *packet);
+    static LLBC_MessageBlock *BuildSendEv(LLBC_Packet *packet);
 
     /**
      * Build close event.
      */
-    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildCloseEv(int sessionId, const char *reason);
+    static LLBC_MessageBlock *BuildCloseEv(int sessionId, const char *reason);
 
     /**
      * Build Iocp monitor event.
      */
 #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_NO_DISCARD static
-    LLBC_MessageBlock *BuildIocpMonitorEv(int ret, LLBC_POverlapped ol, int errNo, int subErrNo);
+    static LLBC_MessageBlock *BuildIocpMonitorEv(int ret, LLBC_POverlapped ol, int errNo, int subErrNo);
 #endif
     /**
      * Build Epoll monitor event.
      */
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildEpollMonitorEv(const LLBC_EpollEvent *evs, int count);
+    static LLBC_MessageBlock *BuildEpollMonitorEv(const LLBC_EpollEvent *evs, int count);
 #endif
 
     /**
      * Build take over session event.
      */
-    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildTakeOverSessionEv(LLBC_Session *session);
+    static LLBC_MessageBlock *BuildTakeOverSessionEv(LLBC_Session *session);
 
     /**
      * Build control protocol stack event.
      */
-    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId,
-                                                                       int ctrlCmd,
-                                                                       const LLBC_Variant &ctrlData);
+    static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData);
 
 public:
     /**

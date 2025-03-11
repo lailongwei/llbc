@@ -40,14 +40,14 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      * @return std::string/LLBC_String - the encoded string.
      */
-    LLBC_NO_DISCARD static std::string Encode(const std::string &input);
-    LLBC_NO_DISCARD static LLBC_String Encode(const LLBC_String &input);
-    LLBC_NO_DISCARD static LLBC_String Encode(const char *input, size_t inputLen);
-    LLBC_NO_DISCARD static int Encode(const std::string &input, std::string &output);
-    LLBC_NO_DISCARD static int Encode(const LLBC_String &input, LLBC_String &output);
-    LLBC_NO_DISCARD static int Encode(const char *input, size_t inputLen, std::string &output);
-    LLBC_NO_DISCARD static int Encode(const char *input, size_t inputLen, LLBC_String &output);
-    LLBC_NO_DISCARD static int Encode(const char *input, size_t inputLen, char *output, size_t &outputLen);
+    static std::string Encode(const std::string &input);
+    static LLBC_String Encode(const LLBC_String &input);
+    static LLBC_String Encode(const char *input, size_t inputLen);
+    static int Encode(const std::string &input, std::string &output);
+    static int Encode(const LLBC_String &input, LLBC_String &output);
+    static int Encode(const char *input, size_t inputLen, std::string &output);
+    static int Encode(const char *input, size_t inputLen, LLBC_String &output);
+    static int Encode(const char *input, size_t inputLen, char *output, size_t &outputLen);
 
     /**
      * Decode a base64 encoded string into bytes.
@@ -58,14 +58,14 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      * @return std::string/LLBC_String - the decoded string.
      */
-    LLBC_NO_DISCARD static std::string Decode(const std::string &input);
-    LLBC_NO_DISCARD static LLBC_String Decode(const LLBC_String &output);
-    LLBC_NO_DISCARD static LLBC_String Decode(const char *input, size_t inputLen);
-    LLBC_NO_DISCARD static int Decode(const std::string &input, std::string &output);
-    LLBC_NO_DISCARD static int Decode(const LLBC_String &input, LLBC_String &output);
-    LLBC_NO_DISCARD static int Decode(const char *input, size_t inputLen, std::string &output);
-    LLBC_NO_DISCARD static int Decode(const char *input, size_t inputLen, LLBC_String &output);
-    LLBC_NO_DISCARD static int Decode(const char *input, size_t inputLen, char *output, size_t &outputLen);
+    static std::string Decode(const std::string &input);
+    static LLBC_String Decode(const LLBC_String &output);
+    static LLBC_String Decode(const char *input, size_t inputLen);
+    static int Decode(const std::string &input, std::string &output);
+    static int Decode(const LLBC_String &input, LLBC_String &output);
+    static int Decode(const char *input, size_t inputLen, std::string &output);
+    static int Decode(const char *input, size_t inputLen, LLBC_String &output);
+    static int Decode(const char *input, size_t inputLen, char *output, size_t &outputLen);
 
 public:
     /**
@@ -73,7 +73,7 @@ public:
      * @param[in] bytesLen - the bytes length.
      * @return - size_t - the encoded string length.
      */
-    LLBC_NO_DISCARD static size_t CalcEncodeLen(size_t bytesLen);
+    static size_t CalcEncodeLen(size_t bytesLen);
 
     /**
      * Calculate decoded length.
@@ -81,7 +81,7 @@ public:
      * @param[in] inputLen - the input characters length(not included \0).
      * @return size_t the decoded length.
      */
-    LLBC_NO_DISCARD static size_t CalcDecodedLen(const char *input, size_t inputLen);
+    static size_t CalcDecodedLen(const char *input, size_t inputLen);
 };
 
 __LLBC_NS_END

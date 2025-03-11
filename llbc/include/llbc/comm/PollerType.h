@@ -51,21 +51,21 @@ public:
      * @param[in] type - the poller type, see above type enumeration.
      * @return bool - return true if validate, otherwise return false.
      */
-    LLBC_NO_DISCARD static bool IsValid(int type);
+    static bool IsValid(int type);
 
     /**
      * Get poller type string representation.
      * @param[in] type - the poller type, see above type enumeration.
      * return const LLBC_String & - the poller type string representation.
      */
-    LLBC_NO_DISCARD static const LLBC_String &Type2Str(int type);
+    static const LLBC_String &Type2Str(int type);
 
     /**
      * Get poller type enumeration from string representation.
      * @param[in] typeStr - the poller type string representation.
      * @return int - the poller type, if error occurred, return End value.
      */
-    LLBC_NO_DISCARD static int Str2Type(const LLBC_String &typeStr);
+    static int Str2Type(const LLBC_String &typeStr);
 };
 
 __LLBC_NS_END

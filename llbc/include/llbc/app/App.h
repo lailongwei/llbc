@@ -57,14 +57,14 @@ public:
      * @param[in] cfgType - the application config type.
      * @return const LLBC_Strings & - the config suffixex.
      */
-    LLBC_NO_DISCARD static const LLBC_Strings &GetConfigSuffixes(int cfgType);
+    static const LLBC_Strings &GetConfigSuffixes(int cfgType);
 
     /**
      * Get config type. 
      * @param cfgSuffix - the config suffix, case insensitive.
      * @return ENUM - the config type, if unsupported application config, return End.
      */
-    LLBC_NO_DISCARD static ENUM GetConfigType(const LLBC_String &cfgSuffix);
+    static ENUM GetConfigType(const LLBC_String &cfgSuffix);
 };
 
 /**

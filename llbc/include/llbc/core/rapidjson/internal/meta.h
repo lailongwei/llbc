@@ -112,8 +112,8 @@ template<typename B, typename D> struct IsBaseOfImpl {
     typedef char (&No) [2];
 
     template <typename T>
-    LLBC_NO_DISCARD static Yes Check(const D*, T);
-    LLBC_NO_DISCARD static No  Check(const B*, int);
+    static Yes Check(const D*, T);
+    static No  Check(const B*, int);
 
     struct Host {
         operator const B*() const;

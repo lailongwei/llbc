@@ -62,7 +62,7 @@ public:
      * @param[in] fileMode - the file mode.
      * @return LLBC_String - The file mode string representation.
      */
-    LLBC_NO_DISCARD static LLBC_String GetFileModeDesc(int fileMode);
+    static LLBC_String GetFileModeDesc(int fileMode);
 };
 
 /**
