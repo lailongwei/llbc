@@ -964,7 +964,7 @@ public:
     }
 
     // isalpha/isupper/islower
-    LLBC_WARN_UNUSED_RESULT static bool isalpha(const _Elem &c)
+    LLBC_NO_DISCARD static bool isalpha(const _Elem &c)
     {
         if (sizeof(_Elem) == 1)
         {
@@ -981,7 +981,7 @@ public:
         }
     }
 
-    LLBC_WARN_UNUSED_RESULT static bool isalpha(const _This &s)
+    LLBC_NO_DISCARD static bool isalpha(const _This &s)
     {
         if (s.empty())
             return false;
@@ -1000,7 +1000,7 @@ public:
         return isalpha(*this);
     }
 
-    LLBC_WARN_UNUSED_RESULT static bool islower(const _Elem &c)
+    LLBC_NO_DISCARD static bool islower(const _Elem &c)
     {
         if (sizeof(_Elem) == 1)
         {
@@ -1017,7 +1017,7 @@ public:
         }
     }
 
-    LLBC_WARN_UNUSED_RESULT static bool islower(const _This &s)
+    LLBC_NO_DISCARD static bool islower(const _This &s)
     {
         if (s.empty())
             return false;
@@ -1039,7 +1039,7 @@ public:
         return islower(*this);
     }
 
-    LLBC_WARN_UNUSED_RESULT static bool isupper(const _Elem &c)
+    LLBC_NO_DISCARD static bool isupper(const _Elem &c)
     {
         if (sizeof(_Elem) == 1)
         {
@@ -1056,7 +1056,7 @@ public:
         }
     }
 
-    LLBC_WARN_UNUSED_RESULT static bool isupper(const _This &s)
+    LLBC_NO_DISCARD static bool isupper(const _This &s)
     {
         if (s.empty())
             return false;
@@ -1079,7 +1079,7 @@ public:
     }
 
     // isdigit
-    LLBC_WARN_UNUSED_RESULT static bool isdigit(const _Elem &c)
+    LLBC_NO_DISCARD static bool isdigit(const _Elem &c)
     {
         if (sizeof(_Elem) == 1)
         {
@@ -1096,7 +1096,7 @@ public:
         }
     }
 
-    LLBC_WARN_UNUSED_RESULT static bool isdigit(const _This &s)
+    LLBC_NO_DISCARD static bool isdigit(const _This &s)
     {
         if (s.empty())
             return false;
@@ -1116,7 +1116,7 @@ public:
     }
 
     // isspace: space[' '],carriage return['\r'],line feed['\n'],form feed['\f'],horizontal tab['\t'],vertical tab['\v']
-    LLBC_WARN_UNUSED_RESULT static bool isspace(const _Elem &c)
+    LLBC_NO_DISCARD static bool isspace(const _Elem &c)
     {
         if (sizeof(_Elem) == 1)
         {
@@ -1133,7 +1133,7 @@ public:
         }
     }
 
-    LLBC_WARN_UNUSED_RESULT static bool isspace(const _This &s)
+    LLBC_NO_DISCARD static bool isspace(const _This &s)
     {
         if (s.empty())
             return false;

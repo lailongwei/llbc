@@ -48,7 +48,7 @@ public:
     int IntegerExponent() const { return (IsNormal() ? Exponent() : kDenormalExponent) - kSignificandSize; }
     uint64_t ToBias() const { return (u_ & kSignMask) ? ~u_ + 1 : u_ | kSignMask; }
 
-    LLBC_WARN_UNUSED_RESULT static int EffectiveSignificandSize(int order) {
+    LLBC_NO_DISCARD static int EffectiveSignificandSize(int order) {
         if (order >= -1021)
             return 53;
         else if (order <= -1074)

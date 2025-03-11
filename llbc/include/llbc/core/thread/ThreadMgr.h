@@ -81,38 +81,38 @@ public:
      * Check in llbc thread or not.
      * @reutrn bool - return llbc thread flag.
      */
-    LLBC_WARN_UNUSED_RESULT static bool InLLBCThread();
+    LLBC_NO_DISCARD static bool InLLBCThread();
 
     /**
      * Check in llbc entry thread or not.
      * @return bool - return llbc entry thread flag.
      */
-    LLBC_WARN_UNUSED_RESULT static bool InLLBCEntryThread();
+    LLBC_NO_DISCARD static bool InLLBCEntryThread();
 
     /**
      * Get current threadId.
      * @return LLBC_ThreadId - current thread id.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_ThreadId CurThreadId();
+    LLBC_NO_DISCARD static LLBC_ThreadId CurThreadId();
 
     /**
      * Get current thread handle.
      * @return LLBC_Handle - current thread handle.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_Handle CurThreadHandle();
+    LLBC_NO_DISCARD static LLBC_Handle CurThreadHandle();
 
     /**
      * Get current native thread handle.
      * @return LLBC_NativeThreadHandle - native thread handle.
      *                                   Note: In win32 platform, don't need call CloseHandle().
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_NativeThreadHandle CurNativeThreadHandle();
+    LLBC_NO_DISCARD static LLBC_NativeThreadHandle CurNativeThreadHandle();
 
     /**
      * Get current thread group handle.
      * @return LLBC_Handle - current thread group handle.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_Handle CurGroupHandle();
+    LLBC_NO_DISCARD static LLBC_Handle CurGroupHandle();
 
 public:
     /**

@@ -15,11 +15,11 @@ ObjType* __CreateTestCaseIns()
 template <int idx>
 struct __TestCaseTraits
 {
-    LLBC_WARN_UNUSED_RESULT static const char* Name()
+    LLBC_NO_DISCARD static const char* Name()
     {
         return nullptr;
     }
-    LLBC_WARN_UNUSED_RESULT static LLBC_NS LLBC_ITestCase* CreateTestCaseIns()
+    LLBC_NO_DISCARD static LLBC_NS LLBC_ITestCase* CreateTestCaseIns()
     {
         return nullptr;
     }

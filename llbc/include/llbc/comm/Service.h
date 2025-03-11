@@ -93,21 +93,21 @@ public:
      * @param[in] runningPhase - the running phase.
      * @return bool - failed phase flag.
      */
-    LLBC_WARN_UNUSED_RESULT static constexpr bool IsFailedPhase(int runningPhase);
+    LLBC_NO_DISCARD static constexpr bool IsFailedPhase(int runningPhase);
 
     /**
      * Check given running phase is stopping phase or not.
      * @param[in] runningPhase - the running phase.
      * @return bool - stopping phase flag.
      */
-    LLBC_WARN_UNUSED_RESULT static constexpr bool IsStoppingPhase(int runningPhase);
+    LLBC_NO_DISCARD static constexpr bool IsStoppingPhase(int runningPhase);
 
     /**
      * Check given running phase is failed/stopping phase or not.
      * @param[in] runningPhase - the running phase.
      * @return bool - failed/stopping phase flag.
      */
-    LLBC_WARN_UNUSED_RESULT static constexpr bool IsFailedOrStoppingPhase(int runningPhase);
+    LLBC_NO_DISCARD static constexpr bool IsFailedOrStoppingPhase(int runningPhase);
 };
 
 /**
@@ -132,7 +132,7 @@ public:
      * @param[in] driveMode - the service drive mode.
      * @return bool - return true if validate, otherwise return false.
      */
-    LLBC_WARN_UNUSED_RESULT static constexpr bool IsValid(int driveMode);
+    LLBC_NO_DISCARD static constexpr bool IsValid(int driveMode);
 };
 
 /**
@@ -156,9 +156,9 @@ public:
      * @param[in] fullStack          - the full stack option, default is true.
      * @return LLBC_Service * - new service.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_Service *Create(const LLBC_String &name = "",
-                                                        LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
-                                                        bool fullStack = true);
+    LLBC_NO_DISCARD static LLBC_Service *Create(const LLBC_String &name = "",
+                                                LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
+                                                bool fullStack = true);
 
 public:
     /**

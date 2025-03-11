@@ -57,7 +57,7 @@ public:
      * @param[in] taskState - the task state.
      * @return const char * - the task state describe.
      */
-    LLBC_WARN_UNUSED_RESULT static const char *GetDesc(int taskState);
+    LLBC_NO_DISCARD static const char *GetDesc(int taskState);
 };
 
 /**

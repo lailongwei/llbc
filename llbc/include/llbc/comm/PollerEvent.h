@@ -92,52 +92,52 @@ public:
     /**
      * Build AddSock event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildAddSockEv(LLBC_Socket *sock,
-                                                                     int sessionId,
-                                                                     const LLBC_SessionOpts &sessionOpts);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildAddSockEv(LLBC_Socket *sock,
+                                                             int sessionId,
+                                                             const LLBC_SessionOpts &sessionOpts);
     
     /**
      * Build Async-Conn event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId,
-                                                                       const LLBC_SessionOpts &sessionOpts,
-                                                                       const LLBC_SockAddr_IN &peerAddr);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildAsyncConnEv(int sessionId,
+                                                               const LLBC_SessionOpts &sessionOpts,
+                                                               const LLBC_SockAddr_IN &peerAddr);
 
     /**
      * Build Send event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildSendEv(LLBC_Packet *packet);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildSendEv(LLBC_Packet *packet);
 
     /**
      * Build close event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildCloseEv(int sessionId, const char *reason);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildCloseEv(int sessionId, const char *reason);
 
     /**
      * Build Iocp monitor event.
      */
 #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_WARN_UNUSED_RESULT static
+    LLBC_NO_DISCARD static
     LLBC_MessageBlock *BuildIocpMonitorEv(int ret, LLBC_POverlapped ol, int errNo, int subErrNo);
 #endif
     /**
      * Build Epoll monitor event.
      */
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildEpollMonitorEv(const LLBC_EpollEvent *evs, int count);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildEpollMonitorEv(const LLBC_EpollEvent *evs, int count);
 #endif
 
     /**
      * Build take over session event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildTakeOverSessionEv(LLBC_Session *session);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildTakeOverSessionEv(LLBC_Session *session);
 
     /**
      * Build control protocol stack event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId,
-                                                                               int ctrlCmd,
-                                                                               const LLBC_Variant &ctrlData);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId,
+                                                                       int ctrlCmd,
+                                                                       const LLBC_Variant &ctrlData);
 
 public:
     /**

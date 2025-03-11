@@ -55,7 +55,7 @@ public:
      * @param[in] shortLevelStr - return short level string, default is false.
      * @return const LLBC_String & - level representation.
      */
-    LLBC_WARN_UNUSED_RESULT static const LLBC_CString &GetLevelStr(int level, bool shortLevelStr = false);
+    LLBC_NO_DISCARD static const LLBC_CString &GetLevelStr(int level, bool shortLevelStr = false);
 
 public:
     /**
@@ -63,14 +63,14 @@ public:
      * @param[in] levelStr - log level representation.
      * @return int - log level enum.
      */
-    LLBC_WARN_UNUSED_RESULT static int GetLevelEnum(const LLBC_CString &levelStr);
+    LLBC_NO_DISCARD static int GetLevelEnum(const LLBC_CString &levelStr);
 
     /**
      * Check giving log level is validate or not.
      * @param[in] level - the given log level.
      * @return bool - return if log level is validate, otherwise return false.
      */
-    LLBC_WARN_UNUSED_RESULT static bool IsValid(int level);
+    LLBC_NO_DISCARD static bool IsValid(int level);
 };
 
 __LLBC_NS_END

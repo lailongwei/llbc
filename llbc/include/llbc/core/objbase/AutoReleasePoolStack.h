@@ -90,7 +90,7 @@ public:
      * Get current thread release pool stack.
      * @return _This * - the current thread release pool stack.
      */
-    LLBC_WARN_UNUSED_RESULT static _This *GetCurrentThreadReleasePoolStack();
+    LLBC_NO_DISCARD static _This *GetCurrentThreadReleasePoolStack();
 
 private:
     LLBC_AutoReleasePool *_head;

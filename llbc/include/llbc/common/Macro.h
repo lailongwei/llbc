@@ -240,11 +240,11 @@
 
 // WARN_UNUSED_RESULT macro define.
 #if defined(__GNUC__) || defined(__clang__)
- #define LLBC_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+ #define LLBC_NO_DISCARD __attribute__((warn_unused_result))
 #elif defined(_MSC_VER) && _MSC_VER >= 1700 // VS 2012 or higher
- #define LLBC_WARN_UNUSED_RESULT _Check_return_
+ #define LLBC_NO_DISCARD _Check_return_
 #else
- #define LLBC_WARN_UNUSED_RESULT
+ #define LLBC_NO_DISCARD
 #endif
 
 // Unused param macro.

@@ -148,8 +148,8 @@ public:
      * @param[in] bytes - bytes string.
      * @return LLBC_String - MD5 digest/hex digest.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_String Digest(const LLBC_String &bytes);
-    LLBC_WARN_UNUSED_RESULT static LLBC_String HexDigest(const LLBC_String &bytes);
+    LLBC_NO_DISCARD static LLBC_String Digest(const LLBC_String &bytes);
+    LLBC_NO_DISCARD static LLBC_String HexDigest(const LLBC_String &bytes);
 
     /**
      * Get bytes MD5 digest/hex digest.
@@ -157,16 +157,16 @@ public:
      * @param[in] len   - bytes length.
      * @return LLBC_String - MD5 digest/hex digest.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_String Digest(const void *bytes, size_t len);
-    LLBC_WARN_UNUSED_RESULT static LLBC_String HexDigest(const void *bytes, size_t len);
+    LLBC_NO_DISCARD static LLBC_String Digest(const void *bytes, size_t len);
+    LLBC_NO_DISCARD static LLBC_String HexDigest(const void *bytes, size_t len);
 
     /**
      * Get file MD5 digest/hex digest.
      * @param[in] file - file name.
      * @return LLBC_String - MD5 digest/hex digest.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_String FileDigest(const LLBC_String &file);
-    LLBC_WARN_UNUSED_RESULT static LLBC_String FileHexDigest(const LLBC_String &file);
+    LLBC_NO_DISCARD static LLBC_String FileDigest(const LLBC_String &file);
+    LLBC_NO_DISCARD static LLBC_String FileHexDigest(const LLBC_String &file);
 
 private:
     static const uint32 _chainingValA;

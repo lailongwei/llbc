@@ -39,7 +39,7 @@ public:
      * Create main bundle(When llbc lib startup, will autocall this method).
      * @return int - return 0 if success, otherwise return -1.
      */
-    LLBC_WARN_UNUSED_RESULT static int CreateMainBundle();
+    LLBC_NO_DISCARD static int CreateMainBundle();
 
     /**
      * Destroy main bundle(When llbc lib cleanup, will autocall this method).
@@ -50,7 +50,7 @@ public:
      * Get main bundle.
      * @return const LLBC_Bundle * - main bundle object.
      */
-    LLBC_WARN_UNUSED_RESULT static const LLBC_Bundle *GetMainBundle();
+    LLBC_NO_DISCARD static const LLBC_Bundle *GetMainBundle();
 
 public:
     /**

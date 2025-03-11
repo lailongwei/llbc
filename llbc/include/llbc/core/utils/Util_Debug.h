@@ -98,7 +98,7 @@ public:
      * Indicates whether the timer is based on a high-resolution performance counter. This field is read-only.
      * @return bool - the high resolution flag.
      */
-    LLBC_WARN_UNUSED_RESULT static constexpr bool IsHighResolution()
+    LLBC_NO_DISCARD static constexpr bool IsHighResolution()
     {
         #if LLBC_SUPPORT_RDTSC
         return true;
@@ -111,7 +111,7 @@ public:
      * Gets the frequency of the timer as the number of ticks per second. This field is read-only.
      * @return uint64 - the watcher frequency.
      */
-    LLBC_WARN_UNUSED_RESULT static uint64 GetFrequency() { return _frequency; }
+    LLBC_NO_DISCARD static uint64 GetFrequency() { return _frequency; }
 
     /**
      * Gets the total elapsed time measured by the current instance.

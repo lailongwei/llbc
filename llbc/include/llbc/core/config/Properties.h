@@ -48,9 +48,9 @@ public:
      * @param[in] errMsg     - the error message, if failed, will be set to this param, otherwise set to 'Success'.
      * @return int - return 0 if success, otherwise return -1.
      */
-    LLBC_WARN_UNUSED_RESULT static int LoadFromFile(const LLBC_String &filePath,
-                                                    LLBC_Variant &properties,
-                                                    LLBC_String *errMsg = nullptr);
+    LLBC_NO_DISCARD static int LoadFromFile(const LLBC_String &filePath,
+                                            LLBC_Variant &properties,
+                                            LLBC_String *errMsg = nullptr);
 
     /**
      * Load properties from string content.
@@ -59,9 +59,9 @@ public:
      * @param[in] errMsg     - the error message, if failed, will be set to this param.
      * @return int - return 0 if success, otherwise return -1.
      */
-    LLBC_WARN_UNUSED_RESULT static int LoadFromString(const LLBC_String &str,
-                                                      LLBC_Variant &properties,
-                                                      LLBC_String *errMsg = nullptr);
+    LLBC_NO_DISCARD static int LoadFromString(const LLBC_String &str,
+                                              LLBC_Variant &properties,
+                                              LLBC_String *errMsg = nullptr);
 
     /**
      * Save properties to file.
@@ -70,9 +70,9 @@ public:
      * @param[in] errMsg     - the error message, if failed, will be set to this param.
      * @return int - return 0 if success, otherwise return -1. 
      */
-    LLBC_WARN_UNUSED_RESULT static int SaveToFile(const LLBC_Variant &properties,
-                                                  const LLBC_String &filePath,
-                                                  LLBC_String *errMsg = nullptr);
+    LLBC_NO_DISCARD static int SaveToFile(const LLBC_Variant &properties,
+                                          const LLBC_String &filePath,
+                                          LLBC_String *errMsg = nullptr);
 
     /**
      * Write property to string content.
@@ -81,37 +81,37 @@ public:
      * @param[in]  errMsg     - the error message, if failed, will be set to this param.
      * @return int - return 0 if success, otherwise return -1.
      */
-    LLBC_WARN_UNUSED_RESULT static int SaveToString(const LLBC_Variant &properties,
-                                                    LLBC_String &str,
-                                                    LLBC_String *errMsg = nullptr);
+    LLBC_NO_DISCARD static int SaveToString(const LLBC_Variant &properties,
+                                            LLBC_String &str,
+                                            LLBC_String *errMsg = nullptr);
 
 private:
     /**
      * Parse property line.
      */
-    LLBC_WARN_UNUSED_RESULT static int ParseLine(int lineNo,
-                                                 const LLBC_String &line,
-                                                 LLBC_Strings &keyItems,
-                                                 LLBC_String &value,
-                                                 LLBC_String *errMsg);
+    LLBC_NO_DISCARD static int ParseLine(int lineNo,
+                                         const LLBC_String &line,
+                                         LLBC_Strings &keyItems,
+                                         LLBC_String &value,
+                                         LLBC_String *errMsg);
 
     /**
      * Write property line.
      */
-    LLBC_WARN_UNUSED_RESULT static int SaveLine(const LLBC_String key,
-                                                const LLBC_Variant &property,
-                                                LLBC_String &str,
-                                                LLBC_String *errMsg);
+    LLBC_NO_DISCARD static int SaveLine(const LLBC_String key,
+                                        const LLBC_Variant &property,
+                                        LLBC_String &str,
+                                        LLBC_String *errMsg);
 
     /**
      * Check property key item.
      */
-    LLBC_WARN_UNUSED_RESULT static bool CheckKeyItem(const LLBC_String &keyItem);
+    LLBC_NO_DISCARD static bool CheckKeyItem(const LLBC_String &keyItem);
 
     /**
      * Check property key items.
      */
-    LLBC_WARN_UNUSED_RESULT static bool CheckKeyItems(const LLBC_Strings &keyItems);
+    LLBC_NO_DISCARD static bool CheckKeyItems(const LLBC_Strings &keyItems);
 
     /**
      * Escape property value.
@@ -120,10 +120,10 @@ private:
     /**
      * Unescape property value.
      */
-    LLBC_WARN_UNUSED_RESULT static int UnescapeValue(int lineNo,
-                                                     const LLBC_String &escapedValue,
-                                                     LLBC_String &rawValue,
-                                                     LLBC_String *errMsg);
+    LLBC_NO_DISCARD static int UnescapeValue(int lineNo,
+                                             const LLBC_String &escapedValue,
+                                             LLBC_String &rawValue,
+                                             LLBC_String *errMsg);
 };
 
 __LLBC_NS_END

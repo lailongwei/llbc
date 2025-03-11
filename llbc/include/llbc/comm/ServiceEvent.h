@@ -231,87 +231,86 @@ public:
     /**
      * Build session create event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildSessionCreateEv(const LLBC_SockAddr_IN &local,
-                                                                           const LLBC_SockAddr_IN &peer,
-                                                                           bool isListen,
-                                                                           int sessionId,
-                                                                           int acceptSessionId,
-                                                                           LLBC_SocketHandle handle);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildSessionCreateEv(const LLBC_SockAddr_IN &local,
+                                                                   const LLBC_SockAddr_IN &peer,
+                                                                   bool isListen,
+                                                                   int sessionId,
+                                                                   int acceptSessionId,
+                                                                   LLBC_SocketHandle handle);
 
     /**
      * Build session destroy event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildSessionDestroyEv(const LLBC_SockAddr_IN &local,
-                                                                            const LLBC_SockAddr_IN &peer,
-                                                                            bool isListen,
-                                                                            int sessionId,
-                                                                            int acceptSessionId,
-                                                                            LLBC_SocketHandle handle,
-                                                                            LLBC_SessionCloseInfo *closeInfo);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildSessionDestroyEv(const LLBC_SockAddr_IN &local,
+                                                                    const LLBC_SockAddr_IN &peer,
+                                                                    bool isListen,
+                                                                    int sessionId,
+                                                                    int acceptSessionId,
+                                                                    LLBC_SocketHandle handle,
+                                                                    LLBC_SessionCloseInfo *closeInfo);
 
     /**
      * Build async-connect result event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildAsyncConnResultEv(int sessionId,
-                                                                             bool connected,
-                                                                             const LLBC_String &reason,
-                                                                             const LLBC_SockAddr_IN &peer);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildAsyncConnResultEv(int sessionId,
+                                                                     bool connected,
+                                                                     const LLBC_String &reason,
+                                                                     const LLBC_SockAddr_IN &peer);
 
     /**
      * Build Data-Arrival event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildDataArrivalEv(LLBC_Packet *packet);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildDataArrivalEv(LLBC_Packet *packet);
 
     /**
      * Build subscribe-event event.
      */
-    LLBC_WARN_UNUSED_RESULT static
-    LLBC_MessageBlock *BuildSubscribeEventEv(int id,
-                                             const LLBC_ListenerStub &stub,
-                                             const LLBC_Delegate<void(LLBC_Event &)> &deleg,
-                                             LLBC_EventListener *listener);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildSubscribeEventEv(int id,
+                                                                    const LLBC_ListenerStub &stub,
+                                                                    const LLBC_Delegate<void(LLBC_Event &)> &deleg,
+                                                                    LLBC_EventListener *listener);
 
     /**
      * Build proto-report event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildProtoReportEv(int sessionId,
-                                                                         int opcode,
-                                                                         int layer,
-                                                                         int level,
-                                                                         const LLBC_String &report);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildProtoReportEv(int sessionId,
+                                                                 int opcode,
+                                                                 int layer,
+                                                                 int level,
+                                                                 const LLBC_String &report);
 
     /**
      * Build unsubscribe-event event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildUnsubscribeEventEv(int id, const LLBC_ListenerStub &stub);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildUnsubscribeEventEv(int id, const LLBC_ListenerStub &stub);
 
     /**
      * Build fire-event event.
      */
-    LLBC_WARN_UNUSED_RESULT static
+    LLBC_NO_DISCARD static
     LLBC_MessageBlock *BuildFireEventEv(LLBC_Event *ev, const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
 
     /**
      * Build application phase event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildAppPhaseEv(bool willStart,
-                                                                      bool startFailed,
-                                                                      bool startFinished,
-                                                                      bool willStop,
-                                                                      int cfgType,
-                                                                      const LLBC_Variant &cfg = LLBC_Variant::nil);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildAppPhaseEv(bool willStart,
+                                                              bool startFailed,
+                                                              bool startFinished,
+                                                              bool willStop,
+                                                              int cfgType,
+                                                              const LLBC_Variant &cfg = LLBC_Variant::nil);
 
     /**
      * Build application reloaded event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildAppReloadedEv(int cfgType,
-                                                                         const LLBC_Variant &cfg);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildAppReloadedEv(int cfgType,
+                                                                 const LLBC_Variant &cfg);
 
     /**
      * Build component event ev.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildComponentEventEv(int eventType,
-                                                                            const LLBC_Variant &eventParams);
+    LLBC_NO_DISCARD static LLBC_MessageBlock *BuildComponentEventEv(int eventType,
+                                                                    const LLBC_Variant &eventParams);
 
 public:
     /**

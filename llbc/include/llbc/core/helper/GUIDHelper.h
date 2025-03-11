@@ -35,20 +35,20 @@ public:
      * Generate GUID.
      * @return LLBC_GUID - GUID value.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_GUID Gen();
+    LLBC_NO_DISCARD static LLBC_GUID Gen();
 
     /**
      * Format GUID.
      * @param[in] guid - GUID value.
      * @return LLBC_String - formatted GUID value.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_String Format(LLBC_GUIDCRef guid);
+    LLBC_NO_DISCARD static LLBC_String Format(LLBC_GUIDCRef guid);
 
     /**
      * Generate GUID and Format the GUID structure data to string format.
      * @return LLBC_String - the string format guid.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_String GenStr();
+    LLBC_NO_DISCARD static LLBC_String GenStr();
 };
 
 __LLBC_NS_END
