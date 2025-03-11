@@ -157,8 +157,8 @@ public:
      * @return LLBC_Service * - new service.
      */
     static LLBC_Service *Create(const LLBC_String &name = "",
-                                                LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
-                                                bool fullStack = true);
+                                LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
+                                bool fullStack = true);
 
 public:
     /**
