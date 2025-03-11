@@ -156,7 +156,7 @@ public:
      * @param[in] fullStack          - the full stack option, default is true.
      * @return LLBC_Service * - new service.
      */
-    LLBC_NO_DISCARD static LLBC_Service *Create(const LLBC_String &name = "",
+    static LLBC_Service *Create(const LLBC_String &name = "",
                                                 LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
                                                 bool fullStack = true);
 

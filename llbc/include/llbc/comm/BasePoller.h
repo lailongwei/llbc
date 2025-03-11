@@ -63,7 +63,7 @@ public:
      * @param[in] type - the poller type.
      * @return This * - the poller, if failed, return nullptr.
      */
-    LLBC_NO_DISCARD static This *Create(int type);
+    static This *Create(int type);
 
 public:
     /**

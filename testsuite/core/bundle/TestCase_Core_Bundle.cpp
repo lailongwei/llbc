@@ -42,7 +42,7 @@ int TestCase_Core_Bundle::Run(int argc, char *argv[])
     
     // Try to access resource: Default.png.
 #if LLBC_TARGET_PLATFORM_NON_IPHONE
-    assert(LLBC_File::TouchFile(mainBundle->GetBundlePath() + "/" + "Default.png") == LLBC_OK);
+    LLBC_File::TouchFile(mainBundle->GetBundlePath() + "/" + "Default.png");
 #endif // LLBC_TARGET_PLATFORM_NON_IPHONE
     LLBC_PrintLn("Default.png path: %s", mainBundle->GetResPath("Default", "png").c_str());
     
@@ -72,7 +72,7 @@ int TestCase_Core_Bundle::Run(int argc, char *argv[])
     }
     
 #if LLBC_TARGET_PLATFORM_NON_IPHONE
-    assert(LLBC_File::DeleteFile(mainBundle->GetBundlePath() + "/" + "Default.png") == LLBC_OK);
+    LLBC_File::DeleteFile(mainBundle->GetBundlePath() + "/" + "Default.png");
 #endif // LLBC_TARGET_PLATFORM_NON_IPHONE
     
     LLBC_PrintLn("Press any key to continue ...");

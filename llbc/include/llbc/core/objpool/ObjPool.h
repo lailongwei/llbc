@@ -378,7 +378,7 @@ private:
 public:
     // GetStripeCapacity.
     template <typename Obj>
-    LLBC_NO_DISCARD static size_t GetStripeCapacity()
+    static size_t GetStripeCapacity()
     {
         return GetStripeCapacityInl<Obj>(0);
     }

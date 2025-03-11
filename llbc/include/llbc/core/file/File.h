@@ -206,7 +206,7 @@ public:
      * @return int - the file no, if failed, return -1.
      */
     int GetFileNo() const;
-    LLBC_NO_DISCARD static int GetFileNo(LLBC_FileHandle handle);
+    static int GetFileNo(LLBC_FileHandle handle);
 
     /**
      * Get file object wrapped file system level file handle, unsafe.
@@ -386,7 +386,7 @@ public:
      * @param[in] path - the file path.
      * @return bool - return true if the file exist, otherwise return false.
      */
-    LLBC_NO_DISCARD static bool Exists(const LLBC_String &path);
+    static bool Exists(const LLBC_String &path);
 
     /**
      * Get file attributes.
@@ -395,7 +395,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int GetFileAttributes(LLBC_FileAttributes &attrs);
-    LLBC_NO_DISCARD static int GetFileAttributes(const LLBC_String &path, LLBC_FileAttributes &attrs);
+    static int GetFileAttributes(const LLBC_String &path, LLBC_FileAttributes &attrs);
 
     /**
      * Touch file.
@@ -409,11 +409,11 @@ public:
      * @param[in] lastModifyTime       - the last modify time, if nullptr, will update to now.
      * @return int - return 0 if success, otherwise return -1.
      */
-    LLBC_NO_DISCARD static int TouchFile(const LLBC_String &filePath,
-                                         bool updateLastAccessTime = true,
-                                         const timespec *lastAccessTime = nullptr,
-                                         bool updateLastModifyTime = true,
-                                         const timespec *lastModifyTime = nullptr);
+    static int TouchFile(const LLBC_String &filePath,
+                         bool updateLastAccessTime = true,
+                         const timespec *lastAccessTime = nullptr,
+                         bool updateLastModifyTime = true,
+                         const timespec *lastModifyTime = nullptr);
 
 public:
     /**
@@ -426,8 +426,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int CopyFile(const LLBC_String &destFilePath, bool overlapped = false);
-    LLBC_NO_DISCARD static
-    int CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destFilePath, bool overlapped = false);
+    static int CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destFilePath, bool overlapped = false);
 
     /**
      * Move file.
@@ -438,8 +437,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int MoveFile(const LLBC_String &toFilePath, bool overlapped = false);
-    LLBC_NO_DISCARD static
-    int MoveFile(const LLBC_String &fromFilePath, const LLBC_String &toFilePath, bool overlapped = false);
+    static int MoveFile(const LLBC_String &fromFilePath, const LLBC_String &toFilePath, bool overlapped = false);
 
     /**
      * Delete file.
@@ -447,7 +445,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int DeleteFile();
-    LLBC_NO_DISCARD static int DeleteFile(const LLBC_String &filePath);
+    static int DeleteFile(const LLBC_String &filePath);
 
 private:
     /**

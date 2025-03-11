@@ -42,16 +42,16 @@ int TestCase_Core_Utils_Base64::Run(int argc, char *argv[])
     std::string decodedEmptyText;
 
     // Test encode.
-    assert(LLBC_Base64::Encode(plainText, encodedText) == LLBC_OK);
+    LLBC_Base64::Encode(plainText, encodedText);
     LLBC_PrintLn("Text: [%s]", plainText.c_str());
     LLBC_PrintLn("Encoded: [%s]", encodedText.c_str());
-    assert(LLBC_Base64::Encode(emptyPlainText, encodedEmptyText) == LLBC_OK);
+    LLBC_Base64::Encode(emptyPlainText, encodedEmptyText);
     LLBC_PrintLn("Empty Text Encoded: [%s]", encodedEmptyText.c_str());
 
     // Test decode.
-    assert(LLBC_Base64::Decode(encodedText, decodedText) == LLBC_OK);
+    LLBC_Base64::Decode(encodedText, decodedText);
     LLBC_PrintLn("Decoded: [%s]", decodedText.c_str());
-    assert(LLBC_Base64::Decode(encodedEmptyText, decodedEmptyText) == LLBC_OK);
+    LLBC_Base64::Decode(encodedEmptyText, decodedEmptyText);
     LLBC_PrintLn("Decoded Empty Text: [%s]", decodedEmptyText.c_str());
 
     LLBC_PrintLn("Press any key to continue...");

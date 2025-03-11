@@ -183,8 +183,8 @@ public:
      * @return App * - this application.
      */
     template <typename App>
-    LLBC_NO_DISCARD static App *ThisApp() { return static_cast<App *>(_thisApp); }
-    LLBC_NO_DISCARD static LLBC_App *ThisApp() { return _thisApp; }
+    static App *ThisApp() { return static_cast<App *>(_thisApp); }
+    static LLBC_App *ThisApp() { return _thisApp; }
 
 public:
     /**
@@ -363,7 +363,7 @@ private:
      * @param[out] cfgType - the application config type.
      * @return LLBC_String - the application config path, return empty string if failed.
      */
-    LLBC_NO_DISCARD static LLBC_String LocateConfigPath(const LLBC_String &appName, int &cfgType);
+    static LLBC_String LocateConfigPath(const LLBC_String &appName, int &cfgType);
 
     /**
      * Application reload implement method.

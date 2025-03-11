@@ -1887,7 +1887,7 @@ public:
         return _errorID;
     }
 	const char* ErrorName() const;
-    LLBC_NO_DISCARD static const char* ErrorIDToName(XMLError errorID);
+    static const char* ErrorIDToName(XMLError errorID);
 
     /** Returns a "long form" error description. A hopefully helpful
         diagnostic with location, line number, and/or additional info.

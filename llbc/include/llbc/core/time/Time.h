@@ -60,25 +60,25 @@ public:
     /**
      * Get current time.
      */
-    LLBC_NO_DISCARD static LLBC_Time Now();
+    static LLBC_Time Now();
 
     /**
      * Get now timestamp, in seconds.
      * @return time_t - now timestamp, in seconds.
      */
-    LLBC_NO_DISCARD static time_t NowTimestampInSecs();
+    static time_t NowTimestampInSecs();
 
     /**
      * Get now timestamp, in milli-seconds.
      * @return time_t - now timestamp, in milli-seconds.
      */
-    LLBC_NO_DISCARD static sint64 NowTimestampInMillis();
+    static sint64 NowTimestampInMillis();
 
     /**
      * Get now timestamp, in micro-seconds.
      * @return time_t - now timestamp, in micro-seconds.
      */
-    LLBC_NO_DISCARD static sint64 NowTimestampInMicros();
+    static sint64 NowTimestampInMicros();
 
 public:
     /**
@@ -286,7 +286,7 @@ public:
      * @param[in] year - the given year.
       *@return bool - return true it means given year is leap year, otherwise not.
      */
-    LLBC_NO_DISCARD static bool IsLeapYear(int year);
+    static bool IsLeapYear(int year);
 
     /**
      * Get specific month max days.
@@ -294,7 +294,7 @@ public:
      * @param[in] month - the month.
      * @return int - the specific month max days, if failed, return 0.
      */
-    LLBC_NO_DISCARD static int GetMonthMaxDays(int year, int month);
+    static int GetMonthMaxDays(int year, int month);
 
     /**
      * Get specific month span days.
@@ -302,7 +302,7 @@ public:
      * @param[in] month - the month - [1, 12].
      * @return int - the month span days(not included giving month).
      */
-    LLBC_NO_DISCARD static int GetMonthSpanDays(int year, int month);
+    static int GetMonthSpanDays(int year, int month);
 
 public:
     /**
@@ -335,9 +335,9 @@ public:
      * @param[in] timeOfHour - cross time of hour point.
      * @return int - crossed hours.
      */
-    LLBC_NO_DISCARD static int GetCrossedHours(const LLBC_Time &from,
-                                               const LLBC_Time &to,
-                                               const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
+    static int GetCrossedHours(const LLBC_Time &from,
+                               const LLBC_Time &to,
+                               const LLBC_TimeSpan &timeOfHour = LLBC_TimeSpan::zero);
 
     /**
      * Get crossed days between from and to time.
@@ -346,9 +346,9 @@ public:
      * @param[in] diffHours - diff time from daily zero time.
      * @return int - crossed days.
      */
-    LLBC_NO_DISCARD static int GetCrossedDays(const LLBC_Time &from,
-                                              const LLBC_Time &to,
-                                              const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
+    static int GetCrossedDays(const LLBC_Time &from,
+                              const LLBC_Time &to,
+                              const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
 
     /**
      * Get crossed weeks between from and to time.
@@ -357,9 +357,9 @@ public:
      * @param[in] timeOfWeek - cross time of week point.
      * @return int - crossed weeks.
      */
-    LLBC_NO_DISCARD static int GetCrossedWeeks(const LLBC_Time &from,
-                                               const LLBC_Time &to,
-                                               const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
+    static int GetCrossedWeeks(const LLBC_Time &from,
+                               const LLBC_Time &to,
+                               const LLBC_TimeSpan &timeOfWeek = LLBC_TimeSpan::zero);
 
     /**
      * Get crossed months between from and to time.
@@ -370,9 +370,9 @@ public:
      * @note: timeOfMonth must be less than 31 days old, otherwise will return 0.
      *        if timeOfMonth=oneDay, it means it's the second day of month.
      */
-    LLBC_NO_DISCARD static int GetCrossedMonths(const LLBC_Time &from,
-                                                const LLBC_Time &to,
-                                                const LLBC_TimeSpan &timeOfMonth = LLBC_TimeSpan::zero);
+    static int GetCrossedMonths(const LLBC_Time &from,
+                                const LLBC_Time &to,
+                                const LLBC_TimeSpan &timeOfMonth = LLBC_TimeSpan::zero);
      
 
 public:
@@ -439,10 +439,10 @@ private:
     /**
      * Crossed time-cycle internal implement. 
      */
-    LLBC_NO_DISCARD static LLBC_TimeSpan GetCrossedCycles(const LLBC_Time &from,
-                                                          const LLBC_Time &to,
-                                                          const LLBC_TimeSpan &timeCycle,
-                                                          LLBC_TimeSpan timeOfTimeCycle);
+    static LLBC_TimeSpan GetCrossedCycles(const LLBC_Time &from,
+                                          const LLBC_Time &to,
+                                          const LLBC_TimeSpan &timeCycle,
+                                          LLBC_TimeSpan timeOfTimeCycle);
 
 private:
     sint64 _time;
