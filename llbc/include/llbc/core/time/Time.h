@@ -90,29 +90,30 @@ public:
      * @param[in] <time parts>     - the all time parts(year, month, day, ...). 
      * @return LLBC_Time - Time object.
      */
-    static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
-    static LLBC_Time FromMillis(sint64 clanderTimeInMillis);
-    static LLBC_Time FromMicros(sint64 clanderTimeInMicros);
-    static LLBC_Time FromTimeVal(const timeval &timeVal);
-    static LLBC_Time FromTimeSpec(const timespec &timeSpec);
+    LLBC_NO_DISCARD static LLBC_Time FromSeconds(time_t clanderTimeInSeconds);
+    LLBC_NO_DISCARD static LLBC_Time FromMillis(sint64 clanderTimeInMillis);
+    LLBC_NO_DISCARD static LLBC_Time FromMicros(sint64 clanderTimeInMicros);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeVal(const timeval &timeVal);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeSpec(const timespec &timeSpec);
     template <size_t _StrArrLen>
-    static LLBC_Time FromTimeStr(const char (&timeStr)[_StrArrLen]);
-    static LLBC_Time FromTimeStr(const char *timeStr);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char (&timeStr)[_StrArrLen]);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char *timeStr);
     template <typename _StrType>
-    static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
+    LLBC_NO_DISCARD static
+    typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
     FromTimeStr(const _StrType &timeStr);
-    static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
-    static LLBC_Time FromTimeStruct(const tm &timeStruct,
-                                    int milliSec = 0,
-                                    int microSec = 0);
-    static LLBC_Time FromTimeParts(int year,
-                                   int month,
-                                   int day,
-                                   int hour,
-                                   int minute,
-                                   int second,
-                                   int milliSec = 0,
-                                   int microSec = 0);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStruct(const tm &timeStruct,
+                                                    int milliSec = 0,
+                                                    int microSec = 0);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeParts(int year,
+                                                   int month,
+                                                   int day,
+                                                   int hour,
+                                                   int minute,
+                                                   int second,
+                                                   int milliSec = 0,
+                                                   int microSec = 0);
 
 public:
     /**
@@ -255,13 +256,13 @@ public:
      * Format local time, see strftime() api.
      */
     LLBC_String Format(const char *format = nullptr) const;
-    static LLBC_String Format(const time_t &clanderTimeInSeconds, const char *format);
+    LLBC_NO_DISCARD static LLBC_String Format(const time_t &clanderTimeInSeconds, const char *format);
 
     /**
      * Format gmt time, see strftime() api.
      */
     LLBC_String FormatAsGmt(const char *format = nullptr) const;
-    static LLBC_String FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format);
+    LLBC_NO_DISCARD static LLBC_String FormatAsGmt(const time_t &clanderTimeInSeconds, const char *format);
 
 public:
     /**
@@ -345,7 +346,7 @@ public:
      * @param[in] diffHours - diff time from daily zero time.
      * @return int - crossed days.
      */
-    static int GetCrossedDays(const LLBC_Time &from, 
+    static int GetCrossedDays(const LLBC_Time &from,
                               const LLBC_Time &to,
                               const LLBC_TimeSpan &timeOfDay = LLBC_TimeSpan::zero);
 
@@ -415,7 +416,7 @@ private:
      * @param[in] timeStrLen - the time string length, not included '\0'.
      * @return LLBC_Time - time obuect.
      */
-    static LLBC_Time FromTimeStr(const char *timeStr, size_t timeStrLen);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char *timeStr, size_t timeStrLen);
 
     /**
      * Internal constructor.
@@ -439,9 +440,9 @@ private:
      * Crossed time-cycle internal implement. 
      */
     static LLBC_TimeSpan GetCrossedCycles(const LLBC_Time &from,
-                                         const LLBC_Time &to,
-                                         const LLBC_TimeSpan &timeCycle,
-                                         LLBC_TimeSpan timeOfTimeCycle);
+                                          const LLBC_Time &to,
+                                          const LLBC_TimeSpan &timeCycle,
+                                          LLBC_TimeSpan timeOfTimeCycle);
 
 private:
     sint64 _time;

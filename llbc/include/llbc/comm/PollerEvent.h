@@ -111,7 +111,8 @@ public:
     /**
      * Build close event.
      */
-    static LLBC_MessageBlock *BuildCloseEv(int sessionId, const char *reason);
+    static LLBC_MessageBlock *BuildCloseEv(int sessionId,
+                                           const char *reason);
 
     /**
      * Build Iocp monitor event.
@@ -123,7 +124,8 @@ public:
      * Build Epoll monitor event.
      */
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    static LLBC_MessageBlock *BuildEpollMonitorEv(const LLBC_EpollEvent *evs, int count);
+    static LLBC_MessageBlock *BuildEpollMonitorEv(const LLBC_EpollEvent *evs,
+                                                  int count);
 #endif
 
     /**
