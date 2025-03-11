@@ -1681,7 +1681,7 @@ private:
                 StringStream srcStream(s.Pop());
                 StackStream<typename TargetEncoding::Ch> dstStream(stack_);
                 while (numCharsToCopy--) {
-                    Transcoder<UTF8<>, TargetEncoding>::Transcode(srcStream, dstStream);
+                    if (Transcoder<UTF8<>, TargetEncoding>::Transcode(srcStream, dstStream));
                 }
                 dstStream.Put('\0');
                 const typename TargetEncoding::Ch* str = dstStream.Pop();
