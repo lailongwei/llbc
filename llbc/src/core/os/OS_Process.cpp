@@ -523,9 +523,9 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     LLBC_ReturnIf(exclusiveInfoPid == getpid(), LLBC_FAILED);
 
     // Open executable process by pid.
-	HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-		FALSE, exclusiveInfoPid);
-	if (processHandle != NULL)
+    HANDLE processHandle = OpenProcess(
+        PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, exclusiveInfoPid);
+    if (processHandle != NULL)
     {
         // Get executable file path refer to pid.
         DWORD getModuleFileNameRet = GetModuleFileNameExA(processHandle, NULL, runningExeFilePath, MAX_PATH);
