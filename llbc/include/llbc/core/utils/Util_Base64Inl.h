@@ -26,24 +26,21 @@ __LLBC_NS_BEGIN
 inline std::string LLBC_Base64::Encode(const std::string &input)
 {
     std::string output;
-    LLBC_ReturnIf(Encode(input, output) == LLBC_OK, output);
-    output.clear();
+    Encode(input, output);
     return output;
 }
 
 inline LLBC_String LLBC_Base64::Encode(const LLBC_String &input)
 {
     LLBC_String output;
-    LLBC_ReturnIf(Encode(input, output) == LLBC_OK, output);
-    output.clear();
+    Encode(input, output);
     return output;
 }
 
 inline LLBC_String LLBC_Base64::Encode(const char *input, size_t inputLen)
 {
     LLBC_String output;
-    LLBC_ReturnIf(Encode(input, inputLen, output) == LLBC_OK, output);
-    output.clear();
+    Encode(input, inputLen, output);
     return output;
 }
 
@@ -86,24 +83,21 @@ inline int LLBC_Base64::Encode(const char *input, size_t inputLen, LLBC_String &
 inline std::string LLBC_Base64::Decode(const std::string &input)
 {
     std::string output;
-    LLBC_ReturnIf(Decode(input, output) == LLBC_OK, output);
-    output.clear();
+    Decode(input, output);
     return output;
 }
 
 inline LLBC_String LLBC_Base64::Decode(const LLBC_String &input)
 {
     LLBC_String output;
-    LLBC_ReturnIf(Decode(input, output) == LLBC_OK, output);
-    output.clear();
+    Decode(input, output);
     return output;
 }
 
 inline LLBC_String LLBC_Base64::Decode(const char *input, size_t inputLen)
 {
     LLBC_String output;
-    LLBC_ReturnIf(Decode(input, inputLen, output) == LLBC_OK, output);
-    output.clear();
+    Decode(input, inputLen, output);
     return output;
 }
 

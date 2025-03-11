@@ -48,7 +48,9 @@ public:
      * @param[in] errMsg     - the error message, if failed, will be set to this param, otherwise set to 'Success'.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int LoadFromFile(const LLBC_String &filePath, LLBC_Variant &properties, LLBC_String *errMsg = nullptr);
+    static int LoadFromFile(const LLBC_String &filePath,
+                            LLBC_Variant &properties,
+                            LLBC_String *errMsg = nullptr);
 
     /**
      * Load properties from string content.
@@ -57,7 +59,9 @@ public:
      * @param[in] errMsg     - the error message, if failed, will be set to this param.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int LoadFromString(const LLBC_String &str, LLBC_Variant &properties, LLBC_String *errMsg = nullptr);
+    static int LoadFromString(const LLBC_String &str,
+                              LLBC_Variant &properties,
+                              LLBC_String *errMsg = nullptr);
 
     /**
      * Save properties to file.
@@ -66,7 +70,9 @@ public:
      * @param[in] errMsg     - the error message, if failed, will be set to this param.
      * @return int - return 0 if success, otherwise return -1. 
      */
-    static int SaveToFile(const LLBC_Variant &properties, const LLBC_String &filePath, LLBC_String *errMsg = nullptr);
+    static int SaveToFile(const LLBC_Variant &properties,
+                          const LLBC_String &filePath,
+                          LLBC_String *errMsg = nullptr);
 
     /**
      * Write property to string content.
@@ -75,7 +81,9 @@ public:
      * @param[in]  errMsg     - the error message, if failed, will be set to this param.
      * @return int - return 0 if success, otherwise return -1.
      */
-    static int SaveToString(const LLBC_Variant &properties, LLBC_String &str, LLBC_String *errMsg = nullptr);
+    static int SaveToString(const LLBC_Variant &properties,
+                            LLBC_String &str,
+                            LLBC_String *errMsg = nullptr);
 
 private:
     /**
@@ -90,7 +98,10 @@ private:
     /**
      * Write property line.
      */
-    static int SaveLine(const LLBC_String key, const LLBC_Variant &property, LLBC_String &str, LLBC_String *errMsg);
+    static int SaveLine(const LLBC_String key,
+                        const LLBC_Variant &property,
+                        LLBC_String &str,
+                        LLBC_String *errMsg);
 
     /**
      * Check property key item.
@@ -105,11 +116,15 @@ private:
     /**
      * Escape property value.
      */
-    static void EscapeValue(const LLBC_String &rawValue, LLBC_String &escapedValue);
+    static void EscapeValue(const LLBC_String &rawValue,
+                            LLBC_String &escapedValue);
     /**
      * Unescape property value.
      */
-    static int UnescapeValue(int lineNo, const LLBC_String &escapedValue, LLBC_String &rawValue, LLBC_String *errMsg);
+    static int UnescapeValue(int lineNo,
+                             const LLBC_String &escapedValue,
+                             LLBC_String &rawValue,
+                             LLBC_String *errMsg);
 };
 
 __LLBC_NS_END

@@ -361,7 +361,7 @@ void LLBC_LogFileAppender::BackupFiles()
         moveTo.format("%s.%d%s", filePathNoSuffix.c_str(), willMoveIndex + 1, _fileSuffix.c_str());
 
 #ifdef LLBC_RELEASE
-        if (LLBC_File::MoveFile(willMove, moveTo, true) != LLBC_OK) {}
+        LLBC_File::MoveFile(willMove, moveTo, true);
 #else
         if (LLBC_File::MoveFile(willMove, moveTo, true) != LLBC_OK)
         {

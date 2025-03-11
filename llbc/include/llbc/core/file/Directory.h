@@ -72,10 +72,12 @@ public:
      * @param[in] paths   - the paths list.
      * @return LLBC_String - the joined path.
      */
-    static LLBC_String Join(const LLBC_String &path1, const LLBC_String &path2);
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_String &path2);
 
     static LLBC_String Join(const LLBC_Strings &paths);
-    static LLBC_String Join(const LLBC_String &path1, const LLBC_Strings &paths);
+    static LLBC_String Join(const LLBC_String &path1,
+                            const LLBC_Strings &paths);
 
     template<typename ...Args>
     static LLBC_String Join(const LLBC_String &path1, const LLBC_String &path2, Args... args);
