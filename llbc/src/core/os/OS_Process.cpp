@@ -104,14 +104,14 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, char *stackBacktrace, size_t b
     while (true)
     {
         if (!::StackWalk64(machineType,
-                           curProc,
-                           curThread,
-                           &stackFrame64,
-                           ctx,
-                           nullptr,
-                           ::SymFunctionTableAccess64,
-                           ::SymGetModuleBase64,
-                           nullptr))
+            curProc,
+            curThread,
+            &stackFrame64,
+            ctx,
+            nullptr,
+            ::SymFunctionTableAccess64,
+            ::SymGetModuleBase64,
+            nullptr))
             break;
 
         if (stackFrame64.AddrFrame.Offset == 0)
@@ -138,13 +138,13 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, char *stackBacktrace, size_t b
         }
 
         const auto usedCap = snprintf(stackBacktrace,
-                                      backtraceSize,
-                                      "#%d 0x%p in %s at %s:%d\n",
-                                      frameNo++,
+            backtraceSize,
+            "#%d 0x%p in %s at %s:%d\n",
+            frameNo++,
                                       reinterpret_cast<void *>(symbol->Address),
-                                      symbol->Name,
-                                      fileName ? fileName : "",
-                                      lineNo);
+            symbol->Name,
+            fileName ? fileName : "",
+            lineNo);
         if (usedCap <= 0 ||
             usedCap >= static_cast<int>(backtraceSize) - 1)
             return;
@@ -157,12 +157,12 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, char *stackBacktrace, size_t b
 static LONG WINAPI __Win32CrashHandler(::EXCEPTION_POINTERS *exception)
 {
     HANDLE dmpFile = ::CreateFileA(__dumpFilePath,
-                                   GENERIC_WRITE,
-                                   FILE_SHARE_READ,
-                                   nullptr,
-                                   CREATE_ALWAYS,
-                                   FILE_ATTRIBUTE_NORMAL,
-                                   nullptr);
+        GENERIC_WRITE,
+        FILE_SHARE_READ,
+        nullptr,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        nullptr);
     if (UNLIKELY(dmpFile == INVALID_HANDLE_VALUE))
         return EXCEPTION_CONTINUE_SEARCH;
 
@@ -176,12 +176,12 @@ static LONG WINAPI __Win32CrashHandler(::EXCEPTION_POINTERS *exception)
     dmpInfo.ClientPointers = TRUE;
 
     const BOOL writeDumpSucc = ::MiniDumpWriteDump(::GetCurrentProcess(),
-                                                   ::GetCurrentProcessId(),
-                                                   dmpFile,
-                                                   (MINIDUMP_TYPE)LLBC_CFG_APP_DUMPFILE_DUMPTYPES,
-                                                   &dmpInfo,
-                                                   nullptr,
-                                                   nullptr);
+        ::GetCurrentProcessId(),
+        dmpFile,
+        (MINIDUMP_TYPE)LLBC_CFG_APP_DUMPFILE_DUMPTYPES,
+        &dmpInfo,
+        nullptr,
+        nullptr);
     if (UNLIKELY(!writeDumpSucc))
     {
         LLBC_NS LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -225,15 +225,15 @@ static BOOL __PreventSetUnhandledExceptionFilter()
     // c3       ret
     unsigned char execute[] = { 0x33, 0xc0, 0xc3 };
 #else
- #error "Unsupported architecture(on windows platform)!"
+#error "Unsupported architecture(on windows platform)!"
 #endif
 
     SIZE_T bytesWritten = 0;
     return ::WriteProcessMemory(GetCurrentProcess(),
-                                orgEntry,
-                                execute,
-                                sizeof(execute),
-                                &bytesWritten);
+        orgEntry,
+        execute,
+        sizeof(execute),
+        &bytesWritten);
 }
 
 __LLBC_INTERNAL_NS_END
@@ -245,9 +245,9 @@ __LLBC_INTERNAL_NS_END
 
 #include "llbc/core/file/File.h"
 
-__LLBC_INTERNAL_NS_BEGIN
+    __LLBC_INTERNAL_NS_BEGIN
 
-static char __exeFilePath[PATH_MAX + 1];
+    static char __exeFilePath[PATH_MAX + 1];
 static char __corePattern[PATH_MAX + 1];
 static char __coreDescFilePath[PATH_MAX + 1];
 static char __shellCmd[PATH_MAX * 2 + 256 + 1];
@@ -287,7 +287,7 @@ static void __NonWin32CrashHandler(int sig)
 
     ssize_t readRet = read(corePatternFd, __corePattern, sizeof(__corePattern) - 1);
     LLBC_DoIf(readRet == -1, close(corePatternFd); raise(sig));
-   
+
     close(corePatternFd);
     __corePattern[readRet >= 0 ? readRet : 0] = '\0';
 
@@ -301,25 +301,25 @@ static void __NonWin32CrashHandler(int sig)
     const int pid = getpid();
     const LLBC_NS uint32 now = time(nullptr);
     int fmtRet = snprintf(__shellCmd,
-                          sizeof(__shellCmd),
-                          "\\cp -rf \"%s\" \"%s/%s_%d_%u\"",
-                          __exeFilePath,
-                          corePatternDir,
-                          exeFileName,
-                          pid,
-                          now);
+        sizeof(__shellCmd),
+        "\\cp -rf \"%s\" \"%s/%s_%d_%u\"",
+        __exeFilePath,
+        corePatternDir,
+        exeFileName,
+        pid,
+        now);
     LLBC_DoIf(fmtRet < 0, raise(sig));
 
     system(__shellCmd);
 
     // Generate stack backtrace describe file(to txt).
     fmtRet = snprintf(__coreDescFilePath,
-                      sizeof(__coreDescFilePath),
-                      "%s/%s_%d_%u_stack_backtrace.txt",
-                      corePatternDir,
-                      exeFileName,
-                      pid,
-                      now);
+        sizeof(__coreDescFilePath),
+        "%s/%s_%d_%u_stack_backtrace.txt",
+        corePatternDir,
+        exeFileName,
+        pid,
+        now);
     LLBC_DoIf(fmtRet < 0, raise(sig));
 
     int coreDescFileFd = open(__coreDescFilePath, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
@@ -327,9 +327,9 @@ static void __NonWin32CrashHandler(int sig)
 
     char descFileHead[64];
     fmtRet = snprintf(descFileHead,
-                      sizeof(descFileHead),
-                      "Stack BackTrace(signal:%d):\n",
-                      sig);
+        sizeof(descFileHead),
+        "Stack BackTrace(signal:%d):\n",
+        sig);
     if (fmtRet > 0)
     {
         write(coreDescFileFd, descFileHead, fmtRet);
@@ -385,8 +385,8 @@ int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
         const auto now = LLBC_Time::Now();
         nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0];
         nmlDumpFilePath.append_format("_%d_%s.dmp",
-                                      LLBC_GetCurrentProcessId(),
-                                      now.Format("%Y%m%d_%H%M%S").c_str());
+            LLBC_GetCurrentProcessId(),
+            now.Format("%Y%m%d_%H%M%S").c_str());
     }
 
     if (nmlDumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))
@@ -401,9 +401,9 @@ int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
     if (!LLBC_INL_NS __hookedCrashSignals)
     {
         ::SetUnhandledExceptionFilter(LLBC_INL_NS __Win32CrashHandler);
-        #ifdef LLBC_RELEASE
+#ifdef LLBC_RELEASE
         LLBC_INL_NS __PreventSetUnhandledExceptionFilter();
-        #endif
+#endif
 
         LLBC_INL_NS __hookedCrashSignals = true;
     }
@@ -474,6 +474,7 @@ __LLBC_NS_END
 #endif // Supp hook process crash
 
 #if LLBC_SUPPORT_SET_PROCESS_EXCLUSIVE
+#include <llbc/core/utils/Util_Text.h>
 #if LLBC_TARGET_PLATFORM_WIN32
 #include <psapi.h>
 #elif LLBC_TARGET_PLATFORM_MAC
@@ -491,52 +492,50 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     // Get current execute file path.
     LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
 
-    // Set exclusive info file path.
-    LLBC_String nmlExclusiveInfoFilePath = exclusiveInfoFilePath;
-    if (nmlExclusiveInfoFilePath.empty())
-    {
-        nmlExclusiveInfoFilePath = LLBC_Directory::Join(selfExeFilePath, LLBC_Directory::ModuleFileName());
-        nmlExclusiveInfoFilePath.append(".pid");
-    }
+	// Set exclusive info file path.
+	LLBC_String nmlExclusiveInfoFilePath = exclusiveInfoFilePath.empty()
+		? LLBC_Directory::ModuleFilePath() + ".pid"
+		: exclusiveInfoFilePath;
 
     // Create then read-lock exclusive info file.
     HANDLE exclusiveInfoFile = CreateFileA(nmlExclusiveInfoFilePath.c_str(),
-                                           GENERIC_READ | GENERIC_WRITE,
-                                           FILE_SHARE_READ,
-                                           NULL,
-                                           OPEN_ALWAYS,
-                                           FILE_ATTRIBUTE_HIDDEN,
-                                           NULL);
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ,
+        NULL,
+        OPEN_ALWAYS,
+        FILE_ATTRIBUTE_HIDDEN,
+        NULL);
     LLBC_SetErrAndReturnIf(exclusiveInfoFile == INVALID_HANDLE_VALUE, LLBC_ERROR_OSAPI, LLBC_FAILED);
-    LLBC_Defer(CloseHandle(exclusiveInfoFile));
+    LLBC_Defer(
+        LLBC_SetErrAndReturnIf(!CloseHandle(exclusiveInfoFile), LLBC_ERROR_OSAPI,)
+    );
 
     // Read pid from exclusive info file.
     DWORD fileSize = GetFileSize(exclusiveInfoFile, NULL);
-    LLBC_ReturnIf(fileSize == -1, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(fileSize == -1 || fileSize >= 32, LLBC_ERROR_OSAPI, LLBC_FAILED);
 
     bool readSucc = ReadFile(exclusiveInfoFile, exclusiveInfoBuf, fileSize, &fileSize, NULL);
     LLBC_SetErrAndReturnIf(!readSucc, LLBC_ERROR_OSAPI, LLBC_FAILED);
     exclusiveInfoBuf[fileSize] = '\0';
 
     // Deal with exclusive info.
-    long exclusiveInfoPid = atoi(exclusiveInfoBuf);
-    if (strlen(exclusiveInfoBuf) != 0 && exclusiveInfoPid != getpid())
-    {
-        // Open executable process by pid.
-        HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-                                           FALSE, exclusiveInfoPid);
-        if (processHandle != NULL)
-        {
-            // Get executable file path refer to pid.
-            DWORD getModuleFileNameRet = GetModuleFileNameExA(processHandle, NULL, runningExeFilePath, MAX_PATH);
-            CloseHandle(processHandle);
-            LLBC_SetErrAndReturnIf(getModuleFileNameRet == 0, LLBC_ERROR_OSAPI, LLBC_FAILED);
-            runningExeFilePath[getModuleFileNameRet] = '\0';
-        }
+    long exclusiveInfoPid = LLBC_Str2Long(exclusiveInfoBuf);
+    LLBC_ReturnIf(exclusiveInfoPid == getpid(), LLBC_FAILED);
 
-        // Compare self name and running process path.
-        LLBC_ReturnIf(runningExeFilePath == selfExeFilePath, LLBC_FAILED);
-    }
+	// Open executable process by pid.
+	HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+		FALSE, exclusiveInfoPid);
+	if (processHandle != NULL)
+	{
+		// Get executable file path refer to pid.
+		DWORD getModuleFileNameRet = GetModuleFileNameExA(processHandle, NULL, runningExeFilePath, MAX_PATH);
+		CloseHandle(processHandle);
+		LLBC_SetErrAndReturnIf(getModuleFileNameRet == 0, LLBC_ERROR_OSAPI, LLBC_FAILED);
+		runningExeFilePath[getModuleFileNameRet] = '\0';
+	}
+
+    // Compare self name and running process path.
+    LLBC_ReturnIf(runningExeFilePath == selfExeFilePath, LLBC_FAILED);
 
     // Clear .pid file and write pid into it.
     SetFilePointer(exclusiveInfoFile, 0, NULL, FILE_BEGIN);
@@ -553,40 +552,38 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
 
     // Set exclusive info file path.
-    LLBC_String nmlExclusiveInfoFilePath = exclusiveInfoFilePath;
-    if (nmlExclusiveInfoFilePath.empty())
-    {
-        nmlExclusiveInfoFilePath = LLBC_Directory::Join(selfExeFilePath, LLBC_Directory::ModuleFileName());
-        nmlExclusiveInfoFilePath.append(".pid");
-    }
+    LLBC_String nmlExclusiveInfoFilePath = exclusiveInfoFilePath.empty()
+        ? LLBC_Directory::ModuleFilePath() + ".pid"
+        : exclusiveInfoFilePath;
 
     // Open exclusive info file and read pid.
     int exclusiveInfoFd = open(nmlExclusiveInfoFilePath.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
     LLBC_SetErrAndReturnIf(exclusiveInfoFd < 0, LLBC_ERROR_OSAPI, LLBC_FAILED);
-    LLBC_Defer(close(exclusiveInfoFd););
+    LLBC_Defer(
+        LLBC_SetErrAndReturnIf(close(exclusiveInfoFd) == -1, LLBC_ERROR_OSAPI, )
+    );
+    LLBC_Defer();
 
     int readRet = read(exclusiveInfoFd, exclusiveInfoBuf, MAX_INPUT);
     LLBC_SetErrAndReturnIf(readRet == -1, LLBC_ERROR_OSAPI, LLBC_FAILED);
     exclusiveInfoBuf[readRet] = '\0';
 
     // Deal with exclusive info.
-    long exclusiveInfoPid = atoi(exclusiveInfoBuf);
-    if (strlen(exclusiveInfoBuf) != 0 && exclusiveInfoPid != getpid())
-    {
-        // Get executable file by pid.
+    long exclusiveInfoPid = LLBC_Str2Long(exclusiveInfoBuf);
+    LLBC_ReturnIf(exclusiveInfoPid == getpid(), LLBC_OK);
+
+	// Get executable file by pid.
 #if LLBC_TARGET_PLATFORM_MAC
-        int pidPathRet = proc_pidpath(exclusiveInfoPid, runningExeFilePath, PATH_MAX);
-        LLBC_DoIf(pidPathRet != -1, runningExeFilePath[pidPathRet] = '\0');
+	int pidPathRet = proc_pidpath(exclusiveInfoPid, runningExeFilePath, PATH_MAX);
+	LLBC_DoIf(pidPathRet != -1, runningExeFilePath[pidPathRet] = '\0');
 #else
-        llbc::LLBC_String runingExe;
-        runingExe.format("/proc/%d/exe", exclusiveInfoPid);
-        ssize_t readLinkRet = readlink(runingExe.c_str(), runningExeFilePath, PATH_MAX);
-        LLBC_DoIf(readLinkRet != -1, runningExeFilePath[readLinkRet] = '\0');
+	llbc::LLBC_String runingExe;
+	runingExe.format("/proc/%d/exe", exclusiveInfoPid);
+	ssize_t readLinkRet = readlink(runingExe.c_str(), runningExeFilePath, PATH_MAX);
+	LLBC_DoIf(readLinkRet != -1, runningExeFilePath[readLinkRet] = '\0');
 #endif
 
-        // Compare self name and running process path.
-        LLBC_ReturnIf(selfExeFilePath == runningExeFilePath, LLBC_FAILED);
-    }
+    LLBC_ReturnIf(selfExeFilePath == runningExeFilePath, LLBC_FAILED);
 
     // Try to lock exclusive info file.
     struct flock fl;
