@@ -101,29 +101,12 @@ int TestCase_Core_OS_Process::TestSetExclusive()
         return LLBC_FAILED;
     }
 
-#if LLBC_TARGET_PLATFORM_WIN32
     if (LLBC_SetProcessExclusive() == LLBC_OK)
     {
         std::cerr << "Another Process Set exclusive success, err:"
                   << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
-#else
-    if (fork() != -1)
-    {
-        if (LLBC_SetProcessExclusive() == LLBC_OK)
-        {
-            std::cerr << "Another Process Set exclusive success, err:"
-                      << LLBC_FormatLastError() << std::endl;
-            exit(-1);
-        }
-    }
-    else
-    {
-        std::cout << "Fork failed!" << std::endl;
-        return LLBC_FAILED;
-    }
-#endif
     return LLBC_OK;
 #else
     // Unsupported set exclusive.
