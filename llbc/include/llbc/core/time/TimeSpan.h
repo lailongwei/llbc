@@ -49,19 +49,29 @@ public:
     /**
      * Convenience span construct methods.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromDays(int days, int hours = 0, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millis = 0, int micros = 0);
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromSeconds(int seconds, int millis = 0, int micros = 0);
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromMillis(sint64 millis, sint64 micros = 0);
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromMicros(sint64 micros);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromDays(int days, int hours = 0, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millis = 0, int micros = 0);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromSeconds(int seconds, int millis = 0, int micros = 0);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromMillis(sint64 millis, sint64 micros = 0);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromMicros(sint64 micros);
     template <size_t _StrArrLen>
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromSpanStr(const char (&spanStr)[_StrArrLen]);
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromSpanStr(const char *spanStr);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromSpanStr(const char (&spanStr)[_StrArrLen]);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromSpanStr(const char *spanStr);
     template <typename _StrType>
-    LLBC_WARN_UNUSED_RESULT static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_TimeSpan>::type
+    LLBC_WARN_UNUSED_RESULT static
+    typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_TimeSpan>::type
     FromSpanStr(const _StrType &spanStr);
-    LLBC_WARN_UNUSED_RESULT static LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
 
 public:
     /**

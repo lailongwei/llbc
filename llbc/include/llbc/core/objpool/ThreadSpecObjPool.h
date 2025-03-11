@@ -95,13 +95,15 @@ public:
      * @return LLBC_GuardedPoolObj<T> - the guarded object.
      */
     template<typename T>
-    LLBC_WARN_UNUSED_RESULT static LLBC_GuardedPoolObj<T> GuardedSafeAcquire() { return GetSafeObjPool()->AcquireGuarded<T>(); }
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_GuardedPoolObj<T> GuardedSafeAcquire() { return GetSafeObjPool()->AcquireGuarded<T>(); }
 
     /**
      * Acquire guarded object in thread-unsafe object pool.
      * @return LLBC_GuardedPoolObj<T> - the guarded object.
      */
     template<typename T>
-    LLBC_WARN_UNUSED_RESULT static LLBC_GuardedPoolObj<T> GuardedUnsafeAcquire() { return GetUnsafeObjPool()->AcquireGuarded<T>(); }
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_GuardedPoolObj<T> GuardedUnsafeAcquire() { return GetUnsafeObjPool()->AcquireGuarded<T>(); }
 };
 __LLBC_NS_END

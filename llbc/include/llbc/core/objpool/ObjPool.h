@@ -388,8 +388,8 @@ private:
     struct stripe_capacity_detectable_type;
 
     template <typename Obj>
-    LLBC_WARN_UNUSED_RESULT static size_t GetStripeCapacityInl(
-        stripe_capacity_detectable_type<Obj, &Obj::GetStripeCapacity> *)
+    LLBC_WARN_UNUSED_RESULT static
+    size_t GetStripeCapacityInl(stripe_capacity_detectable_type<Obj, &Obj::GetStripeCapacity> *)
     {
         return reinterpret_cast<Obj *>(NULL)->GetStripeCapacity();
     }
@@ -673,8 +673,8 @@ private:
     static void Collect_s(void *typedObjPool, bool deep);
 
     // Get typed object pool statistics static method.
-    LLBC_WARN_UNUSED_RESULT static LLBC_Json::Value GetStatistics_s(void *typedObjPool,
-                                                                    LLBC_Json::MemoryPoolAllocator<> &jsonAlloc);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_Json::Value GetStatistics_s(void *typedObjPool, LLBC_Json::MemoryPoolAllocator<> &jsonAlloc);
 
     // Find free stripe.
     _ObjStripe *FindFreeStripe();

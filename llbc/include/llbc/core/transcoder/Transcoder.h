@@ -44,10 +44,15 @@ public:
      * @param[out] destFile - wide-character string file.
      * @return int - return 0 if success, otherwise return -1.
      */
-    LLBC_WARN_UNUSED_RESULT static int MultiByteToWideChar(const LLBC_String &fromCode, const LLBC_String &src, LLBC_WString &dest);
-    LLBC_WARN_UNUSED_RESULT static int MultiByteFileToWideChar(const LLBC_String &fromCode, const LLBC_String &srcFile, LLBC_WString &dest);
-    LLBC_WARN_UNUSED_RESULT static int MultiByteToWideCharFile(const LLBC_String &fromCode, const LLBC_String &src, const LLBC_String &destFile);
-    LLBC_WARN_UNUSED_RESULT static int MultiByteFileToWideCharFile(const LLBC_String &fromCode, const LLBC_String &srcFile, const LLBC_String &destFile);
+    LLBC_WARN_UNUSED_RESULT static
+    int MultiByteToWideChar(const LLBC_String &fromCode, const LLBC_String &src, LLBC_WString &dest);
+    LLBC_WARN_UNUSED_RESULT static
+    int MultiByteFileToWideChar(const LLBC_String &fromCode, const LLBC_String &srcFile, LLBC_WString &dest);
+    LLBC_WARN_UNUSED_RESULT static
+    int MultiByteToWideCharFile(const LLBC_String &fromCode, const LLBC_String &src, const LLBC_String &destFile);
+    LLBC_WARN_UNUSED_RESULT static int MultiByteFileToWideCharFile(const LLBC_String &fromCode,
+                                                                   const LLBC_String &srcFile,
+                                                                   const LLBC_String &destFile);
 
     /**
      * Map a wide-character(Unicode) to a character string.

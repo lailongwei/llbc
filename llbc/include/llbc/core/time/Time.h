@@ -99,7 +99,8 @@ public:
     LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStr(const char (&timeStr)[_StrArrLen]);
     LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStr(const char *timeStr);
     template <typename _StrType>
-    LLBC_WARN_UNUSED_RESULT static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
+    LLBC_WARN_UNUSED_RESULT static
+    typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
     FromTimeStr(const _StrType &timeStr);
     LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
     LLBC_WARN_UNUSED_RESULT static LLBC_Time FromTimeStruct(const tm &timeStruct,

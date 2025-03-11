@@ -426,7 +426,8 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int CopyFile(const LLBC_String &destFilePath, bool overlapped = false);
-    LLBC_WARN_UNUSED_RESULT static int CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destFilePath, bool overlapped = false);
+    LLBC_WARN_UNUSED_RESULT static
+    int CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destFilePath, bool overlapped = false);
 
     /**
      * Move file.

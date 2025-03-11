@@ -90,10 +90,10 @@ private:
      * Parse property line.
      */
     LLBC_WARN_UNUSED_RESULT static int ParseLine(int lineNo,
-                         const LLBC_String &line,
-                         LLBC_Strings &keyItems,
-                         LLBC_String &value,
-                         LLBC_String *errMsg);
+                                                 const LLBC_String &line,
+                                                 LLBC_Strings &keyItems,
+                                                 LLBC_String &value,
+                                                 LLBC_String *errMsg);
 
     /**
      * Write property line.

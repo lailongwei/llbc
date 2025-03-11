@@ -117,7 +117,8 @@ public:
      * Build Iocp monitor event.
      */
 #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildIocpMonitorEv(int ret, LLBC_POverlapped ol, int errNo, int subErrNo);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_MessageBlock *BuildIocpMonitorEv(int ret, LLBC_POverlapped ol, int errNo, int subErrNo);
 #endif
     /**
      * Build Epoll monitor event.
@@ -135,8 +136,8 @@ public:
      * Build control protocol stack event.
      */
     LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildCtrlProtocolStackEv(int sessionId,
-                                                       int ctrlCmd,
-                                                       const LLBC_Variant &ctrlData);
+                                                                               int ctrlCmd,
+                                                                               const LLBC_Variant &ctrlData);
 
 public:
     /**

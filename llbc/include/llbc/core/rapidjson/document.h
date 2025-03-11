@@ -431,129 +431,184 @@ struct TypeHelper {};
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, bool> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsBool(); }
-    LLBC_WARN_UNUSED_RESULT static bool Get(const ValueType& v) { return v.GetBool(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, bool data) { return v.SetBool(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, bool data, typename ValueType::AllocatorType&) { return v.SetBool(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsBool(); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Get(const ValueType& v) { return v.GetBool(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, bool data) { return v.SetBool(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, bool data, typename ValueType::AllocatorType&) { return v.SetBool(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, int> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsInt(); }
-    LLBC_WARN_UNUSED_RESULT static int Get(const ValueType& v) { return v.GetInt(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, int data) { return v.SetInt(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, int data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsInt(); }
+    LLBC_WARN_UNUSED_RESULT static
+    int Get(const ValueType& v) { return v.GetInt(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, int data) { return v.SetInt(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, int data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, unsigned> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsUint(); }
-    LLBC_WARN_UNUSED_RESULT static unsigned Get(const ValueType& v) { return v.GetUint(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, unsigned data) { return v.SetUint(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, unsigned data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsUint(); }
+    LLBC_WARN_UNUSED_RESULT static
+    unsigned Get(const ValueType& v) { return v.GetUint(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, unsigned data) { return v.SetUint(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, unsigned data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
 };
 
 #ifdef _MSC_VER
 LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(long) == sizeof(int));
 template<typename ValueType>
 struct TypeHelper<ValueType, long> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsInt(); }
-    LLBC_WARN_UNUSED_RESULT static long Get(const ValueType& v) { return v.GetInt(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, long data) { return v.SetInt(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, long data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsInt(); }
+    LLBC_WARN_UNUSED_RESULT static
+    long Get(const ValueType& v) { return v.GetInt(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, long data) { return v.SetInt(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, long data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
 };
 
 LLBC_RAPIDJSON_STATIC_ASSERT(sizeof(unsigned long) == sizeof(unsigned));
 template<typename ValueType>
 struct TypeHelper<ValueType, unsigned long> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsUint(); }
-    LLBC_WARN_UNUSED_RESULT static unsigned long Get(const ValueType& v) { return v.GetUint(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, unsigned long data) { return v.SetUint(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, unsigned long data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsUint(); }
+    LLBC_WARN_UNUSED_RESULT static
+    unsigned long Get(const ValueType& v) { return v.GetUint(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, unsigned long data) { return v.SetUint(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, unsigned long data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
 };
 #endif
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, int64_t> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsInt64(); }
-    LLBC_WARN_UNUSED_RESULT static int64_t Get(const ValueType& v) { return v.GetInt64(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, int64_t data) { return v.SetInt64(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, int64_t data, typename ValueType::AllocatorType&) { return v.SetInt64(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsInt64(); }
+    LLBC_WARN_UNUSED_RESULT static
+    int64_t Get(const ValueType& v) { return v.GetInt64(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, int64_t data) { return v.SetInt64(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, int64_t data, typename ValueType::AllocatorType&) { return v.SetInt64(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, uint64_t> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsUint64(); }
-    LLBC_WARN_UNUSED_RESULT static uint64_t Get(const ValueType& v) { return v.GetUint64(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, uint64_t data) { return v.SetUint64(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, uint64_t data, typename ValueType::AllocatorType&) { return v.SetUint64(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsUint64(); }
+    LLBC_WARN_UNUSED_RESULT static
+    uint64_t Get(const ValueType& v) { return v.GetUint64(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, uint64_t data) { return v.SetUint64(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, uint64_t data, typename ValueType::AllocatorType&) { return v.SetUint64(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, double> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsDouble(); }
-    LLBC_WARN_UNUSED_RESULT static double Get(const ValueType& v) { return v.GetDouble(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, double data) { return v.SetDouble(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, double data, typename ValueType::AllocatorType&) { return v.SetDouble(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsDouble(); }
+    LLBC_WARN_UNUSED_RESULT static
+    double Get(const ValueType& v) { return v.GetDouble(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, double data) { return v.SetDouble(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, double data, typename ValueType::AllocatorType&) { return v.SetDouble(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, float> {
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsFloat(); }
-    LLBC_WARN_UNUSED_RESULT static float Get(const ValueType& v) { return v.GetFloat(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, float data) { return v.SetFloat(data); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, float data, typename ValueType::AllocatorType&) { return v.SetFloat(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsFloat(); }
+    LLBC_WARN_UNUSED_RESULT static
+    float Get(const ValueType& v) { return v.GetFloat(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, float data) { return v.SetFloat(data); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, float data, typename ValueType::AllocatorType&) { return v.SetFloat(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, const typename ValueType::Ch*> {
     typedef const typename ValueType::Ch* StringType;
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsString(); }
-    LLBC_WARN_UNUSED_RESULT static StringType Get(const ValueType& v) { return v.GetString(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, const StringType data) { return v.SetString(typename ValueType::StringRefType(data)); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, const StringType data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsString(); }
+    LLBC_WARN_UNUSED_RESULT static
+    StringType Get(const ValueType& v) { return v.GetString(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, const StringType data) { return v.SetString(typename ValueType::StringRefType(data)); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, const StringType data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
 };
 
 #if LLBC_RAPIDJSON_HAS_STDSTRING
 template<typename ValueType> 
 struct TypeHelper<ValueType, std::basic_string<typename ValueType::Ch> > {
     typedef std::basic_string<typename ValueType::Ch> StringType;
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsString(); }
-    LLBC_WARN_UNUSED_RESULT static StringType Get(const ValueType& v) { return StringType(v.GetString(), v.GetStringLength()); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, const StringType& data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsString(); }
+    LLBC_WARN_UNUSED_RESULT static
+    StringType Get(const ValueType& v) { return StringType(v.GetString(), v.GetStringLength()); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, const StringType& data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
 };
 #endif
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::Array> {
     typedef typename ValueType::Array ArrayType;
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsArray(); }
-    LLBC_WARN_UNUSED_RESULT static ArrayType Get(ValueType& v) { return v.GetArray(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, ArrayType data) { return v = data; }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, ArrayType data, typename ValueType::AllocatorType&) { return v = data; }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsArray(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ArrayType Get(ValueType& v) { return v.GetArray(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, ArrayType data) { return v = data; }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, ArrayType data, typename ValueType::AllocatorType&) { return v = data; }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::ConstArray> {
     typedef typename ValueType::ConstArray ArrayType;
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsArray(); }
-    LLBC_WARN_UNUSED_RESULT static ArrayType Get(const ValueType& v) { return v.GetArray(); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsArray(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ArrayType Get(const ValueType& v) { return v.GetArray(); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::Object> {
     typedef typename ValueType::Object ObjectType;
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsObject(); }
-    LLBC_WARN_UNUSED_RESULT static ObjectType Get(ValueType& v) { return v.GetObject(); }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, ObjectType data) { return v = data; }
-    LLBC_WARN_UNUSED_RESULT static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v = data; }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsObject(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ObjectType Get(ValueType& v) { return v.GetObject(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, ObjectType data) { return v = data; }
+    LLBC_WARN_UNUSED_RESULT static
+    ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v = data; }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::ConstObject> {
     typedef typename ValueType::ConstObject ObjectType;
-    LLBC_WARN_UNUSED_RESULT static bool Is(const ValueType& v) { return v.IsObject(); }
-    LLBC_WARN_UNUSED_RESULT static ObjectType Get(const ValueType& v) { return v.GetObject(); }
+    LLBC_WARN_UNUSED_RESULT static
+    bool Is(const ValueType& v) { return v.IsObject(); }
+    LLBC_WARN_UNUSED_RESULT static
+    ObjectType Get(const ValueType& v) { return v.GetObject(); }
 };
 
 } // namespace internal

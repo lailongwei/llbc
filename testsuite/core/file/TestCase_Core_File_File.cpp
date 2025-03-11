@@ -32,7 +32,7 @@ TestCase_Core_File_File::TestCase_Core_File_File()
 
 TestCase_Core_File_File::~TestCase_Core_File_File()
 {
-    if (LLBC_File::DeleteFile(_testFileName) != LLBC_OK);
+    if (LLBC_File::DeleteFile(_testFileName) != LLBC_OK) { }
 }
 
 int TestCase_Core_File_File::Run(int argc, char *argv[])

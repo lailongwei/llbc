@@ -265,10 +265,11 @@ public:
     /**
      * Build subscribe-event event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildSubscribeEventEv(int id,
-                                                                            const LLBC_ListenerStub &stub,
-                                                                            const LLBC_Delegate<void(LLBC_Event &)> &deleg,
-                                                                            LLBC_EventListener *listener);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_MessageBlock *BuildSubscribeEventEv(int id,
+                                             const LLBC_ListenerStub &stub,
+                                             const LLBC_Delegate<void(LLBC_Event &)> &deleg,
+                                             LLBC_EventListener *listener);
 
     /**
      * Build proto-report event.
@@ -287,8 +288,8 @@ public:
     /**
      * Build fire-event event.
      */
-    LLBC_WARN_UNUSED_RESULT static LLBC_MessageBlock *BuildFireEventEv(LLBC_Event *ev,
-                                               const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
+    LLBC_WARN_UNUSED_RESULT static
+    LLBC_MessageBlock *BuildFireEventEv(LLBC_Event *ev, const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler);
 
     /**
      * Build application phase event.
