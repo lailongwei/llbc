@@ -565,10 +565,7 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     // Open exclusive info file and read pid.
     int exclusiveInfoFd = open(nmlExclusiveInfoFilePath.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
     LLBC_SetErrAndReturnIf(exclusiveInfoFd < 0, LLBC_ERROR_OSAPI, LLBC_FAILED);
-    LLBC_Defer(
-        LLBC_SetErrAndReturnIf(close(exclusiveInfoFd) == -1, LLBC_ERROR_OSAPI, )
-    );
-    LLBC_Defer();
+    LLBC_Defer(close(exclusiveInfoFd));
 
     int readRet = read(exclusiveInfoFd, exclusiveInfoBuf, MAX_INPUT);
     LLBC_SetErrAndReturnIf(readRet == -1, LLBC_ERROR_OSAPI, LLBC_FAILED);
