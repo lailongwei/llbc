@@ -525,7 +525,7 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
 
     // Deal with exclusive info.
     uint64 exclusiveInfoPid = LLBC_Str2UInt64(exclusiveInfoBuf);
-    LLBC_SetErrAndReturnIf(exclusiveInfoPid == getpid(), LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(exclusiveInfoPid == getpid(), LLBC_ERROR_PROCESS_IS_EXCLUSIVE, LLBC_FAILED);
 
     // Open executable process by pid.
     HANDLE processHandle = ::OpenProcess(
@@ -540,7 +540,7 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     }
 
     // Compare self name and running process path.
-    LLBC_ReturnIf(runningExeFilePath == selfExeFilePath, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(runningExeFilePath == selfExeFilePath, LLBC_ERROR_PROCESS_IS_EXCLUSIVE, LLBC_FAILED);
 
     // Clear .pid file and write pid into it.
     ::SetFilePointer(exclusiveInfoFile, 0, NULL, FILE_BEGIN);
@@ -567,13 +567,13 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     LLBC_SetErrAndReturnIf(exclusiveInfoFd < 0, LLBC_ERROR_OSAPI, LLBC_FAILED);
     LLBC_Defer(close(exclusiveInfoFd));
 
-    int readRet = read(exclusiveInfoFd, exclusiveInfoBuf, MAX_INPUT);
+    int readRet = read(exclusiveInfoFd, exclusiveInfoBuf, 32);
     LLBC_SetErrAndReturnIf(readRet == -1, LLBC_ERROR_OSAPI, LLBC_FAILED);
     exclusiveInfoBuf[readRet] = '\0';
 
     // Deal with exclusive info.
     uint64 exclusiveInfoPid = LLBC_Str2UInt64(exclusiveInfoBuf);
-    LLBC_SetErrAndReturnIf(exclusiveInfoPid == (uint64)getpid(), LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(exclusiveInfoPid == (uint64)getpid(), LLBC_ERROR_PROCESS_IS_EXCLUSIVE, LLBC_FAILED);
 
     // Get executable file by pid.
 #if LLBC_TARGET_PLATFORM_MAC
@@ -586,7 +586,7 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     LLBC_DoIf(readLinkRet != -1, runningExeFilePath[readLinkRet] = '\0');
 #endif
 
-    LLBC_ReturnIf(selfExeFilePath == runningExeFilePath, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(selfExeFilePath == runningExeFilePath, LLBC_ERROR_PROCESS_IS_EXCLUSIVE, LLBC_FAILED);
 
     // Try to lock exclusive info file.
     struct flock fl;

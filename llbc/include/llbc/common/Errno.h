@@ -682,14 +682,14 @@ __LLBC_NS_BEGIN
 #define LLBC_ERROR_INVALID_FILE_SIZE   ((int)(0xc0000036))
 
 //
-// Message Id: LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE
+// Message Id: LLBC_ERROR_PROCESS_IS_EXCLUSIVE
 //
 // MessageText:
 //
-// process is already exclusive.
+// process is exclusive.
 //
-#define __LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE ((int)(0x00000037))
-#define LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE   ((int)(0xc0000037))
+#define __LLBC_ERROR_PROCESS_IS_EXCLUSIVE ((int)(0x00000037))
+#define LLBC_ERROR_PROCESS_IS_EXCLUSIVE   ((int)(0xc0000037))
 
 
 //
