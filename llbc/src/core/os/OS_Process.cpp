@@ -477,6 +477,7 @@ __LLBC_NS_END
 #include <llbc/core/utils/Util_Text.h>
 #if LLBC_TARGET_PLATFORM_WIN32
 #include <psapi.h>
+#include <Intsafe.h>
 #elif LLBC_TARGET_PLATFORM_MAC
 #include <libproc.h>
 #endif
@@ -510,7 +511,7 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
 
     // Read pid from exclusive info file.
     LARGE_INTEGER fileSizeInt;
-    bool getFileSizeRet = ::GetFileSizeEx(exclusiveInfoFile, &fileSize);
+    bool getFileSizeRet = ::GetFileSizeEx(exclusiveInfoFile, &fileSizeInt);
     LLBC_SetErrAndReturnIf(!getFileSizeRet, LLBC_ERROR_OSAPI, LLBC_FAILED);
     LLBC_SetErrAndReturnIf(fileSize.QuadPart >= 32, LLBC_ERROR_INVALID_FILE_SIZE, LLBC_FAILED);
 
@@ -518,9 +519,9 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     HRESULT int64ToDWordResult = ::Int64ToDWord(fileSize.QuadPart, &readFileSize);
     LLBC_SetErrAndReturnIf(int64ToDWordResult != S_OK, LLBC_ERROR_OSAPI, LLBC_FAILED);
 
-    bool readSucc = ::ReadFile(exclusiveInfoFile, exclusiveInfoBuf, fileSize, &fileSize, NULL);
+    bool readSucc = ::ReadFile(exclusiveInfoFile, exclusiveInfoBuf, readFileSize, &readFileSize, NULL);
     LLBC_SetErrAndReturnIf(!readSucc, LLBC_ERROR_OSAPI, LLBC_FAILED);
-    exclusiveInfoBuf[fileSize] = '\0';
+    exclusiveInfoBuf[readFileSize] = '\0';
 
     // Deal with exclusive info.
     uint64 exclusiveInfoPid = LLBC_Str2UInt64(exclusiveInfoBuf);
