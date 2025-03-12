@@ -639,6 +639,7 @@ LLBC_String LLBC_Directory::ModuleFilePath()
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return "";
     }
+    buf[size] = '\0';
 
     return LLBC_String(buf, strlen(buf));
 #else // Linux/Android

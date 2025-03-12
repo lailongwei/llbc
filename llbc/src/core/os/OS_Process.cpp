@@ -490,15 +490,15 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     static char runningExeFilePath[MAX_PATH + 1] = {0};
 
     // Get current execute file path.
-    LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
+    const LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
 
     // Set exclusive info file path.
     LLBC_String nmlExclusiveInfoFilePath = exclusiveInfoFilePath.empty()
-        ? LLBC_Directory::ModuleFilePath() + ".pid"
+        ? selfExeFilePath + ".pid"
         : exclusiveInfoFilePath;
 
     // Create then read-lock exclusive info file.
-    HANDLE exclusiveInfoFile = CreateFileA(nmlExclusiveInfoFilePath.c_str(),
+    HANDLE exclusiveInfoFile = ::CreateFileA(nmlExclusiveInfoFilePath.c_str(),
                                            GENERIC_READ | GENERIC_WRITE,
                                            FILE_SHARE_READ,
                                            NULL,
@@ -506,30 +506,34 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
                                            FILE_ATTRIBUTE_HIDDEN,
                                            NULL);
     LLBC_SetErrAndReturnIf(exclusiveInfoFile == INVALID_HANDLE_VALUE, LLBC_ERROR_OSAPI, LLBC_FAILED);
-    LLBC_Defer(
-        LLBC_SetErrAndReturnIf(!CloseHandle(exclusiveInfoFile), LLBC_ERROR_OSAPI,)
-    );
+    LLBC_Defer(::CloseHandle(exclusiveInfoFile));
 
     // Read pid from exclusive info file.
-    DWORD fileSize = GetFileSize(exclusiveInfoFile, NULL);
-    LLBC_SetErrAndReturnIf(fileSize == -1 || fileSize >= 32, LLBC_ERROR_OSAPI, LLBC_FAILED);
+    LARGE_INTEGER fileSizeInt;
+    bool getFileSizeRet = ::GetFileSizeEx(exclusiveInfoFile, &fileSize);
+    LLBC_SetErrAndReturnIf(!getFileSizeRet, LLBC_ERROR_OSAPI, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(fileSize.QuadPart >= 32, LLBC_ERROR_INVALID_FILE_SIZE, LLBC_FAILED);
 
-    bool readSucc = ReadFile(exclusiveInfoFile, exclusiveInfoBuf, fileSize, &fileSize, NULL);
+    DWORD readFileSize;
+    HRESULT int64ToDWordResult = ::Int64ToDWord(fileSize.QuadPart, &readFileSize);
+    LLBC_SetErrAndReturnIf(int64ToDWordResult != S_OK, LLBC_ERROR_OSAPI, LLBC_FAILED);
+
+    bool readSucc = ::ReadFile(exclusiveInfoFile, exclusiveInfoBuf, fileSize, &fileSize, NULL);
     LLBC_SetErrAndReturnIf(!readSucc, LLBC_ERROR_OSAPI, LLBC_FAILED);
     exclusiveInfoBuf[fileSize] = '\0';
 
     // Deal with exclusive info.
-    long exclusiveInfoPid = LLBC_Str2Long(exclusiveInfoBuf);
-    LLBC_ReturnIf(exclusiveInfoPid == getpid(), LLBC_FAILED);
+    uint64 exclusiveInfoPid = LLBC_Str2UInt64(exclusiveInfoBuf);
+    LLBC_SetErrAndReturnIf(exclusiveInfoPid == getpid(), LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVEL, LLBC_FAILED);
 
     // Open executable process by pid.
-    HANDLE processHandle = OpenProcess(
+    HANDLE processHandle = ::OpenProcess(
         PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, exclusiveInfoPid);
     if (processHandle != NULL)
     {
         // Get executable file path refer to pid.
-        DWORD getModuleFileNameRet = GetModuleFileNameExA(processHandle, NULL, runningExeFilePath, MAX_PATH);
-        CloseHandle(processHandle);
+        DWORD getModuleFileNameRet = ::GetModuleFileNameExA(processHandle, NULL, runningExeFilePath, MAX_PATH);
+        ::CloseHandle(processHandle);
         LLBC_SetErrAndReturnIf(getModuleFileNameRet == 0, LLBC_ERROR_OSAPI, LLBC_FAILED);
         runningExeFilePath[getModuleFileNameRet] = '\0';
     }
@@ -538,12 +542,13 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     LLBC_ReturnIf(runningExeFilePath == selfExeFilePath, LLBC_FAILED);
 
     // Clear .pid file and write pid into it.
-    SetFilePointer(exclusiveInfoFile, 0, NULL, FILE_BEGIN);
-    SetEndOfFile(exclusiveInfoFile);
-    int printRet = snprintf(exclusiveInfoBuf, 32, "%ld", GetCurrentProcessId());
+    ::SetFilePointer(exclusiveInfoFile, 0, NULL, FILE_BEGIN);
+    ::SetEndOfFile(exclusiveInfoFile);
+    int printRet = snprintf(exclusiveInfoBuf, 32, "%llu", (uint64)::GetCurrentProcessId());
     exclusiveInfoBuf[printRet] = '\0';
     LPDWORD writeSize = 0;
-    WriteFile(exclusiveInfoFile, exclusiveInfoBuf, strlen(exclusiveInfoBuf), writeSize, NULL);
+    bool writeSucc = ::WriteFile(exclusiveInfoFile, exclusiveInfoBuf, strlen(exclusiveInfoBuf), writeSize, NULL);
+    LLBC_SetErrAndReturnIf(!readSucc, LLBC_ERROR_OSAPI, LLBC_FAILED);
 #else // linux and macos
     static char exclusiveInfoBuf[32];
     static char runningExeFilePath[PATH_MAX + 1];
@@ -569,8 +574,8 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     exclusiveInfoBuf[readRet] = '\0';
 
     // Deal with exclusive info.
-    long exclusiveInfoPid = LLBC_Str2Long(exclusiveInfoBuf);
-    LLBC_ReturnIf(exclusiveInfoPid == getpid(), LLBC_FAILED);
+    uint64 exclusiveInfoPid = LLBC_Str2UInt64(exclusiveInfoBuf);
+    LLBC_SetErrAndReturnIf(exclusiveInfoPid == (uint64)getpid(), LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVEL, LLBC_FAILED);
 
     // Get executable file by pid.
 #if LLBC_TARGET_PLATFORM_MAC
@@ -597,8 +602,9 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     // Clear exclusive info file and write info into it.
     ftruncate(exclusiveInfoFd, 0);
     lseek(exclusiveInfoFd, 0, SEEK_SET);
-    snprintf(exclusiveInfoBuf, 32, "%ld", (long)getpid());
-    write(exclusiveInfoFd, exclusiveInfoBuf, strlen(exclusiveInfoBuf) + 1);
+    snprintf(exclusiveInfoBuf, 32, "%llu", (uint64)getpid());
+    int writeRet = write(exclusiveInfoFd, exclusiveInfoBuf, strlen(exclusiveInfoBuf) + 1);
+    LLBC_SetErrAndReturnIf(writeRet == -1, LLBC_ERROR_OSAPI, LLBC_FAILED);
 #endif
     return LLBC_OK;
 }
