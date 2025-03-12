@@ -689,7 +689,7 @@ __LLBC_NS_BEGIN
 // process is already exclusive.
 //
 #define __LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE ((int)(0x00000037))
-#define LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVEL  ((int)(0xc0000037))
+#define LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE   ((int)(0xc0000037))
 
 
 //

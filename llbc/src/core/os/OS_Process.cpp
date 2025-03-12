@@ -525,7 +525,7 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
 
     // Deal with exclusive info.
     uint64 exclusiveInfoPid = LLBC_Str2UInt64(exclusiveInfoBuf);
-    LLBC_SetErrAndReturnIf(exclusiveInfoPid == getpid(), LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVEL, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(exclusiveInfoPid == getpid(), LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE, LLBC_FAILED);
 
     // Open executable process by pid.
     HANDLE processHandle = ::OpenProcess(
@@ -576,7 +576,7 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
 
     // Deal with exclusive info.
     uint64 exclusiveInfoPid = LLBC_Str2UInt64(exclusiveInfoBuf);
-    LLBC_SetErrAndReturnIf(exclusiveInfoPid == (uint64)getpid(), LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVEL, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(exclusiveInfoPid == (uint64)getpid(), LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE, LLBC_FAILED);
 
     // Get executable file by pid.
 #if LLBC_TARGET_PLATFORM_MAC

@@ -143,7 +143,7 @@ namespace llbc
 
         static public uint LLBC_ERROR_INVALID_FILE_SIZE      = 0xc0000036;
 
-        static public uint LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVEL= 0xc0000037;
+        static public uint LLBC_ERROR_PROCESS_IS_ALREADY_EXCLUSIVE= 0xc0000037;
 
     }
 }
