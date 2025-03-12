@@ -555,11 +555,11 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     static char runningExeFilePath[PATH_MAX + 1];
 
     // Get current execute file path.
-    LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
+    const LLBC_String selfExeFilePath = LLBC_Directory::ModuleFilePath();
 
     // Set exclusive info file path.
     LLBC_String nmlExclusiveInfoFilePath = exclusiveInfoFilePath.empty()
-            ? LLBC_Directory::ModuleFilePath().append(".pid").c_str()
+            ? (selfExeFilePath + ".pid").c_str()
             : exclusiveInfoFilePath;
 
     // Open exclusive info file and read pid.
