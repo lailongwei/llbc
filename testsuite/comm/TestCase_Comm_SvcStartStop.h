@@ -27,8 +27,8 @@ using namespace llbc;
 class TestCase_Comm_SvcStartStop final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_SvcStartStop();
-    ~TestCase_Comm_SvcStartStop() override;
+    TestCase_Comm_SvcStartStop() = default;
+    ~TestCase_Comm_SvcStartStop() override = default;
 
 public:
     int Run(int argc, char *artv[]) override;

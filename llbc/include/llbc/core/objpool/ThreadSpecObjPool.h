@@ -90,9 +90,17 @@ public:
     template <typename Obj>
     static void UnsafeRelease(Obj *obj) { GetUnsafeObjPool()->Release(obj); }
 
+    /**
+     * Acquire guarded object in thread-safe object pool.
+     * @return LLBC_GuardedPoolObj<T> - the guarded object.
+     */
     template<typename T>
     static LLBC_GuardedPoolObj<T> GuardedSafeAcquire() { return GetSafeObjPool()->AcquireGuarded<T>(); }
 
+    /**
+     * Acquire guarded object in thread-unsafe object pool.
+     * @return LLBC_GuardedPoolObj<T> - the guarded object.
+     */
     template<typename T>
     static LLBC_GuardedPoolObj<T> GuardedUnsafeAcquire() { return GetUnsafeObjPool()->AcquireGuarded<T>(); }
 };

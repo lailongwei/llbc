@@ -384,7 +384,7 @@ void LLBC_App::Stop()
     FireAppPhaseChangeEvToServices(false, false, false, true);
 
     // Stop all services.
-    _services.StopAll(true);
+    _services.StopAll(true, true);
 
     // Stop app.
     while (true)

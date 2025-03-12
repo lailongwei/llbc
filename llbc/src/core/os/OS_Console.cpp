@@ -32,7 +32,7 @@ __LLBC_INTERNAL_NS_END
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
 __LLBC_INTERNAL_NS_BEGIN
-static LLBC_THREAD_LOCAL int __g_consoleColor[2];
+thread_local int __g_consoleColor[2];
 const static char *__g_consoleColorBeginFmt = "\033[";
 const static char *__g_consoleColorEndFmt = "\033[0m";
 

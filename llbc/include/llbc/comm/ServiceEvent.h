@@ -282,7 +282,8 @@ public:
     /**
      * Build unsubscribe-event event.
      */
-    static LLBC_MessageBlock *BuildUnsubscribeEventEv(int id, const LLBC_ListenerStub &stub);
+    static LLBC_MessageBlock *BuildUnsubscribeEventEv(int id,
+                                                      const LLBC_ListenerStub &stub);
 
     /**
      * Build fire-event event.

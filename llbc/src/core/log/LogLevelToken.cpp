@@ -28,9 +28,17 @@
 
 __LLBC_NS_BEGIN
 
+
+LLBC_LogLevelToken::LLBC_LogLevelToken()
+: _shortLevelStr(false)
+{
+}
+
 int LLBC_LogLevelToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
     SetFormatter(formatter);
+    _shortLevelStr = (formatter.addiParam.strip().tolower() == "short");
+
     return LLBC_OK;
 }
 
@@ -43,7 +51,7 @@ void LLBC_LogLevelToken::Format(const LLBC_LogData &data, LLBC_String &formatted
 {
     const int index = static_cast<int>(formattedData.size());
 
-    const LLBC_CString &lvStr = LLBC_LogLevel::GetLevelStr(data.level);
+    const LLBC_CString &lvStr = LLBC_LogLevel::GetLevelStr(data.level, _shortLevelStr);
     formattedData.append(lvStr.c_str(), lvStr.size());
 
     GetFormatter().Format(formattedData, index);

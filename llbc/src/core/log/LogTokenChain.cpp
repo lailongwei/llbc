@@ -176,9 +176,19 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
         case TokenParseState::ParsingTokenAddiParam:
             if (ch == '}')
             {
+                // Get token additional param.
                 formatter.addiParam = buf.substr(buf.rfind("{") + 1);
 
-                const size_t tokenPos = buf.rfind(LLBC_LogTokenType::EscapeToken) + 1;
+                // Get token define begin position.
+                const size_t tokenBeginPos = buf.rfind(LLBC_LogTokenType::EscapeToken);
+
+                // Get token position(skip indent prefix setting).
+                size_t tokenPos = tokenBeginPos + 1;
+                while (tokenPos < buf.size() - 1 &&
+                       (buf[tokenPos] == '-' || (buf[tokenPos] >= '0' && buf[tokenPos] <= '9')))
+                    ++tokenPos;
+
+                // Build token.
                 token = tokenBuilder->BuildLogToken(buf[tokenPos]);
                 token->Initialize(formatter, "");
                 AppendToken(token);
@@ -186,7 +196,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                 formatter.Reset();
                 state = TokenParseState::NormalState;
 
-                buf.erase(tokenPos - 1);
+                buf.erase(tokenBeginPos);
             }
             else
             {

@@ -229,26 +229,22 @@
     name(name &&) = delete;                \
     name &operator=(name &&) = delete      \
 
-// Thread local macro define.
-#if LLBC_TARGET_PLATFORM_LINUX
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_WIN32
-#define LLBC_THREAD_LOCAL __declspec(thread)
-#elif LLBC_TARGET_PLATFORM_IPHONE
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_MAC
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_ANDROID
-#define LLBC_THREAD_LOCAL __thread
-#endif
-
 // Deprecated attribute macro define.
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
 #define LLBC_DEPRECATED __attribute__((deprecated))
-#elif _MSC_VER >= 1400 // VS 2005 or higher.
+#elif defined(_MSC_VER) && _MSC_VER >= 1400 // VS 2005 or higher.
 #define LLBC_DEPRECATED __declspec(deprecated)
 #else
 #define LLBC_DEPRECATED
+#endif
+
+// WARN_UNUSED_RESULT macro define.
+#if defined(__GNUC__) || defined(__clang__)
+ #define LLBC_NO_DISCARD __attribute__((warn_unused_result))
+#elif defined(_MSC_VER) && _MSC_VER >= 1700 // VS 2012 or higher
+ #define LLBC_NO_DISCARD _Check_return_
+#else
+ #define LLBC_NO_DISCARD
 #endif
 
 // Unused param macro.

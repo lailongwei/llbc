@@ -104,6 +104,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 , _serviceBeginLoop(false)
 , _runningPhase(LLBC_ServiceRunningPhase::NotStarted)
+, _destroyCompWhenStop(false)
 
 , _startErrNo(0)
 , _startSubErrNo(0)
@@ -155,8 +156,8 @@ LLBC_ServiceImpl::~LLBC_ServiceImpl()
         ASSERT(_runningPhase == LLBC_ServiceRunningPhase::NotStarted ||
                LLBC_GetCurrentThreadId() == _svcThreadId);
 
-    // Stop service and destroy comps).
-    Stop();
+    // Stop service and destroy comps.
+    Stop(true);
     DestroyComps(false);
 
     // Clear members.
@@ -288,7 +289,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     return LLBC_OK;
 }
 
-int LLBC_ServiceImpl::Stop()
+int LLBC_ServiceImpl::Stop(bool destroyComp)
 {
     // If service not in <Started> phase, return failed.
     _lock.Lock();
@@ -304,8 +305,11 @@ int LLBC_ServiceImpl::Stop()
     const int driveMode = _driveMode;
     const LLBC_ThreadId svcThreadId = _svcThreadId;
 
+    _destroyCompWhenStop = destroyComp;
+
     // Update service phase to <Stopping>.
     _runningPhase = LLBC_ServiceRunningPhase::StoppingComps;
+
     _lock.Unlock();
 
     // Exec stop logic.
@@ -489,7 +493,7 @@ int LLBC_ServiceImpl::Broadcast(int opcode,
     }
 
     // Get all non-listen sessionIds.
-    static thread_local LLBC_SessionIds sessionIds;
+    thread_local LLBC_SessionIds sessionIds;
 
     _readySessionInfosLock.Lock();
     const auto readySessionInfosEndIt = _readySessionInfos.end();
@@ -1272,6 +1276,9 @@ void LLBC_ServiceImpl::Cleanup()
     // Stop comps.
     StopComps();
 
+    // Destroy comps if needed.
+    LLBC_DoIf(_destroyCompWhenStop, DestroyComps(); _destroyCompWhenStop = false);
+
     // Post-Stop.
     PostStop();
 
@@ -1515,7 +1522,7 @@ void LLBC_ServiceImpl::PostStop()
     _pollerCount = 0;
 }
 
-void LLBC_ServiceImpl::HandlePosts()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::HandlePosts()
 {
     LLBC_ReturnIf(_posts.empty(), void());
 
@@ -1958,17 +1965,19 @@ int LLBC_ServiceImpl::InitComps()
 }
 
 // Define component destroy macro.
-#define __LLBC_Inl_DestoryComp(comp, destroyMeth, toPhase)    \
-    while (true) {                                            \
-        bool destroyFinished = true;                          \
-        comp->destroyMeth(destroyFinished);                   \
-        if (destroyFinished) {                                \
-            comp->_runningPhase = _CompRunningPhase::toPhase; \
-            break;                                            \
-        }                                                     \
-                                                              \
-        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);           \
-    }                                                         \
+#define __LLBC_Inl_DestroyComp(comp, destroyMeth, toPhase)               \
+    while (true) {                                                       \
+        bool destroyFinished = true;                                     \
+        comp->destroyMeth(destroyFinished);                              \
+        if (destroyFinished) {                                           \
+            comp->_runningPhase = _CompRunningPhase::toPhase;            \
+            break;                                                       \
+        }                                                                \
+                                                                         \
+        if (_CompRunningPhase::toPhase >= _CompRunningPhase::LateInited) \
+            OnSvc(false);                                                \
+        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);                      \
+    }                                                                    \
 
 void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
 {
@@ -1977,7 +1986,7 @@ void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
     {
         LLBC_Component *comp = *it;
         if (comp->_runningPhase == _CompRunningPhase::LateInited)
-            __LLBC_Inl_DestoryComp(comp, OnEarlyDestroy, Inited);
+            __LLBC_Inl_DestroyComp(comp, OnEarlyDestroy, Inited);
     }
 
     // Destroy comps.
@@ -1985,7 +1994,7 @@ void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
     {
         LLBC_Component *comp = *it;
         if (comp->_runningPhase == _CompRunningPhase::Inited)
-            __LLBC_Inl_DestoryComp(comp, OnDestroy, NotInit);
+            __LLBC_Inl_DestroyComp(comp, OnDestroy, NotInit);
     }
 
     if (onlyCallEvMeth)
@@ -2075,7 +2084,7 @@ void LLBC_ServiceImpl::StopComps()
     {
         LLBC_Component *comp = *it;
         if (comp->_runningPhase == _CompRunningPhase::LateStarted)
-            __LLBC_Inl_DestoryComp(comp, OnEarlyStop, Started);
+            __LLBC_Inl_DestroyComp(comp, OnEarlyStop, Started);
     }
 
     // Stop comps.
@@ -2083,7 +2092,7 @@ void LLBC_ServiceImpl::StopComps()
     {
         LLBC_Component *comp = *it;
         if (comp->_runningPhase == _CompRunningPhase::Started)
-            __LLBC_Inl_DestoryComp(comp, OnStop, LateInited);
+            __LLBC_Inl_DestroyComp(comp, OnStop, LateInited);
     }
 
     // Update _runningPhase to <Stopping> phase, if in <StoppingComps> phase.
@@ -2100,7 +2109,7 @@ void LLBC_ServiceImpl::StopComps()
 // Undef component destroy macro.
 #undef __LLBC_Inl_DestroyComp
 
-void LLBC_ServiceImpl::UpdateComps()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateComps()
 {
     for(auto &comp : _compList)
     {
@@ -2109,7 +2118,7 @@ void LLBC_ServiceImpl::UpdateComps()
     }
 }
 
-void LLBC_ServiceImpl::LateUpdateComps()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::LateUpdateComps()
 {
     for(auto &comp : _compList)
     {
@@ -2167,7 +2176,7 @@ void LLBC_ServiceImpl::CloseCompLibrary(const LLBC_String &libPath)
     _releasePoolStack = LLBC_AutoReleasePoolStack::GetCurrentThreadReleasePoolStack();
 }
 
-void LLBC_ServiceImpl::UpdateAutoReleasePool()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateAutoReleasePool()
 {
     if (_driveMode == LLBC_ServiceDriveMode::SelfDrive)
         _releasePoolStack->Purge();
@@ -2191,7 +2200,7 @@ void LLBC_ServiceImpl::InitTimerScheduler()
     }
 }
 
-void LLBC_ServiceImpl::UpdateTimerScheduler()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateTimerScheduler()
 {
     _timerScheduler->Update();
 }
