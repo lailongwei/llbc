@@ -510,8 +510,8 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     LLBC_Defer(::CloseHandle(exclusiveInfoFile));
 
     // Read pid from exclusive info file.
-    LARGE_INTEGER fileSizeInt;
-    bool getFileSizeRet = ::GetFileSizeEx(exclusiveInfoFile, &fileSizeInt);
+    LARGE_INTEGER fileSize;
+    bool getFileSizeRet = ::GetFileSizeEx(exclusiveInfoFile, &fileSize);
     LLBC_SetErrAndReturnIf(!getFileSizeRet, LLBC_ERROR_OSAPI, LLBC_FAILED);
     LLBC_SetErrAndReturnIf(fileSize.QuadPart >= 32, LLBC_ERROR_INVALID_FILE_SIZE, LLBC_FAILED);
 
