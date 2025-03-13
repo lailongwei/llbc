@@ -36,7 +36,7 @@ public:
 
 private:
     int BasicTest();
-    int InfiniteEventFireTest();
+    int EventFireDeadLoopDetectionTest();
     int CopyEventTest();
 
 private:

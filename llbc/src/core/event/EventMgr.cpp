@@ -286,19 +286,22 @@ bool LLBC_EventMgr::HasStub(const LLBC_ListenerStub &stub) const
 int LLBC_EventMgr::BeforeFireEvent(const LLBC_Event &ev)
 {
     // If event id already in firing, set <REPEAT> error and return failed.
-    if (_firing > 1 &&
-        !_firingEventIds.empty() &&
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+    if (!_firingEventIds.empty() &&
         std::find(_firingEventIds.begin(), _firingEventIds.end(), ev.GetId()) != _firingEventIds.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
     // Increase firing flag.
     ++_firing;
 
     // Add event id to _firingEventIds set.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     _firingEventIds.push_back(ev.GetId());
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
     return LLBC_OK;
 }
@@ -306,7 +309,9 @@ int LLBC_EventMgr::BeforeFireEvent(const LLBC_Event &ev)
 void LLBC_EventMgr::AfterFireEvent()
 {
     // Remove event id from _firingEventIds list.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     _firingEventIds.resize(_firingEventIds.size() - 1);
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
     // Decrease firing flag.
     if (--_firing != 0)
@@ -315,7 +320,9 @@ void LLBC_EventMgr::AfterFireEvent()
     // Assert: make sure _firing >= 0.
     ASSERT(_firing >= 0 && "llbc framework internal error: LLBC_EventMgr._firing < 0");
     // Assert: make sure _firingEventIds is empty.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     ASSERT(_firingEventIds.empty() && "llbc framework internal error: LLBC_EventMgr._firingEventIds is not empty!");
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
     // Process pending event ops(add/remove).
     for (auto &pendingEventOp : _pendingEventOps)

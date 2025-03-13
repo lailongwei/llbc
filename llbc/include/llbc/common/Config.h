@@ -75,6 +75,12 @@
 #define LLBC_CFG_CORE_FILE_COPY_BUF_SIZE                    16384000
 
 /**
+ * \brief core/event about config options define.
+ */
+// Enable(or disable) the event fire dead loop detection, disabled by default.
+#define LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION 0
+
+/**
  * \brief core/utils about config options define.
  */
 // Determine library impl _itoa() API or not, Non-WIN32 Platform specific.
