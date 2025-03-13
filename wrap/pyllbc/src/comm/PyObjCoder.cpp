@@ -62,7 +62,7 @@ int pyllbc_ObjCoder::Decode(const std::string &in, PyObject *&out)
     {
         LLBC_String err;
         err.format("could not decode json string, err:%s", 
-            LLBC_Json::GetParseError_En(j.GetParseError()), LLBC_ERROR_FORMAT);
+                   LLBC_Json::GetParseError_En(j.GetParseError()), LLBC_ERROR_FORMAT);
         pyllbc_SetError(err);
 
         return LLBC_FAILED;

@@ -228,8 +228,8 @@ int pyllbc_PackLemmaCompiler::Compile_SeqEnd(char ch, char nextCh, PyObject *com
     {
         LLBC_String errStr;
         errStr.format("found sequence end format character: %c, but before this "
-            "not got sequence begin character: %c/%c", ch, pyllbc_PackLemma::ListBegin, pyllbc_PackLemma::TupleBegin);
-
+                      "not got sequence begin character: %c/%c",
+                      ch, pyllbc_PackLemma::ListBegin, pyllbc_PackLemma::TupleBegin);
         pyllbc_SetError(errStr);
 
         return LLBC_FAILED;
@@ -259,8 +259,8 @@ int pyllbc_PackLemmaCompiler::Compile_DictEnd(char ch, char nextCh, PyObject *co
     {
         LLBC_String errStr;
         errStr.format("found dict end format character: %c, "
-            "but before this not got dict begin character: %c", ch, pyllbc_PackLemma::DictBegin);
-
+                      "but before this not got dict begin character: %c",
+                      ch, pyllbc_PackLemma::DictBegin);
         pyllbc_SetError(errStr);
 
         return LLBC_FAILED;
@@ -276,8 +276,8 @@ int pyllbc_PackLemmaCompiler::Compile_DictKWSep(char ch, char nextCh, PyObject *
     {
         LLBC_String errStr;
         errStr.format("found dict key-word separator character: %c, "
-            "but before this not got dict begin character: %c", ch, pyllbc_PackLemma::DictBegin);
-
+                      "but before this not got dict begin character: %c",
+                      ch, pyllbc_PackLemma::DictBegin);
         pyllbc_SetError(errStr);
 
         return LLBC_FAILED;
@@ -314,8 +314,8 @@ int pyllbc_PackLemmaCompiler::Compile_ClassNameBeg(char ch, char nextCh, PyObjec
     {
         LLBC_String errStr;
         errStr.format("found class name begin character: %c, "
-            "but before this not got class format character: %c", ch, pyllbc_PackLemma::Class);
-
+                      "but before this not got class format character: %c",
+                      ch, pyllbc_PackLemma::Class);
         pyllbc_SetError(errStr);
 
         return LLBC_FAILED;
@@ -331,8 +331,8 @@ int pyllbc_PackLemmaCompiler::Compile_ClassNameEnd(char ch, char nextCh, PyObjec
     {
         LLBC_String errStr;
         errStr.format("found class name end character: %c, "
-            "but before this not got class name begin format character: %c", ch, pyllbc_PackLemma::ClassNameBegin);
-
+                      "but before this not got class name begin format character: %c",
+                      ch, pyllbc_PackLemma::ClassNameBegin);
         pyllbc_SetError(errStr);
 
         return LLBC_FAILED;
@@ -348,8 +348,8 @@ int pyllbc_PackLemmaCompiler::Compile_ClassName(char ch, char nextCh, PyObject *
     {
         LLBC_String errStr;
         errStr.format("found class name character: %c, "
-            "but before this not got class name format character: %c", ch, pyllbc_PackLemma::Class);
-
+                      "but before this not got class name format character: %c",
+                      ch, pyllbc_PackLemma::Class);
         pyllbc_SetError(errStr);
 
         return LLBC_FAILED;

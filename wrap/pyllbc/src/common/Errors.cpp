@@ -58,8 +58,7 @@ void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&trace
             const char *fileName = PyString_AsString(codeObj->co_filename);
             const char *definedName = PyString_AsString(codeObj->co_name);
 
-            errStr.append_format("%c<llbc holded>File: %s, line: %d, in %s",
-                                 LLBC_LF,
+            errStr.append_format("\n<llbc holded>File: %s, line: %d, in %s",
                                  fileName,
                                  tbs->tb_lineno,
                                  definedName);
@@ -69,14 +68,20 @@ void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyObject *&trace
     PyErr_Restore(errType, errVal, traceback);
 }
 
-void pyllbc_TransferLLBCError(const char *file, int lineNo, const LLBC_String &additionalMsg)
+void pyllbc_TransferLLBCError(const char *file,
+                              int lineNo,
+                              const LLBC_String &additionalMsg)
 {
     LLBC_String errDesc;
     errDesc.format("%s", LLBC_FormatLastError());
     if (file)
         errDesc.append_format(", raised from c/c++ source %s:%d", file, lineNo);
+
     if (!additionalMsg.empty())
-        errDesc.append_format(", additional info: %s", additionalMsg.c_str());
+    {
+        errDesc.append(", additional info: ");
+        errDesc.append(additionalMsg);
+    }
 
     PyObject *errCls = pyllbc_Exception ? pyllbc_Exception : PyExc_Exception;
     if (!PyErr_Occurred())
@@ -102,17 +107,20 @@ void pyllbc_TransferPyError(const LLBC_String &additionalMsg)
             pyllbc_PyErrFetch(errType, errStr, tbObj);
 
             if (!additionalMsg.empty())
-                errStr.append_format("%c%s", LLBC_LF, additionalMsg.c_str());
+            {
+                errStr.append(1, '\n');
+                errStr.append(additionalMsg);
+            }
 
             pyllbc_ErrSetHook(errStr, LLBC_GetLastError(), errType, tbObj);
         }
     }
 }
 
-void pyllbc_SetError(int errNo)
+void pyllbc_SetError(int errNo, const char *file, int lineNo, const LLBC_String &additionalMsg)
 {
     LLBC_SetLastError(errNo);
-    pyllbc_TransferLLBCError();
+    pyllbc_TransferLLBCError(file, lineNo, additionalMsg);
 }
 
 void pyllbc_SetError(const LLBC_String &errDesc, int llbcErr, PyObject *pyErrType)

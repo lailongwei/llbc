@@ -39,7 +39,9 @@ class LLBC_EXPORT LLBC_TimerScheduler
 {
     typedef LLBC_TimerScheduler _This;
 
-    typedef LLBC_Heap<LLBC_TimerData *> _Heap;
+    typedef LLBC_Heap<LLBC_TimerData *,
+                      std::vector<LLBC_TimerData *>,
+                      std::greater<LLBC_NS LLBC_TimerData *> > _Heap;
 
 public:
     LLBC_TimerScheduler();
@@ -116,7 +118,8 @@ private:
 private:
     LLBC_TimerId _maxTimerId;
     bool _enabled;
-    bool _destroyed;
+    bool _destroying;
+    bool _cancelingAll;
 
     _Heap _heap;
 };

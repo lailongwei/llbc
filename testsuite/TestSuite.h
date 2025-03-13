@@ -36,6 +36,7 @@
 #include "core/os/TestCase_Core_OS_Thread.h"
 #include "core/os/TestCase_Core_OS_Console.h"
 #include "core/os/TestCase_Core_OS_Process.h"
+#include "core/algo/TestCase_Core_Algo_Hash.h"
 #include "core/algo/TestCase_Core_Algo_RingBuffer.h"
 #include "core/bundle/TestCase_Core_Bundle.h"
 #include "core/utils/TestCase_Core_Utils_Text.h"
@@ -51,7 +52,7 @@
 #include "core/file/TestCase_Core_File_Directory.h"
 #include "core/variant/TestCase_Core_Variant.h"
 #include "core/config/TestCase_Core_Config_Ini.h"
-#include "core/config/TestCase_Core_Config_Property.h"
+#include "core/config/TestCase_Core_Config_Properties.h"
 #include "core/time/TestCase_Core_Time_Time.h"
 #include "core/timer/TestCase_Core_Timer_Heap.h"
 #include "core/event/TestCase_Core_Event.h"
@@ -95,6 +96,7 @@
 #include "app/TestCase_App_AppTest.h"
 #include "app/TestCase_App_AppCfgTest.h"
 #include "app/TestCase_App_AppPhaseWaitingTest.h"
+#include "app/TestCase_App_AppTimer.h"
 
 extern int TestSuite_Main(int argc, char *argv[]);
 

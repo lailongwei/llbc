@@ -24,12 +24,12 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_PacketOp : public LLBC_BaseTestCase
+class TestCase_Comm_PacketOp final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Comm_PacketOp();
-    virtual ~TestCase_Comm_PacketOp();
+    ~TestCase_Comm_PacketOp() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 };

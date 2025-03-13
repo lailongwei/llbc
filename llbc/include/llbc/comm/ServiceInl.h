@@ -30,6 +30,13 @@
 
 __LLBC_NS_BEGIN
 
+template <typename Comp>
+typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
+LLBC_Component::GetComponent()
+{
+    return GetService()->GetComponent<Comp>();
+}
+
 constexpr bool LLBC_ServiceRunningPhase::IsFailedPhase(int runningPhase)
 {
     return runningPhase == PreStartFailed ||
@@ -113,21 +120,32 @@ typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value &&
                         Comp *>::type
 LLBC_Service::GetComponent()
 {
-    const auto &compList = GetComponentList();
-    if (compList.size() <= 32)
+    // Get component name.
+    const static LLBC_String compName = LLBC_GetCompName(Comp);
+
+    // Normal search.
+    LockService();
+    auto comp = static_cast<Comp *>(GetComponent(compName));
+    if (comp)
     {
-        Comp *castComp;
-        for (auto *comp : compList)
+        UnlockService();
+        return comp;
+    }
+
+    // Using dynamic_cast to search(lookup all components, lock service again).
+    for (auto &svcComp : GetComponentList())
+    {
+        if ((comp = dynamic_cast<Comp *>(svcComp)))
         {
-            if ((castComp = dynamic_cast<Comp *>(comp)) != nullptr)
-                return castComp;
+            UnlockService();
+            return comp;
         }
     }
 
-    size_t compNameLen;
-    char compName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
-    GetCompName(typeid(Comp).name(), compName, compNameLen);
-    return static_cast<Comp *>(GetComponent(LLBC_CString(compName, compNameLen)));
+    UnlockService();
+    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+
+    return nullptr;
 }
 
 template <typename Comp>
@@ -206,7 +224,7 @@ LLBC_FORCE_INLINE int LLBC_Service::Multicast(const LLBC_SessionIds &sessionIds,
 
     // Encode coder.
     // TODO: Temporary code, will be optimized in later.
-    static thread_local LLBC_Packet pkt;
+    thread_local LLBC_Packet pkt;
     if (UNLIKELY(!pkt.GetPayload()))
         pkt.SetPayload(new LLBC_MessageBlock);
 
@@ -248,7 +266,7 @@ LLBC_FORCE_INLINE int LLBC_Service::Broadcast(int opcode, LLBC_Coder *coder, int
 
     // Encode coder.
     // TODO: Temporary code, will be optimized in later.
-    static thread_local LLBC_Packet pkt;
+    thread_local LLBC_Packet pkt;
     if (UNLIKELY(!pkt.GetPayload()))
         pkt.SetPayload(new LLBC_MessageBlock);
 

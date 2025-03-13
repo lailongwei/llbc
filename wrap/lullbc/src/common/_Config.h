@@ -132,8 +132,6 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_COMM_MIN_SERVICE_FPS");
     lua_pushinteger(l, LLBC_CFG_COMM_MAX_SERVICE_FPS);
     lua_setfield(l, 1, "CFG_COMM_MAX_SERVICE_FPS");
-    lua_pushboolean(l, LLBC_CFG_COMM_MAX_COMP_NAME_LEN);
-    lua_setfield(l, 1, "CFG_COMM_MAX_COMP_NAME_LEN");
     lua_pushinteger(l, LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT);
     lua_setfield(l, 1, "CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT");
     lua_pushboolean(l, LLBC_CFG_COMM_ENABLE_STATUS_HANDLER);

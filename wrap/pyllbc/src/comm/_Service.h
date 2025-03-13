@@ -384,7 +384,8 @@ LLBC_EXTERN_C PyObject *_pyllbc_UnifyPreSubscribe(PyObject *self, PyObject *args
 
     Py_RETURN_NONE;
 #else
-    pyllbc_SetError("Unify pre-subscribe method not support, please enable this flag and recompile llbc(c++) and pyllbc(python) libraries");
+    pyllbc_SetError("Unify pre-subscribe method not support, "
+                    "please enable this flag and recompile llbc(c++) and pyllbc(python) libraries");
     return nullptr;
 #endif
 }

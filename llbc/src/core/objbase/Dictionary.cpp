@@ -22,7 +22,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/common/Config.h"
+#include "llbc/core/algo/Hash.h"
 
 #include "llbc/core/objbase/ObjectFactory.h"
 #include "llbc/core/objbase/ObjectMacro.h"

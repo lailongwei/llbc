@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/thread/SpinLock.h"
+#include "llbc/core/time/TimeSpan.h"
 
 __LLBC_NS_BEGIN
 
@@ -53,64 +53,112 @@ LLBC_EXPORT LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSe
 #endif
 
 /**
- * \brief CPU tick counter, is a high-resoultion preformance counter.
+ * \brief Provides a set of methods and properties that you can use to accurately measure elapsed time.
  */
-class LLBC_EXPORT LLBC_CPUTime
+class LLBC_EXPORT LLBC_Stopwatch final
 {
 public:
-    LLBC_CPUTime(uint64 cpuCount = 0);
-    ~LLBC_CPUTime() = default;
+    /**
+     * Construct stopwatch object.
+     * @param[in] autoStart - start measuring after constructed flag, default is true.
+     */
+    explicit LLBC_Stopwatch(bool autoStart = true);
+
+    /**
+     * Construct stopwatch object by elapsed ticks.
+     * @param[in] elapsedTicks      - elapsed ticks.
+     * @param[in] continueMeasuring - continue measuring flag, default is false.
+     */
+    explicit LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring = false);
 
 public:
-    static uint64 GetCPUFreqPerSecond();
+    /**
+     * Resume measuring elapsed time for an interval. 
+     */
+    void Resume();
+
+    /**
+     * Pause measuring elapsed time for an interval.
+     */
+    void Pause();
+
+    /**
+     * Stops time interval measurement and resets the elapsed time to zero.
+     */
+    void Reset();
+
+    /**
+     * Gets a value indicating whether the Stopwatch timer is running.
+     * @return bool - the running flag.
+     */
+    bool IsRunning() const { return _beginTime != 0; }
 
 public:
-    static LLBC_CPUTime Current();
-    
-    uint64 GetCPUCount() const;
+    /**
+     * Indicates whether the timer is based on a high-resolution performance counter. This field is read-only.
+     * @return bool - the high resolution flag.
+     */
+    static constexpr bool IsHighResolution()
+    {
+        #if LLBC_SUPPORT_RDTSC
+        return true;
+        #else
+        return false;
+        #endif
+    }
 
-    int ToSeconds() const;
-    sint64 ToMillis() const;
-    sint64 ToMicros() const;
-    sint64 ToNanos() const;
+    /**
+     * Gets the frequency of the timer as the number of ticks per second. This field is read-only.
+     * @return uint64 - the watcher frequency.
+     */
+    static uint64 GetFrequency() { return _frequency; }
 
-    static int ToSeconds(uint64 cpuCount);
-    static sint64 ToMillis(uint64 cpuCount);
-    static sint64 ToMicros(uint64 cpuCount);
-    static sint64 ToNanos(uint64 cpuCount);
+    /**
+     * Gets the total elapsed time measured by the current instance.
+     * @return LLBC_TimeSpan - the elapsed time.
+     */
+    LLBC_TimeSpan Elapsed() const;
 
+    /**
+     * Gets the total elapsed time measured by the current instance, in nano-seconds.
+     * @return uint64 - the total elapsed time, in nano-seconds.
+     */
+    uint64 ElapsedNanos() const;
+
+    /**
+     * ets the total elapsed time measured by the current instance, in timer ticks.
+     * @return uint64 - the total elapsed time, in timer tick.
+     */
+    uint64 ElapsedTicks() const;
+
+public:
+    /**
+     * Get elapsed time string reprsentation.
+     * @return LLBC_String - the elapsed time string representation, in milli-seconds.
+     */
     LLBC_String ToString() const;
 
 public:
-    LLBC_CPUTime operator+(const LLBC_CPUTime &right) const;
-    LLBC_CPUTime operator-(const LLBC_CPUTime &right) const;
-    LLBC_CPUTime &operator+=(const LLBC_CPUTime &right);
-    LLBC_CPUTime &operator-=(const LLBC_CPUTime &right);
-
-    bool operator<(const LLBC_CPUTime &right) const;
-    bool operator>(const LLBC_CPUTime &right) const;
-    bool operator<=(const LLBC_CPUTime &right) const;
-    bool operator>=(const LLBC_CPUTime &right) const;
-    bool operator==(const LLBC_CPUTime &right) const;
-    bool operator!=(const LLBC_CPUTime &right) const;
-
-    operator uint64() const;
-
-public:
+    /**
+     * Init watcher frequency.
+     */
     static void InitFrequency();
 
 private:
-    uint64 _cpuCount;
-    static uint64 _freqPerSecond;
+    uint64 _beginTime;
+    uint64 _elapsedTime;
+    static uint64 _frequency;
 };
-
 
 __LLBC_NS_END
 
 /**
- * stream output operator function for cpu time(in global ns).
+ * stream output operator function for Stopwatch(in global ns).
  */
-LLBC_EXTERN LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_CPUTime &cpuTime);
+inline std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Stopwatch &watcher)
+{
+    return o << watcher.ToString();
+}
 
 #include "llbc/core/utils/Util_DebugInl.h"
 

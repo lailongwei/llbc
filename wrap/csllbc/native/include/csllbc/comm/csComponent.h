@@ -51,16 +51,16 @@ public:
     /**
      * All comp event handlers.
      */
-    virtual bool OnInit(bool &initFinished);
-    virtual void OnDestroy(bool &destroyFinished);
+    int OnInit(bool &initFinished) override;
+    void OnDestroy(bool &destroyFinished) override;
 
-    virtual bool OnStart(bool &startFinished);
-    virtual void OnStop(bool &stopFinished);
+    int OnStart(bool &startFinished) override;
+    void OnStop(bool &stopFinished) override;
 
-    virtual void OnUpdate();
-    virtual void OnIdle(const LLBC_TimeSpan &idleTime);
+    void OnUpdate() override;
+    void OnIdle(const LLBC_TimeSpan &idleTime) override;
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
+    void OnEvent(int eventType, const LLBC_Variant &eventParams) override;
 
 private:
     void OnSessionCreate(const LLBC_SessionInfo &sessionInfo);

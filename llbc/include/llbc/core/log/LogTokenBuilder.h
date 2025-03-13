@@ -28,7 +28,7 @@ __LLBC_NS_BEGIN
 /**
  * Pre-declare some classes.
  */
-class LLBC_ILogToken;
+class LLBC_BaseLogToken;
 
 __LLBC_NS_END
 
@@ -44,7 +44,7 @@ public:
     ~LLBC_LogTokenBuilder();
 
 public:
-    LLBC_ILogToken *BuildLogToken(int type) const;
+    LLBC_BaseLogToken *BuildLogToken(int type) const;
 };
 
 /**

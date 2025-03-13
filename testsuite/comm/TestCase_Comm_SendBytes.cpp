@@ -27,24 +27,24 @@ namespace
 
 const int OPCODE = 0;
 
-class TestComp : public LLBC_Component
+class TestComp final : public LLBC_Component
 {
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_Service *svc = GetService();
         LLBC_PrintLn("Service create: %p", svc);
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         LLBC_Service *svc = GetService();
         LLBC_PrintLn("Service destroy: %p", svc);
     }
 
-    virtual void OnUpdate()
+    void OnUpdate() override
     {
         // LLBC_Service *svc = GetService();
         // LLBC_PrintLn("Service update: %p", svc);

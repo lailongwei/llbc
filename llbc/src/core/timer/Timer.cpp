@@ -25,15 +25,15 @@
 #include "llbc/core/time/Time.h"
 #include "llbc/core/variant/Variant.h"
 
-#include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/Timer.h"
+#include "llbc/core/timer/TimerData.h"
 #include "llbc/core/timer/TimerScheduler.h"
 
 __LLBC_NS_BEGIN
 
 LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
                        const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg,
-                       LLBC_Timer::Scheduler *scheduler)
+                       LLBC_TimerScheduler *scheduler)
 : _scheduler(scheduler)
 , _timerData(nullptr)
 
@@ -88,7 +88,14 @@ const LLBC_Variant &LLBC_Timer::GetTimerData() const
     return _data ? *_data : LLBC_Variant::nil;
 }
 
-int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
+LLBC_Time LLBC_Timer::GetTimeoutTime() const
+{
+    return _timerData ?
+        LLBC_Time::FromMillis(_timerData->handle) :
+            LLBC_Time::utcBegin;
+}
+
+int LLBC_Timer::Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &period)
 {
     // Note: Allow reschedule in <OnCancel> event meth.
     // if (_timerData && _timerData->cancelling)
@@ -103,7 +110,8 @@ int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &peri
 
     if (UNLIKELY(!_scheduler))
     {
-        _scheduler = reinterpret_cast<Scheduler *>(__LLBC_GetLibTls()->coreTls.timerScheduler);
+        _scheduler = reinterpret_cast<LLBC_TimerScheduler *>(
+            __LLBC_GetLibTls()->coreTls.timerScheduler);
         if (UNLIKELY(!_scheduler))
         {
             LLBC_SetLastError(LLBC_ERROR_INVALID);
@@ -111,12 +119,12 @@ int LLBC_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &peri
         }
     }
 
-    const sint64 dueTimeMillis = MAX(0ll, dueTime.GetTotalMillis());
+    const sint64 firstPeriodInMillis = MAX(0ll, firstPeriod.GetTotalMillis());
     sint64 periodMillis = MAX(0ll, period.GetTotalMillis());
     if (periodMillis == 0ll)
-        periodMillis = dueTimeMillis;
+        periodMillis = firstPeriodInMillis;
 
-    return _scheduler->Schedule(this, dueTimeMillis, periodMillis);
+    return _scheduler->Schedule(this, firstPeriodInMillis, periodMillis);
 }
 
 int LLBC_Timer::Cancel()

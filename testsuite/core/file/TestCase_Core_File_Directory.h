@@ -24,10 +24,10 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_File_Directory : public LLBC_BaseTestCase
+class TestCase_Core_File_Directory final : public LLBC_BaseTestCase
 {
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     int CurDirTest();

@@ -8,7 +8,7 @@ class PlatformType(object):
     """平台类型"""
     Windows = 1
     Linux = 2
-    Macosx = 3
+    Darwin = 3
     Unknown = 4
 
     @classmethod
@@ -18,8 +18,8 @@ class PlatformType(object):
             return 'windows'
         elif plat_type == cls.Linux:
             return 'linux'
-        elif plat_type == cls.Macosx:
-            return 'macosx'
+        elif plat_type == cls.Darwin:
+            return 'darwin'
         else:
             return 'unknown'
 
@@ -30,8 +30,8 @@ class PlatformType(object):
             return cls.Windows
         elif plat_desc.startswith('linux'):
             return cls.Linux
-        elif plat_desc == 'macosx':
-            return cls.Macosx
+        elif plat_desc == 'macosx' or plat_desc == 'darwin':
+            return cls.Darwin
         else:
             return cls.Unknown
 
@@ -58,8 +58,10 @@ class ProjType(object):
 class ArchType(object):
     """架构类型"""
     x86 = 1
-    x64 = 2
-    Unknown = 3
+    x86_64 = 2
+    ARM = 3
+    ARM64 = 4
+    Unknown = 5
 
     @classmethod
     def desc2type(cls, desc):
@@ -68,7 +70,11 @@ class ArchType(object):
         if desc == 'x86':
             return cls.x86
         elif desc == 'x64' or desc == 'x86_64':
-            return cls.x64
+            return cls.x86_64
+        elif desc == 'arm':
+            return cls.ARM
+        elif desc == 'arm64':
+            return cls.ARM64
         else:
             return cls.Unknown
 
@@ -77,8 +83,12 @@ class ArchType(object):
         """架构类型转架构描述"""
         if arch_type == cls.x86:
             return 'x86'
-        elif arch_type == cls.x64:
-            return 'x64'
+        elif arch_type == cls.x86_64:
+            return 'x86_64'
+        elif arch_type == cls.ARM:
+            return 'ARM'
+        elif arch_type == cls.ARM64:
+            return 'ARM64'
         else:
             return 'unknown'
 
@@ -86,17 +96,17 @@ class ArchType(object):
     def is_valid(cls, arch_type):
         """确认架构类型是否有效"""
         return arch_type == cls.x86 or \
-            arch_type == cls.x64
+            arch_type == cls.x86_64 or \
+            arch_type == cls.ARM or \
+            arch_type == cls.ARM64
 
     @classmethod
     def is_32bit_arch(cls, arch_type):
         """确认是否是32位架构"""
-        arch_desc = cls.type2desc(arch_type)
-        return arch_desc.endswith('32') or arch_desc.endswith('86')
+        return arch_type in (cls.x86, cls.ARM)
 
     @classmethod
     def is_64bit_arch(cls, arch_type):
         """确认是否是64位架构"""
-        arch_desc = cls.type2desc(arch_type)
-        return arch_desc.endswith('64')
+        return arch_type in (cls.x86_64, cls.ARM)
 

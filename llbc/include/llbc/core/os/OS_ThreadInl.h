@@ -37,8 +37,26 @@ LLBC_FORCE_INLINE void LLBC_CPURelax()
     asm volatile ("nop");
  #endif
 #else // WIN32 platform
-    YieldProcessor();
+    ::YieldProcessor();
 #endif // Non-WIN32 platform
 }
+
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+LLBC_FORCE_INLINE void LLBC_Sleep(int milliSeconds)
+{
+    struct timespec ts;
+    if (milliSeconds <= 0)
+    {
+      ts.tv_sec = 0;
+      ts.tv_nsec = 0;
+    }
+    else
+    {
+        ts.tv_sec = milliSeconds / 1000;
+        ts.tv_nsec = (milliSeconds % 1000) * 1000000;
+    }
+    nanosleep(&ts, nullptr);
+}
+#endif // Non-Win32
 
 __LLBC_NS_END

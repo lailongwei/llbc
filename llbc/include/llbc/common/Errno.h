@@ -501,24 +501,45 @@ __LLBC_NS_BEGIN
 #define LLBC_ERROR_NOT_ALLOW             ((int)(0xc0000024))
 
 //
-// Message Id: LLBC_ERROR_COMP_INIT
+// Message Id: LLBC_ERROR_COMP_INIT_FAILED
 //
 // MessageText:
 //
 // initialize comp failed.
 //
-#define __LLBC_ERROR_COMP_INIT           ((int)(0x00000025))
-#define LLBC_ERROR_COMP_INIT             ((int)(0xc0000025))
+#define __LLBC_ERROR_COMP_INIT_FAILED    ((int)(0x00000025))
+#define LLBC_ERROR_COMP_INIT_FAILED      ((int)(0xc0000025))
 
 //
-// Message Id: LLBC_ERROR_COMP_START
+// Message Id: LLBC_ERROR_COMP_LATE_INIT_FAILED
+//
+// MessageText:
+//
+// late initialize comp failed.
+//
+#define __LLBC_ERROR_COMP_LATE_INIT_FAILED ((int)(0x00000026))
+#define LLBC_ERROR_COMP_LATE_INIT_FAILED   ((int)(0xc0000026))
+
+//
+// Message Id: LLBC_ERROR_COMP_START_FAILED
 //
 // MessageText:
 //
 // start comp failed.
 //
-#define __LLBC_ERROR_COMP_START          ((int)(0x00000026))
-#define LLBC_ERROR_COMP_START            ((int)(0xc0000026))
+#define __LLBC_ERROR_COMP_START_FAILED   ((int)(0x00000027))
+#define LLBC_ERROR_COMP_START_FAILED     ((int)(0xc0000027))
+
+//
+// Message Id: LLBC_ERROR_COMP_LATE_START_FAILED
+//
+// MessageText:
+//
+// late start comp failed.
+//
+#define __LLBC_ERROR_COMP_LATE_START_FAILED ((int)(0x00000028))
+#define LLBC_ERROR_COMP_LATE_START_FAILED   ((int)(0xc0000028))
+
 
 //
 // Message Id: LLBC_ERROR_WSA_SYSNOTREADY
@@ -527,8 +548,8 @@ __LLBC_NS_BEGIN
 //
 // underlying network subsystem is not ready for network communication(only provide for windows sockets api).
 //
-#define __LLBC_ERROR_WSA_SYSNOTREADY     ((int)(0x00000027))
-#define LLBC_ERROR_WSA_SYSNOTREADY       ((int)(0xc0000027))
+#define __LLBC_ERROR_WSA_SYSNOTREADY     ((int)(0x00000029))
+#define LLBC_ERROR_WSA_SYSNOTREADY       ((int)(0xc0000029))
 
 //
 // Message Id: LLBC_ERROR_WSA_VERNOTSUPPORTED
@@ -537,8 +558,8 @@ __LLBC_NS_BEGIN
 //
 // the version of Windows Sockets support requested is not provided by this particular Windows Sockets implementation(only provide for windows sockets api).
 //
-#define __LLBC_ERROR_WSA_VERNOTSUPPORTED ((int)(0x00000028))
-#define LLBC_ERROR_WSA_VERNOTSUPPORTED   ((int)(0xc0000028))
+#define __LLBC_ERROR_WSA_VERNOTSUPPORTED ((int)(0x0000002a))
+#define LLBC_ERROR_WSA_VERNOTSUPPORTED   ((int)(0xc000002a))
 
 //
 // Message Id: LLBC_ERROR_WSA_EINPROGRESS
@@ -547,8 +568,8 @@ __LLBC_NS_BEGIN
 //
 // a blocking windows Sockets 1.1 operations in progress(only provide for windows sockets api).
 //
-#define __LLBC_ERROR_WSA_EINPROGRESS     ((int)(0x00000029))
-#define LLBC_ERROR_WSA_EINPROGRESS       ((int)(0xc0000029))
+#define __LLBC_ERROR_WSA_EINPROGRESS     ((int)(0x0000002b))
+#define LLBC_ERROR_WSA_EINPROGRESS       ((int)(0xc000002b))
 
 //
 // Message Id: LLBC_ERROR_WSA_EPROCLIM
@@ -557,8 +578,8 @@ __LLBC_NS_BEGIN
 //
 // limit on the number of tasks supported by the Windows Sockets implementation has been reached(only provide for windows sockets api).
 //
-#define __LLBC_ERROR_WSA_EPROCLIM        ((int)(0x0000002a))
-#define LLBC_ERROR_WSA_EPROCLIM          ((int)(0xc000002a))
+#define __LLBC_ERROR_WSA_EPROCLIM        ((int)(0x0000002c))
+#define LLBC_ERROR_WSA_EPROCLIM          ((int)(0xc000002c))
 
 //
 // Message Id: LLBC_ERROR_IS_LISTEN_SOCKET
@@ -567,8 +588,8 @@ __LLBC_NS_BEGIN
 //
 // the specific socket is listen socket.
 //
-#define __LLBC_ERROR_IS_LISTEN_SOCKET    ((int)(0x0000002b))
-#define LLBC_ERROR_IS_LISTEN_SOCKET      ((int)(0xc000002b))
+#define __LLBC_ERROR_IS_LISTEN_SOCKET    ((int)(0x0000002d))
+#define LLBC_ERROR_IS_LISTEN_SOCKET      ((int)(0xc000002d))
 
 //
 // Message Id: LLBC_ERROR_NOT_POOL_OBJECT
@@ -577,8 +598,8 @@ __LLBC_NS_BEGIN
 //
 // object is not pool object.
 //
-#define __LLBC_ERROR_NOT_POOL_OBJECT     ((int)(0x0000002c))
-#define LLBC_ERROR_NOT_POOL_OBJECT       ((int)(0xc000002c))
+#define __LLBC_ERROR_NOT_POOL_OBJECT     ((int)(0x0000002e))
+#define LLBC_ERROR_NOT_POOL_OBJECT       ((int)(0xc000002e))
 
 //
 // Message Id: LLBC_ERROR_SOCK_MSG_BUF_LIMIT
@@ -587,8 +608,8 @@ __LLBC_NS_BEGIN
 //
 // session send buffer limit.
 //
-#define __LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0x0000002d))
-#define LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0xc000002d))
+#define __LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0x0000002f))
+#define LLBC_ERROR_SESSION_SND_BUF_LIMIT ((int)(0xc000002f))
 
 //
 // Message Id: LLBC_ERROR_NOT_SUPPORT
@@ -597,8 +618,8 @@ __LLBC_NS_BEGIN
 //
 // not support.
 //
-#define __LLBC_ERROR_NOT_SUPPORT         ((int)(0x0000002e))
-#define LLBC_ERROR_NOT_SUPPORT           ((int)(0xc000002e))
+#define __LLBC_ERROR_NOT_SUPPORT         ((int)(0x00000030))
+#define LLBC_ERROR_NOT_SUPPORT           ((int)(0xc0000030))
 
 //
 // Message Id: LLBC_ERROR_CANCELLED
@@ -607,8 +628,49 @@ __LLBC_NS_BEGIN
 //
 // cancelled.
 //
-#define __LLBC_ERROR_CANCELLED           ((int)(0x0000002f))
-#define LLBC_ERROR_CANCELLED             ((int)(0xc000002f))
+#define __LLBC_ERROR_CANCELLED           ((int)(0x00000031))
+#define LLBC_ERROR_CANCELLED             ((int)(0xc0000031))
+
+//
+// Message Id: LLBC_ERROR_APP_EARLY_START_FAILED
+//
+// MessageText:
+//
+// application early start failed.
+//
+#define __LLBC_ERROR_APP_EARLY_START_FAILED ((int)(0x00000032))
+#define LLBC_ERROR_APP_EARLY_START_FAILED   ((int)(0xc0000032))
+
+//
+// Message Id: LLBC_ERROR_APP_START_FAILED
+//
+// MessageText:
+//
+// application start failed.
+//
+#define __LLBC_ERROR_APP_START_FAILED    ((int)(0x00000033))
+#define LLBC_ERROR_APP_START_FAILED      ((int)(0xc0000033))
+
+//
+// Message Id: LLBC_ERROR_TIMER_SCHEDULER_DESTROYING
+//
+// MessageText:
+//
+// timer scheduler destroying.
+//
+#define __LLBC_ERROR_TIMER_SCHEDULER_DESTROYING ((int)(0x00000034))
+#define LLBC_ERROR_TIMER_SCHEDULER_DESTROYING   ((int)(0xc0000034))
+
+//
+// Message Id: LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL
+//
+// MessageText:
+//
+// timer scheduler canceling all.
+//
+#define __LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL ((int)(0x00000035))
+#define LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL   ((int)(0xc0000035))
+
 
 //
 //!! Sentinel error no.

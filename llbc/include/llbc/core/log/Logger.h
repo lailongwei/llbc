@@ -34,7 +34,7 @@ __LLBC_NS_BEGIN
  */
 struct LLBC_LogData;
 class LLBC_LoggerConfigInfo;
-class LLBC_ILogAppender;
+class LLBC_BaseLogAppender;
 class LLBC_LogRunnable;
 
 __LLBC_NS_END
@@ -117,17 +117,20 @@ public:
 
 public:
     /**
-     * Install logger hook.
-     * @param[in] level     - the log level.
-     * @param[in] hookDeleg - the hook delegate.
+     * Set log hook.
+     * @param[in] logLevel - the log level.
+     * @param[in] logHook  - the log hook delegate, is is nullptr, will clear log hook.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int InstallHook(int level, const LLBC_Delegate<void(const LLBC_LogData *)> &hookDeleg);
+    int SetLogHook(int logLevel, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
 
     /**
-     * Uninstall error hook.
+     * Set log hook.
+     * @param[in] logLevels - the log levels.
+     * @param[in] logHook   - the log hook delegate, is is nullptr, will clear log hook.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void UninstallHook(int level);
+    int SetLogHook(std::initializer_list<int> logLevels, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
 
 public:
     /**
@@ -309,7 +312,7 @@ private:
      * Add log appender.
      * @param[in] appender - log appender.
      */
-    void AddAppender(LLBC_ILogAppender *appender);
+    void AddAppender(LLBC_BaseLogAppender *appender);
 
     /**
      * Output log data.
@@ -336,22 +339,35 @@ private:
     void ClearNonRunnableMembers(bool keepErrNo = true);
 
 private:
+    // Logger name.
     LLBC_String _name;
+    // Logger lock.
     mutable LLBC_SpinLock _lock;
 
+    // Log level.
     volatile int _logLevel;
+    // json styled log flag, auto add timestamp in json log or not.
     bool _addTimestampInJsonLog;
+    // Logger config.
     const LLBC_LoggerConfigInfo *_config;
 
+    // Log runnable object.
     LLBC_LogRunnable *_logRunnable;
 
+    // Last flush time, in milliseconds.
     sint64 _lastFlushTime;
+    // Flush interval, in milliseconds.
     sint64 _flushInterval;
-    LLBC_ILogAppender *_appenders;
+    // Log appenders.
+    LLBC_BaseLogAppender *_appenders;
 
+    // Logger object pool.
     LLBC_ObjPool _objPool;
+    // LLBC_LogData typed object pool.
     LLBC_TypedObjPool<LLBC_LogData> &_logDataTypedObjPool;
-    LLBC_Delegate<void(const LLBC_LogData *)> _hookDelegs[LLBC_LogLevel::End];
+
+    // Log hooks.
+    LLBC_Delegate<void(const LLBC_LogData *)> _logHooks[LLBC_LogLevel::End];
 };
 
 __LLBC_NS_END

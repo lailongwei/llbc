@@ -72,8 +72,7 @@ int LLBC_Directory::Create(const LLBC_String &path)
     std::vector<size_t> sepPoses;
     for (size_t pos = 0; pos < path.size(); ++pos)
     {
-        if (path[pos] != LLBC_SLASH_A &&
-                path[pos] != LLBC_BACKLASH_A)
+        if (path[pos] != '/' && path[pos] != '\\')
             continue;
 
         if ((prePos != LLBC_String::npos) && (prePos + 1 == pos))
@@ -189,9 +188,9 @@ bool LLBC_Directory::IsAbsPath(const LLBC_String& path)
     return (path.size() >= 3 &&
             LLBC_String::isalpha(path[0]) &&
             path[1] == ':' &&
-            path[2] == LLBC_BACKLASH_A);
+            path[2] == '\\');
 #else
-    return path[0] == LLBC_SLASH_A;
+    return path[0] == '/';
 #endif
 }
 
@@ -204,12 +203,12 @@ LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
     LLBC_String absPath = path;
 #if LLBC_TARGET_PLATFORM_WIN32
     // Replace all '/' character to '\\'
-    absPath.findreplace(LLBC_SLASH_A, LLBC_BACKLASH_A);
+    absPath.findreplace('/', '\\');
 
     // Merge all '\\\\\\...' prefix characters to 'X:\a\'
     size_t replaceTo = 0;
     while (replaceTo < absPath.size() &&
-        absPath[replaceTo] == LLBC_BACKLASH_A)
+        absPath[replaceTo] == '\\')
         replaceTo++;
 
     if (replaceTo > 0)
@@ -220,7 +219,7 @@ LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
         // If not start with 'X:\\', join the current directory.
         if (!(LLBC_String::isalpha(absPath[0]) &&
               absPath[1] == ':' &&
-              absPath[2] == LLBC_BACKLASH_A))
+              absPath[2] == '\\'))
         {
             absPath = Join(CurDir(), absPath);
         }
@@ -237,14 +236,14 @@ LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
 
     // Trim the tail '\\' characters.
     while (absPath.length() > 3 &&
-           absPath[absPath.length() - 1] == LLBC_BACKLASH_A)
+           absPath[absPath.length() - 1] == '\\')
         absPath = absPath.substr(0, absPath.length() - 1);
 
     // Fetch folder and non-folder path parts(split with '\\').
     const LLBC_String root = absPath.substr(0, 3);
-    parts = absPath.substr(3).split(LLBC_BACKLASH_A);
+    parts = absPath.substr(3).split('\\');
 #else
-    if (absPath[0] != LLBC_SLASH_A) // Not start with '/', join current directory.
+    if (absPath[0] != '/') // Not start with '/', join current directory.
         absPath = Join(CurDir(), absPath);
     else if (absPath.length() == 1) // root directory, direct return.
         return absPath;
@@ -252,7 +251,7 @@ LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
     // Merge all '/////...' prefix characters to '/'
     size_t replaceTo = 0;
     while (replaceTo < absPath.size() &&
-           absPath[replaceTo] == LLBC_SLASH_A)
+           absPath[replaceTo] == '/')
         replaceTo++;
 
     if (replaceTo > 0)
@@ -260,12 +259,12 @@ LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
 
     // Trim the tail '/' characters.
     while(absPath.size() > 1 && 
-        absPath[absPath.length() - 1] == LLBC_SLASH_A)
+        absPath[absPath.length() - 1] == '/')
        absPath = absPath.substr(0, absPath.length() - 1);
 
     // Fetch root and non-root path parts(split with '/').
     const LLBC_String root = absPath.substr(0, 1);
-    parts = absPath.substr(1).split(LLBC_SLASH_A);
+    parts = absPath.substr(1).split('/');
 #endif
     // Merge path parts list(process "." and ".." parts).
     LLBC_Strings stack;
@@ -278,7 +277,7 @@ LLBC_String LLBC_Directory::AbsPath(const LLBC_String &path)
         else if (parts[i] == "..")
         {
             if (!stack.empty())
-                stack.erase(stack.begin() + (stack.size() - 1));
+                stack.erase(stack.begin() + static_cast<long>((stack.size() - 1)));
         }
         else
         {
@@ -301,10 +300,9 @@ LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
     bool path1HasSlash = false;
     const char &lastCh = *path1.rbegin();
 #if LLBC_TARGET_PLATFORM_WIN32
-    if (lastCh == LLBC_SLASH_A ||
-        lastCh == LLBC_BACKLASH_A)
+    if (lastCh == '/' || lastCh == '\\')
 #else
-    if (lastCh == LLBC_SLASH_A)
+    if (lastCh == '/')
 #endif
         path1HasSlash = true;
 
@@ -313,10 +311,9 @@ LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
     {
         const char &firstCh = *path2.begin();
 #if LLBC_TARGET_PLATFORM_WIN32
-        if (firstCh == LLBC_SLASH_A ||
-            firstCh == LLBC_BACKLASH_A)
+        if (firstCh == '/' || firstCh == '\\')
 #else
-        if (firstCh == LLBC_SLASH_A)
+        if (firstCh == '/')
 #endif
             path2HasSlash = true;
     }
@@ -325,9 +322,9 @@ LLBC_String LLBC_Directory::Join(const LLBC_String &path1,
         joined += path2HasSlash ? path2.substr(1) : path2;
     else
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        joined += path2HasSlash ? path2 : LLBC_String().format("%c%s", LLBC_SLASH_A, path2.c_str());
+        joined += path2HasSlash ? path2 : LLBC_String().format("/%s", path2.c_str());
 #else // WIN32
-        joined += path2HasSlash ? path2 : LLBC_String().format("%c%s", LLBC_BACKLASH_A, path2.c_str());
+        joined += path2HasSlash ? path2 : LLBC_String().format("\\%s",  path2.c_str());
 #endif // Non-WIN32
 
     return joined;
@@ -361,7 +358,7 @@ LLBC_Strings LLBC_Directory::SplitExt(const LLBC_String &path)
     if (dotIndex == LLBC_String::npos)
     {
         parts.push_back(path);
-        parts.push_back("");
+        parts.emplace_back("");
     }
     else
     {
@@ -375,8 +372,8 @@ LLBC_Strings LLBC_Directory::SplitExt(const LLBC_String &path)
 
 int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, bool recursive)
 {
-    static LLBC_String __emptyFileExt;
-    return GetFiles(path, files, __emptyFileExt, recursive);
+    static LLBC_String emptyFileExt;
+    return GetFiles(path, files, emptyFileExt, recursive);
 }
 
 int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const LLBC_String &ext, bool recursive)
@@ -616,9 +613,9 @@ LLBC_String LLBC_Directory::ModuleFilePath()
 {
 #if LLBC_TARGET_PLATFORM_WIN32
     DWORD ret;
-    int bufLen = MAX_PATH + 1;
+    size_t bufLen = MAX_PATH + 1;
     char *buf = LLBC_Malloc(char, bufLen);
-    while ((ret = ::GetModuleFileNameA(nullptr, buf, bufLen)) == bufLen)
+    while ((ret = ::GetModuleFileNameA(nullptr, buf, static_cast<DWORD>(bufLen))) == bufLen)
         buf = LLBC_Realloc(char, buf, bufLen * 2);
 
     if (ret == 0)
@@ -660,10 +657,10 @@ LLBC_String LLBC_Directory::ModuleFilePath()
 LLBC_String LLBC_Directory::DirName(const LLBC_String &path)
 {
 #if LLBC_TARGET_PLATFORM_WIN32
-    size_t found = path.rfind(LLBC_BACKLASH_A);
+    size_t found = path.rfind('\\');
     if (found == LLBC_String::npos)
     {
-        found = path.rfind(LLBC_SLASH_A);
+        found = path.rfind('/');
         if (found == LLBC_String::npos)
             return LLBC_String();
     }
@@ -671,12 +668,12 @@ LLBC_String LLBC_Directory::DirName(const LLBC_String &path)
     if (path.length() == 3 &&
         (LLBC_String::isalpha(path[0]) &&
          path[1] == ':' &&
-         (path[2] == LLBC_BACKLASH_A || path[2] == LLBC_SLASH_A)))
+         (path[2] == '\\' || path[2] == '/')))
         return path;
 
     return path.substr(0, found);
 #else
-    const size_t found = path.rfind(LLBC_SLASH_A);
+    const size_t found = path.rfind('/');
     if (found == LLBC_String::npos)
         return LLBC_String();
 
@@ -690,17 +687,17 @@ LLBC_String LLBC_Directory::DirName(const LLBC_String &path)
 LLBC_String LLBC_Directory::BaseName(const LLBC_String &path)
 {
 #if LLBC_TARGET_PLATFORM_WIN32
-    size_t found = path.rfind(LLBC_BACKLASH_A);
+    size_t found = path.rfind('\\');
     if (found == LLBC_String::npos)
     {
-        found = path.rfind(LLBC_SLASH_A);
+        found = path.rfind('/');
         if (found == LLBC_String::npos)
             return path;
     }
 
     return path.substr(found + 1);
 #else
-    const size_t found = path.rfind(LLBC_SLASH_A);
+    const size_t found = path.rfind('/');
     if (found == LLBC_String::npos)
         return path;
     else

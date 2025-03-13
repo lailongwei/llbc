@@ -40,13 +40,9 @@ inline int LLBC_ServiceImpl::GetConfigType() const
 
 inline const LLBC_Variant &LLBC_ServiceImpl::GetConfig() const
 {
-    return _nonPropCfg;
+    return _cfg;
 }
 
-inline const LLBC_Property &LLBC_ServiceImpl::GetPropertyConfig() const
-{
-    return _propCfg;
-}
 inline bool LLBC_ServiceImpl::IsFullStack() const
 {
     return _fullStack;
@@ -62,6 +58,17 @@ inline bool LLBC_ServiceImpl::IsStarted() const
     return _runningPhase == LLBC_ServiceRunningPhase::Started;
 }
 
+inline int LLBC_ServiceImpl::GetFPS() const
+{
+    return _fps;
+}
+
+inline int LLBC_ServiceImpl::GetFrameInterval() const
+{
+    const auto fps = _fps;
+    return fps != static_cast<int>(LLBC_INFINITE) ? 1000 / fps : 0;
+}
+
 inline LLBC_EventMgr &LLBC_ServiceImpl::GetEventManager()
 {
     return _evManager;
@@ -75,6 +82,16 @@ inline LLBC_ObjPool &LLBC_ServiceImpl::GetThreadSafeObjPool()
 inline LLBC_ObjPool &LLBC_ServiceImpl::GetThreadUnsafeObjPool()
 {
     return _threadUnsafeObjPool;
+}
+
+inline void LLBC_ServiceImpl::LockService()
+{
+    _lock.Lock();
+}
+
+inline void LLBC_ServiceImpl::UnlockService()
+{
+    _lock.Unlock();
 }
 
 __LLBC_NS_END

@@ -31,22 +31,6 @@
 #pragma warning(disable:4996)
 #endif
 
-std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
-{
-    return stream << t.ToString();
-}
-
-__LLBC_INTERNAL_NS_BEGIN
-
-static constexpr LLBC_NS LLBC_TimeSpan (LLBC_NS LLBC_Time::*__g_GetTimeOfTimeCycleMeths[4])() const {
-    &LLBC_NS LLBC_Time::GetTimeOfHour,
-    &LLBC_NS LLBC_Time::GetTimeOfDay,
-    &LLBC_NS LLBC_Time::GetTimeOfWeek,
-    &LLBC_NS LLBC_Time::GetTimeOfMonth,
-};
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 const LLBC_Time LLBC_Time::utcBegin;
@@ -54,71 +38,6 @@ const LLBC_Time LLBC_Time::utcBegin;
 LLBC_Time LLBC_Time::Now()
 {
     return LLBC_Time(LLBC_GetMicroseconds());
-}
-
-LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
-{
-    if (UNLIKELY(timeStr.empty()))
-        return LLBC_Time();
-
-    // Split date, time
-    LLBC_Strings dateTimes = timeStr.split(' ', 1, true);
-    if (dateTimes.size() == 1) // Only has date part or time part(try guess).
-    {
-        if (dateTimes[0].find('-') != LLBC_String::npos) // Is date part, append default time part.
-            dateTimes.push_back("0:0:0.000");
-        else // Is time part, insert default date part.
-            dateTimes.insert(dateTimes.begin(), "1970-1-1");
-    }
-
-    const LLBC_String &datePart = dateTimes[0];
-    const LLBC_String &timePart = dateTimes[1];
-
-    // Split year,month,day
-    LLBC_Strings dateParts = datePart.split('-', 2, true);
-    if (dateParts.size() == 1) // Only has day part.
-    {
-        dateParts.insert(dateParts.begin(), "1");
-        dateParts.insert(dateParts.begin(), "1970");
-    }
-    else if (dateParts.size() == 2) // Only has day and month parts.
-    {
-        dateParts.insert(dateParts.begin(), "1970");
-    }
-
-    // Split hour,minute,second
-    LLBC_Strings timeParts = timePart.split(':', 2, true);
-    if (timeParts.size() == 1) // Only has hour part.
-    {
-        timeParts.push_back("0");
-        timeParts.push_back("0");
-    }
-    else if (timeParts.size() == 2) // Only has hour and minute parts.
-    {
-        timeParts.push_back("0");
-    }
-
-    // Split second,millisecond
-    LLBC_Strings secondParts = timeParts[2].split('.', 1);
-    if (secondParts.size() == 1) // Only has second part.
-        secondParts.push_back("0");
-
-    // Convert it
-    int year = LLBC_Str2Int32(dateParts[0].c_str());
-    int month = LLBC_Str2Int32(dateParts[1].c_str());
-    int day = LLBC_Str2Int32(dateParts[2].c_str());
-    int hour = LLBC_Str2Int32(timeParts[0].c_str());
-    int minute = LLBC_Str2Int32(timeParts[1].c_str());
-    int second = LLBC_Str2Int32(secondParts[0].c_str());
-    int microSeconds = LLBC_Str2Int32(secondParts[1].c_str());
-    return FromTimeParts(year,
-                         month,
-                         day,
-                         hour,
-                         minute,
-                         second,
-                         microSeconds / LLBC_TimeConst::numOfMicrosPerMillisecond,
-                         microSeconds % LLBC_TimeConst::numOfMicrosPerMillisecond);
 }
 
 LLBC_Time LLBC_Time::FromTimeStruct(const tm &timeStruct,
@@ -184,37 +103,23 @@ int LLBC_Time::GetMicrosecond() const
         nowLocalMicros % LLBC_TimeConst::numOfMicrosPerMillisecond);
 }
 
-LLBC_Time LLBC_Time::GetDate() const
-{
-    sint64 timeZone = LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond;
-
-    sint64 localTime = _time - timeZone;
-    sint64 datePart = localTime /
-        LLBC_TimeConst::numOfMicrosPerDay *
-        LLBC_TimeConst::numOfMicrosPerDay;
-
-    datePart += timeZone;
-
-    return LLBC_Time(datePart);
-}
-
-LLBC_TimeSpan LLBC_Time::GetTimeOfHour() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfHour() const
 {
     return LLBC_TimeSpan(
         (_time - (LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond)) %
             LLBC_TimeConst::numOfMicrosPerHour);
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfDay() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfDay() const
 {
     return LLBC_TimeSpan(
         (_time - (LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond)) %
             LLBC_TimeConst::numOfMicrosPerDay);
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfWeek() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfWeek(bool startOnSunday) const
 {
-    return LLBC_TimeSpan::FromDays(GetDayOfWeek(),
+    return LLBC_TimeSpan::FromDays(GetDayOfWeek(startOnSunday),
                                    GetHour(),
                                    GetMinute(),
                                    GetSecond(),
@@ -222,7 +127,7 @@ LLBC_TimeSpan LLBC_Time::GetTimeOfWeek() const
                                    GetMicrosecond());
 }
 
-LLBC_TimeSpan LLBC_Time::GetTimeOfMonth() const
+LLBC_TimeSpan LLBC_Time::GetOffsetTimeOfMonth() const
 {
     return LLBC_TimeSpan::FromDays(GetDayOfMonth() - 1,
                                    GetHour(),
@@ -235,10 +140,7 @@ LLBC_TimeSpan LLBC_Time::GetTimeOfMonth() const
 LLBC_String LLBC_Time::Format(const char *format) const
 {
     char buf[32];
-    if (format)
-        strftime(buf, sizeof(buf), format, &_localTimeStruct);
-    else
-        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_localTimeStruct);
+    strftime(buf, sizeof(buf), format ? format : "%Y-%m-%d %H:%M:%S", &_localTimeStruct);
 
     return buf;
 }
@@ -246,10 +148,9 @@ LLBC_String LLBC_Time::Format(const char *format) const
 LLBC_String LLBC_Time::FormatAsGmt(const char *format) const
 {
     char buf[32];
-    if (format)
-        strftime(buf, sizeof(buf), format, &_gmtTimeStruct);
-    else
-        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &_gmtTimeStruct);
+    tm gmtTimeStruct;
+    GetGmtTime(gmtTimeStruct);
+    strftime(buf, sizeof(buf), format ? format : "%Y-%m-%d %H:%M:%S", &gmtTimeStruct);
 
     return buf;
 }
@@ -265,7 +166,7 @@ LLBC_Time LLBC_Time::AddYears(int years) const
     newTimeStruct.tm_year += years;
     bool isLeap = IsLeapYear(GetYear());
     if (isLeap && 
-        GetMonth() == 2 && GetDay() == 29)
+        GetMonth() == 2 && GetDayOfMonth() == 29)
     {
         if (!IsLeapYear(GetYear() + years))
             newTimeStruct.tm_mday -= 1;
@@ -389,7 +290,6 @@ LLBC_Time &LLBC_Time::operator=(const LLBC_Time &time)
 
     _time = time._time;
     memcpy(&_localTimeStruct, &time._localTimeStruct, sizeof(tm));
-    memcpy(&_gmtTimeStruct, &time._gmtTimeStruct, sizeof(tm));
 
     return *this;
 }
@@ -410,36 +310,189 @@ bool LLBC_Time::Deserialize(LLBC_Stream &stream)
         return false;
 
     _time = timeVal;
-    UpdateTimeStructs();
+    FillTimeStruct();
 
     return true;
 }
 
-void LLBC_Time::UpdateTimeStructs()
+#define __LLBC_INL_TIME_STR_PART_TO_VAL(partStr, partLen, timePartVar) \
+    if (UNLIKELY(partLen >= sizeof(numFmtBuf)))                        \
+        return utcBegin;                                               \
+                                                                       \
+    if (LIKELY(partLen > 0))                                           \
+    {                                                                  \
+        memcpy(numFmtBuf, partStr, partLen);                           \
+        numFmtBuf[partLen] = '\0';                                     \
+        timePartVar = atoi(numFmtBuf);                                 \
+    }                                                                  \
+
+#define __LLBC_INL_TIME_PARSE_SEPARATORS(beg, end, sep) \
+    strIt = beg;                                        \
+    sepSize = 0;                                        \
+    while (strIt != end)                                \
+    {                                                   \
+        if (*strIt == sep)                              \
+        {                                               \
+            sepPoses[sepSize++] = strIt;                \
+            if (sepSize == 2)                           \
+                break;                                  \
+        }                                               \
+                                                        \
+        ++strIt;                                        \
+    }                                                   \
+
+LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr, size_t timeStrLen)
 {
-    time_t calendarTime = static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
-    #if LLBC_TARGET_PLATFORM_WIN32
-    localtime_s(&_localTimeStruct, &calendarTime);
-    gmtime_s(&_gmtTimeStruct, &calendarTime);
-    #else
-    localtime_r(&calendarTime, &_localTimeStruct);
-    gmtime_r(&calendarTime, &_gmtTimeStruct);
-    #endif
+    // Time string format:
+    // - yy-mm-dd HH:MM:SS[.micro_sec]
+    // 
+    // eg:
+    //                                 yyyy mm dd  HH MM SS micro_sec
+    // 03 =>                                             03  000000
+    // 02:03 =>                                       02 03  000000
+    // 01:02:03 =>                                 01 02 03  000000
+    // 08 01:02:03 =>                          08  01 02 03  000000
+    // 07-08 01:02:03 =>                    07 08  01 02 03  000000
+    // 06-07-08 01:02:03 =>              06 07 08  01 02 03  000000
+    // 2006-07-08 01:02:03 =>          2006 07 08  01 02 03  000000
+    // 2006-07-08 01:02:03.123456 =>   2006 07 08  01 02 03  123456
+
+    // Argument check.
+    if (UNLIKELY(!timeStr || timeStrLen == 0))
+        return utcBegin;
+
+    // Remove leading whitespace characters.
+    const char *originTimeStr = timeStr;
+    while (*timeStr != '\0')
+    {
+        if (LIKELY(!LLBC_IsSpace(*timeStr)))
+            break;
+        ++timeStr;
+    }
+
+    if (*timeStr == '\0')
+        return utcBegin;
+    timeStrLen -= static_cast<size_t>(timeStr - originTimeStr);
+
+    // Remove trailing whitespace characters.
+    const char *timeStrEnd = timeStr + timeStrLen - 1;
+    while (timeStrEnd != timeStr && LLBC_IsSpace(*timeStrEnd))
+        --timeStrEnd;
+    ++timeStrEnd;
+
+    // Define time string parse helper variables.
+    size_t sepSize;
+    const char *strIt;
+    const char *sepPoses[2]{nullptr, nullptr};
+
+    // Parse <Date> part.
+    char numFmtBuf[12];
+    int year = 1970, month = 1, day = 1;
+    const char *datePartEnd = timeStr;
+    while (++datePartEnd != timeStrEnd)
+        LLBC_BreakIf(LLBC_IsSpace(*datePartEnd));
+    if (datePartEnd != timeStrEnd)
+    {
+        __LLBC_INL_TIME_PARSE_SEPARATORS(timeStr, datePartEnd, '-')
+        if (sepSize == 2)
+        {
+            const size_t yearPartLen = static_cast<size_t>(sepPoses[0] - timeStr);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, yearPartLen, year);
+
+            const size_t monthPartLen = static_cast<size_t>(sepPoses[1] - sepPoses[0] - 1);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(sepPoses[0] + 1, monthPartLen, month);
+
+            const size_t dayPartLen = static_cast<size_t>(datePartEnd - sepPoses[1] - 1);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(sepPoses[1] + 1, dayPartLen, day);
+        }
+        else if (sepSize == 1)
+        {
+            const size_t monthPartLen = static_cast<size_t>(sepPoses[0] - timeStr);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, monthPartLen, month);
+
+            const size_t dayPartLen = static_cast<size_t>(datePartEnd - sepPoses[0] - 1);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(sepPoses[0] + 1, dayPartLen, day);
+        }
+        else
+        {
+            const size_t dayPartLen = static_cast<size_t>(datePartEnd - timeStr);
+            __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, dayPartLen, day);
+        }
+    }
+
+    // Parse <TimeOfDay> part.
+    int hour = 0, minute = 0, second = 0, microSec = 0;
+    if (datePartEnd != timeStrEnd)
+    {
+        timeStr = datePartEnd + 1;
+        while (*timeStr != '\0')
+        {
+            if (LIKELY(!LLBC_IsSpace(*timeStr)))
+                break;
+            ++timeStr;
+        }
+    }
+
+    __LLBC_INL_TIME_PARSE_SEPARATORS(timeStr, timeStrEnd, ':')
+
+    const char *secPart;
+    if (sepSize == 2)
+    {
+        const size_t hourPartLen = static_cast<size_t>(sepPoses[0] - timeStr);
+        __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, hourPartLen, hour);
+
+        const size_t minutePartLen = static_cast<size_t>(sepPoses[1] - sepPoses[0] - 1);
+        __LLBC_INL_TIME_STR_PART_TO_VAL( sepPoses[0] + 1, minutePartLen, minute);
+        secPart = sepPoses[1] + 1;
+    }
+    else if (sepSize == 1)
+    {
+        const size_t minutePartLen = static_cast<size_t>(sepPoses[0] - timeStr);
+        __LLBC_INL_TIME_STR_PART_TO_VAL(timeStr, minutePartLen, minute);
+        secPart = sepPoses[0] + 1;
+    }
+    else
+    {
+        secPart = timeStr;
+    }
+
+    const char *dotPos = secPart;
+    while (dotPos != timeStrEnd)
+    {
+        if (*dotPos == '.')
+            break;
+        ++dotPos;
+    }
+
+    const char *secPartEnd = dotPos != timeStrEnd ? dotPos : timeStrEnd;
+    const size_t secPartLen = static_cast<size_t>(secPartEnd - secPart);
+    __LLBC_INL_TIME_STR_PART_TO_VAL(secPart, secPartLen, second);
+    if (dotPos != timeStrEnd)
+    {
+        const size_t microPartLen = static_cast<size_t>(timeStrEnd - dotPos - 1);
+        __LLBC_INL_TIME_STR_PART_TO_VAL(dotPos + 1, microPartLen, microSec);
+    }
+
+    return FromTimeParts(year, month, day, hour, minute, second, microSec / 1000, microSec % 1000);
 }
 
+#undef __LLBC_INL_TIME_STR_PART_TO_VAL
+#undef __LLBC_INL_TIME_PARSE_SEPARATORS
+
 LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
-                                       LLBC_TimeSpan toTimeOfTimeCycle) const
+                                       LLBC_TimeSpan toTimeOfTimeCycle,
+                                       bool startOnSunday) const
 {
     // !For now, GetIntervalToTimeOfMonth() is not supported.
 
     // Calc fromTimeOfTimeCycle.
     LLBC_TimeSpan fromTimeOfTimeCycle;
     if (timeCycle == LLBC_TimeSpan::oneHour)
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[0])();
+        fromTimeOfTimeCycle = GetOffsetTimeOfHour();
     else if (timeCycle == LLBC_TimeSpan::oneDay)
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[1])();
+        fromTimeOfTimeCycle = GetOffsetTimeOfDay();
     else // oneWeek
-        fromTimeOfTimeCycle = (this->*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[2])();
+        fromTimeOfTimeCycle = GetOffsetTimeOfWeek(startOnSunday);
 
     // Normalize toTimeOfTimeCycle.
     if (UNLIKELY(toTimeOfTimeCycle < LLBC_TimeSpan::zero))
@@ -458,46 +511,65 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
     return diff < LLBC_TimeSpan::zero ? diff + timeCycle : diff;
 }
 
-bool LLBC_Time::IsCrossed(const LLBC_Time &from,
-                          const LLBC_Time &to,
-                          const LLBC_TimeSpan &timeCycle,
-                          LLBC_TimeSpan timeOfTimeCycle)
+LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
+                                          const LLBC_Time &to,
+                                          const LLBC_TimeSpan &timeCycle,
+                                          LLBC_TimeSpan timeOfTimeCycle)
 {
-    // If span < 0, return false.
+    // If span <= 0, return zero.
     const LLBC_TimeSpan diff = to - from;
     if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
-        return false;
+        return LLBC_TimeSpan::zero;
 
-    // If span >= timeCycle, return true.
-    if (diff >= timeCycle)
-        return true;
+    timeOfTimeCycle += LLBC_TimeSpan(LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond);
+    timeOfTimeCycle %= timeCycle;
 
-    // Normalize timeOfTimeCycle[0, timeCycle)
-    if (UNLIKELY(timeOfTimeCycle < LLBC_TimeSpan::zero))
-        timeOfTimeCycle = timeOfTimeCycle % timeCycle + timeCycle;
-    else if (UNLIKELY(timeOfTimeCycle >= timeCycle))
-        timeOfTimeCycle %= timeCycle;
+    if (timeCycle == LLBC_TimeSpan::oneWeek)
+        timeOfTimeCycle = (timeOfTimeCycle + (LLBC_TimeSpan::oneDay * 4)) % LLBC_TimeSpan::oneWeek;
 
-    // Crossed timeCycle judge: toTimeOfTimeCycle judge.
-    // => toTimeOfTimeCycle must be >= timeOfTimeCycle.
-    int methIdx;
-    LLBC_TimeSpan toTimeOfTimeCycle;
-    if (timeCycle == LLBC_TimeSpan::oneHour)
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 0])();
-    else if (timeCycle == LLBC_TimeSpan::oneDay)
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 1])();
-    else // oneWeek
-        toTimeOfTimeCycle = (to.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx = 2])();
+    auto normalizedFrom = from - timeOfTimeCycle;
+    auto normalizedTo = to - timeOfTimeCycle;
 
-    if (toTimeOfTimeCycle < timeOfTimeCycle)
-        return false;
+    normalizedFrom = LLBC_Time(
+        normalizedFrom.GetTimestampInMicros() - (normalizedFrom.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
+    normalizedTo = LLBC_Time(
+        normalizedTo.GetTimestampInMicros() - (normalizedTo.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
 
-    // Crossed timeCycle judge: fromTimeOfTimeCycle judge.
-    const LLBC_TimeSpan fromTimeOfTimeCycle =
-        (from.*LLBC_INL_NS __g_GetTimeOfTimeCycleMeths[methIdx])();
-    return (fromTimeOfTimeCycle < timeOfTimeCycle) ||
-         (fromTimeOfTimeCycle > timeOfTimeCycle &&
-          toTimeOfTimeCycle < fromTimeOfTimeCycle);
+    return normalizedTo - normalizedFrom;
+}
+
+int LLBC_Time::GetCrossedMonths(const LLBC_Time &from,
+                                const LLBC_Time &to,
+                                const LLBC_TimeSpan &timeOfMonth)
+{
+    // If span <= 0, return zero.
+    const LLBC_TimeSpan diff = to - from;
+    if (UNLIKELY(diff <= LLBC_TimeSpan::zero))
+        return 0;
+
+    if (UNLIKELY(timeOfMonth >= LLBC_TimeSpan::oneDay * 31)) 
+        return 0;
+
+    const static auto preMonthMaxDays = [](int year, int month) 
+    {
+        month  = (month == 0) ? 11 : month - 1;
+        if (month == 1)
+            return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) ? 29 : 28;
+
+        const static int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        return daysInMonth[month];
+    };
+
+    const auto fromMaxCycle = LLBC_TimeSpan::FromDays(preMonthMaxDays(from.GetYear(), from.GetMonth()));
+    const auto toMaxCycle = LLBC_TimeSpan::FromDays(preMonthMaxDays(to.GetYear(), to.GetMonth()));
+
+    const auto normalizedFrom = from - ((timeOfMonth > fromMaxCycle) ? fromMaxCycle: timeOfMonth);
+    const auto normalizedTo = to - ((timeOfMonth > toMaxCycle) ? toMaxCycle: timeOfMonth);
+
+    const auto diffYears = normalizedTo.GetYear() - normalizedFrom.GetYear();
+    const auto diffMonths = normalizedTo.GetMonth() - normalizedFrom.GetMonth();
+
+    return diffYears * 12 + diffMonths;
 }
 
 __LLBC_NS_END

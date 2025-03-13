@@ -52,6 +52,10 @@
 /**
  * \brief core/algo about config options define.
  */
+// string hash algorithm(case insensitive).
+// Supports: SDBM, RS, JS, PJW, ELF, BKDR, DJB, AP, MurmurHash3
+// Default: MurmurHash3
+#define LLBC_CFG_DEFAULT_HASH_ALGO                          MurmurHash3
 // Define RingBuffer init capacity.
 #define LLBC_CFG_CORE_ALGO_RING_BUFFER_DEFAULT_CAP          32
 
@@ -69,6 +73,12 @@
 // Define the LLBC_File class CopyFile method copy buffer size, in bytes, default is 16MB.
 // Only used in Non-WIN32 systems.
 #define LLBC_CFG_CORE_FILE_COPY_BUF_SIZE                    16384000
+
+/**
+ * \brief core/event about config options define.
+ */
+// Enable(or disable) the event fire dead loop detection, disabled by default.
+#define LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION 0
 
 /**
  * \brief core/utils about config options define.
@@ -200,10 +210,6 @@
  */
 // Dictionary default bucket size.
 #define LLBC_CFG_OBJBASE_DICT_DFT_BUCKET_SIZE               100
-// Dictionary string key hash algorithm(case insensitive).
-// Supports: SDBM, RS, JS, PJW, ELF, BKDR, DJB, AP
-// Default: BKDR
-#define LLBC_CFG_OBJBASE_DICT_KEY_HASH_ALGO                 BKDR
 
 /**
  * \brief Communication about configs.
@@ -253,8 +259,6 @@
 #define LLBC_CFG_COMM_ENABLE_STATUS_HANDLER                 1
 // Determine enable the unify pre-subscribe handler support or not.
 #define LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE             1
-// Max component name length.
-#define LLBC_CFG_COMM_MAX_COMP_NAME_LEN                     255
 // Dynamic create comp create method prefix name.
 #define LLBC_CFG_COMM_CREATE_COMP_FROM_LIB_FUNC_PREFIX      "llbc_create_comp_"
 // The poller model config(Platform specific).
@@ -291,17 +295,25 @@
 #define LLBC_CFG_APP_TRY_START_INTERVAL             5
 // Application try stop interval(Call OnStop() interval), in milli-seconds.
 #define LLBC_CFG_APP_TRY_STOP_INTERVAL              5
+// Application idle sleep time, in milli-seconds.
+#define LLBC_CFG_APP_IDLE_SLEEP_TIME                5
+// Default application FPS value.
+#define LLBC_CFG_APP_DFT_FPS                        200
+// Min application FPS value.
+#define LLBC_CFG_APP_MIN_FPS                        1
+// Max application FPS value.
+#define LLBC_CFG_APP_MAX_FPS                        1000
 // Application stop signals.
 #if LLBC_TARGET_PLATFORM_WIN32
  #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM}
 #else // Non-Win32
  #define LLBC_CFG_APP_STOP_SIGNALS                   {SIGINT, SIGTERM, SIGQUIT}
 #endif // Win32
-// Application config reload signals.
+// Application reload signals.
 #if LLBC_TARGET_PLATFORM_WIN32
-#define LLBC_CFG_APP_CFG_RELOAD_SIGNALS             {}
+#define LLBC_CFG_APP_RELOAD_SIGNALS                  {}
 #else // Non-Win32
-#define LLBC_CFG_APP_CFG_RELOAD_SIGNALS             {SIGUSR2}
+#define LLBC_CFG_APP_RELOAD_SIGNALS                  {SIGUSR2}
 #endif // Win32
 
 

@@ -79,7 +79,7 @@ public:
         return *this;
     }
 
-    _This &operator=(_This &&rhs)
+    _This &operator=(_This &&rhs) noexcept
     {
         _Base::operator=(std::move(rhs));
         return *this;
@@ -91,7 +91,7 @@ public:
         return *this;
     }
 
-    _This &operator=(_Base &&rhs)
+    _This &operator=(_Base &&rhs) noexcept
     {
         _Base::operator=(std::move(rhs));
         return *this;
@@ -678,11 +678,11 @@ public:
             size_type findIdx = _This::npos;
             if (with_elem)
             {
+                size_type elemFindIdx = _This::npos;
                 for (size_t i = 0; i < sep.size(); ++i)
                 {
-                    findIdx = this->find(sep[i], idx);
-                    if (findIdx != _This::npos)
-                        break;
+                    if ((elemFindIdx = this->find(sep[i], idx)) != _This::npos)
+                        findIdx = (findIdx == _This::npos ? elemFindIdx : MIN(findIdx, elemFindIdx));
                 }
             }
             else
@@ -923,7 +923,7 @@ public:
 
     int compare(const LLBC_BasicCString<_Elem> &cstr) const
     {
-        return _Base::compare(0, cstr.size(), cstr.c_str());
+        return _Base::compare(0, this->size(), cstr.c_str(), cstr.size());
     }
 
     int compare(size_type p0, size_type n0, const _This &str)

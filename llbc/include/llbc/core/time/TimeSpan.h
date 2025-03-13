@@ -49,19 +49,29 @@ public:
     /**
      * Convenience span construct methods.
      */
-    static LLBC_TimeSpan FromDays(int days, int hours = 0, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
-    static LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
-    static LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millis = 0, int micros = 0);
-    static LLBC_TimeSpan FromSeconds(int seconds, int millis = 0, int micros = 0);
-    static LLBC_TimeSpan FromMillis(sint64 millis, sint64 micros = 0);
-    static LLBC_TimeSpan FromMicros(sint64 micros);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromDays(int days, int hours = 0, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millis = 0, int micros = 0);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromSeconds(int seconds, int millis = 0, int micros = 0);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromMillis(sint64 millis, sint64 micros = 0);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromMicros(sint64 micros);
     template <size_t _StrArrLen>
-    static LLBC_TimeSpan FromSpanStr(const char (&spanStr)[_StrArrLen]);
-    static LLBC_TimeSpan FromSpanStr(const char *spanStr);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromSpanStr(const char (&spanStr)[_StrArrLen]);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromSpanStr(const char *spanStr);
     template <typename _StrType>
-    static typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_TimeSpan>::type
+    LLBC_NO_DISCARD static
+    typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_TimeSpan>::type
     FromSpanStr(const _StrType &spanStr);
-    static LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
+    LLBC_NO_DISCARD static
+    LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
 
 public:
     /**
@@ -121,12 +131,12 @@ public:
     sint64 GetTotalMillis() const;
     sint64 GetTotalMicros() const;
 
-    LLBC_TimeSpan AddDays(int days);
-    LLBC_TimeSpan AddHours(int hours);
-    LLBC_TimeSpan AddMinutes(int minutes);
-    LLBC_TimeSpan AddSeconds(int seconds);
-    LLBC_TimeSpan AddMillis(sint64 millis);
-    LLBC_TimeSpan AddMicros(sint64 micros);
+    LLBC_TimeSpan AddDays(int days) const;
+    LLBC_TimeSpan AddHours(int hours) const;
+    LLBC_TimeSpan AddMinutes(int minutes) const;
+    LLBC_TimeSpan AddSeconds(int seconds) const;
+    LLBC_TimeSpan AddMillis(sint64 millis) const;
+    LLBC_TimeSpan AddMicros(sint64 micros) const;
 
     LLBC_TimeSpan operator+(const LLBC_TimeSpan &span) const;
     LLBC_TimeSpan operator-(const LLBC_TimeSpan &span) const;
@@ -160,12 +170,6 @@ public:
 
 public:
     /**
-     * Stream output operator support.
-     */
-    friend std::ostream & ::operator<<(std::ostream &o, const LLBC_TimeSpan &s);
-
-public:
-    /**
      * Serialize&Deserialize support.
      */
     void Serialize(LLBC_Stream &stream) const;
@@ -191,6 +195,11 @@ private:
 };
 
 __LLBC_NS_END
+
+/**
+ * Stream output operator support.
+ */
+std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
 
 #include "llbc/core/time/TimeSpanInl.h"
 

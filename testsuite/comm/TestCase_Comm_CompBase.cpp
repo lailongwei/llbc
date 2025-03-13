@@ -28,10 +28,10 @@ namespace
     {
     public:
         ITestComp() : LLBC_Component() {}
-        virtual ~ITestComp() = default;
+        ~ITestComp() override = default;
     };
     
-    class TestComp : public ITestComp
+    class TestComp final : public ITestComp
     {
     public:
         TestComp()
@@ -39,7 +39,7 @@ namespace
             _timer = nullptr;
         }
 
-        virtual ~TestComp() = default;
+        ~TestComp() override = default;
 
     public:
         void OnPrint()
@@ -48,18 +48,18 @@ namespace
         }
 
     public:
-        virtual bool OnInit(bool &initFinished)
+        int OnInit(bool &initFinished) override
         {
             LLBC_PrintLn("Service initialize");
-            return true;
+            return LLBC_OK;
         }
 
-        virtual void OnDestroy(bool &destroyFinished)
+        void OnDestroy(bool &destroyFinished) override
         {
             LLBC_PrintLn("Service destroy");
         }
 
-        virtual bool OnStart(bool &startFinished)
+        int OnStart(bool &startFinished) override
         {
             LLBC_PrintLn("Service start");
             _timer = new LLBC_Timer(
@@ -67,10 +67,10 @@ namespace
                               std::bind(&TestComp::OnTimerCancel, this, std::placeholders::_1));
             _timer->Schedule(LLBC_TimeSpan::FromSeconds(2), LLBC_TimeSpan::FromSeconds(5));
 
-            return true;
+            return LLBC_OK;
         }
 
-        virtual void OnStop(bool &stopFinished)
+        void OnStop(bool &stopFinished) override
         {
             LLBC_PrintLn("Service stop");
             _timer->Cancel();
@@ -78,40 +78,40 @@ namespace
         }
 
     public:
-        virtual void OnUpdate()
+        void OnUpdate() override
         {
             LLBC_PrintLn("Update...");
         }
 
-        virtual void OnLateUpdate()
+        void OnLateUpdate() override
         {
             LLBC_PrintLn("Late Update...");
         }
 
-        virtual void OnIdle(const LLBC_TimeSpan &idleTime)
+        void OnIdle(const LLBC_TimeSpan &idleTime) override
         {
             LLBC_PrintLn("Idle, idle time: %s...", idleTime.ToString().c_str());
         }
 
     public:
-        virtual void OnTimerTimeout(LLBC_Timer *timer)
+        void OnTimerTimeout(LLBC_Timer *timer)
         {
             LLBC_PrintLn("Timer timeout!");
         }
 
-        virtual void OnTimerCancel(LLBC_Timer *timer)
+        void OnTimerCancel(LLBC_Timer *timer)
         {
-            LLBC_PrintLn("Time cancelled!");
+            LLBC_PrintLn("Timer cancelled!");
         }
 
     private:
         LLBC_Timer *_timer;
     };
 
-    class TestCompFactory : public LLBC_ComponentFactory
+    class TestCompFactory final : public LLBC_ComponentFactory
     {
     public:
-        virtual ITestComp *Create(LLBC_Service *service) const
+        ITestComp *Create(LLBC_Service *service) const override
         {
             return new TestComp;
         }
@@ -120,11 +120,11 @@ namespace
     class IEchoComp : public LLBC_Component
     {
     public:
-        IEchoComp() : LLBC_Component() {}
-        virtual ~IEchoComp() = default;
+        IEchoComp() {}
+        ~IEchoComp() override = default;
     };
 
-    class EchoComp : public IEchoComp
+    class EchoComp final : public IEchoComp
     {
     public:
         void OnPrint()
@@ -133,14 +133,20 @@ namespace
         }
     };
 
-    class EchoCompFactory : public LLBC_ComponentFactory
+    class EchoCompFactory final : public LLBC_ComponentFactory
     {
     public:
-        virtual IEchoComp *Create(LLBC_Service *service) const
+        IEchoComp *Create(LLBC_Service *service) const override
         {
             return new EchoComp;
         }
     };
+
+    class BaseComp2 : public LLBC_Component {};
+    class Comp2 final : public BaseComp2 {};
+
+    class BaseComp3 : public LLBC_Component {};
+    class DerivedComp3 final : public BaseComp3 {};
 }
 
 TestCase_Comm_CompBase::TestCase_Comm_CompBase()
@@ -154,6 +160,9 @@ TestCase_Comm_CompBase::~TestCase_Comm_CompBase()
 int TestCase_Comm_CompBase::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("CompBase test:");
+
+    // Get component name operation.
+    LLBC_ErrorAndReturnIf(TestCompNameOperation() != LLBC_OK, LLBC_FAILED);
 
     // Parse arguments.
     if (argc < 4)
@@ -169,6 +178,100 @@ int TestCase_Comm_CompBase::Run(int argc, char *argv[])
         return TestInInternalDriveService(argv[2], port);
     else
         return TestInExternalDriveService(argv[2], port);
+}
+
+int TestCase_Comm_CompBase::TestCompNameOperation()
+{
+    LLBC_PrintLn("Test component name operation:");
+
+    LLBC_PrintLn("- Create service and add components...");
+    LLBC_Service *svc = LLBC_Service::Create("CompNameOpTestSvc");
+    LLBC_Defer(delete svc);
+    svc->AddComponent<TestCompFactory>();
+    svc->AddComponent<EchoCompFactory>();
+    svc->AddComponent<Comp2>();
+    svc->AddComponent<DerivedComp3>();
+    LLBC_ErrorAndReturnIf(svc->Start() != LLBC_OK, LLBC_FAILED);
+
+    // IXxxComp -> XxxComp:
+    LLBC_Component *comp = svc->GetComponent<ITestComp>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent<ITestComp>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent<ITestComp>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent<ITestComp>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = svc->GetComponent<TestComp>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent<TestComp>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent<TestComp>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent<TestComp>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = svc->GetComponent("ITestComp");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent(\"ITestComp\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent("ITestComp");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent(\"ITestComp\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = svc->GetComponent("TestComp");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent(\"TestComp\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent("TestComp");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent(\"TestComp\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+
+    // BaseXxxComp -> XxxComp:
+    comp = svc->GetComponent<BaseComp2>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent<BaseComp2>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent<BaseComp2>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent<BaseComp2>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = svc->GetComponent<Comp2>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent<Comp2>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent<Comp2>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent<Comp2>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = svc->GetComponent("BaseComp2");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent(\"BaseComp2\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent("BaseComp2");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent(\"BaseComp2\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = svc->GetComponent("Comp2");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent(\"Comp2\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent("Comp2");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent(\"Comp2\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+
+    // No regular component:
+    comp = svc->GetComponent<BaseComp3>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent<BaseComp3>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent<BaseComp3>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent<BaseComp3>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = svc->GetComponent<DerivedComp3>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent<DerivedComp3>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent<DerivedComp3>();
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent<DerivedComp3>(): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    LLBC_Component *comp2 = svc->GetComponent("BaseComp3");
+    LLBC_ErrorAndReturnIf(comp2, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent(\"BaseComp3\"): %p, rtti name:%s", comp2, "null");
+    comp2 = comp->GetComponent("BaseComp3");
+    LLBC_ErrorAndReturnIf(comp2, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent(\"BaseComp3\"): %p, rtti name:%s", comp2, "null");
+    comp = svc->GetComponent("DerivedComp3");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: GetComponent(\"DerivedComp3\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+    comp = comp->GetComponent("DerivedComp3");
+    LLBC_ErrorAndReturnIf(!comp, LLBC_FAILED);
+    LLBC_PrintLn("- Get TestComp, using: comp->GetComponent(\"DerivedComp3\"): %p, rtti name:%s", comp, LLBC_GetTypeName(*comp));
+
+    return LLBC_OK;
 }
 
 int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, int port)

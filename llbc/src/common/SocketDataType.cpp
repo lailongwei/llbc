@@ -26,7 +26,6 @@
 #include "llbc/common/OSHeader.h"
 #include "llbc/common/Errno.h"
 #include "llbc/common/Errors.h"
-#include "llbc/common/Define.h"
 
 #include "llbc/common/SocketDataType.h"
 

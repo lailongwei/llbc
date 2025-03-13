@@ -398,21 +398,25 @@ public:
     {
         // llbc component event enumeration range[0, 100).
         LibBegin = 0,
+
+        // - Session about events.
         SessionCreate = LibBegin,
         SessionDestroy,
         AsyncConnResult,
         ProtoReport,
         UnHandledPacket,
-        AppEarlyStart,
-        AppStartFail,
-        AppStartFinish,
-        AppEarlyStop,
-        AppCfgReload,
-        LibEnd = 100,
 
-        // Logic component event enumeration range[100, 100000).
+        // - Application about events.
+        AppWillStart,
+        AppStartFailed,
+        AppStartFinished,
+        AppWillStop,
+
+        LibEnd = 1000,
+
+        // Logic component event enumeration range[100, 10000000).
         LogicBegin = LibEnd,
-        LogicEnd = 100000
+        LogicEnd = 10000000,
     };
 };
 
@@ -426,18 +430,6 @@ public:
     virtual ~LLBC_Component();
 
 public:
-    /**
-     * Check component inited or not.
-     * @return bool - init flag.
-     */
-    bool IsInited() const;
-
-    /**
-     * Check component started or not.
-     * @return bool - start flag.
-     */
-    bool IsStarted() const;
-
     /**
      * Get service.
      * @return LLBC_Service * - service object.
@@ -466,25 +458,19 @@ public:
      * Get config type.
      * @return int - the config type, see LLBC_AppConfigType enum.
      */
-    int GetConfigType() const;
+    int GetConfigType() const { return _cfgType; }
 
     /**
-     * Get non-property type config.
+     * Get config.
      * @return const LLBC_Variant & - the non-property application config.
      */
-    const LLBC_Variant &GetConfig() const;
+    const LLBC_Variant &GetConfig() const { return _cfg; }
 
     /**
-     * Set non-property type config(temporary support for t/master branch).
+     * Set config.
      * @param[in] compCfg - the component config.
      */
-    void SetConfig(const LLBC_Variant &compCfg);
-
-    /**
-     * Get property type config.
-     * @return const LLBC_Property & - the property config.
-     */
-    const LLBC_Property &GetPropertyConfig() const;
+    void SetConfig(const LLBC_Variant &compCfg) { _cfg = compCfg; }
 
 public:
     /**
@@ -524,68 +510,86 @@ public:
 
 public:
     /**
-     * When service start and not not init component before, will call then event handler.
+     * Component init event handler.
      */
-    virtual bool OnInit(bool &finished);
+    virtual int OnInit(bool &finished) { return LLBC_OK; }
 
     /**
-     * When service destroy, will call this event handler.
+     * Component late-init event handler.
      */
-    virtual void OnDestroy(bool &finished);
+    virtual int OnLateInit(bool &finished) { return LLBC_OK; }
+
+    /**
+     * Component early-destroy event handler.
+     
+     */
+    virtual void OnEarlyDestroy(bool &finished) {  }
+
+    /**
+     * Component destroy event handler.
+     */
+    virtual void OnDestroy(bool &finished) {  }
 
 public:
     /**
-     * When service start, will call this event handler.
+     * Component start event handler.
      */
-    virtual bool OnStart(bool &finished);
+    virtual int OnStart(bool &finished) { return LLBC_OK; }
 
     /**
-     * When service all components started, will call this event handler.
+     * Component late-start event handler.
      */
-    virtual void OnLateStart(bool &finished);
+    virtual int OnLateStart(bool &finished) { return LLBC_OK; }
 
     /**
-     * When service all component will stop, will call this event handler.
+     * Component early-stop event handler.
      */
-    virtual void OnEarlyStop(bool &finished);
+    virtual void OnEarlyStop(bool &finished) {  }
 
     /**
-     * When service stop, will call this event handler.
+     * Component stop event handler.
      */
-    virtual void OnStop(bool &finished);
+    virtual void OnStop(bool &finished) {  }
+
+    /**
+     * Component reload event handler.
+     */
+    virtual void OnReload() {  }
 
 public:
     /**
      * Component update function.
      */
-    virtual void OnUpdate();
+    virtual void OnUpdate() {  }
 
     /**
      * Component late update function.
      */
-    virtual void OnLateUpdate();
+    virtual void OnLateUpdate() {  }
 
     /**
      * Idle event handler.
      * @param[in] idleTime - idle time. 
      */
-    virtual void OnIdle(const LLBC_TimeSpan &idleTime);
+    virtual void OnIdle(const LLBC_TimeSpan &idleTime) {  }
 
     /**
-     * Process components' events.
-     * @param[in] evIndex
-     * @param[in] evArgs
+     * Component event handle method.
+     * @param[in] eventType   - event type, see LLBC_ComponentEventType.
+     * @param[in] eventParams - event params.
      */
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs);
+    virtual void OnEvent(int eventType, const LLBC_Variant &eventParams) {  }
 
 private:
     /**
      * Friend class: LLBC_ServiceImpl.
+     *  Access internal classes/enums:
+     *      [enum] _CompRunningPhase
      *  Access methods:
-     *      void SetService();
-     *      void UpdateComponentCfg();
+     *      void SetService()
+     *      void UpdateComponentCfg()
      * Access data members:
-     *      _inited;
+     *      _runningPhase
      */
     friend class LLBC_ServiceImpl;
 
@@ -601,15 +605,23 @@ private:
     void UpdateComponentCfg();
 
 private:
-    bool _inited;
-    bool _started;
+    // The component Running phase.
+    enum class _CompRunningPhase
+    {
+        NotInit,
+        Inited,
+        LateInited,
+        Started,
+        LateStarted,
+    };
+
+    _CompRunningPhase _runningPhase;
 
     LLBC_Service *_svc;
     LLBC_ComponentMethods *_meths;
 
+    LLBC_Variant _cfg;
     int _cfgType;
-    LLBC_Property *_propCfg;
-    LLBC_Variant *_nonPropCfg;
 };
 
 /**

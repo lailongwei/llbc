@@ -371,8 +371,7 @@ int pyllbc_Service::AddDecoder(int opcode, PyObject *decoder)
 
     if (!_decoders.insert(std::make_pair(opcode, decoder)).second)
     {
-        LLBC_String err;
-        pyllbc_SetError(err.append_format(
+        pyllbc_SetError(LLBC_String().format(
             "repeat to register specify opcode's coder class, opcode: %d", opcode));
 
         return LLBC_FAILED;
@@ -411,7 +410,8 @@ int pyllbc_Service::AsyncConn(const char *ip, uint16 port)
 {
     int sid = _llbcSvc->AsyncConn(ip, port);
     if (sid == 0)
-        pyllbc_TransferLLBCError(__FILE__, __LINE__, LLBC_String().format("async connect to %s:%d failed", ip, port).c_str());
+        pyllbc_TransferLLBCError(__FILE__, __LINE__,
+                                 LLBC_String().format("async connect to %s:%d failed", ip, port));
 
     return sid;
 }
@@ -426,7 +426,7 @@ int pyllbc_Service::RemoveSession(int sessionId, const char *reason)
     if (_llbcSvc->RemoveSession(sessionId, reason) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, 
-            LLBC_String().format("when remove session: %d", sessionId));
+                                 LLBC_String().format("when remove session: %d", sessionId));
         return LLBC_FAILED;
     }
 
@@ -523,7 +523,7 @@ int pyllbc_Service::Subscribe(int opcode, PyObject *handler, int flags)
         err.append_format("repeat subscribe, subscribe opcode:%d, handler:%s, ", opcode, handlerDesc.c_str());
         err.append_format("the opcode already subscribed, handler:[%s]", it->second->ToString().c_str());
 
-        pyllbc_SetError(err, LLBC_ERROR_REPEAT);
+        pyllbc_SetError(err.c_str(), LLBC_ERROR_REPEAT);
 
         return LLBC_FAILED;
     }
@@ -559,7 +559,7 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
         err.append_format("repeat pre-subscribe, pre-subscribe opcode:%d, handler:%s, ", opcode, handlerDesc.c_str());
         err.append_format("the opcode already pre-subscribed, handler:[%s]", it->second->ToString().c_str());
 
-        pyllbc_SetError(err, LLBC_ERROR_REPEAT);
+        pyllbc_SetError(err.c_str(), LLBC_ERROR_REPEAT);
 
         return LLBC_FAILED;
     }
@@ -577,9 +577,10 @@ int pyllbc_Service::PreSubscribe(int opcode, PyObject *preHandler, int flags)
     {
         delete wrapHandler;
 
-        LLBC_String err;
-        pyllbc_SetError(err.format(
-            "repeat to pre-subscribe opcode: %d, the opcode already pre-subscribed", opcode), LLBC_ERROR_REPEAT);
+        pyllbc_SetError(
+            LLBC_String().format(
+                "repeat to pre-subscribe opcode: %d, the opcode already pre-subscribed", opcode).c_str(),
+            LLBC_ERROR_REPEAT);
 
         return LLBC_FAILED;
     }
@@ -675,7 +676,8 @@ int pyllbc_Service::Post(PyObject *callable)
     if (!PyCallable_Check(callable))
     {
         const LLBC_String objDesc = pyllbc_ObjUtil::GetObjStr(callable);
-        pyllbc_SetError(LLBC_String().format("frame callable object not callable: %s", objDesc.c_str()));
+        pyllbc_SetError(LLBC_String().format(
+            "frame callable object not callable: %s", objDesc.c_str()));
 
         return LLBC_FAILED;
     }
@@ -1035,7 +1037,8 @@ void pyllbc_Service::HandleFrameCallables(pyllbc_Service::_FrameCallables &calla
         else
         {
             const LLBC_String objDesc = pyllbc_ObjUtil::GetObjStr(callable);
-            pyllbc_TransferPyError(LLBC_String().format("When call frame-callable: %s", objDesc.c_str()));
+            pyllbc_TransferPyError(
+                LLBC_String().format("When call frame-callable: %s", objDesc.c_str()));
             break;
         }
     }

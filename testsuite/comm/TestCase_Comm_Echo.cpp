@@ -25,19 +25,19 @@
 namespace
 {
 
-class EchoServerComp : public LLBC_Component
+class EchoServerComp final : public LLBC_Component
 {
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         // 消息注册, 因echo实现为流式协议实现, opcode为0
         LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoServerComp::_OnPkt);
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual bool OnStart(bool &startFinished)
+    int OnStart(bool &startFinished) override
     {
         // 执行端口监听
         LLBC_Service *svc = GetService();
@@ -51,30 +51,32 @@ public:
         // 打印启动消息
         std::cout << "Echo server component started, listening on 0.0.0.0:9527, session Id:" << sId << std::endl;
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnStop(bool &stopFinished)
+    void OnStop(bool &stopFinished) override
     {
         // 打印将关闭消息
         std::cout << "Echo server component will stop" << std::endl;
     }
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    void OnEvent(int eventType, const LLBC_Variant &eventParams) override
     {
-        switch(event)
+        switch(eventType)
         {
             case LLBC_ComponentEventType::SessionCreate:
             {
-                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
                 break;
             }
             case LLBC_ComponentEventType::SessionDestroy:
             {
-                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
                 break;
             }
-            default: break;
+
+            default:
+                break;
         }
     }
 
@@ -109,44 +111,44 @@ private:
     }
 };
 
-class EchoClientComp : public LLBC_Component
+class EchoClientComp final : public LLBC_Component
 {
 public:
     EchoClientComp()
     : _sId(0)
     {}
-    virtual ~EchoClientComp() = default;
+    ~EchoClientComp() override = default;
 
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         // 同EchoServerComp, 订阅
         LLBC_Service *svc = GetService();
         svc->Subscribe(0, this, &EchoClientComp::_OnPkt);
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual bool OnStart(bool &startFinished)
+    int OnStart(bool &startFinished) override
     {
         LLBC_Service *svc = GetService();
         _sId = svc->Connect("127.0.0.1", 9527);
         if (_sId == 0)
         {
             std::cerr << "Connect to echo server failed, error:" << LLBC_FormatLastError() << std::endl;
-            return false;
+            return LLBC_FAILED;
         }
 
         std::cout << "Echo client comp started, input echo string, input 'bye' to exit echo client" << std::endl;
         std::flush(std::cout);
 
         if (!_AcceptInput(true))
-            return false;
+            return LLBC_FAILED;
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnStop(bool &stopFinished)
+    void OnStop(bool &stopFinished) override
     {
         std::cout << "Echo client comp will stop" << std::endl;
     }

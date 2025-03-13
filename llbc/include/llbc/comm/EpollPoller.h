@@ -43,51 +43,51 @@ class LLBC_HIDDEN LLBC_EpollPoller final : public LLBC_BasePoller
 {
 public:
     LLBC_EpollPoller();
-    virtual ~LLBC_EpollPoller();
+    ~LLBC_EpollPoller() override;
 
 public:
     /**
      * Startup poller.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Start();
+    int Start() override;
 
     /**
      * Stop poller.
      */
-    virtual void Stop();
+    void Stop() override;
 
     /**
      * Task startup method.
      */
-    virtual void Svc();
+    void Svc() override;
 
     /**
      * Task cleanup method.
      */
-    virtual void Cleanup();
+    void Cleanup() override;
 
 protected:
     /**
      * Queued event handlers.
      */
-    virtual void HandleEv_AddSock(LLBC_PollerEvent &ev);
-    virtual void HandleEv_AsyncConn(LLBC_PollerEvent &ev);
-    virtual void HandleEv_Send(LLBC_PollerEvent &ev);
-    virtual void HandleEv_Close(LLBC_PollerEvent &ev);
-    virtual void HandleEv_Monitor(LLBC_PollerEvent &ev);
-    virtual void HandleEv_TakeOverSession(LLBC_PollerEvent &ev);
-    virtual void HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev);
+    void HandleEv_AddSock(LLBC_PollerEvent &ev) override;
+    void HandleEv_AsyncConn(LLBC_PollerEvent &ev) override;
+    void HandleEv_Send(LLBC_PollerEvent &ev) override;
+    void HandleEv_Close(LLBC_PollerEvent &ev) override;
+    void HandleEv_Monitor(LLBC_PollerEvent &ev) override;
+    void HandleEv_TakeOverSession(LLBC_PollerEvent &ev) override;
+    void HandleEv_CtrlProtocolStack(LLBC_PollerEvent &ev) override;
 
     /**
      * Add session to poller.
      */
-    virtual void AddSession(LLBC_Session *session);
+    void AddSession(LLBC_Session *session) override;
 
     /**
      * Remove session from poller.
      */
-    virtual void RemoveSession(LLBC_Session *session);
+    void RemoveSession(LLBC_Session *session) override;
 
 private:
     /**

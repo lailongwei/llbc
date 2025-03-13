@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Utils_Delegate :public LLBC_BaseTestCase
+class TestCase_Core_Utils_Delegate final :public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Utils_Delegate();
-    virtual ~TestCase_Core_Utils_Delegate();
+    ~TestCase_Core_Utils_Delegate() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void Foo_0();

@@ -153,9 +153,9 @@ int pyllbc_PackLemma_Top::Write(pyllbc_Stream *stream, PyObject *values)
     if (seqSize != static_cast<Py_ssize_t>(_lemmas.size()))
     {
         LLBC_String errStr;
-        pyllbc_SetError(errStr.format(
-            "will pack data sequence size[%ld] not equal format character size[%d]", 
-            seqSize, _lemmas.size()));
+        errStr.format("will pack data sequence size[%ld] not equal format character size[%d]", 
+                      seqSize, _lemmas.size());
+        pyllbc_SetError(errStr);
 
         return LLBC_FAILED;
     }

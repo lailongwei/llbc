@@ -24,10 +24,10 @@
 
 namespace
 {
-class TestComp : public LLBC_Component
+class TestComp final : public LLBC_Component
 {
 public:
-    bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_PrintLn("Service startup, startup timers...");
 
@@ -44,13 +44,11 @@ public:
         LLBC_Timer *rescheduleInCancelTimer = new LLBC_Timer([](LLBC_Timer *timer) {
             LLBC_PrintLn("RescheduleInCancelTimer timeout, cancel it!!!!!!");
             timer->Cancel();
-        },
-                                                             [](LLBC_Timer *timer) {
+        }, [](LLBC_Timer *timer) {
             LLBC_PrintLn("RescheduleInCancelTimer cancel, try reschedule!");
             timer->Schedule(LLBC_TimeSpan::FromSeconds(2));
         });
-        rescheduleInCancelTimer->Schedule(LLBC_TimeSpan::FromSeconds(1));
-        rescheduleInCancelTimer->Cancel();
+        rescheduleInCancelTimer->Schedule(LLBC_Time::Now() + LLBC_TimeSpan::oneSec * 5, LLBC_TimeSpan::oneSec * 10);
 
         // Timer performance test
         #ifdef LLBC_DEBUG
@@ -69,10 +67,10 @@ public:
 
         LLBC_PrintLn("Done!");
 
-        return true;
+        return LLBC_OK;
     }
 
-    void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         LLBC_PrintLn("Service destroy!");
     }

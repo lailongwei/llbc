@@ -47,15 +47,15 @@ LLBC_BundleHandle LLBC_CreateBundle(const LLBC_String &path)
     if (!path.empty())
     {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        realPath.append(1, LLBC_SLASH_A);
+        realPath.append(1, '/');
 #else
-        realPath.append(1, LLBC_BACKLASH_A);
+        realPath.append(1, '\\');
 #endif
 
         realPath.append(path);
 
         const LLBC_String::size_type len = realPath.length();
-        if (realPath[len - 1] == LLBC_SLASH_A || realPath[len - 1] == LLBC_BACKLASH_A)
+        if (realPath[len - 1] == '/' || realPath[len - 1] == '\\')
             realPath.erase(len - 1, 1);
     }
 
@@ -124,12 +124,12 @@ LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
     // Append intermediate directory.
     if (!inDir.empty())
     {
-        if (inDir[0] != LLBC_SLASH_A && inDir[0] != LLBC_BACKLASH_A)
+        if (inDir[0] != '/' && inDir[0] != '\\')
         {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-            path.append(1, LLBC_SLASH_A);
+            path.append(1, '/');
 #else
-            path.append(1, LLBC_BACKLASH_A);
+            path.append(1, '\\');
 #endif
         }
 
@@ -138,12 +138,12 @@ LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
         if (inDir.size() > 1)
         {
             const LLBC_String::size_type endPos = inDir.length();
-            if (inDir[endPos - 1] != LLBC_SLASH_A && inDir[endPos - 1] != LLBC_BACKLASH_A)
+            if (inDir[endPos - 1] != '/' && inDir[endPos - 1] != '\\')
             {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-                path.append(1, LLBC_SLASH_A);
+                path.append(1, '/');
 #else
-                path.append(1, LLBC_BACKLASH_A);
+                path.append(1, '\\');
 #endif
             }
         }
@@ -152,9 +152,9 @@ LLBC_String LLBC_GetBundleResPath(LLBC_BundleHandle bundle,
     {
     // Append slash/backlash.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-        path.append(1, LLBC_SLASH_A);
+        path.append(1, '/');
 #else
-        path.append(1, LLBC_BACKLASH_A);
+        path.append(1, '\\');
 #endif
     }
 

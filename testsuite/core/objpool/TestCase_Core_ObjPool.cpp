@@ -31,20 +31,67 @@ public:
     virtual ~BaseCls() = default;
 };
 
-class DerivedCls : public BaseCls
+class DerivedCls final : public BaseCls
 {
 public:
 };
 
-class _OD_A : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_A() { LLBC_PrintLn("_OD_A destruct"); } };
-class _OD_B : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_B() { LLBC_PrintLn("_OD_B destruct"); } };
-class _OD_C : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_C() { LLBC_PrintLn("_OD_C destruct"); } };
-class _OD_D : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_D() { LLBC_PrintLn("_OD_D destruct"); } };
-class _OD_E : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_E() { LLBC_PrintLn("_OD_E destruct"); } };
-class _OD_F : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_F() { LLBC_PrintLn("_OD_F destruct"); } };
-class _OD_G : public LLBC_PoolObj { public: void Reuse() override {}; ~_OD_G() { LLBC_PrintLn("_OD_G destruct"); } };
-
+class _OD_A final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_A() override { LLBC_PrintLn("_OD_A destruct"); } };
+class _OD_B final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_B() override { LLBC_PrintLn("_OD_B destruct"); } };
+class _OD_C final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_C() override { LLBC_PrintLn("_OD_C destruct"); } };
+class _OD_D final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_D() override { LLBC_PrintLn("_OD_D destruct"); } };
+class _OD_E final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_E() override { LLBC_PrintLn("_OD_E destruct"); } };
+class _OD_F final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_F() override { LLBC_PrintLn("_OD_F destruct"); } };
+class _OD_G final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_G() override { LLBC_PrintLn("_OD_G destruct"); } };
+class _OD_H final : public LLBC_Object { public: ~_OD_H() override { LLBC_PrintLn("_OD_H destruct");}};
 }
+
+class SafeObjPoolPrintNameTask : public LLBC_Task 
+{
+public:
+    SafeObjPoolPrintNameTask(int testTimes)
+    : _objPool(true)
+    , _testTimes(testTimes)
+    {
+    }
+
+public:
+    void Svc() override
+    {
+        int curId = LLBC_AtomicFetchAndAdd(&_subThreadId, 1);
+
+        if ((curId % 2) == 0)
+            _GetName();
+        else 
+            _SetName();
+    }
+
+    void Cleanup() override {  }
+
+    LLBC_ObjPool &GetObjPool() { return _objPool; }
+
+protected:
+    void _GetName()
+    {
+        for (int i = 0; i < _testTimes; i++)
+            LLBC_PrintLn("GetName: %s", _objPool.GetName().c_str());
+    }
+
+    void _SetName()
+    {
+        LLBC_String objPoolName;
+        for (int i = 0; i < _testTimes; i++)
+        {
+            LLBC_PrintLn("SetName: %s", objPoolName.format("test_%d", i).c_str());
+            _objPool.SetName(objPoolName);
+        }
+    }
+
+protected:
+    LLBC_ObjPool _objPool;
+    int _subThreadId = 0;
+    int _testTimes = 10;
+};
 
 int TestCase_Core_ObjPool::Run(int argc, char *argv[])
 {
@@ -60,6 +107,8 @@ int TestCase_Core_ObjPool::Run(int argc, char *argv[])
     LLBC_ReturnIf(GuardedPoolObjTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(LibSupportedObjPoolClassesTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(CommonClassTest_Stream() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(RecycleTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(SafeObjPoolSetNameTest() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -137,7 +186,7 @@ int TestCase_Core_ObjPool::AcquireTest()
         strs2.push_back(objPool.Acquire<std::string>());
 
     // Compare.
-    LLBC_ErrorAndReturnIfNot(strs == strs2, LLBC_FAILED, "Acquire test failed");
+    LLBC_ErrorAndReturnIf(strs != strs2, LLBC_FAILED, "Acquire test failed");
 
     LLBC_PrintLn("Success");
 
@@ -232,73 +281,67 @@ int TestCase_Core_ObjPool::ReflectTest()
 {
     // Basic type reusable reflection.
     LLBC_PrintLn("Basic type IsReusable() Reflect test:");
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<void>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<bool>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<sint8>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<uint8>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<sint16>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<uint16>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<sint32>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<uint32>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<long>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<ulong>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<sint64>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<uint64>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<float>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<double>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<void *>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<void>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<bool>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<sint8>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<uint8>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<sint16>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<uint16>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<sint32>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<uint32>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<long>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<ulong>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<sint64>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<uint64>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<float>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<double>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<void *>(), LLBC_FAILED);
     LLBC_PrintLn("Success");
 
     // String type reusable reflection.
     LLBC_PrintLn("String type IsReusable() Reflect test:");
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<LLBC_String>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<std::string>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<LLBC_CString>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<LLBC_String>() == false, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::string>() == false, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<LLBC_CString>(), LLBC_FAILED);
     LLBC_PrintLn("Success");
 
     // STL containers reusable reflection.
     LLBC_PrintLn("STL containers IsReusable() Reflect test:");
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<std::vector<int> >(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<std::list<int> >(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<std::queue<int> >(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<std::deque<int> >(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(!LLBC_ObjReflector::IsReusable<std::stack<int> >(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<std::set<int> >(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<std::unordered_set<int> >(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::vector<int> >() == false, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::list<int> >() == false, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::queue<int> >(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::deque<int> >() == false, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::stack<int> >(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::set<int> >() == false, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::unordered_set<int> >() == false, LLBC_FAILED);
     using _TestMap = std::map<int, int>;
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<_TestMap>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<_TestMap>() == false, LLBC_FAILED);
     using _TestUnorderedMap = std::unordered_map<int, int>;
-    LLBC_ErrorAndReturnIfNot(LLBC_ObjReflector::IsReusable<_TestUnorderedMap>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<_TestUnorderedMap>() == false, LLBC_FAILED);
     LLBC_PrintLn("Success");
 
     // IsReusable method class reflection.
     LLBC_PrintLn("IsReusable method class reflect test:");
     class _HasMethodType_reuse { public: void reuse() { } };
-    LLBC_ErrorAndReturnIfNot(
-        LLBC_ObjReflector::IsReusable<_HasMethodType_reuse>() == LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_reuse,
-        LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<_HasMethodType_reuse>() != LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_reuse,
+                          LLBC_FAILED);
     class _HasMethodType_Reuse { public: void Reuse() { } };
-    LLBC_ErrorAndReturnIfNot(
-        LLBC_ObjReflector::IsReusable<_HasMethodType_Reuse>() == LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reuse,
-        LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<_HasMethodType_Reuse>() != LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reuse,
+                          LLBC_FAILED);
 
     class _HasMethodType_reset { public: void reset() { } };
-    LLBC_ErrorAndReturnIfNot(
-        LLBC_ObjReflector::IsReusable<_HasMethodType_reset>() == LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_reset,
-        LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<_HasMethodType_reset>() != LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_reset,
+                          LLBC_FAILED);
     class _HasMethodType_Reset { public: void Reset() { } };
-    LLBC_ErrorAndReturnIfNot(
-        LLBC_ObjReflector::IsReusable<_HasMethodType_Reset>() == LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reset,
-        LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<_HasMethodType_Reset>() != LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reset,
+                          LLBC_FAILED);
 
     class _HasMethodType_clear { public: void clear() { } };
-    LLBC_ErrorAndReturnIfNot(
-        LLBC_ObjReflector::IsReusable<_HasMethodType_clear>() == LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_clear,
-        LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<_HasMethodType_clear>() != LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_clear,
+                          LLBC_FAILED);
     class _HasMethodType_Clear { public: void Clear() { } };
-    LLBC_ErrorAndReturnIfNot(
-        LLBC_ObjReflector::IsReusable<_HasMethodType_Clear>() == LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Clear,
-        LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<_HasMethodType_Clear>() != LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Clear,
+                          LLBC_FAILED);
     LLBC_PrintLn("Success");
 
     // Reuse method reflection.
@@ -325,10 +368,22 @@ int TestCase_Core_ObjPool::ReflectTest()
     if (LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reuse)
     {
         LLBC_ObjReflector::Reuse<_ReusableClass>(objPtr);
-        LLBC_ErrorAndReturnIfNot(objPtr->IsReuseMethodCalled(), LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(objPtr->IsReuseMethodCalled() == false, LLBC_FAILED);
     }
+
+    // Note: -Wmismatched-new-delete/-Wmismatched-dealloc only available on GCC 11 or later version
+    #if (LLBC_CUR_COMP == LLBC_COMP_GCC && LLBC_COMP_MAJOR_VER >= 11) || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wmismatched-new-delete"
+    #endif
+
     LLBC_ObjReflector::Delete<_ReusableClass>(objPtr);
     free(objPtr);
+
+    #if (LLBC_CUR_COMP == LLBC_COMP_GCC && LLBC_COMP_MAJOR_VER >= 11) || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    #pragma GCC diagnostic pop
+    #endif
+
     LLBC_PrintLn("Success");
 
     return LLBC_OK;
@@ -439,7 +494,7 @@ int TestCase_Core_ObjPool::MultiThreadThread()
         void Cleanup() override
         {
             LLBC_PrintLn("All threads test finished, objPool stat:\n%s",
-                         _objPool.GetStatistics(LLBC_ObjPoolStatFormat::Json, true).c_str());
+                         _objPool.GetStatistics(LLBC_ObjPoolStatFormat::PrettyJson).c_str());
         }
 
     public:
@@ -509,7 +564,7 @@ int TestCase_Core_ObjPool::PerfTest()
 
     // Exec default new/malloc test.
     LLBC_PrintLn("New/Delete perf test:");
-    auto begTime = LLBC_CPUTime::Current();
+    LLBC_Stopwatch sw;
     for (int i = 0; i < testTimes; ++i)
     {
         for (int j = 0; j < perTimeAcquireTimes; ++j)
@@ -525,8 +580,8 @@ int TestCase_Core_ObjPool::PerfTest()
         }
     }
 
-    auto newDelCostTime = LLBC_CPUTime::Current() - begTime;
-    LLBC_PrintLn("New/Delete test fin, cost: %lld us", newDelCostTime.ToMicros());
+    sw.Pause();
+    LLBC_PrintLn("New/Delete test fin, cost: %lld us", sw.Elapsed().GetTotalMicros());
 
     // Execute object pool acquire/release test.
     LLBC_PrintLn("ObjPool New/Delete perf test:");
@@ -535,7 +590,7 @@ int TestCase_Core_ObjPool::PerfTest()
     objPool.Release(objPool.Acquire<std::vector<int>>());
 
     // auto testObjPool = objPool.GetTypedObjPool<TestObj>();
-    begTime = LLBC_CPUTime::Current();
+    LLBC_Stopwatch sw2;
     for (int i = 0; i < testTimes; ++i)
     {
         for (int j = 0; j < perTimeAcquireTimes; ++j)
@@ -553,11 +608,10 @@ int TestCase_Core_ObjPool::PerfTest()
         }
     }
 
-    auto objPoolNewDelCostTime = LLBC_CPUTime::Current() - begTime;
+    sw2.Pause();
     LLBC_PrintLn("ObjPool New/Delete test fin, cost: %lld us, perf improvement: %.3f",
-                 objPoolNewDelCostTime.ToMicros(),
-                 ((newDelCostTime.GetCPUCount() - objPoolNewDelCostTime.GetCPUCount()) /
-                    static_cast<double>(objPoolNewDelCostTime.GetCPUCount())));
+                 sw2.Elapsed().GetTotalMicros(),
+                 (sw.ElapsedTicks() - sw2.ElapsedTicks()) / static_cast<double>(sw2.ElapsedTicks()));
 
     getchar();
 
@@ -662,46 +716,38 @@ int TestCase_Core_ObjPool::GuardedPoolObjTest()
         auto guard1 = objPool.AcquireGuarded<GuardTestA>();
         // Method call test.
         guard1->Foo(); // operator->
-        static_cast<GuardTestA *>(guard1)->Foo(); // operator GuardTestA *
-        (*guard1).Foo(); // operator*
         guard1.Get()->Foo(); // Get()
 
         // Test copy construct.
         auto guard2 = guard1;
-        LLBC_ErrorAndReturnIfNot(
-            !guard1 && guard2, LLBC_FAILED, "GuardedPoolObj copy construct test failed!");
+        LLBC_ErrorAndReturnIf(guard1 || !guard2, LLBC_FAILED, "GuardedPoolObj copy construct test failed!");
         // guard1->Foo(); // Raise crash.
         // Test move construct.
         auto guard3 = std::move(guard2);
-        LLBC_ErrorAndReturnIfNot(
-            !guard2 && guard3, LLBC_FAILED, "GuardedPoolObj move construct test failed!");
+        LLBC_ErrorAndReturnIf(guard2 || !guard3, LLBC_FAILED, "GuardedPoolObj move construct test failed!");
         // guard2->Foo(); // Raise crash.
 
         // Test copy assignment.
         auto guard4(guard1);
         guard4 = guard3;
-        LLBC_ErrorAndReturnIfNot(
-            !guard3 && guard4, LLBC_FAILED, "GuardedPoolObj copy assignment test failed!");
+        LLBC_ErrorAndReturnIf(guard3 || !guard4, LLBC_FAILED, "GuardedPoolObj copy assignment test failed!");
         // guard3->Foo(); // Raise crash.
         // Test move assignment.
         auto guard5(guard1);
         guard5 = std::move(guard4);
-        LLBC_ErrorAndReturnIfNot(
-            !guard4 && guard5, LLBC_FAILED, "GuardedPoolObj move assignment test failed!");
+        LLBC_ErrorAndReturnIf(guard4 || !guard5, LLBC_FAILED, "GuardedPoolObj move assignment test failed!");
         // guard4->Foo(); // Raise crash.
 
         // Test detach.
         auto guard6 = objPool.AcquireGuarded<GuardTestA>();
         auto obj = guard6.Detach();
-        LLBC_ErrorAndReturnIfNot(
-            !guard6 && obj && !guard6.GetTypedObjPool(), LLBC_FAILED, "GuardedPoolObj detach test failed!");
+        LLBC_ErrorAndReturnIf(guard6 || !obj || guard6.GetTypedObjPool(), LLBC_FAILED, "GuardedPoolObj detach test failed!");
         objPool.Release(obj);
 
         // Test reset.
         auto guard7 = objPool.AcquireGuarded<GuardTestA>();
         guard7.Reset();
-        LLBC_ErrorAndReturnIfNot(
-            !guard7, LLBC_FAILED, "GuardedPoolObj reset test failed!");
+        LLBC_ErrorAndReturnIf(guard7, LLBC_FAILED, "GuardedPoolObj reset test failed!");
     }
 
     // Complex test.
@@ -717,15 +763,13 @@ int _CheckObjPoolSupport()
 {
     LLBC_PrintLn("- class: %s", LLBC_GetTypeName(Obj));
 
-    LLBC_ErrorAndReturnIfNot(
-        LLBC_ObjReflector::IsReusable<Obj>() == SupportedReuse, LLBC_FAILED);
-    LLBC_PrintLn("  - supported reuse: %s",
-                 LLBC_ObjReflector::IsReusable<Obj>() ? "true" : "false");
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<Obj>() != SupportedReuse, LLBC_FAILED);
+                          LLBC_PrintLn("  - supported reuse: %s",
+                                       LLBC_ObjReflector::IsReusable<Obj>() ? "true" : "false");
 
-    LLBC_ErrorAndReturnIfNot(
-        LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>() == SupportedReflection, LLBC_FAILED);
-    LLBC_PrintLn("  - supported reflection: %s",
-                 LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>() ? "true" : "false");
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>() != SupportedReflection, LLBC_FAILED);
+                          LLBC_PrintLn("  - supported reflection: %s",
+                                       LLBC_ObjReflector::IsSupportedObjPoolReflection<Obj>() ? "true" : "false");
 
     return LLBC_OK;
 }
@@ -768,9 +812,9 @@ int TestCase_Core_ObjPool::CommonClassTest_Stream()
     // Acquire LLBC_Stream from obj pool.
     auto stream1 = objPool.Acquire<LLBC_Stream>();
     LLBC_PrintLn("- Acquire from objpool, stream:%s, ptr:%p", stream1->ToString().c_str(), stream1);
-    LLBC_ErrorAndReturnIfNot(stream1->GetTypedObjPool() == objPool.GetTypedObjPool<LLBC_Stream>(),
-                             LLBC_FAILED,
-                             "  - Acquired stream object internal error!");
+    LLBC_ErrorAndReturnIf(stream1->GetTypedObjPool() != objPool.GetTypedObjPool<LLBC_Stream>(),
+                          LLBC_FAILED,
+                          "  - Acquired stream object internal error!");
 
     // Serialize.
     LLBC_PrintLn("- Serialize some data to stream...");
@@ -787,7 +831,7 @@ int TestCase_Core_ObjPool::CommonClassTest_Stream()
                  stream2 == stream1 ? "true" : "false",
                  stream2->ToString().c_str(),
                  stream2);
-    LLBC_ErrorAndReturnIfNot(stream2 == stream1, LLBC_FAILED, "ObjPool acquire internal error");
+    LLBC_ErrorAndReturnIf(stream2 != stream1, LLBC_FAILED, "ObjPool acquire internal error");
 
     // Acquire new stream too.
     auto stream3 = objPool.Acquire<LLBC_Stream>();
@@ -795,7 +839,7 @@ int TestCase_Core_ObjPool::CommonClassTest_Stream()
                  stream3 == stream2 ? "true" : "false",
                  stream3->ToString().c_str(),
                  stream3);
-    LLBC_ErrorAndReturnIfNot(stream3 != stream2, LLBC_FAILED, "ObjPool acquire internal error");
+    LLBC_ErrorAndReturnIf(stream3 == stream2, LLBC_FAILED, "ObjPool acquire internal error");
 
     // Recycle stream2 & stream3.
     LLBC_Recycle(stream3);
@@ -821,4 +865,63 @@ void TestCase_Core_ObjPool::RandAllocAndRelease(LLBC_ObjPool &objPool,
 
     while (--releaseTimes >= 0)
         objPool.Release(objs[releaseTimes]);
+}
+
+int TestCase_Core_ObjPool::RecycleTest()
+{
+    // obj from pool recycle test
+    LLBC_ObjPool objPool;
+    auto* g = objPool.Acquire<_OD_G>();
+    LLBC_Recycle(g);
+
+    // obj by new
+    // TODO():no way to judge，just test
+    auto str = new std::string("obj by new test");
+    LLBC_Recycle(str);
+    
+    // obj as a LLBC_Object
+    auto* obj = new _OD_H;
+    // obj delegate to auto-gc pool, call this only once
+    obj->AutoRelease();
+
+    // add ref
+    obj->Retain();
+    LLBC_ReturnIf(obj->GetAutoRefCount() != 1, LLBC_FAILED)
+    LLBC_ReturnIf(obj->GetRefCount() != 2, LLBC_FAILED)
+    // sub ref
+    LLBC_Recycle(obj);
+
+    // only for test, frame will call Purge automatically
+    __LLBC_LibTls *tls = __LLBC_GetLibTls();
+    auto poolStack = reinterpret_cast<LLBC_AutoReleasePoolStack *>(tls->objbaseTls.poolStack);
+    poolStack->Purge();
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
+{
+    const int testTimes = 20;
+
+    LLBC_String expectedName;
+    expectedName.format("test_%d", testTimes - 1);
+
+    SafeObjPoolPrintNameTask printNametask(testTimes);
+
+    auto &objPool = printNametask.GetObjPool();
+    LLBC_PrintLn("safe-obj-pool: %s", objPool.GetName().c_str());
+
+    printNametask.Activate(8);
+
+    printNametask.Wait();
+
+    auto objPoolFinalName = objPool.GetName();
+
+    LLBC_ErrorAndReturnIf(expectedName != objPoolFinalName, 
+                          LLBC_FAILED, 
+                          "objPoolFinalName(%s) is not expected(%s)", 
+                          objPoolFinalName.c_str(), 
+                          expectedName.c_str());
+
+    return LLBC_OK;
 }

@@ -71,47 +71,50 @@ public:
     /**
      * Stop specific id service.
      * Note:
-     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *  1. Not allow to remove self thread drive's service, if try to call,
      *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
-     * @param[in] id  - the service Id.
-     * @param[in] del - delete service or not, default is true.
+     * @param[in] id          - the service Id.
+     * @param[in] del         - delete service or not, default is true.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Stop(int id, bool del = true);
+    int Stop(int id, bool del = true, bool destroyComp = false);
 
     /**
      * Stop specified name service, like Remove(int id) method.
      * Note:
-     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *  1. Not allow to remove self thread drive's service, if try to call,
      *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
-     * @param[in] name - the service name.
-     * @param[in] del  - delete service or not, default is true.
+     * @param[in] name        - the service name.
+     * @param[in] del         - delete service or not, default is true.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Stop(const LLBC_CString &name, bool del = true);
+    int Stop(const LLBC_CString &name, bool del = true, bool destroyComp = false);
 
     /**
      * Stop all services.
      * Note:
-     *  1. Not allow to remove self thread drive's service, if try to call, 
+     *  1. Not allow to remove self thread drive's service, if try to call,
      *     it will return -1 and LLBC_GetLastError() return LLBC_ERROR_PERM.
-     * @param[in] del - delete service or not, default is true.
+     * @param[in] del         - delete service or not, default is true.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int StopAll(bool del = true);
+    int StopAll(bool del = true, bool destroyComp = false);
 
 public:
     /**
-     * Get all services(included not-start/starting/stoping status services).
-     * @return const Id2Services & - the services collections(indexed by service id).
+     * Get all services ids(included not-start/starting/stoping status services).
+     * @return std::vector<int> - the service ids collections.
      */
-    const Id2Services &GetAllIndexedByIdServices() const;
+    std::vector<int> GetAllServiceIds() const;
 
     /**
-     * Get all services(included not-start/starting/stoping status services).
-     * @return const Name2Services & - the services collections(indexed by service name).
+     * Get all service names(included not-start/starting/stoping status services).
+     * @return LLBC_Strings - the services names collections.
      */
-    const Name2Services &GetAllIndexedByNameServices() const;
+    LLBC_Strings GetAllServiceNames() const;
 
 private:
     /**
@@ -135,7 +138,7 @@ private:
     void OnServiceStop(LLBC_Service *svc);
 
 private:
-    int Stop(LLBC_Service *svc, bool del);
+    int Stop(LLBC_Service *svc, bool del, bool destroyComp);
 
     LLBC_Service *GetServiceNonLock(int id);
     LLBC_Service *GetServiceNonLock(const LLBC_CString &name);
@@ -145,7 +148,7 @@ private:
     static bool InTls(const Name2Services &svcs);
 
 private:
-    LLBC_SpinLock _lock;
+    mutable LLBC_SpinLock _lock;
 
     std::vector<LLBC_Service *> _serviceList;
     Id2Services _id2Services;

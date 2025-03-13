@@ -24,13 +24,14 @@
 
 #include "llbc/core/file/Directory.h"
 #include "llbc/core/helper/STLHelper.h"
-#include "llbc/core/config/Property.h"
+#include "llbc/core/config/Properties.h"
 #include "llbc/core/tinyxml2/tinyxml2.h"
 #include "llbc/core/utils/Util_Text.h"
 #include "llbc/core/utils/Util_Variant.h"
 
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
+#include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/LoggerConfigurator.h"
 
 __LLBC_NS_BEGIN
@@ -45,30 +46,27 @@ LLBC_LoggerConfigurator::~LLBC_LoggerConfigurator()
     LLBC_STLHelper::DeleteContainer(_configs);
 }
 
-int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
+int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath)
 {
     // Load config content.
     LLBC_Variant cfg;
-    const LLBC_String &ext = LLBC_Directory::SplitExt(cfgFile)[1].tolower();
+    const LLBC_String &ext = LLBC_Directory::SplitExt(cfgFilePath)[1].tolower();
     if (ext == ".cfg")
     {
-        LLBC_Property propCfg;
-        if (propCfg.LoadFromFile(cfgFile) != LLBC_OK)
+        if (LLBC_Properties::LoadFromFile(cfgFilePath, cfg) != LLBC_OK)
             return LLBC_FAILED;
-
-        LLBC_VariantUtil::Property2Variant(propCfg, cfg);
     }
     else if (ext == ".xml")
     {
         // Load xml file.
-        ::llbc::tinyxml2::XMLDocument xmlDoc;
-        const auto xmlLoadRet = xmlDoc.LoadFile(cfgFile.c_str());
-        if (xmlLoadRet != ::llbc::tinyxml2::XML_SUCCESS)
+        LLBC_TINYXML2_NS XMLDocument xmlDoc;
+        const auto xmlLoadRet = xmlDoc.LoadFile(cfgFilePath.c_str());
+        if (xmlLoadRet != LLBC_TINYXML2_NS XML_SUCCESS)
         {
             LLBC_String customErrStr;
             customErrStr.format("load log config file failed(xml format), "
                                 "file:%s, errno(tinyxml2:%d), error str:%s",
-                                cfgFile.c_str(), xmlLoadRet, xmlDoc.ErrorStr());
+                                cfgFilePath.c_str(), xmlLoadRet, xmlDoc.ErrorStr());
             LLBC_SetLastError(LLBC_ERROR_FORMAT, customErrStr.c_str());
             return LLBC_FAILED;
         }
@@ -125,23 +123,32 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFile)
         _configs.insert(std::make_pair(loggerName, info));
     }
 
+    // Save config file path.
+    _cfgFilePath = cfgFilePath;
+
     return LLBC_OK;
+}
+
+const LLBC_String &LLBC_LoggerConfigurator::GetConfigFilePath() const
+{
+    return _cfgFilePath;
 }
 
 bool LLBC_LoggerConfigurator::HasSharedAsyncLoggerConfigs() const
 {
-    std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator iter = _configs.begin();
-    for (; iter != _configs.end(); ++iter)
+    for (auto &configItem : _configs)
     {
-        if (iter->second->IsAsyncMode() && 
-            !iter->second->IsIndependentThread())
+        if (configItem.second->IsAsyncMode() && 
+            !configItem.second->IsIndependentThread())
             return true;
     }
 
     return false;
 }
 
-int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_LogRunnable *sharedLogRunnable, LLBC_Logger *logger) const
+int LLBC_LoggerConfigurator::Config(const LLBC_String &name,
+                                    LLBC_LogRunnable *sharedLogRunnable,
+                                    LLBC_Logger *logger) const
 {
     if (name.empty() || !logger)
     {
@@ -155,8 +162,8 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_LogRunnable *s
         return LLBC_FAILED;
     }
 
-    std::map<LLBC_String, LLBC_LoggerConfigInfo *>::const_iterator iter = _configs.find(name);
-    if (iter == _configs.end())
+    auto it = _configs.find(name);
+    if (it == _configs.end())
     {
         LLBC_LoggerConfigInfo *info = new LLBC_LoggerConfigInfo;
         if (info->Initialize(name, LLBC_Variant::nil, _rootConfig) != LLBC_OK)
@@ -166,10 +173,44 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name, LLBC_LogRunnable *s
         }
 
         LLBC_LoggerConfigurator *nonConstThis = const_cast<LLBC_LoggerConfigurator *>(this);
-        iter = nonConstThis->_configs.insert(std::make_pair(name, info)).first;
+        it = nonConstThis->_configs.insert(std::make_pair(name, info)).first;
     }
 
-    return logger->Initialize(iter->second, sharedLogRunnable);
+    return logger->Initialize(it->second, sharedLogRunnable);
+}
+
+int LLBC_LoggerConfigurator::ReConfig(LLBC_Logger *logger) const
+{
+    // Find logger config.
+    const auto it = _configs.find(logger->GetLoggerName());
+    if (it == _configs.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    // Re-Config Update appender(s):
+    const LLBC_LoggerConfigInfo *info = it->second;
+    for (int appenderType = LLBC_LogAppenderType::Begin;
+         appenderType != LLBC_LogAppenderType::Network; // Note: <Network> appender is not supported for now.
+         ++appenderType)
+    {
+        // - Appender log level:
+        //   Note: ignore appender not found error.
+        const auto appenderLogLevel = info->GetAppenderLogLevel(appenderType);
+        if (UNLIKELY(appenderLogLevel == LLBC_LogLevel::End &&
+                     LLBC_GetLastError() != LLBC_ERROR_SUCCESS))
+            return LLBC_FAILED;
+
+        if (logger->SetAppenderLogLevel(appenderType, appenderLogLevel) != LLBC_OK &&
+            LLBC_GetLastError() != LLBC_ERROR_NOT_FOUND)
+            return LLBC_FAILED;
+
+        // - Re-Config other appender attributes.
+        // ... ...
+    }
+    
+    return LLBC_OK;
 }
 
 const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &LLBC_LoggerConfigurator::GetAllConfigInfos() const

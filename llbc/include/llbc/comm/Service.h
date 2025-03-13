@@ -146,7 +146,7 @@ public:
     using LLBC_Task::Wait;
 
 public:
-    virtual ~LLBC_Service() = default;
+    ~LLBC_Service() override = default;
 
 public:
     /**
@@ -180,16 +180,10 @@ public:
     virtual int GetConfigType() const = 0;
 
     /**
-     * Get non-property type config.
-     * @return const LLBC_Variant & - the non-property application config.
+     * Get service config.
+     * @return const LLBC_Variant & - the service config.
      */
     virtual const LLBC_Variant &GetConfig() const = 0;
-
-    /**
-     * Get property type config.
-     * @return const LLBC_Property & - the property config.
-     */
-    virtual const LLBC_Property &GetPropertyConfig() const = 0;
 
     /**
      * Get full stack option.
@@ -233,9 +227,10 @@ public:
 
     /**
      * Stop the service.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return failed.
      */
-    virtual int Stop() = 0;
+    virtual int Stop(bool destroyComp = false) = 0;
 
 public:
     /**
@@ -606,18 +601,19 @@ public:
     virtual LLBC_ServiceEventFirer BeginFireEvent(int eventId) = 0;
 
     /**
-     * Add component event into service. Operated in the next service drive loop.
-     * @param[in] eventEnum
-     * @param[in] eventParams
-     */
-    virtual void AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams) = 0;
-
-public:
-    /**
      * Get event manager.
      * @return LLBC_EventMgr & - the event manager.
      */
     virtual LLBC_EventMgr &GetEventManager() = 0;
+
+public:
+    /**
+     * Add component event into service. Operated in the next service drive loop.
+     * @param[in] eventType   - the event type, see LLBC_ComponentEventType enum.
+     * @param[in] eventParams - the event params.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int AddComponentEvent(int eventType, const LLBC_Variant &eventParams) = 0;
 
 public:
     /**
@@ -666,14 +662,14 @@ public:
 
 protected:
     /**
-     * Get given component name.
-     * @param[in] qualifiedCompName - the qualified component name.
-     * @param[out] compName         - the component name.
-     * @param[out] compNameLen      - the component name length.
+     * Lock service.
      */
-    static void GetCompName(const char *qualifiedCompName,
-                            char (&compName)[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1],
-                            size_t &compNameLen);
+    virtual void LockService() = 0;
+
+    /**
+     * Unlock service.
+     */
+    virtual void UnlockService() = 0;
 
 protected:
     /**
@@ -714,12 +710,6 @@ protected:
 
 protected:
     /**
-     * Get component list.
-     */
-    virtual const std::vector<LLBC_Component *> &GetComponentList() const = 0;
-
-protected:
-    /**
      * Declare friend class: LLBC_Component.
      * Access method list:
      *     GetComponentList()
@@ -727,16 +717,9 @@ protected:
     friend class LLBC_Component;
 
     /**
-     * Declare friend class: LLBC_App.
-     *  Access method list:
-     *      ProcessAppConfigReload()
+     * Get component list.
      */
-    friend class LLBC_App;
-
-    /**
-     * Process application config reload event.
-     */
-    virtual void ProcessAppConfigReload() = 0;
+    virtual const std::vector<LLBC_Component *> &GetComponentList() const = 0;
 
 protected:
     /**

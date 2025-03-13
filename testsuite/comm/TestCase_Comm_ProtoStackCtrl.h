@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_ProtoStackCtrl : public LLBC_BaseTestCase
+class TestCase_Comm_ProtoStackCtrl final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Comm_ProtoStackCtrl();
-    virtual ~TestCase_Comm_ProtoStackCtrl();
+    ~TestCase_Comm_ProtoStackCtrl() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void TestCtrlScene(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData);

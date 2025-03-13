@@ -406,6 +406,7 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     right = right.AsDouble();
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
+    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
     std::cout <<std::endl;
 
     left = -15;
@@ -415,6 +416,7 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     right = right.AsDouble();
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right.BecomeDouble() <<std::endl;
+    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right.BecomeDouble() <<std::endl;
     std::cout <<std::endl;
 
     left = 3;
@@ -427,6 +429,8 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<(left *= right) <<std::endl;
     std::cout <<"[" <<left <<"] /= [" <<right <<"] = ";
     std::cout <<(left /= right) <<std::endl;
+    std::cout <<"[" <<left <<"] %= [" <<right <<"] = ";
+    std::cout <<(left %= right) <<std::endl;
     std::cout <<std::endl;
 
     left = "hello ";
@@ -435,6 +439,7 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
+    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
     std::cout <<std::endl;
 
     left = "he333llo";
@@ -443,11 +448,13 @@ void TestCase_Core_Variant::ArithmeticTest()
     std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
     std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
     std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
+    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
     std::cout <<std::endl;
     std::cout <<"[" <<right <<"] + [" <<left <<"] = " <<right + left <<std::endl;
     std::cout <<"[" <<right <<"] - [" <<left <<"] = " <<right - left <<std::endl;
     std::cout <<"[" <<right <<"] * [" <<left <<"] = " <<right * left <<std::endl;
     std::cout <<"[" <<right <<"] / [" <<left <<"] = " <<right / left <<std::endl;
+    std::cout <<"[" <<right <<"] % [" <<left <<"] = " <<right % left <<std::endl;
     std::cout <<std::endl;
 }
 
@@ -470,7 +477,8 @@ void TestCase_Core_Variant::PairTest()
 
     pa.first.clear();
     pa.second.clear();
-    pa = var2;
+    // For compatibility with vs2017
+    pa = static_cast<std::pair<std::vector<int>, std::map<int, int> >>(var2);
     std::cout << "Recover from Variant, pair.first:" << LLBC_Variant(pa.first)
         << ", pair.second:" << LLBC_Variant(pa.second) << std::endl;
 }
@@ -490,6 +498,23 @@ void TestCase_Core_Variant::SeqTest()
     seq1.SeqPushBack("Hello World");
     seq1.SeqPushBack(subSeq);
     std::cout << "seq1 data:" << seq1 << std::endl;
+
+    // Non-Const sequence subscript access test.
+    LLBC_Variant seqForSubscriptTest;
+    for (int i = 0; i < 10; ++i)
+        seqForSubscriptTest.SeqPushBack(i);
+    std::cout << "Before access <seqForSubscriptTest>:" << seqForSubscriptTest << std::endl;
+    std::cout << "Access <seqForSubscriptTest[10086]>:" << seqForSubscriptTest[10086] << std::endl;
+    std::cout << "After access <seqForSubscriptTest>, size:" << seqForSubscriptTest.Size() << std::endl;
+    ASSERT(seqForSubscriptTest[10086 - 1].IsNil());
+    ASSERT(seqForSubscriptTest.Size() == 10086 + 1 && seqForSubscriptTest[10085] == LLBC_Variant::nil);
+
+    // Const sequence subscript access test.
+    const LLBC_Variant constSeqForSubscriptTest;
+    std::cout << "Before access <constSeqForSubscriptTest>:" << constSeqForSubscriptTest << std::endl;
+    std::cout << "Access <constSeqForSubscriptTest[10086]>:" << constSeqForSubscriptTest[10086] << std::endl;
+    std::cout << "After access <constSeqForSubscriptTest>, size:" << constSeqForSubscriptTest.Size() << std::endl;
+    ASSERT(constSeqForSubscriptTest.IsNil() && constSeqForSubscriptTest.Size() == 0);
 
     // Assignment test.
     LLBC_Variant seq2 = seq1;
@@ -512,6 +537,7 @@ void TestCase_Core_Variant::SeqTest()
     std::cout << "left - right: " << left - right << std::endl;
     std::cout << "left * right: " << left * right << std::endl;
     std::cout << "left / right: " << left / right << std::endl;
+    std::cout << "left % right: " << left % right << std::endl;
 
     // Sequence + - * / non sequence test.
     LLBC_Variant seq10;

@@ -25,18 +25,14 @@ using namespace llbc;
 namespace
 {
 
-class TestCompA : public LLBC_Component
+class TestCompA final : public LLBC_Component
 {
 public:
-    virtual bool OnStart(bool &finished)
+    int OnStart(bool &finished) override
     {
         const LLBC_String compName = LLBC_GetTypeName(TestCompA);
         std::cout << "Comp " << compName << " start..." << std::endl;
         std::cout << "- Cfg:\n" << GetConfig().ToString().c_str() << std::endl;
-
-        LLBC_String propCfgCnt;
-        GetPropertyConfig().SaveToContent(propCfgCnt);
-        std::cout << "- PropCfg:\n" << propCfgCnt << std::endl;
 
         if (GetService()->GetName() == "TestSvc1")
         {
@@ -44,108 +40,80 @@ public:
             cfgReloadTimer_.Schedule(LLBC_TimeSpan::FromSeconds(10));
         }
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnStop(bool &finished)
+    void OnStop(bool &finished) override
     {
         cfgReloadTimer_.Cancel();
     }
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
-    {
-        switch(event)
-        {
-            case LLBC_ComponentEventType::AppCfgReload:
-            {
-                OnAppCfgReload();
-                break;
-            }
-            default: break;
-        }
-    }
-
-private:
-    void OnAppCfgReload()
+    void OnReload() override
     {
         std::cout << "[" << GetService()->GetName()
                   << "."
                   << LLBC_GetTypeName(*this)
                   << ", ptr:"
                   << this
-                  << "] Application config reload"
+                  << "] reload"
                   << std::endl;
         std::cout << "- CfgType:" << GetConfigType() << std::endl;
         std::cout << "- Cfg:\n" << GetConfig().ToString().c_str() << std::endl;
-
-        LLBC_String propCfgCnt;
-        GetPropertyConfig().SaveToContent(propCfgCnt);
-        std::cout << "- PropCfg:\n" << propCfgCnt << std::endl;
     }
 
+private:
     void OnTimeout_ReloadCfg(LLBC_Timer *timer)
     {
-        LLBC_App::ThisApp()->ReloadConfig();
+        LLBC_App::ThisApp()->Reload();
     }
 
 private:
     LLBC_Timer cfgReloadTimer_;
 };
 
-class TestCompB : public LLBC_Component
+class TestCompB final : public LLBC_Component
 {
 public:
-    virtual bool OnStart(bool &finished)
+    int OnStart(bool &finished) override
     {
         const LLBC_String compName = LLBC_GetTypeName(TestCompB);
         std::cout << "Comp " << compName << " start..." << std::endl;
         std::cout << "- Cfg:\n" << GetConfig().ToString().c_str() << std::endl;
 
-        LLBC_String propCfgCnt;
-        GetPropertyConfig().SaveToContent(propCfgCnt);
-        std::cout << "- PropCfg:\n" << propCfgCnt << std::endl;
-
-        return true;
+        return LLBC_OK;
     }
 };
 
-class TestApp : public LLBC_App
+class TestApp final : public LLBC_App
 {
 public:
     TestApp(LLBC_TimeSpan startNeedTime, LLBC_TimeSpan stopNeedTime)
     : _startNeedTime(startNeedTime)
     , _stopNeedTime(stopNeedTime)
+    , _lastRunTime(0)
     {
     }
 
-    virtual ~TestApp()
+    ~TestApp() override
     {
         Stop();
     }
 
 public:
-    virtual int OnEarlyStart(int argc, char *argv[])
+    int OnEarlyStart(int argc, char *argv[], bool &finished) override
     {
         if (HasConfig())
         {
             std::cout << "App has config" << std::endl;
+            std::cout << "- cfg type:" << GetConfigType() << std::endl;
             std::cout << "- cfg path:" << GetConfigPath() << std::endl;
-            if (GetConfigType() == LLBC_AppConfigType::Property)
-            {
-                LLBC_String propCnt;
-                GetPropertyConfig().SaveToContent(propCnt);
-                std::cout << "- cfg cnt:" << propCnt << std::endl;
-            }
-            else
-            {
-                std::cout << "- cfg cnt:" << GetConfig().ToString() << std::endl;
-            }
+            std::cout << "- cfg cnt:" << GetConfig().ToString() << std::endl;
         }
 
         return LLBC_OK;
     }
 
-    virtual int OnStart(int argc, char *argv[], bool &startFinished)
+    int OnStart(int argc, char *argv[], bool &startFinished) override
     {
         if (_startTime == LLBC_Time::utcBegin)
         {
@@ -157,11 +125,11 @@ public:
         if (cost < _startNeedTime)
         {
             startFinished = false;
-            std::cout <<"App " <<GetName() << " starting, cost:" <<cost <<std::endl;
+            // std::cout <<"App " << GetName() << " starting, cost:" << cost <<std::endl;
             return LLBC_OK;
         }
 
-        std::cout <<"App " <<GetName() <<"start finished" <<std::endl;
+        std::cout <<"App " << GetName() << "start finished" <<std::endl;
 
         // Create services.
         std::cout << "Create service <TestSvc1>..." << std::endl;
@@ -169,17 +137,27 @@ public:
         svc1->AddComponent(new TestCompA);
         svc1->AddComponent(new TestCompB);
         svc1->Start();
+        std::cout << "- TestSvc1 started, fps:" << svc1->GetFPS()
+                  << ", interval:" << svc1->GetFrameInterval() << std::endl;
 
         std::cout << "Create service <TestSvc2>..." << std::endl;
         auto svc2 = LLBC_Service::Create("TestSvc2");
         svc2->AddComponent(new TestCompA);
         svc2->AddComponent(new TestCompB);
         svc2->Start();
+        std::cout << "- TestSvc2 started, fps:" << svc2->GetFPS()
+                  << ", interval:" << svc2->GetFrameInterval() << std::endl;
 
         return LLBC_OK;
     }
 
-    virtual void OnStop(bool &stopFinished)
+    void OnLateStart(int argc, char *argv[]) override
+    {
+        std::cout << "App " <<GetName() <<"late start finished" <<std::endl;
+        _lastRunTime = LLBC_GetMilliseconds();
+    }
+
+    void OnStop(bool &stopFinished) override
     {
         if (_stopTime == LLBC_Time::utcBegin)
             _stopTime = LLBC_Time::Now();
@@ -188,7 +166,7 @@ public:
         if (cost < _stopNeedTime)
         {
             stopFinished = false;
-            std::cout <<"App " <<GetName() <<" stopping, cost:" <<cost <<std::endl;
+            // std::cout <<"App " <<GetName() <<" stopping, cost:" <<cost <<std::endl;
         }
         else
         {
@@ -196,10 +174,12 @@ public:
         }
     }
 
-    virtual void OnUpdate(bool &doNothing)
+    void OnUpdate() override
     {
-        std::cout <<"TestApp::OnUpdate()..." <<std::endl;
-        LLBC_Sleep(500);
+        sint64 now = LLBC_GetMilliseconds();
+        std::cout <<"TestApp::OnUpdate()... interval:" << now - _lastRunTime <<std::endl;
+        _lastRunTime = now;
+        LLBC_Sleep(13);
     }
 
 private:
@@ -207,6 +187,7 @@ private:
     LLBC_Time _stopTime;
     LLBC_TimeSpan _startNeedTime;
     LLBC_TimeSpan _stopNeedTime;
+    sint64 _lastRunTime;
 };
 
 }
@@ -226,8 +207,11 @@ int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
 
     // Set config path.
     // If not specific config path, application will auto reload config(order Ini->Cfg->Xml).
-    // app.SetConfigPath("./AppCfgTest.ini");
+    // - ini format config.
+    app.SetConfigPath("./AppCfgTest.ini");
+    // - properties format config.
     // app.SetConfigPath("./AppCfgTest.cfg");
+    // - xml format config.
     // app.SetConfigPath("./AppCfgTest.xml");
 
     // Startup app object.

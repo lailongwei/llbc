@@ -24,15 +24,15 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Config_Property : public LLBC_BaseTestCase
+class TestCase_Core_Algo_Hash final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Config_Property();
-    ~TestCase_Core_Config_Property();
+    TestCase_Core_Algo_Hash();
+    ~TestCase_Core_Algo_Hash() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
-    LLBC_String _file;
+    int SimpleTest();
 };

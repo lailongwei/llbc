@@ -53,13 +53,64 @@ local llbc_ccpp_compile_toolset = nil -- nil/''/gcc/clang/msc/custom_ccpp_toolse
 -- set custom compile toolset, if <llbc_ccpp_compile_toolset> set to 'custom_ccpp_toolset'.
 -- set_custom_ccpp_toolset('<path to ccpp compiler toolset bin path>')
 
--- windows platform flag.
-local llbc_is_windows_platform = string.match(_ACTION, 'vs') ~= nil
+-- determine system type.
+local llbc_system_types = {
+    ['windows'] = 'windows',
+    ['linux'] = 'linux',
+    ['darwin'] = 'darwin',
+    ['unknown'] = 'unknown',
+}
+
+local llbc_system_type = llbc_system_types.unknown
+if _ACTION:match('vs') then
+    llbc_system_type = llbc_system_types.windows
+else
+    local sys_name = string.lower(os_capture('uname'))
+    if sys_name:match('^linux') ~= nil then
+        llbc_system_type = llbc_system_types.linux
+    elseif sys_name:match('^darwin') ~= nil then
+        llbc_system_type = llbc_system_types.darwin
+    else
+        llbc_system_type = llbc_system_types.unknown
+    end
+end
+
+if llbc_system_type == llbc_system_types.unknown then
+    error('Unsupported system, for now, llbc framework supported systems: windows/linux(and linux like)/darwin')
+end
+
+-- determine architecture type.
+local llbc_arch_types = {
+    ['x86'] = 'x86',
+    ['arm'] = 'ARM',
+    ['unknown'] = 'unknown',
+}
+
+local llbc_arch_type = llbc_arch_types.x86
+if llbc_system_type ~= llbc_system_types.windows then
+    local machine_arch = os_capture('uname -m'):lower()
+    if machine_arch:sub(1, #'x86') == 'x86' then
+        llbc_arch_type = llbc_arch_types.x86
+    elseif machine_arch:sub(1, #'arm') == 'arm' then
+        llbc_arch_type = llbc_arch_types.arm
+    else
+        llbc_arch_type = llbc_arch_types.unknown
+    end
+end
+if llbc_arch_type == llbc_arch_types.unknown then
+    error('Unsupported architecture, for now, llbc framework supported systems: x86/ARM')
+end
+
+local llbc_arch_connect_char = '_'
+if llbc_arch_type == llbc_arch_types.arm then
+    llbc_arch_connect_char = ''
+end
 
 ---- solution/projects path.
 llbc_sln_path = "../.."
 llbc_core_lib_path = llbc_sln_path .. "/llbc"
 llbc_testsuite_path = llbc_sln_path .. "/testsuite"
+llbc_quick_start_path = llbc_sln_path .. "/quick_start"
 llbc_wraps_path = llbc_sln_path .. "/wrap"
 llbc_py_wrap_path = llbc_wraps_path .. "/pyllbc"
 llbc_lu_wrap_path = llbc_wraps_path .. "/lullbc"
@@ -67,12 +118,17 @@ llbc_cs_wrap_path = llbc_wraps_path .. "/csllbc"
 
 -- python exec path.
 local llbc_py_exec_path
-if llbc_is_windows_platform then
+if llbc_system_type == llbc_system_types.windows then
     llbc_py_exec_path = "$(ProjectDir)../../tools/py.exe"
 else
     local output = os_capture("python --version")
     if output:find("command not found") then
-        error("python command not found")
+        output = os_capture("python3 --version")
+        if output:find("command not found") then
+            error("python command not found")
+        else
+            llbc_py_exec_path="python3"
+        end
     else
         llbc_py_exec_path = "python"
     end
@@ -81,7 +137,7 @@ end
 -- All libraries output directory.
 local llbc_output_dir
 local llbc_output_base_dir = llbc_sln_path .. "/output/" .. _ACTION
-if llbc_is_windows_platform then
+if llbc_system_type == llbc_system_types.windows then
     llbc_output_dir = llbc_output_base_dir .. "/$(Configuration)"
 else
     llbc_output_dir = llbc_output_base_dir .. "/$(config)"
@@ -93,8 +149,12 @@ local llbc_wrap_testsuite_output_dir = llbc_output_dir .. '/wrap_testsuites'
 -- building script directory.
 local llbc_building_script_dir = llbc_sln_path .. "/tools/building_script"
 
--- #########################################################################
+-- Before gen Makefiles, dump system & architecture info.
+print(string.format(
+    '-------- system type: %s, arch type: %s --------', llbc_system_type, llbc_arch_type))
 
+-- #########################################################################
+-- llbc workspace define.
 workspace ("llbc_" .. _ACTION)
     -- location define.
     location (llbc_sln_path .. "/build/" .. _ACTION)
@@ -108,10 +168,9 @@ workspace ("llbc_" .. _ACTION)
 
     -- architecture.
     filter { "configurations:*32" }
-        architecture "x86"
-    filter {}
+        architecture(llbc_arch_type)
     filter { "configurations:*64" }
-        architecture "x86_64"
+        architecture(llbc_arch_type .. llbc_arch_connect_char .. '64')
     filter {}
 
     -- not use cxx11 abi.
@@ -128,6 +187,9 @@ workspace ("llbc_" .. _ACTION)
         }
         filter {}
     end
+
+    -- set C++ standard as C++17
+    cppdialect "C++17"
 
     -- defines.
     filter { "configurations:debug*" }
@@ -248,10 +310,10 @@ project "llbc"
         }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
-            "-std=c++11",
+            "-std=c++17",
         }
     filter {}
 
@@ -267,15 +329,58 @@ project "llbc"
     local prebuild_cmd = string.format('%s %s %%s %%s %s',
                                        llbc_py_exec_path, prebuild_script, _ACTION)
     filter { "configurations:debug32" }
-    prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
     filter { "configurations:release32" }
-    prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
     filter { "configurations:debug64" }
-    prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
     filter { "configurations:release64" }
-    prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
 
+-- llbc project fast include function.
+function include_llbc_core_lib()
+    -- includedirs.
+    includedirs {
+        llbc_core_lib_path .. "/include",
+    }
+
+    -- links.
+    libdirs { llbc_output_dir }
+    filter { "system:linux" }
+        links {
+            "dl",
+			"pthread",
+        }
+
+    filter { "system:not windows", "configurations:debug*" }
+        links {
+            "llbc_debug",
+        }
+
+    filter { "system:not windows", "configurations:release*" }
+        links {
+            "llbc",
+        }
+
+    filter { "system:windows" }
+        links {
+            "ws2_32",
+        }
+
+    filter { "system:windows", "configurations:debug*" }
+        links {
+            "libllbc_debug",
+        }
+
+    filter { "system:windows", "configurations:release*" }
+        links {
+            "libllbc",
+        }
+    filter {}
+end
+
+group "tests"
 -- ****************************************************************************
 -- core library testsuite compile setting.
 project "testsuite"
@@ -302,55 +407,18 @@ project "testsuite"
         llbc_testsuite_path .. "/**.ini",
     }
 
-    -- includedirswrap\csllbc\csharp\script_tools.
+    -- include llbc core lib.
+    include_llbc_core_lib()
+
+    -- includedirs.
     includedirs {
-        llbc_core_lib_path .. "/include",
         llbc_testsuite_path,
     }
 
-    -- links.
-    libdirs { llbc_output_dir }
-    filter { "system:linux" }
-        links {
-            "dl",
-			"pthread",
-        }
-    filter {}
-
-    filter { "system:not windows", "configurations:debug*" }
-        links {
-            "llbc_debug",
-        }
-    filter {}
-
-    filter { "system:not windows", "configurations:release*" }
-        links {
-            "llbc",
-        }
-    filter {}
-
-    filter { "system:windows" }
-        links {
-            "ws2_32",
-        }
-    filter {}
-
-    filter { "system:windows", "configurations:debug*" }
-        links {
-            "libllbc_debug",
-        }
-    filter {}
-
-    filter { "system:windows", "configurations:release*" }
-        links {
-            "libllbc",
-        }
-    filter {}
-
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
-            "-std=c++11",
+            "-std=c++17",
         }
     filter {}
 
@@ -360,10 +428,12 @@ project "testsuite"
     -- Copy all testcases config files to output directory.
     postbuildmessage("Copying all testcase config files to output directory...");
     local test_cfgs = {
-        "core/config/IniTestCfg.ini",
+        "core/config/test_ini.ini",
+        "core/config/test_prop.properties",
         "core/log/LogTestCfg.cfg",
         "core/log/LogTestCfg.xml",
         "app/AppCfgTest.cfg",
+        "app/AppCfgTest.properties",
         "app/AppCfgTest.ini",
         "app/AppCfgTest.xml",
     }
@@ -381,8 +451,51 @@ project "testsuite"
         end
     filter {}
 
-group "wrap"
+-- ****************************************************************************
+-- quick start project compile setting.
+project "quick_start"
+    -- laugnage, kind.
+    language "c++"
+    kind "ConsoleApp"
 
+    -- toolset.
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
+
+    -- dependents.
+    dependson {
+        "llbc",
+    }
+
+    -- files.
+    files {
+        llbc_quick_start_path .. "/**.h",
+        llbc_quick_start_path .. "/**.cpp",
+        llbc_quick_start_path .. "/**.xml",
+        llbc_quick_start_path .. "/**.cfg",
+        llbc_quick_start_path .. "/**.ini",
+    }
+
+    -- include llbc core lib.
+    include_llbc_core_lib()
+
+    -- includedirs.
+    includedirs {
+        llbc_quick_start_path,
+    }
+
+    -- Enable c++17 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++17",
+        }
+    filter {}
+
+    -- Specific debug directory.
+    debugdir(llbc_output_dir)
+
+group "wrap"
 -- ****************************************************************************
 -- python wrap library(pyllbc) compile setting.
 -- import pylib_setting.
@@ -446,17 +559,17 @@ project "pyllbc"
     local postbuild_cmd = string.format('%s %s %%s %%s %s',
                                         llbc_py_exec_path, postbuild_script, _ACTION)
     filter { "configurations:debug32" }
-    prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
-    postbuildcommands { string.format(postbuild_cmd, 'x86', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'debug') }
     filter { "configurations:release32" }
-    prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
-    postbuildcommands { string.format(postbuild_cmd, 'x86', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'release') }
     filter { "configurations:debug64" }
-    prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
-    postbuildcommands { string.format(postbuild_cmd, 'x64', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
     filter { "configurations:release64" }
-    prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
-    postbuildcommands { string.format(postbuild_cmd, 'x64', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
 
     -- target name, target prefix, extension.
@@ -493,9 +606,15 @@ project "pyllbc"
     -- link cpython lib.
     -- local py_ver_str = os_capture('python --version')
     -- local py_ver_match_str = '(%w+ )(%d+).(%d+).(%d+)'
+    local py_ver_str = '2.7.18'
     local cpython_readme_file = io.open(llbc_py_wrap_path .. '/cpython/README', 'r')
-    local py_ver_str = cpython_readme_file:read()
-    cpython_readme_file:close()
+    if not cpython_readme_file then
+        io.stderr:write(string.format('Could not open cpython README file, set set python version to:%s\n', py_ver_str))
+    else
+        py_ver_str = cpython_readme_file:read()
+        cpython_readme_file:close()
+    end
+
     local py_ver_match_str = '(.*)(%d+).(%d+).(%d+).*'
     local py_major_ver = string.gsub(py_ver_str, py_ver_match_str, '%2')
     local py_minor_ver = string.gsub(py_ver_str, py_ver_match_str, '%3')
@@ -508,10 +627,11 @@ project "pyllbc"
         links { string.format("python%s.%s", py_major_ver, py_minor_ver) }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows", "language:c++" }
         buildoptions {
-            "-std=c++11"
+            "-std=c++17",
+            "-Wno-register"
         }
     filter {}
 
@@ -519,6 +639,7 @@ project "pyllbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-Wno-error=register",
         }
     filter {}
 
@@ -585,10 +706,10 @@ project "csllbc_native"
         }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
-            "-std=c++11",
+            "-std=c++17",
         }
     filter {}
 
@@ -775,23 +896,23 @@ project "lullbc_luaexec"
 
     filter { "system:not windows" }
         links { "dl" }
-    filter {}
-
     filter { "configurations:debug*", "system:windows" }
         links { "liblua_debug" }
-    filter {}
     filter { "configurations:release*", "system:windows" }
         links { "liblua" }
-    filter {}
     filter { "configurations:debug*", "system:not windows" }
         links { "lua_debug" }
-    filter {}
     filter { "configurations:release*", "system:not windows" }
         links { "lua" }
     filter {}
  
     -- target name, target prefix.
     targetname "lua"
+
+    -- for macosx, fix premake5 not auto add @rpath bug.
+    filter { "system:macosx" }
+        runpathdirs { "@loader_path/." }
+    filter {}
 
 -- lua wrap library(lullbc) compile setting.
 -- import lualib_setting.
@@ -854,17 +975,17 @@ project "lullbc"
     local prebuild_cmd = string.format('%s %s %%s %%s %s', llbc_py_exec_path, prebuild_script, _ACTION)
     local postbuild_cmd = string.format('%s %s %%s %%s %s', llbc_py_exec_path, postbuild_script, _ACTION)
     filter { "configurations:debug32" }
-        prebuildcommands { string.format(prebuild_cmd, 'x86', 'debug') }
-        postbuildcommands { string.format(postbuild_cmd, 'x86', 'debug') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'debug') }
     filter { "configurations:release32" }
-        prebuildcommands { string.format(prebuild_cmd, 'x86', 'release') }
-        postbuildcommands { string.format(postbuild_cmd, 'x86', 'release') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'release') }
     filter { "configurations:debug64" }
-        prebuildcommands { string.format(prebuild_cmd, 'x64', 'debug') }
-        postbuildcommands { string.format(postbuild_cmd, 'x64', 'debug') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
     filter { "configurations:release64" }
-        prebuildcommands { string.format(prebuild_cmd, 'x64', 'release') }
-        postbuildcommands { string.format(postbuild_cmd, 'x64', 'release') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
 
     -- target name, target prefix, extension.
@@ -910,10 +1031,10 @@ project "lullbc"
         }
     filter {}
 
-    -- Enable c++11 support.
+    -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
-            "-std=c++11",
+            "-std=c++17",
         }
     filter {}
 

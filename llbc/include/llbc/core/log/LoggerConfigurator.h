@@ -48,9 +48,16 @@ public:
 public:
     /**
      * Initialize logger configurator by cfg file.
+     * @param[in] cfgFilePath - the config file path.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_String &cfgFile);
+    int Initialize(const LLBC_String &cfgFilePath);
+
+    /**
+     * @brief Get the config file path.
+     * @return const LLBC_String & - the config file path. 
+     */
+    const LLBC_String &GetConfigFilePath() const;
 
     /**
      * Check has any shared async loggers or not.
@@ -67,6 +74,13 @@ public:
      */
     int Config(const LLBC_String &name, LLBC_LogRunnable *sharedLogRunnable, LLBC_Logger *logger) const;
 
+    /**
+     * @brief Re-Config given logger.
+     * @param[in] logger - will config logger.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int ReConfig(LLBC_Logger *logger) const;
+
 public:
     /**
      * Get all config infos.
@@ -75,6 +89,7 @@ public:
     const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &GetAllConfigInfos() const;
 
 private:
+    LLBC_String _cfgFilePath;
     LLBC_LoggerConfigInfo *_rootConfig;
     std::map<LLBC_String, LLBC_LoggerConfigInfo *> _configs;
 };

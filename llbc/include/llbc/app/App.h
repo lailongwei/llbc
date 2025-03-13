@@ -53,11 +53,11 @@ public:
     };
 
     /**
-     * Get appliation config suffix.
+     * Get appliation config suffixes.
      * @param[in] cfgType - the application config type.
-     * @return const LLBC_String & - the config suffix.
+     * @return const LLBC_Strings & - the config suffixex.
      */
-    static const LLBC_String &GetConfigSuffix(int cfgType);
+    static const LLBC_Strings &GetConfigSuffixes(int cfgType);
 
     /**
      * Get config type. 
@@ -78,7 +78,7 @@ public:
         // llbc library event enumeration range[0,100).
         LibBegin = 0,
         Stop = LibBegin, // Application stop event.
-        ReloadApplicationConfig, // Application config reload event.
+        Reload, // Application reload event.
         LibEnd = 100,
 
         // Logic event enumeration range[100, 100000).
@@ -133,7 +133,7 @@ public:
      * @param[in] argv - the application startup arguments.
      * @return int - return 0 if start success, otherwise return -1.
      */
-    virtual int OnEarlyStart(int argc, char *argv[]);
+    virtual int OnEarlyStart(int argc, char *argv[], bool &earlyStartFinished) { return LLBC_OK; }
 
     /**
      * Application start event method, please override this method in your project.
@@ -149,12 +149,12 @@ public:
      * @param[in] argc - the application startup arguments count.
      * @param[in] argv - the application startup arguments.
      */
-    virtual void OnLateStart(int argc, char *argv[]);
+    virtual void OnLateStart(int argc, char *argv[]) {  }
 
     /**
      * Application will stop event method, when application will stop, will call this event method.
      */
-    virtual void OnEarlyStop();
+    virtual void OnEarlyStop(bool &earlyStopFinished) {  }
 
     /**
      * Application stop event method, please override this method in your project.
@@ -165,18 +165,17 @@ public:
     /**
      * Application stop finish event method, when application stop finish, will call this event method.
      */
-    virtual void OnLateStop();
+    virtual void OnLateStop() {  }
 
     /**
      * Application main-loop event method, when application running, will call this event method per-tick.
-     * @param[out] doNothing - if event method do nothing, set to true(default is true), otherwise set to false.
      */
-    virtual void OnUpdate(bool &doNothing);
+    virtual void OnUpdate() {  }
 
     /**
-     * Application config reloaded event method, please override this method in your project.
+     * Application reloaded event method, please override this method in your project.
      */
-    virtual void OnConfigReload();
+    virtual void OnReload() {  }
 
 public:
     /**
@@ -184,63 +183,8 @@ public:
      * @return App * - this application.
      */
     template <typename App>
-    static App *ThisApp();
-    static LLBC_App *ThisApp();
-
-public:
-    /**
-     * Check have application config or not.
-     * @return bool - return true if has config, otherwise return false.
-     */
-    bool HasConfig() const;
-
-    /**
-     * Get non-property type config.
-     * @return const LLBC_Variant & - the non-property application config.
-     */
-    const LLBC_Variant &GetConfig() const;
-
-    /**
-     * Get property type config.
-     * @return const LLBC_Property & - the property config.
-     */
-    const LLBC_Property &GetPropertyConfig() const;
-
-    /**
-     * Get application config type.
-     * @return LLBC_AppConfigType::ENUM - application config type.
-     */
-    LLBC_AppConfigType::ENUM GetConfigType() const;
-
-    /**
-     * Get application config path.
-     * @return const LLBC_String & - the application config path.
-     */
-    const LLBC_String &GetConfigPath() const;
-
-    /**
-     * Set application config path.
-     * @param[in] cfgPath - the config path.
-     * @return int - return 0 if success, other return -1.
-     */
-    int SetConfigPath(const LLBC_String &cfgPath);
-
-    /**
-     * Reload application config.
-     * @param[in] callEvMeth - specific call event method when reload success or not.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int ReloadConfig(bool callEvMeth = true);
-
-    /**
-     * Prevent application config load.
-     */
-    void PreventConfigLoad();
-
-    /**
-     * Cancel prevent application config load.
-     */
-    void CancelPreventConfigLoad();
+    static App *ThisApp() { return static_cast<App *>(_thisApp); }
+    static LLBC_App *ThisApp() { return _thisApp; }
 
 public:
     /**
@@ -269,7 +213,81 @@ public:
      * Get application start phase.
      * @return int - the application start phase.
      */
-    int GetStartPhase() const;
+    int GetStartPhase() const { return _startPhase; }
+
+    /**
+     * Get application FPS.
+     * @return int - the application FPS.
+     */
+    int GetFPS() const;
+
+    /**
+     * Set application FPS.
+     * @return int - return 0 if success, ohterwise return -1.
+     */
+    int SetFPS(int fps);
+
+    /**
+     * Get application frame interval, in milli-seconds.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int GetFrameInterval() const;
+
+public:
+    /**
+     * Check have application config or not.
+     * @return bool - return true if has config, otherwise return false.
+     */
+    bool HasConfig() const;
+
+    /**
+     * Get application config.
+     * @return LLBC_Variant - the application config.
+     */
+    LLBC_Variant GetConfig() const;
+
+    /**
+     * Get application config(thread unsafety).
+     * @return const LLBC_Variant & - the application config.
+     */
+    const LLBC_Variant &GetConfigUnsafe() const { return _cfg; }
+
+    /**
+     * Get application config type.
+     * @return LLBC_AppConfigType::ENUM - application config type.
+     */
+    LLBC_AppConfigType::ENUM GetConfigType() const { return _cfgType; }
+
+    /**
+     * Get application config path.
+     * @return const LLBC_String & - the application config path.
+     */
+    LLBC_String GetConfigPath() const;
+
+    /**
+     * Set application config path.
+     * @param[in] cfgPath - the config path.
+     * @return int - return 0 if success, other return -1.
+     */
+    int SetConfigPath(const LLBC_String &cfgPath);
+
+    /**
+     * Reload application.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Reload();
+
+    /**
+     * Prevent application reload.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int PreventReload();
+
+    /**
+     * Cancel prevent application reload.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int CancelPreventReload();
 
 public:
     /**
@@ -299,13 +317,13 @@ public:
      * Get application name.
      * @return const LLBC_String & - application name.
      */
-    const LLBC_String &GetName() const;
+    const LLBC_String &GetName() const { return _name; }
 
     /**
      * Get startup arguments.
      * @return const LLBC_StartArgs & - the startup arguments(llbc library wrapped object const reference).
      */
-    const LLBC_StartArgs &GetStartArgs() const;
+    const LLBC_StartArgs &GetStartArgs() const { return _startArgs; }
 
 public:
     /**
@@ -323,18 +341,20 @@ public:
 
     /**
      * Stop service by service Id.
-     * @param[in] id  - service Id.
-     * @param[in] del - delete service or not, default is true.
+     * @param[in] id          - service Id.
+     * @param[in] del         - delete service or not, default is true.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int StopService(int id, bool del = true);
+    int StopService(int id, bool del = true, bool destroyComp = false);
     /**
      * Stop service by service name.
-     * @param[in] name - service name.
-     * @param[in] del  - delete service or not, default is true.
+     * @param[in] name        - service name.
+     * @param[in] del         - delete service or not, default is true.
+     * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int StopService(const LLBC_CString &name, bool del = true);
+    int StopService(const LLBC_CString &name, bool del = true, bool destroyComp = false);
 
 private:
     /**
@@ -346,56 +366,60 @@ private:
     static LLBC_String LocateConfigPath(const LLBC_String &appName, int &cfgType);
 
     /**
-     * Reload application config.
+     * Application reload implement method.
+     * @param[in] checkAppStarted - Check Application started flag.
+     * @param[in] callEvMeth      - Call event method flag.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int LoadConfig(bool lock);
-    int LoadIniConfig();
-    int LoadXmlConfig();
-    int LoadPropertyConfig();
+    int ReloadImpl(bool checkAppStarted, bool callEvMeth);
+
+    /**
+     * Load/Reload application config.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int ReloadConfig();
+    int ReloadIniConfig();
+    int ReloadXmlConfig();
+    int ReloadPropertyConfig();
 
 private:
-    void HandleEvents(bool &doNothing);
+    void HandleEvents();
     void HandleEvent_Stop(const LLBC_AppEvent &ev);
-    void HandleEvent_ReloadAppCfg(const LLBC_AppEvent &ev);
+    void HandleEvent_Reload(const LLBC_AppEvent &ev);
 
     static void HandleSignal_Stop(int sig);
-    static void HandleSignal_ReloadAppCfg(int sig);
+    static void HandleSignal_Reload(int sig);
 
 private:
-    void FireAppPhaseChangeEvToServices(bool earlyStart,
-                                        bool startFail,
-                                        bool startFinish,
-                                        bool earlyStop);
-
-protected:
-    LLBC_String _name;
-    volatile int _startPhase;
-
-    bool _llbcLibStartupInApp;
-
-    LLBC_SpinLock _cfgLock;
-    volatile bool _loadingCfg;
-    volatile int _preventCfgLoad;
-    LLBC_Property _propCfg;
-    LLBC_Variant _nonPropCfg;
-    LLBC_String _cfgPath;
-    LLBC_AppConfigType::ENUM _cfgType;
-
-    LLBC_ServiceMgr &_services;
+    void FireAppPhaseChangeEvToServices(bool willStart,
+                                        bool startFailed,
+                                        bool startFinished,
+                                        bool willStop);
 
 private:
-    volatile LLBC_ThreadId _startThreadId;
-    LLBC_StartArgs _startArgs;
+    // Application core data members.
+    static LLBC_App *_thisApp; //!!! application singleton instance.
+    LLBC_String _name; // Application name.
+    volatile int _fps; // Application FPS.
+    volatile int _startPhase; // Application start phase.
+    LLBC_StartArgs _startArgs; // Application start args.
+    volatile LLBC_ThreadId _startThreadId; // Call Start() thread Id.
+    bool _llbcLibStartupInApp; // llbc library startup in App flag.
+    bool _requireStop; // Stop flag, when App processed Stop event, will set to true.
+    LLBC_ServiceMgr &_services; // Service manager.
 
-    bool _requireStop;
+    // Load/Reload data members.
+    volatile int _loading; // Loading flag.
+    mutable LLBC_SpinLock _loadLock; // Load lock.
+    LLBC_Variant _cfg; // Config.
+    LLBC_String _cfgPath; // Application config path.
+    LLBC_AppConfigType::ENUM _cfgType; // Application config type.
 
-    LLBC_SpinLock _eventLock;
-    std::vector<LLBC_AppEvent *> _events[2];
-    std::map<int, LLBC_Delegate<void(const LLBC_AppEvent &)> > _libEventHandlers;
-    std::map<int, LLBC_Delegate<void(const LLBC_AppEvent &)> > _logicEventHandlers;
-
-    static LLBC_App *_thisApp;
+    // Event & Event handle data members.
+    LLBC_SpinLock _eventLock; // event lock.
+    std::vector<LLBC_AppEvent *> _events[2]; // Waiting for handle events.
+    std::map<int, LLBC_Delegate<void(const LLBC_AppEvent &)> > _libEventHandlers; // Library level event handlers.
+    std::map<int, LLBC_Delegate<void(const LLBC_AppEvent &)> > _logicEventHandlers; // Logic level event handlers.
 };
 
 __LLBC_NS_END

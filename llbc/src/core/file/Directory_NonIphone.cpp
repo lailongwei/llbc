@@ -82,8 +82,7 @@ LLBC_String LLBC_Directory::HomeDir()
 
 #if LLBC_TARGET_PLATFORM_WIN32
     const size_t pathLen = path.length();
-    if (path[pathLen - 1] == LLBC_SLASH_A ||
-        path[pathLen - 1] == LLBC_BACKLASH_A)
+    if (path[pathLen - 1] == '/' || path[pathLen - 1] == '\\')
     {
         if (pathLen == 3 &&
             LLBC_String::isalpha(path[0]) &&
@@ -98,7 +97,7 @@ LLBC_String LLBC_Directory::HomeDir()
     }
 #else // Non-Win32
     const size_t pathLen = path.length();
-    if (path[pathLen - 1] == LLBC_SLASH_A)
+    if (path[pathLen - 1] == '/')
     {
         if (pathLen == 1)
             return path;
@@ -135,7 +134,7 @@ LLBC_String LLBC_Directory::TempDir()
     LLBC_String path = buf;
     free(buf);
 
-    if (path[path.length() - 1] == LLBC_BACKLASH_A)
+    if (path[path.length() - 1] == '\\')
         return path.substr(0, path.length() - 1);
     
     return path;

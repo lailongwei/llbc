@@ -36,7 +36,7 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-void LLBC_SeedRand(int seed)
+void LLBC_SeedRand(uint32 seed)
 {
     LLBC_LockGuard guard(LLBC_INL_NS __g_randomLock);
     LLBC_INL_NS __g_random.Seed(seed);

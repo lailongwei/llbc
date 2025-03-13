@@ -236,7 +236,7 @@ public:
     template <typename _Key, typename _Val>
     explicit LLBC_Variant(const std::unordered_map<_Key, _Val> &um);
     LLBC_Variant(const LLBC_Variant &var);
-    LLBC_Variant(LLBC_Variant &&var);
+    LLBC_Variant(LLBC_Variant &&var) noexcept;
 
 public:
     // Fetch variant data type and holder data.
@@ -485,7 +485,7 @@ public:
     template <typename _Key, typename _Val>
     LLBC_Variant &operator=(const std::map<_Key, _Val> &m);
     LLBC_Variant &operator=(const LLBC_Variant &var);
-    LLBC_Variant &operator=(LLBC_Variant &&var);
+    LLBC_Variant &operator=(LLBC_Variant &&var) noexcept;
 
     // Relational operators.
     bool operator==(const LLBC_Variant &another) const;
@@ -516,11 +516,13 @@ public:
     LLBC_Variant operator-(const LLBC_Variant &another) const;
     LLBC_Variant operator*(const LLBC_Variant &another) const;
     LLBC_Variant operator/(const LLBC_Variant &another) const;
+    LLBC_Variant operator%(const LLBC_Variant &another) const;
 
     LLBC_Variant &operator+=(const LLBC_Variant &another);
     LLBC_Variant &operator-=(const LLBC_Variant &another);
     LLBC_Variant &operator*=(const LLBC_Variant &another);
     LLBC_Variant &operator/=(const LLBC_Variant &another);
+    LLBC_Variant &operator%=(const LLBC_Variant &another);
 
     // Arithmetic operators(template base).
     template <typename _T>
@@ -531,6 +533,8 @@ public:
     LLBC_Variant operator*(const _T &another) const;
     template <typename _T>
     LLBC_Variant operator/(const _T &another) const;
+    template <typename _T>
+    LLBC_Variant operator%(const _T &another) const;
 
     template <typename _T>
     LLBC_Variant &operator+=(const _T &another);
@@ -540,6 +544,8 @@ public:
     LLBC_Variant &operator*=(const _T &another);
     template <typename _T>
     LLBC_Variant &operator/=(const _T &another);
+    template <typename _T>
+    LLBC_Variant &operator%=(const _T &another);
 
     // Type to string.
     const LLBC_String &TypeToString() const;

@@ -27,20 +27,29 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_Time::LLBC_Time()
-: _time(0)
+: LLBC_Time(0)
 {
-    UpdateTimeStructs();
 }
 
 inline LLBC_Time::LLBC_Time(const LLBC_Time &time)
 : _time(time._time)
 {
     memcpy(&_localTimeStruct, &time._localTimeStruct, sizeof(tm));
-    memcpy(&_gmtTimeStruct, &time._gmtTimeStruct, sizeof(tm));
 }
 
-inline LLBC_Time::~LLBC_Time()
+inline time_t LLBC_Time::NowTimestampInSecs()
 {
+    return time(nullptr);
+}
+
+inline sint64 LLBC_Time::NowTimestampInMillis()
+{
+    return LLBC_GetMilliseconds();
+}
+
+inline sint64 LLBC_Time::NowTimestampInMicros()
+{
+    return LLBC_GetMicroseconds();
 }
 
 inline LLBC_Time LLBC_Time::FromSeconds(time_t clanderTimeInSeconds)
@@ -69,6 +78,29 @@ inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
                      timeSpec.tv_nsec / LLBC_TimeConst::numOfNanosPerMicrosecond);
 }
 
+template <size_t _StrArrLen>
+LLBC_Time LLBC_Time::FromTimeStr(const char (&timeStr)[_StrArrLen])
+{
+    return FromTimeStr(timeStr, _StrArrLen - 1);
+}
+
+inline LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr)
+{
+    return FromTimeStr(timeStr, strlen(timeStr));
+}
+
+template <typename _StrType>
+typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
+LLBC_Time::FromTimeStr(const _StrType &timeStr)
+{
+    return FromTimeStr(timeStr.c_str(), timeStr.size());
+}
+
+inline LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
+{
+    return FromTimeStr(timeStr.c_str(), timeStr.size());
+}
+
 inline int LLBC_Time::GetYear() const
 {
     return _localTimeStruct.tm_year + 1900; // scene 1900
@@ -76,27 +108,23 @@ inline int LLBC_Time::GetYear() const
 
 inline int LLBC_Time::GetMonth() const
 {
-    return _localTimeStruct.tm_mon + 1; // start by 1
+    return _localTimeStruct.tm_mon;
 }
 
-inline int LLBC_Time::GetDay() const
+inline int LLBC_Time::GetDayOfWeek(bool startOnSunday) const
 {
-    return _localTimeStruct.tm_mday;
-}
-
-inline int LLBC_Time::GetDayOfWeek() const
-{
-    return _localTimeStruct.tm_wday;
+    int wday = _localTimeStruct.tm_wday;
+    return startOnSunday ? wday : ((wday - 1) + 7) % 7;
 }
 
 inline int LLBC_Time::GetDayOfMonth() const
 {
-        return GetDayOfYear() - GetMonthSpanDays(GetYear(), GetMonth() - 1);
+    return _localTimeStruct.tm_mday;
 }
 
 inline int LLBC_Time::GetDayOfYear() const
 {
-    return _localTimeStruct.tm_yday + 1; // start by 1
+    return _localTimeStruct.tm_yday;
 }
 
 inline int LLBC_Time::GetHour() const
@@ -114,6 +142,26 @@ inline int LLBC_Time::GetSecond() const
     return _localTimeStruct.tm_sec;
 }
 
+inline LLBC_Time LLBC_Time::GetBeginTimeOfHour() const
+{
+    return *this - GetOffsetTimeOfHour();
+}
+
+inline LLBC_Time LLBC_Time::GetBeginTimeOfDay() const
+{
+    return *this - GetOffsetTimeOfDay();
+}
+
+inline LLBC_Time LLBC_Time::GetBeginTimeOfWeek(int startOnSunday) const
+{
+    return *this - GetOffsetTimeOfWeek(startOnSunday);
+}
+
+inline LLBC_Time LLBC_Time::GetBeginTimeOfMonth() const
+{
+    return *this - GetOffsetTimeOfMonth();
+}
+
 inline time_t LLBC_Time::GetTimestampInSecs() const
 {
     return static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
@@ -129,14 +177,22 @@ inline sint64 LLBC_Time::GetTimestampInMicros() const
     return _time;
 }
 
-inline const tm &LLBC_Time::GetGmtTime() const
+inline tm LLBC_Time::GetGmtTime() const
 {
-    return _gmtTimeStruct;
+    struct tm timeStruct;
+    GetGmtTime(timeStruct);
+
+    return timeStruct;
 }
 
 inline void LLBC_Time::GetGmtTime(tm &timeStruct) const
 {
-    memcpy(&timeStruct, &_gmtTimeStruct, sizeof(tm));
+    const time_t calendarTime = static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
+    #if LLBC_TARGET_PLATFORM_WIN32
+    gmtime_s(&timeStruct, &calendarTime);
+    #else
+    gmtime_r(&calendarTime, &timeStruct);
+    #endif
 }
 
 inline const tm &LLBC_Time::GetLocalTime() const
@@ -161,38 +217,38 @@ inline LLBC_String LLBC_Time::FormatAsGmt(const time_t &clanderTimeInSeconds, co
 
 inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfHour(const LLBC_TimeSpan &toTimeOfHour) const
 {
-    return GetIntervalTo(LLBC_TimeSpan::oneHour, toTimeOfHour);
+    return GetIntervalTo(LLBC_TimeSpan::oneHour, toTimeOfHour, false);
 }
 
 inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfDay(const LLBC_TimeSpan &toTimeOfDay) const
 {
-    return GetIntervalTo(LLBC_TimeSpan::oneDay, toTimeOfDay);
+    return GetIntervalTo(LLBC_TimeSpan::oneDay, toTimeOfDay, false);
 }
 
-inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek) const
+inline LLBC_TimeSpan LLBC_Time::GetIntervalToTimeOfWeek(const LLBC_TimeSpan &toTimeOfWeek, bool startOnSunday) const
 {
-    return GetIntervalTo(LLBC_TimeSpan::oneWeek, toTimeOfWeek);
+    return GetIntervalTo(LLBC_TimeSpan::oneWeek, toTimeOfWeek, startOnSunday);
 }
 
-inline bool LLBC_Time::IsCrossedHour(const LLBC_Time &from,
+inline int LLBC_Time::GetCrossedHours(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeOfHour)
+{
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneHour, timeOfHour).GetTotalHours();
+}
+
+inline int LLBC_Time::GetCrossedDays(const LLBC_Time &from, 
                                      const LLBC_Time &to,
-                                     const LLBC_TimeSpan &timeOfHour)
+                                     const LLBC_TimeSpan &timeOfDay)
 {
-    return IsCrossed(from, to, LLBC_TimeSpan::oneHour, timeOfHour);
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneDay, timeOfDay).GetTotalDays(); 
 }
 
-inline bool LLBC_Time::IsCrossedDay(const LLBC_Time &from,
-                                    const LLBC_Time &to,
-                                    const LLBC_TimeSpan &timeOfDay)
+inline int LLBC_Time::GetCrossedWeeks(const LLBC_Time &from,
+                                      const LLBC_Time &to,
+                                      const LLBC_TimeSpan &timeOfWeek)
 {
-    return IsCrossed(from, to, LLBC_TimeSpan::oneDay, timeOfDay);
-}
-
-inline bool LLBC_Time::IsCrossedWeek(const LLBC_Time &from,
-                                     const LLBC_Time &to,
-                                     const LLBC_TimeSpan &timeOfWeek)
-{
-    return IsCrossed(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek);
+    return GetCrossedCycles(from, to, LLBC_TimeSpan::oneWeek, timeOfWeek).GetTotalDays() / 7;
 }
 
 inline bool LLBC_Time::operator==(const LLBC_Time &time) const
@@ -233,7 +289,23 @@ inline void LLBC_Time::Serialize(LLBC_Stream &stream) const
 inline LLBC_Time::LLBC_Time(const sint64 &clendarTimeInMicroseconds)
 : _time(clendarTimeInMicroseconds)
 {
-    UpdateTimeStructs();
+    FillTimeStruct();
+}
+
+inline void LLBC_Time::FillTimeStruct()
+{
+    time_t calendarTime = static_cast<time_t>(_time / LLBC_TimeConst::numOfMicrosPerSecond);
+    #if LLBC_TARGET_PLATFORM_WIN32
+    localtime_s(&_localTimeStruct, &calendarTime);
+    #else
+    localtime_r(&calendarTime, &_localTimeStruct);
+    #endif
 }
 
 __LLBC_NS_END
+
+inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t)
+{
+    return stream << t.ToString();
+}
+

@@ -25,20 +25,20 @@
 int TestCase_Com_StreamFunc::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Stream test:");
-    LLBC_ErrorAndReturnIfNot(CtorTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(AttachTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(SwapTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(EndianTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(RWPosTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(SkipRWTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(ReadableSizeTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(WritableSizeTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(GetBufTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(BufOpTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(NumericSerTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(StrSerTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(StlContainerSerTest() == LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(SerializableObjSerTest() == LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(CtorTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(AttachTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(SwapTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(EndianTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(RWPosTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(SkipRWTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(ReadableSizeTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(WritableSizeTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(GetBufTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(BufOpTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(NumericSerTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(StrSerTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(StlContainerSerTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(SerializableObjSerTest() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -50,14 +50,14 @@ int TestCase_Com_StreamFunc::CtorTest()
     // Test default constructor.
     LLBC_Stream stream;
     LLBC_PrintLn("Construct by default ctor:\n- %s", stream.ToString().c_str());
-    LLBC_ErrorAndReturnIfNot(stream.GetBuf() == nullptr &&
-                             stream.GetCap() == 0 &&
-                             stream.GetWritePos() == 0 &&
-                             stream.GetReadableSize() == 0 &&
-                             stream.GetWritableSize() == 0 &&
-                             stream.GetEndian() == LLBC_DefaultEndian &&
-                             !stream.IsAttach(),
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBuf() != nullptr ||
+                          stream.GetCap() != 0 ||
+                          stream.GetWritePos() != 0 ||
+                          stream.GetReadableSize() != 0 ||
+                          stream.GetWritableSize() != 0 ||
+                          stream.GetEndian() != LLBC_DefaultEndian ||
+                          stream.IsAttach() == true,
+                          LLBC_FAILED);
 
     stream.SetEndian(
         stream.GetEndian() == LLBC_Endian::BigEndian ?
@@ -75,34 +75,29 @@ int TestCase_Com_StreamFunc::CtorTest()
                      attach ? "true" : "false");
         LLBC_PrintLn("stream1:%s", stream1.ToString().c_str());
         LLBC_PrintLn("stream2:%s", stream2.ToString().c_str());
-        LLBC_ErrorAndReturnIfNot(stream2.IsAttach() == attach &&
-                                 (attach ?
-                                      stream1.GetBuf() == stream2.GetBuf() :
-                                          stream2.GetBuf() != stream1.GetBuf()) &&
-                                 stream2.GetReadPos() == stream1.GetReadPos() &&
-                                 stream2.GetWritePos() == stream1.GetWritePos() &&
-                                 (attach ?
-                                      stream2.GetCap() == stream1.GetCap() : true) &&
-                                  memcmp(stream2.GetBuf(),
-                                         stream1.GetBuf(),
-                                         stream1.GetWritePos()) == 0,
+        LLBC_ErrorAndReturnIf((stream2.IsAttach() == attach &&
+                               (attach ? stream1.GetBuf() == stream2.GetBuf() : stream2.GetBuf() != stream1.GetBuf()) &&
+                               stream2.GetReadPos() == stream1.GetReadPos() &&
+                               stream2.GetWritePos() == stream1.GetWritePos() &&
+                               (attach ? stream2.GetCap() == stream1.GetCap() : true) &&
+                               memcmp(stream2.GetBuf(), stream1.GetBuf(), stream1.GetWritePos()) == 0) == false,
                                  LLBC_FAILED);
 
         int intVal;
         bool boolVal;
         LLBC_String strVal;
         stream2 >> boolVal >> intVal >> strVal;
-        LLBC_ErrorAndReturnIfNot(boolVal == false &&
-                                 intVal == 10086 &&
-                                 strVal == "hello world",
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(boolVal != false ||
+                              intVal != 10086 ||
+                              strVal != "hello world",
+                              LLBC_FAILED);
 
         return LLBC_OK;
     };
 
     // Test copy construct.
-    LLBC_ReturnIfNot(testCopyConstruct(true) == LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIfNot(testCopyConstruct(false) == LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testCopyConstruct(true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testCopyConstruct(false) != LLBC_OK, LLBC_FAILED);
 
     // Test move construct.
     {
@@ -118,22 +113,21 @@ int TestCase_Com_StreamFunc::CtorTest()
         LLBC_PrintLn("  - stream1:%s", stream1.ToString().c_str());
         LLBC_PrintLn("  - stream2:%s", stream2.ToString().c_str());
 
-        LLBC_ErrorAndReturnIfNot(stream1.GetBuf() == nullptr &&
-                                 stream1.GetCap() == 0 &&
-                                 stream1.GetReadPos() == 0 &&
-                                 stream1.GetWritePos() == 0,
-                                 LLBC_FAILED);
-        LLBC_ErrorAndReturnIfNot(stream2.GetBuf() == stream1Copy.GetBuf() &&
-                                 stream2.GetCap() == stream1Copy.GetCap() &&
-                                 stream2.GetWritePos() == stream1Copy.GetWritePos(),
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream1.GetBuf() != nullptr ||
+                              stream1.GetCap() != 0 ||
+                              stream1.GetReadPos() != 0 ||
+                              stream1.GetWritePos() != 0,
+                              LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream2.GetBuf() != stream1Copy.GetBuf() ||
+                              stream2.GetCap() != stream1Copy.GetCap() ||
+                              stream2.GetWritePos() != stream1Copy.GetWritePos(),
+                              LLBC_FAILED);
 
         int intVal;
         bool boolVal;
         double dblVal;
         stream2 >> intVal >> boolVal >> dblVal;
-        LLBC_ErrorAndReturnIfNot(intVal == 3 && boolVal == false && dblVal == 6.3,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(intVal != 3 || boolVal != false || dblVal != 6.3, LLBC_FAILED);
     }
 
     // Define construct by buf and size test lambda.
@@ -144,23 +138,22 @@ int TestCase_Com_StreamFunc::CtorTest()
         LLBC_PrintLn("Construct by buf and size(attach = %s):", attach ? "true" : "false");
         LLBC_PrintLn("- buf:%p, size:%lu", buf, size);
         LLBC_PrintLn("- stream:%s", stream.ToString().c_str());
-        LLBC_ErrorAndReturnIfNot(stream.IsAttach() == attach &&
-                                 stream.GetEndian() == LLBC_DefaultEndian &&
-                                 (attach ? stream.GetBuf() == buf : stream.GetBuf() != buf) &&
-                                 stream.GetReadPos() == 0 &&
-                                 stream.GetWritePos() == size &&
-                                 stream.GetCap() == size,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf((stream.IsAttach() == attach &&
+                               stream.GetEndian() == LLBC_DefaultEndian &&
+                               (attach ? stream.GetBuf() == buf : stream.GetBuf() != buf) &&
+                               stream.GetReadPos() == 0 &&
+                               stream.GetWritePos() == size &&
+                               stream.GetCap() == size) == false,
+                              LLBC_FAILED);
 
-        LLBC_ErrorAndReturnIfNot(memcmp(stream.GetBuf(), "hello", sizeof("hello")) == 0,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(memcmp(stream.GetBuf(), "hello", sizeof("hello")) != 0, LLBC_FAILED);
 
         return LLBC_OK;
     };
 
     // Test construct by buf and size.
-    LLBC_ReturnIfNot(testConstructByBufAndSize(true) == LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIfNot(testConstructByBufAndSize(false) == LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByBufAndSize(true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByBufAndSize(false) != LLBC_OK, LLBC_FAILED);
 
     // Define construct by cap test lambda.
     auto testConstructByCap = [](size_t cap) {
@@ -170,36 +163,36 @@ int TestCase_Com_StreamFunc::CtorTest()
         LLBC_PrintLn("- cap lower 8 bit: %02lx", stream.GetCap() & 0xf);
         LLBC_PrintLn("- stream:%s", stream.ToString().c_str());
 
-        LLBC_ErrorAndReturnIfNot((cap == 0 ?
-                                      stream.GetBuf() == nullptr : stream.GetBuf() != nullptr) &&
-                                      stream.GetCap() == cap &&
-                                      stream.GetReadPos() == 0 &&
-                                      stream.GetWritePos() == 0 &&
-                                      stream.GetEndian() == LLBC_DefaultEndian,
-                                      LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(((cap == 0 ?
+                              stream.GetBuf() == nullptr : stream.GetBuf() != nullptr) &&
+                              stream.GetCap() == cap &&
+                              stream.GetReadPos() == 0 &&
+                              stream.GetWritePos() == 0 &&
+                              stream.GetEndian() == LLBC_DefaultEndian) == false,
+                              LLBC_FAILED);
 
         if (cap > 0)
         {
-            LLBC_ErrorAndReturnIfNot(stream.SetWritePos(cap - 1), LLBC_FAILED);
-            LLBC_ErrorAndReturnIfNot(stream.SetWritePos(cap), LLBC_FAILED);
-            LLBC_ErrorAndReturnIfNot(!stream.SetWritePos(cap + 1), LLBC_FAILED);
+            LLBC_ErrorAndReturnIf(stream.SetWritePos(cap - 1) == false, LLBC_FAILED);
+            LLBC_ErrorAndReturnIf(stream.SetWritePos(cap) == false, LLBC_FAILED);
+            LLBC_ErrorAndReturnIf(stream.SetWritePos(cap + 1) != false, LLBC_FAILED);
 
-            LLBC_ErrorAndReturnIfNot(stream.SetReadPos(stream.GetWritePos() - 1), LLBC_FAILED);
-            LLBC_ErrorAndReturnIfNot(stream.SetReadPos(stream.GetWritePos()), LLBC_FAILED);
-            LLBC_ErrorAndReturnIfNot(!stream.SetReadPos(stream.GetWritePos() + 1), LLBC_FAILED);
+            LLBC_ErrorAndReturnIf(stream.SetReadPos(stream.GetWritePos() - 1) == false, LLBC_FAILED);
+            LLBC_ErrorAndReturnIf(stream.SetReadPos(stream.GetWritePos()) == false, LLBC_FAILED);
+            LLBC_ErrorAndReturnIf(stream.SetReadPos(stream.GetWritePos() + 1) != false, LLBC_FAILED);
         }
 
         return LLBC_OK;
     };
 
     // Test construct by cap.
-    LLBC_ReturnIfNot(testConstructByCap(0) == LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIfNot(testConstructByCap(3) == LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIfNot(testConstructByCap(9) == LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIfNot(testConstructByCap(16) == LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIfNot(testConstructByCap(18) == LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIfNot(testConstructByCap(128) == LLBC_OK, LLBC_FAILED);
-    LLBC_ReturnIfNot(testConstructByCap(299) == LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByCap(0) != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByCap(3) != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByCap(9) != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByCap(16) != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByCap(18) != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByCap(128) != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(testConstructByCap(299) != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -214,11 +207,11 @@ int TestCase_Com_StreamFunc::AttachTest()
 
         LLBC_Stream stream;
         LLBC_PrintLn("  - Default stream:%s", stream.ToString().c_str());
-        LLBC_ErrorAndReturnIfNot(stream.IsAttach() == false, LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream.IsAttach() == true, LLBC_FAILED);
 
         stream.SetAttach(true);
         LLBC_PrintLn("  - Set stream attach attr to true:%s", stream.ToString().c_str());
-        LLBC_ErrorAndReturnIfNot(stream.IsAttach() == true, LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream.IsAttach() == false, LLBC_FAILED);
     }
 
     // Test attach from another stream.
@@ -235,13 +228,13 @@ int TestCase_Com_StreamFunc::AttachTest()
         LLBC_Stream *stream2 = new LLBC_Stream;
         stream2->Attach(stream1);
         LLBC_PrintLn("  - Attach construct from origin stream:%s", stream2->ToString().c_str());
-        LLBC_ErrorAndReturnIfNot(stream2->IsAttach() &&
-                                 stream2->GetBuf() == stream1.GetBuf() &&
-                                 stream2->GetCap() == stream1.GetCap() &&
-                                 stream2->GetReadPos() == 0 &&
-                                 stream2->GetWritePos() == stream1.GetWritePos() &&
-                                 stream2->GetEndian() == stream1.GetEndian(),
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream2->IsAttach() == false ||
+                              stream2->GetBuf() != stream1.GetBuf() ||
+                              stream2->GetCap() != stream1.GetCap() ||
+                              stream2->GetReadPos() != 0 ||
+                              stream2->GetWritePos() != stream1.GetWritePos() ||
+                              stream2->GetEndian() != stream1.GetEndian(),
+                              LLBC_FAILED);
 
         delete stream2;
         LLBC_PrintLn("  - Delete attach stream, original stream:%s", stream1.ToString().c_str());
@@ -250,13 +243,13 @@ int TestCase_Com_StreamFunc::AttachTest()
         LLBC_Defer(free(buf));
         LLBC_PrintLn("After detach original stream, stream:%s, detach buf:%p",
                      stream1.ToString().c_str(), buf);
-        LLBC_ErrorAndReturnIfNot(buf != nullptr &&
-                                 stream1.GetBuf() == nullptr &&
-                                 stream1.GetCap() == 0 &&
-                                 stream1.GetReadPos() == 0 &&
-                                 stream1.GetWritePos() == 0 &&
-                                 stream1.GetEndian() != LLBC_DefaultEndian,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(buf == nullptr ||
+                              stream1.GetBuf() != nullptr ||
+                              stream1.GetCap() != 0 ||
+                              stream1.GetReadPos() != 0 ||
+                              stream1.GetWritePos() != 0 ||
+                              stream1.GetEndian() == LLBC_DefaultEndian,
+                              LLBC_FAILED);
     }
 
     // Test attach from buf.
@@ -268,13 +261,13 @@ int TestCase_Com_StreamFunc::AttachTest()
         stream.Attach(buf, sizeof(buf));
         LLBC_PrintLn("  - Attach from buf, buf:%p, bufSize:%lu, stream:%s",
                      buf, sizeof(buf), stream.ToString().c_str());
-        LLBC_ErrorAndReturnIfNot(stream.GetBuf() == buf &&
-                                 stream.GetCap() == sizeof(buf) &&
-                                 stream.GetReadPos() == 0 &&
-                                 stream.GetWritePos() == sizeof(buf),
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream.GetBuf() != buf ||
+                              stream.GetCap() != sizeof(buf) ||
+                              stream.GetReadPos() != 0 ||
+                              stream.GetWritePos() != sizeof(buf),
+                              LLBC_FAILED);
 
-        LLBC_ErrorAndReturnIfNot(stream.GetWritableSize() == 0, LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream.GetWritableSize() != 0, LLBC_FAILED);
     }
 
     // Test reattach.
@@ -294,13 +287,13 @@ int TestCase_Com_StreamFunc::AttachTest()
         attStream2.Attach(attStream1);
         LLBC_PrintLn("  - attStream2(attach from origStream):%s",
                      attStream2.ToString().c_str());
-        LLBC_ErrorAndReturnIfNot(attStream1.IsAttach() &&
-                                 attStream2.IsAttach() &&
-                                 attStream2.GetBuf() == attStream1.GetBuf() &&
-                                 attStream2.GetCap() == attStream1.GetCap() &&
-                                 attStream2.GetReadPos() == 0 &&
-                                 attStream2.GetWritePos() == attStream1.GetWritePos(),
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(attStream1.IsAttach() == false ||
+                              attStream2.IsAttach() == false ||
+                              attStream2.GetBuf() != attStream1.GetBuf() ||
+                              attStream2.GetCap() != attStream1.GetCap() ||
+                              attStream2.GetReadPos() != 0 ||
+                              attStream2.GetWritePos() != attStream1.GetWritePos(),
+                              LLBC_FAILED);
     }
 
     return LLBC_OK;
@@ -342,21 +335,21 @@ int TestCase_Com_StreamFunc::SwapTest()
     LLBC_PrintLn("  - stream1: %s", stream1.ToString().c_str());
     LLBC_PrintLn("  - stream2: %s", stream2.ToString().c_str());
 
-    LLBC_ErrorAndReturnIfNot(stream1.GetBuf() == stream2Buf &&
-                             stream2.GetBuf() == stream1Buf,
-                             LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream1.GetCap() == stream2Cap &&
-                             stream2.GetCap() == stream1Cap,
-                             LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream1.GetEndian() == stream2Endian &&
-                             stream2.GetEndian() == stream1Endian,
-                             LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream1.GetReadPos() == stream2ReadPos &&
-                             stream2.GetReadPos() == stream1ReadPos,
-                             LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream1.GetWritePos() == stream2WritePos &&
-                             stream2.GetWritePos() == stream1WritePos,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream1.GetBuf() != stream2Buf ||
+                          stream2.GetBuf() != stream1Buf,
+                          LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream1.GetCap() != stream2Cap ||
+                          stream2.GetCap() != stream1Cap,
+                          LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream1.GetEndian() != stream2Endian ||
+                          stream2.GetEndian() != stream1Endian,
+                          LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream1.GetReadPos() != stream2ReadPos ||
+                          stream2.GetReadPos() != stream1ReadPos,
+                          LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream1.GetWritePos() != stream2WritePos ||
+                          stream2.GetWritePos() != stream1WritePos,
+                          LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -368,25 +361,25 @@ int TestCase_Com_StreamFunc::EndianTest()
     // Test default stream endian.
     LLBC_Stream stream;
     LLBC_PrintLn("- Default stream endian is:%s", LLBC_Endian::Type2Str(stream.GetEndian()));
-    LLBC_ErrorAndReturnIfNot(stream.GetEndian() == LLBC_DefaultEndian, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetEndian() != LLBC_DefaultEndian, LLBC_FAILED);
 
     // Test big endian.
     LLBC_Stream beStream;
     beStream.SetEndian(LLBC_Endian::BigEndian);
     beStream << 1;
     LLBC_PrintLn("- Big endian stream:%s", beStream.ToString().c_str());
-    LLBC_ErrorAndReturnIfNot(beStream.GetBuf<uint8>()[0] == 0 &&
-                             beStream.GetBuf<uint8>()[sizeof(int) - 1] == 1,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(beStream.GetBuf<uint8>()[0] != 0 ||
+                          beStream.GetBuf<uint8>()[sizeof(int) - 1] != 1,
+                          LLBC_FAILED);
 
     // Test little endian.
     LLBC_Stream leStream;
     leStream.SetEndian(LLBC_Endian::LittleEndian);
     leStream << 1;
     LLBC_PrintLn("- Little endian stream:%s", leStream.ToString().c_str());
-    LLBC_ErrorAndReturnIfNot(leStream.GetBuf<uint8>()[0] == 1 &&
-                             leStream.GetBuf<uint8>()[sizeof(int) - 1] == 0,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(leStream.GetBuf<uint8>()[0] != 1 ||
+                          leStream.GetBuf<uint8>()[sizeof(int) - 1] != 0,
+                          LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -398,10 +391,10 @@ int TestCase_Com_StreamFunc::RWPosTest()
     // Test default stream cap/rpos/wpos.
     LLBC_Stream stream;
     LLBC_PrintLn("- Default stream:%s", stream.ToString().c_str());
-    LLBC_ErrorAndReturnIfNot(stream.GetCap() == 0 &&
-                             stream.GetReadPos() == 0 &&
-                             stream.GetWritePos() == 0,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetCap() != 0 ||
+                          stream.GetReadPos() != 0 ||
+                          stream.GetWritePos() != 0,
+                          LLBC_FAILED);
 
     // Test Recap().
     LLBC_PrintLn("- Test recap");
@@ -413,7 +406,7 @@ int TestCase_Com_StreamFunc::RWPosTest()
         const bool recapRet = stream.Recap(recapSize);
         LLBC_PrintLn("  - Recap %lu -> %lu, ret:%s",
                      oldCap, recapSize, recapRet ? "true" : "false");
-        LLBC_ErrorAndReturnIfNot(recapSize >= oldCap ? recapRet : !recapRet, LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(recapSize >= oldCap ? !recapRet : recapRet, LLBC_FAILED);
     }
 
     // Test SetWritePos().
@@ -426,8 +419,7 @@ int TestCase_Com_StreamFunc::RWPosTest()
         const bool setWPosRet = stream.SetWritePos(newWPos);
         LLBC_PrintLn("  - Set wpos %lu -> %lu, cap:%lu, ret:%s",
                      oldWPos, newWPos, stream.GetCap(), setWPosRet ? "true" : "false");
-        LLBC_ErrorAndReturnIfNot(newWPos <= stream.GetCap() ? setWPosRet : !setWPosRet,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(newWPos <= stream.GetCap() ? !setWPosRet : setWPosRet, LLBC_FAILED);
     }
 
     // Test SetReadPos().
@@ -441,8 +433,8 @@ int TestCase_Com_StreamFunc::RWPosTest()
         const bool setRPosRet = stream.SetReadPos(newRPos);
         LLBC_PrintLn("  - Set rpos %lu -> %lu, rpos:%lu, ret:%s",
                      oldRPos, newRPos, stream.GetWritePos(), setRPosRet ? "true" : "false");
-        LLBC_ErrorAndReturnIfNot(newRPos <= stream.GetWritePos() ? setRPosRet : !setRPosRet,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(newRPos <= stream.GetWritePos() ? !setRPosRet : setRPosRet,
+                              LLBC_FAILED);
     }
 
     // Test auto normalize rpos.
@@ -452,8 +444,8 @@ int TestCase_Com_StreamFunc::RWPosTest()
     stream.SetReadPos(stream.GetWritePos() / 2);
     stream.SetWritePos(stream.GetReadPos() - 1);
     LLBC_PrintLn("  - Auto normalized rpos, stream:%s", stream.ToString().c_str());
-    LLBC_ErrorAndReturnIfNot(stream.GetReadPos() == stream.GetWritePos(),
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetReadPos() != stream.GetWritePos(),
+                          LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -483,10 +475,8 @@ int TestCase_Com_StreamFunc::SkipRWTest()
         LLBC_PrintLn("  - Skip write, skip:%d(to wpos:%lld), ret:%s, stream:%s",
                      skip, newWPos, skipWRet ? "true" : "false", stream.ToString().c_str());
 
-        LLBC_ErrorAndReturnIfNot(newWPos < 0 ||
-                                   newWPos > static_cast<sint64>(stream.GetCap()) ?
-                                   !skipWRet : skipWRet,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(!(newWPos < 0 || newWPos > static_cast<sint64>(stream.GetCap()) ? !skipWRet : skipWRet),
+                              LLBC_FAILED);
     }
 
     // Set stream wpos to cap/2.
@@ -503,10 +493,8 @@ int TestCase_Com_StreamFunc::SkipRWTest()
         LLBC_PrintLn("  - Skip read, skip:%d(to rpos:%lld), ret:%s, stream:%s",
                      skip, newRPos, skipRRet ? "true" : "false", stream.ToString().c_str());
 
-        LLBC_ErrorAndReturnIfNot(newRPos < 0 ||
-                                     newRPos > static_cast<sint64>(stream.GetWritePos()) ?
-                                     !skipRRet : skipRRet,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(!(newRPos < 0 || newRPos > static_cast<sint64>(stream.GetWritePos()) ? !skipRRet : skipRRet),
+                              LLBC_FAILED);
     }
 
     return LLBC_OK;
@@ -519,7 +507,7 @@ int TestCase_Com_StreamFunc::ReadableSizeTest()
     // Test default stream readable size.
     LLBC_Stream stream;
     LLBC_PrintLn("- Default stream readable size:%lu", stream.GetReadableSize());
-    LLBC_ErrorAndReturnIfNot(stream.GetReadableSize() == 0, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetReadableSize() != 0, LLBC_FAILED);
 
     // Set cap&write pos to 4096.
     stream.Recap(4096);
@@ -535,8 +523,8 @@ int TestCase_Com_StreamFunc::ReadableSizeTest()
         LLBC_PrintLn("  - Set read pos, readPos:%lu, readableSize:%lu",
                      readPos, stream.GetReadableSize());
 
-        LLBC_ErrorAndReturnIfNot(stream.GetReadableSize() == stream.GetWritePos() - readPos,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream.GetReadableSize() != stream.GetWritePos() - readPos,
+                              LLBC_FAILED);
     }
 
     return LLBC_OK;
@@ -563,8 +551,8 @@ int TestCase_Com_StreamFunc::WritableSizeTest()
         LLBC_PrintLn("  - Set write pos, writePos:%lu, writableSize:%lu",
                      writePos, stream.GetWritableSize());
 
-        LLBC_ErrorAndReturnIfNot(stream.GetWritableSize() == stream.GetCap() - writePos,
-                                 LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(stream.GetWritableSize() != stream.GetCap() - writePos,
+                              LLBC_FAILED);
     }
 
     return LLBC_OK;
@@ -576,41 +564,36 @@ int TestCase_Com_StreamFunc::GetBufTest()
 
     // Test get default stream GetBuf().
     LLBC_Stream stream;
-    LLBC_ErrorAndReturnIfNot(!stream.GetBuf(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBuf(), LLBC_FAILED);
     LLBC_PrintLn("- Default stream GetBuf<void>() ret:%p", stream.GetBuf());
-    LLBC_ErrorAndReturnIfNot(!stream.GetBuf<int>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBuf<int>(), LLBC_FAILED);
     LLBC_PrintLn("- Default stream Getbuf<int>() ret:%p", stream.GetBuf<int>());
 
     // Normal test:
     stream.SetEndian(LLBC_Endian::LittleEndian);
     stream << 3 << "hello world";
-    LLBC_ErrorAndReturnIfNot(stream.GetBuf(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream.GetBuf() == stream.GetBuf<int>(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream.GetBuf() == stream.GetBufStartWithReadPos(),
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBuf() == nullptr, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBuf() != stream.GetBuf<int>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBuf() != stream.GetBufStartWithReadPos(), LLBC_FAILED);
 
-    LLBC_ErrorAndReturnIfNot(stream.GetBufStartWithReadPos() != stream.GetBufStartWithWritePos(),
-                             LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream.GetBufStartWithWritePos<char>() - stream.GetBuf<char>() == sizeof(int) + 15,
-                             LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(*stream.GetBuf<int>() == 3, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBufStartWithReadPos() == stream.GetBufStartWithWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBufStartWithWritePos<char>() - stream.GetBuf<char>() != sizeof(int) + 15, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(*stream.GetBuf<int>() != 3, LLBC_FAILED);
     LLBC_PrintLn("- After write some bytes to stream, stream:%s", stream.ToString().c_str());
 
     int intVal;
     LLBC_String strVal;
     stream >> intVal >> strVal;
-    LLBC_ErrorAndReturnIfNot(intVal == 3, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(strVal == "hello world", LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream.GetBufStartWithReadPos() == stream.GetBufStartWithWritePos(),
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(intVal != 3, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(strVal != "hello world", LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBufStartWithReadPos() != stream.GetBufStartWithWritePos(), LLBC_FAILED);
     LLBC_PrintLn("- After read from stream, stream:%s, intVal:%d, strVal:%s",
                  stream.ToString().c_str(), intVal, strVal.c_str());
 
     // Read/Write begin buf test:
     stream.SetWritePos(3);
     stream.SetReadPos(1);
-    LLBC_ErrorAndReturnIfNot(stream.GetBufStartWithWritePos<char>() - stream.GetBufStartWithReadPos<char>() == 2,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBufStartWithWritePos<char>() - stream.GetBufStartWithReadPos<char>() != 2, LLBC_FAILED);
     LLBC_PrintLn("- After set wpos=3/rpos=1, buf diff:%ld",
                  stream.GetBufStartWithWritePos<char>() - stream.GetBufStartWithReadPos<char>());
 
@@ -631,43 +614,43 @@ int TestCase_Com_StreamFunc::BufOpTest()
     // Insert "hello"
     LLBC_Stream stream;
     stream.Insert(0, "hello", sizeof("hello"));
-    LLBC_ErrorAndReturnIfNot(stream.GetWritePos() == sizeof("hello"), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(LLBC_String("hello") == stream.GetBuf<char>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetWritePos() != sizeof("hello"), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_String("hello") != stream.GetBuf<char>(), LLBC_FAILED);
     dumpStream(stream, "After write \"hello\" str:");
 
     // Insert "xxx" after 'e' character.
     stream.SetReadPos(4);
     stream.Insert(2, "xxx", 3);
-    LLBC_ErrorAndReturnIfNot(stream.GetWritePos() == 9, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream.GetReadPos() == 7, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(LLBC_String("xxxllo") == stream.GetBuf<char>() + 2, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetWritePos() != 9, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetReadPos() != 7, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_String("xxxllo") != stream.GetBuf<char>() + 2, LLBC_FAILED);
     dumpStream(stream, "After insert \"xxx\" after 'e':");
 
     // Insert "0" at 0 pos.
     stream.Insert(0, "0", 1);
-    LLBC_ErrorAndReturnIfNot(stream.GetWritePos() == 10, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream.GetBuf<char>()[0] == '0', LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetWritePos() != 10, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetBuf<char>()[0] != '0', LLBC_FAILED);
     dumpStream(stream, "After insert '0' at 0 pos:");
 
     // Insert "x" at buffer end.
     stream.Insert(LLBC_Stream::npos, "x", 1);
-    LLBC_ErrorAndReturnIfNot(stream.GetWritePos() == 11, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(*(stream.GetBuf<char>() + 10) == 'x', LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetWritePos() != 11, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(*(stream.GetBuf<char>() + 10) != 'x', LLBC_FAILED);
     dumpStream(stream, "After insert 'x' ad end pos:");
 
     // Erase string "hello" end \0.
     stream.Replace(9, 10, nullptr, 0);
     // Insert '\0' at the end of stream.
     stream.Insert(LLBC_Stream::npos, "", 1);
-    LLBC_ErrorAndReturnIfNot(stream.GetWritePos() == 11, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(*(stream.GetBuf<char>() + 9) == 'x', LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetWritePos() != 11, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(*(stream.GetBuf<char>() + 9) != 'x', LLBC_FAILED);
     dumpStream(stream, "After adjust '\0' pos:");
 
     // Erase "xxx".
     stream.SetReadPos(4);
     stream.Erase(3, 6);
-    LLBC_ErrorAndReturnIfNot(stream.GetWritePos() == 8, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(stream.GetReadPos() == 3, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetWritePos() != 8, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stream.GetReadPos() != 3, LLBC_FAILED);
     dumpStream(stream, "After erase \"xxx\":");
 
     return LLBC_OK;
@@ -710,32 +693,32 @@ int TestCase_Com_StreamFunc::NumericSerTest()
         << fVal1 >> fVal2
         << dVal1 >> dVal2;
 
-    LLBC_ErrorAndReturnIfNot(bVal1 == bVal2 &&
-                             s8Val1 == s8Val2 &&
-                             u8Val1 == u8Val2 &&
-                             s16Val1 == s16Val2 &&
-                             u16Val1 == u16Val2 &&
-                             s32Val1 == s32Val2 &&
-                             u32Val1 == u32Val2 &&
-                             lVal1 == lVal2 &&
-                             ulVal1 == ulVal2 &&
-                             s64Val1 == s64Val2 &&
-                             u64Val1 == u64Val2 &&
-                             std::fabs(fVal1 - fVal2) < std::numeric_limits<float>::epsilon() &&
-                             std::fabs(dVal1- dVal2) < std::numeric_limits<double>::epsilon(),
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(bVal1 != bVal2 ||
+                          s8Val1 != s8Val2 ||
+                          u8Val1 != u8Val2 ||
+                          s16Val1 != s16Val2 ||
+                          u16Val1 != u16Val2 ||
+                          s32Val1 != s32Val2 ||
+                          u32Val1 != u32Val2 ||
+                          lVal1 != lVal2 ||
+                          ulVal1 != ulVal2 ||
+                          s64Val1 != s64Val2 ||
+                          u64Val1 != u64Val2 ||
+                          std::fabs(fVal1 - fVal2) >= std::numeric_limits<float>::epsilon() ||
+                          std::fabs(dVal1- dVal2) >= std::numeric_limits<double>::epsilon(),
+                          LLBC_FAILED);
 
-    LLBC_ErrorAndReturnIfNot(s.GetWritePos() ==
-                             sizeof(bool) +
-                             sizeof(sint8) + sizeof(uint8) +
-                             sizeof(sint16) + sizeof(uint16) +
-                             sizeof(sint32) + sizeof(uint32) +
-                             sizeof(long) + sizeof(ulong) +
-                             sizeof(sint64) + sizeof(uint64) +
-                             sizeof(float) + sizeof(double),
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetWritePos() !=
+                          sizeof(bool) +
+                          sizeof(sint8) + sizeof(uint8) +
+                          sizeof(sint16) + sizeof(uint16) +
+                          sizeof(sint32) + sizeof(uint32) +
+                          sizeof(long) + sizeof(ulong) +
+                          sizeof(sint64) + sizeof(uint64) +
+                          sizeof(float) + sizeof(double),
+                          LLBC_FAILED);
 
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
 
     LLBC_PrintLn("- sint8: %d, %d", s8Val1, s8Val2);
     LLBC_PrintLn("- uint8: %u, %u", u8Val1, u8Val2);
@@ -759,9 +742,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     LLBC_Stream s;
     std::string stdStr1("Hello world"), stdStr2;
     s << stdStr1 >> stdStr2;
-    LLBC_ErrorAndReturnIfNot(stdStr2 == stdStr1, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == stdStr1.size() + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stdStr2 != stdStr1, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != stdStr1.size() + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- std::string ser/deser:");
     LLBC_PrintLn("  - stdStr1: %s", stdStr1.c_str());
     LLBC_PrintLn("  - stdStr2: %s", stdStr2.c_str());
@@ -770,9 +753,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     s.Clear();
     LLBC_String llbcStr1("Hey Judy"), llbcStr2;
     s << llbcStr1 >> llbcStr2;
-    LLBC_ErrorAndReturnIfNot(llbcStr1 == llbcStr2, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == llbcStr1.size() + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(llbcStr1 != llbcStr2, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != llbcStr1.size() + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- LLBC_String ser/deser:");
     LLBC_PrintLn("  - llbcStr1: %s", llbcStr1.c_str());
     LLBC_PrintLn("  - llbcStr2: %s", llbcStr2.c_str());
@@ -782,10 +765,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     char literalStr1[] = "I am literal string";
     char literalStr2[sizeof(literalStr1)];
     s << literalStr1 >> literalStr2;
-    LLBC_ErrorAndReturnIfNot(memcmp(literalStr1, literalStr2, strlen(literalStr1)) == 0,
-                             LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == sizeof(literalStr1) - 1 + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(memcmp(literalStr1, literalStr2, strlen(literalStr1)) != 0, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != sizeof(literalStr1) - 1 + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- literal string ser/deser:");
     LLBC_PrintLn("  - literalStr1: %s", literalStr1);
     LLBC_PrintLn("  - literalStr2: %s", literalStr2);
@@ -794,9 +776,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     s.Clear();
     LLBC_String llbcStr3;
     s << stdStr1 >> llbcStr3;
-    LLBC_ErrorAndReturnIfNot(llbcStr3 == stdStr1, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == stdStr1.size() + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(llbcStr3 != stdStr1, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != stdStr1.size() + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- std::string -> LLBC_String:");
     LLBC_PrintLn("  - stdStr1: %s", stdStr1.c_str());
     LLBC_PrintLn("  - llbcStr3: %s", llbcStr3.c_str());
@@ -805,9 +787,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     s.Clear();
     char literalStr3[sizeof(literalStr1)];
     s << stdStr1 >> literalStr3;
-    LLBC_ErrorAndReturnIfNot(stdStr1 == literalStr3, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == stdStr1.size() + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stdStr1 != literalStr3, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != stdStr1.size() + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- std::string -> literal string:");
     LLBC_PrintLn("  - stdStr1: %s", stdStr1.c_str());
     LLBC_PrintLn("  - literalStr3: %s", literalStr3);
@@ -816,9 +798,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     s.Clear();
     std::string stdStr3;
     s << llbcStr1 >> stdStr3;
-    LLBC_ErrorAndReturnIfNot(stdStr3 == llbcStr1, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == llbcStr1.size() + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stdStr3 != llbcStr1, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != llbcStr1.size() + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- LLBC_String -> std::string:");
     LLBC_PrintLn("  - llbcStr1: %s", llbcStr1.c_str());
     LLBC_PrintLn("  - stdStr3: %s", stdStr3.c_str());
@@ -827,9 +809,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     s.Clear();
     char literalStr4[32];
     s << llbcStr1 >> literalStr4;
-    LLBC_ErrorAndReturnIfNot(llbcStr1 == literalStr4, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == llbcStr1.size() + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(llbcStr1 != literalStr4, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != llbcStr1.size() + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- LLBC_String -> literal string:");
     LLBC_PrintLn("  - llbcStr1: %s", llbcStr1.c_str());
     LLBC_PrintLn("  - literalStr4: %s", literalStr4);
@@ -838,9 +820,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     s.Clear();
     std::string stdStr4;
     s << literalStr1 >> stdStr4;
-    LLBC_ErrorAndReturnIfNot(stdStr4 == literalStr1, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == stdStr4.size() + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(stdStr4 != literalStr1, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != stdStr4.size() + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- literal string -> std::string:");
     LLBC_PrintLn("  - literalStr1: %s", literalStr1);
     LLBC_PrintLn("  - stdStr4: %s", stdStr4.c_str());
@@ -849,9 +831,9 @@ int TestCase_Com_StreamFunc::StrSerTest()
     s.Clear();
     LLBC_String llbcStr4;
     s << literalStr1 >> llbcStr4;
-    LLBC_ErrorAndReturnIfNot(llbcStr4 == literalStr1, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == llbcStr4.size() + sizeof(uint32), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(llbcStr4 != literalStr1, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != llbcStr4.size() + sizeof(uint32), LLBC_FAILED);
     LLBC_PrintLn("- literal string -> LLBC_String:");
     LLBC_PrintLn("  - literalStr1: %s", literalStr1);
     LLBC_PrintLn("  - llbcStr4: %s", llbcStr4.c_str());
@@ -861,8 +843,8 @@ int TestCase_Com_StreamFunc::StrSerTest()
     s << "hello world";
     char literalStr5[3];
     bool readRet = s.Read(literalStr5);
-    LLBC_ErrorAndReturnIfNot(!readRet, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == 0, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(readRet == true, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != 0, LLBC_FAILED);
     LLBC_PrintLn("- literal string overflow read test:");
     LLBC_PrintLn("  - string in stream: hello world");
     LLBC_PrintLn("  - Read() return: %s", readRet ? "true" : "false");
@@ -885,11 +867,9 @@ _StlContainerSerTest()
 
     LLBC_Stream s;
     s << c1 >> c2;
-    LLBC_ErrorAndReturnIfNot(c1 == c2, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetWritePos() ==
-                                 sizeof(uint32) + sizeof(int) * contSize,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(c1 != c2, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetWritePos() != sizeof(uint32) + sizeof(int) * contSize, LLBC_FAILED);
     LLBC_PrintLn("  - c1: %s", LLBC_Variant(c1).ValueToString().c_str());
     LLBC_PrintLn("  - c2: %s", LLBC_Variant(c2).ValueToString().c_str());
 
@@ -910,11 +890,9 @@ _StlContainerSerTest()
 
     LLBC_Stream s;
     s << c1 >> c2;
-    LLBC_ErrorAndReturnIfNot(c1 == c2, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetWritePos() ==
-                                 sizeof(uint32) + sizeof(int) * contSize,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(c1 != c2, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetWritePos() != sizeof(uint32) + sizeof(int) * contSize, LLBC_FAILED);
     LLBC_PrintLn("  - c1: %s", LLBC_Variant(c1).ValueToString().c_str());
     LLBC_PrintLn("  - c2: %s", LLBC_Variant(c2).ValueToString().c_str());
 
@@ -935,12 +913,12 @@ _StlContainerSerTest()
 
     LLBC_Stream s;
     s << c1 >> c2;
-    LLBC_ErrorAndReturnIfNot(c1 == c2, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetWritePos() ==
-                                 sizeof(uint32) + (sizeof(typename Container::key_type) +
-                                    sizeof(typename Container::mapped_type)) * contSize,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(c1 != c2, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetWritePos() != sizeof(uint32) +
+                                             (sizeof(typename Container::key_type) +
+                                             sizeof(typename Container::mapped_type)) * contSize,
+                          LLBC_FAILED);
     LLBC_PrintLn("  - c1: %s", LLBC_Variant(c1).ValueToString().c_str());
     LLBC_PrintLn("  - c2: %s", LLBC_Variant(c2).ValueToString().c_str());
 
@@ -959,12 +937,10 @@ _StlContainerSerTest()
 
     LLBC_Stream s;
     s << c1 >> c2;
-    LLBC_ErrorAndReturnIfNot(c1 == c2, LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIfNot(s.GetWritePos() ==
-                                 sizeof(uint32) + sizeof(typename Container::value_type) *
-                                    std::tuple_size<Container>::value,
-                             LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(c1 != c2, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetWritePos() != sizeof(uint32) + sizeof(typename Container::value_type) * std::tuple_size<Container>::value,
+                          LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -991,8 +967,8 @@ int TestCase_Com_StreamFunc::StlContainerSerTest()
         LLBC_Stream s;
         std::tuple<int, uint32, int> tup1(3, 4, 5), tup2;
         s << tup1 >> tup2;
-        LLBC_ErrorAndReturnIfNot(tup1 == tup2, LLBC_FAILED);
-        LLBC_ErrorAndReturnIfNot(s.GetWritePos() == sizeof(uint32) + sizeof(int) * 3, LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(tup1 != tup2, LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(s.GetWritePos() != sizeof(uint32) + sizeof(int) * 3, LLBC_FAILED);
     }
 
     // Nested stl container test.
@@ -1017,8 +993,8 @@ int TestCase_Com_StreamFunc::StlContainerSerTest()
 
         LLBC_Stream s;
         s << nestedCont1 >> nestedCont2;
-        LLBC_ErrorAndReturnIfNot(nestedCont1 == nestedCont2, LLBC_FAILED);
-        LLBC_ErrorAndReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(nestedCont1 != nestedCont2, LLBC_FAILED);
+        LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
         LLBC_PrintLn("- nestedCont1: %s", LLBC_Variant(nestedCont1).ToString().c_str());
         LLBC_PrintLn("- nestedCont2: %s", LLBC_Variant(nestedCont2).ToString().c_str());
     }
@@ -1050,9 +1026,9 @@ int TestCase_Com_StreamFunc::SerializableObjSerTest()
         bool _Deser(LLBC_Stream &s)
         {
             deserCalled = true;
-            LLBC_ReturnIfNot(s.Read(intVal), false);
-            LLBC_ReturnIfNot(s.Read(dblVal), false);
-            LLBC_ReturnIfNot(s.Read(strVal), false);
+            LLBC_ReturnIf(s.Read(intVal) == false, false);
+            LLBC_ReturnIf(s.Read(dblVal) == false, false);
+            LLBC_ReturnIf(s.Read(strVal) == false, false);
 
             return true;
         }
@@ -1089,9 +1065,9 @@ int TestCase_Com_StreamFunc::SerializableObjSerTest()
             LLBC_Stream s; \
             clsName obj1(LLBC_Rand(10, 20), LLBC_RandReal(), "hello world"), obj2(0, 0.0, ""); \
             s << obj1 >> obj2; \
-            LLBC_ReturnIfNot(obj1 == obj2, LLBC_FAILED); \
-            LLBC_ReturnIfNot(obj1.serCalled && obj2.deserCalled, LLBC_FAILED); \
-            LLBC_ReturnIfNot(s.GetReadPos() == s.GetWritePos(), LLBC_FAILED); \
+            LLBC_ReturnIf((obj1 == obj2) == false, LLBC_FAILED); \
+            LLBC_ReturnIf((obj1.serCalled && obj2.deserCalled) == false, LLBC_FAILED); \
+            LLBC_ReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED); \
             LLBC_PrintLn("  - obj1: %d, %f, %s", obj1.intVal, obj1.dblVal, obj1.strVal.c_str()); \
             LLBC_PrintLn("  - obj2: %d, %f, %s", obj2.intVal, obj2.dblVal, obj2.strVal.c_str()); \
         } \

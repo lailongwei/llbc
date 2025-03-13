@@ -56,9 +56,13 @@ LLBC_EventMgr::LLBC_EventMgr()
 
 LLBC_EventMgr::~LLBC_EventMgr()
 {
-    for (_Id2ListenerInfos::iterator it = _id2ListenerInfos.begin();
-         it != _id2ListenerInfos.end();
-         ++it)
+    // Assert: Make sure not in firing when delete event mgr.
+    ASSERT(!IsFiring() && "Not allow delete LLBC_EventMgr when event firing");
+    // Assert: Make sure pending event operations is empty.
+    ASSERT(_pendingEventOps.empty() && "llbc framework internal error: _pendingEventOps is not empty!");
+
+    // Recycle all listener infos.
+    for (auto it = _id2ListenerInfos.begin(); it != _id2ListenerInfos.end(); ++it)
         LLBC_STLHelper::RecycleContainer(it->second);
 }
 
@@ -76,12 +80,12 @@ LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
     if (AddListenerCheck(boundStub, stub) != LLBC_OK)
         return 0;
 
-    _ListenerInfo *li = new _ListenerInfo;
-    li->evId = id;
-    li->stub = stub;
-    li->deleg = listener;
+    _ListenerInfo *listenerInfo = new _ListenerInfo;
+    listenerInfo->evId = id;
+    listenerInfo->stub = stub;
+    listenerInfo->deleg = listener;
 
-    AddListenerInfo(li);
+    AddListenerInfo(listenerInfo);
 
     return stub;
 }
@@ -100,48 +104,51 @@ LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
     if (AddListenerCheck(boundStub, stub) != LLBC_OK)
         return 0;
 
-    _ListenerInfo *li = new _ListenerInfo;
-    li->evId = id;
-    li->stub = stub;
-    li->listener = listener;
+    _ListenerInfo *listenerInfo = new _ListenerInfo;
+    listenerInfo->evId = id;
+    listenerInfo->stub = stub;
+    listenerInfo->listener = listener;
 
-    AddListenerInfo(li);
+    AddListenerInfo(listenerInfo);
 
     return stub;
 }
 
 int LLBC_EventMgr::RemoveListener(int id)
 {
-    if (id <= 0)
+    // Event id check.
+    if (UNLIKELY(id <= 0))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    _Id2ListenerInfos::iterator idIt = _id2ListenerInfos.find(id);
+    // If in firing, pending operation.
+    if (IsFiring())
+    {
+        _PendingEventOp *pendingOp = new _PendingEventOp(_PendingEventOp::RemoveListenersById);
+        pendingOp->opInfo.eventId = id;
+        _pendingEventOps.push_back(pendingOp);
+        _pendingRemoveEventIds_.insert(id);
+
+        LLBC_SetLastError(LLBC_ERROR_PENDING);
+
+        return LLBC_FAILED;
+    }
+
+    // Find event listeners and remove it.
+    const auto idIt = _id2ListenerInfos.find(id);
     if (idIt == _id2ListenerInfos.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
-    if (IsFiring())
-    {
-        if (!_pendingRemoveEvIds.insert(id).second)
-            LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        else
-            LLBC_SetLastError(LLBC_ERROR_PENDING);
-
-        return LLBC_FAILED;
-    }
-
-    _ListenerInfos &lis = idIt->second;
-    for (_ListenerInfos::iterator it = lis.begin();
-         it != lis.end();
-         ++it)
+    _ListenerInfos &listenerInfos = idIt->second;
+    for (auto it = listenerInfos.begin(); it != listenerInfos.end(); ++it)
         _stub2ListenerInfos.erase((*it)->stub);
 
-    LLBC_STLHelper::RecycleContainer(idIt->second);
+    LLBC_STLHelper::RecycleContainer(listenerInfos);
     _id2ListenerInfos.erase(idIt);
 
     return LLBC_OK;
@@ -149,37 +156,42 @@ int LLBC_EventMgr::RemoveListener(int id)
 
 int LLBC_EventMgr::RemoveListener(const LLBC_ListenerStub &stub)
 {
-    if (stub == 0)
+    // Event stub check.
+    if (UNLIKELY(stub == 0))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-    _Stub2ListenerInfos::iterator stubIt = _stub2ListenerInfos.find(stub);
+    // If in firing, pending operation.
+    if (IsFiring())
+    {
+        _PendingEventOp *pendingOp = new _PendingEventOp(_PendingEventOp::RemoveListenerByStub);
+        pendingOp->opInfo.eventStub = stub;
+        _pendingEventOps.push_back(pendingOp);
+        _pendingRemoveStubs_.insert(stub);
+
+        LLBC_SetLastError(LLBC_ERROR_PENDING);
+
+        return LLBC_FAILED;
+    }
+
+    // Find listener and remove it.
+    const auto stubIt = _stub2ListenerInfos.find(stub);
     if (stubIt == _stub2ListenerInfos.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
-    if (IsFiring())
-    {
-        if (!_pendingRemoveEvStubs.insert(stub).second)
-            LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        else
-            LLBC_SetLastError(LLBC_ERROR_PENDING);
+    const int evId = stubIt->second.first;
+    const auto idIt = _id2ListenerInfos.find(evId);
+    _ListenerInfos &listenerInfos = idIt->second;
 
-        return LLBC_FAILED;
-    }
-
-    int &evId = stubIt->second.first;
-    _Id2ListenerInfos::iterator idIt = _id2ListenerInfos.find(evId);
-    _ListenerInfos &lis = idIt->second;
-
-    _ListenerInfos::iterator &liIt = stubIt->second.second;
-    LLBC_Recycle(*liIt);
-    lis.erase(liIt);
-    if (lis.empty())
+    _ListenerInfos::iterator &listenerIt = stubIt->second.second;
+    LLBC_Recycle(*listenerIt);
+    listenerInfos.erase(listenerIt);
+    if (listenerInfos.empty())
         _id2ListenerInfos.erase(idIt);
 
     _stub2ListenerInfos.erase(stubIt);
@@ -187,46 +199,75 @@ int LLBC_EventMgr::RemoveListener(const LLBC_ListenerStub &stub)
     return LLBC_OK;
 }
 
-void LLBC_EventMgr::RemoveAllListeners()
+int LLBC_EventMgr::RemoveAllListeners()
 {
     if (IsFiring())
     {
+        _pendingEventOps.push_back(new _PendingEventOp(_PendingEventOp::RemoveAllListeners));
         _pendingRemoveAllListeners = true;
-        return;
+
+        LLBC_SetLastError(LLBC_ERROR_PENDING);
+
+        return LLBC_FAILED;
     }
 
     _stub2ListenerInfos.clear();
-    for (_Id2ListenerInfos::iterator it = _id2ListenerInfos.begin();
-         it != _id2ListenerInfos.end();
-         ++it)
-        LLBC_STLHelper::RecycleContainer(it->second);
+    for (auto &listenerInfosItem : _id2ListenerInfos)
+        LLBC_STLHelper::RecycleContainer(listenerInfosItem.second);
+
+    return LLBC_OK;
 }
 
-void LLBC_EventMgr::Fire(LLBC_Event *ev)
+int LLBC_EventMgr::Fire(LLBC_Event *ev)
 {
-    BeforeFireEvent();
+    // Prevent use defer syntax to optimize Fire() method performance.
+    // LLBC_Defer(LLBC_DoIf(!ev->IsDontDelAfterFire(), LLBC_Recycle(ev)));
 
-    _Id2ListenerInfos::iterator idIt = _id2ListenerInfos.find(ev->GetId());
-    if (idIt != _id2ListenerInfos.end())
+    // Firstly, if in firing, check will fire event id has been remove or not.
+    if (IsFiring() &&
+        (_pendingRemoveAllListeners ||
+         (!_pendingRemoveEventIds_.empty() &&
+          _pendingRemoveEventIds_.find(ev->GetId()) != _pendingRemoveEventIds_.end())))
     {
-        _ListenerInfos &lis = idIt->second;
-        const _ListenerInfos::const_iterator lItEnd = lis.end();
-        for (_ListenerInfos::const_iterator lIt = lis.begin();
-             lIt != lItEnd;
-             ++lIt)
+        if (!ev->IsDontDelAfterFire())
+            LLBC_Recycle(ev);
+        return LLBC_OK;
+    }
+
+    // Do before fire event logic.
+    const int ret = BeforeFireEvent(*ev);
+    if (UNLIKELY(ret != LLBC_OK))
+    {
+        if (!ev->IsDontDelAfterFire())
+            LLBC_Recycle(ev);
+        return LLBC_FAILED;
+    }
+
+    // Call all listeners.
+    const auto idIt = _id2ListenerInfos.find(ev->GetId());
+    if (idIt != _id2ListenerInfos.end() && !idIt->second.empty())
+    {
+        for (auto &listenerInfo : idIt->second)
         {
-            const _ListenerInfo * const &li = *lIt;
-            if (li->deleg)
-                li->deleg(*ev);
+            if (!_pendingRemoveStubs_.empty() &&
+                _pendingRemoveStubs_.find(listenerInfo->stub) != _pendingRemoveStubs_.end())
+                continue;
+
+            if (listenerInfo->deleg)
+                listenerInfo->deleg(*ev);
             else
-                li->listener->Invoke(*ev);
+                listenerInfo->listener->Invoke(*ev);
         }
     }
 
+    // Recycle event.
     if (!ev->IsDontDelAfterFire())
         LLBC_Recycle(ev);
 
+    // Do after fire event logic.
     AfterFireEvent();
+
+    return LLBC_OK;
 }
 
 LLBC_EventFirer LLBC_EventMgr::BeginFire(int evId)
@@ -242,46 +283,86 @@ bool LLBC_EventMgr::HasStub(const LLBC_ListenerStub &stub) const
     return _stub2ListenerInfos.find(stub) != _stub2ListenerInfos.end();
 }
 
-void LLBC_EventMgr::BeforeFireEvent()
+int LLBC_EventMgr::BeforeFireEvent(const LLBC_Event &ev)
 {
+    // If event id already in firing, set <REPEAT> error and return failed.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+    if (!_firingEventIds.empty() &&
+        std::find(_firingEventIds.begin(), _firingEventIds.end(), ev.GetId()) != _firingEventIds.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+
+    // Increase firing flag.
     ++_firing;
+
+    // Add event id to _firingEventIds set.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+    _firingEventIds.push_back(ev.GetId());
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+
+    return LLBC_OK;
 }
 
 void LLBC_EventMgr::AfterFireEvent()
 {
+    // Remove event id from _firingEventIds list.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+    _firingEventIds.resize(_firingEventIds.size() - 1);
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+
+    // Decrease firing flag.
     if (--_firing != 0)
         return;
 
-    if (_pendingRemoveAllListeners)
+    // Assert: make sure _firing >= 0.
+    ASSERT(_firing >= 0 && "llbc framework internal error: LLBC_EventMgr._firing < 0");
+    // Assert: make sure _firingEventIds is empty.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+    ASSERT(_firingEventIds.empty() && "llbc framework internal error: LLBC_EventMgr._firingEventIds is not empty!");
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+
+    // Process pending event ops(add/remove).
+    for (auto &pendingEventOp : _pendingEventOps)
     {
-        _pendingRemoveEvIds.clear();
-        _pendingRemoveEvStubs.clear();
-
-        RemoveAllListeners();
-        _pendingRemoveAllListeners = false;
-
-        return;
+        const auto opType = pendingEventOp->opType;
+        if (opType == _PendingEventOp::AddListener)
+        {
+            AddListenerInfo(pendingEventOp->opInfo.listenerInfo);
+            pendingEventOp->opInfo.listenerInfo = nullptr;
+        }
+        else if (opType == _PendingEventOp::RemoveAllListeners)
+        {
+            RemoveAllListeners();
+        }
+        else if (opType == _PendingEventOp::RemoveListenersById)
+        {
+            RemoveListener(pendingEventOp->opInfo.eventId);
+        }
+        else // RemoveListenerByStub
+        {
+            RemoveListener(pendingEventOp->opInfo.eventStub);
+        }
     }
 
-    if (!_pendingRemoveEvIds.empty())
-    {
-        for (std::set<int>::const_iterator it = _pendingRemoveEvIds.begin();
-             it != _pendingRemoveEvIds.end();
-             ++it)
-            RemoveListener(*it);
+    LLBC_STLHelper::DeleteContainer(_pendingEventOps);
+    _pendingRemoveAllListeners = false;
+    _pendingRemoveEventIds_.clear();
+    _pendingRemoveStubs_.clear();
+}
 
-        _pendingRemoveEvIds.clear();
-    }
+LLBC_EventMgr::_PendingEventOp::_PendingEventOp(_PendingEventOpType opType)
+: opType(opType)
+, opInfo{}
+{
+}
 
-    if (!_pendingRemoveEvStubs.empty())
-    {
-        for (std::set<LLBC_ListenerStub>::const_iterator it = _pendingRemoveEvStubs.begin();
-             it != _pendingRemoveEvStubs.end();
-             ++it)
-            RemoveListener(*it);
-
-        _pendingRemoveEvStubs.clear();
-    }
+LLBC_EventMgr::_PendingEventOp::~_PendingEventOp()
+{
+    if (opType == AddListener && opInfo.listenerInfo)
+        delete opInfo.listenerInfo;
 }
 
 int LLBC_EventMgr::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_ListenerStub &stub)
@@ -306,12 +387,25 @@ int LLBC_EventMgr::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_Lis
     return LLBC_OK;
 }
 
-void LLBC_EventMgr::AddListenerInfo(_ListenerInfo *li)
+int LLBC_EventMgr::AddListenerInfo(_ListenerInfo *listenerInfo)
 {
-    auto &lis = _id2ListenerInfos[li->evId];
-    lis.push_back(li);
+    if (IsFiring())
+    {
+        _PendingEventOp *pendingOp = new _PendingEventOp(_PendingEventOp::AddListener);
+        pendingOp->opInfo.listenerInfo = listenerInfo;
+        _pendingEventOps.push_back(pendingOp);
 
-    _stub2ListenerInfos[li->stub] = std::make_pair(li->evId, --lis.end());
+        LLBC_SetLastError(LLBC_ERROR_PENDING);
+
+        return LLBC_FAILED;
+    }
+
+    auto &listenerInfos = _id2ListenerInfos[listenerInfo->evId];
+    listenerInfos.push_back(listenerInfo);
+
+    _stub2ListenerInfos[listenerInfo->stub] = std::make_pair(listenerInfo->evId, --listenerInfos.end());
+
+    return LLBC_OK;
 }
 
 __LLBC_NS_END

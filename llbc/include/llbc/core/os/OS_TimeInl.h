@@ -190,18 +190,20 @@ LLBC_FORCE_INLINE uint64 LLBC_RdTsc()
     return static_cast<uint64>(cur.QuadPart);
     #else // Non-win32
     uint32 lo = 0, hi = 0;
-    __asm__ volatile ("lfence\n\t"
-                    "rdtsc\n\t"
-                    "mov %%edx, %1;"
-                    "mov %%eax, %0;"
-                    "lfence\n\t":"=r"(lo), "=r"(hi)
-                    ::"%eax", "%ebx", "%ecx", "%edx");
-
+    if (__LLBC_supportedRdtscp)
+        __asm__ volatile ("rdtscp" : "=a" (lo), "=d" (hi) :: "rcx");
+    else
+        __asm__ volatile ("lfence\n\t"
+                          "rdtsc\n\t"
+                          "mov %%edx, %1;"
+                          "mov %%eax, %0;"
+                          "lfence\n\t":"=r"(lo), "=r"(hi)
+                          ::"%eax", "%ebx", "%ecx", "%edx");
     return (static_cast<uint64>(hi) << 32) | lo;
     #endif // LLBC_TARGET_PLATFORM_WIN32
 #else
     return LLBC_GetMicroseconds();
-#endif
+#endif // LLBC_SUPPORT_RDTSC
 }
 
 __LLBC_NS_END

@@ -24,10 +24,10 @@
 
 namespace
 {
-    class TestPackProtocol : public LLBC_PacketProtocol
+    class TestPackProtocol final : public LLBC_PacketProtocol
     {
     public:
-        virtual bool Ctrl(int ctrlCmd, const LLBC_Variant &ctrlData, bool &removeSession)
+        bool Ctrl(int ctrlCmd, const LLBC_Variant &ctrlData, bool &removeSession) override
         {
             LLBC_PrintLn(">>>Ctrl protocol, cmd:%d, data:%s", ctrlCmd, ctrlData.ToString().c_str());
             return false; // Return true if you want to pass control command to lower protocols.
@@ -41,10 +41,10 @@ namespace
         }
     };
 
-    class TestProtoFactory : public LLBC_IProtocolFactory
+    class TestProtoFactory final : public LLBC_IProtocolFactory
     {
     public:
-        virtual LLBC_IProtocol *Create(int layer) const
+        LLBC_IProtocol *Create(int layer) const override
         {
             switch (layer)
             {
@@ -63,24 +63,25 @@ namespace
         }
     };
 
-    class TestComp : public LLBC_Component
+    class TestComp final : public LLBC_Component
     {
     public:
-        virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+        void OnEvent(int eventType, const LLBC_Variant &eventParams) override
         {
-            switch (event)
+            switch (eventType)
             {
                 case LLBC_ComponentEventType::SessionCreate:
                 {
-                    OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                    OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
                     break;
                 }
                 case LLBC_ComponentEventType::SessionDestroy:
                 {
-                    OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                    OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
                     break;
                 }
-                default: break;
+                default:
+                    break;
             }
         }
 

@@ -24,10 +24,10 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Com_Stream : public LLBC_BaseTestCase
+class TestCase_Com_Stream final : public LLBC_BaseTestCase
 {
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     int BasicTest();
@@ -40,6 +40,7 @@ private:
     int EndianTest();
     int PODTypeSerTest();
     int TrivialClsSerTest();
+    int NonTrivialClsSerTest();
     int SerializableClsSerTest();
     int MovableReadTest();
 

@@ -18,24 +18,14 @@
 
 #pragma once
 
-#include "llbc/common/Common.h"
+#include "llbc/core/tinyxml2/tinyxml2.h"
 
 /**
  * Classes pre-declare.
  */
 __LLBC_NS_BEGIN
-
 class LLBC_Ini;
 class LLBC_Variant;
-class LLBC_Property;
-
-namespace tinyxml2
-{
-
-class XMLElement;
-class XMLDocument;
-
-}
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -76,21 +66,13 @@ public:
      * @param[in] doc  - the xml document.
      * @param[out] var - the variant object.
      */
-    static void Xml2Variant(const ::llbc::tinyxml2::XMLDocument &doc, LLBC_Variant &var);
+    static void Xml2Variant(const LLBC_TINYXML2_NS XMLDocument &doc, LLBC_Variant &var);
     /**
      * Convert xml element to variant.
      * @param[in] elem - the xml element.
      * @param[out] var - the variant object.
      */
-    static void Xml2Variant(const ::llbc::tinyxml2::XMLElement &elem, LLBC_Variant &var);
-
-    /**
-     * Convert property to variant.
-     * 
-     * @param[in] prop - the property object.
-     * @param[out] var - the variant object.
-     */
-    static void Property2Variant(const LLBC_Property &prop, LLBC_Variant &var);
+    static void Xml2Variant(const LLBC_TINYXML2_NS XMLElement &elem, LLBC_Variant &var);
 };
 
 __LLBC_NS_END

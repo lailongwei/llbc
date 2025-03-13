@@ -72,9 +72,8 @@ int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
         if (UNLIKELY(ch != Base::StringLen))
         {
             _state = Base::Error;
-
-            LLBC_String errStr;
-            pyllbc_SetError(errStr.format("str type raw-lemma except '#' lemma to done, but got: %c", ch));
+            pyllbc_SetError(LLBC_String().format(
+                "str type raw-lemma except '#' lemma to done, but got: %c", ch));
 
             return LLBC_FAILED;
         }
@@ -89,17 +88,15 @@ int pyllbc_PackLemma_Raw::Process(Symbol ch, Symbol nextCh)
     if (raw.find(ch) == raw.end())
     {
         _state = Base::Error;
-
-        LLBC_String errStr;
-        pyllbc_SetError(errStr.format("invalid raw-lemma character: %c", ch));
+        pyllbc_SetError(LLBC_String().format("invalid raw-lemma character: %c", ch));
 
         return LLBC_FAILED;
     }
     else if (ch == Base::StringLen) // Special raw-lemma character, process it.
     {
         _state = Base::Error;
-
         pyllbc_SetError("str len lemma '#' must place on str lemma 'S' later");
+
         return LLBC_FAILED;
     }
 
@@ -184,9 +181,7 @@ PyObject *pyllbc_PackLemma_Raw::Read(pyllbc_Stream *stream)
     default:
         obj = nullptr;
         {
-            LLBC_String errStr;
-            pyllbc_SetError(
-                errStr.format("Unknown raw-lemma symbol: %c", _symbol));
+            pyllbc_SetError(LLBC_String().format("Unknown raw-lemma symbol: %c", _symbol));
         }
         break;
     }
@@ -259,8 +254,7 @@ int pyllbc_PackLemma_Raw::Write(pyllbc_Stream *stream, PyObject *values)
     default:
         rtn = LLBC_FAILED;
         {
-            LLBC_String errStr;
-            pyllbc_SetError(errStr.format(
+            pyllbc_SetError(LLBC_String().format(
                 "unknown format character in raw-lemma: %c", _symbol));
         }
         break;

@@ -38,18 +38,18 @@ public:
     /**
      * Destructor.
      */
-    virtual ~lullbc_Timer();
+    ~lullbc_Timer() override;
 
 public:
     /**
      * Overrided method, when timer timeout, will call this method.
      */
-    virtual void OnTimeout();
+    void OnTimeout() override;
 
     /**
      * Overrided method, when timer cancel, will call this method.
      */
-    virtual void OnCancel();
+    void OnCancel() override;
 
 private:
     bool PushCallable();

@@ -50,7 +50,9 @@ LLBC_HIDDEN void pyllbc_PyErrFetch(PyObject *&errType, LLBC_String &errStr, PyOb
 /**
  * Transfer llbc library error to python.
  */
-LLBC_HIDDEN void pyllbc_TransferLLBCError(const char *file = nullptr, int lineNo = 0, const LLBC_String &additionalMsg = "");
+LLBC_HIDDEN void pyllbc_TransferLLBCError(const char *file = nullptr,
+                                          int lineNo = 0,
+                                          const LLBC_String &additionalMsg = "");
 
 /**
  * Transfer python error to llbc.
@@ -60,9 +62,15 @@ LLBC_HIDDEN void pyllbc_TransferPyError(const LLBC_String &additionalMsg = "");
 
 /**
  * Set pyllbc module last error.
- * @param[in] errNo - must according to llbc library errno constraint.
+ * @param[in] errNo         - must according to llbc library errno constraint.
+ * @param[in] file          - the error file.
+ * @param[in] line          - the error line.
+ * @param[in] additionalMsg - the additional message.
  */
-LLBC_HIDDEN void pyllbc_SetError(int errNo);
+LLBC_HIDDEN void pyllbc_SetError(int errNo,
+                                 const char *file = nullptr,
+                                 int lineNo = 0,
+                                 const LLBC_String &additionalMsg = "");
 
 /**
  * Set pyllbc module error.

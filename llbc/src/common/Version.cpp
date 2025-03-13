@@ -117,7 +117,6 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("  per thread max drive services count: %d\n", LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT);
     desc.append_format("  enabled register status code handler support: %s\n", LLBC_CFG_COMM_ENABLE_STATUS_HANDLER ? "true" : "false");
     desc.append_format("  enabled unify pre-subscribe support: %s\n", LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE ? "true" : "false");
-    desc.append_format("  max supported component name length: %d\n", LLBC_CFG_COMM_MAX_COMP_NAME_LEN);
 
     // Append third-party info.
     // desc.append_format("3rd party info: \n");

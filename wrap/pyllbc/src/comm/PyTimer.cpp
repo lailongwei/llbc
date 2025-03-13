@@ -36,8 +36,8 @@ namespace
             const LLBC_String objDesc = pyllbc_ObjUtil::GetObjStr(obj);
             if (LIKELY(!PyErr_Occurred()))
             {
-                LLBC_String errStr;
-                pyllbc_SetError(errStr.format("timeout/cancel handler must callable, handler: %s", objDesc.c_str()));
+                pyllbc_SetError(LLBC_String().format(
+                    "timeout/cancel handler must callable, handler: %s", objDesc.c_str()));
             }
 
             method = boundedObj = nullptr;
@@ -50,8 +50,7 @@ namespace
                 const LLBC_String objDesc = pyllbc_ObjUtil::GetObjStr(obj);
                 if (LIKELY(!PyErr_Occurred()))
                 {
-                    LLBC_String errStr;
-                    pyllbc_SetError(errStr.format(
+                    pyllbc_SetError(LLBC_String().format(
                         "could not pass unbound method object to timer, obj: %s", objDesc.c_str()));
                 }
 
@@ -229,13 +228,12 @@ void pyllbc_Timer::SetIgnoredDeadRef(bool flag)
 {
     _ignoredDeadRef = flag;
 }
-
-int pyllbc_Timer::Schedule(sint64 dueTime, sint64 period)
+    
+int pyllbc_Timer::Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period)
 {
-    if (Base::Schedule(LLBC_TimeSpan::FromMillis(dueTime), LLBC_TimeSpan::FromMillis(period)) != LLBC_OK)
+    if (Base::Schedule(dueTime, period) != LLBC_OK)
     {
-        const LLBC_String desc = ToString();
-        pyllbc_TransferLLBCError(__FILE__, __LINE__, desc);
+        pyllbc_TransferLLBCError(__FILE__, __LINE__, ToString());
         return LLBC_FAILED;
     }
 

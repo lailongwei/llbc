@@ -23,28 +23,39 @@
 
 #include "llbc/common/PFConfig.h"
 
-// The llbc namespace define.
-#define LLBC_NAMESPACE ::llbc::
-#define LLBC_NS        LLBC_NAMESPACE
+// The llbc/llbc-internal namespace name define.
+#define LLBC_NS_NAME                  llbc
+#define LLBC_INTERNAL_NS_NAME         LLBC_Concat(__, LLBC_NS_NAME)
 
-// The llbc internal namespace  define.
-#define LLBC_INTERNAL_NAMESPACE ::__llbc::
-#define LLBC_INTERNAL_NS        LLBC_INTERNAL_NAMESPACE
-#define LLBC_INL_NS             LLBC_INTERNAL_NAMESPACE
+// The llbc/llbc-internal namespace define.
+#define LLBC_NS                       ::LLBC_NS_NAME::
+#define LLBC_INTERNAL_NS              ::LLBC_INTERNAL_NS_NAME::
+#define LLBC_INL_NS                   LLBC_INTERNAL_NS
 
-// llbc library namespace macros(begin/end) define.
-#define __LLBC_NS_BEGIN \
-    namespace llbc {    \
+// llbc library namespace begin&end macros define.
+#define __LLBC_NS_BEGIN               \
+    namespace LLBC_NS_NAME {          \
 
-#define __LLBC_NS_END   \
-    }                   \
+#define __LLBC_NS_END                 \
+    }                                 \
 
-// llbc library internal namespace macros(begin/end) define.
-#define __LLBC_INTERNAL_NS_BEGIN \
-    namespace __llbc {           \
+// llbc library internal namespace begin&end macros define.
+#define __LLBC_INTERNAL_NS_BEGIN      \
+    namespace LLBC_INTERNAL_NS_NAME { \
 
-#define __LLBC_INTERNAL_NS_END   \
-    }                            \
+#define __LLBC_INTERNAL_NS_END        \
+    }                                 \
+
+// Common return values define.
+#define LLBC_OK     (0)
+#define LLBC_FAILED (-1)
+
+// Wait infinite macro define.
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+#define LLBC_INFINITE    ((int)(0xffffffff))
+#else // LLBC_TARGET_PLATFORM_WIN32
+#define LLBC_INFINITE    INFINITE
+#endif // LLBC_TARGET_PLATFORM_NON_WIN32
 
 // llbc library error describe buffer size.
 #define __LLBC_ERROR_DESC_SIZE            2048
@@ -64,7 +75,7 @@
 
 // NDebug/Release macro define.
 #ifndef LLBC_DEBUG
- #define LLBC_NDEBUG 1
+ #define LLBC_NDEBUG  1
  #define LLBC_RELEASE 1
 #endif
 
@@ -105,13 +116,16 @@
 #define LLBC_ISUNSIGNED_TYPE(type)     ((type)(0 - 1) > 0)
 #define LLBC_ISUNSIGNED_VAL(type, val) ((type)val >= 0 && (type)~a >= (type)0)
 
-// Force inline macro define.
+// Force-Inline/No-Inline macro define.
 #if defined(_MSC_VER)
  #define LLBC_FORCE_INLINE __forceinline
+ #define LLBC_NO_INLINE    __declspec(noinline)
 #elif defined(__GNUC__) || defined(__clang__)
  #define LLBC_FORCE_INLINE __inline__ __attribute__((always_inline))
+ #define LLBC_NO_INLINE    __attribute__((noinline))
 #else
  #define LLBC_FORCE_INLINE inline
+ #define LLBC_NO_INLINE
 #endif
 
 // Extern macro define.
@@ -215,26 +229,22 @@
     name(name &&) = delete;                \
     name &operator=(name &&) = delete      \
 
-// Thread local macro define.
-#if LLBC_TARGET_PLATFORM_LINUX
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_WIN32
-#define LLBC_THREAD_LOCAL __declspec(thread)
-#elif LLBC_TARGET_PLATFORM_IPHONE
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_MAC
-#define LLBC_THREAD_LOCAL __thread
-#elif LLBC_TARGET_PLATFORM_ANDROID
-#define LLBC_THREAD_LOCAL __thread
-#endif
-
 // Deprecated attribute macro define.
 #if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
 #define LLBC_DEPRECATED __attribute__((deprecated))
-#elif _MSC_VER >= 1400 // VS 2005 or higher.
+#elif defined(_MSC_VER) && _MSC_VER >= 1400 // VS 2005 or higher.
 #define LLBC_DEPRECATED __declspec(deprecated)
 #else
 #define LLBC_DEPRECATED
+#endif
+
+// WARN_UNUSED_RESULT macro define.
+#if defined(__GNUC__) || defined(__clang__)
+ #define LLBC_NO_DISCARD __attribute__((warn_unused_result))
+#elif defined(_MSC_VER) && _MSC_VER >= 1700 // VS 2012 or higher
+ #define LLBC_NO_DISCARD _Check_return_
+#else
+ #define LLBC_NO_DISCARD
 #endif
 
 // Unused param macro.
@@ -403,10 +413,3 @@
 #define LLBC_ExitIf(cond, exitCode)                                 \
     { if ((cond)) exit(static_cast<int>(exitCode)); }               \
 
-#define LLBC_DoIfNot(cond, behav) LLBC_DoIf(!(cond), behav)
-#define LLBC_ContinueIfNot(cond, behav) LLBC_ContinueIf(!(cond), behav)
-#define LLBC_BreakIfNot(cond, behav) LLBC_BreakIf(!(cond), behav)
-#define LLBC_SetErrAndBreakIfNot(cond, err) LLBC_SetErrAndBreakIf(!(cond), err)
-#define LLBC_ReturnIfNot(cond, ret) LLBC_ReturnIf(!(cond), ret)
-#define LLBC_SetErrAndReturnIfNot(cond, err, ret) LLBC_SetErrAndReturnIf(!(cond), err, ret)
-#define LLBC_ExitIfNot(cond, exitCode) LLBC_ExitIf(!(cond), exitCode)

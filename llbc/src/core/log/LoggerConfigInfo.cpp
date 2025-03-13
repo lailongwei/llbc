@@ -29,6 +29,7 @@
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogRollingMode.h"
+#include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 
 /*
@@ -134,9 +135,9 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, AsStr).strip()).empty())
         {
             #if LLBC_TARGET_PLATFORM_WIN32
-            _logDir = _logDir.findreplace(LLBC_SLASH_A, LLBC_BACKLASH_A);
+            _logDir = _logDir.findreplace('/', '\\');
             #else
-            _logDir = _logDir.findreplace(LLBC_BACKLASH_A, LLBC_SLASH_A);
+            _logDir = _logDir.findreplace('\\', '/');
             #endif
         }
 
@@ -230,6 +231,24 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     return LLBC_OK;
 }
 
+int LLBC_LoggerConfigInfo::GetAppenderLogLevel(int appenderType) const
+{
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    if (appenderType == LLBC_LogAppenderType::Console)
+    {
+        return GetConsoleLogLevel();
+    }
+    else if (appenderType == LLBC_LogAppenderType::File)
+    {
+        return GetFileLogLevel();
+    }
+    else
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_LogLevel::End;
+    }
+}
+
 void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 {
     // Replace process id: %p.
@@ -274,7 +293,7 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 #if LLBC_TARGET_PLATFORM_IPHONE
     if (_logToFile &&
         !_logFile.empty() &&
-        _logFile[0] != LLBC_SLASH_A)
+        _logFile[0] != '/')
         _logFile = LLBC_Directory::Join(LLBC_Directory::TempDir(), _logFile);
 #endif // LLBC_TARGET_PLATFORM_IPHONE
 }

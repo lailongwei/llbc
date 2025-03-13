@@ -24,12 +24,12 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_SvcStartStop : public LLBC_BaseTestCase
+class TestCase_Comm_SvcStartStop final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_SvcStartStop();
-    virtual ~TestCase_Comm_SvcStartStop();
+    TestCase_Comm_SvcStartStop() = default;
+    ~TestCase_Comm_SvcStartStop() override = default;
 
 public:
-    virtual int Run(int argc, char *artv[]);
+    int Run(int argc, char *artv[]) override;
 };

@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/time/TimeSpan.h"
+#include "llbc/core/time/Time.h"
 #include "llbc/core/utils/Util_Delegate.h"
 
 __LLBC_NS_BEGIN
@@ -40,11 +40,14 @@ __LLBC_NS_BEGIN
  */
 class LLBC_EXPORT LLBC_Timer
 {
-    typedef LLBC_TimerScheduler Scheduler;
-
 public:
     /**
-     * Constructor.
+     * Default constructor.
+     */
+    LLBC_Timer(): LLBC_Timer(nullptr, nullptr, nullptr) {  }
+
+    /**
+     * Construct from delegate(s) and scheduler.
      * @param[in] timeoutDeleg - the timeout handler delegate.
      * @param[in] cancelDeleg  - the cancel handler delegate(optional).
      * @param[in] scheduler    - timer scheduler, if set to nullptr, it means use default scheduler, 
@@ -55,9 +58,9 @@ public:
      *              In llbc service logic thread, use Service's timer scheduler.
      *              In other non-llbc library style thread, scheduler is nullptr.
      */
-    explicit LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg = nullptr,
+    explicit LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
                         const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg = nullptr,
-                        Scheduler *scheduler = nullptr);
+                        LLBC_TimerScheduler *scheduler = nullptr);
     virtual ~LLBC_Timer();
 
 public:
@@ -134,6 +137,12 @@ public:
     LLBC_Variant &GetTimerData();
     const LLBC_Variant &GetTimerData() const;
 
+    /**
+     * Get timeout time(only available in timeout processing).
+     * @return LLBC_Time - timeout time.
+     */
+    LLBC_Time GetTimeoutTime() const;
+
 public:
     /**
      * Timeout event handler.
@@ -148,11 +157,19 @@ public:
 public:
     /**
      * Schedule timer.
-     * @param[in] dueTime - due time, in milli-seconds.
-     * @param[in] period  - period value, in milli-seconds, if is zero, will use dueTime to schedule.
+     * @param[in] firstTime - first timeout time, must be >= LLBC_Time::Now().
+     * @param[in] period    - period time, if is zero, will use firstTime - LLBC_Time::Now().
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
+    virtual int Schedule(const LLBC_Time &firstTime, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
+
+    /**
+     * Schedule timer.
+     * @param[in] firstPeriod - first period time.
+     * @param[in] period      - period time, if is zero, wll use firstPeriod.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
 
     /**
      * Cancel this timer.
@@ -195,7 +212,7 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_Timer);
 
 private:
-    Scheduler *_scheduler;
+    LLBC_TimerScheduler *_scheduler;
     LLBC_TimerData *_timerData;
 
     LLBC_Variant *_data;

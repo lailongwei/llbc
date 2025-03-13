@@ -31,65 +31,20 @@ namespace
             Event1 = 1,
             Event2 = 2,
             Event3 = 3,
+            Event4 = 4,
         };
     };
 
     static LLBC_EventMgr evMgr;
 }
 
-TestCase_Core_Event::TestCase_Core_Event()
-{
-}
-
-TestCase_Core_Event::~TestCase_Core_Event()
-{
-}
-
 int TestCase_Core_Event::Run(int argc, char *argv[])
 {
-    std::cout <<"core/event test:" <<std::endl;
+    LLBC_PrintLn("EventMgr test:");
 
-    // Fire Event1 to test params pass.
-    std::cout <<"Add Event1 Listener OnEvent1()" <<std::endl;
-    _ev1Stub = evMgr.AddListener(EventIds::Event1, this, &TestCase_Core_Event::OnEvent1);
-    std::cout <<"Add Event1 Listener OnEvent1Too()" <<std::endl;
-    _ev1TooStub = evMgr.AddListener(EventIds::Event1, this, &TestCase_Core_Event::OnEvent1Too);
-
-    // Build event.
-    LLBC_Event *ev = new LLBC_Event(EventIds::Event1);
-    // Attach int key indexed params.
-    ev->SetParam(0, 1);
-    ev->SetParam(1, true);
-    ev->SetParam(2, "Hello world");
-    ev->SetParam(2, "Hello world(overrided)");
-    (*ev)[3] = 1.5;
-    (*ev)[4] = -1.5f;
-    (*ev)[4] = -3.0f;
-    // Attach string key indexed params.
-    ev->SetParam("Key1", "Hello world");
-    (*ev)["Key2"] =  "Hey, Judy";
-    // Fire Event1(Event2 listener already add in Event1 handler).
-    evMgr.Fire(ev);
-
-    std::cout <<"Fire Event2" <<std::endl;
-    evMgr.Fire(new LLBC_Event(EventIds::Event2));
-
-    std::cout <<"Fire Event1" <<std::endl;
-    evMgr.Fire(new LLBC_Event(EventIds::Event1));
-
-    std::cout <<"Test chain call event fire" <<std::endl;
-    evMgr.AddListener(EventIds::Event3, [this](LLBC_Event &ev){
-        std::cout <<"Event3 handler, func: " <<__FUNCTION__ <<", ev: 0x" <<this <<std::endl;
-        std::cout <<"event params: " <<std::endl;
-        DumpEvParams(ev);
-    });
-    evMgr.BeginFire(EventIds::Event3)
-        .SetParam(1, "Hello World")
-        .SetParam("hey", "judy")
-        .SetParam(LLBC_String("hey too"), 3.1415926)
-        .Fire();
-
-    evMgr.BeginFire(EventIds::Event3);
+    LLBC_ErrorAndReturnIf(BasicTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(EventFireDeadLoopDetectionTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(CopyEventTest() != LLBC_OK, LLBC_FAILED);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -97,50 +52,218 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Event::OnEvent1(LLBC_Event &ev)
+int TestCase_Core_Event::BasicTest()
 {
-    std::cout <<"OnEvent1() called! event params(this: 0x" <<this <<"):" <<std::endl;
-    DumpEvParams(ev);
-}
+    LLBC_PrintLn("Basic test:");
 
-void TestCase_Core_Event::OnEvent1Too(LLBC_Event &ev)
-{
-    std::cout <<"OnEvent1Too()called! add Event2 event listener OnEvent2()" <<std::endl;
+    // Add all event listeners.
+    LLBC_EventMgr evMgr;
+    LLBC_PrintLn("Add event listeners");
+    auto ev1Stub1 = evMgr.AddListener(EventIds::Event1, [this, &evMgr](LLBC_Event &ev) {
+        LLBC_PrintLn("- Event1 event handler[1] called, params:");
+        DumpEvParams(ev);
 
-    // Add Event2 listener.
-    evMgr.AddListener(EventIds::Event2, this, &TestCase_Core_Event::OnEvent2);
-}
+        // Test event nested fire.
+        LLBC_PrintLn("- Fire Event2...");
+        evMgr.BeginFire(EventIds::Event2)
+            .SetParam("Event2_Key1", "The value")
+            .Fire();
+    });
 
-void TestCase_Core_Event::OnEvent2(LLBC_Event &ev)
-{
-    std::cout <<"OnEvent2() called! remove Event1 event listener OnEvent1Too() and remove self listener" <<std::endl;
+    auto ev1Stub2 = evMgr.AddListener(EventIds::Event1, [this](LLBC_Event &ev) {
+        LLBC_PrintLn("- Event1 event handler[2] called, params:");
+        DumpEvParams(ev);
+    });
 
-    // Remove Event1 OnEvent1Too() listener.
-    evMgr.RemoveListener(_ev1TooStub);
-    // Remove Event2 OnEvent2() listener.
+    evMgr.AddListener(EventIds::Event2, [this, &evMgr](LLBC_Event &ev) {
+        LLBC_PrintLn("- Event2 event handler called, params:");
+        DumpEvParams(ev);
+
+        // Test event nested fire.
+        LLBC_PrintLn("- Fire Event3...");
+        evMgr.BeginFire(EventIds::Event3)
+            .SetParam("Event3_Key1", "The value")
+            .SetParam("Event3_Key2", LLBC_Rand())
+            .Fire();
+    });
+
+    evMgr.AddListener(EventIds::Event3, [this, &evMgr, ev1Stub1](LLBC_Event &ev) {
+        LLBC_PrintLn("Event3 event handler called, params:");
+        DumpEvParams(ev);
+
+        // Add Event4 listener.
+        LLBC_PrintLn("- Add Event4 listener...");
+        evMgr.AddListener(EventIds::Event4, [](LLBC_Event &ev) {
+            LLBC_FilePrintLn(stderr, "Error: Event4 handler called");
+        });
+
+        // Try fire Event4.
+        LLBC_PrintLn("- Try fire Event4...");
+        evMgr.BeginFire(EventIds::Event4)
+            .Fire();
+
+        // Test remove listener(by stub) in event handler.
+        LLBC_PrintLn("- Remove Event1-Stub1 listener, stub:%llu", ev1Stub1);
+        auto ret = evMgr.RemoveListener(ev1Stub1);
+
+        // Test remove listener(by event id) in event handler.
+        // LLBC_PrintLn("- Remove Event1 listeners, Event1:%llu", EventIds::Event1);
+        // auto ret = evMgr.RemoveListener(EventIds::Event1);
+
+        // Test remove all listeners.
+        // LLBC_PrintLn("- Remove all listeners");
+        // auto ret = evMgr.RemoveAllListeners();
+
+        // auto ret = evMgr.RemoveAllListeners();
+        if (ret != LLBC_FAILED || LLBC_GetLastError() != LLBC_ERROR_PENDING)
+        {
+            LLBC_FilePrintLn(stderr,
+                             "- Error: Remove Event1-Stub1 listener return errno is not: <LLBC_ERROR_PENDING>, ret:%d, errno:%d",
+                             ret, LLBC_GetLastError());
+        }
+
+        // Fire Event1 again.
+        LLBC_PrintLn("- Fire Event1 again..");
+        evMgr.BeginFire(EventIds::Event1)
+             .Fire();
+        LLBC_PrintLn("- Fire Event1 finished");
+    });
+
+    // Fire Event1.
+    LLBC_PrintLn("Fire Event1...");
+    char charArray[] = "char array: hello world";
+    const char constCharArray[] = "const char array: hello world";
+    const char *constCharPointer = "const char pointer: hello world";
+    evMgr.BeginFire(EventIds::Event1)
+        .SetParam("cstring", "cstring: hello world")
+        .SetParam("cstring", "cstring: hello world")
+        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(std::string("string"), "string: hello world")
+        .SetParam(charArray, "char array: hello world")
+        .SetParam(charArray, "char array: hello world")
+        .SetParam(constCharArray, "const char array: hello world")
+        .SetParam(constCharArray, "const char array: hello world")
+        .SetParam(constCharPointer, "const char pointer: hello world")
+        .SetParam(constCharPointer, "const char pointer: hello world")
+        .SetParam("Event1_Key1", LLBC_Rand())
+        .Fire();
+
+    auto* ev = new LLBC_Event(EventIds::Event1);
+    ev->SetParam(std::string("copy string"), "copy string: hello world");
+    (*ev)["empty"] = 111;
+    LLBC_PrintLn("Empty key params - param:%d", (*ev)["empty"].AsInt32());
+
+    // Test finished, remove all listeners.
+    evMgr.RemoveListener(ev1Stub1);
+    evMgr.RemoveListener(ev1Stub2);
     evMgr.RemoveListener(EventIds::Event2);
+    evMgr.RemoveAllListeners();
+
+    LLBC_PrintLn("Basic test finished");
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Event::EventFireDeadLoopDetectionTest()
+{
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+    LLBC_PrintLn("Event fire dead loop detection test:");
+
+    // Add event listeners.
+    LLBC_EventMgr evMgr;
+    evMgr.AddListener(EventIds::Event1, [&evMgr](LLBC_Event &ev) {
+        LLBC_PrintLn("In Event1 handler, fire Event2...");
+        evMgr.BeginFire(EventIds::Event2)
+            .Fire();
+    });
+    evMgr.AddListener(EventIds::Event2, [&evMgr](LLBC_Event &ev) {
+        LLBC_PrintLn("In Event2 handler, fire Event3...");
+        evMgr.BeginFire(EventIds::Event3)
+        .Fire();
+    });
+    evMgr.AddListener(EventIds::Event3, [&evMgr](LLBC_Event &ev) {
+        LLBC_PrintLn("In Event3 handler, fire Event1 too...");
+        auto ret = evMgr.BeginFire(EventIds::Event1)
+            .Fire();
+        if (ret != LLBC_FAILED && LLBC_GetLastError() != LLBC_ERROR_REPEAT)
+        {
+            LLBC_FilePrintLn(stderr,
+                             "- Repeated fire Event1 return errno is not: <LLBC_ERROR_REPEAT>, ret:%d, errno:%d",
+                             ret, LLBC_GetLastError());
+        }
+        else
+        {
+            LLBC_PrintLn("- Dead loop event fire has been detected!");
+        }
+    });
+
+    // Fire Event1.
+    LLBC_PrintLn("Fire Event1...");
+    evMgr.BeginFire(EventIds::Event1)
+        .Fire();
+
+    // Remove all listeners.
+    evMgr.RemoveAllListeners();
+
+    LLBC_PrintLn("Event fire dead loop detection test finished");
+    #else // disabled event fire dead loop detection.
+    LLBC_PrintLn("Disabled event fire dead loop detection, ignore this test...");
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Event::CopyEventTest()
+{
+    LLBC_PrintLn("==================================");
+    LLBC_PrintLn("Event copy test:");
+
+
+    LLBC_Event originEv(1);
+    originEv.SetParam("origin_key1", "origin_value1");
+    originEv.SetParam("origin_key2", "origin_value2");
+
+    LLBC_Event copyEv(originEv);
+    LLBC_PrintLn("Copy event, origin event:");
+    DumpEvParams(originEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event assignEv;
+    assignEv = originEv;
+    LLBC_PrintLn("Assign event, origin event:");
+    DumpEvParams(assignEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event copyRightEv([]()
+    {
+        LLBC_Event ev(2);
+        ev.SetParam("copy_right_key1", "copy_right_value1");
+        ev.SetParam("copy_right_key2", "copy_right_value2");
+        return ev;
+    }());
+    LLBC_PrintLn("Copy right event:");
+    DumpEvParams(copyRightEv);
+    LLBC_PrintLn("==================================");
+
+    LLBC_Event assignRightEv;
+    assignRightEv = []()
+    {
+        LLBC_Event ev(3);
+        ev.SetParam("assign_right_key1", "assign_right_value1");
+        ev.SetParam("assign_right_key2", "assign_right_value2");
+        return ev;
+    }();
+    LLBC_PrintLn("Assign right event:");
+    DumpEvParams(assignRightEv);
+
+    LLBC_PrintLn("Event copy test finished");
+    LLBC_PrintLn("==================================");
+    return LLBC_OK;
 }
 
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
-    std::cout <<"- Event " <<ev.GetId() <<" const char * indexed params:" <<std::endl;
-    const std::map<LLBC_CString, LLBC_Variant> &cstrKeyParams = ev.GetConstantStrKeyParams();
-    for (std::map<LLBC_CString, LLBC_Variant>::const_iterator cstrKeyIt = cstrKeyParams.begin();
-         cstrKeyIt != cstrKeyParams.end();
-         ++cstrKeyIt)
-        std::cout <<"  - " <<cstrKeyIt->first <<": " <<cstrKeyIt->second <<std::endl;
-
-    std::cout <<"- Event " <<ev.GetId() <<" int indexed params:" <<std::endl;
-    const std::map<int, LLBC_Variant> &intKeyParams = ev.GetIntKeyParams();
-    for (std::map<int, LLBC_Variant>::const_iterator intKeyIt = intKeyParams.begin();
-         intKeyIt != intKeyParams.end();
-         ++intKeyIt)
-        std::cout <<"  - " <<intKeyIt->first <<": " <<intKeyIt->second <<std::endl;
-
-    std::cout <<"- Event " <<ev.GetId() <<" LLBC_String indexed params:" <<std::endl;
-    const std::map<LLBC_String, LLBC_Variant> &strKeyParams = ev.GetStrKeyParams();
-    for (std::map<LLBC_String, LLBC_Variant>::const_iterator strKeyIt = strKeyParams.begin();
-         strKeyIt != strKeyParams.end();
-         ++strKeyIt)
-        std::cout <<"  - " <<strKeyIt->first <<": " <<strKeyIt->second <<std::endl;
+    std::stringstream s;
+    s << ev;
+    LLBC_PrintLn("LLBC Event info:%s", s.str().c_str());
 }

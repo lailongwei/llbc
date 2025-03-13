@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_File_File : public LLBC_BaseTestCase
+class TestCase_Core_File_File final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_File_File();
-    virtual ~TestCase_Core_File_File();
+    ~TestCase_Core_File_File() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     bool FileModeDescTest();

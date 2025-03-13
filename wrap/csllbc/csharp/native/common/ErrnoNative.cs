@@ -107,27 +107,39 @@ namespace llbc
 
         static public uint LLBC_ERROR_NOT_ALLOW              = 0xc0000024;
 
-        static public uint LLBC_ERROR_COMP_INIT              = 0xc0000025;
+        static public uint LLBC_ERROR_COMP_INIT_FAILED       = 0xc0000025;
 
-        static public uint LLBC_ERROR_COMP_START             = 0xc0000026;
+        static public uint LLBC_ERROR_COMP_LATE_INIT_FAILED  = 0xc0000026;
 
-        static public uint LLBC_ERROR_WSA_SYSNOTREADY        = 0xc0000027;
+        static public uint LLBC_ERROR_COMP_START_FAILED      = 0xc0000027;
 
-        static public uint LLBC_ERROR_WSA_VERNOTSUPPORTED    = 0xc0000028;
+        static public uint LLBC_ERROR_COMP_LATE_START_FAILED = 0xc0000028;
 
-        static public uint LLBC_ERROR_WSA_EINPROGRESS        = 0xc0000029;
+        static public uint LLBC_ERROR_WSA_SYSNOTREADY        = 0xc0000029;
 
-        static public uint LLBC_ERROR_WSA_EPROCLIM           = 0xc000002a;
+        static public uint LLBC_ERROR_WSA_VERNOTSUPPORTED    = 0xc000002a;
 
-        static public uint LLBC_ERROR_IS_LISTEN_SOCKET       = 0xc000002b;
+        static public uint LLBC_ERROR_WSA_EINPROGRESS        = 0xc000002b;
 
-        static public uint LLBC_ERROR_NOT_POOL_OBJECT        = 0xc000002c;
+        static public uint LLBC_ERROR_WSA_EPROCLIM           = 0xc000002c;
 
-        static public uint LLBC_ERROR_SESSION_SND_BUF_LIMIT  = 0xc000002d;
+        static public uint LLBC_ERROR_IS_LISTEN_SOCKET       = 0xc000002d;
 
-        static public uint LLBC_ERROR_NOT_SUPPORT            = 0xc000002e;
+        static public uint LLBC_ERROR_NOT_POOL_OBJECT        = 0xc000002e;
 
-        static public uint LLBC_ERROR_CANCELLED              = 0xc000002f;
+        static public uint LLBC_ERROR_SESSION_SND_BUF_LIMIT  = 0xc000002f;
+
+        static public uint LLBC_ERROR_NOT_SUPPORT            = 0xc0000030;
+
+        static public uint LLBC_ERROR_CANCELLED              = 0xc0000031;
+
+        static public uint LLBC_ERROR_APP_EARLY_START_FAILED = 0xc0000032;
+
+        static public uint LLBC_ERROR_APP_START_FAILED       = 0xc0000033;
+
+        static public uint LLBC_ERROR_TIMER_SCHEDULER_DESTROYING= 0xc0000034;
+
+        static public uint LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL= 0xc0000035;
 
     }
 }

@@ -25,7 +25,7 @@
 namespace
 {
 
-class TestObj : public LLBC_Object
+class TestObj final : public LLBC_Object
 {
 public:
     TestObj()
@@ -33,20 +33,20 @@ public:
         LLBC_PrintLn("TestObj construct: %p", this);
     }
 
-    virtual ~TestObj()
+    ~TestObj() override
     {
         LLBC_PrintLn("TestObj destruct: %p", this);
     }
 };
 
-class MyComp : public LLBC_Component
+class MyComp final : public LLBC_Component
 {
 public:
     MyComp() {  }
-    virtual ~MyComp() {  }
+    ~MyComp() override {  }
 
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_PrintLn("MyComp initialize ...");
 
@@ -59,15 +59,15 @@ public:
         obj->Retain();
         obj->AutoRelease();
 
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         LLBC_PrintLn("MyComp destroy...");
     }
 
-    virtual void OnUpdate()
+    void OnUpdate() override
     {
         // Create new release pool.
         LLBC_AutoReleasePool *pool = new LLBC_AutoReleasePool;

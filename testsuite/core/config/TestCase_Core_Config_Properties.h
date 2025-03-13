@@ -21,44 +21,15 @@
 
 #pragma once
 
-__LLBC_NS_BEGIN
+#include "llbc.h"
+using namespace llbc;
 
-template <>
-inline int LLBC_Property::SetValue(const LLBC_String &name, const LLBC_Variant &value, const LLBC_String &comments)
+class TestCase_Core_Config_Properties final : public LLBC_BaseTestCase
 {
-    if (!name.empty() && !this->CheckName(name))
-    {
-        LLBC_SetLastError(LLBC_ERROR_FORMAT);
-        return LLBC_FAILED;
-    }
+public:
+    TestCase_Core_Config_Properties();
+    ~TestCase_Core_Config_Properties() override;
 
-    if (name.empty())
-    {
-        this->Cleanup();
-        if (!value.IsStr())
-            _value = new LLBC_Variant(value.ValueToString());
-        else
-            _value = new LLBC_Variant(value);
-
-        _comments = comments;
-
-        return LLBC_OK;
-    }
-    else
-    {
-        this->ExpandProperties(name);
-
-        This *prop = const_cast<This *>(this->GetProperty(name));
-        prop->SetValue("", value, comments);
-
-        return LLBC_OK;
-    }
-}
-
-template <typename _ValueType>
-inline int LLBC_Property::SetValue(const LLBC_String &name, const _ValueType &value, const LLBC_String &comments)
-{
-    return this->SetValue(name, LLBC_Variant(value), comments);
-}
-
-__LLBC_NS_END
+public:
+    int Run(int argc, char *argv[]) override;
+};

@@ -24,7 +24,7 @@
 
 namespace
 {
-    class TestComp : public LLBC_Component
+    class TestComp final : public LLBC_Component
     {
     public:
         TestComp()
@@ -32,21 +32,21 @@ namespace
         {
         }
 
-        virtual bool OnStart(bool &startFinished)
+        int OnStart(bool &startFinished) override
         {
             _updateTimes = 0;
             _beginUpdateTime = 0;
             LLBC_PrintLn("Service %s start", GetService()->GetName().c_str());
 
-            return true;
+            return LLBC_OK;
         }
 
-        virtual void OnStop(bool &stopFinished)
+        void OnStop(bool &stopFinished) override
         {
             LLBC_PrintLn("Service %s stop", GetService()->GetName().c_str());
         }
 
-        virtual void OnUpdate()
+        void OnUpdate() override
         {
             if (_updateTimes == 0)
                 _beginUpdateTime = LLBC_GetMilliseconds();

@@ -35,7 +35,7 @@ int TestCase_Core_Config_Ini::Run(int argc, char *argv[])
     LLBC_PrintLn("LLBC_Ini test:");
 
     LLBC_Ini ini;
-    const LLBC_String iniFile = "IniTestCfg.ini";
+    const LLBC_String iniFile = "test_ini.ini";
 
     // Load ini file.
     LLBC_PrintLn("Load ini file: %s", iniFile.c_str());

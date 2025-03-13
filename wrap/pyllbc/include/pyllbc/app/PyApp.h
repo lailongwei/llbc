@@ -36,7 +36,7 @@ public:
      * Ctor & Dtor.
      */
     pyllbc_App(PyObject *pyApp);
-    virtual ~pyllbc_App();
+    ~pyllbc_App() override;
 
 public:
     /**
@@ -49,12 +49,12 @@ public:
     /**
      * Application event method: OnStart.
      */
-    virtual int OnStart(int argc, char *argv[], bool &startFinished);
+    int OnStart(int argc, char *argv[], bool &startFinished) override;
 
     /**
      * Application event method: OnStop.
      */
-    virtual void OnStop(bool &stopFinished);
+    void OnStop(bool &stopFinished) override;
 
 private:
     PyObject *_pyApp; // Borrowed reference.

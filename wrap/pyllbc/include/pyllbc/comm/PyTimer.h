@@ -41,48 +41,48 @@ public:
     /**
      * Destructor.
      */
-    virtual ~pyllbc_Timer();
+    ~pyllbc_Timer() override;
 
 public:
     /**
      * Make sure ignored dead-weakref object error or not, default is false.
      * @return bool - true if ignored, otherwise return false.
      */
-    virtual bool IsIgnoredDeadRef() const;
+    bool IsIgnoredDeadRef() const;
 
     /**
      * Set the ignored dead-weakref flag.
      * @param[in] flag - the ignored dead-weakref flag.
      */
-    virtual void SetIgnoredDeadRef(bool flag);
+    void SetIgnoredDeadRef(bool flag);
 
 public:
     /**
      * Schedule timer(rewrite).
-     * @param[in] dueTime - due time, in milli-seconds.
-     * @param[in] period  - period value, in milli-seconds.
+     * @param[in] dueTime - due time.
+     * @param[in] period  - period value.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(sint64 dueTime, sint64 period);
+    int Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero) override;
 
 public:
     /**
      * Get timer string representation.
      * @return LLBC_String - the timer string representation.
      */
-    virtual LLBC_String ToString() const;
+    LLBC_String ToString() const override;
 
 public:
     /**
      * Timeout event handler.
      * @return bool - return true means readd, otherwise means stop this timer.
      */
-    virtual void OnTimeout();
+    void OnTimeout() override;
 
     /**
      * Cancel event handler.
      */
-    virtual void OnCancel();
+    void OnCancel() override;
 
 private:
     PyObject *_pyTimer;

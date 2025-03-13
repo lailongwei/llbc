@@ -147,7 +147,7 @@ LLBC_END_C_DECL
  *        This file class provides static methods for the creation, copying, deleting, moving, 
  *        and opening of single file, and access FileSystem object.
  */
-class LLBC_EXPORT LLBC_File
+class LLBC_EXPORT LLBC_File final
 {
 public:
     /**
@@ -166,7 +166,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~LLBC_File();
+    ~LLBC_File();
 
 public:
     /**
@@ -309,7 +309,7 @@ public:
      *                       otherwise return error a special error code.
      */
     LLBC_String ReadToEnd();
-    static LLBC_String ReadToEnd(const LLBC_String &filePath);
+    LLBC_NO_DISCARD static LLBC_String ReadToEnd(const LLBC_String &filePath);
 
     /**
      * File bytes read method.

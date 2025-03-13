@@ -25,7 +25,7 @@
 namespace
 {
 
-class MyObj : public LLBC_Object
+class MyObj final : public LLBC_Object
 {
 public:
     MyObj()
@@ -34,7 +34,7 @@ public:
         m_data = malloc(10);
     }
 
-    virtual ~MyObj()
+    ~MyObj() override
     {
         std::cout <<"MyObj destruct" <<std::endl;
         free(m_data);

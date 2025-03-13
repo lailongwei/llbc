@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Thread_Guard : public LLBC_BaseTestCase
+class TestCase_Core_Thread_Guard final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Thread_Guard();
-    virtual ~TestCase_Core_Thread_Guard();
+    ~TestCase_Core_Thread_Guard() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void TestGuardFunc();

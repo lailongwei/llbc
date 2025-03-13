@@ -25,7 +25,17 @@
 namespace
 {
 
-struct TestData : public LLBC_Coder
+class MyCompEventType
+{
+public:
+    enum
+    {
+        MyCompEv1 = LLBC_ComponentEventType::LogicBegin,
+        MyCompEv2,
+    };
+};
+
+struct TestData final : public LLBC_Coder
 {
     int iVal;
     LLBC_String strVal;
@@ -35,40 +45,40 @@ struct TestData : public LLBC_Coder
     {
     }
 
-    virtual ~TestData()
+    ~TestData() override
     {
         std::cout <<"0x" <<this <<": Test data destroyed!" <<std::endl;
     }
 
-    virtual bool Encode(LLBC_Packet &packet)
+    bool Encode(LLBC_Packet &packet) override
     {
         packet <<iVal <<strVal;
         return true;
     }
 
-    virtual bool Decode(LLBC_Packet &packet)
+    bool Decode(LLBC_Packet &packet) override
     {
         packet >>iVal >>strVal;
         return true;
     }
 
-    virtual void Reuse()
+    void Reuse()
     {
         iVal = 0;
         strVal.clear();
     }
 };
 
-class TestDataFactory : public LLBC_CoderFactory
+class TestDataFactory final : public LLBC_CoderFactory
 {
 public:
-    virtual LLBC_Coder *Create() const
+    LLBC_Coder *Create() const override
     {
         return new TestData;
     }
 };
 
-class TestComp : public LLBC_Component
+class TestComp final : public LLBC_Component
 {
 public:
     TestComp()
@@ -76,30 +86,30 @@ public:
     {}
 
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_PrintLn("Service initialize");
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         LLBC_PrintLn("Service Destroy");
     }
 
-    virtual bool OnStart(bool &startFinished)
+    int OnStart(bool &startFinished) override
     {
         LLBC_PrintLn("Service start");
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnStop(bool &stopFinished)
+    void OnStop(bool &stopFinished) override
     {
         LLBC_PrintLn("Service stop");
     }
 
 public:
-    virtual void OnUpdate()
+    void OnUpdate() override
     {
         int fps = LLBC_Rand(20, 61);
         // LLBC_PrintLn("Service update, set fps to %d", fps);
@@ -107,36 +117,48 @@ public:
         GetService()->SetFPS(fps);
     }
 
-    virtual void OnIdle(const LLBC_TimeSpan &idleTime)
+    void OnIdle(const LLBC_TimeSpan &idleTime) override
     {
         // LLBC_PrintLn("Service idle, idle time: %s", idleTime.ToString().c_str());
     }
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    void OnEvent(int eventType, const LLBC_Variant &eventParams) override
     {
-        switch(event)
+        switch(eventType)
         {
             case LLBC_ComponentEventType::SessionCreate:
             {
-                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
                 break;
             }
             case LLBC_ComponentEventType::SessionDestroy:
             {
-                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
                 break;
             }
             case LLBC_ComponentEventType::AsyncConnResult:
             {
-                OnAsyncConnResult(*evArgs.AsPtr<LLBC_AsyncConnResult>());
+                OnAsyncConnResult(*eventParams.AsPtr<LLBC_AsyncConnResult>());
                 break;
             }
             case LLBC_ComponentEventType::ProtoReport:
             {
-                OnProtoReport(*evArgs.AsPtr<LLBC_ProtoReport>());
+                OnProtoReport(*eventParams.AsPtr<LLBC_ProtoReport>());
                 break;
             }
-            default: break;
+            case MyCompEventType::MyCompEv1:
+            {
+                LLBC_PrintLn("Recv MyCompEv1 event, params:%s", eventParams.ToString().c_str());
+                break;
+            }
+            case MyCompEventType::MyCompEv2:
+            {
+                LLBC_PrintLn("Recv MyCompEv2 event, params:%s", eventParams.ToString().c_str());
+                break;
+            }
+
+            default:
+                break;
         }
     }
 
@@ -155,6 +177,9 @@ public:
         resPacket->SetEncoder(resData);
 
         GetService()->Send(resPacket);
+
+        GetService()->AddComponentEvent(MyCompEventType::MyCompEv1, LLBC_Variant(10086));
+        GetService()->AddComponentEvent(MyCompEventType::MyCompEv2, LLBC_Variant("Hello world"));
     }
 
     bool OnPreRecvData(LLBC_Packet &packet)
@@ -217,10 +242,10 @@ private:
     }
 };
 
-class TestCompFactory : public LLBC_ComponentFactory
+class TestCompFactory final : public LLBC_ComponentFactory
 {
 public:
-    LLBC_Component *Create(LLBC_Service *service) const
+    LLBC_Component *Create(LLBC_Service *service) const override
     {
         return new TestComp;
     }

@@ -34,7 +34,9 @@ class LLBC_EXPORT LLBC_Event : public LLBC_PoolObj
 {
 public:
     explicit LLBC_Event(int id = 0, bool dontDelAfterFire = false);
-    virtual ~LLBC_Event();
+    LLBC_Event(const LLBC_Event &other);
+    LLBC_Event(LLBC_Event &&other) noexcept;
+    ~LLBC_Event() override;
 
 public:
     /**
@@ -62,138 +64,44 @@ public:
     void SetDontDelAfterFire(bool dontDelAfterFire);
 
 public:
-    /**
-     * Get integer key indexed event param.
-     * @param[in] key - the integer key.
-     * @return const LLBC_Variant & - the event param.
-     */
-    const LLBC_Variant &GetParam(int key) const;
+#define __LLBC_Inl_EventKeyMatch \
+        (std::is_same_v<std::remove_extent_t<KeyType>, char> || \
+         (std::is_pointer_v<KeyType> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<KeyType>>, char>) || \
+         std::is_same_v<KeyType, LLBC_CString> || \
+         LLBC_IsTemplSpec<KeyType, std::basic_string>::value \
+        )
 
     /**
-    * Get constant string key indexed event param.
-    * @param[in] key - the constant string key.
+    * Get LLBC_Variant key indexed event param.
+    * @param[in] key - the key.
     * @return const LLBC_Variant & - the event param.
     */
-    const LLBC_Variant &GetParam(const char* key) const;
+    template<typename KeyType>
+    std::enable_if_t<__LLBC_Inl_EventKeyMatch, const LLBC_Variant &>
+    GetParam(const KeyType &key);
 
     /**
-     * Get string key indexed event param.
-     * @param[in] key - the string key.
-     * @return const LLBC_Variant & - the event param.
-     */
-    const LLBC_Variant &GetParam(const LLBC_String &key) const;
-
-    /**
-     * Set integer key indexed event param.
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    LLBC_Event &SetParam(int key, const LLBC_Variant &param);
-    /**
-     * Set integer key indexed event param(template version).
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    template <typename ParamType>
-    LLBC_Event &SetParam(int key, const ParamType &param);
-
-    /**
-    * Set constant string key indexed event param.
-    * @param[in] key   - the param key.
+    * Get LLBC_CString key indexed event param.
+    * @param[in] key   - the key.
     * @param[in] param - the param.
     * @return LLBC_Event & - this reference.
     */
-    LLBC_Event &SetParam(const char* key, const LLBC_Variant &param);
-    /**
-    * Set constant string key indexed event param(template version).
-    * @param[in] key   - the param key.
-    * @param[in] param - the param.
-    * @return LLBC_Event & - this reference.
-    */
-    template <typename ParamType>
-    LLBC_Event &SetParam(const char* key, const ParamType &param);
+    template<typename KeyType, typename ParamType>
+    std::enable_if_t<__LLBC_Inl_EventKeyMatch, void>
+    SetParam(const KeyType &key, const ParamType &param);
 
     /**
-     * Set string key indexed event param.
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
+     * Get all key indexed params.
+     * @return const std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params const reference.
      */
-    LLBC_Event &SetParam(const LLBC_String &key, const LLBC_Variant &param);
-    /**
-     * Set string key indexed event param(template version).
-     * @param[in] key   - the param key.
-     * @param[in] param - the param.
-     * @return LLBC_Event & - this reference.
-     */
-    template <typename ParamType>
-    LLBC_Event &SetParam(const LLBC_String &key, const ParamType &param);
-
-public:
-    /**
-     * Get all int key indexed params.
-     * @return const std::map<int, LLBC_Variant> & - the int key indexed params const reference.
-     */
-    const std::map<int, LLBC_Variant> &GetIntKeyParams() const;
-    /**
-     * Get all int key indexed params(mutable).
-     * @return std::map<int, LLBC_Variant> & - the int key indexed params mutable reference.
-     */
-    std::map<int, LLBC_Variant> &GetMutableIntKeyParams();
+    const std::map<LLBC_CString, LLBC_Variant> &GetParams() const;
 
     /**
-     * Get all string key indexed params count.
-     * @return size_t - the integer key indexed params count.
+     * Get all key indexed params(mutable).
+     * @return std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params mutable reference.
      */
-    size_t GetIntKeyParamsCount() const;
+    std::map<LLBC_CString, LLBC_Variant> &GetMutableParams();
 
-    /**
-    * Get all constant string key indexed params.
-    * @return const std::map<LLBC_CString, LLBC_Variant> & - the constant string key indexed params reference.
-    */
-    const std::map<LLBC_CString, LLBC_Variant> &GetConstantStrKeyParams() const;
-    /**
-    * Get all constant string key indexed params(mutable).
-    * @return const std::map<LLBC_CString, LLBC_Variant> & - the mutable constant string key indexed params reference.
-    */
-    std::map<LLBC_CString, LLBC_Variant> &GetMutableConstantStrKeyParams();
-
-    /**
-    * Get all constant string key indexed params count.
-    * @return size_t - the constant string key indexed params count.
-    */
-    size_t GetConstantStrKeyParamsCount() const;
-
-    /**
-     * Get all string key indexed params.
-     * @return const std::map<LLBC_String, LLBC_Variant> & - the constant string key indexed params reference.
-     */
-    const std::map<LLBC_String, LLBC_Variant> &GetStrKeyParams() const;
-    /**
-     * Get all string key indexed params(mutable).
-     * @return std::map<LLBC_String, LLBC_Variant> & - the mutable string key indexed params reference.
-     */
-    std::map<LLBC_String, LLBC_Variant> &GetMutableStrKeyParams();
-
-    /**
-     * Get all string key indexed params count.
-     * @return size_t - the string key indexed params count.
-     */
-    size_t GetStrKeyParamsCount() const;
-
-public:
-    /**
-     * Clone event.
-     * Note:
-     *      - the clone event don't delete after handle flag always false.
-     *      - the clone event extend data always nullptr.
-     * @return LLBC_Event * - the clone event.
-     */
-    LLBC_Event *Clone() const;
-
-public:
     /**
      * Get extend data.
      * @return void * - the extend data.
@@ -209,46 +117,39 @@ public:
 
     /**
      * Clear extend data.
+     * @param[in] delDeleg - the flag to indicate whether delete delegate.
      */
-    void ClearExtData();
+    void ClearExtData(bool delDeleg = false);
 
 public:
     /**
      * Subscript supports.
      */
-    LLBC_Variant &operator[](int key);
-    LLBC_Variant &operator[](const char* key);
-    LLBC_Variant &operator[](const LLBC_String &key);
-    const LLBC_Variant &operator[](int key) const;
-    const LLBC_Variant &operator[](const char* key) const;
-    const LLBC_Variant &operator[](const LLBC_String &key) const;
+    template<typename KeyType>
+    LLBC_Variant &operator[](const KeyType &key);
+    template<typename KeyType>
+    const LLBC_Variant &operator[](const KeyType &key) const;
+
+    /**
+     * Assignment operator.
+     */
+    LLBC_Event &operator=(const LLBC_Event &other);
+    LLBC_Event &operator=(LLBC_Event &&other) noexcept;
 
 public:
     /**
      * Object-Pool reflection support: Reuse Event object.
      */
-    virtual void Reuse();
-
-    /**
-     * Disable assignment.
-     */
-    LLBC_DISABLE_ASSIGNMENT(LLBC_Event);
+    void Reuse();
 
 protected:
     int _id;
     bool _dontDelAfterFire;
-
-    typedef std::map<int, LLBC_Variant> _IntKeyParams;
-    _IntKeyParams *_intKeyParams;
-
-    typedef std::map<LLBC_CString, LLBC_Variant> _ConstantStrKeyParams;
-    _ConstantStrKeyParams *_constantStrKeyParams;
-
-    typedef std::map<LLBC_String, LLBC_Variant> _StrKeyParams;
-    _StrKeyParams *_strKeyParams;
+    std::map<LLBC_CString, LLBC_Variant> _params;
+    std::map<LLBC_CString, std::string *> _heavyKeys;
 
     void *_extData;
-    LLBC_Delegate<void(void *)> _extDataClearDeleg;
+    LLBC_Delegate<void(void *)> *_extDataClearDeleg;
 };
 
 /**
@@ -258,7 +159,7 @@ class LLBC_EXPORT LLBC_EventListener
 {
 public:
     /**
-     * Ctor & Detor.
+     * Ctor & Dtor.
      */
     LLBC_EventListener() = default;
     virtual ~LLBC_EventListener() = default;
@@ -273,6 +174,9 @@ public:
 
 __LLBC_NS_END
 
+/**
+ * Stream output operator support.
+ */
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Event &ev);
+
 #include "llbc/core/event/EventInl.h"
-
-

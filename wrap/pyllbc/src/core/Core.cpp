@@ -64,22 +64,10 @@ void pyllbc_AddCoreMethods()
     inl->AddMethod(methods.BoolJudge);
 
     // core/config
-    inl->AddMethod(methods.Property_New);
-    inl->AddMethod(methods.Property_Delete);
-    inl->AddMethod(methods.Property_FromContent);
-    inl->AddMethod(methods.Property_FromFile);
-    inl->AddMethod(methods.Property_ToContent);
-    inl->AddMethod(methods.Property_ToFile);
-    inl->AddMethod(methods.Property_GetPropertiesCount);
-    inl->AddMethod(methods.Property_GetPropertyNames);
-    inl->AddMethod(methods.Property_GetValue);
-    inl->AddMethod(methods.Property_SetValue);
-    inl->AddMethod(methods.Property_GetComments);
-    inl->AddMethod(methods.Property_SetComments);
-    inl->AddMethod(methods.Property_HasProperty);
-    inl->AddMethod(methods.Property_GetProperty);
-    inl->AddMethod(methods.Property_RemoveProperty);
-    inl->AddMethod(methods.Property_RemoveAllPropertyes);
+    inl->AddMethod(methods.Properties_LoadFromString);
+    inl->AddMethod(methods.Properties_LoadFromFile);
+    inl->AddMethod(methods.Properties_SaveToString);
+    inl->AddMethod(methods.Properties_SaveToFile);
 
     // core/log
     inl->AddMethod(methods.InitLoggerMgr);
@@ -88,7 +76,7 @@ void pyllbc_AddCoreMethods()
 
     // core/utils
     top->AddMethod(methods.refcnt);
-    inl->AddMethod(methods.HashString);
+    inl->AddMethod(methods.Hash);
 
     // core/event
     inl->AddMethod(methods.Event_New);

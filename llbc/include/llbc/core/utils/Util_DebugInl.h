@@ -23,143 +23,98 @@
 #pragma once
 
 #include "llbc/core/os/OS_Time.h"
-#include "llbc/core/time/Time.h"
 
 __LLBC_NS_BEGIN
 
-inline LLBC_CPUTime::LLBC_CPUTime(uint64 cpuCount)
-: _cpuCount(cpuCount)
+inline LLBC_Stopwatch::LLBC_Stopwatch(bool autoStart)
+: _beginTime(autoStart ? LLBC_RdTsc() : 0llu)
+, _elapsedTime(0llu)
 {
 }
 
-inline uint64 LLBC_CPUTime::GetCPUFreqPerSecond()
+inline LLBC_Stopwatch::LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring)
+: _beginTime(continueMeasuring ? LLBC_RdTsc() : 0llu)
+, _elapsedTime(elapsedTicks)
 {
-    return _freqPerSecond;
 }
 
-inline uint64 LLBC_CPUTime::GetCPUCount() const
+inline void LLBC_Stopwatch::Resume()
 {
-    return _cpuCount;
+    if (_beginTime == 0)
+        _beginTime = LLBC_RdTsc();
 }
 
-inline int LLBC_CPUTime::ToSeconds() const
+inline void LLBC_Stopwatch::Pause()
 {
-#if LLBC_SUPPORT_RDTSC
-    return static_cast<int>(_cpuCount / _freqPerSecond);
-#else // Not supp rdtsc
-    return _cpuCount / LLBC_TimeConst::numOfMicrosPerSecond;
-#endif // Supp rdtsc
+    if (_beginTime != 0)
+    {
+        _elapsedTime += LLBC_RdTsc() - _beginTime;
+        _beginTime = 0;
+    }
 }
 
-inline sint64 LLBC_CPUTime::ToMillis() const
+inline void LLBC_Stopwatch::Reset()
 {
-#if LLBC_SUPPORT_RDTSC
-    return _cpuCount * 1000ll / _freqPerSecond;
-#else // Not supp rdtsc
-    return _cpuCount / LLBC_TimeConst::numOfMillisPerSecond;
-#endif // Supp rdtsc
+    _beginTime = 0;
+    _elapsedTime = 0;
 }
 
-inline sint64 LLBC_CPUTime::ToMicros() const
+inline LLBC_TimeSpan LLBC_Stopwatch::Elapsed() const
 {
-#if LLBC_SUPPORT_RDTSC
-    return _cpuCount * 1000000ll / _freqPerSecond;
-#else // Not supp rdtsc
-    return _cpuCount;
-#endif // Supp rdtsc
-}
-
-inline sint64 LLBC_CPUTime::ToNanos() const
-{
-#if LLBC_SUPPORT_RDTSC
-    return _cpuCount * 1000000000ll / _freqPerSecond;
-#else // Not supp rdtsc
-    return _cpuCount * LLBC_TimeConst::numOfNanosPerMicrosecond;
-#endif // Supp rdtsc
-}
-
-inline int LLBC_CPUTime::ToSeconds(uint64 cpuCount)
-{
-    return LLBC_CPUTime(cpuCount).ToSeconds();
-}
-
-inline sint64 LLBC_CPUTime::ToMillis(uint64 cpuCount)
-{
-    return LLBC_CPUTime(cpuCount).ToMillis();
-}
-
-inline sint64 LLBC_CPUTime::ToMicros(uint64 cpuCount)
-{
-    return LLBC_CPUTime(cpuCount).ToMicros();
-}
-
-inline sint64 LLBC_CPUTime::ToNanos(uint64 cpuCount)
-{
-    return LLBC_CPUTime(cpuCount).ToNanos();
-}
-
-inline LLBC_CPUTime LLBC_CPUTime::operator+(const LLBC_CPUTime &right) const
-{
-    return LLBC_CPUTime(_cpuCount + right._cpuCount);
-}
-
-inline LLBC_CPUTime LLBC_CPUTime::operator-(const LLBC_CPUTime &right) const
-{
-    if (_cpuCount < right._cpuCount)
-        return LLBC_CPUTime(0);
-
-    return LLBC_CPUTime(_cpuCount - right._cpuCount);
-}
-
-inline LLBC_CPUTime &LLBC_CPUTime::operator+=(const LLBC_CPUTime &right)
-{
-    _cpuCount += right._cpuCount;
-    return *this;
-}
-
-inline LLBC_CPUTime &LLBC_CPUTime::operator-=(const LLBC_CPUTime &right)
-{
-    if (_cpuCount < right._cpuCount)
-        _cpuCount = 0;
+    #if LLBC_SUPPORT_RDTSC
+    if (_beginTime != 0)
+        return LLBC_TimeSpan(static_cast<sint64>(
+            (LLBC_RdTsc() - _beginTime + _elapsedTime) * 1000000llu / _frequency));
     else
-        _cpuCount -= right._cpuCount;
-
-    return *this;
+        return LLBC_TimeSpan(static_cast<sint64>(_elapsedTime * 1000000llu / _frequency));
+    #else // Unsupported rdtsc
+    if (_beginTime != 0)
+        return LLBC_TimeSpan(static_cast<sint64>(LLBC_RdTsc() - _beginTime + _elapsedTime));
+    else
+        return LLBC_TimeSpan(static_cast<sint64>(_elapsedTime));
+    #endif // LLBC_SUPPORT_RDTSC
 }
 
-inline bool LLBC_CPUTime::operator<(const LLBC_CPUTime &right) const
+inline uint64 LLBC_Stopwatch::ElapsedNanos() const
 {
-    return _cpuCount < right._cpuCount;
+    #if LLBC_SUPPORT_RDTSC
+    if (_beginTime != 0)
+        return (LLBC_RdTsc() - _beginTime + _elapsedTime) * 1000000000llu / _frequency;
+    else
+        return _elapsedTime * 1000000000llu / _frequency;
+    #else // Unsupported rdtsc
+    if (_beginTime != 0)
+        return (LLBC_RdTsc() - _beginTime + _elapsedTime) * LLBC_TimeConst::numOfNanosPerMicrosecond;
+    else
+        return _elapsedTime * LLBC_TimeConst::numOfNanosPerMicrosecond;
+    #endif // LLBC_SUPPORT_RDTSC
 }
 
-inline bool LLBC_CPUTime::operator>(const LLBC_CPUTime &right) const
+inline uint64 LLBC_Stopwatch::ElapsedTicks() const
 {
-    return _cpuCount > right._cpuCount;
+    if (_beginTime != 0)
+        return LLBC_RdTsc() - _beginTime + _elapsedTime;
+    else
+        return _elapsedTime;
 }
 
-inline bool LLBC_CPUTime::operator<=(const LLBC_CPUTime &right) const
+inline LLBC_String LLBC_Stopwatch::ToString() const
 {
-    return _cpuCount <= right._cpuCount;
+    const uint64 nanos = ElapsedNanos();
+
+    LLBC_String repr;
+    repr.format("%.03f ms", nanos / 1000000.0);
+
+    return repr;
 }
 
-inline bool LLBC_CPUTime::operator>=(const LLBC_CPUTime &right) const
+inline void LLBC_Stopwatch::InitFrequency()
 {
-    return _cpuCount >= right._cpuCount;
-}
-
-inline bool LLBC_CPUTime::operator==(const LLBC_CPUTime &right) const
-{
-    return _cpuCount == right._cpuCount;
-}
-
-inline bool LLBC_CPUTime::operator!=(const LLBC_CPUTime &right) const
-{
-    return _cpuCount != right._cpuCount;
-}
-
-inline LLBC_CPUTime::operator uint64() const
-{
-    return _cpuCount;
+#if LLBC_SUPPORT_RDTSC
+    _frequency = LLBC_GetCpuCounterFrequency();
+#else
+    _frequency = LLBC_TimeConst::numOfMicrosPerSecond;
+#endif
 }
 
 __LLBC_NS_END

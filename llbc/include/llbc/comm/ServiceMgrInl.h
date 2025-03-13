@@ -23,14 +23,22 @@
 
 __LLBC_NS_BEGIN
 
-inline const LLBC_ServiceMgr::Id2Services &LLBC_ServiceMgr::GetAllIndexedByIdServices() const
+inline std::vector<int> LLBC_ServiceMgr::GetAllServiceIds() const
 {
-    return _id2Services;
+    std::vector<int> serviceIds;
+    LLBC_LockGuard guard(_lock);
+    LLBC_Foreach(_id2Services, serviceIds.push_back(item.first));
+
+    return serviceIds;
 }
 
-inline const LLBC_ServiceMgr::Name2Services &LLBC_ServiceMgr::GetAllIndexedByNameServices() const
+inline LLBC_Strings LLBC_ServiceMgr::GetAllServiceNames() const
 {
-    return _name2Services;
+    LLBC_Strings serviceNames;
+    LLBC_LockGuard guard(_lock);
+    LLBC_Foreach(_name2Services, serviceNames.push_back(item.first));
+
+    return serviceNames;
 }
 
 inline LLBC_Service *LLBC_ServiceMgr::GetServiceNonLock(int id)

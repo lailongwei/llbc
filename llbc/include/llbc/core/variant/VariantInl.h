@@ -21,8 +21,8 @@
 
 #pragma once
 
+#include "llbc/core/algo/Hash.h"
 #include "llbc/core/variant/VariantTraits.h"
-#include "llbc/core/objbase/KeyHashAlgorithm.h"
 
 __LLBC_NS_BEGIN
 
@@ -577,7 +577,7 @@ LLBC_Variant::operator _Ty *() const
 template <>
 inline LLBC_Variant::operator char *() const
 {
-    static thread_local char emptyMutableEmptyStr[1] = {'\0'};
+    thread_local char emptyMutableEmptyStr[1] = {'\0'};
     return IsStrX() ?  const_cast<char *>(_holder.data.obj.str->c_str()) : emptyMutableEmptyStr;
 }
 
@@ -1025,6 +1025,11 @@ inline LLBC_Variant LLBC_Variant::operator/(const LLBC_Variant &another) const
     return LLBC_VariantTraits::div(*this, another);
 }
 
+inline LLBC_Variant LLBC_Variant::operator%(const LLBC_Variant &another) const
+{
+    return LLBC_VariantTraits::mod(*this, another);
+}
+
 inline LLBC_Variant &LLBC_Variant::operator+=(const LLBC_Variant &another)
 {
     LLBC_VariantTraits::add_equal(*this, another);
@@ -1046,6 +1051,12 @@ inline LLBC_Variant &LLBC_Variant::operator*=(const LLBC_Variant &another)
 inline LLBC_Variant &LLBC_Variant::operator/=(const LLBC_Variant &another)
 {
     LLBC_VariantTraits::div_equal(*this, another);
+    return *this;
+}
+
+inline LLBC_Variant &LLBC_Variant::operator%=(const LLBC_Variant &another)
+{
+    LLBC_VariantTraits::mod_equal(*this, another);
     return *this;
 }
 
@@ -1074,6 +1085,12 @@ LLBC_Variant LLBC_Variant::operator/(const _T &another) const
 }
 
 template <typename _T>
+LLBC_Variant LLBC_Variant::operator%(const _T &another) const
+{
+    return operator%(LLBC_Variant(another));
+}
+
+template <typename _T>
 LLBC_Variant &LLBC_Variant::operator+=(const _T &another)
 {
     return operator+=(LLBC_Variant(another));
@@ -1095,6 +1112,12 @@ template <typename _T>
 LLBC_Variant &LLBC_Variant::operator/=(const _T &another)
 {
     return operator/=(LLBC_Variant(another));
+}
+
+template <typename _T>
+LLBC_Variant &LLBC_Variant::operator%=(const _T &another)
+{
+    return operator%=(LLBC_Variant(another));
 }
 
 inline void LLBC_Variant::SetType(int type)
@@ -1262,7 +1285,9 @@ struct hash<LLBC_NS LLBC_Variant>
         else if (var.IsStr())
         {
             const LLBC_NS LLBC_Variant::Str * const &str = var.GetHolder().data.obj.str;
-            return str && !str->empty() ? LLBC_Hash(str->data(), str->size()) : LLBC_Hash(nullptr, 0);
+            return str && !str->empty() ?
+                LLBC_NS LLBC_Hash(str->data(), str->size()) :
+                    LLBC_NS LLBC_Hash(nullptr, 0);
         }
         else if (var.IsSeq())
         {

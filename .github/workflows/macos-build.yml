@@ -8,7 +8,6 @@ on:
 
 jobs:
   macos-build:
-    if: false
     name: MacOS build job
     runs-on: macOS-latest
     steps:
@@ -29,15 +28,19 @@ jobs:
           make core_lib config=debug64 -j4
           make core_lib config=release64 -j4
         
-      - name: Compile test code
+      - name: Compile testsuite
         run: |
           make test config=release64 -j4
+
+      - name: Compile quick_start
+        run: |
+          make quick_start config=release64 -j4
 
       - name: Build all target by cmake
         run: |
           mkdir cmake_build
           cd cmake_build
           cmake ..
-          make -j
+          make -j4
         
       - run: echo "🍏 This job's status is ${{ job.status }}."

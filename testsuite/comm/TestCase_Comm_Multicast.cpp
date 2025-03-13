@@ -27,7 +27,7 @@ namespace
 
 const int OPCODE = 1;
 
-class TestComp : public LLBC_Component
+class TestComp final : public LLBC_Component
 {
 public:
     TestComp(bool asClient, bool useBst)
@@ -38,18 +38,18 @@ public:
     }
 
 public:
-    virtual bool OnInit(bool &initFinished)
+    int OnInit(bool &initFinished) override
     {
         LLBC_PrintLn("Service created!");
-        return true;
+        return LLBC_OK;
     }
 
-    virtual void OnDestroy(bool &destroyFinished)
+    void OnDestroy(bool &destroyFinished) override
     {
         LLBC_PrintLn("Service destroy!");
     }
 
-    virtual void OnUpdate()
+    void OnUpdate() override
     {
         if (_asClient)
             return;
@@ -61,26 +61,29 @@ public:
             svc->Multicast(_sessionIds, OPCODE, "Hello, world!", 14, 0);
     }
 
-    virtual void OnEvent(LLBC_ComponentEventType::ENUM event, const LLBC_Variant &evArgs)
+    void OnEvent(int eventType, const LLBC_Variant &eventParams) override
     {
-        switch (event)
+        switch (eventType)
         {
             case LLBC_ComponentEventType::SessionCreate:
             {
-                OnSessionCreate(*evArgs.AsPtr<LLBC_SessionInfo>());
+                OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
                 break;
             }
+
             case LLBC_ComponentEventType::SessionDestroy:
             {
-                OnSessionDestroy(*evArgs.AsPtr<LLBC_SessionDestroyInfo>());
+                OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
                 break;
             }
-            default: break;
+
+            default:
+                break;
         }
     }
 
 public:
-    virtual void OnRecv(LLBC_Packet &packet)
+    void OnRecv(LLBC_Packet &packet)
     {
         const int sessionId = packet.GetSessionId();
         const char *data = reinterpret_cast<const char *>(packet.GetPayload());

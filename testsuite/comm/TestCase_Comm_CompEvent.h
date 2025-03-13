@@ -24,8 +24,8 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_CompEvent : public LLBC_BaseTestCase
+class TestCase_Comm_CompEvent final : public LLBC_BaseTestCase
 {
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 };

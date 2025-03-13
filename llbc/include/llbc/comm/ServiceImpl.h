@@ -48,70 +48,64 @@ public:
      * @param[in] fullStack          - the full stack option, default is true.
      */
     LLBC_ServiceImpl(const LLBC_String &name = "",
-                 LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
-                 bool fullStack = true);
+                     LLBC_IProtocolFactory *dftProtocolFactory = nullptr,
+                     bool fullStack = true);
 
     /**
      * Service destructor.
      */
-    virtual ~LLBC_ServiceImpl();
+    ~LLBC_ServiceImpl() override;
 
 public:
     /**
      * Get the service Id.
      * @return int - the service Id.
      */
-    virtual int GetId() const;
+    int GetId() const override;
 
     /**
      * Get the service name.
      * @return const LLBC_String & - the service name.
      */
-    virtual const LLBC_String &GetName() const;
+    const LLBC_String &GetName() const override;
 
     /**
      * Get config type.
      * @return int - the config type, see LLBC_AppConfigType enum.
      */
-    virtual int GetConfigType() const;
+    int GetConfigType() const override;
 
     /**
-     * Get non-property type config.
-     * @return const LLBC_Variant & - the non-property application config.
+     * Get service config.
+     * @return const LLBC_Variant & - the service config.
      */
-    virtual const LLBC_Variant &GetConfig() const;
-
-    /**
-     * Get property type config.
-     * @return const LLBC_Property & - the property config.
-     */
-    virtual const LLBC_Property &GetPropertyConfig() const;
+    const LLBC_Variant &GetConfig() const override;
 
     /**
      * Get full stack option.
      * @return bool - the full stack option.
      */
-    virtual bool IsFullStack() const;
+    bool IsFullStack() const override;
 
     /**
      * Get the service drive mode.
      * @return DriveMode - the service drive mode.
      */
-    virtual LLBC_ServiceDriveMode::ENUM GetDriveMode() const;
+    LLBC_ServiceDriveMode::ENUM GetDriveMode() const override;
 
     /**
      * Set the service drive mode.
      * @param[in] mode - the service drive mode.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int SetDriveMode(LLBC_ServiceDriveMode::ENUM mode);
+    int SetDriveMode(LLBC_ServiceDriveMode::ENUM mode) override;
 
 public:
     /**
      * Suppress coder not found warning in protocol-stack.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int SuppressCoderNotFoundWarning();
+    int SuppressCoderNotFoundWarning() override;
 
 public:
     /**
@@ -119,44 +113,45 @@ public:
      * @param[in] pollerCount - the poller count.
      * @return int - return 0 if startup successful, otherwise return -1.
      */
-    virtual int Start(int pollerCount = 1);
+    int Start(int pollerCount = 1) override;
 
     /**
      * Check service is started or not.
      * @return bool - return true if running, otherwise return false.
      */
-    virtual bool IsStarted() const;
+    bool IsStarted() const override;
 
     /**
      * Stop the service.
+     * @param[in] destroyComp - destroy service components or not.
      * @return int - return 0 if success, otherwise return failed.
      */
-    virtual int Stop();
+    int Stop(bool destroyComp = false) override;
 
 public:
     /**
      * Get service FPS.
      * @return int - the service FPS.
      */
-    virtual int GetFPS() const;
+    int GetFPS() const override;
 
     /**
      * Set service FPS.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int SetFPS(int fps);
+    int SetFPS(int fps) override;
 
     /**
      * Get service frame interval, in milli-seconds.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int GetFrameInterval() const;
+    int GetFrameInterval() const override;
 
 public:
     /**
      * Create a session and listening.
      * Note:
-     *      If service not start when call this method, connection operation will 
+     *      If service not start when call this method, connection operation will
      *      create a pending-operation and recorded in service, your maybe could not get error.
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
@@ -165,15 +160,15 @@ public:
      * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LLBC_GetLastError().
      */
-    virtual int Listen(const char *ip,
-                       uint16 port,
-                       LLBC_IProtocolFactory *protoFactory = nullptr,
-                       const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
+    int Listen(const char *ip,
+               uint16 port,
+               LLBC_IProtocolFactory *protoFactory = nullptr,
+               const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) override;
 
     /**
      * Establishes a connection to a specified address.
      * Note:
-     *      If service not start when call this method, connection operation will 
+     *      If service not start when call this method, connection operation will
      *      create a pending-operation and recorded in service, your maybe could not get error.
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
@@ -183,16 +178,16 @@ public:
      * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id, if return 0, means failed, see LBLC_GetLastError().
      */
-    virtual int Connect(const char *ip,
-                        uint16 port,
-                        double timeout = -1.0,
-                        LLBC_IProtocolFactory *protoFactory = nullptr,
-                        const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
+    int Connect(const char *ip,
+                uint16 port,
+                double timeout = -1.0,
+                LLBC_IProtocolFactory *protoFactory = nullptr,
+                const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) override;
 
     /**
      * Asynchronous establishes a connection to a specified address.
      * Note:
-     *      If service not start when call this method, connection operation will 
+     *      If service not start when call this method, connection operation will
      *      create a pending-operation and recorded in service, your maybe could not get error.
      * @param[in] ip           - the ip address.
      * @param[in] port         - the port number.
@@ -202,31 +197,31 @@ public:
      * @param[in] sessionOpts  - the session options.
      * @return int - the new session Id(not yet connected), if return 0 means failed, see LLBC_GetLastError().
      */
-    virtual int AsyncConn(const char *ip,
-                          uint16 port,
-                          double timeout = -1.0,
-                          LLBC_IProtocolFactory *protoFactory = nullptr,
-                          const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts);
+    int AsyncConn(const char *ip,
+                  uint16 port,
+                  double timeout = -1.0,
+                  LLBC_IProtocolFactory *protoFactory = nullptr,
+                  const LLBC_SessionOpts &sessionOpts = LLBC_DftSessionOpts) override;
 
     /**
      * Check given sessionId is legal or not.
      * @param[in] sessionId - the given session Id.
      * @return bool - return true is given session Id validate, otherwise return false.
      */
-    virtual bool IsSessionValidate(int sessionId);
+    bool IsSessionValidate(int sessionId) override;
 
     /**
      * Send packet.
-     * Note: 
+     * Note:
      *      no matter this method success or not, packet will be managed by this call,
      *      it means no matter this call success or not, delete packet operation will
      *      execute by llbc framework.
      * @param[in] packet - the packet.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Send(LLBC_Packet *packet);
+    int Send(LLBC_Packet *packet) override;
 
-    /** 
+    /**
      * Multicast bytes.
      * @param[in] sessionIds - the session Ids.
      * @param[in] opcode     - the opcode.
@@ -236,12 +231,12 @@ public:
      * @param[in] flags      - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Multicast(const LLBC_SessionIds &sessionIds,
-                          int opcode,
-                          const void *bytes,
-                          size_t len,
-                          int status = 0,
-                          uint32 flags = 0);
+    int Multicast(const LLBC_SessionIds &sessionIds,
+                  int opcode,
+                  const void *bytes,
+                  size_t len,
+                  int status = 0,
+                  uint32 flags = 0) override;
 
    /**
      * Broadcast bytes.
@@ -252,11 +247,11 @@ public:
      * @param[in] flags      - the flags, default is 0.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Broadcast(int opcode,
-                          const void *bytes,
-                          size_t len,
-                          int status = 0,
-                          uint32 flags = 0);
+    int Broadcast(int opcode,
+                  const void *bytes,
+                  size_t len,
+                  int status = 0,
+                  uint32 flags = 0) override;
 
     /**
      * Remove session, always success.
@@ -264,7 +259,7 @@ public:
 	 * @param[in] reason    - the close reason string, use to describe session close reason.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int RemoveSession(int sessionId, const char *reason = nullptr);
+    int RemoveSession(int sessionId, const char *reason = nullptr) override;
 
     /**
      * Control session protocol stack.
@@ -273,54 +268,55 @@ public:
      * @param[in] ctrlData  - the stack control data(user defined).
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CtrlProtocolStack(int sessionId,
-                                  int ctrlCmd,
-                                  const LLBC_Variant &ctrlData);
+    int CtrlProtocolStack(int sessionId,
+                          int ctrlCmd,
+                          const LLBC_Variant &ctrlData) override;
 
 public:
     /**
      * Register component.
      */
-    virtual int AddComponent(LLBC_Component *comp);
-    virtual int AddComponent(const LLBC_String &compSharedLibPath,
-                             const LLBC_String &compName,
-                             LLBC_Component *&comp);
+    int AddComponent(LLBC_Component *comp) override;
+
+    int AddComponent(const LLBC_String &compSharedLibPath,
+                     const LLBC_String &compName,
+                     LLBC_Component *&comp) override;
 
     /**
      * Get component.
      */
-    virtual LLBC_Component *GetComponent(const LLBC_CString &compName);
+    LLBC_Component *GetComponent(const LLBC_CString &compName) override;
 
- 
+
 public:
     /**
      * Add coder factory.
      */
-    virtual int AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory);
+    int AddCoderFactory(int opcode, LLBC_CoderFactory *coderFactory) override;
 
 public:
     /**
      * Subscribe message to specified delegate.
      */
-    virtual int Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg);
+    int Subscribe(int opcode, const LLBC_Delegate<void(LLBC_Packet &)> &deleg) override;
 
     /**
      * Previous subscribe message to specified delegate, if method return nullptr, will stop packet process flow.
      */
-    virtual int PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg);
+    int PreSubscribe(int opcode, const LLBC_Delegate<bool(LLBC_Packet &)> &deleg) override;
 
     #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     /**
      * Unify previous subscribe message to specified delegate, if method return false, will stop packet process flow.
      */
-    virtual int UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg);
+    int UnifyPreSubscribe(const LLBC_Delegate<bool(LLBC_Packet &)> &deleg) override;
     #endif // LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
 
     #if LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
     /**
      * Subscribe message status to specified delegate, if subscribed, service will not call default opcode handler.
      */
-    virtual int SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg);
+    int SubscribeStatus(int opcode, int status, const LLBC_Delegate<void(LLBC_Packet &)> &deleg) override;
     #endif // LLBC_CFG_COMM_ENABLE_STATUS_HANDLER
 
 public:
@@ -328,31 +324,32 @@ public:
      * Enable/Disable timer scheduler, only use external-drive type service.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int EnableTimerScheduler();
-    virtual int DisableTimerScheduler();
+    int EnableTimerScheduler() override;
+
+    int DisableTimerScheduler() override;
 
 public:
     /**
      * Subscribe event to specified delegate.
      */
-    virtual LLBC_ListenerStub SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg);
+    LLBC_ListenerStub SubscribeEvent(int event, const LLBC_Delegate<void(LLBC_Event &)> &deleg) override;
 
     /**
      * Subscribe event to specified event listener.
      */
-    virtual LLBC_ListenerStub SubscribeEvent(int event, LLBC_EventListener *listener);
+    LLBC_ListenerStub SubscribeEvent(int event, LLBC_EventListener *listener) override;
 
     /**
      * Unsubscribe event.
      * @param[in] event - the event Id, all the event's handler will delegate.
      */
-    virtual void UnsubscribeEvent(int event);
+    void UnsubscribeEvent(int event) override;
 
     /**
      * Unsubscribe event.
      * @param[in] stub - the event stub.
      */
-    virtual void UnsubscribeEvent(const LLBC_ListenerStub &stub);
+    void UnsubscribeEvent(const LLBC_ListenerStub &stub) override;
 
     /**
      * Fire event(asynchronous operation).
@@ -360,34 +357,36 @@ public:
      * @param[in] enqueueHandler - the event enqueue handler.
      * @param[in] dequeueHandler - the event dequeue handler.
      */
-    virtual void FireEvent(LLBC_Event *ev,
-                           const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
-                           const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr);
+    void FireEvent(LLBC_Event *ev,
+                   const LLBC_Delegate<void(LLBC_Event *)> &enqueueHandler = nullptr,
+                   const LLBC_Delegate<void(LLBC_Event *)> &dequeueHandler = nullptr) override;
 
     /**
      * Begin fire event(asynchronous operation).
      * @param[in] eventId - the event id.
-     * @return LLBC_Event & - the event firer object. 
+     * @return LLBC_Event & - the event firer object.
      */
     /**
      * Begin fire event(asynchronous operation).
      * @param[in] eventId - the event id.
-     * @return LLBC_ServiceEventFirer - the event firer object. 
+     * @return LLBC_ServiceEventFirer - the event firer object.
      */
-    virtual LLBC_ServiceEventFirer BeginFireEvent(int eventId);
-
-    /**
-     * Add component event into service. Operated in the next service drive loop.
-     * @param[in] eventEnum
-     * @param[in] eventParams
-     */
-    virtual void AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams);
+    LLBC_ServiceEventFirer BeginFireEvent(int eventId) override;
 
     /**
      * Get event manager.
      * @return LLBC_EventMgr & - the event manager.
      */
-    virtual LLBC_EventMgr &GetEventManager();
+    LLBC_EventMgr &GetEventManager() override;
+
+public:
+    /**
+     * Add component event into service. Operated in the next service drive loop.
+     * @param[in] eventType   - the event type, see LLBC_ComponentEventType enum.
+     * @param[in] eventParams - the event params.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddComponentEvent(int compEvent, const LLBC_Variant &eventParams) override;
 
 public:
     /**
@@ -395,7 +394,7 @@ public:
      * @param[in] runnable - the runnable obj.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable);
+    int Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable) override;
 
     /**
      * Get service protocol stack, only full-stack option disabled available.
@@ -403,51 +402,58 @@ public:
      * @param[in] sessionId - the session Id.
      * @return const LLBC_ProtocolStack * - the protocol stack.
      */
-    virtual const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const;
+    const LLBC_ProtocolStack *GetCodecProtocolStack(int sessionId) const override;
 
 public:
     /**
      * Get service thread-safe object pool.
      * @return LLBC_ObjPool & - the service thread-safe object pool.
      */
-    virtual LLBC_ObjPool &GetThreadSafeObjPool();
+    LLBC_ObjPool &GetThreadSafeObjPool() override;
 
     /**
      * Get service thread-unsafe object pool.
      * @return LLBC_ObjPool * - the service thread-unsafe object pool.
      */
-    virtual LLBC_ObjPool &GetThreadUnsafeObjPool();
+    LLBC_ObjPool &GetThreadUnsafeObjPool() override;
 
 public:
     /**
      * One time service call routine, if service drive mode is ExternalDrive, you must manual call this method.
      * @param[in] fullFrame - the full frame flag.
      */
-    virtual void OnSvc(bool fullFrame = true);
+    void OnSvc(bool fullFrame = true) override;
+
+protected:
+    /**
+     * Lock service.
+     */
+    void LockService() override;
+
+    /**
+     * Unlock service.
+     */
+    void UnlockService() override;
 
 protected:
     /**
      * Stack create helper method(call by service and session class).
      */
-    virtual LLBC_ProtocolStack *CreatePackStack(int sessionId,
-                                                int acceptSessionId = 0,
-                                                LLBC_ProtocolStack *stack = nullptr);
-    virtual LLBC_ProtocolStack *CreateCodecStack(int sessionId,
-                                                 int acceptSessionId = 0,
-                                                 LLBC_ProtocolStack *stack = nullptr);
-    virtual LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0);
+    LLBC_ProtocolStack *CreatePackStack(int sessionId,
+                                        int acceptSessionId = 0,
+                                        LLBC_ProtocolStack *stack = nullptr) override;
+
+    LLBC_ProtocolStack *CreateCodecStack(int sessionId,
+                                         int acceptSessionId = 0,
+                                         LLBC_ProtocolStack *stack = nullptr) override;
+
+    LLBC_ProtocolStack *CreateFullStack(int sessionId, int acceptSessionId = 0) override;
 
 protected:
     /**
      * Get component list.
      */
-    virtual const std::vector<LLBC_Component *> &GetComponentList() const;
-
-protected:
-    /**
-     * Process application config reload event.
-     */
-    virtual void ProcessAppConfigReload();
+    const std::vector<LLBC_Component *> &GetComponentList() const override;
 
 protected:
     /**
@@ -460,18 +466,20 @@ protected:
     /**
      * Session protocol factory operation methods.
      */
-    virtual void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory);
-    virtual LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId);
-    virtual void RemoveSessionProtocolFactory(int sessionId);
+    void AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory) override;
+
+    LLBC_IProtocolFactory *FindSessionProtocolFactory(int sessionId) override;
+
+    void RemoveSessionProtocolFactory(int sessionId) override;
 
 protected:
     /**
      * Ready session operation methods.
      */
-    virtual void AddReadySession(int sessionId,
-                                 int acceptSessionId,
-                                 bool isListenSession,
-                                 bool repeatCheck = false);
+    void AddReadySession(int sessionId,
+                         int acceptSessionId,
+                         bool isListenSession,
+                         bool repeatCheck = false) override;
     void RemoveReadySession(int sessionId);
     void RemoveAllReadySessions();
 
@@ -479,18 +487,20 @@ protected:
     /**
      * Task entry method.
      */
-    virtual void Svc();
+    void Svc() override;
 
     /**
      * Task cleanup method.
      */
-    virtual void Cleanup();
+    void Cleanup() override;
 
 private:
     /**
      * Service config operation methods.
+     * @param[in] appCfgType    - the application config type, see LLBC_AppConfigType.
+     * @param[in] appCfg        - the application config.
      */
-    void UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev = nullptr);
+    void UpdateServiceCfg(int appCfgType, const LLBC_Variant &appCfg);
 
     /**
      * Service TLS operation methods.
@@ -523,7 +533,8 @@ private:
     void HandleEv_UnsubscribeEv(LLBC_ServiceEvent &ev);
     void HandleEv_FireEv(LLBC_ServiceEvent &ev);
     void HandleEv_AppPhaseEv(LLBC_ServiceEvent &ev);
-    void HandleEv_AppCfgReload(LLBC_ServiceEvent &ev);
+    void HandleEv_AppReloaded(LLBC_ServiceEvent &ev);
+    void HandleEv_ComponentEvent(LLBC_ServiceEvent &ev);
 
     /**
      * Component operation methods.
@@ -588,6 +599,7 @@ private:
     mutable LLBC_RecursiveLock _lock; // Service lock.
     volatile bool _serviceBeginLoop; // Service begin loop flag.
     volatile LLBC_ServiceRunningPhase::ENUM _runningPhase; // Service running phase.
+    bool _destroyCompWhenStop; // Destroy components when stop service.
     typedef void (LLBC_ServiceImpl::*_EvHandler)(LLBC_ServiceEvent &);
     static _EvHandler _evHandlers[LLBC_ServiceEventType::End]; // Service event handlers slot.
 
@@ -597,8 +609,7 @@ private:
 
     // Config about members.
     int _cfgType; // Config type, see LLBC_AppConfigType enum.
-    LLBC_Property _propCfg; // Prop type config content.
-    LLBC_Variant _nonPropCfg; // Non-Prop type config content(xml/ini/...).
+    LLBC_Variant _cfg; // Prop type config content.
 
     // Protocol/poller/session about members.
     bool _fullStack; // ProtocolStack running mode(full/half).
@@ -627,12 +638,12 @@ private:
     mutable LLBC_SpinLock _readySessionInfosLock; // Ready session set lock.
 
     // FPS about members.
-    int _fps; // Service FPS.
-    int _frameInterval; // Frame interval, 1000/_fps.
+    volatile int _fps; // Service FPS.
     sint64 _begSvcTime; // Begin heartbeat time, update on every heartbeat begin.
 
-public:
+private:
     // Components about members.
+    using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
     std::list<LLBC_Component *> _willRegComps; // Will register component list.
     std::vector<LLBC_Component *> _compList; // Component list.
     std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
@@ -667,7 +678,7 @@ private:
     // - Event support members.
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
-    std::queue<std::pair<LLBC_ComponentEventType::ENUM, const LLBC_Variant &>> _componentEvents; // Component events.
+    std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
 };
 
 __LLBC_NS_END

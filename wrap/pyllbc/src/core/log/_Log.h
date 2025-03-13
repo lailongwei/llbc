@@ -30,7 +30,8 @@ LLBC_EXTERN_C PyObject *_pyllbc_InitLoggerMgr(PyObject *self, PyObject *args)
     LLBC_LoggerMgr *loggerMgr = LLBC_LoggerMgrSingleton;
     if (loggerMgr->Initialize(cfgFile) != LLBC_OK)
     {
-        pyllbc_TransferLLBCError(__FILE__, __LINE__);
+        pyllbc_TransferLLBCError(__FILE__, __LINE__,
+                                 LLBC_String().format("Init logger mgr failed, cfgFile:%s", cfgFile));
         return nullptr;
     }
 
@@ -64,7 +65,8 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
             loggerMgr->GetRootLogger() : loggerMgr->GetLogger(loggerName);
     if (!logger)
     {
-        pyllbc_TransferLLBCError(__FILE__, __LINE__);
+        pyllbc_TransferLLBCError(__FILE__, __LINE__,
+            LLBC_String().format("logger <%s> not found", loggerName ? loggerName : "root"));
         return nullptr;
     }
 
@@ -82,16 +84,10 @@ LLBC_EXTERN_C PyObject *_pyllbc_LogMsg(PyObject *self, PyObject *args)
             return nullptr;
     }
 
-    int rtn = logger->NonFormatOutput(level,
-                                      tag,
-                                      file,
-                                      line,
-                                      func,
-                                      0,
-                                      msg,
-                                      -1);
+    int rtn = logger->NonFormatOutput(level, tag, file, line, func, 0, msg, -1);
     if (UNLIKELY(rtn != LLBC_OK))
     {
+        // TODO: 
         pyllbc_TransferLLBCError(__FILE__, __LINE__);
         return nullptr;
     }

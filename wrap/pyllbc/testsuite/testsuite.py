@@ -22,7 +22,7 @@ def main():
     # GUIDTest()()
     # BundleTest()()
     # RandomTest()()
-    # PropertyTest()()
+    # PropertiesTest()()
     # EventTestCase()()
     # LogTest()()
 

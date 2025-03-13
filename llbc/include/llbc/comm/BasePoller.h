@@ -55,7 +55,7 @@ public:
      * Constructor & Destructor.
      */
     LLBC_BasePoller();
-    virtual ~LLBC_BasePoller();
+    ~LLBC_BasePoller() override;
 
 public:
     /**
@@ -105,7 +105,7 @@ public:
     /**
      * Task cleanup handler.
      */
-    virtual void Cleanup();
+    void Cleanup() override;
 
 protected:
     /**

@@ -24,14 +24,14 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Thread_ThreadMgr : public LLBC_BaseTestCase
+class TestCase_Core_Thread_ThreadMgr final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Thread_ThreadMgr();
-    virtual ~TestCase_Core_Thread_ThreadMgr();
+    ~TestCase_Core_Thread_ThreadMgr() override;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     int Test_StaticMethods();

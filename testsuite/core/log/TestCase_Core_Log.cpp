@@ -23,8 +23,6 @@
 #include "core/log/TestCase_Core_Log.h"
 #include <iomanip>
 
-#include "llbc/core/log/ILogAppender.h"
-
 TestCase_Core_Log::TestCase_Core_Log()
 {
 }
@@ -47,9 +45,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    // const LLBC_String logCfgFile = "LogTestCfg.cfg";
-    const LLBC_String logCfgFile = "LogTestCfg.xml";
-    if(LLBC_LoggerMgrSingleton->Initialize(logCfgFile) != LLBC_OK)
+    _logCfgFilePath = "LogTestCfg.cfg";
+    // _logCfgFilePath  = "LogTestCfg.xml";
+    if(LLBC_LoggerMgrSingleton->Initialize(_logCfgFilePath) != LLBC_OK)
 #endif
     {
         LLBC_FilePrintLn(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
@@ -57,9 +55,12 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
         return -1;
     }
 
-    // Install logger hook(to root logger).
+    // Defer finalize logger mgr.
+    LLBC_Defer(LLBC_LoggerMgrSingleton->Finalize());
+
+    // Set log hook(to root logger).
     LLBC_Logger *rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
-    rootLogger->InstallHook(LLBC_LogLevel::Debug,
+    rootLogger->SetLogHook({ LLBC_LogLevel::Debug, LLBC_LogLevel::Trace },
                             LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
 
     // Use root logger to test.
@@ -68,16 +69,19 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_DEBUG("This is a debug log message.");
     LLOG_DEBUG3("test_tag", "This is a debug log message.");
 
-    // Uninstall logger hook(from root logger).
-    rootLogger->UninstallHook(LLBC_LogLevel::Debug);
+    // Clear log hook(from root logger).
+    rootLogger->SetLogHook({ LLBC_LogLevel::Debug, LLBC_LogLevel::Trace }, nullptr);
 
-    // Test condition macro log
+    // Sync logger multi-thread test.
+    SyncLoggerMultiThreadTest();
+
+    // Test condition macro log.
     DoConditionMacroLogTest();
-    
+
 #if LLBC_CFG_LOG_USING_WITH_STREAM
     LSLOG_DEBUG("Message type test, char: " <<'a' <<", bool: " <<true <<", uint8: " <<(uint8)8
         <<", sint16: " <<(sint16)-16 << ", uint16: " <<(uint16)16 <<", sint32: " <<-32
-        <<", uint32: " <<(uint32)32 <<", long: " <<(long)-1 <<", ulong: " <<(llbc::ulong)1
+        <<", uint32: " <<(uint32)32 <<", long: " <<(long)-1 <<", ulong: " <<(LLBC_NS ulong)1
         <<", sint64: " <<(sint64)-64 <<", uint64: " <<(uint64)64 <<", float: " <<(float)1.0
         <<", double: " <<2.0 <<", ldouble: " <<(ldouble)3.0);
 
@@ -143,28 +147,24 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
             LLBC_LoggerMgrSingleton->GetLogger("perftest")->GetLoggerObjPool().GetStatistics();
         LLBC_PrintLn("perftest logger object pool stat:\n%s", objPoolStat.c_str());
 
-        LLBC_CPUTime begin = LLBC_CPUTime::Current();
+        LLBC_Stopwatch sw;
         const int loopLmt = 2000000;
         for (int i = 0; i < loopLmt; ++i)
             LLOG_TRACE2("perftest", "performance test msg, msg idx:%d", i);
 
-        LLBC_CPUTime elapsed = LLBC_CPUTime::Current() - begin;
+        sw.Pause();
         LLBC_PrintLn("Performance test completed, "
                        "log times:%d, cost:%s ms, per-log cost:%.3f us",
                        loopLmt,
-                       elapsed.ToString().c_str(),
-                       elapsed.ToNanos() / static_cast<double>(loopLmt) / 1000.0);
+                       sw.ToString().c_str(),
+                       sw.ElapsedNanos() / static_cast<double>(loopLmt) / 1000.0);
     }
 
     // Test json styled log.
     DoJsonLogTest();
 
-    int jsonLogTestTimes = 30;
-    for (int i = 0; i < jsonLogTestTimes; ++i)
-        DoJsonLogTest();
-
-    // Finalize logger.
-    LLBC_LoggerMgrSingleton->Finalize();
+    // Test logger mgr reload.
+    LLBC_ErrorAndReturnIf(DoLoggerMgrReloadTest() != LLBC_OK, LLBC_FAILED);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -360,6 +360,46 @@ void TestCase_Core_Log::DoUninitLogTest()
     LJLOG_DEBUG3("uninit_tag").Add("Key1", "Key1 value").Finish("This is a uninited json log message");
 }
 
+void TestCase_Core_Log::SyncLoggerMultiThreadTest()
+{
+    LLBC_PrintLn("Sync logger multi-thread test:");
+
+    class _TestTask : public LLBC_Task
+    {
+    public:
+        explicit _TestTask(uint32 testTimes):_testTimes(testTimes), _nowTimes(0) {  }
+
+    public:
+        void Svc() override
+        {
+            sint32 nowTimes;
+            sint32 logTimes = 0;
+            while ((nowTimes = LLBC_AtomicFetchAndAdd(&_nowTimes, 1)) < _testTimes)
+            {
+                ++logTimes;
+                LLOG_INFO2("sync", "[%08u] I am thread %d...", nowTimes, LLBC_GetCurrentThreadId());
+            }
+
+            LLBC_PrintLn("Test thread %d exit, nowTimes:%d, logTimes:%d", LLBC_GetCurrentThreadId(), nowTimes, logTimes);
+        }
+
+        void Cleanup() override
+        {
+            LLOG_INFO2("sync", "Sync logger multi-thread test finished, total test times: %d", _nowTimes);
+        }
+
+    public:
+        sint32 _testTimes;
+        sint32 _nowTimes;
+    };
+
+    _TestTask task(500000);
+    task.Activate(20);
+    task.Wait();
+
+    LLBC_PrintLn("Sync logger multi-thread test finished");
+}
+
 void TestCase_Core_Log::DoConditionMacroLogTest()
 {
     LLBC_LogAndDoIf(true, Error, {});
@@ -394,6 +434,34 @@ void TestCase_Core_Log::DoConditionMacroLogTest()
                                                    1, 3.14, "hello world"); }();
 }
 
+int TestCase_Core_Log::DoLoggerMgrReloadTest()
+{
+    LLBC_PrintLn("LoggerMgr reload test, please modify logger config file, "
+                 "then press any key to continue ...");
+    LLBC_PrintLn("- logger config file path:%s", _logCfgFilePath.c_str());
+
+    // Reload.
+    getchar();
+    LLBC_ErrorAndReturnIf(LLBC_LoggerMgrSingleton->Reload() != LLBC_OK,
+                          LLBC_FAILED,
+                          "Reload logger mgr failed, err:%s",
+                          LLBC_FormatLastError());
+
+    for (auto &loggerName : {"root", "test"})
+    {
+        LLBC_PrintLn("After reload logger mgr, output %s logger all levers log:", loggerName);
+        for (int logLevel = LLBC_LogLevel::Begin; logLevel != LLBC_LogLevel::End; ++logLevel)
+        {
+            LLOG(loggerName, nullptr, logLevel,
+                 "This is a <%s> level log for %s logger",
+                 LLBC_LogLevel::GetLevelStr(logLevel).c_str(), loggerName);
+        }
+        LLBC_PrintLn("All levels log has been output, please check console/file output");
+    }
+
+    return LLBC_OK;
+}
+
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
     LLBC_PrintLn("Log hook, loggerName: %s, level: %s, message: %s",
@@ -401,4 +469,3 @@ void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
                    LLBC_LogLevel::GetLevelStr(logData->level).c_str(),
                    logData->msg);
 }
-

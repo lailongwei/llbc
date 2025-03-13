@@ -40,6 +40,7 @@
 #endif
 
 // core/algo
+#include "llbc/core/algo/Hash.h"
 #include "llbc/core/algo/RingBuffer.h"
 
 // core/bundle
@@ -76,7 +77,7 @@
 
 // core/config
 #include "llbc/core/config/Ini.h"
-#include "llbc/core/config/Property.h"
+#include "llbc/core/config/Properties.h"
 
 // core/time
 #include "llbc/core/time/Time.h"
@@ -112,6 +113,7 @@
 // core/log
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogLevel.h"
+#include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerMgr.h"
 #include "llbc/core/log/LogJsonMsg.h"

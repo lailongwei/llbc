@@ -24,25 +24,21 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Event : public LLBC_BaseTestCase
+class TestCase_Core_Event final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Event();
-    virtual ~TestCase_Core_Event();
+    TestCase_Core_Event() = default;
+
+    ~TestCase_Core_Event() override = default;
 
 public:
-    virtual int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
-    void OnEvent1(LLBC_Event &ev);
-    void OnEvent1Too(LLBC_Event &ev);
-
-    void OnEvent2(LLBC_Event &ev);
+    int BasicTest();
+    int EventFireDeadLoopDetectionTest();
+    int CopyEventTest();
 
 private:
     void DumpEvParams(const LLBC_Event &ev);
-
-private:
-    LLBC_ListenerStub _ev1Stub;
-    LLBC_ListenerStub _ev1TooStub;
 };

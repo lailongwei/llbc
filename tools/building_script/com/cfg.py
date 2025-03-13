@@ -116,7 +116,7 @@ class _Cfg(object):
         pf = self.platform
         if pf == PlatformType.Windows:
             return '.dll'
-        elif pf == PlatformType.Macosx:
+        elif pf == PlatformType.Darwin:
             return '.dylib'
         else:
             return '.so'

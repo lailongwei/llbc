@@ -33,7 +33,6 @@
 #include "llbc/comm/protocol/IProtocol.h"
 #include "llbc/comm/protocol/ProtocolStack.h"
 #include "llbc/comm/protocol/NormalProtocolFactory.h"
-#include "llbc/comm/Component.h"
 #include "llbc/comm/ServiceImpl.h"
 #include "llbc/comm/ServiceMgr.h"
 
@@ -41,7 +40,7 @@
 
 namespace
 {
-    typedef LLBC_NS LLBC_ProtocolStack _Stack;
+    using _Stack = LLBC_NS LLBC_ProtocolStack;
 }
 
 #define __LLBC_INL_CHECK_RUNNING_PHASE_EQ(requirePhase, failedSetErr, failedRet) \
@@ -85,7 +84,9 @@ LLBC_ServiceImpl::_EvHandler LLBC_ServiceImpl::_evHandlers[LLBC_ServiceEventType
     &LLBC_ServiceImpl::HandleEv_FireEv,
 
     &LLBC_ServiceImpl::HandleEv_AppPhaseEv,
-    &LLBC_ServiceImpl::HandleEv_AppCfgReload,
+    &LLBC_ServiceImpl::HandleEv_AppReloaded,
+
+    &LLBC_ServiceImpl::HandleEv_ComponentEvent,
 };
 
 LLBC_ListenerStub LLBC_ServiceImpl::_evManagerMaxListenerStub = 0;
@@ -103,6 +104,7 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _svcMgr(*LLBC_ServiceMgrSingleton)
 , _serviceBeginLoop(false)
 , _runningPhase(LLBC_ServiceRunningPhase::NotStarted)
+, _destroyCompWhenStop(false)
 
 , _startErrNo(0)
 , _startSubErrNo(0)
@@ -115,7 +117,6 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
 , _dftProtocolFactory(dftProtocolFactory)
 
 , _fps(LLBC_CFG_COMM_DFT_SERVICE_FPS)
-, _frameInterval(1000 / LLBC_CFG_COMM_DFT_SERVICE_FPS)
 , _begSvcTime(0)
 
 // Service extend functions about members.
@@ -155,8 +156,8 @@ LLBC_ServiceImpl::~LLBC_ServiceImpl()
         ASSERT(_runningPhase == LLBC_ServiceRunningPhase::NotStarted ||
                LLBC_GetCurrentThreadId() == _svcThreadId);
 
-    // Stop service and destroy comps).
-    Stop();
+    // Stop service and destroy comps.
+    Stop(true);
     DestroyComps(false);
 
     // Clear members.
@@ -288,7 +289,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
     return LLBC_OK;
 }
 
-int LLBC_ServiceImpl::Stop()
+int LLBC_ServiceImpl::Stop(bool destroyComp)
 {
     // If service not in <Started> phase, return failed.
     _lock.Lock();
@@ -304,8 +305,11 @@ int LLBC_ServiceImpl::Stop()
     const int driveMode = _driveMode;
     const LLBC_ThreadId svcThreadId = _svcThreadId;
 
+    _destroyCompWhenStop = destroyComp;
+
     // Update service phase to <Stopping>.
     _runningPhase = LLBC_ServiceRunningPhase::StoppingComps;
+
     _lock.Unlock();
 
     // Exec stop logic.
@@ -333,12 +337,6 @@ int LLBC_ServiceImpl::Stop()
     }
 }
 
-int LLBC_ServiceImpl::GetFPS() const
-{
-    LLBC_LockGuard guard(_lock);
-    return _fps;
-}
-
 int LLBC_ServiceImpl::SetFPS(int fps)
 {
     if (fps != static_cast<int>(LLBC_INFINITE) &&
@@ -351,22 +349,8 @@ int LLBC_ServiceImpl::SetFPS(int fps)
     LLBC_LockGuard guard(_lock);
 
     _fps = fps;
-    if (_fps != static_cast<int>(LLBC_INFINITE))
-    {
-        _frameInterval = 1000 / _fps;
-    }
-    else
-    {
-        _frameInterval = 0;
-    }
 
     return LLBC_OK;
-}
-
-int LLBC_ServiceImpl::GetFrameInterval() const
-{
-    LLBC_LockGuard guard(_lock);
-    return _frameInterval;
 }
 
 int LLBC_ServiceImpl::Listen(const char *ip,
@@ -509,7 +493,7 @@ int LLBC_ServiceImpl::Broadcast(int opcode,
     }
 
     // Get all non-listen sessionIds.
-    static thread_local LLBC_SessionIds sessionIds;
+    thread_local LLBC_SessionIds sessionIds;
 
     _readySessionInfosLock.Lock();
     const auto readySessionInfosEndIt = _readySessionInfos.end();
@@ -623,21 +607,12 @@ int LLBC_ServiceImpl::AddComponent(LLBC_Component *comp)
         NotStarted, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Get component name.
-    size_t compNameLen;
-    char compName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
-    GetCompName(typeid(*comp).name(), compName, compNameLen);
+    const LLBC_String compName = LLBC_GetCompName(*comp);
 
     // Define component find lambda.
-    const auto findLambda = [comp, compName, compNameLen](LLBC_Component *regComp) {
-        if (comp == regComp)
-            return true;
-
-        char regCompName[LLBC_CFG_COMM_MAX_COMP_NAME_LEN + 1];
-        size_t regCompNameLen;
-        GetCompName(typeid(*regComp).name(), regCompName, regCompNameLen);
-
-        return regCompNameLen == compNameLen &&
-            memcmp(compName, regCompName, compNameLen) == 0;
+    const auto findLambda = [comp, compName](LLBC_Component *regComp) {
+        return comp == regComp ||
+            compName == LLBC_GetCompName(*regComp);
     };
 
     // Repeat add check.
@@ -715,10 +690,7 @@ int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath,
     }
 
     // Validate comp class name and giving compName is same or not.
-    auto realCompName = LLBC_GetTypeName(*comp);
-    const auto realCompNSNameEnd = strrchr(realCompName, ':');
-    if (realCompNSNameEnd != nullptr)
-        realCompName = realCompNSNameEnd + 1;
+    const LLBC_CString realCompName = LLBC_GetCompName(*comp);
     if (UNLIKELY(realCompName != compName))
     {
         LLBC_XDelete(comp);
@@ -750,16 +722,28 @@ LLBC_Component *LLBC_ServiceImpl::GetComponent(const LLBC_CString &compName)
         return nullptr;
     }
 
+    // Strict match.
     const auto compsEnd = _name2Comps.end();
-
     LLBC_LockGuard guard(_lock);
     auto it = _name2Comps.find(compName);
     if (it != compsEnd)
         return it->second;
 
+    // Match IXxxYyy.
     if (compName.size() > 1 && compName[0] == 'I')
     {
         if ((it = _name2Comps.find(compName + 1)) != compsEnd)
+            return it->second;
+    }
+
+    // Match BaseXxxYyy.
+    if (compName.size() > 4 &&
+        compName[0] == 'B' &&
+        compName[1] == 'a' &&
+        compName[2] == 's' &&
+        compName[3] == 'e')
+    {
+        if ((it = _name2Comps.find(compName + 4)) != compsEnd)
             return it->second;
     }
 
@@ -959,9 +943,16 @@ LLBC_ServiceEventFirer LLBC_ServiceImpl::BeginFireEvent(int eventId)
     return LLBC_ServiceEventFirer(this, ev);
 }
 
-void LLBC_ServiceImpl::AddComponentEvent(LLBC_ComponentEventType::ENUM eventEnum, const LLBC_Variant &eventParams)
+int LLBC_ServiceImpl::AddComponentEvent(int eventType, const LLBC_Variant &eventParams)
 {
-    _componentEvents.emplace(eventEnum, eventParams);
+    if (eventType < LLBC_ComponentEventType::LogicBegin ||
+        eventType >= LLBC_ComponentEventType::LogicEnd)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
+
+    return Push(LLBC_SvcEvUtil::BuildComponentEventEv(eventType, eventParams));
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
@@ -1003,14 +994,15 @@ const LLBC_ProtocolStack *LLBC_ServiceImpl::GetCodecProtocolStack(int sessionId)
 
 void LLBC_ServiceImpl::OnSvc(bool fullFrame)
 {
-    if (fullFrame && _frameInterval == 0)
+    const auto frameInterval = GetFrameInterval();
+    if (fullFrame && frameInterval == 0)
         fullFrame = false;
 
     while (UNLIKELY(_runningPhase != LLBC_ServiceRunningPhase::Started &&
                     _runningPhase != LLBC_ServiceRunningPhase::StartingComps &&
                     _runningPhase != LLBC_ServiceRunningPhase::StoppingComps))
     {
-        LLBC_DoIf(fullFrame, LLBC_Sleep(_frameInterval));
+        LLBC_DoIf(fullFrame, LLBC_Sleep(frameInterval));
         return;
     }
 
@@ -1048,8 +1040,8 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
     if (fullFrame)
     {
         const sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
-        if (elapsed >= 0 && elapsed < _frameInterval)
-            LLBC_Sleep(static_cast<int>(_frameInterval - elapsed));
+        if (elapsed >= 0 && elapsed < frameInterval)
+            LLBC_Sleep(static_cast<int>(frameInterval - elapsed));
     }
 
     // If in stopping phases(StoppingComp/Stopping) and is ExternalDrive mode, Exec cleanup.
@@ -1136,20 +1128,6 @@ LLBC_ProtocolStack *LLBC_ServiceImpl::CreateFullStack(int sessionId, int acceptS
 const std::vector<LLBC_Component *> &LLBC_ServiceImpl::GetComponentList() const
 {
     return _compList;
-}
-
-void LLBC_ServiceImpl::ProcessAppConfigReload()
-{
-    if (!IsStarted())
-        return;
-
-    LLBC_LockGuard guard(_lock);
-    if (!IsStarted())
-        return;
-
-    auto app = LLBC_App::ThisApp();
-    Push(LLBC_SvcEvUtil::BuildAppCfgReloadEv(
-        app->GetConfigType(), app->GetPropertyConfig(), app->GetConfig()));
 }
 
 void LLBC_ServiceImpl::AddSessionProtocolFactory(int sessionId, LLBC_IProtocolFactory *protoFactory)
@@ -1298,6 +1276,9 @@ void LLBC_ServiceImpl::Cleanup()
     // Stop comps.
     StopComps();
 
+    // Destroy comps if needed.
+    LLBC_DoIf(_destroyCompWhenStop, DestroyComps(); _destroyCompWhenStop = false);
+
     // Post-Stop.
     PostStop();
 
@@ -1308,25 +1289,18 @@ void LLBC_ServiceImpl::Cleanup()
         _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
 }
 
-void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
+void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appCfg)
 {
-    auto app = LLBC_App::ThisApp();
-    if (UNLIKELY(!app))
+    // Update config type.
+    _cfgType = appCfgType;
+    _cfg.BecomeNil();
+
+    if (_cfgType < LLBC_AppConfigType::Begin ||
+        _cfgType >= LLBC_AppConfigType::End)
         return;
 
-    // If use app config, lock app config load.
-    if (!ev)
-        app->PreventConfigLoad();
-    LLBC_Defer(if (!ev) app->CancelPreventConfigLoad());
-
-    // Get config type.
-    _cfgType = ev ? ev->cfgType : app->GetConfigType();
-
-    // Reset service config.
-    _propCfg.RemoveAllProperties();
-    _nonPropCfg = LLBC_Variant::nil;
-
     // Update service config.
+    bool isXmlCfg = false;
     if (_cfgType == LLBC_AppConfigType::Property)
     {
         // Service config prop name:
@@ -1334,47 +1308,65 @@ void LLBC_ServiceImpl::UpdateServiceCfg(LLBC_SvcEv_AppCfgReloadedEv *ev)
         // <svc_name>.xxx
         // <svc_name>.xxx.xxx
         // <svc_name>.xxx.xxx.xxx....
-        auto &appPropCfg = ev ? ev->propCfg : app->GetPropertyConfig();
-        auto svcCfg = appPropCfg.GetProperty(GetName());
-        LLBC_DoIf(svcCfg, _propCfg = *svcCfg);
+        _cfg = appCfg[GetName()];
     }
-    else
+    else if (_cfgType == LLBC_AppConfigType::Ini)
     {
-        auto &appNonPropCfg = ev ? ev->nonPropCfg : app->GetConfig();
-        if (_cfgType == LLBC_AppConfigType::Ini)
+        // Service config section: [<svc_name>]
+        // Comp config section(s): [<svc_name>.<comp_name>]
+        for (auto it = appCfg.DictBegin(); it != appCfg.DictEnd(); ++it)
         {
-            // Service config section: [<svc_name>]
-            // Comp config section(s): [<svc_name>.<comp_name>]
-            for (auto it = appNonPropCfg.DictBegin(); it != appNonPropCfg.DictEnd(); ++it)
+            const auto iniSectionName = it->first.AsStr();
+            if (iniSectionName == GetName())
             {
-                const auto iniSectionName = it->first.AsStr();
-                if (iniSectionName == GetName() ||
-                    (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1))
-                    _nonPropCfg[iniSectionName] = it->second;
+                for (auto &iniCfgItem : it->second.AsDict())
+                    _cfg.DictInsert(iniCfgItem.first, iniCfgItem.second);
             }
-        }
-        else if (_cfgType == LLBC_AppConfigType::Xml)
-        {
-            auto &svcCfgs = appNonPropCfg[LLBC_XMLKeys::Children];
-            for (auto &svcCfg : svcCfgs.AsSeq())
+            else if (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1)
             {
-                const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].AsStr();
-                if (svcCfgName != "Service" &&
-                    svcCfgName != "service" &&
-                    svcCfgName != "Svc" &&
-                    svcCfgName != "svc")
-                    continue;
-
-                const auto &svcCfgAttrs = svcCfg[LLBC_XMLKeys::Attrs];
-                if (svcCfgAttrs["Name"] == GetName() ||
-                    svcCfgAttrs["name"] == GetName())
-                {
-                    _nonPropCfg = svcCfg;
-                    break;
-                }
+                auto &compCfg = _cfg[iniSectionName.substr(GetName().size() + 1)];
+                for (auto &compCfgItem : it->second.AsDict())
+                    compCfg.DictInsert(compCfgItem.first, compCfgItem.second);
             }
         }
     }
+    else // if (_cfgType == LLBC_AppConfigType::Xml)
+    {
+        isXmlCfg = true;
+        auto &svcCfgs = appCfg[LLBC_XMLKeys::Children];
+        for (auto &svcCfg : svcCfgs.AsSeq())
+        {
+            const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].AsStr();
+            if (svcCfgName != "Service" &&
+                svcCfgName != "service" &&
+                svcCfgName != "Svc" &&
+                svcCfgName != "svc")
+                continue;
+
+            const auto &svcCfgAttrs = svcCfg[LLBC_XMLKeys::Attrs];
+            if (svcCfgAttrs["Name"] == GetName() ||
+                svcCfgAttrs["name"] == GetName())
+            {
+                _cfg = svcCfg;
+                break;
+            }
+        }
+    }
+
+    // After config update, read recognizable service config.
+    // - Update service fps:
+    for (auto cfgItem : _cfg.AsDict())
+    {
+        if (cfgItem.first.AsStr().tolower() == "fps")
+        {
+            const auto fps = isXmlCfg ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
+            SetFPS(fps);
+            break;
+        }
+    }
+
+    // - Update other service configs.
+    // ... ...
 }
 
 void LLBC_ServiceImpl::AddServiceToTls()
@@ -1465,7 +1457,13 @@ int LLBC_ServiceImpl::PreStart()
     }
 
     // Update service config.
-    UpdateServiceCfg();
+    auto app = LLBC_App::ThisApp();
+    if (app)
+    {
+        app->PreventReload();
+        UpdateServiceCfg(app->GetConfigType(), app->GetConfigUnsafe());
+        app->CancelPreventReload();
+    }
 
     // Initialize PollerMgr.
     if (_pollerMgr.Init(_pollerCount) != LLBC_OK)
@@ -1516,8 +1514,7 @@ void LLBC_ServiceImpl::PostStop()
 
     // Cleanup service config.
     _cfgType = LLBC_AppConfigType::End;
-    _propCfg.RemoveAllProperties();
-    _nonPropCfg.BecomeNil();
+    _cfg.BecomeNil();
 
     // Reset _svcThreadId.
     _svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
@@ -1525,7 +1522,7 @@ void LLBC_ServiceImpl::PostStop()
     _pollerCount = 0;
 }
 
-void LLBC_ServiceImpl::HandlePosts()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::HandlePosts()
 {
     LLBC_ReturnIf(_posts.empty(), void());
 
@@ -1555,20 +1552,6 @@ void LLBC_ServiceImpl::HandleQueuedEvents()
             delete block;
         }
     }
-
-    while(!_componentEvents.empty())
-    {
-        auto &event = _componentEvents.front();
-        auto &eventEnum = event.first;
-        auto &eventParams = event.second;
-
-        for(auto *comp : _compList)
-        {
-            comp->OnEvent(eventEnum, eventParams);
-        }
-
-        _componentEvents.pop();
-    }
 }
 
 void LLBC_ServiceImpl::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
@@ -1592,11 +1575,10 @@ void LLBC_ServiceImpl::HandleEv_SessionCreate(LLBC_ServiceEvent &_)
     LLBC_Variant eventParams(&info);
 
     // Dispatch session-create event to all comps.
-    for(auto *comp : _compList)
+    for(auto &comp : _compList)
     {
-        LLBC_ContinueIf(comp->_started == false);
-
-        comp->OnEvent(LLBC_ComponentEventType::SessionCreate, eventParams);
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnEvent(LLBC_ComponentEventType::SessionCreate, eventParams);
     }
 }
 
@@ -1625,11 +1607,10 @@ void LLBC_ServiceImpl::HandleEv_SessionDestroy(LLBC_ServiceEvent &_)
     LLBC_Variant eventParams(&destroyInfo);
 
     // Dispatch session-destroy event to all comps.
-    for(auto *comp : _compList)
+    for(auto &comp : _compList)
     {
-        LLBC_ContinueIf(comp->_started == false);
-
-        comp->OnEvent(LLBC_ComponentEventType::SessionDestroy, eventParams);
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnEvent(LLBC_ComponentEventType::SessionDestroy, eventParams);
     }
 
     // Remove session protocol factory.
@@ -1651,11 +1632,10 @@ void LLBC_ServiceImpl::HandleEv_AsyncConnResult(LLBC_ServiceEvent &_)
     LLBC_Variant eventParams(&result);
 
     // Dispatch async-conn-result event to all comps.
-    for(auto *comp : _compList)
+    for(auto &comp : _compList)
     {
-        LLBC_ContinueIf(comp->_started == false);
-
-        comp->OnEvent(LLBC_ComponentEventType::AsyncConnResult, eventParams);
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnEvent(LLBC_ComponentEventType::AsyncConnResult, eventParams);
     }
 
     // Remove session protocol factory, if connect failed.
@@ -1756,11 +1736,10 @@ void LLBC_ServiceImpl::HandleEv_DataArrival(LLBC_ServiceEvent &_)
     {
         // Dispatch unhandled-packet event to all comps.
         LLBC_Variant eventParams(packet);
-        for(auto *comp : _compList)
+        for(auto &comp : _compList)
         {
-            LLBC_ContinueIf(comp->_started == false);
-
-            comp->OnEvent(LLBC_ComponentEventType::UnHandledPacket, eventParams);
+            if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+                comp->OnEvent(LLBC_ComponentEventType::UnHandledPacket, eventParams);
         }
     }
 
@@ -1782,11 +1761,10 @@ void LLBC_ServiceImpl::HandleEv_ProtoReport(LLBC_ServiceEvent &_)
     LLBC_Variant eventParams(&report);
 
     // Dispatch proto-report event to all comps.
-    for(auto *comp : _compList)
+    for(auto &comp : _compList)
     {
-        LLBC_ContinueIf(comp->_started == false);
-
-        comp->OnEvent(LLBC_ComponentEventType::ProtoReport, eventParams);
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnEvent(LLBC_ComponentEventType::ProtoReport, eventParams);
     }
 }
 
@@ -1836,119 +1814,136 @@ void LLBC_ServiceImpl::HandleEv_AppPhaseEv(LLBC_ServiceEvent &_)
 {
     typedef LLBC_SvcEv_AppPhaseEv _Ev;
     auto &ev = static_cast<_Ev &>(_);
-    LLBC_Variant eventParams{};
-    if (ev.earlyStart)
-    {
-        for(auto *comp : _compList)
-        {
-            LLBC_ContinueIf(comp->_started == false);
 
-            comp->OnEvent(LLBC_ComponentEventType::AppEarlyStart, eventParams);
+    LLBC_Variant eventParams;
+    if (ev.willStart)
+    {
+        for(auto &comp : _compList)
+        {
+            if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+                comp->OnEvent(LLBC_ComponentEventType::AppWillStart, eventParams);
         }
     }
-    else if (ev.startFail)
+    else if (ev.startFailed)
     {
-        for(auto *comp : _compList)
+        for(auto &comp : _compList)
         {
-            LLBC_ContinueIf(comp->_started == false);
-
-            comp->OnEvent(LLBC_ComponentEventType::AppStartFail, eventParams);
+            if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+                comp->OnEvent(LLBC_ComponentEventType::AppStartFailed, eventParams);
         }
     }
-    else if (ev.startFinish)
+    else if (ev.startFinished)
     {
         if (_cfgType == LLBC_AppConfigType::End)
-            UpdateServiceCfg();
+            UpdateServiceCfg(ev.cfgType, ev.cfg);
 
-        for(auto *comp : _compList)
+        for(auto &comp : _compList)
         {
-            LLBC_ContinueIf(comp->_started == false);
-
-            comp->OnEvent(LLBC_ComponentEventType::AppStartFinish, eventParams);
+            if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+                comp->OnEvent(LLBC_ComponentEventType::AppStartFinished, eventParams);
         }
     }
-    else if (ev.earlyStop)
+    else if (ev.willStop)
     {
-        for(auto *comp : _compList)
+        for(auto &comp : _compList)
         {
-            LLBC_ContinueIf(comp->_started == false);
-
-            comp->OnEvent(LLBC_ComponentEventType::AppEarlyStop, eventParams);
+            if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+                comp->OnEvent(LLBC_ComponentEventType::AppWillStop, eventParams);
         }
     }
 }
 
-void LLBC_ServiceImpl::HandleEv_AppCfgReload(LLBC_ServiceEvent &_)
+void LLBC_ServiceImpl::HandleEv_AppReloaded(LLBC_ServiceEvent &_)
 {
     // Update service config.
-    UpdateServiceCfg(&static_cast<LLBC_SvcEv_AppCfgReloadedEv &>(_));
+    auto &ev = static_cast<LLBC_SvcEv_AppReloadedEv &>(_);
+    UpdateServiceCfg(ev.cfgType, ev.cfg);
+
     // Update all components config.
     for (auto &compItem : _name2Comps)
         compItem.second->UpdateComponentCfg();
 
-    // Dispatch app-cfg-reload event to all comps.
+    // Dispatch app-reload event to all comps.
     LLBC_Variant eventParams{};
-    for(auto *comp : _compList)
+    for(auto &comp : _compList)
     {
-        LLBC_ContinueIf(comp->_started == false);
-
-        comp->OnEvent(LLBC_ComponentEventType::AppCfgReload, eventParams);
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnReload();
     }
 }
+
+void LLBC_ServiceImpl::HandleEv_ComponentEvent(LLBC_ServiceEvent &_)
+{
+    auto &ev = static_cast<LLBC_SvcEv_ComponentEventEv &>(_);
+    for (auto &comp : _compList)
+    {
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnEvent(ev.eventType, ev.eventParams);
+    }
+}
+
+// Define comp init macro.
+#define __LLBC_Inl_InitComp(comp, initMeth, toPhase, failSetErrno)        \
+    {                                                                     \
+        while (true) {                                                    \
+            bool initFinished = true;                                     \
+            LLBC_SetLastError(LLBC_ERROR_SUCCESS);                        \
+            if (comp->initMeth(initFinished) != LLBC_OK) {                \
+                if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)            \
+                    LLBC_SetLastError(failSetErrno);                      \
+                                                                          \
+                _startErrNo = LLBC_GetLastError();                        \
+                _startSubErrNo = LLBC_GetSubErrorNo();                    \
+                                                                          \
+                break;                                                    \
+            }                                                             \
+                                                                          \
+            if (initFinished) {                                           \
+                comp->_runningPhase = _CompRunningPhase::toPhase;         \
+                break;                                                    \
+            }                                                             \
+                                                                          \
+            if (_CompRunningPhase::toPhase >= _CompRunningPhase::Started) \
+                OnSvc(false);                                             \
+            LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);                  \
+        }                                                                 \
+                                                                          \
+        if (comp->_runningPhase != _CompRunningPhase::toPhase) {          \
+            compsInitSucc = false;                                        \
+            break;                                                        \
+        }                                                                 \
+    }                                                                     \
 
 int LLBC_ServiceImpl::InitComps()
 {
     // Set _runningPhase to InitingComps
     _runningPhase = LLBC_ServiceRunningPhase::InitingComps;
 
-    // Use while() for support repeatly add components operation.
+    // Init comps.
     bool compsInitSucc = true;
     while (!_willRegComps.empty())
     {
         // Pop will-reg comp.
-        const std::list<LLBC_Component *>::iterator willRegCompIt = _willRegComps.begin();
-        LLBC_Component * const willRegComp = *willRegCompIt;
+        auto willRegCompIt = _willRegComps.begin();
+        auto comp = *willRegCompIt;
         _willRegComps.erase(willRegCompIt);
 
-        // Set service to comp & update component config & add to service's comps dict.
-        willRegComp->SetService(this);
-        willRegComp->UpdateComponentCfg();
-        AddComp(willRegComp);
-
-        // If inited, continue.
-        if (willRegComp->_inited)
-            continue;
+        // Set service to comp & update comp config & add to service's comps dict.
+        comp->SetService(this);
+        comp->UpdateComponentCfg();
+        AddComp(comp);
 
         // Init comp.
-        while (true)
-        {
-            bool initFinished = true;
-            LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-            if (!willRegComp->OnInit(initFinished))
-            {
-                if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
-                    LLBC_SetLastError(LLBC_ERROR_COMP_INIT);
+        if (comp->_runningPhase == _CompRunningPhase::NotInit)
+            __LLBC_Inl_InitComp(comp, OnInit, Inited, LLBC_ERROR_COMP_INIT_FAILED);
+    }
 
-                _startErrNo = LLBC_GetLastError();
-                _startSubErrNo = LLBC_GetSubErrorNo();
-
-                break;
-            }
-
-            if (initFinished)
-            {
-                willRegComp->_inited = true;
-                break;
-            }
-
-            LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
-        }
-
-        if (!willRegComp->_inited)
-        {
-            compsInitSucc = false;
-            break;
-        }
+    // Late-Init comps.
+    for (auto &comp : _compList)
+    {
+        // Late-Init comp.
+        if (comp->_runningPhase == _CompRunningPhase::Inited)
+            __LLBC_Inl_InitComp(comp, OnLateInit, LateInited, LLBC_ERROR_COMP_LATE_INIT_FAILED);
     }
 
     if (!compsInitSucc)
@@ -1969,28 +1964,37 @@ int LLBC_ServiceImpl::InitComps()
     return LLBC_OK;
 }
 
+// Define component destroy macro.
+#define __LLBC_Inl_DestroyComp(comp, destroyMeth, toPhase)               \
+    while (true) {                                                       \
+        bool destroyFinished = true;                                     \
+        comp->destroyMeth(destroyFinished);                              \
+        if (destroyFinished) {                                           \
+            comp->_runningPhase = _CompRunningPhase::toPhase;            \
+            break;                                                       \
+        }                                                                \
+                                                                         \
+        if (_CompRunningPhase::toPhase >= _CompRunningPhase::LateInited) \
+            OnSvc(false);                                                \
+        LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);                      \
+    }                                                                    \
+
 void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
 {
-    // Call components OnDestroy() event method.
+    // Early-Destroy comps.
     for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
     {
         LLBC_Component *comp = *it;
-        if (!comp->_inited)
-            continue;
+        if (comp->_runningPhase == _CompRunningPhase::LateInited)
+            __LLBC_Inl_DestroyComp(comp, OnEarlyDestroy, Inited);
+    }
 
-        while (true)
-        {
-            bool destroyFinished = true;
-            comp->OnDestroy(destroyFinished);
-
-            if (destroyFinished)
-            {
-                comp->_inited = false;
-                break;
-            }
-
-            LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
-        }
+    // Destroy comps.
+    for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
+    {
+        LLBC_Component *comp = *it;
+        if (comp->_runningPhase == _CompRunningPhase::Inited)
+            __LLBC_Inl_DestroyComp(comp, OnDestroy, NotInit);
     }
 
     if (onlyCallEvMeth)
@@ -2036,67 +2040,25 @@ int LLBC_ServiceImpl::StartComps()
         return LLBC_FAILED;
     }
 
-    // Call comps OnStart() event method.
-    size_t compIdx = 0;
-    const size_t compsSize = _compList.size();
-    for (; compIdx < compsSize; ++compIdx)
+    // Start comps.
+    bool compsInitSucc = true;
+    for (auto &comp : _compList)
     {
-        auto &comp = _compList[compIdx];
-        if (comp->_started)
-            continue;
-
-        while (true)
-        {
-            bool startFinished = true;
-            LLBC_SetLastError(LLBC_ERROR_SUCCESS);
-            if (!comp->OnStart(startFinished))
-            {
-                if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
-                    LLBC_SetLastError(LLBC_ERROR_COMP_START);
-
-                _startErrNo = LLBC_GetLastError();
-                _startSubErrNo = LLBC_GetSubErrorNo();
-                break;
-            }
-
-            if (startFinished)
-            {
-                comp->_started = true;
-                break;
-            }
-
-            OnSvc(false);
-            LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
-        }
-
-        // If comp start failed, stop all comps stop process.
-        if (!comp->_started)
-            break;
+        if (comp->_runningPhase == _CompRunningPhase::LateInited)
+            __LLBC_Inl_InitComp(comp, OnStart, Started, LLBC_ERROR_COMP_START_FAILED);
     }
 
-    // If all comps start finished, call comps OnLateStart() event method.
-    // TODO: will remove async-waiting for Late-Start finish design in the future.
-    if (compIdx == compsSize)
+    // Late-Start comps.
+    if (compsInitSucc)
     {
-        for (compIdx = 0; compIdx != compsSize; ++compIdx)
+        for (auto comp : _compList)
         {
-            auto &comp = _compList[compIdx];
-            while (true)
-            {
-                bool lateStartFinish = true;
-                comp->OnLateStart(lateStartFinish);
-                if (lateStartFinish)
-                    break;
-
-                OnSvc(false);
-                LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
-            }
+            if (comp->_runningPhase == _CompRunningPhase::Started)
+                __LLBC_Inl_InitComp(comp, OnLateStart, LateStarted, LLBC_ERROR_COMP_LATE_START_FAILED);
         }
-
-        _runningPhase = LLBC_ServiceRunningPhase::CompsStarted;
-        return LLBC_OK;
     }
-    else // Otherwise stop all comps.
+
+    if (!compsInitSucc)
     {
         StopComps();
         DestroyComps(true);
@@ -2106,51 +2068,31 @@ int LLBC_ServiceImpl::StartComps()
         LLBC_SetSubErrorNo(_startSubErrNo);
 
         _runningPhase = LLBC_ServiceRunningPhase::StartCompsFailed;
+
         return LLBC_FAILED;
     }
+
+    _runningPhase = LLBC_ServiceRunningPhase::CompsStarted;
+
+    return LLBC_OK;
 }
 
 void LLBC_ServiceImpl::StopComps()
 {
-    // Call comps OnEarlyStop() event method.
-    // TODO: will remove async-waiting for Early-Stop finish design in the future.
-    for (int compIdx = static_cast<int>(_compList.size() - 1); compIdx >= 0; --compIdx)
+    // Before-Stop comps.
+    for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
     {
-        auto &comp = _compList[compIdx];
-        if (!comp->_started)
-            continue;
-
-        while (true)
-        {
-            bool earlyStopFinish = true;
-            comp->OnEarlyStop(earlyStopFinish);
-            if (earlyStopFinish)
-                break;
-
-            OnSvc(false);
-            LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
-        }
+        LLBC_Component *comp = *it;
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            __LLBC_Inl_DestroyComp(comp, OnEarlyStop, Started);
     }
 
-    // Call comps OnStop() event method.
-    for (int compIdx = static_cast<int>(_compList.size()) - 1; compIdx >= 0; --compIdx)
+    // Stop comps.
+    for (auto it = _compList.rbegin(); it != _compList.rend(); ++it)
     {
-        auto &comp = _compList[compIdx];
-        if (!comp->_started)
-            continue;
-
-        while (true)
-        {
-            bool stopFinished = true;
-            comp->OnStop(stopFinished);
-            if (stopFinished)
-                break;
-
-            OnSvc(false);
-            LLBC_Sleep(LLBC_CFG_APP_TRY_STOP_INTERVAL);
-        }
-
-        comp->_started = false;
+        LLBC_Component *comp = *it;
+        if (comp->_runningPhase == _CompRunningPhase::Started)
+            __LLBC_Inl_DestroyComp(comp, OnStop, LateInited);
     }
 
     // Update _runningPhase to <Stopping> phase, if in <StoppingComps> phase.
@@ -2161,23 +2103,27 @@ void LLBC_ServiceImpl::StopComps()
     _pollerMgr.Stop();
 }
 
-void LLBC_ServiceImpl::UpdateComps()
-{
-    for(auto *comp : _compList)
-    {
-        LLBC_ContinueIf(comp->_started == false);
+// Undef comp init macro.
+#undef __LLBC_Inl_InitComp
 
-        comp->OnUpdate();
+// Undef component destroy macro.
+#undef __LLBC_Inl_DestroyComp
+
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateComps()
+{
+    for(auto &comp : _compList)
+    {
+        if (comp->_runningPhase >= _CompRunningPhase::Started)
+            comp->OnUpdate();
     }
 }
 
-void LLBC_ServiceImpl::LateUpdateComps()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::LateUpdateComps()
 {
-    for(auto *comp : _compList)
+    for(auto &comp : _compList)
     {
-        LLBC_ContinueIf(comp->_started == false);
-
-        comp->OnLateUpdate();
+        if (comp->_runningPhase >= _CompRunningPhase::Started)
+            comp->OnLateUpdate();
     }
 }
 
@@ -2185,15 +2131,11 @@ void LLBC_ServiceImpl::AddComp(LLBC_Component *comp)
 {
     _compList.push_back(comp);
 
-    auto compName = LLBC_GetTypeName(*comp);
-    const auto colonPos = strrchr(compName, ':');
-    if (colonPos)
-        compName = colonPos + 1;
-    const auto compNameLen = strlen(compName);
+    const LLBC_CString compName = LLBC_GetCompName(*comp);
+    auto allocCompName = LLBC_Malloc(char, compName.size() + 1);
+    memcpy(allocCompName, compName.c_str(), compName.size() + 1);
 
-    auto allocCompName = LLBC_Malloc(char, compNameLen + 1);
-    memcpy(allocCompName, compName, compNameLen + 1);
-    _name2Comps.emplace(allocCompName, comp);
+    _name2Comps.emplace(LLBC_CString(allocCompName, compName.size()), comp);
 }
 
 LLBC_Library *LLBC_ServiceImpl::OpenCompLibrary(const LLBC_String &libPath, bool &existingLib)
@@ -2234,7 +2176,7 @@ void LLBC_ServiceImpl::CloseCompLibrary(const LLBC_String &libPath)
     _releasePoolStack = LLBC_AutoReleasePoolStack::GetCurrentThreadReleasePoolStack();
 }
 
-void LLBC_ServiceImpl::UpdateAutoReleasePool()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateAutoReleasePool()
 {
     if (_driveMode == LLBC_ServiceDriveMode::SelfDrive)
         _releasePoolStack->Purge();
@@ -2258,7 +2200,7 @@ void LLBC_ServiceImpl::InitTimerScheduler()
     }
 }
 
-void LLBC_ServiceImpl::UpdateTimerScheduler()
+LLBC_FORCE_INLINE void LLBC_ServiceImpl::UpdateTimerScheduler()
 {
     _timerScheduler->Update();
 }
@@ -2274,17 +2216,18 @@ void LLBC_ServiceImpl::ClearTimerScheduler()
 
 void LLBC_ServiceImpl::ProcessIdle()
 {
-    for(auto *comp : _compList)
+    const auto frameInterval = GetFrameInterval();
+    for(auto &comp : _compList)
     {
         sint64 elapsed = LLBC_GetMilliseconds() - _begSvcTime;
-        if (LIKELY(elapsed >= 0))
-        {
-            if (elapsed >= _frameInterval)
-                break;
+        if (UNLIKELY(elapsed < 0))
+            break;
 
-            LLBC_ContinueIf(comp->_started == false);
-            comp->OnIdle(LLBC_TimeSpan::FromMillis(_frameInterval - elapsed));
-        }
+        if (elapsed >= frameInterval)
+            break;
+
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnIdle(LLBC_TimeSpan::FromMillis(frameInterval - elapsed));
     }
 }
 

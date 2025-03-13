@@ -158,7 +158,20 @@ LLBC_EXPORT int LLBC_KillThread(LLBC_NativeThreadHandle handle, int sig);
  * Sleep function.
  * @param[in] milliSeconds - time-out values.
  */
-LLBC_EXPORT void LLBC_Sleep(int milliSeconds);
+#if LLBC_TARGET_PLATFORM_WIN32
+#define LLBC_Sleep(milliSeconds) ::Sleep(milliSeconds)
+#else // Non-Win32
+void LLBC_Sleep(int milliSeconds);
+#endif // Win32
+
+/**
+ * Yield the processor, causes the calling thread to relinquish the CPU.
+ */
+#if LLBC_TARGET_PLATFORM_WIN32
+#define LLBC_Yield() ::YieldProcessor()
+#else // Non-Win32
+#define LLBC_Yield() sched_yield()
+#endif // Win32
 
 /**
  * Relax CPU.

@@ -24,19 +24,25 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Log : public LLBC_BaseTestCase
+class TestCase_Core_Log final : public LLBC_BaseTestCase
 {
 public:
     TestCase_Core_Log();
-    virtual ~TestCase_Core_Log();
+    ~TestCase_Core_Log() override;
 
 public:
-    int Run(int argc, char *argv[]);
+    int Run(int argc, char *argv[]) override;
 
 private:
     void DoLogLevelSetTest();
     void DoJsonLogTest();
     void DoUninitLogTest();
+    void SyncLoggerMultiThreadTest();
     void DoConditionMacroLogTest();
+    int DoLoggerMgrReloadTest();
+
     void OnLogHook(const LLBC_LogData *logData);
+
+private:
+    LLBC_String _logCfgFilePath;
 };

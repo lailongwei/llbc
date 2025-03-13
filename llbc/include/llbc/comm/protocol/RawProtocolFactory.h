@@ -35,7 +35,7 @@ public:
      * Create specific layer protocol.
      * @return LLBC_IProtocol * - the protocol pointer.
      */
-    virtual LLBC_IProtocol *Create(int layer) const;
+    LLBC_IProtocol *Create(int layer) const override;
 };
 
 __LLBC_NS_END

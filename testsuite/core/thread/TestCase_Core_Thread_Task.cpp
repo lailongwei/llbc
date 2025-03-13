@@ -22,37 +22,36 @@
 
 #include "core/thread/TestCase_Core_Thread_Task.h"
 
+namespace
+{
+
 /**
  * \brief Test task encapsulation.
  */
-class TestTask : public LLBC_Task
+class BasicTestTask final : public LLBC_Task
 {
 public:
-    explicit TestTask(size_t perThreadPopTimes);
-    virtual ~TestTask();
-    
-public:
-    virtual void Svc();
+    explicit BasicTestTask(size_t perThreadPopTimes);
+    ~BasicTestTask() override = default;
 
-    virtual void Cleanup();
+public:
+    void Svc() override;
+
+    void Cleanup() override;
 
 private:
     const size_t _perThreadPopTimes;
-    static LLBC_THREAD_LOCAL int *_val;
+    static thread_local int *_val;
 };
 
-LLBC_THREAD_LOCAL int *TestTask::_val = nullptr;
+thread_local int *BasicTestTask::_val = nullptr;
 
-inline TestTask::TestTask(size_t perThreadPopTimes)
+BasicTestTask::BasicTestTask(size_t perThreadPopTimes)
 : _perThreadPopTimes(perThreadPopTimes)
 {
 }
 
-inline TestTask::~TestTask()
-{
-}
-
-inline void TestTask::Svc()
+void BasicTestTask::Svc()
 {
     ASSERT(GetTaskState() == LLBC_TaskState::Activated);
 
@@ -71,7 +70,7 @@ inline void TestTask::Svc()
         LLBC_Stream stream(block->GetData(), block->GetReadableSize());
         stream.Read(content);
 
-        LLBC_PrintLn("[%d] fetch data: %s",  LLBC_GetCurrentThreadId(), content.c_str());
+        LLBC_PrintLn("[%d] fetch data: %s", LLBC_GetCurrentThreadId(), content.c_str());
 
         delete block;
     }
@@ -79,9 +78,11 @@ inline void TestTask::Svc()
     ASSERT(GetTaskState() == LLBC_TaskState::Activated);
 }
 
-inline void TestTask::Cleanup()
+void BasicTestTask::Cleanup()
 {
     LLBC_PrintLn("Task cleanup, queue size:%lu", GetMessageSize());
+}
+
 }
 
 TestCase_Core_Thread_Task::TestCase_Core_Thread_Task()
@@ -96,10 +97,20 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/thread/task test:");
 
+    LLBC_ErrorAndReturnIf(BasicTaskTest() != LLBC_OK, LLBC_FAILED)
+    LLBC_ErrorAndReturnIf(EmptyTaskTest() != LLBC_OK, LLBC_FAILED)
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Thread_Task::BasicTaskTest()
+{
+    LLBC_PrintLn("Basic task test:");
+
     // Activate task.
     const int threadNum = 5;
     const size_t pushMsgSize = 10000 * threadNum;
-    TestTask *task = new TestTask(pushMsgSize / threadNum);
+    BasicTestTask *task = new BasicTestTask(pushMsgSize / threadNum);
     task->Activate(5);
     const int taskState = task->GetTaskState();
     LLBC_PrintLn("Task activated, task state:%s(%d)",
@@ -131,5 +142,33 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
-    return 0;
+    return LLBC_OK;
 }
+
+int TestCase_Core_Thread_Task::EmptyTaskTest()
+{
+    LLBC_PrintLn("Empty task test:");
+
+    class EmptyTestTask : public LLBC_Task
+    {
+    public:
+        void Svc() override {  }
+        void Cleanup() override {  }
+    };
+
+    static constexpr int threadNum = 20;
+    LLBC_PrintLn("Activate EmptyTestTask, threadNum:%d", threadNum);
+    EmptyTestTask *task = new EmptyTestTask;
+    LLBC_Defer(delete task);
+    task->Activate(threadNum);
+
+    LLBC_PrintLn("Wait EmptyTestTask...");
+    LLBC_ErrorAndReturnIf(task->Wait() != LLBC_OK, LLBC_FAILED);
+    LLBC_PrintLn("EmptyTestTask wait finished!");
+
+    LLBC_PrintLn("Press any key to continue ...");
+    getchar();
+
+    return LLBC_OK;
+}
+
