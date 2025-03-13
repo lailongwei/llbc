@@ -421,6 +421,9 @@ void LLBC_App::Stop()
         sigaction(cfgReloadSig, &sa, nullptr);
 #endif // Non-Win32
 
+    // Cancel handle crash.
+    LLBC_CancelHandleCrash();
+
     // Cleanup members.
     _cfgPath.clear();
     _cfgType = LLBC_AppConfigType::End;

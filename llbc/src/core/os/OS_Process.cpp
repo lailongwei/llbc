@@ -48,6 +48,7 @@ int LLBC_GetCurrentProcessId()
 __LLBC_NS_END
 
 #if LLBC_SUPPORT_HANDLE_CRASH
+
 __LLBC_INTERNAL_NS_BEGIN
 
 static bool __hookedCrashSignals = false;
@@ -254,7 +255,7 @@ static char __corePattern[PATH_MAX + 1];
 static char __coreDescFilePath[PATH_MAX + 1];
 static char __shellCmd[PATH_MAX * 2 + 256 + 1];
 static void *__frames[LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES] {nullptr};
-static int __catchSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
+static int __crashSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 
 static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
@@ -305,7 +306,7 @@ static void __NonWin32CrashHandler(int sig)
     // Uninstall this signal's hook.
     signal(sig, SIG_DFL);
 
-    // If handling another crash signal, raise the signal again, otherwise mask hanlding signal.
+    // If handling another crash signal, raise the signal again, otherwise mask this signal is being processed.
     if (__handlingCrashSignals)
     {
         raise(sig);
@@ -491,7 +492,7 @@ int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
         struct sigaction sa;
         memset(&sa, 0, sizeof(sa));
         sa.sa_handler = LLBC_INL_NS __NonWin32CrashHandler;
-        for (auto sig : LLBC_INL_NS __catchSignals)
+        for (auto &sig : LLBC_INL_NS __crashSignals)
         {
             sigaddset(&ss, sig);
             sigaction(sig, &sa, nullptr);
@@ -513,8 +514,27 @@ int LLBC_HandleCrash(const LLBC_String &dumpFilePath,
 #endif // Win32
 }
 
+void LLBC_CancelHandleCrash()
+{
+    if (!LLBC_INL_NS __hookedCrashSignals)
+        return;
+
+#if LLBC_TARGET_PLATFORM_WIN32
+    ::SetUnhandledExceptionFilter(NULL);
+#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = SIG_DFT;
+    for (auto &sig : LLBC_INL_NS __crashSignals)
+        sigaction(sig, &sa, nullptr);
+#endif // Win32
+
+    LLBC_INL_NS __hookedCrashSignals = false;
+}
+
 __LLBC_NS_END
-#endif // Supp hook process crash
+
+#endif // LLBC_SUPPORT_HANDLE_CRASH
 
 #if LLBC_CUR_COMP == LLBC_COMP_GCC
 #pragma GCC diagnostic pop
