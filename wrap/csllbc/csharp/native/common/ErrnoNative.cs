@@ -141,5 +141,9 @@ namespace llbc
 
         static public uint LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL= 0xc0000035;
 
+        static public uint LLBC_ERROR_INVALID_FILE_SIZE      = 0xc0000036;
+
+        static public uint LLBC_ERROR_PROCESS_IS_EXCLUSIVE   = 0xc0000037;
+
     }
 }

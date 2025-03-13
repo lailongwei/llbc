@@ -39,5 +39,7 @@ private:
     void TestCrash_DivisionByZero();
     void TestCrash_InvalidPtrWrite();
     void TestCrash_InvalidPtrRead();
+    
+    int TestSetExclusive();
 };
 

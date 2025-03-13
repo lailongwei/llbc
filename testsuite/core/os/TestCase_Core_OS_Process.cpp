@@ -26,6 +26,10 @@ int TestCase_Core_OS_Process::Run(int argc, char *argvp[])
 {
     std::cout <<"core/os/process test:" <<std::endl;
 
+    // Test set exclusive
+    if (TestSetExclusive() != LLBC_OK)
+        return LLBC_FAILED;
+
     // Test crash hook.
     if (TestCrash() != LLBC_OK)
         return LLBC_FAILED;
@@ -83,4 +87,29 @@ void TestCase_Core_OS_Process::TestCrash_InvalidPtrRead()
     int *invalidPtr4Write = nullptr;
     std::cout << *invalidPtr4Write << std::endl;
 }
- 
+
+int TestCase_Core_OS_Process::TestSetExclusive()
+{
+    std::cout << "Set exclusive test:" << std::endl;
+
+#if LLBC_SUPPORT_SET_PROCESS_EXCLUSIVE
+    // Set exclusive
+    std::cout << "Set exclusive..." << std::endl;
+    if (LLBC_SetProcessExclusive() != LLBC_OK)
+    {
+        std::cerr << "Set exclusive failed, err:" << LLBC_FormatLastError() << std::endl;
+        return LLBC_FAILED;
+    }
+
+    if (LLBC_SetProcessExclusive() == LLBC_OK)
+    {
+        std::cerr << "Another Process Set exclusive success, err:"
+                  << LLBC_FormatLastError() << std::endl;
+        return LLBC_FAILED;
+    }
+    return LLBC_OK;
+#else
+    // Unsupported set exclusive.
+    return LLBC_OK;
+#endif
+}

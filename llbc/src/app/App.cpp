@@ -585,21 +585,24 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
 
             for (auto cfgSecItem : cfgItem.second.AsDict())
             {
-                if (cfgSecItem.first.AsStr().tolower() == "fps")
-                {
+                const auto cfgSecItemKey = cfgSecItem.first.AsStr().tolower();
+                if (cfgSecItemKey == "fps")
                     SetFPS(cfgSecItem.second);
-                    break;
-                }
+                else if (cfgSecItemKey == "exclusive" && cfgSecItem.second.AsLooseBool())
+                    LLBC_ReturnIf(LLBC_SetProcessExclusive() != LLBC_OK, LLBC_FAILED);
             }
 
             break;
         }
 
-        if (cfgItem.first.AsStr().tolower() == "fps")
+        const auto cfgItemKey = cfgItem.first.AsStr().tolower();
+        if (cfgItemKey == "fps" || cfgItemKey == "exclusive")
         {
-            const auto& fps = _cfgType == LLBC_AppConfigType::Xml ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
-            SetFPS(fps);
-            break;
+            const auto &cfgItemValue = _cfgType == LLBC_AppConfigType::Xml ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
+            if (cfgItemKey == "fps")
+                SetFPS(cfgItemValue);
+            else if (cfgItemKey == "exclusive" && cfgItemValue.AsLooseBool())
+                LLBC_ReturnIf(LLBC_SetProcessExclusive() != LLBC_OK, LLBC_FAILED);
         }
     }
 

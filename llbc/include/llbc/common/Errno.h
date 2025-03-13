@@ -671,6 +671,26 @@ __LLBC_NS_BEGIN
 #define __LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL ((int)(0x00000035))
 #define LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL   ((int)(0xc0000035))
 
+//
+// Message Id: LLBC_ERROR_INVALID_FILE_SIZE
+//
+// MessageText:
+//
+// file size is invalid.
+//
+#define __LLBC_ERROR_INVALID_FILE_SIZE ((int)(0x00000036))
+#define LLBC_ERROR_INVALID_FILE_SIZE   ((int)(0xc0000036))
+
+//
+// Message Id: LLBC_ERROR_PROCESS_IS_EXCLUSIVE
+//
+// MessageText:
+//
+// process is exclusive.
+//
+#define __LLBC_ERROR_PROCESS_IS_EXCLUSIVE ((int)(0x00000037))
+#define LLBC_ERROR_PROCESS_IS_EXCLUSIVE   ((int)(0xc0000037))
+
 
 //
 //!! Sentinel error no.
