@@ -33,14 +33,14 @@ __LLBC_NS_BEGIN
 /**
  * \brief The event manager class encapsulation.
  */
-class LLBC_EXPORT LLBC_EventMgr
+class LLBC_EXPORT LLBC_EventMgr final
 {
 public:
     /**
      * Ctor & Dtor.
      */
     LLBC_EventMgr();
-    virtual ~LLBC_EventMgr();
+    ~LLBC_EventMgr();
 
 public:
     /**
@@ -63,9 +63,9 @@ public:
      * @param[in] boundStub - the bound stub, if not specified, will auto gen stub.
      * @return LLBC_ListenerStub - return LLBC_INVALID_LISTENER_STUB if failed, otherwise return validate stub.
      */
-    virtual LLBC_ListenerStub AddListener(int id,
-                                          const LLBC_Delegate<void(LLBC_Event &)> &listener,
-                                          const LLBC_ListenerStub &boundStub = 0);
+    LLBC_ListenerStub AddListener(int id,
+                                  const LLBC_Delegate<void(LLBC_Event &)> &listener,
+                                  const LLBC_ListenerStub &boundStub = 0);
 
     /**
      * Add event listener.
@@ -74,9 +74,9 @@ public:
      * @param[in]] boundStub - bound listener stub, if specific, will use bound stub.
      * @return LLBC_ListenerStub - return LLBC_INAVLID_LISTENER_STUB if failed, otherwise return validate stub.
      */
-    virtual LLBC_ListenerStub AddListener(int id,
-                                          LLBC_EventListener *listener,
-                                          const LLBC_ListenerStub &boundStub = 0);
+    LLBC_ListenerStub AddListener(int id,
+                                  LLBC_EventListener *listener,
+                                  const LLBC_ListenerStub &boundStub = 0);
 
     /**
      * Remove event deleg.
@@ -85,7 +85,7 @@ public:
      *               specially, if return LLBC_FAILED,  and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
-    virtual int RemoveListener(int id);
+    int RemoveListener(int id);
 
     /**
      * Remove event deleg using deleg stub.
@@ -94,7 +94,7 @@ public:
      *               specially, if return LLBC_FAILED, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
-    virtual int RemoveListener(const LLBC_ListenerStub &stub);
+    int RemoveListener(const LLBC_ListenerStub &stub);
 
     /**
      * Remove event deleg using deleg stub and clear the deleg stub.
@@ -103,7 +103,7 @@ public:
      *               specially, if return LLBC_FAILED, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
-    virtual int RemoveListenerX(LLBC_ListenerStub &stub);
+    int RemoveListenerX(LLBC_ListenerStub &stub);
 
     /**
      * Remove all listeners.
@@ -111,7 +111,7 @@ public:
      *               specially, if return LLBC_FAILED, and fetch the last error is pending,
      *               it means operation will success on later, but pending at now.
      */
-    virtual int RemoveAllListeners();
+    int RemoveAllListeners();
 
 public:
     /**
@@ -119,7 +119,7 @@ public:
      * @param[in] ev - event object.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Fire(LLBC_Event *ev);
+    int Fire(LLBC_Event *ev);
 
     /**
      * Begin fire event.
