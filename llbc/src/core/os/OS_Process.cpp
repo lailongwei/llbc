@@ -481,7 +481,7 @@ void LLBC_CancelHandleCrash()
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = SIG_DFT;
+    sa.sa_handler = SIG_DFL;
     for (auto &sig : LLBC_INL_NS __crashSignals)
         sigaction(sig, &sa, nullptr);
 #endif // Win32
