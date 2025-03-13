@@ -259,9 +259,9 @@ void TestCase_Core_Time_Time::TimeClassTest()
     {
         for (size_t j = 0; j < testTimeStrs.size(); ++j)
         {
-            auto temp_time = LLBC_Time::FromTimeStr(testTimeStrs[j]);
+            auto fromTimeStrTime = LLBC_Time::FromTimeStr(testTimeStrs[j]);
             std::cout << "LLBC_Time::FromTimeStr(): " << testTimeStrs[j]
-                      << "to " << temp_time.GetTimestampInSecs()
+                      << "to " << fromTimeStrTime.GetTimestampInSecs()
                       << std::endl;
         }
     }
