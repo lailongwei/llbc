@@ -43,7 +43,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     LLBC_PrintLn("EventMgr test:");
 
     LLBC_ErrorAndReturnIf(BasicTest() != LLBC_OK, LLBC_FAILED);
-    LLBC_ErrorAndReturnIf(InfiniteEventFireTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(EventFireDeadLoopDetectionTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ErrorAndReturnIf(CopyEventTest() != LLBC_OK, LLBC_FAILED);
 
     LLBC_PrintLn("Press any key to continue ...");
@@ -164,9 +164,10 @@ int TestCase_Core_Event::BasicTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Event::InfiniteEventFireTest()
+int TestCase_Core_Event::EventFireDeadLoopDetectionTest()
 {
-    LLBC_PrintLn("Infinite event fire test:");
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+    LLBC_PrintLn("Event fire dead loop detection test:");
 
     // Add event listeners.
     LLBC_EventMgr evMgr;
@@ -192,7 +193,7 @@ int TestCase_Core_Event::InfiniteEventFireTest()
         }
         else
         {
-            LLBC_PrintLn("- Infinite event fire has been checked!");
+            LLBC_PrintLn("- Dead loop event fire has been detected!");
         }
     });
 
@@ -204,7 +205,10 @@ int TestCase_Core_Event::InfiniteEventFireTest()
     // Remove all listeners.
     evMgr.RemoveAllListeners();
 
-    LLBC_PrintLn("Infinite event fire test finished");
+    LLBC_PrintLn("Event fire dead loop detection test finished");
+    #else // disabled event fire dead loop detection.
+    LLBC_PrintLn("Disabled event fire dead loop detection, ignore this test...");
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
     return LLBC_OK;
 }

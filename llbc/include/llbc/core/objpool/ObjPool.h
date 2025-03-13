@@ -412,8 +412,8 @@ private:
     struct typed_obj_pool_created_ev_handler;
 
     template <typename Obj>
-    static void OnTypedObjPoolCreatedInl(
-        LLBC_TypedObjPool<Obj> *typedObjPool, typed_obj_pool_created_ev_handler<Obj, &Obj::OnTypedObjPoolCreated> *)
+    static void OnTypedObjPoolCreatedInl(LLBC_TypedObjPool<Obj> *typedObjPool,
+                                         typed_obj_pool_created_ev_handler<Obj, &Obj::OnTypedObjPoolCreated> *)
     {
         return reinterpret_cast<Obj *>(NULL)->OnTypedObjPoolCreated(typedObjPool);
     }
