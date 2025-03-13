@@ -204,7 +204,9 @@ protected:
     typedef std::list<_ListenerInfo *> _ListenerInfos; // listener info list.
 
     int _firing; // Firing flag.
-    std::vector<int> _firingEventIds; // Firing event ids, used for prevent event fire endless loop.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION 
+    std::vector<int> _firingEventIds; // Firing event ids, used for event fire dead loop detection.
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION 
     static sint64 _maxListenerStub; // Max listener stub.
 
     std::map<int, _ListenerInfos> _id2ListenerInfos; // event id 2 listeners.
