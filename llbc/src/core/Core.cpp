@@ -110,6 +110,11 @@ void __LLBC_CoreCleanup()
     #if LLBC_CFG_OS_IMPL_SYMBOL
     (void)LLBC_CleanupSymbol();
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
+
+    // Cancel handle crash.
+    #if LLBC_SUPPORT_HANDLE_CRASH
+    LLBC_CancelHandleCrash();
+    #endif // LLBC_SUPPORT_HANDLE_CRASH
 }
 
 __LLBC_NS_END

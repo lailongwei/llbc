@@ -38,6 +38,8 @@ __LLBC_NS_BEGIN
  */
 LLBC_EXPORT int LLBC_GetCurrentProcessId();
 
+#if LLBC_SUPPORT_HANDLE_CRASH
+
 /**
  * Handle process crash(and set user-defined dump file path and additional crash callback).
  * @param[in] dumpFilePath  - the dump file path.
@@ -49,5 +51,12 @@ LLBC_EXPORT int LLBC_GetCurrentProcessId();
 LLBC_EXPORT int LLBC_HandleCrash(const LLBC_String &dumpFilePath = "",
                                  const LLBC_Delegate<void(const char *stackBacktrace,
                                                           int sig)> &crashCallback = nullptr);
+
+/**
+ * Cancel handle crash.
+ */
+LLBC_EXPORT void LLBC_CancelHandleCrash();
+
+#endif // LLBC_SUPPORT_HANDLE_CRASH
 
 __LLBC_NS_END
