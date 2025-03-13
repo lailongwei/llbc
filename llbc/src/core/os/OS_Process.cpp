@@ -554,10 +554,12 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     ::SetEndOfFile(exclusiveInfoFile);
     int printRet = snprintf(exclusiveInfoBuf, sizeof(exclusiveInfoBuf), "%llu", static_cast<uint64>(::GetCurrentProcessId()));
     exclusiveInfoBuf[printRet] = '\0';
+
+    DWORD writeStrLen = strlen(exclusiveInfoBuf);
     DWORD writeSize = 0;
-    bool writeSucc = ::WriteFile(exclusiveInfoFile, exclusiveInfoBuf, strlen(exclusiveInfoBuf), &writeSize, NULL);
+    bool writeSucc = ::WriteFile(exclusiveInfoFile, exclusiveInfoBuf, writeStrLen, &writeSize, NULL);
     LLBC_SetErrAndReturnIf(!writeSucc, LLBC_ERROR_OSAPI, LLBC_FAILED);
-    LLBC_SetErrAndReturnIf(writeSize != strlen(exclusiveInfoBuf), LLBC_ERROR_TRUNCATED, LLBC_FAILED);
+    LLBC_SetErrAndReturnIf(writeSize != writeStrLen, LLBC_ERROR_TRUNCATED, LLBC_FAILED);
 #else // linux and macos
     char exclusiveInfoBuf[32 + 1];
 
@@ -609,6 +611,7 @@ int LLBC_SetProcessExclusive(const LLBC_CString &exclusiveInfoFilePath)
     ftruncate(exclusiveInfoFd, 0);
     lseek(exclusiveInfoFd, 0, SEEK_SET);
     snprintf(exclusiveInfoBuf, sizeof(exclusiveInfoBuf), "%llu", static_cast<uint64>(getpid()));
+
     int writeSize = strlen(exclusiveInfoBuf);
     int writeRet = write(exclusiveInfoFd, exclusiveInfoBuf, writeSize);
     LLBC_SetErrAndReturnIf(writeRet == -1, LLBC_ERROR_OSAPI, LLBC_FAILED);
