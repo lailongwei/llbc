@@ -61,7 +61,8 @@ namespace
         void OnStop(bool &stopFinished) override
         {
             LLBC_PrintLn("Application stop");
-            LLBC_XDelete(_testSvc);
+            // Service(s) has been destroyed by Application, do not delete again service.
+            // LLBC_XDelete(_testSvc);
         }
 
     private:
