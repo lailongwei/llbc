@@ -393,6 +393,7 @@ void TestCase_Core_Log::SyncLoggerMultiThreadTest()
         sint32 _nowTimes;
     };
 
+    auto syncLogger = LLBC_LoggerMgrSingleton->GetLogger("sync");
     _TestTask task(500000);
     task.Activate(20);
     task.Wait();

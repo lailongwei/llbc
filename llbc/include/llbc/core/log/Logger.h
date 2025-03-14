@@ -346,10 +346,8 @@ private:
 
     // Log level.
     volatile int _logLevel;
-    // json styled log flag, auto add timestamp in json log or not.
-    bool _addTimestampInJsonLog;
     // Logger config.
-    const LLBC_LoggerConfigInfo *_config;
+    LLBC_LoggerConfigInfo *_config;
 
     // Log runnable object.
     LLBC_LogRunnable *_logRunnable;
