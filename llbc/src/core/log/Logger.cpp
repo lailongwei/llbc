@@ -45,7 +45,6 @@ __LLBC_NS_BEGIN
 
 LLBC_Logger::LLBC_Logger()
 : _logLevel(LLBC_LogLevel::End)
-, _addTimestampInJsonLog(false)
 , _config(nullptr)
 
 , _logRunnable(nullptr)
@@ -93,8 +92,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     _name.append(config->GetLoggerName());
 
     _logLevel = config->GetLogLevel();
-    _addTimestampInJsonLog = config->IsAddTimestampInJsonLog();
-    _config = config;
+    _config = new LLBC_LoggerConfigInfo(*config);
 
     _flushInterval = _config->GetFlushInterval();
 
@@ -254,6 +252,11 @@ bool LLBC_Logger::IsAsyncMode() const
 {
     LLBC_LockGuard guard(_lock);
     return _config->IsAsyncMode();
+}
+
+bool LLBC_Logger::IsAddTimestampInJsonLog() const
+{
+    return _config->IsAddTimestampInJsonLog();
 }
 
 int LLBC_Logger::SetLogHook(int logLevel, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook)
@@ -638,8 +641,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
     _flushInterval = 0;
     _lastFlushTime = 0;
 
-    _config = nullptr;
-    _addTimestampInJsonLog = false;
+    LLBC_XDelete(_config);
     _logLevel = LLBC_LogLevel::End;
 
     _name.clear();

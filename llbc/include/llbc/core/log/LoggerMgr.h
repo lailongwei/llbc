@@ -37,7 +37,6 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Logger;
 class LLBC_LogJsonMsg;
-class LLBC_LoggerConfigurator;
 class LLBC_LogRunnable;
 
 __LLBC_NS_END
@@ -64,9 +63,10 @@ public:
     /**
      * Reload logger manager using config file.
      * Note: logger reload only support existing logger(s) reload.
+     * @param[in] newCfgFilePath = the new config, if is empty, use original config file.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Reload();
+    int Reload(const LLBC_String &newCfgFilePath = "");
 
     /**
      * Finalize logger manager.
@@ -132,7 +132,7 @@ public:
 private:
     mutable LLBC_DummyLock _lock;
 
-    LLBC_LoggerConfigurator *_configurator;
+    LLBC_String _cfgFilePath;
     LLBC_LogRunnable *_sharedLogRunnable;
 
     LLBC_Logger * volatile _rootLogger;

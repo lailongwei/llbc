@@ -39,7 +39,7 @@ __LLBC_NS_BEGIN
 /**
  * The logger configurator class encapsulation.
  */
-class LLBC_LoggerConfigurator
+class LLBC_HIDDEN LLBC_LoggerConfigurator
 {
 public:
     LLBC_LoggerConfigurator();
