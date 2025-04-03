@@ -185,8 +185,10 @@ int TestCase_Core_ObjPool::AcquireTest()
     for (int i = 0; i < 10; ++i)
         strs2.push_back(objPool.Acquire<std::string>());
 
+    #if !LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
     // Compare.
     LLBC_ErrorAndReturnIf(strs != strs2, LLBC_FAILED, "Acquire test failed");
+    #endif
 
     LLBC_PrintLn("Success");
 
@@ -812,9 +814,11 @@ int TestCase_Core_ObjPool::CommonClassTest_Stream()
     // Acquire LLBC_Stream from obj pool.
     auto stream1 = objPool.Acquire<LLBC_Stream>();
     LLBC_PrintLn("- Acquire from objpool, stream:%s, ptr:%p", stream1->ToString().c_str(), stream1);
+    #if !LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
     LLBC_ErrorAndReturnIf(stream1->GetTypedObjPool() != objPool.GetTypedObjPool<LLBC_Stream>(),
                           LLBC_FAILED,
                           "  - Acquired stream object internal error!");
+    #endif // !LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
 
     // Serialize.
     LLBC_PrintLn("- Serialize some data to stream...");
