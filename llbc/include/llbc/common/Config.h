@@ -204,6 +204,8 @@
 #define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reset    1
 #define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_reuse    1
 #define LLBC_CFG_CORE_OBJPOOL_OBJ_REUSE_MATCH_METH_Reuse    1
+// Object pool use malloc instead.
+#define LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD            0
 
 /**
  * \brief ObjBase about configs.
