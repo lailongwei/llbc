@@ -176,7 +176,7 @@ void LLBC_LoggerMgr::Finalize()
     for (auto rit = _loggerList.rbegin(); rit != _loggerList.rend(); ++rit)
     {
         if (rit->first != LLBC_CFG_LOG_ROOT_LOGGER_NAME)
-            delete const_cast<char *>(rit->first.c_str());
+            free(const_cast<char *>(rit->first.c_str()));
         delete rit->second;
     }
     _loggerList.clear();
