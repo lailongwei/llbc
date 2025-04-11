@@ -243,6 +243,8 @@ __LLBC_INTERNAL_NS_END
 #include <libgen.h>
 #include <signal.h>
 #include <execinfo.h>
+#include <dlfcn.h>
+#include <cxxabi.h>
 
 #include "llbc/core/file/File.h"
 
@@ -257,6 +259,47 @@ static int __crashSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 
 static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
+
+static void __DumpStackTrace(int outputFd)
+{
+    // Get stack trace frames.
+    const int frameCount = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
+    if (frameCount == 0)
+        return;
+
+    // Pre-allocate buffer for demangled names.
+    char demangledNameBuf[512];
+    size_t demangledNameBufLen = sizeof(demangledNameBuf);
+
+    // Process each frame directly using dladdr.
+    for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex)
+    {
+        Dl_info dlInfo;
+        if (dladdr(__frames[frameIndex], &dlInfo))
+        {
+            const char *symName = dlInfo.dli_sname ? dlInfo.dli_sname : "<unknown>";
+            const void *symAddr = dlInfo.dli_saddr ? dlInfo.dli_saddr : __frames[frameIndex];
+            const char *objName = dlInfo.dli_fname ? basename((char *)dlInfo.dli_fname) : "<unknown>";
+
+            // Try to demangle the symbol name if available.
+            const char *displayName = symName;
+            if (symName != nullptr && symName[0] != '\0' && symName[0] != '?')
+            {
+                int status = 0;
+                char *demangled = abi::__cxa_demangle(symName, demangledNameBuf, &demangledNameBufLen, &status);
+                if (status == 0 && demangled == demangledNameBuf)
+                    displayName = demangledNameBuf;
+            }
+
+            dprintf(outputFd, " [%02d] \t %s(%s+%p)\n", frameIndex, objName, displayName,
+                    (void *)((char *)__frames[frameIndex] - (char *)symAddr));
+        }
+        else
+        {
+            dprintf(outputFd, " [%02d] \t <unknown function>\n", frameIndex);
+        }
+    }
+}
 
 static void __NonWin32CrashHandler(int sig)
 {
@@ -337,8 +380,8 @@ static void __NonWin32CrashHandler(int sig)
         fsync(coreDescFileFd);
     }
 
-    const auto framesCnt = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
-    backtrace_symbols_fd(__frames, framesCnt, coreDescFileFd);
+    __DumpStackTrace(coreDescFileFd);
+
     fsync(coreDescFileFd);
 
     // Call callback delegate.
