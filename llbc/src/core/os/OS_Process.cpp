@@ -26,6 +26,7 @@
 #include "llbc/core/os/OS_Process.h"
 #if LLBC_SUPPORT_HANDLE_CRASH
 #include "llbc/core/file/Directory.h"
+#include "llbc/common/RTTI.h"
 #endif
 #include "llbc/core/log/LoggerMgr.h"
 
@@ -243,6 +244,8 @@ __LLBC_INTERNAL_NS_END
 #include <libgen.h>
 #include <signal.h>
 #include <execinfo.h>
+#include <libunwind.h>
+#include <dlfcn.h>
 
 #include "llbc/core/file/File.h"
 
@@ -252,8 +255,9 @@ static char __exeFilePath[PATH_MAX + 1];
 static char __corePattern[PATH_MAX + 1];
 static char __coreDescFilePath[PATH_MAX + 1];
 static char __shellCmd[PATH_MAX * 2 + 256 + 1];
-static void *__frames[LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES] {nullptr};
 static int __crashSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
+static char __coreSym[2048];
+static char __coreFormat[PATH_MAX + 2048 + 128];
 
 static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
@@ -323,7 +327,7 @@ static void __NonWin32CrashHandler(int sig)
                       now);
     LLBC_DoIf(fmtRet < 0, raise(sig));
 
-    int coreDescFileFd = open(__coreDescFilePath, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
+    int coreDescFileFd = open(__coreDescFilePath, O_CREAT | O_RDWR | O_SYNC, S_IRUSR | S_IWUSR);
     LLBC_DoIf(coreDescFileFd == -1, raise(sig));
 
     char descFileHead[64];
@@ -334,12 +338,55 @@ static void __NonWin32CrashHandler(int sig)
     if (fmtRet > 0)
     {
         write(coreDescFileFd, descFileHead, fmtRet);
-        fsync(coreDescFileFd);
     }
 
-    const auto framesCnt = backtrace(__frames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
-    backtrace_symbols_fd(__frames, framesCnt, coreDescFileFd);
-    fsync(coreDescFileFd);
+    unw_cursor_t cursor;
+    unw_context_t context;
+
+    // Initialize the context and cursor.
+    unw_getcontext(&context);
+    unw_init_local(&cursor, &context);
+
+    int frame = 0;
+    while (unw_step(&cursor) > 0)
+    {
+        unw_word_t pc, offset;
+        if (unw_get_reg(&cursor, UNW_REG_IP, &pc) != 0)
+        {
+            fmtRet = snprintf(__coreFormat, sizeof(__coreFormat), "#%-2d get PC failed\n", frame);
+            if (fmtRet > 0)
+                write(coreDescFileFd, __coreFormat, fmtRet);
+
+            break;
+        }
+
+        if (unw_get_proc_name(&cursor, __coreSym, sizeof(__coreSym), &offset) == 0)
+        {
+            auto demangledName = llbc::__LLBC_GetTypeName(__coreSym);
+            auto name = demangledName ? demangledName : __coreSym;
+
+            Dl_info info;
+            if (dladdr(reinterpret_cast<void *>(pc), &info) != 0)
+            {
+                auto *filename = strrchr(info.dli_fname, '/');
+                filename = (filename != nullptr) ? filename + 1 : info.dli_fname;
+                fmtRet = snprintf(__coreFormat, sizeof(__coreFormat), "#%-2d %s(%s+0x%lx)[0x%lx]\n", frame, filename, name, offset, pc);
+            }
+            else
+            {
+                fmtRet = snprintf(__coreFormat, sizeof(__coreFormat), "#%-2d (%s+0x%lx)[0x%lx]\n", frame, name, offset, pc);
+            }
+        }
+        else
+        {
+            fmtRet = snprintf(__coreFormat, sizeof(__coreFormat), "#%-2d (unknown)[0x%lx ]\n", frame, pc);
+        }
+
+        if (fmtRet > 0)
+            write(coreDescFileFd, __coreFormat, fmtRet);
+
+        ++frame;
+    }
 
     // Call callback delegate.
     if (__crashCallback)
