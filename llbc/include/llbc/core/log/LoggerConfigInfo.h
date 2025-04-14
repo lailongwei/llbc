@@ -37,7 +37,7 @@ __LLBC_NS_BEGIN
 /**
  * \brief The logger config info class encapsulation.
  */
-class LLBC_LoggerConfigInfo
+class LLBC_HIDDEN LLBC_LoggerConfigInfo
 {
 public:
     LLBC_LoggerConfigInfo();
@@ -239,11 +239,6 @@ private:
      * @return sint64 - the normalized log file size.
      */
     sint64 NormalizeLogFileSize(const LLBC_String &logFileSize);
-
-    /**
-     * Disable assignment.
-     */
-    LLBC_DISABLE_ASSIGNMENT(LLBC_LoggerConfigInfo);
 
 private:
     LLBC_String _loggerName;

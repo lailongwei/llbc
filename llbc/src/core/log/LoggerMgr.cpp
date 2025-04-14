@@ -64,24 +64,22 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath)
     }
 
     // Initialize logger configurator.
-    _configurator = new LLBC_LoggerConfigurator;
-    if (_configurator->Initialize(cfgFilePath) != LLBC_OK)
-    {
-        LLBC_XDelete(_configurator);
+    LLBC_LoggerConfigurator *logConfigurator = new LLBC_LoggerConfigurator;
+    LLBC_Defer(delete logConfigurator);
+    if (logConfigurator->Initialize(cfgFilePath) != LLBC_OK)
         return LLBC_FAILED;
-    }
 
     // Create shared log runnable.
-    if (_configurator->HasSharedAsyncLoggerConfigs())
+    if (logConfigurator->HasSharedAsyncLoggerConfigs())
         _sharedLogRunnable = new LLBC_LogRunnable;
 
     // Config root logger.
     _rootLogger = new LLBC_Logger;
     const LLBC_CString rootLoggerName(LLBC_CFG_LOG_ROOT_LOGGER_NAME);
-    if (_configurator->Config(rootLoggerName, _sharedLogRunnable, _rootLogger) != LLBC_OK)
+    if (logConfigurator->Config(rootLoggerName, _sharedLogRunnable, _rootLogger) != LLBC_OK)
     {
         LLBC_XDelete(_rootLogger);
-        LLBC_XDelete(_configurator);
+        LLBC_XDelete(_sharedLogRunnable);
 
         return LLBC_FAILED;
     }
@@ -89,23 +87,33 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath)
     _loggerList.emplace_back(rootLoggerName, _rootLogger);
     _cstr2Loggers.insert(std::make_pair(rootLoggerName, _rootLogger));
 
+    // Save config file path.
+    _cfgFilePath.assign(cfgFilePath.c_str(), cfgFilePath.size());
+
     // Config other loggers.
-    const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = _configurator->GetAllConfigInfos();
+    const std::map<LLBC_String, LLBC_LoggerConfigInfo *> &configs = logConfigurator->GetAllConfigInfos();
     for (auto cfgIter = configs.begin(); cfgIter != configs.end(); ++cfgIter)
     {
         if (cfgIter->first == rootLoggerName)
             continue;
 
         LLBC_Logger *logger = new LLBC_Logger;
-        if (_configurator->Config(cfgIter->first, _sharedLogRunnable, logger) != LLBC_OK)
+        if (logConfigurator->Config(cfgIter->first, _sharedLogRunnable, logger) != LLBC_OK)
         {
             delete logger;
             Finalize();
+
             return LLBC_FAILED;
         }
 
-        _loggerList.emplace_back(cfgIter->first, logger);
-        _cstr2Loggers.insert(std::make_pair(cfgIter->first.c_str(), logger));
+        const LLBC_String &cfgLoggerName = cfgIter->first;
+        const size_t loggerNameLen = cfgLoggerName.size();
+        LLBC_CString loggerName(LLBC_Malloc(char, loggerNameLen + 1), loggerNameLen);
+        memcpy(const_cast<char *>(loggerName.c_str()), cfgLoggerName.c_str(), cfgLoggerName.size());
+        const_cast<char *>(loggerName.c_str())[loggerNameLen] = '\0';
+
+        _loggerList.emplace_back(loggerName, logger);
+        _cstr2Loggers.insert(std::make_pair(loggerName, logger));
     }
 
     _cstr2LoggersEnd = _cstr2Loggers.end();
@@ -117,7 +125,7 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath)
     return LLBC_OK;
 }
 
-int LLBC_LoggerMgr::Reload()
+int LLBC_LoggerMgr::Reload(const LLBC_String &newCfgFilePath)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -131,7 +139,8 @@ int LLBC_LoggerMgr::Reload()
     // Load config file(use temporary LoggerConfigurator).
     auto logConfigurator = new LLBC_LoggerConfigurator;
     LLBC_Defer(delete logConfigurator);
-    if (logConfigurator->Initialize(_configurator->GetConfigFilePath()) != LLBC_OK)
+    if (logConfigurator->Initialize(
+            !newCfgFilePath.empty() ? newCfgFilePath : _cfgFilePath) != LLBC_OK)
         return LLBC_FAILED;
 
     // Re-Config root logger.
@@ -162,16 +171,20 @@ void LLBC_LoggerMgr::Finalize()
     }
 
     // Delete all loggers and set _rootLogger logger to nullptr.
-    for (auto rit = _loggerList.rbegin(); rit != _loggerList.rend(); ++rit)
-        delete rit->second;
-    _loggerList.clear();
     _cstr2Loggers.clear();
     _cstr2LoggersEnd = _cstr2Loggers.end();
+    for (auto rit = _loggerList.rbegin(); rit != _loggerList.rend(); ++rit)
+    {
+        if (rit->first != LLBC_CFG_LOG_ROOT_LOGGER_NAME)
+            free(const_cast<char *>(rit->first.c_str()));
+        delete rit->second;
+    }
+    _loggerList.clear();
 
     _rootLogger = nullptr;
 
-    // Delete logger configurator.
-    LLBC_XDelete(_configurator);
+    // Clear _cfgFilePath.
+    _cfgFilePath.clear();
 }
 
 LLBC_Logger *LLBC_LoggerMgr::GetRootLogger() const
