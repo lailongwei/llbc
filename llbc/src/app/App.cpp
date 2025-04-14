@@ -237,7 +237,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     if (_cfgPath.empty())
     {
         int cfgType;
-        if (!(_cfgPath = LocateConfigPath(name, cfgType)).empty())
+        if (!(_cfgPath = LocateConfigPath(_name, cfgType)).empty())
             _cfgType = static_cast<LLBC_AppConfigType::ENUM>(cfgType);
     }
 
