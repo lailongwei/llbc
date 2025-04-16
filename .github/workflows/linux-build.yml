@@ -29,7 +29,7 @@ jobs:
 
       - name: install deps
         run: |
-          yum install -y openssl-devel wget tar gcc gcc-c++ libuuid-devel automake autoconf libtool make git cmake python2
+          yum install -y openssl-devel wget tar gcc gcc-c++ libuuid-devel automake autoconf libtool make git cmake python2 libunwind-devel
           ln -s /usr/bin/python2 /usr/bin/python
 
       - name: Check out repository code
