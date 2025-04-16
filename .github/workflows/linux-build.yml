@@ -30,8 +30,9 @@ jobs:
       - name: install deps
         run: |
           yum install -y openssl-devel wget tar gcc gcc-c++ libuuid-devel automake autoconf libtool make git cmake python2
-          yum install -y libunwind-dev
           ln -s /usr/bin/python2 /usr/bin/python
+          wget https://github.com/libunwind/libunwind/archive/refs/tags/v1.2.1.tar.gz
+          tar -zxvf v1.2.1.tar.gz && cd libunwind-1.2.1 && ./autogen.sh && ./configure && make && make install
 
       - name: Check out repository code
         uses: actions/checkout@v3
