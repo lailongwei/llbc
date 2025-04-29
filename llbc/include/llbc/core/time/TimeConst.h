@@ -72,19 +72,39 @@ public:
     /**
      * Day of week describe, started by Sunday.
      */
-    static const char *dayOfWeekDesc[7];
+    static constexpr const char *dayOfWeekDesc[7] {
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+    };
 
     /**
      * Day of week brief describe, started by Sunday.
      */
-    static const char *dayOfWeekBriefDesc[7];
+    static constexpr const char *dayOfWeekBriefDesc[7] {
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+    };
 
     /**
      * Get day of week describe, started by Sunday.
      * @param[in] dayOfWeek - day of week.
      * @return const char * - the day of week describe.
      */
-    static const char *GetDayOfWeekDesc(int dayOfWeek, bool brief = false);
+    static constexpr const char *GetDayOfWeekDesc(int dayOfWeek, bool brief = false)
+    {
+        return (brief ? dayOfWeekBriefDesc : dayOfWeekDesc)[
+            dayOfWeek >= 0 ? dayOfWeek % 7 : (dayOfWeek % 7 + 7)];
+    }
 };
 
 __LLBC_NS_END
