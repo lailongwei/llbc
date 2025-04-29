@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "llbc/core/utils/Util_text.h"
 #include "llbc/core/time/TimeConst.h"
 
 __LLBC_NS_BEGIN
