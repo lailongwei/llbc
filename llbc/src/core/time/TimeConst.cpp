@@ -26,30 +26,4 @@
 
 __LLBC_NS_BEGIN
 
-const char *LLBC_TimeConst::dayOfWeekDesc[7] {
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday"
-};
-
-const char *LLBC_TimeConst::dayOfWeekBriefDesc[7] {
-    "Sun",
-    "Mon",
-    "Tue",
-    "Wed",
-    "Thu",
-    "Fri",
-    "Sat"
-};
-
-const char *LLBC_TimeConst::GetDayOfWeekDesc(int dayOfWeek, bool brief)
-{
-    return (brief ? dayOfWeekBriefDesc : dayOfWeekDesc)[
-        dayOfWeek >= 0 ? dayOfWeek % 7 : (dayOfWeek % 7 + 7)];
-}
-
 __LLBC_NS_END
