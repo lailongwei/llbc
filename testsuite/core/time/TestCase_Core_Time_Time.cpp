@@ -37,6 +37,9 @@ int TestCase_Core_Time_Time::Run(int argc, char *argv[])
     OSTimeTest();
     std::cout << std::endl;
 
+    ConstexprTimeSpanTest();
+    std::cout << std::endl;
+
     TimeClassTest();
     std::cout << std::endl;
 
@@ -78,6 +81,86 @@ void TestCase_Core_Time_Time::OSTimeTest()
     gettimeofday(&tv, nullptr);
     std::cout <<"WIN32 spec: gettimeofday(), tv_sec: " <<tv.tv_sec <<", tv_usec: " <<tv.tv_usec <<std::endl;
 #endif
+}
+
+void TestCase_Core_Time_Time::ConstexprTimeSpanTest()
+{
+    std::cout <<"Constexpr TimeSpan test: " <<std::endl;
+
+    // Construct test.
+    std::cout <<"- Construct test:" <<std::endl;
+    constexpr LLBC_TimeSpan ts1;
+    std::cout <<"  - default constructed timespan:" <<ts1 <<std::endl;
+    constexpr LLBC_TimeSpan ts2 = LLBC_TimeSpan::FromMicros(1);
+    std::cout <<"  - constructed from FromMicros(): " <<ts2 <<std::endl;
+    constexpr LLBC_TimeSpan ts3 = LLBC_TimeSpan::FromMillis(1);
+    std::cout <<"  - constructed from FromMillis(): " <<ts3 <<std::endl;
+    constexpr LLBC_TimeSpan ts4 = LLBC_TimeSpan::FromSeconds(1, 2, 3);
+    std::cout <<"  - constructed from FromSeconds(): " <<ts4 <<std::endl;
+    constexpr LLBC_TimeSpan ts5 = LLBC_TimeSpan::FromMinutes(1, 2, 3, 4);
+    std::cout <<"  - constructed from FromMinutes(): " <<ts5 <<std::endl;
+    constexpr LLBC_TimeSpan ts6 = LLBC_TimeSpan::FromHours(1, 2, 3, 4, 5);
+    std::cout <<"  - constructed from FromMinutes(): " <<ts6 <<std::endl;
+    constexpr LLBC_TimeSpan ts7 = LLBC_TimeSpan::FromDays(1, 2, 3, 4, 5, 6);
+    std::cout <<"  - constructed from FromMinutes(): " <<ts7 <<std::endl;
+
+    // GetXXX test.
+    std::cout <<"- GetXXX test, ts:" <<ts7 <<std::endl;
+    std::cout <<"  - GetDays: " <<ts7.GetDays() <<std::endl;
+    std::cout <<"  - GetHours: " <<ts7.GetHours() <<std::endl;
+    std::cout <<"  - GetMinutes: " <<ts7.GetMinutes() <<std::endl;
+    std::cout <<"  - GetSeconds: " <<ts7.GetSeconds() <<std::endl;
+    std::cout <<"  - GetMillis: " <<ts7.GetMillis() <<std::endl;
+    std::cout <<"  - GetMicros: " <<ts7.GetMicros() <<std::endl;
+    std::cout <<"  - GetTotalDays: " <<ts7.GetTotalDays() <<std::endl;
+    std::cout <<"  - GetTotalHours: " <<ts7.GetTotalHours() <<std::endl;
+    std::cout <<"  - GetTotalMinutes: " <<ts7.GetTotalMinutes() <<std::endl;
+    std::cout <<"  - GetTotalSeconds: " <<ts7.GetTotalSeconds() <<std::endl;
+    std::cout <<"  - GetTotalMillis: " <<ts7.GetTotalMillis() <<std::endl;
+    std::cout <<"  - GetTotalMicros: " <<ts7.GetTotalMicros() <<std::endl;
+
+    constexpr LLBC_TimeSpan ts8 = LLBC_TimeSpan::FromDays(ts7.GetDays(),
+                                                          ts7.GetHours(),
+                                                          ts7.GetMinutes(),
+                                                          ts7.GetSeconds(),
+                                                          ts7.GetMillis(),
+                                                          ts7.GetMicros());
+    std::cout <<"  - Construct from FromDays(GetXXX(), GetXXX(), ...):" <<ts8 <<std::endl;
+    static_assert(ts7 == ts8);
+
+    // AddXXX test.
+    std::cout <<"- AddXXX test: " <<std::endl;
+    constexpr LLBC_TimeSpan ts9;
+    constexpr LLBC_TimeSpan ts10 = ts9.AddDays(1);
+    constexpr LLBC_TimeSpan ts11 = ts10.AddHours(1);
+    constexpr LLBC_TimeSpan ts12 = ts11.AddMinutes(1);
+    constexpr LLBC_TimeSpan ts13 = ts12.AddSeconds(1);
+    constexpr LLBC_TimeSpan ts14 = ts13.AddMillis(1);
+    constexpr LLBC_TimeSpan ts15 = ts14.AddMicros(1);
+    static_assert(ts15 == LLBC_TimeSpan::FromDays(1, 1, 1, 1, 1, 1));
+    std::cout <<"  - After call AddXXX():" <<ts15 <<std::endl;
+
+    // Arithmetic test.
+    std::cout <<"- Arithmetic test: " <<std::endl;
+    constexpr LLBC_TimeSpan ts16;
+    constexpr LLBC_TimeSpan ts17 = ts16 + LLBC_TimeSpan::FromDays(2);
+    constexpr LLBC_TimeSpan ts18 = ts17 - LLBC_TimeSpan::FromDays(1);
+    constexpr LLBC_TimeSpan ts19 = ts18 * 2.0;
+    constexpr LLBC_TimeSpan ts20 = ts19 / 2.0;
+    constexpr LLBC_TimeSpan ts21 = ts20 % 2;
+    constexpr LLBC_TimeSpan ts22 = ts21 % LLBC_TimeSpan::FromMicros(2);
+    static_assert(ts22 == LLBC_TimeSpan::FromSeconds(0));
+    std::cout <<"  - After call all aritimeric operators: " <<ts22 <<std::endl;
+
+    // Logical operators test.
+    std::cout <<"- Logical operators test: " <<std::endl;
+    constexpr LLBC_TimeSpan ts23 = LLBC_TimeSpan::FromDays(1);
+    constexpr LLBC_TimeSpan ts24 = LLBC_TimeSpan::FromDays(1);
+    constexpr LLBC_TimeSpan ts25 = LLBC_TimeSpan::FromHours(1);
+    static_assert(ts23 == ts24 && ts23 >= ts24 && ts23 <= ts24);
+    static_assert(ts23 > ts25 && ts23 >= ts25 && ts25 < ts23 && ts25 <= ts23);
+    static_assert(ts23 == ts23 && ts23 != ts25);
+    std::cout << " - Success" <<std::endl;
 }
 
 void TestCase_Core_Time_Time::TimeClassTest()
