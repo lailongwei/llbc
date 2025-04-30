@@ -254,8 +254,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 
         __LLBC_LockCustomErr();
 
-        typedef std::map<int, LLBC_String>::iterator _Iter;
-        _Iter it = __g_customErrDesc.find(no);
+        const auto it = __g_customErrDesc.find(no);
         const bool found = it != __g_customErrDesc.end();
 
         const char *errDesc =
@@ -457,9 +456,7 @@ int LLBC_RemoveCustomErrno(int no)
 
     __LLBC_LockCustomErr();
 
-    typedef std::map<int, LLBC_String>::iterator _Iter;
-    _Iter it = __g_customErrDesc.find(no);
-
+    const auto it = __g_customErrDesc.find(no);
     const bool found = it != __g_customErrDesc.end();
     if (found)
         __g_customErrDesc.erase(it);
