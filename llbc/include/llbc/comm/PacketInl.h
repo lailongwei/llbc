@@ -507,10 +507,8 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::vector<_Ty> &val)
     this->Write(static_cast<uint32>(val.size()));
 
     const size_t size = val.size();
-    for (size_t i = 0; i < size; ++i)
-    {
-        this->Write(val[i]);
-    }
+    for (auto &item : val)
+        this->Write(item);
 
     return LLBC_OK;
 }
@@ -519,12 +517,8 @@ template <typename _Ty>
 LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::list<_Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
-
-    typedef typename std::list<_Ty>::const_iterator _Iter;
-
-    _Iter it = val.begin(), endIt = val.end();
-    for (; it != endIt; ++it)
-        this->Write(*it);
+    for (auto &item : val)
+        this->Write(item);
 
     return LLBC_OK;
 }
@@ -534,9 +528,8 @@ LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::deque<_Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
 
-    const size_t size = val.size();
-    for (size_t i = 0; i < size; ++i)
-        this->Write(val[i]);
+    for (auto &item : val)
+        this->Write(item);
 
     return LLBC_OK;
 }
@@ -545,12 +538,8 @@ template <typename _Kty>
 LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::set<_Kty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
-
-    typedef typename std::set<_Kty>::const_iterator _Iter;
-
-    _Iter it = val.begin(), endIt = val.end();
-    for (; it != endIt; ++it)
-        this->Write(*it);
+    for (auto &item : val)
+        this->Write(item);
 
     return LLBC_OK;
 }
@@ -559,14 +548,10 @@ template <typename _Kty, typename _Ty>
 LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::map<_Kty, _Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
-
-    typedef typename std::map<_Kty, _Ty>::const_iterator _Iter;
-
-    _Iter it = val.begin(), endIt = val.end();
-    for (; it != endIt; ++it)
+    for (auto &item : val)
     {
-        this->Write(it->first);
-        this->Write(it->second);
+        this->Write(item.first);
+        this->Write(item.second);
     }
 
     return LLBC_OK;
