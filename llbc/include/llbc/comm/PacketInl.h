@@ -505,8 +505,6 @@ template <typename _Ty>
 LLBC_FORCE_INLINE int LLBC_Packet::Write(const std::vector<_Ty> &val)
 {
     this->Write(static_cast<uint32>(val.size()));
-
-    const size_t size = val.size();
     for (auto &item : val)
         this->Write(item);
 
