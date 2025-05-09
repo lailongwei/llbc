@@ -159,7 +159,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
         if (_fileBufferSize > 0) // If file buffered, process flush logic
         {
             _notFlushLogCount += 1;
-            if (data.level >= LLBC_LogLevel::Warn)
+            if (data.level >= LLBC_LogLevel::Error)
                 Flush();
         }
 
