@@ -21,20 +21,24 @@
 
 #pragma once
 
-#include "llbc.h"
-using namespace llbc;
+#include "llbc/common/Common.h"
 
-class TestCase_Core_Thread_Task final : public LLBC_BaseTestCase
+__LLBC_NS_BEGIN
+
+template <template <typename> class Task>
+ void LLBC_TaskQueue::InitQueue(std::in_place_type_t<Task<LLBC_TaskQueue>>, int)
 {
-public:
-    TestCase_Core_Thread_Task();
-    ~TestCase_Core_Thread_Task() override;
+}
 
-public:
-    int Run(int argc, char *argv[]) override;
+template <template <typename> class Task> 
+void LLBC_MultiThreadTaskQueue::InitQueue(std::in_place_type_t<Task<LLBC_MultiThreadTaskQueue>>, int threadNum)
+{
+    _processorIdGetter = &Task<LLBC_MultiThreadTaskQueue>::GetProcessorId;
+    _threadNum = threadNum;
+    _msgQueues.reserve(_threadNum);
 
-private:
-    int BasicTaskTest();
-    int EmptyTaskTest();
-    int MultiThreadTaskTest();
-};
+    for (size_t i = 0; i < _threadNum; ++i)
+        _msgQueues.emplace_back(std::make_unique<LLBC_MessageQueue>());
+}
+
+__LLBC_NS_END
