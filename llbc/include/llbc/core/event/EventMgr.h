@@ -33,43 +33,6 @@ __LLBC_NS_BEGIN
 /**
  * \brief The event manager class encapsulation.
  */
-class LLBC_EXPORT LLBC_EventMgrHook
-{
-public:
-    LLBC_EventMgrHook() : _evMgr(nullptr) {}
-    virtual ~LLBC_EventMgrHook() {}
-
-public:
-    /**
-     * Event manager pre-fire event.
-     * @param[in] event - event object.
-     */
-    virtual void PreFire(LLBC_Event* event) = 0;
-
-    /**
-     * Event manager post-fire event.
-     * @param[in] event - event object.
-     */
-    virtual void PostFire(LLBC_Event* event) = 0;
-
-private:
-    /**
-     * Associated event manager.
-     * @param[in] evMgr - event manager object.
-     */
-    void SetEventMgr(LLBC_EventMgr *evMgr) { _evMgr = evMgr; }
-
-private:
-    // Friend class.
-    friend class LLBC_EventMgr;
-
-private:
-    LLBC_EventMgr *_evMgr; // Related event manager.
-};
-
-/**
- * \brief The event manager class encapsulation.
- */
 class LLBC_EXPORT LLBC_EventMgr final
 {
 public:
@@ -81,11 +44,54 @@ public:
 
 public:
     /**
-     * Set event mgr hook.
-     * @param[in] hook  - event mgr hook object.
-     * @return int - return 0 if success, otherwise return -1.
+     * Add pre-fire hook.
+     * @param[in] hookName       - hook name.
+     * @param[in] obj        - object.
+     * @param[in] hook       - deleg.
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
      */
-    int AddEventMgrHook(LLBC_EventMgrHook *hook);
+    template <typename ObjectType>
+    int AddPreFireHook(const LLBC_String &hookName, ObjectType *obj, void (ObjectType::*hook)(LLBC_Event *));
+
+    /**
+     * Add pre-fire hook.
+     * @param[in] hookName      - hook name.
+     * @param[in] hook      - deleg.
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
+     */
+    int AddPreFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook);
+
+    /**
+     * Add post-fire hook.
+     * @param[in] hookName       - hook name.
+     * @param[in] obj        - object.
+     * @param[in] hook       - deleg.
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
+     */
+    template <typename ObjectType>
+    int AddPostFireHook(const LLBC_String &hookName, ObjectType *obj, void (ObjectType::*hook)(LLBC_Event *));
+
+    /**
+     * Add post-fire hook.
+     * @param[in] hookName      - hook name.
+     * @param[in] hook      - deleg.
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
+     */
+    int AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook);
+
+    /**
+     * Remove pre-fire hook using hook name.
+     * @param[in] hookName    - hook name.
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
+     */
+    int RemovePreFireHook(const LLBC_String &hookName);
+
+    /**
+     * Remove post-fire hook using hook name.
+     * @param[in] hookName    - hook name.
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
+     */
+    int RemovePostFireHook(const LLBC_String &hookName);
 
 public:
     /**
@@ -267,8 +273,14 @@ protected:
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
-    // All event manager hooks.
-    std::vector<LLBC_EventMgrHook *> _eventMgrHooks;
+    // Pre-fire hooks.
+    std::list<LLBC_Delegate<void(LLBC_Event *)>> _preFireHooks;
+    // Pre-fire hook map.
+    std::map<LLBC_String, std::list<LLBC_Delegate<void(LLBC_Event *)>>::iterator> _preFireHookMap;
+    // Post-fire hooks.
+    std::list<LLBC_Delegate<void(LLBC_Event *)>> _postFireHooks;
+    // Post-fire hook map.
+    std::map<LLBC_String, std::list<LLBC_Delegate<void(LLBC_Event *)>>::iterator> _postFireHookMap;
 };
 
 __LLBC_NS_END
