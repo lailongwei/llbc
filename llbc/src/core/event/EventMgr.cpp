@@ -66,7 +66,7 @@ LLBC_EventMgr::~LLBC_EventMgr()
         LLBC_STLHelper::RecycleContainer(it->second);
 }
 
-int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook)
+int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delegate<bool(LLBC_Event *)> &hook)
 {
     if (hookName.empty() || !hook)
     {
@@ -74,7 +74,7 @@ int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delega
         return LLBC_FAILED;
     }
 
-    if (!_preFireHookMap.empty() && _preFireHookMap.find(hookName) != _preFireHookMap.end())
+    if (_preFireHookMap.find(hookName) != _preFireHookMap.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -82,7 +82,18 @@ int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delega
 
     _preFireHooks.push_back(hook);
     _preFireHookMap[hookName] = prev(_preFireHooks.end());
+
     return LLBC_OK;
+}
+
+void LLBC_EventMgr::RemovePreFireHook(const LLBC_String &hookName)
+{
+    auto it = _preFireHookMap.find(hookName);
+    if (it == _preFireHookMap.end())
+        return;
+
+    _preFireHooks.erase(it->second);
+    _preFireHookMap.erase(it);
 }
 
 int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook)
@@ -93,7 +104,7 @@ int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Deleg
         return LLBC_FAILED;
     }
 
-    if (!_postFireHookMap.empty() && _postFireHookMap.find(hookName) != _postFireHookMap.end())
+    if (_postFireHookMap.find(hookName) != _postFireHookMap.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
@@ -101,29 +112,18 @@ int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Deleg
 
     _postFireHooks.push_front(hook);
     _postFireHookMap[hookName] = _postFireHooks.begin();
+
     return LLBC_OK;
 }
 
-int LLBC_EventMgr::RemovePreFireHook(const LLBC_String &hookName)
-{
-    auto it = _preFireHookMap.find(hookName);
-    if (it == _preFireHookMap.end())
-        return LLBC_FAILED;
-
-    _preFireHooks.erase(it->second);
-    _preFireHookMap.erase(it);
-    return LLBC_OK;
-}
-
-int LLBC_EventMgr::RemovePostFireHook(const LLBC_String &hookName)
+void LLBC_EventMgr::RemovePostFireHook(const LLBC_String &hookName)
 {
     auto it = _postFireHookMap.find(hookName);
     if (it == _postFireHookMap.end())
-        return LLBC_FAILED;
+        return;
 
     _postFireHooks.erase(it->second);
     _postFireHookMap.erase(it);
-    return LLBC_OK;
 }
 
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
@@ -295,17 +295,13 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
     }
 
     // Do before fire event logic.
-    const int ret = BeforeFireEvent(*ev);
+    const int ret = BeforeFireEvent(ev);
     if (UNLIKELY(ret != LLBC_OK))
     {
         if (!ev->IsDontDelAfterFire())
             LLBC_Recycle(ev);
         return LLBC_FAILED;
     }
-
-    // All event manager hooks do pre-fire.
-    for (auto &preHook : _preFireHooks)
-        preHook(ev);
 
     // Call all listeners.
     const auto idIt = _id2ListenerInfos.find(ev->GetId());
@@ -351,24 +347,34 @@ bool LLBC_EventMgr::HasStub(const LLBC_ListenerStub &stub) const
     return _stub2ListenerInfos.find(stub) != _stub2ListenerInfos.end();
 }
 
-int LLBC_EventMgr::BeforeFireEvent(const LLBC_Event &ev)
+int LLBC_EventMgr::BeforeFireEvent(LLBC_Event *ev)
 {
     // If event id already in firing, set <REPEAT> error and return failed.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     if (!_firingEventIds.empty() &&
-        std::find(_firingEventIds.begin(), _firingEventIds.end(), ev.GetId()) != _firingEventIds.end())
+        std::find(_firingEventIds.begin(), _firingEventIds.end(), ev->GetId()) != _firingEventIds.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
+    // All event manager hooks do pre-fire, stop continuing fire when the pre-fire execution fails.
+    for (auto &preHook : _preFireHooks)
+    {
+        if (!preHook(ev))
+        {
+            LLBC_SetLastError(LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FIALED);
+            return LLBC_FAILED;
+        }
+    }
+
     // Increase firing flag.
     ++_firing;
 
     // Add event id to _firingEventIds set.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
-    _firingEventIds.push_back(ev.GetId());
+    _firingEventIds.push_back(ev->GetId());
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
     return LLBC_OK;
