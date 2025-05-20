@@ -73,7 +73,7 @@ int LLBC_EventMgr::AddEventMgrHook(LLBC_EventMgrHook *hook)
 
     _eventMgrHooks.emplace_back(hook);
 
-    return LLBC_SUCCESS;
+    return LLBC_OK;
 }
 
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
