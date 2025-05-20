@@ -66,13 +66,63 @@ LLBC_EventMgr::~LLBC_EventMgr()
         LLBC_STLHelper::RecycleContainer(it->second);
 }
 
-int LLBC_EventMgr::AddEventMgrHook(LLBC_EventMgrHook *hook)
+int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook)
 {
-    if (hook == nullptr)
+    if (hookName.empty() || !hook)
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    if (!_preFireHookMap.empty() && _preFireHookMap.find(hookName) != _preFireHookMap.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+
+    _preFireHooks.push_back(hook);
+    _preFireHookMap[hookName] = prev(_preFireHooks.end());
+    return LLBC_OK;
+}
+
+int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook)
+{
+    if (hookName.empty() || !hook)
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    if (!_postFireHookMap.empty() && _postFireHookMap.find(hookName) != _postFireHookMap.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+
+    _postFireHooks.push_front(hook);
+    _postFireHookMap[hookName] = _postFireHooks.begin();
+    return LLBC_OK;
+}
+
+int LLBC_EventMgr::RemovePreFireHook(const LLBC_String &hookName)
+{
+    auto it = _preFireHookMap.find(hookName);
+    if (it == _preFireHookMap.end())
         return LLBC_FAILED;
 
-    _eventMgrHooks.emplace_back(hook);
+    _preFireHooks.erase(it->second);
+    _preFireHookMap.erase(it);
+    return LLBC_OK;
+}
 
+int LLBC_EventMgr::RemovePostFireHook(const LLBC_String &hookName)
+{
+    auto it = _postFireHookMap.find(hookName);
+    if (it == _postFireHookMap.end())
+        return LLBC_FAILED;
+
+    _postFireHooks.erase(it->second);
+    _postFireHookMap.erase(it);
     return LLBC_OK;
 }
 
@@ -254,8 +304,8 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
     }
 
     // All event manager hooks do pre-fire.
-    for (auto * hook : _eventMgrHooks)
-        hook->PreFire(ev);
+    for (auto &preHook : _preFireHooks)
+        preHook(ev);
 
     // Call all listeners.
     const auto idIt = _id2ListenerInfos.find(ev->GetId());
@@ -274,13 +324,13 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
         }
     }
 
+    // All event manager hooks do post-fire.
+    for (auto &postHook : _postFireHooks)
+        postHook(ev);
+
     // Recycle event.
     if (!ev->IsDontDelAfterFire())
         LLBC_Recycle(ev);
-
-    // All event manager hooks do post-fire.
-    for (auto * hook : _eventMgrHooks)
-        hook->PostFire(ev);
 
     // Do after fire event logic.
     AfterFireEvent();
