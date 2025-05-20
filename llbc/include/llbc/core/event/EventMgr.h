@@ -45,27 +45,34 @@ public:
 public:
     /**
      * Add pre-fire hook.
-     * @param[in] hookName       - hook name.
-     * @param[in] obj        - object.
-     * @param[in] hook       - deleg.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
-     */
-    template <typename ObjectType>
-    int AddPreFireHook(const LLBC_String &hookName, ObjectType *obj, void (ObjectType::*hook)(LLBC_Event *));
-
-    /**
-     * Add pre-fire hook.
-     * @param[in] hookName      - hook name.
+     * @param[in] hookName  - hook name.
+     * @param[in] obj       - object.
      * @param[in] hook      - deleg.
      * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
      */
-    int AddPreFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook);
+    template <typename ObjectType>
+    int AddPreFireHook(const LLBC_String &hookName, ObjectType *obj, bool (ObjectType::*hook)(LLBC_Event *));
+
+    /**
+     * Add pre-fire hook.
+     * @param[in] hookName  - hook name.
+     * @param[in] hook      - deleg.
+     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
+     */
+    int AddPreFireHook(const LLBC_String &hookName, const LLBC_Delegate<bool(LLBC_Event *)> &hook);
+
+    /**
+     * Remove pre-fire hook using hook name.
+     * @param[in] hookName  - hook name.
+     * @return void.
+     */
+    void RemovePreFireHook(const LLBC_String &hookName);
 
     /**
      * Add post-fire hook.
-     * @param[in] hookName       - hook name.
-     * @param[in] obj        - object.
-     * @param[in] hook       - deleg.
+     * @param[in] hookName  - hook name.
+     * @param[in] obj       - object.
+     * @param[in] hook      - deleg.
      * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
      */
     template <typename ObjectType>
@@ -73,25 +80,18 @@ public:
 
     /**
      * Add post-fire hook.
-     * @param[in] hookName      - hook name.
+     * @param[in] hookName  - hook name.
      * @param[in] hook      - deleg.
      * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
      */
     int AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook);
 
     /**
-     * Remove pre-fire hook using hook name.
-     * @param[in] hookName    - hook name.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
-     */
-    int RemovePreFireHook(const LLBC_String &hookName);
-
-    /**
      * Remove post-fire hook using hook name.
-     * @param[in] hookName    - hook name.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
+     * @param[in] hookName  - hook name.
+     * @return void.
      */
-    int RemovePostFireHook(const LLBC_String &hookName);
+    void RemovePostFireHook(const LLBC_String &hookName);
 
 public:
     /**
@@ -194,7 +194,7 @@ protected:
     /**
      * Before fire event method.
      */
-    int BeforeFireEvent(const LLBC_Event &ev);
+    int BeforeFireEvent(LLBC_Event *ev);
 
     /**
      * After fire event method.
@@ -274,9 +274,10 @@ protected:
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
     // Pre-fire hooks.
-    std::list<LLBC_Delegate<void(LLBC_Event *)>> _preFireHooks;
+    std::list<LLBC_Delegate<bool(LLBC_Event *)>> _preFireHooks;
     // Pre-fire hook map.
-    std::map<LLBC_String, std::list<LLBC_Delegate<void(LLBC_Event *)>>::iterator> _preFireHookMap;
+    std::map<LLBC_String, std::list<LLBC_Delegate<bool(LLBC_Event *)>>::iterator> _preFireHookMap;
+
     // Post-fire hooks.
     std::list<LLBC_Delegate<void(LLBC_Event *)>> _postFireHooks;
     // Post-fire hook map.
