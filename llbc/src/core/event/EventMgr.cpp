@@ -66,6 +66,16 @@ LLBC_EventMgr::~LLBC_EventMgr()
         LLBC_STLHelper::RecycleContainer(it->second);
 }
 
+int LLBC_EventMgr::AddEventMgrHook(LLBC_EventMgrHook *hook)
+{
+    if (hook == nullptr)
+        return LLBC_FAILED;
+
+    _eventMgrHooks.emplace_back(hook);
+
+    return LLBC_SUCCESS;
+}
+
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
                                              const LLBC_Delegate<void(LLBC_Event &)> &listener,
                                              const LLBC_ListenerStub &boundStub)
@@ -243,6 +253,10 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
         return LLBC_FAILED;
     }
 
+    // All event manager hooks do pre-fire.
+    for (auto * hook : _eventMgrHooks)
+        hook->PreFire(ev);
+
     // Call all listeners.
     const auto idIt = _id2ListenerInfos.find(ev->GetId());
     if (idIt != _id2ListenerInfos.end() && !idIt->second.empty())
@@ -263,6 +277,10 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
     // Recycle event.
     if (!ev->IsDontDelAfterFire())
         LLBC_Recycle(ev);
+
+    // All event manager hooks do post-fire.
+    for (auto * hook : _eventMgrHooks)
+        hook->PostFire(ev);
 
     // Do after fire event logic.
     AfterFireEvent();
