@@ -64,9 +64,13 @@ public:
     /**
      * Remove pre-fire hook using hook name.
      * @param[in] hookName  - hook name.
-     * @return void.
      */
     void RemovePreFireHook(const LLBC_String &hookName);
+
+    /**
+     * Remove all pre-fire hook.
+     */
+    void RemoveAllPreFireHook();
 
     /**
      * Add post-fire hook.
@@ -89,9 +93,13 @@ public:
     /**
      * Remove post-fire hook using hook name.
      * @param[in] hookName  - hook name.
-     * @return void.
      */
     void RemovePostFireHook(const LLBC_String &hookName);
+
+    /**
+     * Remove all post-fire hook.
+     */
+    void RemoveAllPostFireHook();
 
 public:
     /**
