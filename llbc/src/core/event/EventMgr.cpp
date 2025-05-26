@@ -81,7 +81,7 @@ int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delega
     }
 
     _preFireHooks.push_back(hook);
-    _preFireHookMap[hookName] = prev(_preFireHooks.end());
+    _preFireHookMap[hookName] = std::prev(_preFireHooks.end());
 
     return LLBC_OK;
 }
@@ -94,6 +94,12 @@ void LLBC_EventMgr::RemovePreFireHook(const LLBC_String &hookName)
 
     _preFireHooks.erase(it->second);
     _preFireHookMap.erase(it);
+}
+
+void LLBC_EventMgr::RemoveAllPreFireHook()
+{
+    _preFireHookMap.clear();
+    _preFireHooks.clear();
 }
 
 int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook)
@@ -124,6 +130,12 @@ void LLBC_EventMgr::RemovePostFireHook(const LLBC_String &hookName)
 
     _postFireHooks.erase(it->second);
     _postFireHookMap.erase(it);
+}
+
+void LLBC_EventMgr::RemoveAllPostFireHook()
+{
+    _postFireHookMap.clear();
+    _postFireHooks.clear();
 }
 
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
@@ -320,9 +332,14 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
         }
     }
 
-    // All event manager hooks do post-fire.
+    // All event manager hooks do post-fire, post-fire do not delete the event obj.
+    const bool oldDontDelAfterFire = ev->IsDontDelAfterFire();
+
+    ev->SetDontDelAfterFire(true);
     for (auto &postHook : _postFireHooks)
         postHook(ev);
+
+    ev->SetDontDelAfterFire(oldDontDelAfterFire);
 
     // Recycle event.
     if (!ev->IsDontDelAfterFire())
@@ -359,7 +376,11 @@ int LLBC_EventMgr::BeforeFireEvent(LLBC_Event *ev)
     }
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
-    // All event manager hooks do pre-fire, stop continuing fire when the pre-fire execution fails.
+    // All event manager hooks do pre-fire, stop continuing fire when the pre-fire execution fails,
+    // pre-fire do not delete the event obj
+    const bool oldDontDelAfterFire = ev->IsDontDelAfterFire();
+
+    ev->SetDontDelAfterFire(true);
     for (auto &preHook : _preFireHooks)
     {
         if (!preHook(ev))
@@ -368,6 +389,8 @@ int LLBC_EventMgr::BeforeFireEvent(LLBC_Event *ev)
             return LLBC_FAILED;
         }
     }
+
+    ev->SetDontDelAfterFire(oldDontDelAfterFire);
 
     // Increase firing flag.
     ++_firing;
