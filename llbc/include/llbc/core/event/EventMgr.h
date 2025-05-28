@@ -73,6 +73,12 @@ public:
     void RemoveAllPreFireHooks();
 
     /**
+     * Handle pre-firing hook operations,
+     * including the addition and deletion of pre-fire.
+     */
+    void HandlePreFiringHookOperations();
+
+    /**
      * Add post-fire hook.
      * @param[in] hookName  - hook name.
      * @param[in] obj       - object.
@@ -102,10 +108,10 @@ public:
     void RemoveAllPostFireHooks();
 
     /**
-     * Handle firing hook operations,
-     * including the addition and deletion of pre-fire as well as the addition and deletion of post-fire.
+     * Handle post-firing hook operations,
+     * including the addition and deletion of post-fire.
      */
-    void HandleFiringHookOperations();
+    void HandlePostFiringHookOperations();
 
 public:
     /**
@@ -289,23 +295,23 @@ protected:
 
     typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo; // Pre-fire info.
 
+    // Is pre-firing.
+    int _preFiring;
     // Pre-fire hooks.
     std::list<_PreFireInfo> _preFireHookList;
     // Pre-fire hook map.
     std::map<LLBC_String, std::list<_PreFireInfo>::iterator> _preFireHookMap;
-    // Pre-fire hook final name, followed by it is the hook added during the (firing) process.
-    LLBC_String _preFireHookFinalName;
     // Removing pre-fire hook's names, these hooks should not process.
     std::set<LLBC_String> _preFireRemovingNameSet;
 
     typedef std::pair<LLBC_String, LLBC_Delegate<void(LLBC_Event *)>> _PostFireInfo; // Post-fire info.
 
+    // Is post-firing.
+    int _postFiring;
     // Post-fire hooks.
     std::list<_PostFireInfo> _postFireHookList;
     // Post-fire hook map.
     std::map<LLBC_String, std::list<_PostFireInfo>::iterator> _postFireHookMap;
-    // Post-fire hook final name, preceded by the hook added during the (firing) process.
-    LLBC_String _postFireHookFinalName = "";
     // Removing post-fire hook's names, these hooks should not process.
     std::set<LLBC_String> _postFireRemovingNameSet;
 };
