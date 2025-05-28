@@ -70,7 +70,7 @@ public:
     /**
      * Remove all pre-fire hook.
      */
-    void RemoveAllPreFireHook();
+    void RemoveAllPreFireHooks();
 
     /**
      * Add post-fire hook.
@@ -99,7 +99,13 @@ public:
     /**
      * Remove all post-fire hook.
      */
-    void RemoveAllPostFireHook();
+    void RemoveAllPostFireHooks();
+
+    /**
+     * Handle firing hook operations,
+     * including the addition and deletion of pre-fire as well as the addition and deletion of post-fire.
+     */
+    void HandleFiringHookOperations();
 
 public:
     /**
@@ -281,15 +287,25 @@ protected:
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
+    typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo;
     // Pre-fire hooks.
-    std::list<LLBC_Delegate<bool(LLBC_Event *)>> _preFireHooks;
+    std::list<_PreFireInfo> _preFireHookList;
     // Pre-fire hook map.
-    std::map<LLBC_String, std::list<LLBC_Delegate<bool(LLBC_Event *)>>::iterator> _preFireHookMap;
+    std::map<LLBC_String, std::list<_PreFireInfo>::iterator> _preFireHookMap;
+    // Pre-fire hook final name, followed by it is the hook added during the (firing) process.
+    LLBC_String _preFireHookFinalName;
+    // Removing pre-fire hook's names, these hooks should not process.
+    std::set<LLBC_String> _preFireRemovingNameSet;
 
+    typedef std::pair<LLBC_String, LLBC_Delegate<void(LLBC_Event *)>> _PostFireInfo;
     // Post-fire hooks.
-    std::list<LLBC_Delegate<void(LLBC_Event *)>> _postFireHooks;
+    std::list<_PostFireInfo> _postFireHookList;
     // Post-fire hook map.
-    std::map<LLBC_String, std::list<LLBC_Delegate<void(LLBC_Event *)>>::iterator> _postFireHookMap;
+    std::map<LLBC_String, std::list<_PostFireInfo>::iterator> _postFireHookMap;
+    // Post-fire hook final name, preceded by the hook added during the (firing) process.
+    LLBC_String _postFireHookFinalName = "";
+    // Removing post-fire hook's names, these hooks should not process.
+    std::set<LLBC_String> _postFireRemovingNameSet;
 };
 
 __LLBC_NS_END
