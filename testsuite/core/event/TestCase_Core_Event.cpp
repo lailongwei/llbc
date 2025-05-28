@@ -370,7 +370,7 @@ int TestCase_Core_Event::EventHookTest()
 
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Remove all pre-fire hooks: [Sub->Post3->Global->Post1->Global] :");
-    subEvMgr.RemoveAllPreFireHook();
+    subEvMgr.RemoveAllPreFireHooks();
     runTimes = 0;
     subEvMgr.BeginFire(EventIds::Event1).SetParam("RunTimes", &runTimes).Fire();
     ASSERT(runTimes == 3 && "Fire error, check it!");
@@ -378,7 +378,7 @@ int TestCase_Core_Event::EventHookTest()
 
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Remove all post-fire hooks: [Sub] :");
-    subEvMgr.RemoveAllPostFireHook();
+    subEvMgr.RemoveAllPostFireHooks();
     runTimes = 0;
     subEvMgr.BeginFire(EventIds::Event1).SetParam("RunTimes", &runTimes).Fire();
     ASSERT(runTimes == 1 && "Fire error, check it!");
