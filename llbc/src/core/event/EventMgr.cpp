@@ -82,9 +82,6 @@ int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delega
     _preFireHookList.emplace_back(_PreFireInfo{hookName, hook});
     _preFireHookMap[hookName] = std::prev(_preFireHookList.end());
 
-    // When firing, new hook will not be executed.
-    LLBC_DoIf(!IsFiring(), _preFireHookFinalName = hookName);
-
     return LLBC_OK;
 }
 
@@ -94,8 +91,8 @@ void LLBC_EventMgr::RemovePreFireHook(const LLBC_String &hookName)
     if (it == _preFireHookMap.end())
         return;
 
-    // When firing, recorded in the set, these hooks are not executed.
-    if (IsFiring())
+    // When pre-firing, recorded in the set, these hooks are not executed.
+    if (_preFiring > 0)
     {
         _preFireRemovingNameSet.emplace(hookName);
         return;
@@ -104,13 +101,12 @@ void LLBC_EventMgr::RemovePreFireHook(const LLBC_String &hookName)
     // Real delete the hook.
     _preFireHookList.erase(it->second);
     _preFireHookMap.erase(it);
-    _preFireHookFinalName = _preFireHookList.empty() ? "" : std::prev(_preFireHookList.end())->first;
 }
 
 void LLBC_EventMgr::RemoveAllPreFireHooks()
 {
-    // When firing, recorded in the set, these hooks are not executed.
-    if (IsFiring())
+    // When pre-firing, recorded in the set, these hooks are not executed.
+    if (_preFiring > 0)
     {
         LLBC_Foreach(_preFireHookList, _preFireRemovingNameSet.emplace(item.first));
         return;
@@ -119,7 +115,24 @@ void LLBC_EventMgr::RemoveAllPreFireHooks()
     _preFireRemovingNameSet.clear();
     _preFireHookMap.clear();
     _preFireHookList.clear();
-    _preFireHookFinalName = "";
+}
+
+void LLBC_EventMgr::HandlePreFiringHookOperations()
+{
+    if (_preFiring > 0)
+        return;
+
+    // Delete removing pre-fire hooks.
+    if (_preFireHookList.size() != _preFireRemovingNameSet.size())
+    {
+        for (auto &name : _preFireRemovingNameSet)
+            RemovePreFireHook(name);
+        _preFireRemovingNameSet.clear();
+    }
+    else
+    {
+        RemoveAllPreFireHooks();
+    }
 }
 
 int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook)
@@ -139,9 +152,6 @@ int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Deleg
     _postFireHookList.emplace_front(_PostFireInfo{hookName, hook});
     _postFireHookMap[hookName] = _postFireHookList.begin();
 
-    // When firing, new hook will not be executed.
-    LLBC_DoIf(!IsFiring(), _postFireHookFinalName = hookName);
-
     return LLBC_OK;
 }
 
@@ -151,8 +161,8 @@ void LLBC_EventMgr::RemovePostFireHook(const LLBC_String &hookName)
     if (it == _postFireHookMap.end())
         return;
 
-    // When firing, recorded in the set, these hooks are not executed.
-    if (IsFiring())
+    // When post-firing, recorded in the set, these hooks are not executed.
+    if (_postFiring > 0)
     {
         _postFireRemovingNameSet.emplace(hookName);
         return;
@@ -160,13 +170,12 @@ void LLBC_EventMgr::RemovePostFireHook(const LLBC_String &hookName)
 
     _postFireHookList.erase(it->second);
     _postFireHookMap.erase(it);
-    _postFireHookFinalName = _postFireHookList.empty() ? "" : _postFireHookList.begin()->first;
 }
 
 void LLBC_EventMgr::RemoveAllPostFireHooks()
 {
-    // When firing, recorded in the set, these hooks are not executed.
-    if (IsFiring())
+    // When post-firing, recorded in the set, these hooks are not executed.
+    if (_postFiring > 0)
     {
         LLBC_Foreach(_postFireHookList, _postFireRemovingNameSet.emplace(item.first));
         return;
@@ -175,45 +184,19 @@ void LLBC_EventMgr::RemoveAllPostFireHooks()
     _postFireRemovingNameSet.clear();
     _postFireHookMap.clear();
     _postFireHookList.clear();
-    _postFireHookFinalName = "";
 }
 
-void LLBC_EventMgr::HandleFiringHookOperations()
+void LLBC_EventMgr::HandlePostFiringHookOperations()
 {
-    if (_preFireHookList.size() != _preFireRemovingNameSet.size())
-    {
-        // Final name has been moved to the latest pre-fire hook.
-        if (_preFireRemovingNameSet.empty())
-        {
-            _preFireHookFinalName = _preFireHookList.empty() ? "" : std::prev(_preFireHookList.end())->first;
-        }
-        // Delete removing pre-fire hooks.
-        else
-        {
-            for (auto &name : _preFireRemovingNameSet)
-                RemovePreFireHook(name);
-            _preFireRemovingNameSet.clear();
-        }
-    }
-    else
-    {
-        RemoveAllPreFireHooks();
-    }
+    if (_postFiring > 0)
+        return;
 
+    // Delete removing post-fire hooks.
     if (_postFireHookList.size() != _postFireRemovingNameSet.size())
     {
-        // Final name has been moved to the latest post-fire hook.
-        if (_postFireRemovingNameSet.empty())
-        {
-            _postFireHookFinalName = _postFireHookList.empty() ? "" : _postFireHookList.begin()->first;
-        }
-        // Delete removing post-fire hooks.
-        else
-        {
-            for (auto &name : _postFireRemovingNameSet)
-                RemovePostFireHook(name);
-            _postFireRemovingNameSet.clear();
-        }
+        for (auto &name : _postFireRemovingNameSet)
+            RemovePostFireHook(name);
+        _postFireRemovingNameSet.clear();
     }
     else
     {
@@ -420,17 +403,17 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
 
     ev->SetDontDelAfterFire(true);
 
-    bool can_do = false;
+    // Increase post-firing flag.
+    ++_postFiring;
     for (auto &[name, postHook] : _postFireHookList)
     {
-        // The hook that comes before this hook is added during the firing process
-        // and will not be executed in this current iteration.
-        if (name == _postFireHookFinalName)
-            can_do = true;
-
-        if (can_do && _postFireRemovingNameSet.find(name) == _postFireRemovingNameSet.end())
+        if (_postFireRemovingNameSet.find(name) == _postFireRemovingNameSet.end())
             postHook(ev);
     }
+    // Decrease post-firing flag.
+    --_postFiring;
+    // Handle hook addition and deletion after post-fire().
+    HandlePostFiringHookOperations();
 
     // After post-fire, event reset the old DONT DEL AFTER FIRE option.
     ev->SetDontDelAfterFire(oldDontDelAfterFire);
@@ -470,40 +453,46 @@ int LLBC_EventMgr::BeforeFireEvent(LLBC_Event *ev)
     }
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
-    // Increase firing flag.
-    ++_firing;
-
     // All event manager hooks do pre-fire, stop continuing fire when the pre-fire execution fails,
-    // pre-fire do not delete the event obj
+    // pre-fire do not delete the event obj.
     const bool oldDontDelAfterFire = ev->IsDontDelAfterFire();
+
+    // Increase pre-firing flag.
+    ++_preFiring;
 
     ev->SetDontDelAfterFire(true);
     for (auto &[name, preHook] : _preFireHookList)
     {
         if (_preFireRemovingNameSet.find(name) == _preFireRemovingNameSet.end() && !preHook(ev))
         {
-            // Decrease firing flag.
-            --_firing;
+            // Decrease pre-firing flag.
+            --_preFiring;
             // Handle hook addition and deletion after fire().
-            HandleFiringHookOperations();
+            HandlePreFiringHookOperations();
             // Set error code.
             LLBC_SetLastError(LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED);
             return LLBC_FAILED;
         }
-        // The hook that follows this hook is added during the firing process
-        // and will not be executed in this current iteration.
-        if (name == _preFireHookFinalName)
-            break;
     }
 
     // After pre-fire, event reset the old DONT DEL AFTER FIRE option.
     ev->SetDontDelAfterFire(oldDontDelAfterFire);
+
+    // Decrease pre-firing flag.
+    --_preFiring;
+    // Handle hook addition and deletion after fire().
+    HandlePreFiringHookOperations();
+
+    // Increase firing flag.
+    ++_firing;
 
     // Add event id to _firingEventIds set.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     _firingEventIds.push_back(ev->GetId());
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
+    // Handle hook addition and deletion after fire().
+    HandlePreFiringHookOperations();
     return LLBC_OK;
 }
 
@@ -552,9 +541,6 @@ void LLBC_EventMgr::AfterFireEvent()
     _pendingRemoveAllListeners = false;
     _pendingRemoveEventIds_.clear();
     _pendingRemoveStubs_.clear();
-
-    // Handle hook addition and deletion after fire().
-    HandleFiringHookOperations();
 }
 
 LLBC_EventMgr::_PendingEventOp::_PendingEventOp(_PendingEventOpType opType)
