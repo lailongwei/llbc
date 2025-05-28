@@ -347,13 +347,23 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Add post-fire2、post-fire3 hook: "
                  "[Pre1->Global->Pre3->Global->Sub->Post3->Global->Post2->Global->Post1->Global] :");
-    subEvMgr.AddPostFireHook("PostFire2", [](LLBC_Event *ev) -> void {
+    subEvMgr.AddPostFireHook("PostFire2", [&](LLBC_Event *ev) -> void {
         LLBC_PrintLn("\tPostFire2");
         evMgr.Fire(ev);
+        subEvMgr.AddPreFireHook("PreFire4_Success", [](LLBC_Event *ev) -> bool {
+            LLBC_PrintLn("\tPreFire4_Success");
+            evMgr.Fire(ev);
+            return true;
+        });
     });
-    subEvMgr.AddPostFireHook("PostFire3", [](LLBC_Event *ev) -> void {
+    subEvMgr.AddPostFireHook("PostFire3", [&](LLBC_Event *ev) -> void {
         LLBC_PrintLn("\tPostFire3");
         evMgr.Fire(ev);
+        subEvMgr.AddPostFireHook("PostFire4", [&](LLBC_Event *ev) -> void {
+            LLBC_PrintLn("\tPostFire4");
+            evMgr.Fire(ev);
+            subEvMgr.RemovePostFireHook("PostFire3");
+        });
     });
     runTimes = 0;
     subEvMgr.BeginFire(EventIds::Event1).SetParam("RunTimes", &runTimes).Fire();
@@ -361,11 +371,12 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
 
     LLBC_PrintLn("----------------------------------");
-    LLBC_PrintLn("Remove post-fire2 hook: [Pre1->Global->Pre3->Global->Sub->Post3->Global->Post1->Global] :");
+    LLBC_PrintLn("Remove post-fire2 hook: "
+                 "[Pre1->Global->Pre3->Global->Pre4->Global->Sub->Post4->Global->Post1->Global] :");
     subEvMgr.RemovePostFireHook("PostFire2");
     runTimes = 0;
     subEvMgr.BeginFire(EventIds::Event1).SetParam("RunTimes", &runTimes).Fire();
-    ASSERT(runTimes == 5 && "Fire error, check it!");
+    ASSERT(runTimes == 6 && "Fire error, check it!");
     LLBC_PrintLn("----------------------------------");
 
     LLBC_PrintLn("----------------------------------");
