@@ -104,15 +104,18 @@ void LLBC_EventMgr::RemovePreFireHook(const LLBC_String &hookName)
     // Real delete the hook.
     _preFireHookList.erase(it->second);
     _preFireHookMap.erase(it);
-
-    if (_preFireHookList.empty())
-        _preFireHookFinalName = "";
-    else
-        _preFireHookFinalName = std::prev(_preFireHookList.end())->first;
+    _preFireHookFinalName = _preFireHookList.empty() ? "" : std::prev(_preFireHookList.end())->first;
 }
 
 void LLBC_EventMgr::RemoveAllPreFireHooks()
 {
+    // When firing, recorded in the set, these hooks are not executed.
+    if (IsFiring())
+    {
+        LLBC_Foreach(_preFireHookList, _preFireRemovingNameSet.emplace(item.first));
+        return;
+    }
+
     _preFireRemovingNameSet.clear();
     _preFireHookMap.clear();
     _preFireHookList.clear();
@@ -157,15 +160,18 @@ void LLBC_EventMgr::RemovePostFireHook(const LLBC_String &hookName)
 
     _postFireHookList.erase(it->second);
     _postFireHookMap.erase(it);
-
-    if (_postFireHookList.empty())
-        _postFireHookFinalName = "";
-    else
-        _postFireHookFinalName = _postFireHookList.begin()->first;
+    _postFireHookFinalName = _postFireHookList.empty() ? "" : _postFireHookList.begin()->first;
 }
 
 void LLBC_EventMgr::RemoveAllPostFireHooks()
 {
+    // When firing, recorded in the set, these hooks are not executed.
+    if (IsFiring())
+    {
+        LLBC_Foreach(_postFireHookList, _postFireRemovingNameSet.emplace(item.first));
+        return;
+    }
+
     _postFireRemovingNameSet.clear();
     _postFireHookMap.clear();
     _postFireHookList.clear();
@@ -174,27 +180,45 @@ void LLBC_EventMgr::RemoveAllPostFireHooks()
 
 void LLBC_EventMgr::HandleFiringHookOperations()
 {
-    // Final name has been moved to the latest pre-fire hook.
-    if (_preFireHookList.empty())
-        _preFireHookFinalName = "";
+    if (_preFireHookList.size() != _preFireRemovingNameSet.size())
+    {
+        // Final name has been moved to the latest pre-fire hook.
+        if (_preFireRemovingNameSet.empty())
+        {
+            _preFireHookFinalName = _preFireHookList.empty() ? "" : std::prev(_preFireHookList.end())->first;
+        }
+        // Delete removing pre-fire hooks.
+        else
+        {
+            for (auto &name : _preFireRemovingNameSet)
+                RemovePreFireHook(name);
+            _preFireRemovingNameSet.clear();
+        }
+    }
     else
-        _preFireHookFinalName = std::prev(_preFireHookList.end())->first;
+    {
+        RemoveAllPreFireHooks();
+    }
 
-    // Final name has been moved to the latest post-fire hook.
-    if (_postFireHookList.empty())
-        _postFireHookFinalName = "";
+    if (_postFireHookList.size() != _postFireRemovingNameSet.size())
+    {
+        // Final name has been moved to the latest post-fire hook.
+        if (_postFireRemovingNameSet.empty())
+        {
+            _postFireHookFinalName = _postFireHookList.empty() ? "" : _postFireHookList.begin()->first;
+        }
+        // Delete removing post-fire hooks.
+        else
+        {
+            for (auto &name : _postFireRemovingNameSet)
+                RemovePostFireHook(name);
+            _postFireRemovingNameSet.clear();
+        }
+    }
     else
-        _postFireHookFinalName = _postFireHookList.begin()->first;
-
-    // Delete removing pre-fire hooks.
-    for (auto &name : _preFireRemovingNameSet)
-        RemovePreFireHook(name);
-    _preFireRemovingNameSet.clear();
-
-    // Delete removing post-fire hooks.
-    for (auto &name : _postFireRemovingNameSet)
-        RemovePostFireHook(name);
-    _postFireRemovingNameSet.clear();
+    {
+        RemoveAllPostFireHooks();
+    }
 }
 
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
