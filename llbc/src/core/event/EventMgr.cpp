@@ -79,7 +79,7 @@ int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delega
         return LLBC_FAILED;
     }
 
-    _preFireHookList.push_back({hookName, hook});
+    _preFireHookList.emplace_back(_PreFireInfo{hookName, hook});
     _preFireHookMap[hookName] = std::prev(_preFireHookList.end());
 
     // When firing, new hook will not be executed.
@@ -136,7 +136,7 @@ int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Deleg
         return LLBC_FAILED;
     }
 
-    _postFireHookList.push_front({hookName, hook});
+    _postFireHookList.emplace_front(_PostFireInfo{hookName, hook});
     _postFireHookMap[hookName] = _postFireHookList.begin();
 
     // When firing, new hook will not be executed.

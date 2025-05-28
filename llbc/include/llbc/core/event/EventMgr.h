@@ -287,7 +287,8 @@ protected:
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
-    typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo;
+    typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo; // Pre-fire info.
+
     // Pre-fire hooks.
     std::list<_PreFireInfo> _preFireHookList;
     // Pre-fire hook map.
@@ -297,7 +298,8 @@ protected:
     // Removing pre-fire hook's names, these hooks should not process.
     std::set<LLBC_String> _preFireRemovingNameSet;
 
-    typedef std::pair<LLBC_String, LLBC_Delegate<void(LLBC_Event *)>> _PostFireInfo;
+    typedef std::pair<LLBC_String, LLBC_Delegate<void(LLBC_Event *)>> _PostFireInfo; // Post-fire info.
+
     // Post-fire hooks.
     std::list<_PostFireInfo> _postFireHookList;
     // Post-fire hook map.
