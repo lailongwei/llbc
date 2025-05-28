@@ -174,10 +174,24 @@ void LLBC_EventMgr::RemoveAllPostFireHooks()
 
 void LLBC_EventMgr::HandleFiringHookOperations()
 {
+    // Final name has been moved to the latest pre-fire hook.
+    if (_preFireHookList.empty())
+        _preFireHookFinalName = "";
+    else
+        _preFireHookFinalName = std::prev(_preFireHookList.end())->first;
+
+    // Final name has been moved to the latest post-fire hook.
+    if (_postFireHookList.empty())
+        _postFireHookFinalName = "";
+    else
+        _postFireHookFinalName = _postFireHookList.begin()->first;
+
+    // Delete removing pre-fire hooks.
     for (auto &name : _preFireRemovingNameSet)
         RemovePreFireHook(name);
     _preFireRemovingNameSet.clear();
 
+    // Delete removing post-fire hooks.
     for (auto &name : _postFireRemovingNameSet)
         RemovePostFireHook(name);
     _postFireRemovingNameSet.clear();
