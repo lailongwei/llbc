@@ -73,12 +73,6 @@ public:
     void RemoveAllPreFireHooks();
 
     /**
-     * Handle pre-firing hook operations,
-     * including the addition and deletion of pre-fire.
-     */
-    void HandlePreFiringHookOperations();
-
-    /**
      * Add post-fire hook.
      * @param[in] hookName  - hook name.
      * @param[in] obj       - object.
@@ -106,12 +100,6 @@ public:
      * Remove all post-fire hook.
      */
     void RemoveAllPostFireHooks();
-
-    /**
-     * Handle post-firing hook operations,
-     * including the addition and deletion of post-fire.
-     */
-    void HandlePostFiringHookOperations();
 
 public:
     /**
@@ -271,6 +259,12 @@ private:
     // Add listener info to event manager.
     int AddListenerInfo(_ListenerInfo *listenerInfo);
 
+    // Handle pre-firing hook operations, including the addition and deletion of pre-fire.
+    void HandlePreFiringHookOperations();
+
+    // Handle post-firing hook operations, including the addition and deletion of post-fire.
+    void HandlePostFiringHookOperations();
+
 protected:
     typedef std::list<_ListenerInfo *> _ListenerInfos; // listener info list.
 
@@ -293,7 +287,8 @@ protected:
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
-    typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo; // Pre-fire info.
+    // Pre-fire info.
+    typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo;
 
     // Is pre-firing.
     int _preFiring;
@@ -304,7 +299,8 @@ protected:
     // Removing pre-fire hook's names, these hooks should not process.
     std::set<LLBC_String> _preFireRemovingNameSet;
 
-    typedef std::pair<LLBC_String, LLBC_Delegate<void(LLBC_Event *)>> _PostFireInfo; // Post-fire info.
+    // Post-fire info.
+    typedef std::pair<LLBC_String, LLBC_Delegate<void(LLBC_Event *)>> _PostFireInfo;
 
     // Is post-firing.
     int _postFiring;
