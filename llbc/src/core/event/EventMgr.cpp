@@ -79,7 +79,7 @@ int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delega
         return LLBC_FAILED;
     }
 
-    _preFireHookList.emplace_back(_PreFireInfo{hookName, hook});
+    _preFireHookList.emplace_back(hookName, hook);
     _preFireHookMap[hookName] = std::prev(_preFireHookList.end());
 
     return LLBC_OK;
@@ -117,24 +117,6 @@ void LLBC_EventMgr::RemoveAllPreFireHooks()
     _preFireHookList.clear();
 }
 
-void LLBC_EventMgr::HandlePreFiringHookOperations()
-{
-    if (_preFiring > 0)
-        return;
-
-    // Delete removing pre-fire hooks.
-    if (_preFireHookList.size() != _preFireRemovingNameSet.size())
-    {
-        for (auto &name : _preFireRemovingNameSet)
-            RemovePreFireHook(name);
-        _preFireRemovingNameSet.clear();
-    }
-    else
-    {
-        RemoveAllPreFireHooks();
-    }
-}
-
 int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook)
 {
     if (hookName.empty() || !hook)
@@ -149,7 +131,7 @@ int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Deleg
         return LLBC_FAILED;
     }
 
-    _postFireHookList.emplace_front(_PostFireInfo{hookName, hook});
+    _postFireHookList.emplace_front(hookName, hook);
     _postFireHookMap[hookName] = _postFireHookList.begin();
 
     return LLBC_OK;
@@ -184,24 +166,6 @@ void LLBC_EventMgr::RemoveAllPostFireHooks()
     _postFireRemovingNameSet.clear();
     _postFireHookMap.clear();
     _postFireHookList.clear();
-}
-
-void LLBC_EventMgr::HandlePostFiringHookOperations()
-{
-    if (_postFiring > 0)
-        return;
-
-    // Delete removing post-fire hooks.
-    if (_postFireHookList.size() != _postFireRemovingNameSet.size())
-    {
-        for (auto &name : _postFireRemovingNameSet)
-            RemovePostFireHook(name);
-        _postFireRemovingNameSet.clear();
-    }
-    else
-    {
-        RemoveAllPostFireHooks();
-    }
 }
 
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
@@ -596,6 +560,42 @@ int LLBC_EventMgr::AddListenerInfo(_ListenerInfo *listenerInfo)
     _stub2ListenerInfos[listenerInfo->stub] = std::make_pair(listenerInfo->evId, --listenerInfos.end());
 
     return LLBC_OK;
+}
+
+void LLBC_EventMgr::HandlePreFiringHookOperations()
+{
+    if (_preFiring > 0)
+        return;
+
+    // Delete removing pre-fire hooks.
+    if (_preFireHookList.size() != _preFireRemovingNameSet.size())
+    {
+        for (auto &name : _preFireRemovingNameSet)
+            RemovePreFireHook(name);
+        _preFireRemovingNameSet.clear();
+    }
+    else
+    {
+        RemoveAllPreFireHooks();
+    }
+}
+
+void LLBC_EventMgr::HandlePostFiringHookOperations()
+{
+    if (_postFiring > 0)
+        return;
+
+    // Delete removing post-fire hooks.
+    if (_postFireHookList.size() != _postFireRemovingNameSet.size())
+    {
+        for (auto &name : _postFireRemovingNameSet)
+            RemovePostFireHook(name);
+        _postFireRemovingNameSet.clear();
+    }
+    else
+    {
+        RemoveAllPostFireHooks();
+    }
 }
 
 __LLBC_NS_END
