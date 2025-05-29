@@ -38,6 +38,7 @@ private:
     int BasicTest();
     int EventFireDeadLoopDetectionTest();
     int CopyEventTest();
+    int EventHookTest();
 
 private:
     void DumpEvParams(const LLBC_Event &ev);
