@@ -50,6 +50,8 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
 LLBC_EventMgr::LLBC_EventMgr()
 : _firing(0)
 , _pendingRemoveAllListeners(false)
+, _preFiring(0)
+, _postFiring(0)
 {
 }
 
