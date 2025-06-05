@@ -45,7 +45,9 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     LLBC_ErrorAndReturnIf(BasicTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ErrorAndReturnIf(EventFireDeadLoopDetectionTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ErrorAndReturnIf(CopyEventTest() != LLBC_OK, LLBC_FAILED);
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
     LLBC_ErrorAndReturnIf(EventHookTest() != LLBC_OK, LLBC_FAILED);
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -262,6 +264,7 @@ int TestCase_Core_Event::CopyEventTest()
     return LLBC_OK;
 }
 
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 int TestCase_Core_Event::EventHookTest()
 {
     LLBC_PrintLn("==================================");
@@ -294,11 +297,12 @@ int TestCase_Core_Event::EventHookTest()
 
     LLBC_PrintLn("----------------------------------");
 
+    auto &subEvHookMgr = subEvMgr.GetEventHookMgr();
 
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Add pre-fire1 hook: [Pre1->Global->Sub] :");
 
-    subEvMgr.AddPreFireHook("PreFire1_Success", [](LLBC_Event *ev) -> bool {
+    subEvHookMgr.AddPreFireHook("PreFire1_Success", [](LLBC_Event *ev) -> bool {
         LLBC_PrintLn("\tPreFire1_Success");
         evMgr.Fire(ev);
         return true;
@@ -316,7 +320,7 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Add post-fire1 hook: [Pre1->Global->Sub->Post1->Global] :");
 
-    subEvMgr.AddPostFireHook("PostFire1", [](LLBC_Event *ev) -> void {
+    subEvHookMgr.AddPostFireHook("PostFire1", [](LLBC_Event *ev) -> void {
         LLBC_PrintLn("\tPostFire1");
         evMgr.Fire(ev);
     });
@@ -333,7 +337,7 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Add pre-fire2 hook: [Pre1->Global->Pre2->Global] :");
 
-    subEvMgr.AddPreFireHook("PreFire2_Fail", [](LLBC_Event *ev) -> bool {
+    subEvHookMgr.AddPreFireHook("PreFire2_Fail", [](LLBC_Event *ev) -> bool {
         LLBC_PrintLn("\tPreFire2_Fail");
         evMgr.Fire(ev);
         return false;
@@ -351,7 +355,7 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Add pre-fire3 hook: [Pre1->Global->Pre2->Global] :");
 
-    subEvMgr.AddPreFireHook("PreFire3_Success", [](LLBC_Event *ev) -> bool {
+    subEvHookMgr.AddPreFireHook("PreFire3_Success", [](LLBC_Event *ev) -> bool {
         LLBC_PrintLn("\tPreFire3_Success");
         evMgr.Fire(ev);
         return true;
@@ -369,7 +373,7 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Remove pre-fire2 hook: [Pre1->Global->Pre3->Global->Sub->Post1->Global] :");
 
-    subEvMgr.RemovePreFireHook("PreFire2_Fail");
+    subEvHookMgr.RemovePreFireHook("PreFire2_Fail");
 
     runTimes = 0;
     subEvMgr.BeginFire(EventIds::Event1)
@@ -393,17 +397,17 @@ int TestCase_Core_Event::EventHookTest()
     // Post4 will add but not do.
     // Remove post3 will not do.
 
-    subEvMgr.AddPostFireHook("PostFire2", [&](LLBC_Event *ev) -> void {
+    subEvHookMgr.AddPostFireHook("PostFire2", [&](LLBC_Event *ev) -> void {
         LLBC_PrintLn("\tPostFire2");
         evMgr.Fire(ev);
 
-        subEvMgr.AddPreFireHook("PreFire4_Success", [&](LLBC_Event *ev) -> bool {
+        subEvHookMgr.AddPreFireHook("PreFire4_Success", [&](LLBC_Event *ev) -> bool {
             LLBC_PrintLn("\tPreFire4_Success");
             evMgr.Fire(ev);
 
-            subEvMgr.RemoveAllPreFireHooks();
+            subEvHookMgr.RemoveAllPreFireHooks();
 
-            subEvMgr.AddPreFireHook("PreFire5_Success", [](LLBC_Event *ev) -> bool {
+            subEvHookMgr.AddPreFireHook("PreFire5_Success", [](LLBC_Event *ev) -> bool {
                 LLBC_PrintLn("\tPreFire5_Success");
                 evMgr.Fire(ev);
                 return true;
@@ -413,15 +417,15 @@ int TestCase_Core_Event::EventHookTest()
         });
     });
 
-    subEvMgr.AddPostFireHook("PostFire3", [&](LLBC_Event *ev) -> void {
+    subEvHookMgr.AddPostFireHook("PostFire3", [&](LLBC_Event *ev) -> void {
         LLBC_PrintLn("\tPostFire3");
         evMgr.Fire(ev);
 
-        subEvMgr.AddPostFireHook("PostFire4", [&](LLBC_Event *ev) -> void {
+        subEvHookMgr.AddPostFireHook("PostFire4", [&](LLBC_Event *ev) -> void {
             LLBC_PrintLn("\tPostFire4");
             evMgr.Fire(ev);
 
-            subEvMgr.RemovePostFireHook("PostFire3");
+            subEvHookMgr.RemovePostFireHook("PostFire3");
         });
     });
 
@@ -441,14 +445,14 @@ int TestCase_Core_Event::EventHookTest()
     // after remove all pre-fire, pre4 add pre5, so pre5 can do.
     // In post4 will remove post3, so post3 can not do.
 
-    subEvMgr.RemovePostFireHook("PostFire2");
+    subEvHookMgr.RemovePostFireHook("PostFire2");
 
-    subEvMgr.AddPreFireHook("PreFire6_Success", [](LLBC_Event *ev) -> bool {
+    subEvHookMgr.AddPreFireHook("PreFire6_Success", [](LLBC_Event *ev) -> bool {
         LLBC_PrintLn("\tPreFire6_Success");
         evMgr.Fire(ev);
         return true;
     });
-    subEvMgr.AddPreFireHook("PreFire7_Success", [](LLBC_Event *ev) -> bool {
+    subEvHookMgr.AddPreFireHook("PreFire7_Success", [](LLBC_Event *ev) -> bool {
         LLBC_PrintLn("\tPreFire7_Success");
         evMgr.Fire(ev);
         return true;
@@ -466,7 +470,7 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Remove all post-fire hooks: [Pre5->Global->Sub] :");
 
-    subEvMgr.RemoveAllPostFireHooks();
+    subEvHookMgr.RemoveAllPostFireHooks();
 
     runTimes = 0;
     subEvMgr.BeginFire(EventIds::Event1)
@@ -480,12 +484,12 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Add pre-fire8、pre-fire9 hook: [Pre5->Global->Pre8->Global->Pre9->Global->Sub] :");
 
-    subEvMgr.AddPreFireHook("PreFire8_Success", [](LLBC_Event *ev) -> bool {
+    subEvHookMgr.AddPreFireHook("PreFire8_Success", [](LLBC_Event *ev) -> bool {
         LLBC_PrintLn("\tPreFire8_Success");
         evMgr.Fire(ev);
         return true;
     });
-    subEvMgr.AddPreFireHook("PreFire9_Success", [](LLBC_Event *ev) -> bool {
+    subEvHookMgr.AddPreFireHook("PreFire9_Success", [](LLBC_Event *ev) -> bool {
         LLBC_PrintLn("\tPreFire9_Success");
         evMgr.Fire(ev);
         return true;
@@ -503,7 +507,7 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("----------------------------------");
     LLBC_PrintLn("Remove all pre-fire hooks: [Sub] :");
 
-    subEvMgr.RemoveAllPreFireHooks();
+    subEvHookMgr.RemoveAllPreFireHooks();
 
     runTimes = 0;
     subEvMgr.BeginFire(EventIds::Event1)
@@ -521,6 +525,7 @@ int TestCase_Core_Event::EventHookTest()
     LLBC_PrintLn("==================================");
     return LLBC_OK;
 }
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
 void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {

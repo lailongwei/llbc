@@ -26,6 +26,9 @@
 __LLBC_NS_BEGIN
 class LLBC_Event;
 class LLBC_EventFirer;
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+class LLBC_EventHookMgr;
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -42,64 +45,10 @@ public:
     LLBC_EventMgr();
     ~LLBC_EventMgr();
 
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 public:
-    /**
-     * Add pre-fire hook.
-     * @param[in] hookName  - hook name.
-     * @param[in] obj       - object.
-     * @param[in] hook      - deleg.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
-     */
-    template <typename ObjectType>
-    int AddPreFireHook(const LLBC_String &hookName, ObjectType *obj, bool (ObjectType::*hook)(LLBC_Event *));
-
-    /**
-     * Add pre-fire hook.
-     * @param[in] hookName  - hook name.
-     * @param[in] hook      - deleg.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
-     */
-    int AddPreFireHook(const LLBC_String &hookName, const LLBC_Delegate<bool(LLBC_Event *)> &hook);
-
-    /**
-     * Remove pre-fire hook using hook name.
-     * @param[in] hookName  - hook name.
-     */
-    void RemovePreFireHook(const LLBC_String &hookName);
-
-    /**
-     * Remove all pre-fire hook.
-     */
-    void RemoveAllPreFireHooks();
-
-    /**
-     * Add post-fire hook.
-     * @param[in] hookName  - hook name.
-     * @param[in] obj       - object.
-     * @param[in] hook      - deleg.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
-     */
-    template <typename ObjectType>
-    int AddPostFireHook(const LLBC_String &hookName, ObjectType *obj, void (ObjectType::*hook)(LLBC_Event *));
-
-    /**
-     * Add post-fire hook.
-     * @param[in] hookName  - hook name.
-     * @param[in] hook      - deleg.
-     * @return int - success if return LLBC_OK, otherwise return LLBC_FAILED.
-     */
-    int AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook);
-
-    /**
-     * Remove post-fire hook using hook name.
-     * @param[in] hookName  - hook name.
-     */
-    void RemovePostFireHook(const LLBC_String &hookName);
-
-    /**
-     * Remove all post-fire hook.
-     */
-    void RemoveAllPostFireHooks();
+    LLBC_EventHookMgr &GetEventHookMgr();
+#endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
 public:
     /**
@@ -207,7 +156,7 @@ protected:
     /**
      * After fire event method.
      */
-    void AfterFireEvent();
+    void AfterFireEvent(LLBC_Event *ev);
 
 protected:
     /**
@@ -259,12 +208,6 @@ private:
     // Add listener info to event manager.
     int AddListenerInfo(_ListenerInfo *listenerInfo);
 
-    // Handle pre-firing hook operations, including the addition and deletion of pre-fire.
-    void HandlePreFiringHookOperations();
-
-    // Handle post-firing hook operations, including the addition and deletion of post-fire.
-    void HandlePostFiringHookOperations();
-
 protected:
     typedef std::list<_ListenerInfo *> _ListenerInfos; // listener info list.
 
@@ -287,29 +230,10 @@ protected:
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
 
-    // Pre-fire info.
-    typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo;
-
-    // Is pre-firing.
-    int _preFiring;
-    // Pre-fire hooks.
-    std::list<_PreFireInfo> _preFireHookList;
-    // Pre-fire hook map.
-    std::map<LLBC_String, std::list<_PreFireInfo>::iterator> _preFireHookMap;
-    // Removing pre-fire hook's names, these hooks should not process.
-    std::set<LLBC_String> _preFireRemovingNameSet;
-
-    // Post-fire info.
-    typedef std::pair<LLBC_String, LLBC_Delegate<void(LLBC_Event *)>> _PostFireInfo;
-
-    // Is post-firing.
-    int _postFiring;
-    // Post-fire hooks.
-    std::list<_PostFireInfo> _postFireHookList;
-    // Post-fire hook map.
-    std::map<LLBC_String, std::list<_PostFireInfo>::iterator> _postFireHookMap;
-    // Removing post-fire hook's names, these hooks should not process.
-    std::set<LLBC_String> _postFireRemovingNameSet;
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    // Event hook manager object, object will create when use GetEventHookMgr.
+    LLBC_EventHookMgr *_eventHookMgr;
+    #endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 };
 
 __LLBC_NS_END

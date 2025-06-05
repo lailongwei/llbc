@@ -29,6 +29,9 @@
 #include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 #include "llbc/core/event/EventFirer.h"
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+#include "llbc/core/event/EventHookMgr.h"
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 #include "llbc/core/event/EventMgr.h"
 
 __LLBC_NS_BEGIN
@@ -50,13 +53,19 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
 LLBC_EventMgr::LLBC_EventMgr()
 : _firing(0)
 , _pendingRemoveAllListeners(false)
-, _preFiring(0)
-, _postFiring(0)
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+, _eventHookMgr(nullptr)
+#endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 {
 }
 
 LLBC_EventMgr::~LLBC_EventMgr()
 {
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    if(_eventHookMgr)
+        LLBC_Recycle(_eventHookMgr);
+    #endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+
     // Assert: Make sure not in firing when delete event mgr.
     ASSERT(!IsFiring() && "Not allow delete LLBC_EventMgr when event firing");
     // Assert: Make sure pending event operations is empty.
@@ -67,108 +76,14 @@ LLBC_EventMgr::~LLBC_EventMgr()
         LLBC_STLHelper::RecycleContainer(it->second);
 }
 
-int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName, const LLBC_Delegate<bool(LLBC_Event *)> &hook)
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+LLBC_EventHookMgr &LLBC_EventMgr::GetEventHookMgr()
 {
-    if (hookName.empty() || !hook)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
-
-    if (_preFireHookMap.find(hookName) != _preFireHookMap.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    _preFireHookList.emplace_back(hookName, hook);
-    _preFireHookMap[hookName] = std::prev(_preFireHookList.end());
-
-    return LLBC_OK;
+    if (!_eventHookMgr)
+        _eventHookMgr = new LLBC_EventHookMgr();
+    return *_eventHookMgr;
 }
-
-void LLBC_EventMgr::RemovePreFireHook(const LLBC_String &hookName)
-{
-    const auto it = _preFireHookMap.find(hookName);
-    if (it == _preFireHookMap.end())
-        return;
-
-    // When pre-firing, recorded in the set, these hooks are not executed.
-    if (_preFiring > 0)
-    {
-        _preFireRemovingNameSet.emplace(hookName);
-        return;
-    }
-
-    // Real delete the hook.
-    _preFireHookList.erase(it->second);
-    _preFireHookMap.erase(it);
-}
-
-void LLBC_EventMgr::RemoveAllPreFireHooks()
-{
-    // When pre-firing, recorded in the set, these hooks are not executed.
-    if (_preFiring > 0)
-    {
-        LLBC_Foreach(_preFireHookList, _preFireRemovingNameSet.emplace(item.first));
-        return;
-    }
-
-    _preFireRemovingNameSet.clear();
-    _preFireHookMap.clear();
-    _preFireHookList.clear();
-}
-
-int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName, const LLBC_Delegate<void(LLBC_Event *)> &hook)
-{
-    if (hookName.empty() || !hook)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
-
-    if (_postFireHookMap.find(hookName) != _postFireHookMap.end())
-    {
-        LLBC_SetLastError(LLBC_ERROR_REPEAT);
-        return LLBC_FAILED;
-    }
-
-    _postFireHookList.emplace_front(hookName, hook);
-    _postFireHookMap[hookName] = _postFireHookList.begin();
-
-    return LLBC_OK;
-}
-
-void LLBC_EventMgr::RemovePostFireHook(const LLBC_String &hookName)
-{
-    const auto it = _postFireHookMap.find(hookName);
-    if (it == _postFireHookMap.end())
-        return;
-
-    // When post-firing, recorded in the set, these hooks are not executed.
-    if (_postFiring > 0)
-    {
-        _postFireRemovingNameSet.emplace(hookName);
-        return;
-    }
-
-    _postFireHookList.erase(it->second);
-    _postFireHookMap.erase(it);
-}
-
-void LLBC_EventMgr::RemoveAllPostFireHooks()
-{
-    // When post-firing, recorded in the set, these hooks are not executed.
-    if (_postFiring > 0)
-    {
-        LLBC_Foreach(_postFireHookList, _postFireRemovingNameSet.emplace(item.first));
-        return;
-    }
-
-    _postFireRemovingNameSet.clear();
-    _postFireHookMap.clear();
-    _postFireHookList.clear();
-}
+#endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
                                              const LLBC_Delegate<void(LLBC_Event &)> &listener,
@@ -364,32 +279,12 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
         }
     }
 
-    // All event manager hooks do post-fire, post-fire do not delete the event obj.
-    const bool oldDontDelAfterFire = ev->IsDontDelAfterFire();
-
-    ev->SetDontDelAfterFire(true);
-
-    // Increase post-firing flag.
-    ++_postFiring;
-    for (auto &[name, postHook] : _postFireHookList)
-    {
-        if (_postFireRemovingNameSet.find(name) == _postFireRemovingNameSet.end())
-            postHook(ev);
-    }
-    // Decrease post-firing flag.
-    --_postFiring;
-    // Handle hook addition and deletion after post-fire().
-    HandlePostFiringHookOperations();
-
-    // After post-fire, event reset the old DONT DEL AFTER FIRE option.
-    ev->SetDontDelAfterFire(oldDontDelAfterFire);
+    // Do after fire event logic.
+    AfterFireEvent(ev);
 
     // Recycle event.
     if (!ev->IsDontDelAfterFire())
         LLBC_Recycle(ev);
-
-    // Do after fire event logic.
-    AfterFireEvent();
 
     return LLBC_OK;
 }
@@ -419,35 +314,11 @@ int LLBC_EventMgr::BeforeFireEvent(LLBC_Event *ev)
     }
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
-    // All event manager hooks do pre-fire, stop continuing fire when the pre-fire execution fails,
-    // pre-fire do not delete the event obj.
-    const bool oldDontDelAfterFire = ev->IsDontDelAfterFire();
-
-    // Increase pre-firing flag.
-    ++_preFiring;
-
-    ev->SetDontDelAfterFire(true);
-    for (auto &[name, preHook] : _preFireHookList)
-    {
-        if (_preFireRemovingNameSet.find(name) == _preFireRemovingNameSet.end() && !preHook(ev))
-        {
-            // Decrease pre-firing flag.
-            --_preFiring;
-            // Handle hook addition and deletion after fire().
-            HandlePreFiringHookOperations();
-            // Set error code.
-            LLBC_SetLastError(LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED);
-            return LLBC_FAILED;
-        }
-    }
-
-    // After pre-fire, event reset the old DONT DEL AFTER FIRE option.
-    ev->SetDontDelAfterFire(oldDontDelAfterFire);
-
-    // Decrease pre-firing flag.
-    --_preFiring;
-    // Handle hook addition and deletion after fire().
-    HandlePreFiringHookOperations();
+    // The event hook manager do pre-fire, stop continuing fire when the pre-fire execution fails.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    if (_eventHookMgr && _eventHookMgr->PreFire(ev) == LLBC_FAILED)
+        return LLBC_FAILED;
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
     // Increase firing flag.
     ++_firing;
@@ -456,13 +327,10 @@ int LLBC_EventMgr::BeforeFireEvent(LLBC_Event *ev)
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     _firingEventIds.push_back(ev->GetId());
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
-
-    // Handle hook addition and deletion after fire().
-    HandlePreFiringHookOperations();
     return LLBC_OK;
 }
 
-void LLBC_EventMgr::AfterFireEvent()
+void LLBC_EventMgr::AfterFireEvent(LLBC_Event *ev)
 {
     // Remove event id from _firingEventIds list.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
@@ -479,6 +347,13 @@ void LLBC_EventMgr::AfterFireEvent()
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     ASSERT(_firingEventIds.empty() && "llbc framework internal error: LLBC_EventMgr._firingEventIds is not empty!");
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+
+    // The event hook manager do post-fire.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    if (_eventHookMgr)
+        _eventHookMgr->PostFire(ev);
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+
 
     // Process pending event ops(add/remove).
     for (auto &pendingEventOp : _pendingEventOps)
@@ -562,42 +437,6 @@ int LLBC_EventMgr::AddListenerInfo(_ListenerInfo *listenerInfo)
     _stub2ListenerInfos[listenerInfo->stub] = std::make_pair(listenerInfo->evId, --listenerInfos.end());
 
     return LLBC_OK;
-}
-
-void LLBC_EventMgr::HandlePreFiringHookOperations()
-{
-    if (_preFiring > 0)
-        return;
-
-    // Delete removing pre-fire hooks.
-    if (_preFireHookList.size() != _preFireRemovingNameSet.size())
-    {
-        for (auto &name : _preFireRemovingNameSet)
-            RemovePreFireHook(name);
-        _preFireRemovingNameSet.clear();
-    }
-    else
-    {
-        RemoveAllPreFireHooks();
-    }
-}
-
-void LLBC_EventMgr::HandlePostFiringHookOperations()
-{
-    if (_postFiring > 0)
-        return;
-
-    // Delete removing post-fire hooks.
-    if (_postFireHookList.size() != _postFireRemovingNameSet.size())
-    {
-        for (auto &name : _postFireRemovingNameSet)
-            RemovePostFireHook(name);
-        _postFireRemovingNameSet.clear();
-    }
-    else
-    {
-        RemoveAllPostFireHooks();
-    }
 }
 
 __LLBC_NS_END
