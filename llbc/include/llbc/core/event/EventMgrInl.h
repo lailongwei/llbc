@@ -26,34 +26,6 @@
 __LLBC_NS_BEGIN
 
 template <typename ObjectType>
-int LLBC_EventMgr::AddPreFireHook(const LLBC_String &hookName,
-                                  ObjectType *obj,
-                                  bool (ObjectType::*hook)(LLBC_Event *))
-{
-    if (!obj || !hook)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
-
-    return this->AddPreFireHook(hookName, LLBC_Delegate<bool(LLBC_Event *)>(obj, hook));
-}
-
-template <typename ObjectType>
-int LLBC_EventMgr::AddPostFireHook(const LLBC_String &hookName,
-                                   ObjectType *obj,
-                                   void (ObjectType::*hook)(LLBC_Event *))
-{
-    if (!obj || !hook)
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
-
-    return this->AddPostFireHook(hookName, LLBC_Delegate<void(LLBC_Event *)>(obj, hook));
-}
-
-template <typename ObjectType>
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id, 
                                              ObjectType *obj, 
                                              void (ObjectType::*listener)(LLBC_Event &),
