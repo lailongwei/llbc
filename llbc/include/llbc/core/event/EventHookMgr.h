@@ -124,11 +124,11 @@ private:
     void HandlePostFiringHookOperations();
 
 private:
+    friend class LLBC_EventMgr;
+
+    // Disable assignment&move-assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_EventHookMgr);
     LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_EventHookMgr);
-
-    // Friend class.
-    friend class LLBC_EventMgr;
 
     // Pre-fire info.
     typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo;
