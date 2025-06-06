@@ -55,7 +55,7 @@ LLBC_EventMgr::LLBC_EventMgr()
 , _pendingRemoveAllListeners(false)
 #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 , _eventHookMgr(nullptr)
-#endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 {
 }
 
@@ -63,8 +63,8 @@ LLBC_EventMgr::~LLBC_EventMgr()
 {
     #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
     if(_eventHookMgr)
-        LLBC_Recycle(_eventHookMgr);
-    #endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+        LLBC_XRecycle(_eventHookMgr);
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
     // Assert: Make sure not in firing when delete event mgr.
     ASSERT(!IsFiring() && "Not allow delete LLBC_EventMgr when event firing");
@@ -83,7 +83,7 @@ LLBC_EventHookMgr &LLBC_EventMgr::GetEventHookMgr()
         _eventHookMgr = new LLBC_EventHookMgr();
     return *_eventHookMgr;
 }
-#endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
                                              const LLBC_Delegate<void(LLBC_Event &)> &listener,

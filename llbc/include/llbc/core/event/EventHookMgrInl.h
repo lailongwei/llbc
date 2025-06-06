@@ -25,8 +25,8 @@ __LLBC_NS_BEGIN
 
 template <typename ObjectType>
 int LLBC_EventHookMgr::AddPreFireHook(const LLBC_String &hookName,
-                                  ObjectType *obj,
-                                  bool (ObjectType::*hook)(LLBC_Event *))
+                                      ObjectType *obj,
+                                      bool (ObjectType::*hook)(LLBC_Event *))
 {
     if (!obj || !hook)
     {
@@ -39,8 +39,8 @@ int LLBC_EventHookMgr::AddPreFireHook(const LLBC_String &hookName,
 
 template <typename ObjectType>
 int LLBC_EventHookMgr::AddPostFireHook(const LLBC_String &hookName,
-                                   ObjectType *obj,
-                                   void (ObjectType::*hook)(LLBC_Event *))
+                                       ObjectType *obj,
+                                       void (ObjectType::*hook)(LLBC_Event *))
 {
     if (!obj || !hook)
     {
