@@ -671,6 +671,16 @@ __LLBC_NS_BEGIN
 #define __LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL ((int)(0x00000035))
 #define LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL   ((int)(0xc0000035))
 
+//
+// Message Id: LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED
+//
+// MessageText:
+//
+// event manager pre fire failed.
+//
+#define __LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED ((int)(0x00000036))
+#define LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED   ((int)(0xc0000036))
+
 
 //
 //!! Sentinel error no.
