@@ -45,11 +45,6 @@ public:
     LLBC_EventMgr();
     ~LLBC_EventMgr();
 
-#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
-public:
-    LLBC_EventHookMgr &GetEventHookMgr();
-#endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
-
 public:
     /**
      * Add event deleg.
@@ -142,6 +137,14 @@ public:
      */
     bool IsFiring() const;
 
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    /**
+     * Get event hook manager object.
+     * @return LLBC_EventHookMgr - create event hook manager object if _eventHookMgr nullptr, and return *_eventHookMgr.
+     */
+    LLBC_EventHookMgr &GetEventHookMgr();
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+
 protected:
     /**
      * Check given listen stub in the event manager exist or not.
@@ -233,7 +236,7 @@ protected:
     #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
     // Event hook manager object, object will create when use GetEventHookMgr.
     LLBC_EventHookMgr *_eventHookMgr;
-    #endif //LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 };
 
 __LLBC_NS_END

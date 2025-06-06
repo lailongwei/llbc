@@ -42,8 +42,8 @@ public:
      */
     LLBC_EventHookMgr();
     ~LLBC_EventHookMgr();
-    LLBC_EventHookMgr(const LLBC_EventHookMgr&) = delete;
-    LLBC_EventHookMgr& operator=(const LLBC_EventHookMgr&) = delete;
+    LLBC_DISABLE_ASSIGNMENT(LLBC_EventHookMgr);
+    LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_EventHookMgr);
 
 public:
     /**
@@ -105,7 +105,6 @@ public:
     void RemoveAllPostFireHooks();
 
 private:
-
     /**
      * Pre-fire event.
      * @param[in] event - event object.
