@@ -42,8 +42,6 @@ public:
      */
     LLBC_EventHookMgr();
     ~LLBC_EventHookMgr();
-    LLBC_DISABLE_ASSIGNMENT(LLBC_EventHookMgr);
-    LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_EventHookMgr);
 
 public:
     /**
@@ -126,10 +124,12 @@ private:
     void HandlePostFiringHookOperations();
 
 private:
+    LLBC_DISABLE_ASSIGNMENT(LLBC_EventHookMgr);
+    LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_EventHookMgr);
+
     // Friend class.
     friend class LLBC_EventMgr;
 
-private:
     // Pre-fire info.
     typedef std::pair<LLBC_String, LLBC_Delegate<bool(LLBC_Event *)>> _PreFireInfo;
 
