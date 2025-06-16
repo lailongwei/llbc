@@ -13,7 +13,7 @@ jobs:
   linux-build:
     name: Linux build job
     runs-on: ubuntu-latest
-    container: docker.io/centos:latest
+    container: docker.io/centos:8
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -31,6 +31,8 @@ jobs:
         run: |
           yum install -y openssl-devel wget tar gcc gcc-c++ libuuid-devel automake autoconf libtool make git cmake python2
           ln -s /usr/bin/python2 /usr/bin/python
+          wget https://github.com/libunwind/libunwind/archive/refs/tags/v1.2.1.tar.gz
+          tar -zxvf v1.2.1.tar.gz && cd libunwind-1.2.1 && ./autogen.sh && ./configure && make && make install
 
       - name: Check out repository code
         uses: actions/checkout@v3

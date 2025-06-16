@@ -84,6 +84,9 @@
 
 // core/event
 #include "llbc/core/event/EventFirer.h"
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+#include "llbc/core/event/EventHookMgr.h"
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 #include "llbc/core/event/EventMgr.h"
 
 // core/timer

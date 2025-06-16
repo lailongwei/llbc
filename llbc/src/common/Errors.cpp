@@ -148,6 +148,8 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "timer scheduler destroying", // 0x0034
     // timer scheduler canceling all.
     "timer scheduler canceling all", // 0x0035
+    // event manager pre fire failed.
+    "event manager pre fire failed", // 0x0036
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;
@@ -254,8 +256,7 @@ const char *LLBC_StrErrorEx(int no, int subErrno)
 
         __LLBC_LockCustomErr();
 
-        typedef std::map<int, LLBC_String>::iterator _Iter;
-        _Iter it = __g_customErrDesc.find(no);
+        const auto it = __g_customErrDesc.find(no);
         const bool found = it != __g_customErrDesc.end();
 
         const char *errDesc =
@@ -457,9 +458,7 @@ int LLBC_RemoveCustomErrno(int no)
 
     __LLBC_LockCustomErr();
 
-    typedef std::map<int, LLBC_String>::iterator _Iter;
-    _Iter it = __g_customErrDesc.find(no);
-
+    const auto it = __g_customErrDesc.find(no);
     const bool found = it != __g_customErrDesc.end();
     if (found)
         __g_customErrDesc.erase(it);

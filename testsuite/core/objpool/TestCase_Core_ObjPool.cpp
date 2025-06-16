@@ -44,6 +44,30 @@ class _OD_E final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_E() over
 class _OD_F final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_F() override { LLBC_PrintLn("_OD_F destruct"); } };
 class _OD_G final : public LLBC_PoolObj { public: void Reuse() {}; ~_OD_G() override { LLBC_PrintLn("_OD_G destruct"); } };
 class _OD_H final : public LLBC_Object { public: ~_OD_H() override { LLBC_PrintLn("_OD_H destruct");}};
+
+struct ReflectMethTest
+{
+    static bool methCalled_GetStripeCapacity;
+    static bool methCalled_OnTypedObjPoolCreated;
+
+    size_t GetStripeCapacity()
+    {
+        LLBC_PrintLn("GetStripeCapacity() reflection method called");
+        methCalled_GetStripeCapacity = true;
+
+        return LLBC_CFG_CORE_OBJPOOL_STRIPE_CAPACITY;
+    }
+
+    void OnTypedObjPoolCreated(LLBC_TypedObjPool<ReflectMethTest> *typedObjPool)
+    {
+        LLBC_PrintLn("OnTypedObjPoolCreated() reflection method called");
+        methCalled_OnTypedObjPoolCreated = true;
+    }
+};
+
+bool ReflectMethTest::methCalled_GetStripeCapacity = false;
+bool ReflectMethTest::methCalled_OnTypedObjPoolCreated = false;
+
 }
 
 class SafeObjPoolPrintNameTask : public LLBC_Task 
@@ -385,6 +409,16 @@ int TestCase_Core_ObjPool::ReflectTest()
     #if (LLBC_CUR_COMP == LLBC_COMP_GCC && LLBC_COMP_MAJOR_VER >= 11) || LLBC_CUR_COMP == LLBC_COMP_CLANG
     #pragma GCC diagnostic pop
     #endif
+
+    // GetStripeCapacity && OnTypedObjPoolCreated reflection method test
+    LLBC_ObjPool objPool;
+    auto testObj = objPool.AcquireGuarded<ReflectMethTest>();
+    LLBC_PrintLn("- Reflection method: GetStripeCapacity() called:%d",
+                 testObj->methCalled_GetStripeCapacity);
+    LLBC_PrintLn("- Reflection method: OnTypedObjPoolCreated() called:%d",
+                 testObj->methCalled_OnTypedObjPoolCreated);
+    ASSERT(testObj->methCalled_GetStripeCapacity &&
+           testObj->methCalled_OnTypedObjPoolCreated);
 
     LLBC_PrintLn("Success");
 

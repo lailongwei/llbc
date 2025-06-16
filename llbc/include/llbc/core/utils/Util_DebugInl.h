@@ -59,6 +59,12 @@ inline void LLBC_Stopwatch::Reset()
     _elapsedTime = 0;
 }
 
+inline void LLBC_Stopwatch::Restart()
+{
+    _elapsedTime = 0;
+    _beginTime = LLBC_RdTsc();
+}
+
 inline LLBC_TimeSpan LLBC_Stopwatch::Elapsed() const
 {
     #if LLBC_SUPPORT_RDTSC

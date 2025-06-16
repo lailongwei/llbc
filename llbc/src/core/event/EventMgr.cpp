@@ -29,6 +29,9 @@
 #include "llbc/core/objpool/ThreadSpecObjPool.h"
 
 #include "llbc/core/event/EventFirer.h"
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+#include "llbc/core/event/EventHookMgr.h"
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 #include "llbc/core/event/EventMgr.h"
 
 __LLBC_NS_BEGIN
@@ -49,13 +52,20 @@ LLBC_EventMgr::_ListenerInfo::~_ListenerInfo()
 
 LLBC_EventMgr::LLBC_EventMgr()
 : _firing(0)
-
 , _pendingRemoveAllListeners(false)
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+, _eventHookMgr(nullptr)
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 {
 }
 
 LLBC_EventMgr::~LLBC_EventMgr()
 {
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    if(_eventHookMgr)
+        LLBC_XRecycle(_eventHookMgr);
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+
     // Assert: Make sure not in firing when delete event mgr.
     ASSERT(!IsFiring() && "Not allow delete LLBC_EventMgr when event firing");
     // Assert: Make sure pending event operations is empty.
@@ -65,6 +75,15 @@ LLBC_EventMgr::~LLBC_EventMgr()
     for (auto it = _id2ListenerInfos.begin(); it != _id2ListenerInfos.end(); ++it)
         LLBC_STLHelper::RecycleContainer(it->second);
 }
+
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+LLBC_EventHookMgr &LLBC_EventMgr::GetEventHookMgr()
+{
+    if (!_eventHookMgr)
+        _eventHookMgr = new LLBC_EventHookMgr();
+    return *_eventHookMgr;
+}
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
 LLBC_ListenerStub LLBC_EventMgr::AddListener(int id,
                                              const LLBC_Delegate<void(LLBC_Event &)> &listener,
@@ -235,7 +254,7 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
     }
 
     // Do before fire event logic.
-    const int ret = BeforeFireEvent(*ev);
+    const int ret = BeforeFireEvent(ev);
     if (UNLIKELY(ret != LLBC_OK))
     {
         if (!ev->IsDontDelAfterFire())
@@ -260,12 +279,12 @@ int LLBC_EventMgr::Fire(LLBC_Event *ev)
         }
     }
 
+    // Do after fire event logic.
+    AfterFireEvent(ev);
+
     // Recycle event.
     if (!ev->IsDontDelAfterFire())
         LLBC_Recycle(ev);
-
-    // Do after fire event logic.
-    AfterFireEvent();
 
     return LLBC_OK;
 }
@@ -283,30 +302,35 @@ bool LLBC_EventMgr::HasStub(const LLBC_ListenerStub &stub) const
     return _stub2ListenerInfos.find(stub) != _stub2ListenerInfos.end();
 }
 
-int LLBC_EventMgr::BeforeFireEvent(const LLBC_Event &ev)
+int LLBC_EventMgr::BeforeFireEvent(LLBC_Event *ev)
 {
     // If event id already in firing, set <REPEAT> error and return failed.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     if (!_firingEventIds.empty() &&
-        std::find(_firingEventIds.begin(), _firingEventIds.end(), ev.GetId()) != _firingEventIds.end())
+        std::find(_firingEventIds.begin(), _firingEventIds.end(), ev->GetId()) != _firingEventIds.end())
     {
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
+    // The event hook manager do pre-fire, stop continuing fire when the pre-fire execution fails.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    if (_eventHookMgr && _eventHookMgr->PreFire(ev) == LLBC_FAILED)
+        return LLBC_FAILED;
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+
     // Increase firing flag.
     ++_firing;
 
     // Add event id to _firingEventIds set.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
-    _firingEventIds.push_back(ev.GetId());
+    _firingEventIds.push_back(ev->GetId());
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
-
     return LLBC_OK;
 }
 
-void LLBC_EventMgr::AfterFireEvent()
+void LLBC_EventMgr::AfterFireEvent(LLBC_Event *ev)
 {
     // Remove event id from _firingEventIds list.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
@@ -323,6 +347,13 @@ void LLBC_EventMgr::AfterFireEvent()
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     ASSERT(_firingEventIds.empty() && "llbc framework internal error: LLBC_EventMgr._firingEventIds is not empty!");
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
+
+    // The event hook manager do post-fire.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    if (_eventHookMgr)
+        _eventHookMgr->PostFire(ev);
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+
 
     // Process pending event ops(add/remove).
     for (auto &pendingEventOp : _pendingEventOps)

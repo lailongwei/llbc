@@ -254,7 +254,7 @@ public:
     /**
      * Object-Pool event handler: typed object pool created.
      */
-    void OnTypedObjPoolCreated(LLBC_ObjPool *objPool);
+    void OnTypedObjPoolCreated(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool);
 
 public:
     /**

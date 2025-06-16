@@ -128,9 +128,10 @@ void LLBC_Packet::SetTypedObjPool(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool)
     _typedObjPool = typedObjPool;
 }
 
-void LLBC_Packet::OnTypedObjPoolCreated(LLBC_ObjPool *objPool)
+void LLBC_Packet::OnTypedObjPoolCreated(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool)
 {
     // Set delete order: LLBC_Packet <- LLBC_MessageBlock.
+    auto objPool = typedObjPool->GetObjPool();
     objPool->EnsureDeletionBefore<LLBC_Packet, LLBC_MessageBlock>();
 }
 
