@@ -80,7 +80,7 @@
 // Enable(or disable) the event fire dead loop detection, disabled by default.
 #define LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION 0
 // Enable(or disable) the event hook, enable by default.
-#define LLBC_CFG_CORE_ENABLE_EVENT_HOOK                     1
+#define LLBC_CFG_CORE_ENABLE_EVENT_HOOK                     0
 
 /**
  * \brief core/utils about config options define.
