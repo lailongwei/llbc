@@ -36,6 +36,8 @@ public:
 private:
     void OSTimeTest();
 
+    void ConstexprTimeSpanTest();
+
     void TimeClassTest();
     void TimeSpanClassTest();
     void CpuTimeTest();

@@ -77,6 +77,12 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         sw.Resume();
         LLBC_Sleep(618);
         LLBC_PrintLn("- After Resume & sleep 618ms, watcher: %s", sw.ToString().c_str());
+
+        sw.Restart();
+        LLBC_Sleep(618);
+        sw.Restart();
+        LLBC_Sleep(618);
+        LLBC_PrintLn("- After Restart & sleep 618ms(2 times), watcher: %s", sw.ToString().c_str());
     }
 
     // - Construct from ticks test.
