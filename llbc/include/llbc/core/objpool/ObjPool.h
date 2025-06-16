@@ -391,7 +391,16 @@ private:
     static size_t GetStripeCapacityInl(
         stripe_capacity_detectable_type<Obj, &Obj::GetStripeCapacity> *)
     {
+        #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wnonnull"
+        #endif
+
         return reinterpret_cast<Obj *>(NULL)->GetStripeCapacity();
+
+        #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+        #pragma GCC diagnostic pop
+        #endif
     }
 
     template <typename Obj>
@@ -415,7 +424,16 @@ private:
     static void OnTypedObjPoolCreatedInl(LLBC_TypedObjPool<Obj> *typedObjPool,
                                          typed_obj_pool_created_ev_handler<Obj, &Obj::OnTypedObjPoolCreated> *)
     {
+        #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wnonnull"
+        #endif
+
         return reinterpret_cast<Obj *>(NULL)->OnTypedObjPoolCreated(typedObjPool);
+
+        #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+        #pragma GCC diagnostic pop
+        #endif
     }
 
     template <typename Obj>
