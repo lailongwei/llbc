@@ -404,7 +404,7 @@ public:
     template <typename Obj>
     static void OnTypedObjPoolCreated(LLBC_TypedObjPool<Obj> *typedObjPool)
     {
-        OnTypedObjPoolCreatedInl(typedObjPool, 0);
+        OnTypedObjPoolCreatedInl<Obj>(typedObjPool, 0);
     }
 
 private:
