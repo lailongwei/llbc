@@ -161,6 +161,9 @@ LLBC_TypedObjPool<Obj>::~LLBC_TypedObjPool()
 template <typename Obj>
 Obj *LLBC_TypedObjPool<Obj>::Acquire()
 {
+    #if LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
+    return new Obj;
+    #else // Don't use malloc instead.
     _WrappedObj *wrappedObj;
 
     // Lock & Find _WrappedObj.
@@ -214,11 +217,15 @@ Obj *LLBC_TypedObjPool<Obj>::Acquire()
 
     // Return obj.
     return reinterpret_cast<Obj *>(wrappedObj->buff);
+    #endif // LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
 }
 
 template <typename Obj>
 void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
 {
+    #if LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
+    delete obj;
+    #else // Don't use malloc instead.
     // Get wrap obj.
     auto wrappedObj = reinterpret_cast<_WrappedObj *>(reinterpret_cast<uint8 *>(obj) - _objOffset);
 
@@ -266,6 +273,7 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
 
     // Unlock.
     __LLBC_INL_UnlockObjPool();
+    #endif // LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
 }
 
 template <typename Obj>
@@ -538,6 +546,9 @@ inline LLBC_ObjPool::~LLBC_ObjPool()
 template <typename Obj>
 void LLBC_ObjPool::Release(Obj *obj)
 {
+    #if LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
+    delete obj;
+    #else // Don't use malloc instead.
     // Get wrapped object.
     auto wrappedObj = reinterpret_cast<typename LLBC_TypedObjPool<Obj>::_WrappedObj *>(
         reinterpret_cast<uint8 *>(obj) - LLBC_TypedObjPool<Obj>::_objOffset);
@@ -552,6 +563,7 @@ void LLBC_ObjPool::Release(Obj *obj)
     (*reinterpret_cast<void(**)(void *, void *)>(
         reinterpret_cast<uint8 *>(wrappedObj->typedObjPool) -
             off))(wrappedObj->typedObjPool, obj);
+    #endif // LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD
 }
 
 inline void LLBC_ObjPool::Collect(bool deep)

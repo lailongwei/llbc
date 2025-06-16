@@ -88,6 +88,11 @@ public:
     void Reset();
 
     /**
+     * Restart time interval measurement(Reset() + Resume()).
+     */
+    void Restart();
+
+    /**
      * Gets a value indicating whether the Stopwatch timer is running.
      * @return bool - the running flag.
      */

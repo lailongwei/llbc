@@ -49,17 +49,17 @@ public:
     /**
      * Convenience span construct methods.
      */
-    LLBC_NO_DISCARD static
+    LLBC_NO_DISCARD static constexpr
     LLBC_TimeSpan FromDays(int days, int hours = 0, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
-    LLBC_NO_DISCARD static
+    LLBC_NO_DISCARD static constexpr
     LLBC_TimeSpan FromHours(int hours, int minutes = 0, int seconds = 0, int millis = 0, int micros = 0);
-    LLBC_NO_DISCARD static
+    LLBC_NO_DISCARD static constexpr
     LLBC_TimeSpan FromMinutes(int minutes, int seconds = 0, int millis = 0, int micros = 0);
-    LLBC_NO_DISCARD static
+    LLBC_NO_DISCARD static constexpr
     LLBC_TimeSpan FromSeconds(int seconds, int millis = 0, int micros = 0);
-    LLBC_NO_DISCARD static
+    LLBC_NO_DISCARD static constexpr
     LLBC_TimeSpan FromMillis(sint64 millis, sint64 micros = 0);
-    LLBC_NO_DISCARD static
+    LLBC_NO_DISCARD static constexpr
     LLBC_TimeSpan FromMicros(sint64 micros);
     template <size_t _StrArrLen>
     LLBC_NO_DISCARD static
@@ -72,6 +72,25 @@ public:
     FromSpanStr(const _StrType &spanStr);
     LLBC_NO_DISCARD static
     LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
+
+public:
+    /**
+     * Construct by time tick, in micro-seconds.
+     * @param[in] spanInMicros - the span value, in micro-seconds.
+     */
+    explicit constexpr LLBC_TimeSpan(const sint64 &spanInMicros = 0);
+
+    /**
+     * Construct by span string representation, fmt: [DD ][HH:]MM:SS[.Micros].
+     * @param[in] spanStr - the span value string representation.
+     */
+    template <size_t _StrArrLen>
+    explicit LLBC_TimeSpan(const char (&spanStr)[_StrArrLen]);
+    explicit LLBC_TimeSpan(const char *spanStr);
+    template <typename _StrType,
+              typename = typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, _StrType>::type>
+    explicit LLBC_TimeSpan(const _StrType &spanStr);
+    explicit LLBC_TimeSpan(const LLBC_String &spanStr);
 
 public:
     /**
@@ -95,55 +114,36 @@ public:
 
 public:
     /**
-     * Construct by time tick, in micro-seconds.
-     * @param[in] spanInMicros - the span value, in micro-seconds.
-     */
-    explicit LLBC_TimeSpan(const sint64 &spanInMicros = 0);
-
-    /**
-     * Construct by span string representation, fmt: [DD ][HH:]MM:SS[.Micros].
-     * @param[in] spanStr - the span value string representation.
-     */
-    template <size_t _StrArrLen>
-    explicit LLBC_TimeSpan(const char (&spanStr)[_StrArrLen]);
-    explicit LLBC_TimeSpan(const char *spanStr);
-    template <typename _StrType,
-              typename = typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, _StrType>::type>
-    explicit LLBC_TimeSpan(const _StrType &spanStr);
-    explicit LLBC_TimeSpan(const LLBC_String &spanStr);
-
-public:
-    /**
      * Get days/hours/minutes/seconds/milli-seconds/micro-seconds.
      * @return int - the time span parts value.
      */
-    int GetDays() const;
-    int GetHours() const;
-    int GetMinutes() const;
-    int GetSeconds() const;
-    int GetMillis() const;
-    int GetMicros() const;
+    constexpr int GetDays() const;
+    constexpr int GetHours() const;
+    constexpr int GetMinutes() const;
+    constexpr int GetSeconds() const;
+    constexpr int GetMillis() const;
+    constexpr int GetMicros() const;
 
-    int GetTotalDays() const;
-    int GetTotalHours() const;
-    int GetTotalMinutes() const;
-    int GetTotalSeconds() const;
-    sint64 GetTotalMillis() const;
-    sint64 GetTotalMicros() const;
+    constexpr int GetTotalDays() const;
+    constexpr int GetTotalHours() const;
+    constexpr int GetTotalMinutes() const;
+    constexpr int GetTotalSeconds() const;
+    constexpr sint64 GetTotalMillis() const;
+    constexpr sint64 GetTotalMicros() const;
 
-    LLBC_TimeSpan AddDays(int days) const;
-    LLBC_TimeSpan AddHours(int hours) const;
-    LLBC_TimeSpan AddMinutes(int minutes) const;
-    LLBC_TimeSpan AddSeconds(int seconds) const;
-    LLBC_TimeSpan AddMillis(sint64 millis) const;
-    LLBC_TimeSpan AddMicros(sint64 micros) const;
+    constexpr LLBC_TimeSpan AddDays(int days) const;
+    constexpr LLBC_TimeSpan AddHours(int hours) const;
+    constexpr LLBC_TimeSpan AddMinutes(int minutes) const;
+    constexpr LLBC_TimeSpan AddSeconds(int seconds) const;
+    constexpr LLBC_TimeSpan AddMillis(sint64 millis) const;
+    constexpr LLBC_TimeSpan AddMicros(sint64 micros) const;
 
-    LLBC_TimeSpan operator+(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator-(const LLBC_TimeSpan &span) const;
-    LLBC_TimeSpan operator*(double scale) const;
-    LLBC_TimeSpan operator/(double scale) const;
-    LLBC_TimeSpan operator%(sint64 span) const;
-    LLBC_TimeSpan operator%(const LLBC_TimeSpan &span) const;
+    constexpr LLBC_TimeSpan operator+(const LLBC_TimeSpan &span) const;
+    constexpr LLBC_TimeSpan operator-(const LLBC_TimeSpan &span) const;
+    constexpr LLBC_TimeSpan operator*(double scale) const;
+    constexpr LLBC_TimeSpan operator/(double scale) const;
+    constexpr LLBC_TimeSpan operator%(sint64 span) const;
+    constexpr LLBC_TimeSpan operator%(const LLBC_TimeSpan &span) const;
 
     LLBC_TimeSpan &operator+=(const LLBC_TimeSpan &span);
     LLBC_TimeSpan &operator-=(const LLBC_TimeSpan &span);
@@ -152,14 +152,12 @@ public:
     LLBC_TimeSpan &operator%=(sint64 span);
     LLBC_TimeSpan &operator%=(const LLBC_TimeSpan &span);
 
-    bool operator==(const LLBC_TimeSpan &span) const;
-    bool operator!=(const LLBC_TimeSpan &span) const;
-    bool operator<(const LLBC_TimeSpan &span)const;
-    bool operator>(const LLBC_TimeSpan &span) const;
-    bool operator<=(const LLBC_TimeSpan &span) const;
-    bool operator>=(const LLBC_TimeSpan &span) const;
-
-    LLBC_TimeSpan &operator=(const LLBC_TimeSpan &span);
+    constexpr bool operator==(const LLBC_TimeSpan &span) const;
+    constexpr bool operator!=(const LLBC_TimeSpan &span) const;
+    constexpr bool operator<(const LLBC_TimeSpan &span)const;
+    constexpr bool operator>(const LLBC_TimeSpan &span) const;
+    constexpr bool operator<=(const LLBC_TimeSpan &span) const;
+    constexpr bool operator>=(const LLBC_TimeSpan &span) const;
 
 public:
     /**
@@ -182,7 +180,7 @@ private:
      * @param spanStr    - the span string.
      * @param spanStrLen - the span string length.
      */
-    explicit LLBC_TimeSpan(const char *spanStr, size_t spanStrLen);
+    LLBC_TimeSpan(const char *spanStr, size_t spanStrLen);
 
 private:
     // Declare friend class:LLBC_Time.

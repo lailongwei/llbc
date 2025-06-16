@@ -297,6 +297,8 @@ project "llbc"
             "dl",
             "uuid",
             "pthread",
+            "unwind",
+            "unwind-x86_64",
         }
     filter { "system:windows" }
         links {

@@ -38,6 +38,9 @@ private:
     int BasicTest();
     int EventFireDeadLoopDetectionTest();
     int CopyEventTest();
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    int EventHookTest();
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
 private:
     void DumpEvParams(const LLBC_Event &ev);

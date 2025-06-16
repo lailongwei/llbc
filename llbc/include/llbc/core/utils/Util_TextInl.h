@@ -273,4 +273,5 @@ inline LLBC_String LLBC_NumToStrInHex(const void *val)
 {
     return LLBC_NumToStrInHex(const_cast<void *>(val));
 }
+
 __LLBC_NS_END
