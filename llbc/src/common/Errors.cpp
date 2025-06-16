@@ -148,6 +148,8 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "timer scheduler destroying", // 0x0034
     // timer scheduler canceling all.
     "timer scheduler canceling all", // 0x0035
+    // event manager pre fire failed.
+    "event manager pre fire failed", // 0x0036
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;

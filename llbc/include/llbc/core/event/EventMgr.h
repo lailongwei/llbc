@@ -26,6 +26,9 @@
 __LLBC_NS_BEGIN
 class LLBC_Event;
 class LLBC_EventFirer;
+#if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+class LLBC_EventHookMgr;
+#endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 __LLBC_NS_END
 
 __LLBC_NS_BEGIN
@@ -134,6 +137,14 @@ public:
      */
     bool IsFiring() const;
 
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    /**
+     * Get event hook manager object.
+     * @return LLBC_EventHookMgr - create event hook manager object if _eventHookMgr nullptr, and return *_eventHookMgr.
+     */
+    LLBC_EventHookMgr &GetEventHookMgr();
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+
 protected:
     /**
      * Check given listen stub in the event manager exist or not.
@@ -143,12 +154,12 @@ protected:
     /**
      * Before fire event method.
      */
-    int BeforeFireEvent(const LLBC_Event &ev);
+    int BeforeFireEvent(LLBC_Event *ev);
 
     /**
      * After fire event method.
      */
-    void AfterFireEvent();
+    void AfterFireEvent(LLBC_Event *ev);
 
 protected:
     /**
@@ -221,6 +232,11 @@ protected:
     std::set<int> _pendingRemoveEventIds_;
     // Pending remove event stubs, used for prevent event firing in event firing.
     std::set<LLBC_ListenerStub> _pendingRemoveStubs_;
+
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    // Event hook manager object, object will create when use GetEventHookMgr.
+    LLBC_EventHookMgr *_eventHookMgr;
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 };
 
 __LLBC_NS_END
