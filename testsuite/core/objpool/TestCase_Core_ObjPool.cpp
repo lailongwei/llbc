@@ -407,7 +407,7 @@ int TestCase_Core_ObjPool::ReflectTest()
     #endif
 
     LLBC_ObjReflector::Delete<_ReusableClass>(objPtr);
-    #ifdef __SANITIZE_ADDRESS__
+    #ifdef LLBC_ASAN
         delete objPtr;
     #else
         free(objPtr);

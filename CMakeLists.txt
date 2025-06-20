@@ -23,15 +23,15 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
 endif()
 
-# Enable AddressSanitizer when build type is Debug.
-if(CMAKE_BUILD_TYPE MATCHES Debug)
+# Set ASAN options.
+SET(ENABLE_ASAN OFF CACHE BOOL "enable address sanitize")
+if(ENABLE_ASAN AND NOT WIN32)
 	set(SANITIZER_FLAGS
 		-fsanitize=address
 		-fno-omit-frame-pointer
 		-g)
-	add_compile_options(${SANITIZER_FLAGS} )
+	add_compile_options(${SANITIZER_FLAGS})
 	add_link_options(${SANITIZER_FLAGS})
-	add_compile_definitions(ASAN)
 endif()
 
 # Set llbc core lib directory.

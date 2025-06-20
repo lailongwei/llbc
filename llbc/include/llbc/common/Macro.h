@@ -80,7 +80,7 @@
 #endif
 
 // ASAN marco define.
-#ifdef ASAN
+#ifdef __SANITIZE_ADDRESS__
  #ifndef LLBC_ASAN
   #define LLBC_ASAN 1
  #endif
