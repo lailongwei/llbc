@@ -79,6 +79,17 @@
  #define LLBC_RELEASE 1
 #endif
 
+// ASAN marco define.
+#ifdef __SANITIZE_ADDRESS__
+ #ifndef LLBC_ASAN
+  #define LLBC_ASAN 1
+ #endif
+#else
+ #ifdef LLBC_ASAN
+  #error "Defined LLBC_ASAN macro, but ASAN macro undefined!"
+ #endif
+#endif
+
 // Exception throw macro define.
 #define LLBC_THROW(e, s) throw e(s)
 

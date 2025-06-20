@@ -157,8 +157,17 @@ LLBC_FORCE_INLINE LLBC_Stream::LLBC_Stream(void *buf, size_t size, bool attach)
 
 LLBC_FORCE_INLINE LLBC_Stream::~LLBC_Stream()
 {
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wfree-nonheap-object"
+    #endif
+
     if (_buf && !_attach)
         free(_buf);
+
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    #pragma GCC diagnostic pop
+    #endif
 }
 
 LLBC_FORCE_INLINE void LLBC_Stream::Attach(const LLBC_Stream &rhs)
@@ -180,7 +189,7 @@ LLBC_FORCE_INLINE void LLBC_Stream::Attach(const LLBC_Stream &rhs)
 
 LLBC_FORCE_INLINE void LLBC_Stream::Attach(void *buf, size_t size)
 {
-    if (buf && !_attach)
+    if (_buf && !_attach)
         free(_buf);
 
     _readPos = 0;

@@ -374,8 +374,11 @@ int TestCase_Core_ObjPool::ReflectTest()
     LLBC_PrintLn("Reuse method reflect test:");
     auto intPtr = new int(3);
     LLBC_ObjReflector::Reuse<int>(intPtr);
+    delete intPtr;
+
     auto mapPtr = new std::map<int, int>;
     LLBC_ObjReflector::Reuse<std::map<int, int> >(mapPtr);
+    delete mapPtr;
 
     class _ReusableClass
     {
@@ -404,7 +407,11 @@ int TestCase_Core_ObjPool::ReflectTest()
     #endif
 
     LLBC_ObjReflector::Delete<_ReusableClass>(objPtr);
-    free(objPtr);
+    #ifdef LLBC_ASAN
+        delete objPtr;
+    #else
+        free(objPtr);
+    #endif
 
     #if (LLBC_CUR_COMP == LLBC_COMP_GCC && LLBC_COMP_MAJOR_VER >= 11) || LLBC_CUR_COMP == LLBC_COMP_CLANG
     #pragma GCC diagnostic pop
@@ -514,7 +521,8 @@ int TestCase_Core_ObjPool::MultiThreadThread()
             auto threadId = LLBC_GetCurrentThreadId();
             LLBC_PrintLn("Thread %d begin test objpool...", threadId);
 
-            _testedTimes.SetValue(new size_t(0));
+            size_t value = 0;
+            _testedTimes.SetValue(&value);
             while (*_testedTimes != _needTestTimes)
             {
                 ++*_testedTimes;

@@ -23,6 +23,17 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
 endif()
 
+# Set ASAN options.
+SET(ENABLE_ASAN OFF CACHE BOOL "enable address sanitize")
+if(ENABLE_ASAN AND NOT WIN32)
+	set(SANITIZER_FLAGS
+		-fsanitize=address
+		-fno-omit-frame-pointer
+		-g)
+	add_compile_options(${SANITIZER_FLAGS})
+	add_link_options(${SANITIZER_FLAGS})
+endif()
+
 # Set llbc core lib directory.
 set(LLBC_LIB_DIR ${PROJECT_SOURCE_DIR}/llbc)
 # Set llbc testsuite directory.

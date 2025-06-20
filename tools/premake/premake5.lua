@@ -53,6 +53,9 @@ local llbc_ccpp_compile_toolset = nil -- nil/''/gcc/clang/msc/custom_ccpp_toolse
 -- set custom compile toolset, if <llbc_ccpp_compile_toolset> set to 'custom_ccpp_toolset'.
 -- set_custom_ccpp_toolset('<path to ccpp compiler toolset bin path>')
 
+-- set asan enable flag.
+local asan_enable = false
+
 -- determine system type.
 local llbc_system_types = {
     ['windows'] = 'windows',
@@ -251,6 +254,13 @@ workspace ("llbc_" .. _ACTION)
     filter { "system:not windows", "language:c++" }
         linkoptions { "-rdynamic" }
     filter {}
+
+    if asan_enable then
+        filter { "system:not windows", "language:c++" }
+            linkoptions { "-fsanitize=address -fno-omit-frame-pointer -g" }
+            buildoptions { "-fsanitize=address -fno-omit-frame-pointer -g" }
+        filter {}
+    end
 
 -- ****************************************************************************
 -- llbc core library compile setting.
