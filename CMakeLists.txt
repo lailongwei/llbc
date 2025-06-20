@@ -23,6 +23,17 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
 endif()
 
+# Enable AddressSanitizer when build type is Debug.
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+	set(SANITIZER_FLAGS
+		-fsanitize=address
+		-fno-omit-frame-pointer
+		-g)
+	add_compile_options(${SANITIZER_FLAGS} )
+	add_link_options(${SANITIZER_FLAGS})
+	add_compile_definitions(ASAN)
+endif()
+
 # Set llbc core lib directory.
 set(LLBC_LIB_DIR ${PROJECT_SOURCE_DIR}/llbc)
 # Set llbc testsuite directory.

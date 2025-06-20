@@ -24,6 +24,10 @@
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/os/OS_Thread.h"
 
+#ifdef LLBC_ASAN
+#include "sanitizer/asan_interface.h"
+#endif
+
 // The object pool lock operation macros define.
 #if LLBC_TARGET_PLATFORM_WIN32
  #define __LLBC_INL_InitObjPoolLock() \
@@ -213,6 +217,9 @@ Obj *LLBC_TypedObjPool<Obj>::Acquire()
     }
 
     // Mask obj in using.
+    #ifdef LLBC_ASAN
+    __asan_unpoison_memory_region(wrappedObj->buff, sizeof(wrappedObj->buff));
+    #endif
     wrappedObj->unFlags.flags.inUsing = true;
 
     // Return obj.
@@ -245,6 +252,9 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
         wrappedObj->unFlags.flags.constructed = false;
     }
     wrappedObj->unFlags.flags.inUsing = false;
+    #ifdef LLBC_ASAN
+    __asan_poison_memory_region(wrappedObj->buff, sizeof(wrappedObj->buff));
+    #endif
 
     // Get stripe.
     auto stripe = wrappedObj->stripeOrNextFreeObj.stripe;
@@ -300,6 +310,9 @@ void LLBC_TypedObjPool<Obj>::Collect(bool deep)
 
             if (wrappedObj->unFlags.flags.constructed)
             {
+                #ifdef LLBC_ASAN
+                __asan_unpoison_memory_region(wrappedObj->buff, sizeof(wrappedObj->buff));
+                #endif
                 LLBC_ObjReflector::Delete<Obj>(wrappedObj->buff);
                 wrappedObj->unFlags.flags.constructed = false;
                 --_reusableObjCount;
@@ -414,6 +427,9 @@ void LLBC_TypedObjPool<Obj>::DeleteStripe(_ObjStripe *stripe)
             LLBC_ObjReflector::IsReusable<Obj>())
             LLBC_ObjReflector::Reuse<Obj>(wrappedObj->buff);
 
+        #ifdef LLBC_ASAN
+        __asan_unpoison_memory_region(wrappedObj->buff, sizeof(wrappedObj->buff));
+        #endif
         LLBC_ObjReflector::Delete<Obj>(wrappedObj->buff);
     }
 

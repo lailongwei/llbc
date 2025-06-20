@@ -892,7 +892,7 @@ _StlContainerSerTest()
     s << c1 >> c2;
     LLBC_ErrorAndReturnIf(c1 != c2, LLBC_FAILED);
     LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
-    LLBC_ErrorAndReturnIf(s.GetWritePos() != sizeof(uint32) + sizeof(int) * contSize, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(s.GetWritePos() != sizeof(uint32) + sizeof(int) * c1.size(), LLBC_FAILED);
     LLBC_PrintLn("  - c1: %s", LLBC_Variant(c1).ValueToString().c_str());
     LLBC_PrintLn("  - c2: %s", LLBC_Variant(c2).ValueToString().c_str());
 
@@ -917,7 +917,7 @@ _StlContainerSerTest()
     LLBC_ErrorAndReturnIf(s.GetReadPos() != s.GetWritePos(), LLBC_FAILED);
     LLBC_ErrorAndReturnIf(s.GetWritePos() != sizeof(uint32) +
                                              (sizeof(typename Container::key_type) +
-                                             sizeof(typename Container::mapped_type)) * contSize,
+                                             sizeof(typename Container::mapped_type)) * c1.size(),
                           LLBC_FAILED);
     LLBC_PrintLn("  - c1: %s", LLBC_Variant(c1).ValueToString().c_str());
     LLBC_PrintLn("  - c2: %s", LLBC_Variant(c2).ValueToString().c_str());
