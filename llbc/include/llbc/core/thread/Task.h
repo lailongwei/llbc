@@ -22,7 +22,9 @@
 #pragma once
 
 #include "llbc/core/os/OS_Thread.h"
-#include "llbc/core/thread/MessageQueue.h"
+#include "llbc/core/thread/SpinLock.h"
+
+#include "llbc/core/thread/TaskQueue.h"
 
 __LLBC_NS_BEGIN
 
@@ -63,11 +65,12 @@ public:
 /**
  * \brief Task class encapsulation.
  */
-class LLBC_EXPORT LLBC_Task
+template<typename Queue>
+class LLBC_TaskBase : public Queue
 {
 public:
-    LLBC_Task(LLBC_ThreadMgr *threadMgr = nullptr);
-    virtual ~LLBC_Task();
+    LLBC_TaskBase(LLBC_ThreadMgr *threadMgr = nullptr);
+    virtual ~LLBC_TaskBase();
 
 public:
     /**
@@ -121,56 +124,19 @@ public:
     /**
      * Cleanup method, when all threads terminated, will call this method to cleanup task.
      */
-    virtual void Cleanup() = 0; 
-
-public:
-    /**
-     * Push message block to task.
-     * @param[in] block - message block.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int Push(LLBC_MessageBlock *block);
+    virtual void Cleanup() = 0;
 
     /**
-     * Pop message block from task.
-     * @param[out] block - message block.
-     * @return int - return 0 if success, otherwise return -1.
+     * Get current thread processor id.
+     * @return int - current thread processor id.
      */
-    virtual int Pop(LLBC_MessageBlock *&block);
-
-    /**
-     * Pop all message blocks from task.
-     * @param[out] blocks - the message blocks.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int PopAll(LLBC_MessageBlock *&blocks);
-
-    /**
-     * Try pop message block from task.
-     * @param[out] block - message block.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    virtual int TryPop(LLBC_MessageBlock *&block);
-
-    /**
-     * Timed pop message block from task.
-     * @param[out] block   - message block.
-     * @param[in] interval - interval, in milliseconds.
-     * @return int -  return 0 if success, otherwise return -1.
-     */
-    virtual int TimedPop(LLBC_MessageBlock *&block, int interval);
-
-    /**
-     * Get unprocessed message size.
-     * @return size_t - the unprocessed message size.
-     */
-    size_t GetMessageSize() const;
+    static int GetProcessorId();
 
 private:
     /**
      * Disable assignment.
      */
-    LLBC_DISABLE_ASSIGNMENT(LLBC_Task);
+    LLBC_DISABLE_ASSIGNMENT(LLBC_TaskBase);
 
     /*
      * Task internal cleanup.
@@ -194,9 +160,20 @@ private:
     volatile int _threadNum;
     volatile int _activatingThreadNum;
     volatile int _inSvcMethThreadNum;
+    volatile int _activatedThreadNum;
 
-    LLBC_MessageQueue _msgQueue;
+    static thread_local int _processorId;
 };
+
+/**
+ * \brief Task class encapsulation.
+ */
+class LLBC_EXPORT LLBC_Task : public LLBC_TaskBase<LLBC_TaskQueue>{};
+
+/**
+ * \brief Task class encapsulation.
+ */
+class LLBC_EXPORT LLBC_MultiThreadTask : public LLBC_TaskBase<LLBC_MultiThreadTaskQueue>{};
 
 __LLBC_NS_END
 
