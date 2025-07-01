@@ -96,13 +96,17 @@ public:
     LLBC_NO_DISCARD static LLBC_Time FromTimeVal(const timeval &timeVal);
     LLBC_NO_DISCARD static LLBC_Time FromTimeSpec(const timespec &timeSpec);
     template <size_t _StrArrLen>
-    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char (&timeStr)[_StrArrLen]);
-    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char *timeStr);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char (&timeStr)[_StrArrLen],
+                                                 const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char *timeStr,
+                                                 const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
     template <typename _StrType>
     LLBC_NO_DISCARD static
     typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
-    FromTimeStr(const _StrType &timeStr);
-    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const LLBC_String &timeStr);
+    FromTimeStr(const _StrType &timeStr,
+                const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const LLBC_String &timeStr,
+                                                 const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
     LLBC_NO_DISCARD static LLBC_Time FromTimeStruct(const tm &timeStruct,
                                                     int milliSec = 0,
                                                     int microSec = 0);
@@ -414,9 +418,12 @@ private:
      * 
      * @param[in] timeStr    - the time string representatin, eg: 2024-09-10 18:19:30.123456
      * @param[in] timeStrLen - the time string length, not included '\0'.
+     * @param[in] timeSep    - the time separator.
      * @return LLBC_Time - time obuect.
      */
-    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char *timeStr, size_t timeStrLen);
+    LLBC_NO_DISCARD static LLBC_Time FromTimeStr(const char *timeStr,
+                                                 size_t timeStrLen,
+                                                 const LLBC_TimeSep &timeSep);
 
     /**
      * Internal constructor.

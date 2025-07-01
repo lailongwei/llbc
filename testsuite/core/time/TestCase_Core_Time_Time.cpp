@@ -302,8 +302,8 @@ void TestCase_Core_Time_Time::TimeClassTest()
     ts.tv_sec = 10000000; ts.tv_nsec = 123456;
     std::cout <<"FromTimeSpec(ts.sec=10000000, ts.tv_nsec=123456): " <<LLBC_Time::FromTimeSpec(ts) <<std::endl;
 
-    auto fromTimeStrTest = [](const char *timeStr) {
-        LLBC_Time fromTimeRepr = LLBC_Time::FromTimeStr(timeStr);
+    auto fromTimeStrTest = [](const char *timeStr, const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft) {
+        LLBC_Time fromTimeRepr = LLBC_Time::FromTimeStr(timeStr, timeSep);
         std::cout <<"FromTimeStr(" <<timeStr <<"): " <<fromTimeRepr <<std::endl;
         std::cout <<"    millisec: " <<fromTimeRepr.GetMillisecond() <<", microsec: " <<fromTimeRepr.GetMicrosecond() <<std::endl;
     };
@@ -328,6 +328,12 @@ void TestCase_Core_Time_Time::TimeClassTest()
     fromTimeStrTest("-- :.345678");
     fromTimeStrTest("-- ::.345678");
 
+    LLBC_TimeSep timeSep;
+    timeSep.YMDSep = '/';
+    timeSep.HMSSep = '.';
+    timeSep.microSecSep = '#';
+    fromTimeStrTest("2025/07/01 20.05.08#123456", timeSep);
+
     size_t fromTimeStrPerfTestTimes = 100000;
     std::vector<LLBC_String> testTimeStrs {
         "2024-09-01 21:55:55.332345",
@@ -343,9 +349,10 @@ void TestCase_Core_Time_Time::TimeClassTest()
         for (size_t j = 0; j < testTimeStrs.size(); ++j)
         {
             auto fromTimeStrTime = LLBC_Time::FromTimeStr(testTimeStrs[j]);
-            std::cout << "LLBC_Time::FromTimeStr(): " << testTimeStrs[j]
-                      << "to " << fromTimeStrTime.GetTimestampInSecs()
-                      << std::endl;
+            // std::cout << "LLBC_Time::FromTimeStr(): " << testTimeStrs[j]
+            //           << "to " << fromTimeStrTime.GetTimestampInSecs()
+            //           << std::endl;
+            ASSERT(fromTimeStrTime.ToString() == testTimeStrs[j]);
         }
     }
     const auto costTime = LLBC_GetMicroseconds() - begTime;
@@ -411,6 +418,14 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
     std::cout << "LLBC_TimeSpan::FromSpanStr(\"-8 01:02:03:04:05\"): " << LLBC_TimeSpan::FromSpanStr("-8 01:02:03:04:05") << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(std::string(\"05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr(std::string("05 01:02:03.04")) << std::endl;
     std::cout << "LLBC_TimeSpan::FromSpanStr(LLBC_String(\"05 01:02:03.04\"): " << LLBC_TimeSpan::FromSpanStr(LLBC_String("05 01:02:03.04")) << std::endl;
+
+    LLBC_TimeSep timeSep;
+    timeSep.datetimeSep = '#';
+    timeSep.HMSSep = '/';
+    timeSep.microSecSep = '*';
+    std::cout << "LLBC_TimeSpan::FromSpanStr(\"6#08/56/55*123456\"): "
+              << LLBC_TimeSpan::FromSpanStr("6#08/56/55*123456", timeSep)
+              << std::endl;
 
     std::cout << "LLBC_TimeSpan::FromSpanStr() performance test:" << std::endl;
     #if LLBC_DEBUG
