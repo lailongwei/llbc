@@ -180,7 +180,7 @@ LLBC_FORCE_INLINE void LLBC_Stream::Attach(const LLBC_Stream &rhs)
 
 LLBC_FORCE_INLINE void LLBC_Stream::Attach(void *buf, size_t size)
 {
-    if (buf && !_attach)
+    if (_buf && !_attach)
         free(_buf);
 
     _readPos = 0;
