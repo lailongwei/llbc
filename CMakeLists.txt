@@ -1,6 +1,11 @@
 # CMake minimum version.
 cmake_minimum_required(VERSION 3.2)
 
+# Setup c/cxx compilers and linker(if needed).
+# set(CMAKE_C_COMPILER "<path/to/your/c_compiler>")
+# set(CMAKE_CXX_COMPILER "<path/to/your/cxx_compiler")
+# set(CMAKE_LINKER, "<path/to/your/linker>")
+
 # Set custom compiler, if you need.
 # set(CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir")
 # set(STDC_LIB_DIR "${CUSTOM_COMPILE_TOOLSET_DIR}/lib64")
