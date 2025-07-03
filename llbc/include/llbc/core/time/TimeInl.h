@@ -79,26 +79,30 @@ inline LLBC_Time LLBC_Time::FromTimeSpec(const timespec &timeSpec)
 }
 
 template <size_t _StrArrLen>
-LLBC_Time LLBC_Time::FromTimeStr(const char (&timeStr)[_StrArrLen])
+LLBC_Time LLBC_Time::FromTimeStr(const char (&timeStr)[_StrArrLen],
+                                 const LLBC_TimeSep &timeSep)
 {
-    return FromTimeStr(timeStr, _StrArrLen - 1);
+    return FromTimeStr(timeStr, _StrArrLen - 1, timeSep);
 }
 
-inline LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr)
+inline LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr,
+                                        const LLBC_TimeSep &timeSep)
 {
-    return FromTimeStr(timeStr, strlen(timeStr));
+    return FromTimeStr(timeStr, strlen(timeStr), timeSep);
 }
 
 template <typename _StrType>
 typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_Time>::type
-LLBC_Time::FromTimeStr(const _StrType &timeStr)
+LLBC_Time::FromTimeStr(const _StrType &timeStr,
+                       const LLBC_TimeSep &timeSep)
 {
-    return FromTimeStr(timeStr.c_str(), timeStr.size());
+    return FromTimeStr(timeStr.c_str(), timeStr.size(), timeSep);
 }
 
-inline LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr)
+inline LLBC_Time LLBC_Time::FromTimeStr(const LLBC_String &timeStr,
+                                        const LLBC_TimeSep &timeSep)
 {
-    return FromTimeStr(timeStr.c_str(), timeStr.size());
+    return FromTimeStr(timeStr.c_str(), timeStr.size(), timeSep);
 }
 
 inline int LLBC_Time::GetYear() const

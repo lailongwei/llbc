@@ -71,26 +71,30 @@ constexpr LLBC_TimeSpan LLBC_TimeSpan::FromMicros(sint64 micros)
 }
 
 template <size_t _StrArrLen>
-LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const char (&spanStr)[_StrArrLen])
+LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const char (&spanStr)[_StrArrLen],
+                                         const LLBC_TimeSep &timeSep)
 {
-    return LLBC_TimeSpan(spanStr, _StrArrLen - 1);
+    return LLBC_TimeSpan(spanStr, _StrArrLen - 1, timeSep);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const char *spanStr)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const char *spanStr,
+                                                const LLBC_TimeSep &timeSep)
 {
-    return LLBC_TimeSpan(spanStr, strlen(spanStr));
+    return LLBC_TimeSpan(spanStr, strlen(spanStr), timeSep);
 }
 
 template <typename _StrType>
 typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_TimeSpan>::type
-LLBC_TimeSpan::FromSpanStr(const _StrType &spanStr)
+LLBC_TimeSpan::FromSpanStr(const _StrType &spanStr,
+                           const LLBC_TimeSep &timeSep)
 {
-    return LLBC_TimeSpan(spanStr.c_str(), spanStr.size());
+    return LLBC_TimeSpan(spanStr.c_str(), spanStr.size(), timeSep);
 }
 
-inline LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const LLBC_String &spanStr)
+inline LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const LLBC_String &spanStr,
+                                                const LLBC_TimeSep &timeSep)
 {
-    return LLBC_TimeSpan(spanStr.c_str(), spanStr.size());
+    return LLBC_TimeSpan(spanStr.c_str(), spanStr.size(), timeSep);
 }
 
 constexpr LLBC_TimeSpan::LLBC_TimeSpan(const sint64 &spanInMicros)
@@ -99,24 +103,28 @@ constexpr LLBC_TimeSpan::LLBC_TimeSpan(const sint64 &spanInMicros)
 }
 
 template <size_t _StrArrLen>
-LLBC_TimeSpan::LLBC_TimeSpan(const char (&spanStr)[_StrArrLen])
-: LLBC_TimeSpan(spanStr, _StrArrLen -1)
+LLBC_TimeSpan::LLBC_TimeSpan(const char (&spanStr)[_StrArrLen],
+                             const LLBC_TimeSep &timeSep)
+: LLBC_TimeSpan(spanStr, _StrArrLen -1, timeSep)
 {
 }
 
-inline LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr)
-: LLBC_TimeSpan(spanStr, strlen(spanStr))
+inline LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr,
+                                    const LLBC_TimeSep &timeSep)
+: LLBC_TimeSpan(spanStr, strlen(spanStr), timeSep)
 {
 }
 
 template <typename _StrType, typename>
-LLBC_TimeSpan::LLBC_TimeSpan(const _StrType &spanStr)
-: LLBC_TimeSpan(spanStr.c_str(), spanStr.size())
+LLBC_TimeSpan::LLBC_TimeSpan(const _StrType &spanStr,
+                             const LLBC_TimeSep &timeSep)
+: LLBC_TimeSpan(spanStr.c_str(), spanStr.size(), timeSep)
 {
 }
 
-inline LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &spanStr)
-: LLBC_TimeSpan(spanStr.c_str(), spanStr.size())
+inline LLBC_TimeSpan::LLBC_TimeSpan(const LLBC_String &spanStr,
+    const LLBC_TimeSep &timeSep)
+: LLBC_TimeSpan(spanStr.c_str(), spanStr.size(), timeSep)
 {
 }
 
