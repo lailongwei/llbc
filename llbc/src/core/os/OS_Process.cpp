@@ -61,7 +61,7 @@ __LLBC_INTERNAL_NS_END
 #if LLBC_TARGET_PLATFORM_WIN32
 __LLBC_INTERNAL_NS_BEGIN
 
-static char __dumpFilePath[MAX_PATH + 1];
+static char __dumpFilePath[LLBC_PATH_MAX + 1];
 
 static void __GetExceptionBackTrace(PCONTEXT ctx, char *stackBacktrace, size_t backtraceSize)
 {
@@ -251,13 +251,13 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static char __exeFilePath[PATH_MAX + 1];
-static char __corePattern[PATH_MAX + 1];
-static char __coreDescFilePath[PATH_MAX + 1];
-static char __shellCmd[PATH_MAX * 2 + 256 + 1];
+static char __exeFilePath[LLBC_PATH_MAX + 1];
+static char __corePattern[LLBC_PATH_MAX + 1];
+static char __coreDescFilePath[LLBC_PATH_MAX + 1];
+static char __shellCmd[LLBC_PATH_MAX * 2 + 256 + 1];
 static int __crashSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 static char __coreSym[2048];
-static char __coreFormat[PATH_MAX + 2048 + 128];
+static char __coreFormat[LLBC_PATH_MAX + 2048 + 128];
 
 static volatile bool __handlingCrashSignals = false;
 static const char *__corePatternPath = "/proc/sys/kernel/core_pattern";
@@ -320,7 +320,7 @@ static void __NonWin32CrashHandler(int sig)
     }
 
     // Get executable file path.
-    ssize_t readLinkRet = readlink("/proc/self/exe", __exeFilePath, PATH_MAX);
+    ssize_t readLinkRet = readlink("/proc/self/exe", __exeFilePath, sizeof(__exeFilePath) - 1);
     LLBC_DoIf(readLinkRet == -1, raise(sig));
 
     __exeFilePath[readLinkRet] = '\0';
