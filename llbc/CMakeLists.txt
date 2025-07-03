@@ -1,7 +1,7 @@
 # Set project name.
 project(llbc_lib)
 
-# Recurse all cpp/mm/... files.
+# Recurse all source files.
 file(GLOB_RECURSE LLBC_LIB_COMMON_SRC_FILES *.cpp)
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     file(GLOB_RECURSE LLBC_LIB_PLATFORM_SRC_FILES *.mm)
