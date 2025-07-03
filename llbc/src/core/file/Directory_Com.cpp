@@ -599,59 +599,14 @@ int LLBC_Directory::GetDirectories(const LLBC_String &path, LLBC_Strings &direct
 #endif // LLBC_TARGET_PLATFORM_WIN32
 }
 
-LLBC_String LLBC_Directory::ModuleFileDir()
+LLBC_String LLBC_Directory::ModuleFileDir(bool readLink)
 {
-    return DirName(ModuleFilePath());
+    return DirName(ModuleFilePath(readLink));
 }
 
-LLBC_String LLBC_Directory::ModuleFileName()
+LLBC_String LLBC_Directory::ModuleFileName(bool readLink)
 {
-    return BaseName(ModuleFilePath());
-}
-
-LLBC_String LLBC_Directory::ModuleFilePath()
-{
-#if LLBC_TARGET_PLATFORM_WIN32
-    DWORD ret;
-    size_t bufLen = MAX_PATH + 1;
-    char *buf = LLBC_Malloc(char, bufLen);
-    while ((ret = ::GetModuleFileNameA(nullptr, buf, static_cast<DWORD>(bufLen))) == bufLen)
-        buf = LLBC_Realloc(char, buf, bufLen * 2);
-
-    if (ret == 0)
-    {
-
-        free(buf);
-        LLBC_SetLastError(LLBC_ERROR_OSAPI); 
-        return "";
-    }
-
-    buf[ret] = '\0';
-    LLBC_String modFileName(buf);
-    free(buf);
-
-    return modFileName;
-#elif LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
-    char buf[PATH_MAX + 1];
-    uint32 size = sizeof(buf);
-    if (_NSGetExecutablePath(buf, &size) != 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return "";
-    }
-
-    return LLBC_String(buf, size);
-#else // Linux/Android
-    ssize_t ret = -1;
-    char buf[PATH_MAX + 1];
-    if ((ret = readlink("/proc/self/exe", buf, PATH_MAX)) == -1)
-    {
-        LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return "";
-    }
-
-    return LLBC_String(buf, ret);
-#endif // Win32
+    return BaseName(ModuleFilePath(readLink));
 }
 
 LLBC_String LLBC_Directory::DirName(const LLBC_String &path)

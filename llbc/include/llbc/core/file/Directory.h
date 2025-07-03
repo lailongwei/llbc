@@ -120,21 +120,30 @@ public:
 public:
     /**
      * Get current executable module file directory.
+     * Remarks:
+     * - In Win32 platform, readLink param has no effect.
+     * @param[in] readLink - whether read link(if current executable is link), default is true.
      * @return LLBC_String - the module file directory.
      */
-    static LLBC_String ModuleFileDir();
+    static LLBC_String ModuleFileDir(bool readLink = true);
 
     /**
      * Get current executable module file name.
+     * Remarks:
+     * - In Win32 platform, readLink param has no effect.
+     * @param[in] readLink - whether read link(if current executable is link), default is true.
      * @return LLBC_String - the module file name.
      */
-    static LLBC_String ModuleFileName();
+    static LLBC_String ModuleFileName(bool readLink = true);
 
     /**
      * Get current executable module file path(dir + name).
+     * Remarks:
+     * - In Win32 platform, readLink param has no effect.
+     * @param[in] readLink - whether read link(if current executable is link), default is true.
      * @return LLBC_String - the module file path.
      */
-    static LLBC_String ModuleFilePath();
+    static LLBC_String ModuleFilePath(bool readLink = true);
 
     /**
      * Get given path directory name.
