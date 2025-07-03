@@ -1,8 +1,12 @@
 # Set project name.
 project(llbc_lib)
 
-# Recurse all cpp files.
-file(GLOB_RECURSE LLBC_LIB_SRC_FILES *.cpp *.mm)
+# Recurse all cpp/mm/... files.
+file(GLOB_RECURSE LLBC_LIB_COMMON_SRC_FILES *.cpp)
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    file(GLOB_RECURSE LLBC_LIB_PLATFORM_SRC_FILES *.mm)
+endif()
+set(SOURCES ${LLBC_LIB_COMMON_SRC_FILES} ${LLBC_LIB_PLATFORM_SRC_FILES})
 
 # Include llbc lib directory.
 set(LLBC_LIB_INCLUDE ${LLBC_LIB_DIR}/include)
@@ -24,12 +28,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 
 # Build core library static library.
 set(LLBC_LIB_STATIC ${PROJECT_NAME})
-add_library(${LLBC_LIB_STATIC} STATIC ${LLBC_LIB_SRC_FILES})
+add_library(${LLBC_LIB_STATIC} STATIC ${SOURCES})
 target_link_libraries(${LLBC_LIB_STATIC})
 target_compile_definitions(${LLBC_LIB_STATIC} PRIVATE -DLLBC_LIB_STATIC)
 
 # Build core library shared library.
 set(LLBC_LIB_SHARED ${PROJECT_NAME}_shared)
-add_library(${LLBC_LIB_SHARED} SHARED ${LLBC_LIB_SRC_FILES})
+add_library(${LLBC_LIB_SHARED} SHARED ${SOURCES})
 target_link_libraries(${LLBC_LIB_SHARED} ${LLBC_LIB_LINK_LIB})
 target_compile_definitions(${LLBC_LIB_SHARED} PRIVATE -DLLBC_LIB_SHARED)
