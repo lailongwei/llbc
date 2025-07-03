@@ -41,6 +41,7 @@ struct LLBC_EXPORT __LLBC_LibTls
         char errDesc[__LLBC_ERROR_DESC_SIZE];
         char customErrDesc[__LLBC_ERROR_DESC_SIZE];
         char clibErrFmtBuf[__LLBC_CLIB_ERROR_FORMAT_BUF_SIZE];
+        char pathBuf[LLBC_PATH_MAX + 1];
         char rtti[__LLBC_RTTI_BUF_SIZE];
     } commonTls;
 
