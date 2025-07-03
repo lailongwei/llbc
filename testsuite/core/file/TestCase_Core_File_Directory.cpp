@@ -306,9 +306,12 @@ int TestCase_Core_File_Directory::GetDirectoriesTest()
 int TestCase_Core_File_Directory::ModuleFileTest()
 {
     LLBC_PrintLn("ModuleFile test:");
-    LLBC_PrintLn("Module file name: %s", LLBC_Directory::ModuleFileName().c_str());
-    LLBC_PrintLn("Module file directory: %s", LLBC_Directory::ModuleFileDir().c_str());
-    LLBC_PrintLn("Module file path: %s", LLBC_Directory::ModuleFilePath().c_str());
+    LLBC_PrintLn("Module file name(readLink = true): %s", LLBC_Directory::ModuleFileName().c_str());
+    LLBC_PrintLn("Module file name(readLink = false): %s", LLBC_Directory::ModuleFileName(false).c_str());
+    LLBC_PrintLn("Module file directory(readLink = true): %s", LLBC_Directory::ModuleFileDir().c_str());
+    LLBC_PrintLn("Module file directory(readLink = false): %s", LLBC_Directory::ModuleFileDir(false).c_str());
+    LLBC_PrintLn("Module file path(readLink = true): %s", LLBC_Directory::ModuleFilePath().c_str());
+    LLBC_PrintLn("Module file path(readLink = false): %s", LLBC_Directory::ModuleFilePath(false).c_str());
 
     LLBC_Print("\n");
 
