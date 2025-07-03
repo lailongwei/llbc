@@ -252,6 +252,11 @@ workspace ("llbc_" .. _ACTION)
         linkoptions { "-rdynamic" }
     filter {}
 
+    -- add Foundation framework on macosx platform.
+    filter { "system:macosx", "language:c++" }
+        linkoptions { "-framework Foundation" }
+    filter {}
+
 -- ****************************************************************************
 -- llbc core library compile setting.
 project "llbc"
