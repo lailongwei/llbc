@@ -33,13 +33,12 @@ LLBC_String LLBC_Directory::ModuleFilePath(bool readLink)
 #if LLBC_TARGET_PLATFORM_WIN32
     // Call WIN32 API, get module file path.
     DWORD ret;
-    size_t bufLen = MAX_PATH + 1;
+    size_t bufLen = LLBC_PATH_MAX + 1;
     char *buf = LLBC_Malloc(char, bufLen);
     while ((ret = ::GetModuleFileNameA(nullptr, buf, static_cast<DWORD>(bufLen))) == bufLen)
         buf = LLBC_Realloc(char, buf, bufLen * 2);
     if (ret == 0)
     {
-
         free(buf);
         LLBC_SetLastError(LLBC_ERROR_OSAPI); 
         return "";
@@ -53,19 +52,18 @@ LLBC_String LLBC_Directory::ModuleFilePath(bool readLink)
     return modFilePath;
 #else // LLBC_TARGET_PLATFORM_MAC == 0 && LLBC_TARGET_PLATFORM_IPHONE == 0
     ssize_t pathLen;
-    char buf[PATH_MAX + 1];
-
+    auto &pathBuf = __LLBC_GetLibTls()->commonTls.pathBuf;
     if (readLink)
     {
         // Read link.
-        if ((pathLen = readlink("/proc/self/exe", buf, PATH_MAX)) == -1)
+        if ((pathLen = readlink("/proc/self/exe", pathBuf, sizeof(pathBuf))) == -1)
         {
             LLBC_SetLastError(LLBC_ERROR_CLIB);
             return "";
         }
 
         // Convert to LLBC_String.
-        return LLBC_String(buf, pathLen);
+        return LLBC_String(pathBuf, pathLen);
     }
     else
     {
@@ -83,8 +81,8 @@ LLBC_String LLBC_Directory::ModuleFilePath(bool readLink)
         while ((ch = fgetc(f)) != EOF)
         {
             LLBC_BreakIf(ch == '\0');
-            buf[pathLen++] = static_cast<char>(ch);
-            if (UNLIKELY(pathLen == sizeof(buf)))
+            pathBuf[pathLen++] = static_cast<char>(ch);
+            if (UNLIKELY(pathLen == sizeof(pathBuf)))
             {
                 LLBC_SetLastError(LLBC_ERROR_LIMIT);
                 fclose(f);
@@ -110,7 +108,7 @@ LLBC_String LLBC_Directory::ModuleFilePath(bool readLink)
             return "";
         }
 
-        return AbsPath(LLBC_String(buf, pathLen));
+        return AbsPath(LLBC_String(pathBuf, pathLen));
     }
 #endif // Win32
 }
@@ -129,15 +127,15 @@ LLBC_String LLBC_Directory::DocDir()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     return HomeDir();
 #else // Win32
-    CHAR buf[MAX_PATH];
-    memset(buf, 0, sizeof(CHAR) * MAX_PATH);
-    if (::SHGetSpecialFolderPathA(nullptr, buf, CSIDL_COMMON_DOCUMENTS, FALSE) == FALSE)
+    auto &pathBuf = __LLBC_GetLibTls()->commonTls.pathBuf;
+    memset(pathBuf, 0, sizeof(pathBuf));
+    if (::SHGetSpecialFolderPathA(nullptr, pathBuf, CSIDL_COMMON_DOCUMENTS, FALSE) == FALSE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return "";
     }
 
-    return buf;
+    return pathBuf;
 #endif // Non-Win32
 }
 
@@ -219,7 +217,7 @@ LLBC_String LLBC_Directory::TempDir()
         return "";
     }
 
-    LPSTR buf = reinterpret_cast<LPSTR>(malloc(sizeof(CHAR) * bufLen));
+    LPSTR buf = reinterpret_cast<LPSTR>(malloc(bufLen));
     if (::GetTempPathA(bufLen, buf) == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -242,15 +240,15 @@ LLBC_String LLBC_Directory::CacheDir()
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     return "/tmp";
 #else // Win32
-    CHAR buf[MAX_PATH];
-    memset(buf, 0, sizeof(CHAR) * MAX_PATH);
-    if (::SHGetSpecialFolderPathA(nullptr, buf, CSIDL_INTERNET_CACHE, FALSE) == FALSE)
+    auto &pathBuf = __LLBC_GetLibTls()->commonTls.pathBuf;
+    memset(pathBuf, 0, sizeof(pathBuf));
+    if (::SHGetSpecialFolderPathA(nullptr, pathBuf, CSIDL_INTERNET_CACHE, FALSE) == FALSE)
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
         return "";
     }
  
-    return buf;
+    return pathBuf;
 #endif
 }
 

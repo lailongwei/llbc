@@ -26,10 +26,6 @@
  #include <dirent.h>
 #endif // Non-Win32
 
-#if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
- #include <mach-o/dyld.h>
-#endif
-
 #include "llbc/core/file/Directory.h"
 #include "llbc/core/file/File.h"
 
@@ -663,15 +659,8 @@ LLBC_String LLBC_Directory::BaseName(const LLBC_String &path)
 LLBC_String LLBC_Directory::CurDir()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    uint32 bufLen = 0;
-#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    bufLen = PATH_MAX;
-#else
-    bufLen = MAXPATHLEN;
-#endif
-    
-    char cwd[bufLen];
-    if (!getcwd(cwd, bufLen))
+    auto &cwd = __LLBC_GetLibTls()->commonTls.pathBuf;
+    if (!getcwd(cwd, sizeof(cwd)))
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_String();

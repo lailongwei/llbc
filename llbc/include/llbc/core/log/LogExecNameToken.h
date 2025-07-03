@@ -57,11 +57,7 @@ public:
     void Format(const LLBC_LogData &data, LLBC_String &formattedData) const override;
 
 private:
-    #if LLBC_TARGET_PLATFORM_WIN32
-    char _execName[MAX_PATH + 1];
-    #else
-    char _execName[PATH_MAX + 1];
-    #endif
+    char _execName[LLBC_PATH_MAX + 1];
     size_t _execNameLen;
 };
 

@@ -206,6 +206,13 @@
 #define ASSERT(x) assert(x)
 #endif
 
+// PATH_MAX macro define.
+#if LLBC_TARGET_PLATFORM_WIN32
+#define LLBC_PATH_MAX MAX_PATH
+#else // Non-Win32
+#define LLBC_PATH_MAX PATH_MAX
+#endif // Win32
+
 // Symbol concat macro define.
 #define LLBC_Concat(x, y)  LLBC_IConcat(x, y)
 #define LLBC_IConcat(x, y) x##y

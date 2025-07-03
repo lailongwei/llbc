@@ -2,7 +2,7 @@
 project(llbc_lib)
 
 # Recurse all cpp files.
-file(GLOB_RECURSE LLBC_LIB_SRC_FILES *.cpp)
+file(GLOB_RECURSE LLBC_LIB_SRC_FILES *.cpp *.mm)
 
 # Include llbc lib directory.
 set(LLBC_LIB_INCLUDE ${LLBC_LIB_DIR}/include)
