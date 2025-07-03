@@ -13,28 +13,36 @@
 
 // iPhone/Macosx implementation:
 #if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
-#import <Foundation/Foundation.h>
+ #include <mach-o/dyld.h>
  __LLBC_NS_BEGIN
 LLBC_String LLBC_Directory::ModuleFilePath(bool readLink)
 {
-    if (readLink)
+    // Get executable path.
+    auto &commonTls = __LLBC_GetLibTls()->commonTls;
+    auto &pathBuf = commonTls.pathBuf;
+    uint32 size = sizeof(pathBuf);
+    if (UNLIKELY(_NSGetExecutablePath(pathBuf, &size) != 0))
     {
-        char buf[PATH_MAX + 1];
-        uint32 size = sizeof(buf);
-        if (_NSGetExecutablePath(buf, &size) != 0)
-        {
-            LLBC_SetLastError(LLBC_ERROR_CLIB);
-            return "";
-        }
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return "";
+    }
 
-        return LLBC_String(buf, size);
-    }
-    else
+    // If dont't need read link, return.
+    if (!readLink)
+        return pathBuf;
+
+    // Get real path && return.
+    // Note: Use libTls.commonTls.rtti buf to call realpath() for improve performance.
+    auto &rttiBuf = commonTls.rtti;
+    static_assert(sizeof(rttiBuf) >= sizeof(pathBuf),
+                  "llbc framework internal error, rtti buf size must be greater then or equal to path buf size");
+    if (UNLIKELY(realpath(pathBuf, rttiBuf) == nullptr))
     {
-        NSProcessInfo *processInfo = [NSProcessInfo processInfo];
-        NSString *executablePath = [[processInfo arguments] objectAtIndex:0];
-        return AbsPath([executablePath UTF8String]);
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return "";
     }
+
+    return rttiBuf;
 }
 __LLBC_NS_END
 #endif // iPhone/Macosx

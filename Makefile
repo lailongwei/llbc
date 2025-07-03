@@ -147,7 +147,7 @@ $(CSWRAP_TARGET): $(CORELIB_TARGET)
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_native.make
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc.make
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_testsuite.make
-$(LUWRAP_LUALIB_TARGET):
+$(LUWRAP_LUALIB_TARGET): $(PREMAKE_TARGET)
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_lualib.make
 $(LUWRAP_LUAEXE_TARGET): $(LUWRAP_LUALIB_TARGET)
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_luaexec.make
