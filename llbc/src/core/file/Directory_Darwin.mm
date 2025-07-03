@@ -13,6 +13,7 @@
 
 // iPhone/Macosx implementation:
 #if LLBC_TARGET_PLATFORM_IPHONE || LLBC_TARGET_PLATFORM_MAC
+ #include <mach-o/dyld.h>
 #import <Foundation/Foundation.h>
  __LLBC_NS_BEGIN
 LLBC_String LLBC_Directory::ModuleFilePath(bool readLink)
