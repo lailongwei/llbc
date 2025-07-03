@@ -681,7 +681,6 @@ __LLBC_NS_BEGIN
 #define __LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED ((int)(0x00000036))
 #define LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED   ((int)(0xc0000036))
 
-
 //
 //!! Sentinel error no.
 //

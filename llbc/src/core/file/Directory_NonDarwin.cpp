@@ -24,6 +24,102 @@
 
 #include "llbc/core/file/Directory.h"
 
+#if LLBC_TARGET_PLATFORM_IOS == 0 && LLBC_TARGET_PLATFORM_MAC == 0
+
+__LLBC_NS_BEGIN
+
+LLBC_String LLBC_Directory::ModuleFilePath(bool readLink)
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    // Call WIN32 API, get module file path.
+    DWORD ret;
+    size_t bufLen = MAX_PATH + 1;
+    char *buf = LLBC_Malloc(char, bufLen);
+    while ((ret = ::GetModuleFileNameA(nullptr, buf, static_cast<DWORD>(bufLen))) == bufLen)
+        buf = LLBC_Realloc(char, buf, bufLen * 2);
+    if (ret == 0)
+    {
+
+        free(buf);
+        LLBC_SetLastError(LLBC_ERROR_OSAPI); 
+        return "";
+    }
+
+    // Convert to LLBC_String and free buffer.
+    LLBC_String modFilePath(buf, ret);
+    free(buf);
+
+    // Return.
+    return modFilePath;
+#else // LLBC_TARGET_PLATFORM_MAC == 0 && LLBC_TARGET_PLATFORM_IPHONE == 0
+    ssize_t pathLen;
+    char buf[PATH_MAX + 1];
+
+    if (readLink)
+    {
+        // Read link.
+        if ((pathLen = readlink("/proc/self/exe", buf, PATH_MAX)) == -1)
+        {
+            LLBC_SetLastError(LLBC_ERROR_CLIB);
+            return "";
+        }
+
+        // Convert to LLBC_String.
+        return LLBC_String(buf, pathLen);
+    }
+    else
+    {
+        // Open cmdline file.
+        FILE *f = fopen("/proc/self/cmdline", "rb");
+        if (UNLIKELY(!f))
+        {
+            LLBC_SetLastError(LLBC_ERROR_CLIB);
+            return "";
+        }
+
+        // Read first argument.
+        int ch;
+        pathLen = 0;
+        while ((ch = fgetc(f)) != EOF)
+        {
+            LLBC_BreakIf(ch == '\0');
+            buf[pathLen++] = static_cast<char>(ch);
+            if (UNLIKELY(pathLen == sizeof(buf)))
+            {
+                LLBC_SetLastError(LLBC_ERROR_LIMIT);
+                fclose(f);
+                return "";
+            }
+        }
+
+        // Process I/O error.
+        if (UNLIKELY(ch == EOF && ferror(f)))
+        {
+            LLBC_SetLastError(LLBC_ERROR_CLIB);
+            fclose(f);
+            return "";
+        }
+
+        // Close cmdline file.
+        fclose(f);
+
+        // Process unknown error.
+        if (UNLIKELY(pathLen == 0))
+        {
+            LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+            return "";
+        }
+
+        return AbsPath(LLBC_String(buf, pathLen));
+    }
+#endif // Win32
+}
+
+__LLBC_NS_END
+
+#endif // LLBC_TARGET_PLATFORM_IOS == 0 && LLBC_TARGET_PLATFORM_MAC == 0
+
+
 #if LLBC_TARGET_PLATFORM_NON_IPHONE
 
 __LLBC_NS_BEGIN
