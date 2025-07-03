@@ -27,6 +27,8 @@
 
 __LLBC_NS_BEGIN
 
+const LLBC_TimeSep LLBC_TimeSep::dft;
+
 const LLBC_TimeSpan LLBC_TimeSpan::zero = LLBC_TimeSpan::FromSeconds(0);
 const LLBC_TimeSpan LLBC_TimeSpan::oneSec = LLBC_TimeSpan::FromSeconds(1);
 const LLBC_TimeSpan LLBC_TimeSpan::oneMillisec = LLBC_TimeSpan::FromMillis(1);
@@ -57,7 +59,9 @@ const LLBC_TimeSpan LLBC_TimeSpan::negOneWeek = LLBC_TimeSpan::FromDays(-7);
         _span += atoi(numFmtBuf) * spanFactor;                              \
     }                                                                       \
 
-LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
+LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr,
+                             size_t spanStrLen,
+                             const LLBC_TimeSep &timeSep)
 : _span(0)
 {
     // Time span string format:
@@ -99,7 +103,10 @@ LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
     char numFmtBuf[12];
     const char *dayPartEnd = spanStr;
     while (++dayPartEnd != spanStrEnd)
-        LLBC_BreakIf(LLBC_IsSpace(*dayPartEnd));
+    {
+        LLBC_BreakIf(*dayPartEnd == timeSep.datetimeSep ||
+                     (timeSep.datetimeSep == ' ' && LLBC_IsSpace(*dayPartEnd)));
+    }
     if (dayPartEnd != spanStrEnd)
     {
         size_t dayPartLen = static_cast<size_t>(dayPartEnd - spanStr);
@@ -114,16 +121,16 @@ LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
         }
     }
 
-    // - Search all colons pos.
-    size_t colonSize = 0;
-    const char *colonPoses[2]{nullptr, nullptr};
+    // - Search all HH:MM:SS pos.
+    size_t hmsSize = 0;
+    const char *hmsPoses[2]{nullptr, nullptr};
     const char *strIt = spanStr;
     while (strIt != spanStrEnd)
     {
-        if (*strIt == ':')
+        if (*strIt == timeSep.HMSSep)
         {
-            colonPoses[colonSize++] = strIt;
-            if (colonSize == 2)
+            hmsPoses[hmsSize++] = strIt;
+            if (hmsSize == 2)
                 break;
         }
 
@@ -132,22 +139,22 @@ LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
 
     // - Parse <HH:MM> part.
     const char *secPart;
-    if (colonSize == 2)
+    if (hmsSize == 2)
     {
-        size_t partLen = static_cast<size_t>(colonPoses[0] - spanStr);
+        size_t partLen = static_cast<size_t>(hmsPoses[0] - spanStr);
         __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(spanStr, partLen, LLBC_TimeConst::numOfMicrosPerHour);
 
-        partLen = static_cast<size_t>(colonPoses[1] - colonPoses[0] - 1);
-        __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(colonPoses[0] + 1, partLen, LLBC_TimeConst::numOfMicrosPerMinute);
+        partLen = static_cast<size_t>(hmsPoses[1] - hmsPoses[0] - 1);
+        __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(hmsPoses[0] + 1, partLen, LLBC_TimeConst::numOfMicrosPerMinute);
 
-        secPart = colonPoses[1] + 1;
+        secPart = hmsPoses[1] + 1;
     }
-    else if (colonSize == 1)
+    else if (hmsSize == 1)
     {
-        size_t partLen = static_cast<size_t>(colonPoses[0] - spanStr);
+        size_t partLen = static_cast<size_t>(hmsPoses[0] - spanStr);
         __LLBC_INL_TIME_SPAN_STR_PART_TO_SPAN(spanStr, partLen, LLBC_TimeConst::numOfMicrosPerMinute);
 
-        secPart = colonPoses[0] + 1;
+        secPart = hmsPoses[0] + 1;
     }
     else
     {
@@ -158,7 +165,7 @@ LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr, size_t spanStrLen)
     const char *dotPos = secPart;
     while (dotPos != spanStrEnd)
     {
-        if (*dotPos == '.')
+        if (*dotPos == timeSep.microSecSep)
             break;
         ++dotPos;
     }

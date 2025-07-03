@@ -39,6 +39,24 @@ __LLBC_NS_END
 std::ostream & operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
 
 __LLBC_NS_BEGIN
+/**
+ * \brief The time separator define.
+ * Default datetime format: YYYY-MM-DD HH:MM:SS.micro_second
+ */
+struct LLBC_EXPORT LLBC_TimeSep
+{
+    // datetime separator, default is space.
+    char datetimeSep = ' ';
+    // date year/month/day separator, default is '-'.
+    char YMDSep = '-';
+    // hour/minute/second separator, default is ':'.
+    char HMSSep = ':';
+    // datetime and microsecond separator, default is '.'.
+    char microSecSep = '.';
+
+    // The default time separator.
+    static const LLBC_TimeSep dft;
+};
 
 /**
  * \brief Time span class encapsulation.
@@ -63,15 +81,19 @@ public:
     LLBC_TimeSpan FromMicros(sint64 micros);
     template <size_t _StrArrLen>
     LLBC_NO_DISCARD static
-    LLBC_TimeSpan FromSpanStr(const char (&spanStr)[_StrArrLen]);
+    LLBC_TimeSpan FromSpanStr(const char (&spanStr)[_StrArrLen],
+                              const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
     LLBC_NO_DISCARD static
-    LLBC_TimeSpan FromSpanStr(const char *spanStr);
+    LLBC_TimeSpan FromSpanStr(const char *spanStr,
+                              const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
     template <typename _StrType>
     LLBC_NO_DISCARD static
     typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, LLBC_TimeSpan>::type
-    FromSpanStr(const _StrType &spanStr);
+    FromSpanStr(const _StrType &spanStr,
+                const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
     LLBC_NO_DISCARD static
-    LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr);
+    LLBC_TimeSpan FromSpanStr(const LLBC_String &spanStr,
+                              const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
 
 public:
     /**
@@ -85,12 +107,16 @@ public:
      * @param[in] spanStr - the span value string representation.
      */
     template <size_t _StrArrLen>
-    explicit LLBC_TimeSpan(const char (&spanStr)[_StrArrLen]);
-    explicit LLBC_TimeSpan(const char *spanStr);
+    explicit LLBC_TimeSpan(const char (&spanStr)[_StrArrLen],
+                           const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
+    explicit LLBC_TimeSpan(const char *spanStr,
+                           const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
     template <typename _StrType,
               typename = typename std::enable_if<LLBC_IsTemplSpec<_StrType, std::basic_string>::value, _StrType>::type>
-    explicit LLBC_TimeSpan(const _StrType &spanStr);
-    explicit LLBC_TimeSpan(const LLBC_String &spanStr);
+    explicit LLBC_TimeSpan(const _StrType &spanStr,
+                           const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
+    explicit LLBC_TimeSpan(const LLBC_String &spanStr,
+                           const LLBC_TimeSep &timeSep = LLBC_TimeSep::dft);
 
 public:
     /**
@@ -180,7 +206,9 @@ private:
      * @param spanStr    - the span string.
      * @param spanStrLen - the span string length.
      */
-    LLBC_TimeSpan(const char *spanStr, size_t spanStrLen);
+    LLBC_TimeSpan(const char *spanStr,
+                  size_t spanStrLen,
+                  const LLBC_TimeSep &timeSep);
 
 private:
     // Declare friend class:LLBC_Time.
