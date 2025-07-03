@@ -252,9 +252,13 @@ workspace ("llbc_" .. _ACTION)
         linkoptions { "-rdynamic" }
     filter {}
 
-    -- add Foundation framework on macosx platform.
+    -- for macosx, add Foundation framework.
     filter { "system:macosx", "language:c++" }
         linkoptions { "-framework Foundation" }
+    filter {}
+    -- for macosx, auto add rpath=@loader_path if is debug target.
+    filter { "system:macosx", "language:c++", "configurations:debug*" }
+        linkoptions { "-Wl,-rpath,@loader_path" }
     filter {}
 
 -- ****************************************************************************
@@ -916,9 +920,9 @@ project "lullbc_luaexec"
     -- target name, target prefix.
     targetname "lua"
 
-    -- for macosx, fix premake5 not auto add @rpath bug.
-    filter { "system:macosx" }
-        runpathdirs { "@loader_path/." }
+    -- for macosx, fix premake5 not auto add @rpath bug(ignore debug* configuration).
+    filter { "system:macosx", "configurations:release*" }
+        linkoptions { "-Wl,-rpath,@loader_path" }
     filter {}
 
 -- lua wrap library(lullbc) compile setting.
