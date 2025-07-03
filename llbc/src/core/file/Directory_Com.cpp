@@ -659,14 +659,8 @@ LLBC_String LLBC_Directory::BaseName(const LLBC_String &path)
 LLBC_String LLBC_Directory::CurDir()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-    constexpr uint32 bufLen = PATH_MAX;
-#else
-    constexpr uint32 bufLen = MAXPATHLEN;
-#endif
-    
-    char cwd[bufLen];
-    if (!getcwd(cwd, bufLen))
+    auto &cwd = __LLBC_GetLibTls()->commonTls.pathBuf;
+    if (!getcwd(cwd, sizeof(cwd)))
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_String();
