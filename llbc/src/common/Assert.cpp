@@ -68,7 +68,7 @@ void __LLBC_AssertFail(const char *cond,
     const char *fileBaseName = strrchr(file, '\\');
     if (!fileBaseName)
         fileBaseName = strrchr(file, '/');
-    else // Non-Win32
+    #else // Non-Win32
     const char *fileBaseName = strrchr(file, '/');
     #endif // Win32
 
