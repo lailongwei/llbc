@@ -183,7 +183,7 @@ pyllbc_Timer::pyllbc_Timer(PyObject *pyTimer, PyObject *timeoutCallable, PyObjec
 , _pyTimer(pyTimer)
 , _ignoredDeadRef(false)
 {
-    ASSERT(PyCallable_Check(timeoutCallable) && "timer's timeout obj must callable");
+    llbc_assert(PyCallable_Check(timeoutCallable) && "timer's timeout obj must callable");
     if (__NormalizeObj(timeoutCallable,
                        _timeoutCallable,
                        _timeoutCallableDesc,

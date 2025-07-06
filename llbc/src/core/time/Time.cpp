@@ -507,8 +507,8 @@ LLBC_TimeSpan LLBC_Time::GetIntervalTo(const LLBC_TimeSpan &timeCycle,
 
     // Debug assertion.
     #if LLBC_DEBUG
-    ASSERT((toTimeOfTimeCycle >= LLBC_TimeSpan::zero && toTimeOfTimeCycle < timeCycle) &&
-           "llbc framework internal error");
+    llbc_assert((toTimeOfTimeCycle >= LLBC_TimeSpan::zero && toTimeOfTimeCycle < timeCycle) &&
+                "llbc framework internal error");
     #endif
 
     // Calc interval-to.

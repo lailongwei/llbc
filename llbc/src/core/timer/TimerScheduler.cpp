@@ -200,8 +200,8 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     }
 
     LLBC_TimerData *data = timer->_timerData;
-    ASSERT(data->timer == timer && 
-        "Timer scheduler internal error, LLBC_TimerData::timer != argument: timer!");
+    llbc_assert(data->timer == timer && 
+                "Timer scheduler internal error, LLBC_TimerData::timer != argument: timer!");
 
     data->validate = false;
     data->cancelling = true;

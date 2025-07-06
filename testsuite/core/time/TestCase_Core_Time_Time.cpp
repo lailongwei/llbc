@@ -352,7 +352,7 @@ void TestCase_Core_Time_Time::TimeClassTest()
             // std::cout << "LLBC_Time::FromTimeStr(): " << testTimeStrs[j]
             //           << "to " << fromTimeStrTime.GetTimestampInSecs()
             //           << std::endl;
-            ASSERT(fromTimeStrTime.ToString() == testTimeStrs[j]);
+            llbc_assert(fromTimeStrTime.ToString() == testTimeStrs[j]);
         }
     }
     const auto costTime = LLBC_GetMicroseconds() - begTime;

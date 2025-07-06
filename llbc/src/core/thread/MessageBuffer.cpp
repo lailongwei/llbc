@@ -81,7 +81,7 @@ size_t LLBC_MessageBuffer::Read(void *buf, size_t len)
         LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
     const size_t alreadyRead = len - needReadLen;
-    ASSERT(alreadyRead <= _size && "llbc library internal error for LLBC_MessageBuffer");
+    llbc_assert(alreadyRead <= _size && "llbc library internal error for LLBC_MessageBuffer");
 
     _size -= alreadyRead;
 
@@ -274,7 +274,7 @@ size_t LLBC_MessageBuffer::Remove(size_t length)
         LLBC_SetLastError(LLBC_ERROR_SUCCESS);
 
     const size_t removedLen = length - needRemoveLength;
-    ASSERT(removedLen <= _size && "llbc library internal error for LLBC_MessageBuffer");
+    llbc_assert(removedLen <= _size && "llbc library internal error for LLBC_MessageBuffer");
 
     _size -= removedLen;
     

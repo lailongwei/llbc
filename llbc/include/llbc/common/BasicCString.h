@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include "llbc/common/PFConfig.h"
-
 #include "llbc/common/OSHeader.h"
+#include "llbc/common/Assert.h"
 
 __LLBC_NS_BEGIN
 
@@ -306,7 +305,7 @@ public:
     const value_type &operator[](size_type index) const
     {
         #if LLBC_DEBUG
-        ASSERT(LIKELY(index < _size) && "index out of range");
+        llbc_assert(LIKELY(index < _size) && "index out of range");
         #endif // LLBC_DEBUG
 
         return _cstr[index];
@@ -316,8 +315,8 @@ public:
     LLBC_BasicCString operator+(difference_type offset) const
     {
         #if LLBC_DEBUG
-        ASSERT(((offset >= 0 && offset <= static_cast<difference_type>(_size)) ||
-                (offset < 0 && std::abs(offset) < *((difference_type *)(&_cstr)))) &&
+        llbc_assert(((offset >= 0 && offset <= static_cast<difference_type>(_size)) ||
+                     (offset < 0 && std::abs(offset) < *((difference_type *)(&_cstr)))) &&
                "index out of range");
         #endif // LLBC_DEBUG
 

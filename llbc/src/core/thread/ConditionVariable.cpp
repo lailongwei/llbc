@@ -91,7 +91,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     pthread_mutex_t *mtx = reinterpret_cast<pthread_mutex_t *>(lock.Handle());
-    ASSERT(mtx);
+    llbc_assert(mtx);
 
     if (milliSeconds == static_cast<int>(LLBC_INFINITE))
     {
@@ -140,7 +140,8 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     lock.Unlock();
     DWORD waitTimes = (milliSeconds == LLBC_INFINITE) ? (INFINITE) : milliSeconds;
     DWORD waitRet = ::WaitForSingleObject(_cond.blockQueue, waitTimes);
-    ASSERT((waitRet == WAIT_OBJECT_0 || waitRet == WAIT_TIMEOUT) && "LLBC_CriticalVariable::TimedWait() error!");
+    llbc_assert((waitRet == WAIT_OBJECT_0 || waitRet == WAIT_TIMEOUT) &&
+                "LLBC_CriticalVariable::TimedWait() error!");
 
     bool successed = (waitRet == WAIT_OBJECT_0) ? true : false;
     if (!successed)

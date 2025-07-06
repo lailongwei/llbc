@@ -74,7 +74,7 @@ LLBC_App::LLBC_App()
 , _loading(0)
 , _cfgType(LLBC_AppConfigType::End)
 {
-    ASSERT(!_thisApp && "Not allow create more than one application object");
+    llbc_assert(!_thisApp && "Not allow create more than one application object");
 
     _thisApp = this;
     _libEventHandlers.emplace(LLBC_AppEventType::Stop,
@@ -85,7 +85,7 @@ LLBC_App::LLBC_App()
 
 LLBC_App::~LLBC_App()
 {
-    ASSERT(!IsStarted() && "Please stop application before destruct");
+    llbc_assert(!IsStarted() && "Please stop application before destruct");
     LLBC_DoIf(_llbcLibStartupInApp, LLBC_Cleanup());
     _thisApp = nullptr;
 }

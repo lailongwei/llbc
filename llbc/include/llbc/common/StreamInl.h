@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "llbc/common/Macro.h"
 #include "llbc/common/Endian.h"
 #include "llbc/common/TemplateDeduction.h"
 
@@ -493,7 +494,7 @@ std::enable_if_t<std::is_pointer_v<T> &&
                  bool>
 LLBC_Stream::Read(T &obj)
 {
-    ASSERT(false && "Unsupported stream read operation(for char *)!");
+    llbc_assert(false && "Unsupported stream read operation(for char *)!");
     return false;
 }
 
@@ -926,7 +927,7 @@ template <typename T>
 std::enable_if_t<!std::is_trivial_v<T>, bool>
 LLBC_Stream::ReadImpl(T &obj, ...)
 {
-    ASSERT(false && "Read non-trivial object is unsupported for now!");
+    llbc_assert(false && "Read non-trivial object is unsupported for now!");
     return false;
 }
 
@@ -1072,7 +1073,7 @@ std::enable_if_t<LLBC_IsTemplSpec<T, std::queue>::value ||
                  LLBC_IsTemplSpec<T, std::stack>::value>
 LLBC_Stream::Write(const T &container)
 {
-    ASSERT(false && "Write std::queue/std::stack is not supported for now");
+    llbc_assert(false && "Write std::queue/std::stack is not supported for now");
 }
 
 template <typename T>
@@ -1209,7 +1210,7 @@ template <typename T>
 std::enable_if_t<!std::is_trivial_v<T> >
 LLBC_Stream::WriteImpl(const T &obj, ...)
 {
-    ASSERT(false && "Write non-trivial object is unsupported for now!");
+    llbc_assert(false && "Write non-trivial object is unsupported for now!");
 }
 
 template <typename T>

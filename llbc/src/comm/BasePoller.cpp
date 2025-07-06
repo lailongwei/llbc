@@ -123,7 +123,7 @@ void LLBC_BasePoller::SetPollerMgr(LLBC_PollerMgr *mgr)
 
 int LLBC_BasePoller::Start()
 {
-    ASSERT(false && "Please implement LLBC_BasePoller::Start() method!");
+    llbc_assert(false && "Please implement LLBC_BasePoller::Start() method!");
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 }
@@ -200,7 +200,7 @@ void LLBC_BasePoller::HandleEv_AddSock(LLBC_PollerEvent &ev)
 
 void LLBC_BasePoller::HandleEv_AsyncConn(LLBC_PollerEvent &ev)
 {
-    ASSERT(false && "Please implement LLBC_Base_Poller::HandleEv_AsyncConn() method!");
+    llbc_assert(false && "Please implement LLBC_Base_Poller::HandleEv_AsyncConn() method!");
 }
 
 void LLBC_BasePoller::HandleEv_Send(LLBC_PollerEvent &ev)
@@ -242,7 +242,7 @@ void LLBC_BasePoller::HandleEv_Close(LLBC_PollerEvent &ev)
 
 void LLBC_BasePoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
 {
-    ASSERT(false && "Please implement LLBC_BasePoller::HandleEv_Monitor() method!");
+    llbc_assert(false && "Please implement LLBC_BasePoller::HandleEv_Monitor() method!");
 }
 
 void LLBC_BasePoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)

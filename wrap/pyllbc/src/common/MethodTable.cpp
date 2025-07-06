@@ -97,8 +97,8 @@ const PyMethodDef *pyllbc_MethodTable::GetMethods() const
 
 void pyllbc_MethodTable::ReCapacity(sint32 cap)
 {
-    ASSERT(cap > _capacity && 
-        "pyllbc_MethodTable::ReCaacity(): new capacity size was invalid!");
+    llbc_assert(cap > _capacity && 
+                "pyllbc_MethodTable::ReCaacity(): new capacity size was invalid!");
 
     _methods = LLBC_Realloc(PyMethodDef, 
                             _methods, 

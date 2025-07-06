@@ -42,8 +42,8 @@ pyllbc_Module::pyllbc_Module(const LLBC_String &name, This *parent)
 
 , _dict(nullptr)
 {
-    ASSERT(!_name.empty() &&
-        "pyllbc_Module::ctor(): module name must be not null!");
+    llbc_assert(!_name.empty() &&
+                "pyllbc_Module::ctor(): module name must be not null!");
 
     if (parent)
         parent->AddSubModule(this);

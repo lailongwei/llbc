@@ -258,7 +258,7 @@ inline int pyllbc_ObjAttrOptr::GetAttr(const LLBC_String &name, _Val &val)
     static const LLBC_String err = 
         "pyllbc_ObjAttrOptr::GetAttr<_Val>(): Unspecifilization template call!";
 
-    ASSERT(false && err.c_str());
+    llbc_assert(false && err.c_str());
     
     pyllbc_SetError(err.c_str(), LLBC_ERROR_UNKNOWN);
 
@@ -398,7 +398,7 @@ inline int pyllbc_ObjAttrOptr::SetAttr(const LLBC_String &name, const _Val &val)
     static const LLBC_String err = 
         "pyllbc_ObjAttrOptr::SetAttr<_Val>(): Unspecifilization template call!";
 
-    ASSERT(false && err.c_str());
+    llbc_assert(false && err.c_str());
 
     pyllbc_SetError(err.c_str(), LLBC_ERROR_UNKNOWN);
 

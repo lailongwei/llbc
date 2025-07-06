@@ -21,8 +21,7 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/common/PFConfig.h"
-
+#include "llbc/common/Assert.h"
 #include "llbc/common/OSHeader.h"
 #include "llbc/common/Errno.h"
 #include "llbc/common/Errors.h"
@@ -323,7 +322,8 @@ void LLBC_OverlappedGroup::InsertOverlapped(LLBC_POverlapped ol)
 void LLBC_OverlappedGroup::DeleteOverlapped(LLBC_POverlapped ol)
 {
     _OLContainerIter iter = _ols.find(ol);
-    ASSERT(iter != _ols.end() && "LLBC_OverlappedGroup::DeleteOverlapped(): not found overlapped!");
+    llbc_assert(iter != _ols.end() &&
+                "LLBC_OverlappedGroup::DeleteOverlapped(): not found overlapped!");
 
     ClearOverlappedMembers(ol);
     delete ol;
@@ -346,7 +346,7 @@ void LLBC_OverlappedGroup::DeleteAllOverlappeds()
 
 void LLBC_OverlappedGroup::RemoveOverlapped(LLBC_POverlapped ol)
 {
-    ASSERT(_ols.erase(ol) != 0);
+    llbc_assert(_ols.erase(ol) != 0);
 }
 
 void LLBC_OverlappedGroup::ClearOverlappedMembers(LLBC_POverlapped ol)
