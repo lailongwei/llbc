@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/Macro.h"
-
-#include "llbc/common/OSHeader.h"
 #include "llbc/common/BasicDataType.h"
 
 __LLBC_NS_BEGIN

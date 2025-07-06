@@ -506,15 +506,15 @@ void TestCase_Core_Variant::SeqTest()
     std::cout << "Before access <seqForSubscriptTest>:" << seqForSubscriptTest << std::endl;
     std::cout << "Access <seqForSubscriptTest[10086]>:" << seqForSubscriptTest[10086] << std::endl;
     std::cout << "After access <seqForSubscriptTest>, size:" << seqForSubscriptTest.Size() << std::endl;
-    ASSERT(seqForSubscriptTest[10086 - 1].IsNil());
-    ASSERT(seqForSubscriptTest.Size() == 10086 + 1 && seqForSubscriptTest[10085] == LLBC_Variant::nil);
+    llbc_assert(seqForSubscriptTest[10086 - 1].IsNil());
+    llbc_assert(seqForSubscriptTest.Size() == 10086 + 1 && seqForSubscriptTest[10085] == LLBC_Variant::nil);
 
     // Const sequence subscript access test.
     const LLBC_Variant constSeqForSubscriptTest;
     std::cout << "Before access <constSeqForSubscriptTest>:" << constSeqForSubscriptTest << std::endl;
     std::cout << "Access <constSeqForSubscriptTest[10086]>:" << constSeqForSubscriptTest[10086] << std::endl;
     std::cout << "After access <constSeqForSubscriptTest>, size:" << constSeqForSubscriptTest.Size() << std::endl;
-    ASSERT(constSeqForSubscriptTest.IsNil() && constSeqForSubscriptTest.Size() == 0);
+    llbc_assert(constSeqForSubscriptTest.IsNil() && constSeqForSubscriptTest.Size() == 0);
 
     // Assignment test.
     LLBC_Variant seq2 = seq1;

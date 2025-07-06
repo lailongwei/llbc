@@ -21,8 +21,8 @@
 
 #include "llbc/common/Export.h"
 
+#include "llbc/common/Assert.h"
 #include "llbc/common/OSHeader.h"
-#include "llbc/common/Macro.h"
 #include "llbc/common/BasicDataType.h"
 #include "llbc/common/Errno.h"
 
@@ -97,7 +97,7 @@ void __LLBC_CreateLibTls()
 #endif
     if (!tlsCreated)
     {
-        ASSERT(!tlsCreated && "Create llbc library TLS handle failed!");
+        llbc_assert(!tlsCreated && "Create llbc library TLS handle failed!");
         exit(-1);
     }
 }

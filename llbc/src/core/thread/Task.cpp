@@ -45,7 +45,7 @@ LLBC_Task::LLBC_Task(LLBC_ThreadMgr *threadMgr)
 
 LLBC_Task::~LLBC_Task()
 {
-    ASSERT(_taskState == LLBC_TaskState::NotActivated);
+    llbc_assert(_taskState == LLBC_TaskState::NotActivated);
 }
 
 int LLBC_Task::Activate(int threadNum,

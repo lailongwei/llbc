@@ -81,7 +81,7 @@ private:
     {
         static void Operate(const pointer_type &pointer)
         {
-            ASSERT(false && "Unsupported op");
+            llbc_assert(false && "Unsupported op");
         }
     };
 

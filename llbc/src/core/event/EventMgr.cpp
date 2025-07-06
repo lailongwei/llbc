@@ -67,9 +67,9 @@ LLBC_EventMgr::~LLBC_EventMgr()
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
     // Assert: Make sure not in firing when delete event mgr.
-    ASSERT(!IsFiring() && "Not allow delete LLBC_EventMgr when event firing");
+    llbc_assert(!IsFiring() && "Not allow delete LLBC_EventMgr when event firing");
     // Assert: Make sure pending event operations is empty.
-    ASSERT(_pendingEventOps.empty() && "llbc framework internal error: _pendingEventOps is not empty!");
+    llbc_assert(_pendingEventOps.empty() && "llbc framework internal error: _pendingEventOps is not empty!");
 
     // Recycle all listener infos.
     for (auto it = _id2ListenerInfos.begin(); it != _id2ListenerInfos.end(); ++it)
@@ -342,10 +342,12 @@ void LLBC_EventMgr::AfterFireEvent(LLBC_Event *ev)
         return;
 
     // Assert: make sure _firing >= 0.
-    ASSERT(_firing >= 0 && "llbc framework internal error: LLBC_EventMgr._firing < 0");
+    llbc_assert(_firing >= 0 &&
+                "llbc framework internal error: LLBC_EventMgr._firing < 0");
     // Assert: make sure _firingEventIds is empty.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
-    ASSERT(_firingEventIds.empty() && "llbc framework internal error: LLBC_EventMgr._firingEventIds is not empty!");
+    llbc_assert(_firingEventIds.empty() &&
+                "llbc framework internal error: LLBC_EventMgr._firingEventIds is not empty!");
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
     // The event hook manager do post-fire.
@@ -412,7 +414,7 @@ int LLBC_EventMgr::AddListenerCheck(const LLBC_ListenerStub &boundStub, LLBC_Lis
     {
         stub = static_cast<LLBC_ListenerStub>(
             LLBC_AtomicFetchAndAdd(&_maxListenerStub, 1));
-        ASSERT(stub != 0 && "Event stubs are exhausted");
+        llbc_assert(stub != 0 && "Event stubs are exhausted");
     }
 
     return LLBC_OK;

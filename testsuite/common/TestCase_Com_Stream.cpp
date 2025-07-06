@@ -246,7 +246,7 @@ int TestCase_Com_Stream::BasicTest()
 {
     LLBC_PrintLn("BasicTest:");
 
-    ASSERT(LLBC_ObjReflector::IsSupportedObjPoolReflection<LLBC_Stream>());
+    llbc_assert(LLBC_ObjReflector::IsSupportedObjPoolReflection<LLBC_Stream>());
     LLBC_PrintLn("- LLBC_Stream supported objpool reflection?:%d",
                  LLBC_ObjReflector::IsSupportedObjPoolReflection<LLBC_Stream>());
 
@@ -286,7 +286,7 @@ int TestCase_Com_Stream::BasicTest()
     LLBC_PrintLn("- After read, bVal:%d, intVal:%d, dblVal:%f, strVal:%s, stream:%s",
                  bVal, intVal, dblVal, strVal, stream2.ToString().c_str());
 
-    ASSERT(stream2.GetReadPos() == stream2.GetWritePos());
+    llbc_assert(stream2.GetReadPos() == stream2.GetWritePos());
 
     return LLBC_OK;
 }
@@ -337,7 +337,7 @@ int TestCase_Com_Stream::EnumTest()
     LLBC_PrintLn("Read U64Enum: %llu, equal U64Enum::ENUM2?:%d", static_cast<uint64>(u64en), u64en == U64Enum::ENUM2);
     LLBC_SetErrAndReturnIf(u64en != U64Enum::ENUM2, LLBC_ERROR_UNKNOWN, LLBC_FAILED);
 
-    ASSERT(stream.GetReadPos() == stream.GetWritePos());
+    llbc_assert(stream.GetReadPos() == stream.GetWritePos());
 
     return LLBC_OK;
 }
@@ -506,8 +506,8 @@ int TestCase_Com_Stream::EndianTest()
                      prefix,
                      intVals[0], intVals[1], intVals[2], intVals[3]);
 
-        ASSERT(intVals[0] == 1 && intVals[1] == 3 &&
-               intVals[2] == 5 && intVals[3] == 7);
+        llbc_assert(intVals[0] == 1 && intVals[1] == 3 &&
+                    intVals[2] == 5 && intVals[3] == 7);
     };
 
     LLBC_Stream stream1;

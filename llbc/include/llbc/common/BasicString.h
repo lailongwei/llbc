@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/PFConfig.h"
-
-#include "llbc/common/Macro.h"
 #include "llbc/common/Errno.h"
 #include "llbc/common/BasicCString.h"
 
