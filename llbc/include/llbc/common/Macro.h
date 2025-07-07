@@ -250,7 +250,7 @@
 #endif
 
 // Unused param macro.
-#define LLBC_UNUSED_PARAM(param)  (void)param
+#define LLBC_UNUSED_PARAM(param)  static_cast<void>(param)
 
 // No except macro.
 #if LLBC_TARGET_PLATFORM_NON_WIN32
