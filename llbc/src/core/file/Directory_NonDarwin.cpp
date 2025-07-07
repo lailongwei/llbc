@@ -31,22 +31,25 @@ __LLBC_NS_BEGIN
 LLBC_String LLBC_Directory::ModuleFilePath(bool readLink)
 {
 #if LLBC_TARGET_PLATFORM_WIN32
+    // Mark <readLink> as unused.
+    LLBC_UNUSED_PARAM(readLink);
+
     // Call WIN32 API, get module file path.
     DWORD ret;
-    size_t bufLen = LLBC_PATH_MAX + 1;
-    char *buf = LLBC_Malloc(char, bufLen);
-    while ((ret = ::GetModuleFileNameA(nullptr, buf, static_cast<DWORD>(bufLen))) == bufLen)
-        buf = LLBC_Realloc(char, buf, bufLen * 2);
-    if (ret == 0)
+    LLBC_String modFilePath;
+    // modFilePath.resize(LLBC_PATH_MAX + 1);
+    modFilePath.resize(1);
+    while ((ret = ::GetModuleFileNameA(nullptr,
+                                       const_cast<char *>(modFilePath.c_str()),
+                                       static_cast<DWORD>(modFilePath.size()))) == modFilePath.size())
+        modFilePath.resize(modFilePath.size() + LLBC_PATH_MAX);
+    if (UNLIKELY(ret == 0))
     {
-        free(buf);
         LLBC_SetLastError(LLBC_ERROR_OSAPI); 
         return "";
     }
 
-    // Convert to LLBC_String and free buffer.
-    LLBC_String modFilePath(buf, ret);
-    free(buf);
+    modFilePath.resize(ret);
 
     // Return.
     return modFilePath;
