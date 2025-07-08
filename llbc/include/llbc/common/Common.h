@@ -22,14 +22,13 @@
 
 #pragma once
 
-#include "llbc/common/PFConfig.h"
+// #include "llbc/common/PFConfig.h" // Included in other header file.
+// #include "llbc/common/Config.h" // Included in other header file.
 #include "llbc/common/Compiler.h"
 
-#include "llbc/common/Config.h"
-
-#include "llbc/common/OSHeader.h"
-// #include "llbc/common/ThirdHeader.h"
-#include "llbc/common/Macro.h"
+#include "llbc/common/OSHeader.h" // Included in other header file.
+// #include "llbc/common/Macro.h" // Included in other header file.
+#include "llbc/common/Assert.h" // Included in other header file.
 #include "llbc/common/BasicDataType.h"
 #include "llbc/common/TemplateDeduction.h"
 #include "llbc/common/Endian.h"

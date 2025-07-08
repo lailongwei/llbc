@@ -28,8 +28,8 @@ pyllbc_ScriptIntegrator::pyllbc_ScriptIntegrator(const LLBC_String &script)
 : _script(script)
 , _builded(false)
 {
-    ASSERT(!_script.empty() &&
-        "python script content must not null!");
+    llbc_assert(!_script.empty() &&
+                "python script content must not null!");
 }
 
 pyllbc_ScriptIntegrator::~pyllbc_ScriptIntegrator()

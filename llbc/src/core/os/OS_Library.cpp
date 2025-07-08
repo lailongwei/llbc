@@ -71,7 +71,7 @@ extern "C" __attribute__((destructor)) void LLBC_SelfLibDetach()
 //
 //  case DLL_THREAD_ATTACH:
 //  case DLL_THREAD_DETACH:
-//      ASSERT(false && "llbc library fatal error occurred, thread attach/detach dll event received!");
+//      llbc_assert(false && "llbc library fatal error occurred, thread attach/detach dll event received!");
 //      break;
 //
 //  case DLL_PROCESS_DETACH:

@@ -188,13 +188,13 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
     for(int i = 1; i < 20; i += 2)
     {
         LLBC_Dictionary::Iter it = dict.Find(i);
-        ASSERT(it != dict.End() && "Dictionary internal error, check it!");
+        llbc_assert(it != dict.End() && "Dictionary internal error, check it!");
         dict.Erase(it);
     }
     for(int i = 2; i <= 20; i += 2)
     {
         int status = dict.Erase(i);
-        ASSERT(status == LLBC_OK && "Dictionary internal error, check it!");
+        llbc_assert(status == LLBC_OK && "Dictionary internal error, check it!");
     }
 
     std::cout <<"Done, output: " <<std::endl;

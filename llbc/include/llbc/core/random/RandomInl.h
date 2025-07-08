@@ -90,7 +90,7 @@ LLBC_Random::Rand(const _Weights &weights)
         i++;
     }
 
-    ASSERT(false && "llbc framework internal error");
+    llbc_assert(false && "llbc framework internal error");
     return 0;
 }
 

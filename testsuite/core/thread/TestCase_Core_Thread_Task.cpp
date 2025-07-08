@@ -53,7 +53,7 @@ BasicTestTask::BasicTestTask(size_t perThreadPopTimes)
 
 void BasicTestTask::Svc()
 {
-    ASSERT(GetTaskState() == LLBC_TaskState::Activated);
+    llbc_assert(GetTaskState() == LLBC_TaskState::Activated);
 
     _val = new int();
     LLBC_PrintLn("Thread allocated thread-local variable[int *], ptr:%p", _val);
@@ -75,7 +75,7 @@ void BasicTestTask::Svc()
         delete block;
     }
 
-    ASSERT(GetTaskState() == LLBC_TaskState::Activated);
+    llbc_assert(GetTaskState() == LLBC_TaskState::Activated);
 }
 
 void BasicTestTask::Cleanup()

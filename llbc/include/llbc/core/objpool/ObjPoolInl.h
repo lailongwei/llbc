@@ -173,7 +173,7 @@ Obj *LLBC_TypedObjPool<Obj>::Acquire()
     {
         wrappedObj = stripe->freeObjs;
         stripe->freeObjs = wrappedObj->stripeOrNextFreeObj.nextFreeObj;
-        ASSERT(!wrappedObj->unFlags.flags.inUsing && "llbc framework internal error");
+        llbc_assert(!wrappedObj->unFlags.flags.inUsing && "llbc framework internal error");
     }
     else
     {
@@ -230,9 +230,9 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
     auto wrappedObj = reinterpret_cast<_WrappedObj *>(reinterpret_cast<uint8 *>(obj) - _objOffset);
 
     // Exec required checks.
-    ASSERT(wrappedObj->unFlags.flags.inUsing && "Repeated release object");
-    ASSERT(wrappedObj->magicNum == LLBC_CFG_CORE_OBJPOOL_OBJ_MAGIC_NUMBER &&
-           "The object is not a objpool object");
+    llbc_assert(wrappedObj->unFlags.flags.inUsing && "Repeated release object");
+    llbc_assert(wrappedObj->magicNum == LLBC_CFG_CORE_OBJPOOL_OBJ_MAGIC_NUMBER &&
+                "The object is not a objpool object");
 
     // Reuse/Delete obj.
     if constexpr (LLBC_ObjReflector::IsReusable<Obj>())
@@ -347,7 +347,7 @@ void LLBC_TypedObjPool<Obj>::Collect(bool deep)
             }
 
             #if LLBC_CFG_CORE_OBJECT_POOL_DEBUG
-            ASSERT(erasedFromFreeStripes && "llbc framework internal error");
+            llbc_assert(erasedFromFreeStripes && "llbc framework internal error");
             #endif
         }
 
@@ -409,7 +409,7 @@ void LLBC_TypedObjPool<Obj>::DeleteStripe(_ObjStripe *stripe)
         if (!wrappedObj->unFlags.flags.constructed)
             continue;
 
-        // ASSERT(!wrappedObj->unFlags.flags.inUsing && "Object leak");
+        // llbc_assert(!wrappedObj->unFlags.flags.inUsing && "Object leak");
         if (wrappedObj->unFlags.flags.inUsing &&
             LLBC_ObjReflector::IsReusable<Obj>())
             LLBC_ObjReflector::Reuse<Obj>(wrappedObj->buff);
@@ -554,9 +554,9 @@ void LLBC_ObjPool::Release(Obj *obj)
         reinterpret_cast<uint8 *>(obj) - LLBC_TypedObjPool<Obj>::_objOffset);
 
     // Execute required checks.
-    ASSERT(wrappedObj->unFlags.flags.inUsing && "Repeated release object");
-    ASSERT(wrappedObj->magicNum == LLBC_CFG_CORE_OBJPOOL_OBJ_MAGIC_NUMBER &&
-           "The object is not a objpool object");
+    llbc_assert(wrappedObj->unFlags.flags.inUsing && "Repeated release object");
+    llbc_assert(wrappedObj->magicNum == LLBC_CFG_CORE_OBJPOOL_OBJ_MAGIC_NUMBER &&
+                "The object is not a objpool object");
 
     // Release object.
     auto off = _releaseObjMethOffset;
@@ -783,7 +783,7 @@ int LLBC_ObjPool::EnsureDeletionBefore()
         else
         {
             auto grandFrontNode = backNode->GetFront();
-            ASSERT(grandFrontNode->RemoveBack(backName) == LLBC_OK && "llbc framework internal error");
+            llbc_assert(grandFrontNode->RemoveBack(backName) == LLBC_OK && "llbc framework internal error");
 
             frontNode->AddBack(backNode);
             grandFrontNode->AddBack(frontNode);

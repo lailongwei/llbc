@@ -984,7 +984,7 @@ void pyllbc_Service::DeletePyPacket(void *_)
 
 void pyllbc_Service::CreateLLBCService(const LLBC_String &svcName, bool useNormalProtocolFactory)
 {
-    ASSERT(!_llbcSvc && "llbc service pointer not nullptr");
+    llbc_assert(!_llbcSvc && "llbc service pointer not nullptr");
 
     LLBC_IProtocolFactory *protoFactory = nullptr;
     if (useNormalProtocolFactory)

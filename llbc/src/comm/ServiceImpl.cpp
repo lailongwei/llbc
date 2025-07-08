@@ -138,8 +138,8 @@ LLBC_ServiceImpl::LLBC_ServiceImpl(const LLBC_String &name,
     // Get the poller type from Config.h.
     const char *pollerModel = LLBC_CFG_COMM_POLLER_MODEL;
     const int pollerType = LLBC_PollerType::Str2Type(pollerModel);
-    ASSERT(LLBC_PollerType::IsValid(pollerType) &&
-           "Invalid LLBC_CFG_COMM_POLLER_MODEL config!");
+    llbc_assert(LLBC_PollerType::IsValid(pollerType) &&
+                "Invalid LLBC_CFG_COMM_POLLER_MODEL config!");
 
     _pollerMgr.SetService(this);
     _pollerMgr.SetPollerType(pollerType);
@@ -149,12 +149,12 @@ LLBC_ServiceImpl::~LLBC_ServiceImpl()
 {
     // Forbid destroy service in service thread(Self Drive mode).
     if (_driveMode == LLBC_ServiceDriveMode::SelfDrive)
-        ASSERT(LLBC_GetCurrentThreadId() != _svcThreadId);
+        llbc_assert(LLBC_GetCurrentThreadId() != _svcThreadId);
 
     // Forbid destroy service in service thread and not in <NotStarted> phase.
     if (_driveMode == LLBC_ServiceDriveMode::ExternalDrive)
-        ASSERT(_runningPhase == LLBC_ServiceRunningPhase::NotStarted ||
-               LLBC_GetCurrentThreadId() == _svcThreadId);
+        llbc_assert(_runningPhase == LLBC_ServiceRunningPhase::NotStarted ||
+                    LLBC_GetCurrentThreadId() == _svcThreadId);
 
     // Stop service and destroy comps.
     Stop(true);
@@ -1071,15 +1071,17 @@ LLBC_ProtocolStack *LLBC_ServiceImpl::CreatePackStack(int sessionId,
 
     // Create PackLayer protocol.
     LLBC_IProtocol *packProtocol = protoFactory->Create(LLBC_ProtocolLayer::PackLayer);
-    ASSERT(packProtocol && "Protocol stack require PackLayer protocol exist!");
-    ASSERT(packProtocol->GetLayer() == LLBC_ProtocolLayer::PackLayer && "Invalid protocol layer!");
+    llbc_assert(packProtocol && "Protocol stack require PackLayer protocol exist!");
+    llbc_assert(packProtocol->GetLayer() == LLBC_ProtocolLayer::PackLayer &&
+                "Invalid protocol layer!");
     stack->AddProtocol(packProtocol);
 
     // Create CompressLayer protocol.
     LLBC_IProtocol *compressProtocol = protoFactory->Create(LLBC_ProtocolLayer::CompressLayer);
     if (compressProtocol)
     {
-        ASSERT(compressProtocol->GetLayer() == LLBC_ProtocolLayer::CompressLayer && "Invalid protocol layer!");
+        llbc_assert(compressProtocol->GetLayer() == LLBC_ProtocolLayer::CompressLayer &&
+                    "Invalid protocol layer!");
         stack->AddProtocol(compressProtocol);
     }
 
@@ -1105,8 +1107,8 @@ LLBC_ProtocolStack *LLBC_ServiceImpl::CreateCodecStack(int sessionId,
     LLBC_IProtocol *codecLayer = protoFactory->Create(LLBC_ProtocolLayer::CodecLayer);
     if (codecLayer)
     {
-        ASSERT(codecLayer->GetLayer() ==
-            LLBC_ProtocolLayer::CodecLayer && "Invalid protocol layer!");
+        llbc_assert(codecLayer->GetLayer() == LLBC_ProtocolLayer::CodecLayer &&
+                    "Invalid protocol layer!");
 
         stack->AddProtocol(codecLayer);
         stack->SetCoders(&_coderFactories);
@@ -1382,7 +1384,7 @@ void LLBC_ServiceImpl::AddServiceToTls()
         }
     }
 
-    ASSERT(false && "llbc framework internal error");
+    llbc_assert(false && "llbc framework internal error");
 }
 
 void LLBC_ServiceImpl::RemoveServiceFromTls()

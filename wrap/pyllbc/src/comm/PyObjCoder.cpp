@@ -242,7 +242,7 @@ int pyllbc_ObjCoder::EncodeSeq(PyObject *in, LLBC_Json::Document &out)
     }
 
     const Py_ssize_t len = PySequence_Fast_GET_SIZE(fastSeq);
-    ASSERT(len >= 0 && "python API internal error");
+    llbc_assert(len >= 0 && "python API internal error");
 
     for (Py_ssize_t i = 0; i < len; ++i)
     {

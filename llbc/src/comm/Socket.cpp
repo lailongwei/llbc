@@ -520,7 +520,8 @@ void LLBC_Socket::OnSend()
             size_t sent = block->GetReadableSize();
             _olGroup.DeleteOverlapped(ol);
 
-            ASSERT(sent <= _iocpSendingDataSize && "llbc library internal error for LLBC_Socket::OnSend(LLBC_POverlapped ol)");
+            llbc_assert(sent <= _iocpSendingDataSize &&
+                        "llbc library internal error for LLBC_Socket::OnSend(LLBC_POverlapped ol)");
             _iocpSendingDataSize -= sent;
 
             _session->OnSent(sent);
