@@ -487,19 +487,25 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
 {
     // Application config directory locate order:
     // -> <cwd>
-    // -> <module file directory>
+    // -> <module file directory[readLink == false]>
+    // -> <module file directory[readLink == true ]>
     //    -> <cwd>/Config -> config -> Conf -> conf -> Cfg -> cfg
-    //    -> <module file directory>/Config -> config -> Conf -> conf -> Cfg -> cfg
+    //    -> <module file directory[readLink == false]>/Config -> config -> Conf -> conf -> Cfg -> cfg
+    //    -> <module file directory[readLink == true ]>/Config -> config -> Conf -> conf -> Cfg -> cfg
     //       -> <cwd>/../Config -> config -> Conf -> conf -> Cfg -> cfg
-    //       -> <module file directory>/../Config -> config -> Conf -> conf -> Cfg -> cfg
+    //       -> <module file directory[readLink == false]>/../Config -> config -> Conf -> conf -> Cfg -> cfg
+    //       -> <module file directory[readLink == true ]>/../Config -> config -> Conf -> conf -> Cfg -> cfg
     //          -> <cwd>/..
-    //          -> <module file directory>/..
+    //          -> <module file directory[readLink == false]>/..
+    //          -> <module file directory[readLink == true ]>/..
     //
     // Application config filename locate order:
     // -> app_name
     //    -> stripped _d/_debug suffix app_name
-    //       -> executable_name
+    //       -> executable_name[readLink == false]
     //          -> stripped _d/_debug suffix executable_name
+    //             -> executable_name[readLink == true]
+    //                -> stripped _d/_debug suffix executable_name
     //
     // Application config type locate order:
     // -> .ini
@@ -508,36 +514,64 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
 
     // Build config directories.
     // -> <cwd>
-    //    -> <module file directory>
-    LLBC_Strings cfgFileDirs{LLBC_Directory::CurDir(),
-                             LLBC_Directory::ModuleFileDir()};
+    // -> <module file directory>
+    LLBC_Strings cfgFileDirs{ LLBC_Directory::CurDir(),
+                              LLBC_Directory::ModuleFileDir(false) };
+    if (LLBC_Directory::ModuleFileDir(true) != LLBC_Directory::ModuleFileDir(true))
+        cfgFileDirs.push_back(LLBC_Directory::ModuleFileDir(true));
 
     // -> <cwd>/xxxxx
-    //    -> <module file directory/xxxxx
+    // -> <module file directory>/xxxxx
     const char *interDirs[] = {"Config", "config", "Conf", "conf", "Cfg", "cfg"};
     for (auto &cfgDir : interDirs)
         cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::CurDir(), cfgDir));
     for (auto &cfgDir : interDirs)
-        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), cfgDir));
+        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(false), cfgDir));
+    if (LLBC_Directory::ModuleFileDir(true) != LLBC_Directory::ModuleFileDir(false))
+    {
+        for (auto &cfgDir : interDirs)
+            cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(true), cfgDir));
+    }
     // -> <cwd>/../xxxxx
-    //    -> <module file directory>/../xxxxx
+    // -> <module file directory>/../xxxxx
     for (auto &cfgDir : interDirs)
         cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::CurDir(), "..", cfgDir));
     for (auto &cfgDir : interDirs)
-        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), "..", cfgDir));
+        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(false), "..", cfgDir));
+    if (LLBC_Directory::ModuleFileDir(true) != LLBC_Directory::ModuleFileDir(false))
+    {
+        for (auto &cfgDir : interDirs)
+            cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(true), "..", cfgDir));
+    }
     // -> <cwd>/..
-    //    -> <module file directory>/..
+    // -> <module file directory>/..
     cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::CurDir(), ".."));
-    cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(), ".."));
+    cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(false), ".."));
+    if (LLBC_Directory::ModuleFileDir(true) != LLBC_Directory::ModuleFileDir(false))
+        cfgFileDirs.push_back(LLBC_Directory::Join(LLBC_Directory::ModuleFileDir(true), ".."));
 
     // Building config filenames.
     LLBC_Strings cfgFileNames{appName};
+    LLBC_String strippedDbgSuffixAppName = appName;
     if (appName.endswith("_d") || appName.endswith("_debug"))
-              cfgFileNames.push_back(appName.substr(0, appName.rfind('_')));
-    const auto execName = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
-    cfgFileNames.push_back(execName);
-    if (execName.endswith("_d") || execName.endswith("_debug"))
-        cfgFileNames.push_back(execName.substr(0, execName.rfind('_')));
+    {
+        strippedDbgSuffixAppName = appName.substr(0, appName.rfind('_'));
+        cfgFileNames.push_back(strippedDbgSuffixAppName);
+    }
+    for (auto &readLinkFlag : { false, true })
+    {
+        const auto execName =
+            LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName(readLinkFlag))[0];
+        if (execName != appName &&
+            execName != strippedDbgSuffixAppName)
+            cfgFileNames.push_back(execName);
+        if (execName.endswith("_d") || execName.endswith("_debug"))
+        {
+            const auto strippedDbgSuffixExecName = execName.substr(0, execName.rfind('_'));
+            if (strippedDbgSuffixExecName != strippedDbgSuffixAppName)
+                cfgFileNames.push_back(strippedDbgSuffixExecName);
+        }
+    }
 
     // Execute config file locate.
     for (auto &cfgFileDir : cfgFileDirs)
