@@ -201,11 +201,6 @@
  #endif
 #endif
 
-// ASSERT macro define.
-#ifndef ASSERT
-#define ASSERT(x) assert(x)
-#endif
-
 // PATH_MAX macro define.
 #if LLBC_TARGET_PLATFORM_WIN32
 #define LLBC_PATH_MAX MAX_PATH
@@ -255,7 +250,7 @@
 #endif
 
 // Unused param macro.
-#define LLBC_UNUSED_PARAM(param)  (void)param
+#define LLBC_UNUSED_PARAM(param)  static_cast<void>(param)
 
 // No except macro.
 #if LLBC_TARGET_PLATFORM_NON_WIN32

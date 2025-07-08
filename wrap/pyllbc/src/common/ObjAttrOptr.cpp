@@ -26,8 +26,8 @@
 pyllbc_ObjAttrOptr::pyllbc_ObjAttrOptr(PyObject *obj)
 : _obj(obj)
 {
-    ASSERT(_obj && 
-        "pyllbc_ObjAttrOptr::ctor(): obj parameter must be not null!");
+    llbc_assert(_obj && 
+                "pyllbc_ObjAttrOptr::ctor(): obj parameter must be not null!");
 
     Py_INCREF(_obj);
 }

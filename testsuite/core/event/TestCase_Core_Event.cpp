@@ -293,7 +293,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 1 && "Fire error, check it!");
+    llbc_assert(runTimes == 1 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -312,7 +312,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 2 && "Fire error, check it!");
+    llbc_assert(runTimes == 2 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -329,7 +329,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 3 && "Fire error, check it!");
+    llbc_assert(runTimes == 3 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -347,7 +347,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 2 && "Fire error, check it!");
+    llbc_assert(runTimes == 2 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -365,7 +365,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 2 && "Fire error, check it!");
+    llbc_assert(runTimes == 2 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -379,7 +379,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 4 && "Fire error, check it!");
+    llbc_assert(runTimes == 4 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -433,7 +433,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 6 && "Fire error, check it!");
+    llbc_assert(runTimes == 6 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -462,7 +462,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 7 && "Fire error, check it!");
+    llbc_assert(runTimes == 7 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -476,7 +476,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 2 && "Fire error, check it!");
+    llbc_assert(runTimes == 2 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -499,7 +499,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 4 && "Fire error, check it!");
+    llbc_assert(runTimes == 4 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 
@@ -513,7 +513,7 @@ int TestCase_Core_Event::EventHookTest()
     subEvMgr.BeginFire(EventIds::Event1)
             .SetParam("RunTimes", &runTimes)
             .Fire();
-    ASSERT(runTimes == 1 && "Fire error, check it!");
+    llbc_assert(runTimes == 1 && "Fire error, check it!");
 
     LLBC_PrintLn("----------------------------------");
 

@@ -71,7 +71,7 @@ template <typename T>
 LLBC_FORCE_INLINE T LLBC_RingBuffer<T>::Pop()
 {
 #if LLBC_DEBUG
-    ASSERT(!IsEmpty() && "Try pop a empty LLBC_RingBuffer!");
+    llbc_assert(!IsEmpty() && "Try pop a empty LLBC_RingBuffer!");
 #endif
 
     T elem(std::move(_elems[_front]));

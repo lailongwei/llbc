@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/PFConfig.h"
-
-#include "llbc/common/OSHeader.h"
 #include "llbc/common/StringDataType.h"
 
 __LLBC_NS_BEGIN

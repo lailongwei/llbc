@@ -417,8 +417,8 @@ int TestCase_Core_ObjPool::ReflectTest()
                  testObj->methCalled_GetStripeCapacity);
     LLBC_PrintLn("- Reflection method: OnTypedObjPoolCreated() called:%d",
                  testObj->methCalled_OnTypedObjPoolCreated);
-    ASSERT(testObj->methCalled_GetStripeCapacity &&
-           testObj->methCalled_OnTypedObjPoolCreated);
+    llbc_assert(testObj->methCalled_GetStripeCapacity &&
+                testObj->methCalled_OnTypedObjPoolCreated);
 
     LLBC_PrintLn("Success");
 

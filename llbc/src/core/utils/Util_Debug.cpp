@@ -93,7 +93,7 @@ LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep, size_t li
     }
 
     #if LLBC_DEBUG
-    ASSERT(hexStrIdx == hexStr.size() && "llbc framework internal error");
+    llbc_assert(hexStrIdx == hexStr.size() && "llbc framework internal error");
     #endif
 
     return hexStr;

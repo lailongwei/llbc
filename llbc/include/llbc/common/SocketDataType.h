@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include "llbc/common/PFConfig.h"
-
-#include "llbc/common/Macro.h"
 #include "llbc/common/BasicDataType.h"
 #include "llbc/common/StringDataType.h"
 

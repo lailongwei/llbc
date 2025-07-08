@@ -82,7 +82,7 @@ inline int LLBC_MessageBlock::Read(void *buf, size_t len)
         return LLBC_FAILED;
     }
 
-    ASSERT((char *)buf + len <= _buf || _buf + _size <= buf);
+    llbc_assert((char *)buf + len <= _buf || _buf + _size <= buf);
 
     memcpy(buf, _buf + _readPos, len);
     _readPos += len;
@@ -107,7 +107,7 @@ inline int LLBC_MessageBlock::Write(const void *buf, size_t len)
         Resize(MAX(_writePos + len, _size * 2));
     }
 
-    ASSERT((char *)(buf) + len <= _buf || _buf + _size <= buf);
+    llbc_assert((char *)(buf) + len <= _buf || _buf + _size <= buf);
 
     memcpy(_buf + _writePos, buf, len);
     _writePos += len;
@@ -310,7 +310,7 @@ inline void LLBC_MessageBlock::SetNext(LLBC_MessageBlock *next)
 
 inline void LLBC_MessageBlock::Resize(size_t newSize)
 {
-    ASSERT(!_attach && newSize > _size);
+    llbc_assert(!_attach && newSize > _size);
 
     _buf = LLBC_Realloc(char, _buf, newSize);
     _size = newSize;

@@ -104,7 +104,8 @@ int LLBC_GetQueuedCompletionStatus(LLBC_IocpHandle handle,
                                      TRUE,
                                      &flags);
 #if LLBC_DEBUG
-            ASSERT(grRet == FALSE && "llbc library internal error, in LLBC_GetQueuedCompletionStatus()!");
+            llbc_assert(grRet == FALSE &&
+                        "llbc library internal error, in LLBC_GetQueuedCompletionStatus()!");
 #endif
             LLBC_SetLastError(LLBC_ERROR_NETAPI);
         }

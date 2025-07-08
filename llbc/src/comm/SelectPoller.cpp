@@ -240,7 +240,7 @@ void LLBC_SelectPoller::HandleEv_Close(LLBC_PollerEvent &ev)
 
 void LLBC_SelectPoller::HandleEv_Monitor(LLBC_PollerEvent &ev)
 {
-    ASSERT(false && "Select Poller could not process Monitor Event");
+    llbc_assert(false && "Select Poller could not process Monitor Event");
 }
 
 void LLBC_SelectPoller::HandleEv_TakeOverSession(LLBC_PollerEvent &ev)
@@ -350,7 +350,8 @@ int LLBC_SelectPoller::HandleConnecting(LLBC_FdSet &writes, LLBC_FdSet &excepts)
 #if LLBC_DEBUG
             if (inExceptSet)
             {
-                ASSERT(sockErr != 0 && "llbc library internal error, in SelectPoller::HandleConnecting()!");
+                llbc_assert(sockErr != 0 &&
+                            "llbc library internal error, in SelectPoller::HandleConnecting()!");
             }
 #endif // LLBC_DEBUG
 
