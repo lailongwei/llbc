@@ -38,8 +38,12 @@ int LLBC_LogExecNameToken::Initialize(const LLBC_LogFormattingInfo &formatter, c
 {
     SetFormatter(formatter);
 
+    // Ensure preserve link flag.
+    const bool preserveLink = formatter.addiParam.tolower() == "preservelink";
+
+    // Get module file name.
     const LLBC_String execName =
-        LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
+        LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName(!preserveLink))[0];
     _execNameLen = MIN(execName.size(), sizeof(_execName) - 1);
     memcpy(_execName, execName.c_str(), _execNameLen);
 
