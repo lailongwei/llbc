@@ -257,14 +257,17 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
     _logFile.findreplace("%p", curProcId); 
 
     // Replace exec name: %e/%m.
+    // Note: %m pattern is deprecated.
     // TODO: Temporary support pattern additional params.
-    bool needPreserveExecNameLink = false;
-    size_t modFileNamePatternEnd = LLBC_String::npos;
-    auto modFileNamePatternBeg = _logFile.find("%m");
-    LLBC_DoIf(modFileNamePatternBeg == LLBC_String::npos, modFileNamePatternBeg = _logFile.find("%e"));
-
-    if (modFileNamePatternBeg != LLBC_String::npos)
+    while (true)
     {
+        auto modFileNamePatternBeg = _logFile.find("%e");
+        LLBC_DoIf(modFileNamePatternBeg == LLBC_String::npos, modFileNamePatternBeg = _logFile.find("%m"));
+        LLBC_BreakIf(modFileNamePatternBeg == LLBC_String::npos);
+
+        bool needPreserveExecNameLink = false;
+        size_t modFileNamePatternEnd = LLBC_String::npos;
+
         modFileNamePatternEnd = modFileNamePatternBeg + 2;
         if (modFileNamePatternEnd != _logFile.size() && _logFile[modFileNamePatternEnd] == '{')
         {
@@ -282,15 +285,12 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
                 ++modFileNamePatternEnd;
             }
         }
-    }
 
-    if (modFileNamePatternBeg != LLBC_String::npos)
-    {
         const LLBC_String modFileName =
             LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName(!needPreserveExecNameLink))[0];
         _logFile.erase(modFileNamePatternBeg, modFileNamePatternEnd - modFileNamePatternBeg);
         _logFile.insert(modFileNamePatternBeg, modFileName);
-    }
+    };
 
     // Replace logger name: %l.
     _logFile.findreplace("%l", _loggerName);
