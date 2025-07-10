@@ -87,7 +87,7 @@
                  xxx-%L => xxx, 同'_'
                  xxx--%L => xxx, 同'__'
                - non-root logger: 行为同%l一致 -->
-        <logFile>log/llbc_%p_%e{PreserveLink}_%L</logFile>
+        <logFile>log/llbc_%p_%m_%e{PreserveLink}_%L</logFile>
         <!-- 日志文件后缀. -->
         <logFileSuffix>.txt</logFileSuffix>
         <!-- 是否强制使用执行文件路径作为 logFile 相对输出路径. -->
