@@ -101,29 +101,33 @@ LLBC_Num2Str2(_NumTy num, size_t *strLen)
     }
     else if constexpr (std::is_floating_point_v<_NumTy>)
     {
-        auto numBuf = __LLBC_GetLibTls()->commonTls.num2StrBuf;
-        const int len = snprintf(numBuf, sizeof(numBuf), "%f", num);
+        int len;
+        auto &strBuf = __LLBC_GetLibTls()->commonTls.num2StrBuf;
+        if constexpr (std::is_same_v<_NumTy, ldouble>)
+            len = snprintf(strBuf, sizeof(strBuf), "%Lf", num);
+        else
+            len = snprintf(strBuf, sizeof(strBuf), "%f", num);
         if (UNLIKELY(len <= 0))
         {
-            numBuf[0] = '0';
-            numBuf[1] = '\0';
+            strBuf[0] = '0';
+            strBuf[1] = '\0';
             if (strLen)
                 *strLen = 1;
 
-            return numBuf;
+            return strBuf;
         }
 
         if (strLen)
         {
             // !!! Note: For win32 platform, snprintf has bug when formatting floating point. !!!
             #if LLBC_TARGET_PLATFORM_WIN32
-            *strLen = strlen(numBuf);
+            *strLen = strlen(strBuf);
             #else
             *strLen = static_cast<size_t>(len);
             #endif
         }
 
-        return numBuf;
+        return strBuf;
     }
     else if constexpr (std::is_pointer_v<_NumTy>)
     {
@@ -133,7 +137,8 @@ LLBC_Num2Str2(_NumTy num, size_t *strLen)
     }
     else
     {
-        static_assert(false, "Unsupported _NumTy");
+        llbc_assert(false && "Unsupported _NumTy");
+        return "";
     }
 }
 
@@ -221,13 +226,22 @@ LLBC_Str2Num(const char *str, int base)
     LLBC_UNUSED_PARAM(base);
 
     if constexpr (std::is_same_v<_NumTy, float>)
+    {
         return LIKELY(str) ? strtof(str, nullptr) : .0f;
+    }
     else if constexpr (std::is_same_v<_NumTy, double>)
+    {
         return LIKELY(str) ? strtod(str, nullptr) : .0;
+    }
     else if constexpr (std::is_same_v<_NumTy, long double>)
+    {
         return LIKELY(str) ? strtold(str, nullptr) : .0;
+    }
     else
-        static_assert(false, "Unsupport floating point type");
+    {
+        llbc_assert(false && "Unsupport floating point type");
+        return _NumTy();
+    }
 }
 
 __LLBC_NS_END
