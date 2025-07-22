@@ -256,10 +256,41 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
         LLBC_Num2Str(LLBC_GetCurrentProcessId());
     _logFile.findreplace("%p", curProcId); 
 
-    // Replace module file name: %m/%e.
-    const LLBC_String modFileName = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
-    _logFile.findreplace("%m", modFileName) //! '%m' replace format has been deprecated.
-            .findreplace("%e", modFileName);
+    // Replace exec name: %e/%m.
+    // Note: %m pattern is deprecated.
+    // TODO: Temporary support pattern additional params.
+    while (true)
+    {
+        auto modFileNamePatternBeg = _logFile.find("%e");
+        LLBC_DoIf(modFileNamePatternBeg == LLBC_String::npos, modFileNamePatternBeg = _logFile.find("%m"));
+        LLBC_BreakIf(modFileNamePatternBeg == LLBC_String::npos);
+
+        bool needPreserveExecNameLink = false;
+        size_t modFileNamePatternEnd = LLBC_String::npos;
+
+        modFileNamePatternEnd = modFileNamePatternBeg + 2;
+        if (modFileNamePatternEnd != _logFile.size() && _logFile[modFileNamePatternEnd] == '{')
+        {
+            ++modFileNamePatternEnd;
+            while (modFileNamePatternEnd < _logFile.size() &&
+                   _logFile[modFileNamePatternEnd] != '}')
+                ++modFileNamePatternEnd;
+
+            if (modFileNamePatternEnd < _logFile.size())
+            {
+                if (_logFile.substr(
+                        modFileNamePatternBeg + 3,
+                        modFileNamePatternEnd - modFileNamePatternBeg - 3).strip().tolower() == "preservelink")
+                    needPreserveExecNameLink = true;
+                ++modFileNamePatternEnd;
+            }
+        }
+
+        const LLBC_String modFileName =
+            LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName(!needPreserveExecNameLink))[0];
+        _logFile.erase(modFileNamePatternBeg, modFileNamePatternEnd - modFileNamePatternBeg);
+        _logFile.insert(modFileNamePatternBeg, modFileName);
+    };
 
     // Replace logger name: %l.
     _logFile.findreplace("%l", _loggerName);

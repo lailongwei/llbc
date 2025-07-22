@@ -43,6 +43,7 @@
                当前支持的格式描述如下:
                  %N: 打印logger名字,对于当前配置,为root
                  %e: 打印进程可执行文件名(已去除扩展名)
+                     Note: 默认情况下, %e将自动dereference软链接以得到真正的名字, 如果开发者需要保留软链接名, 可通过AdditionalParam指定PerserveLink来进行限制
                  %g: 打印消息tag, 用于给同类型消息打入相同的tag信息.
                  %F: 打印日志所在函数名.
                  %f: 打印日志所在的代码文件名.
@@ -77,6 +78,7 @@
         <!-- 日志文件名:
              - %p: 当前进程Id
              - %m/%e: 已去除后缀的当前主执行体映像名(Note: %m已废弃, 请使用%e来描述主执行体映像名)
+               - Note: %m/%e同样可通过{PreserveLink}来保留软链接名
              - %l: 当前日志记录器名
              - %L: 跟%l类似, 当前日志记录器名, 差别是这个替换符会"智能的"进行替换, 规则如下:
                - root logger:
@@ -85,7 +87,7 @@
                  xxx-%L => xxx, 同'_'
                  xxx--%L => xxx, 同'__'
                - non-root logger: 行为同%l一致 -->
-        <logFile>log/llbc_%p_%e_%L</logFile>
+        <logFile>log/llbc_%p_%m_%e{PreserveLink}_%L</logFile>
         <!-- 日志文件后缀. -->
         <logFileSuffix>.txt</logFileSuffix>
         <!-- 是否强制使用执行文件路径作为 logFile 相对输出路径. -->
