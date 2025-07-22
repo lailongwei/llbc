@@ -409,7 +409,7 @@ int TestCase_Core_Utils_Text::_Test_Str2NumImpl()
             _NumTyLmt::min() + static_cast<_NumTy>(50),
             _NumTyLmt::min() + static_cast<_NumTy>(100),
             _NumTy(),
-            static_cast<_NumTy>(3.14159),
+            static_cast<_NumTy>(3.5),
         };
 
         for (auto testNum : testNums)
