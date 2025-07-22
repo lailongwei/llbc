@@ -153,9 +153,9 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
 
 void TestCase_Comm_SendBytes::FetchArgs(int argc, char *argv[])
 {
-    _asClient = LLBC_ToLower(argv[1]) == "client" ? true : false;
-    _useNmlProtocolFactory = LLBC_ToLower(argv[2]) == "normal" ? true : false;
+    _asClient = LLBC_String(argv[1]).tolower() == "client" ? true : false;
+    _useNmlProtocolFactory = LLBC_String(argv[2]).tolower() == "normal" ? true : false;
 
     _runIp = argv[3];
-    _runPort = LLBC_Str2Int32(argv[4]);
+    _runPort = LLBC_Str2Num<int>(argv[4]);
 }

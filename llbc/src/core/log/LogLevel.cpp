@@ -55,7 +55,7 @@ int LLBC_LogLevel::GetLevelEnum(const LLBC_CString &levelStr)
     if (UNLIKELY(levelStr.empty()))
         return LLBC_LogLevel::End;
 
-    const LLBC_String upperStr = LLBC_ToUpper(levelStr.c_str());
+    const LLBC_String upperStr = LLBC_String(levelStr).toupper();
     if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Trace][0] == upperStr)
         return LLBC_LogLevel::Trace;
     else if (LLBC_INTERNAL_NS __level2StrRepr[LLBC_LogLevel::Debug][0] == upperStr)

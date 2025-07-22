@@ -220,53 +220,10 @@ bool LLBC_Variant::AsLooseBool() const
         if (!str || str->empty())
             return false;
 
-        const Str nmlStr = str->strip().tolower();
-        if (nmlStr == LLBC_INL_NS __g_trueStr || nmlStr == LLBC_INL_NS __g_yesStr)
-            return true;
-        else if (nmlStr.find('.') != Str::npos)
-            return std::fabs(LLBC_Str2Double(nmlStr.c_str())) > DBL_EPSILON;
-        else
-            return AsInt64() != 0;
+        return LLBC_Str2LooseBool(str->c_str(), 10, true);
     }
 
     return AsBool();
-}
-
-sint64 LLBC_Variant::AsInt64() const
-{
-    const LLBC_VariantType::ENUM firstType = GetFirstType();
-    if (firstType == LLBC_VariantType::NIL ||
-        firstType == LLBC_VariantType::SEQ ||
-        firstType == LLBC_VariantType::DICT)
-        return 0;
-
-    if (firstType == LLBC_VariantType::STR)
-    {
-        const Str * const &str = _holder.data.obj.str;
-        if (!str || str->empty())
-            return 0;
-
-        if (str->find('.'))
-            return static_cast<sint64>(LLBC_Str2Double(str->c_str()));
-        else
-            return LLBC_Str2Int64(str->c_str());
-    }
-
-    if (_holder.type == LLBC_VariantType::RAW_FLOAT ||
-        _holder.type == LLBC_VariantType::RAW_DOUBLE)
-    {
-        if (std::fabs(_holder.data.raw.doubleVal) <= DBL_EPSILON)
-            return 0;
-
-        return static_cast<sint64>(_holder.data.raw.doubleVal);
-    }
-
-    return _holder.data.raw.int64Val;
-}
-
-uint64 LLBC_Variant::AsUInt64() const
-{
-    return static_cast<uint64>(AsInt64());
 }
 
 double LLBC_Variant::AsDouble() const
@@ -278,8 +235,19 @@ double LLBC_Variant::AsDouble() const
         return 0.0;
 
     if (firstType == LLBC_VariantType::STR)
-        return (_holder.data.obj.str && !_holder.data.obj.str->empty()) ? 
-                LLBC_Str2Double(_holder.data.obj.str->c_str()) : 0.0;
+    {
+        const auto &str = _holder.data.obj.str;
+        if (!str || str->empty())
+            return 0.0;
+
+        if (str->find('.') != LLBC_String::npos)
+            return LLBC_Str2Num<double>(str->c_str());
+
+        if (str->find('-') != LLBC_String::npos)
+            return static_cast<double>(AsSignedOrUnsigned64<sint64>());
+        else
+            return static_cast<double>(AsSignedOrUnsigned64<uint64>());
+    }
 
     if (firstType == LLBC_VariantType::RAW)
     {
@@ -306,7 +274,7 @@ LLBC_String LLBC_Variant::AsStr() const
         }
         else if (IsFloat() || IsDouble())
         {
-            return LLBC_NumToStr(_holder.data.raw.doubleVal);
+            return LLBC_Num2Str(_holder.data.raw.doubleVal);
         }
         else if (IsSignedRaw())
         {
@@ -315,14 +283,14 @@ LLBC_String LLBC_Variant::AsStr() const
                 return *_num2StrFastAccessTbl[
                     static_cast<int>(_holder.data.raw.int64Val - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN)];
 
-            return LLBC_NumToStr(_holder.data.raw.int64Val);
+            return LLBC_Num2Str(_holder.data.raw.int64Val);
         }
         else
         {
             if (IsPtr())
-                return LLBC_String().format("0x%p", _holder.data.raw.uint64Val);
+                return LLBC_Num2Str<uint64, true>(_holder.data.raw.uint64Val);
             else
-                return LLBC_NumToStr(_holder.data.raw.uint64Val);
+                return LLBC_Num2Str(_holder.data.raw.uint64Val);
         }
     }
 

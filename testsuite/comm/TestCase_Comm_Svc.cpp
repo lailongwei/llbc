@@ -163,7 +163,7 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
 
     // Parse arguments.
     const char *ip = argv[3];
-    const int port = LLBC_Str2Int32(argv[4]);
+    const int port = LLBC_Str2Num<int>(argv[4]);
     const bool asClient = LLBC_String(argv[1]) == "client" ? true : false;
     LLBC_IProtocolFactory *protoFactory;
     if (LLBC_String(argv[2]) == "normal")

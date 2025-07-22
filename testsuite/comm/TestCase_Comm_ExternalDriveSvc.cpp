@@ -195,7 +195,7 @@ int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
     }
 
     const char *ip = argv[1];
-    const uint16 port = LLBC_Str2Int32(argv[2]);
+    const uint16 port = LLBC_Str2Num<int>(argv[2]);
 
     // Create comp and register it.
     TestComp *comp = new TestComp;

@@ -116,8 +116,8 @@ LLBC_EXTERN_C PyObject *_pyllbc_RunTestCase(PyObject *self, PyObject *args)
         return nullptr;
 
     char *tcArgs[2] = {nullptr, nullptr};
-    tcArgs[0] = const_cast<char *>(LLBC_NumToStr(self).c_str());
-    tcArgs[1] = const_cast<char *>(LLBC_NumToStr(argObj).c_str());
+    tcArgs[0] = const_cast<char *>(LLBC_Num2Str<void *, true>(self).c_str());
+    tcArgs[1] = const_cast<char *>(LLBC_Num2Str<void *, true>(argObj).c_str());
 
     return Py_BuildValue("i", tc->Run(2, tcArgs));
 }

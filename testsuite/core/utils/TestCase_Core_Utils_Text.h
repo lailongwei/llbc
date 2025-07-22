@@ -28,4 +28,14 @@ class TestCase_Core_Utils_Text final : public LLBC_BaseTestCase
 {
 public:
     int Run(int argc, char *argv[]) override;
+
+private:
+    int _Test_Num2Str();
+    int _Test_Str2Num();
+    int _Test_Str2LooseBool();
+
+    template <typename _NumTy, bool _HexFormat>
+    int _Test_Num2StrImpl();
+    template <typename _NumTy>
+    int _Test_Str2NumImpl();
 };

@@ -63,7 +63,7 @@ int TestCase_Core_OS_Process::TestCrash()
 void TestCase_Core_OS_Process::TestCrash_DivisionByZero()
 {
     std::cout << "Trigger division by 0 exception..." << std::endl;
-    std::cout << "3 / 0 = " << 3 / LLBC_Str2Int32("0") << std::endl;
+    std::cout << "3 / 0 = " << 3 / LLBC_Str2Num<int>("0") << std::endl;
 }
 
 void TestCase_Core_OS_Process::TestCrash_InvalidPtrWrite()
