@@ -123,9 +123,7 @@ This *pyllbc_Module::GetParentModule() const
 
 This *pyllbc_Module::GetSubModule(const LLBC_String &name) const
 {
-    std::vector<LLBC_String> names;
-    LLBC_SplitString(name, ".", names);
-
+    std::vector<LLBC_String> names = name.split('.');
     if (names.empty())
     {
         pyllbc_SetError("module name empty", LLBC_ERROR_INVALID);

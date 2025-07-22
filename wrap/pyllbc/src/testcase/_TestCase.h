@@ -33,7 +33,7 @@ public:
 public:
     int Run(int argc, char *argv[]) override
     {
-        PyObject *pyObj = reinterpret_cast<PyObject *>(LLBC_Str2Ptr(argv[0]));
+        PyObject *pyObj = reinterpret_cast<PyObject *>(LLBC_Str2Num<PyObject *>(argv[0]));
 
         PyObject *callable = nullptr;
         pyllbc_ObjAttrOptr optr(pyObj);
@@ -50,7 +50,7 @@ public:
     
         Py_DECREF(callable);
 
-        PyObject *arg = reinterpret_cast<PyObject *>(LLBC_Str2Ptr(argv[1]));
+        PyObject *arg = reinterpret_cast<PyObject *>(LLBC_Str2Num<PyObject *>(argv[1]));
         PyObject *rtn = PyObject_CallMethod(pyObj, const_cast<char *>("run"), const_cast<char *>("N"), arg);
         if (!rtn)
             return LLBC_FAILED;
