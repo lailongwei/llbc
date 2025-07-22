@@ -160,7 +160,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
         case TokenParseState::ParsingTokenIndent:
             if ((ch < '0' || ch > '9') && ch != '-')
             {
-                const int minLength = LLBC_Str2Int32(&buf[buf.rfind(LLBC_LogTokenType::EscapeToken) + 1]);
+                const int minLength = LLBC_Str2Num<int>(&buf[buf.rfind(LLBC_LogTokenType::EscapeToken) + 1]);
                 formatter.leftAlign = minLength < 0 ? true : false;
                 formatter.minLen = std::abs(minLength);
 
