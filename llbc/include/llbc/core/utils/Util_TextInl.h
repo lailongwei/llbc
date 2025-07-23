@@ -85,7 +85,9 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 template <typename _NumTy, bool _HexFormat>
-std::enable_if_t<std::is_arithmetic_v<_NumTy> || std::is_pointer_v<_NumTy>,
+std::enable_if_t<std::is_arithmetic_v<_NumTy> ||
+                    std::is_pointer_v<_NumTy> ||
+                    std::is_enum_v<_NumTy>,
                  const char *>
 LLBC_Num2Str2(_NumTy num, size_t *strLen)
 {
@@ -94,6 +96,10 @@ LLBC_Num2Str2(_NumTy num, size_t *strLen)
         if (strLen)
             *strLen = 1;
         return num ? "1" : "0";
+    }
+    else if constexpr (std::is_enum_v<_NumTy>)
+    {
+        return LLBC_INL_NS __LLBC_Integral2Str<sint64, _HexFormat>(static_cast<sint64>(num), strLen);
     }
     else if constexpr (std::is_integral_v<_NumTy>)
     {
@@ -138,13 +144,18 @@ LLBC_Num2Str2(_NumTy num, size_t *strLen)
     else
     {
         llbc_assert(false && "Unsupported _NumTy");
+        if (strLen)
+            *strLen = 0;
+
         return "";
     }
 }
 
 template <typename _NumTy, bool _HexFormat>
-std::enable_if_t<std::is_arithmetic_v<_NumTy> || std::is_pointer_v<_NumTy>,
-                 LLBC_String> 
+std::enable_if_t<std::is_arithmetic_v<_NumTy> ||
+                    std::is_pointer_v<_NumTy> ||
+                    std::is_enum_v<_NumTy>,
+                 LLBC_String>
 LLBC_Num2Str(_NumTy num)
 {
     size_t strLen;
@@ -191,6 +202,13 @@ LLBC_Str2Num(const char *str, int base)
         return LIKELY(str) ? strtoll(str, nullptr, base) : 0ll;
     else // uint64
         return LIKELY(str) ? strtoull(str, nullptr, base) : 0llu;
+}
+
+template <typename _NumTy>
+std::enable_if_t<std::is_enum_v<_NumTy>, _NumTy>
+LLBC_Str2Num(const char *str, int base)
+{
+    return static_cast<_NumTy>(LLBC_Str2Num<sint64>(str, base));
 }
 
 template <typename _NumTy>
@@ -245,4 +263,3 @@ LLBC_Str2Num(const char *str, int base)
 }
 
 __LLBC_NS_END
-
