@@ -39,6 +39,7 @@ __LLBC_NS_END
 std::ostream & operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpan &span);
 
 __LLBC_NS_BEGIN
+
 /**
  * \brief The time separator define.
  * Default datetime format: YYYY-MM-DD HH:MM:SS.micro_second
