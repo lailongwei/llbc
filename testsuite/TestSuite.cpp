@@ -78,7 +78,7 @@ int TestSuite_Main(int argc, char* argv[])
 
         // __ClearInputBuf();
         const LLBC_Strings inputs = LLBC_String(inputBuf).strip().split(' ');
-        idx = LLBC_Str2Int32(inputs[0].c_str());
+        idx = LLBC_Str2Num<int>(inputs[0].c_str());
         if (idx <= 0)
         {
             break;

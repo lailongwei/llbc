@@ -38,6 +38,7 @@ struct LLBC_EXPORT __LLBC_LibTls
         /* error, sub-error, and error describe character pointer. */
         int errNo;
         int subErrNo;
+        char num2StrBuf[32];
         char errDesc[__LLBC_ERROR_DESC_SIZE];
         char customErrDesc[__LLBC_ERROR_DESC_SIZE];
         char clibErrFmtBuf[__LLBC_CLIB_ERROR_FORMAT_BUF_SIZE];

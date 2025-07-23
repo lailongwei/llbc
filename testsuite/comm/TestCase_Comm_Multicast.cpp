@@ -181,14 +181,14 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
 
 void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
 {
-    _asClient = LLBC_ToLower(argv[1]) == "client" ? true : false;
-    _useNmlProtocolFactory = LLBC_ToLower(argv[2]) == "normal" ? true : false;
+    _asClient = LLBC_String(argv[1]).tolower() == "client" ? true : false;
+    _useNmlProtocolFactory = LLBC_String(argv[2]).tolower() == "normal" ? true : false;
 
     _runIp = argv[3];
-    _runPort = LLBC_Str2Int32(argv[4]);
+    _runPort = LLBC_Str2Num<int>(argv[4]);
 
     if (argc >= 6)
-        _useBst = LLBC_ToLower(argv[5]) == "true" ? true : false;
+        _useBst = LLBC_String(argv[5]).tolower() == "true" ? true : false;
 }
 
 int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_Service *svc)

@@ -253,7 +253,7 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 {
     // Replace process id: %p.
     const LLBC_String curProcId = 
-        LLBC_NumToStr(LLBC_GetCurrentProcessId());
+        LLBC_Num2Str(LLBC_GetCurrentProcessId());
     _logFile.findreplace("%p", curProcId); 
 
     // Replace exec name: %e/%m.

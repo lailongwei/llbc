@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         LLBC_ContinueIf(inputs[0].empty());
 
         // Parse quick start index.
-        const int index = LLBC_Str2Int32(inputs[0].c_str()) - 1;
+        const int index = LLBC_Str2Num<int>(inputs[0].c_str()) - 1;
         LLBC_BreakIf(index < 0);
 
         if (index >= __QUICK_STARTS_COUNT)

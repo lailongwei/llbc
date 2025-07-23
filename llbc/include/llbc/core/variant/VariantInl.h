@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/core/algo/Hash.h"
+#include "llbc/core/utils/Util_Text.h"
 #include "llbc/core/variant/VariantTraits.h"
 
 __LLBC_NS_BEGIN
@@ -506,9 +507,19 @@ inline unsigned long LLBC_Variant::AsULong() const
 }
 
 template <typename _Ty>
-inline _Ty *LLBC_Variant::AsPtr() const
+_Ty *LLBC_Variant::AsPtr() const
 {
     return reinterpret_cast<_Ty *>(AsUInt64());
+}
+
+inline sint64 LLBC_Variant::AsInt64() const
+{
+    return AsSignedOrUnsigned64<sint64>();
+}
+
+inline uint64 LLBC_Variant::AsUInt64() const
+{
+    return AsSignedOrUnsigned64<uint64>();
 }
 
 inline float LLBC_Variant::AsFloat() const
@@ -1222,6 +1233,50 @@ void LLBC_Variant::CpToBinaryCont(_BinaryContainer &binaryCont) const
     const DictConstIter endIt = _holder.data.obj.dict->end();
     for (DictConstIter it = _holder.data.obj.dict->begin(); it != endIt; ++it)
         binaryCont.emplace(LLBC_Variant(it->first), LLBC_Variant(it->second));
+}
+
+template <typename _64Ty>
+_64Ty LLBC_Variant::AsSignedOrUnsigned64() const
+{
+    const LLBC_VariantType::ENUM firstType = GetFirstType();
+    if (firstType == LLBC_VariantType::NIL ||
+        firstType == LLBC_VariantType::SEQ ||
+        firstType == LLBC_VariantType::DICT)
+        return 0;
+
+    if (firstType == LLBC_VariantType::STR)
+    {
+        const Str * const &str = _holder.data.obj.str;
+        if (!str || str->empty())
+            return 0;
+
+        int base = 10;
+        if (str->size() > 2)
+        {
+            size_t hexadecimalBegPos = str->find("0x");
+            if (hexadecimalBegPos == LLBC_String::npos)
+                hexadecimalBegPos = str->find("0X");
+
+            if (hexadecimalBegPos != LLBC_String::npos)
+                base = 16;
+        }
+
+        return LLBC_Str2Num<_64Ty>(str->c_str(), base);
+    }
+
+    if (_holder.type == LLBC_VariantType::RAW_FLOAT ||
+        _holder.type == LLBC_VariantType::RAW_DOUBLE)
+    {
+        if (LLBC_IsFloatZero(_holder.data.raw.doubleVal))
+            return 0;
+
+        return static_cast<_64Ty>(_holder.data.raw.doubleVal);
+    }
+
+    if constexpr (std::is_unsigned_v<_64Ty>)
+        return _holder.data.raw.uint64Val;
+    else
+        return _holder.data.raw.int64Val;
 }
 
 inline bool LLBC_Variant::IsStrX() const

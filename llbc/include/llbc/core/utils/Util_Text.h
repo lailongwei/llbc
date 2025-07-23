@@ -26,70 +26,88 @@
 __LLBC_NS_BEGIN
 
 /**
- * Split string using specific separator.
- * @param[in]  str            - the source string.
- * @param[in]  separator      - separator string.
- * @param[out] destStrList    - sestination string list.
- * @param[in]  justSplitFirst - split first flag, if true, when split one time, will stop.
- * @param[in]  escapeChar     - escape character, default is '\0'.
+ * Convert number to string.
+ * @param[in] num    - the number.
+ * @param[in] strLen - number length, if not null, will set.
+ * @return const char * - the number string.
  */
-LLBC_EXPORT void LLBC_SplitString(const LLBC_String &str,
-                                  const LLBC_String &separator,
-                                  std::vector<LLBC_String> &destStrList,
-                                  bool justSplitFirst = false,
-                                  char escapeChar = '\0');
+template <typename _NumTy, bool _HexFormat = false>
+std::enable_if_t<std::is_arithmetic_v<_NumTy> || std::is_pointer_v<_NumTy>,
+                 const char *>
+LLBC_Num2Str2(_NumTy num, size_t *strLen = nullptr);
 
 /**
- * Filter out specific string in given string.
- * @param[in] str       - the sill filter out's string.
- * @param[in] filterStr - filter out string.
- * @return LLBC_String - the already filter out's string.
+ * Convert number to string(this function has pool performance).
+ * @param[in] num - the number.
+ * @return LLBC_String - the number string.
  */
-LLBC_EXPORT LLBC_String LLBC_FilterOutString(const LLBC_String &str, const LLBC_String &filterStr);
+template <typename _NumTy, bool _HexFormat = false>
+std::enable_if_t<std::is_arithmetic_v<_NumTy> || std::is_pointer_v<_NumTy>,
+                 LLBC_String>
+LLBC_Num2Str(_NumTy num);
 
 /**
- * Convert lower case character to upper case.
- * @param[in] str - will convert string.
- * @return LLBC_String - the converted string.
+ * llbc framework special function, try convert string to loose bol.
+ * Note: This function can recognize true/yes, and return true.
+ * @param[in] str                 - the string.
+ * @param[in] base                - base of the interpreted integer value¡£
+ * @param[in] recognizeTrueAndYes - recognize true/false string, default is true. 
+ * @return bool - the bool value.
  */
-LLBC_EXPORT LLBC_String LLBC_ToUpper(const char *str);
+LLBC_EXPORT bool LLBC_Str2LooseBool(const char *str,
+                                    int base = 10,
+                                    bool recognizeTrueAndYes = true);
 
 /**
- * Convert upper case character to lower case.
- * @param[in] str - will convert string.
- * @return LLBC_String - the converted string.
+ * Interprets an sint8/uint8/sint16/uint16/sint32/uint32 value in a byte string pointed to by str.
+ * @param[in] str  - pointer to the null-terminated by string to be interpreted.
+ * @param[in] base - base of the interpreted integer value.
+ * @return _NumTy - An integer value corresponding to the contents of str is returned.
  */
-LLBC_EXPORT LLBC_String LLBC_ToLower(const char *str);
+template <typename _NumTy>
+std::enable_if_t<std::is_same_v<_NumTy, sint8> ||
+                    std::is_same_v<_NumTy, uint8> ||
+                    std::is_same_v<_NumTy, sint16> ||
+                    std::is_same_v<_NumTy, uint16> ||
+                    std::is_same_v<_NumTy, sint32> ||
+                    std::is_same_v<_NumTy, uint32>,
+                 _NumTy>
+LLBC_Str2Num(const char *str, int base = 10);
 
 /**
- * Convert string to number(signed/unsigned)(int, long, long long, pointer, double) type.
- * @param[in] str - the string value.
- * @return number - the converted vavlue.
+ * Interprets an long/ulong/sint64/uint64 value in a byte string pointed to by str.
+ * @param[in] str  - pointer to the null-terminated by string to be interpreted.
+ * @param[in] base - base of the interpreted integer value.
+ * @return _NumTy - An integer value corresponding to the contents of str is returned.
  */
-LLBC_EXPORT sint32 LLBC_Str2Int32(const char *str);
-LLBC_EXPORT uint32 LLBC_Str2UInt32(const char *str);
-LLBC_EXPORT long LLBC_Str2Long(const char *str);
-LLBC_EXPORT ulong LLBC_Str2ULong(const char *str);
-LLBC_EXPORT sint64 LLBC_Str2Int64(const char *str);
-LLBC_EXPORT uint64 LLBC_Str2UInt64(const char *str);
-LLBC_EXPORT void *LLBC_Str2Ptr(const char *str);
-LLBC_EXPORT double LLBC_Str2Double(const char *str);
+template <typename _NumTy>
+std::enable_if_t<std::is_same_v<_NumTy, long> ||
+                    std::is_same_v<_NumTy, ulong> ||
+                    std::is_same_v<_NumTy, sint64> ||
+                    std::is_same_v<_NumTy, uint64>,
+                 _NumTy>
+LLBC_Str2Num(const char *str, int base = 10);
 
 /**
- * Convert number(signed/unsigned) type to string format.
- * @param[in] val - number value.
- * @return LLBC_String - the converted string.
+ * Interprets an pointer value in a byte string pointed to by str.
+ * Note: !!! In this function implement, will auto normalize <base> param to 16, if str starts with '0x'/'0X' !!!
+ * @param[in] str  - pointer to the null-terminated by string to be interpreted.
+ * @param[in] base - base of the interpreted integer value.
+ * @return _NumTy - An integer value corresponding to the contents of str is returned.
  */
-template <typename T>
-LLBC_String LLBC_NumToStr(T val);
+template <typename _NumTy>
+std::enable_if_t<std::is_pointer_v<_NumTy>, _NumTy>
+LLBC_Str2Num(const char *str, int base = 10);
 
 /**
- * Convert number(signed/unsigned) type to string with hexadecimal format.
- * @param[in] val - number value.
- * @return LLBC_String - the converted string.
+ * Interprets an floating point value in a byte string pointed to by str.
+ * @param[in] str  - pointer to the null-terminated by string to be interpreted.
+ * @param[in] base - base of the interpreted integer value.
+ * @return _NumTy - An integer value corresponding to the contents of str is returned.
  */
-template <typename T>
-LLBC_String LLBC_NumToStrInHex(T val);
+template <typename _NumTy>
+std::enable_if_t<std::is_floating_point_v<_NumTy>, _NumTy>
+LLBC_Str2Num(const char *str, int base = 10);
 
 __LLBC_NS_END
 
