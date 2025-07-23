@@ -22,6 +22,21 @@
 
 #include "core/utils/TestCase_Core_Utils_Text.h"
 
+namespace
+{
+
+enum Util_Text_TestEnum
+{
+    TestEnumVal = 1,
+};
+
+enum class Util_Text_TestEnumCls
+{
+    TestEnumVal = 2,
+};
+
+}
+
 int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/utils/Util_Text test:");
@@ -58,6 +73,16 @@ int TestCase_Core_Utils_Text::_Test_Num2Str()
 
     for (auto &boolVal : {true, false})
         testNum2Str_bool(boolVal);
+
+    // Num->Str, enum:
+    LLBC_PrintLn("  - LLBC_Num2Str<Enum>() test:");
+    auto enumStr = LLBC_Num2Str(Util_Text_TestEnum::TestEnumVal);
+    LLBC_PrintLn("    - LLBC_Num2Str(Util_Text_TestEnum::TestEnumVal) return:%s, expect:1", enumStr.c_str());
+    llbc_assert(enumStr == "1" && "LLBC_Num2Str<Eunm> test failed");
+
+    enumStr = LLBC_Num2Str(Util_Text_TestEnumCls::TestEnumVal);
+    LLBC_PrintLn("    - LLBC_Num2Str(Util_Text_TestEnumCls::TestEnumVal) return:%s, expect:2", enumStr.c_str());
+    llbc_assert(enumStr == "2" && "LLBC_Num2Str<EnumCls> test failed");
 
     // Num->Str, sint8/uint8:
     LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint8, false>() != LLBC_OK), LLBC_FAILED);
@@ -128,6 +153,18 @@ int TestCase_Core_Utils_Text::_Test_Str2Num()
 
         return LLBC_OK;
     };
+
+    // Str->Num, enum:
+    LLBC_PrintLn("  - LLBC_Str2Num<Enum>() test:");
+    auto enumVal = LLBC_Str2Num<Util_Text_TestEnum>("1");
+    LLBC_PrintLn("    - LLBC_Str2Num<Util_Text_TestEnum>(""1"") return:%d, except:%d",
+                      enumVal, Util_Text_TestEnum::TestEnumVal);
+    llbc_assert(enumVal == Util_Text_TestEnum::TestEnumVal && "LLBC_Str2Num<Enum>() test failed");
+
+    auto enumVal2 = LLBC_Str2Num<Util_Text_TestEnumCls>("2");
+    LLBC_PrintLn("    - LLBC_Str2Num<Util_Text_TestEnumCls>(""2"") return:%d, except:%d",
+                      static_cast<int>(enumVal2), static_cast<int>(Util_Text_TestEnumCls::TestEnumVal));
+    llbc_assert(enumVal2 == Util_Text_TestEnumCls::TestEnumVal && "LLBC_Str2Num<EnumCls>() test failed");
 
     for (auto &boolStr : {"0", "  0", "0    ", "   0   ", "", "   "})
         LLBC_ErrorAndReturnIf(boolTestFunc(boolStr, 10, false) != LLBC_OK, LLBC_FAILED);

@@ -32,7 +32,9 @@ __LLBC_NS_BEGIN
  * @return const char * - the number string.
  */
 template <typename _NumTy, bool _HexFormat = false>
-std::enable_if_t<std::is_arithmetic_v<_NumTy> || std::is_pointer_v<_NumTy>,
+std::enable_if_t<std::is_arithmetic_v<_NumTy> ||
+                    std::is_pointer_v<_NumTy> ||
+                    std::is_enum_v<_NumTy>,
                  const char *>
 LLBC_Num2Str2(_NumTy num, size_t *strLen = nullptr);
 
@@ -42,7 +44,9 @@ LLBC_Num2Str2(_NumTy num, size_t *strLen = nullptr);
  * @return LLBC_String - the number string.
  */
 template <typename _NumTy, bool _HexFormat = false>
-std::enable_if_t<std::is_arithmetic_v<_NumTy> || std::is_pointer_v<_NumTy>,
+std::enable_if_t<std::is_arithmetic_v<_NumTy> ||
+                    std::is_pointer_v<_NumTy> ||
+                    std::is_enum_v<_NumTy>,
                  LLBC_String>
 LLBC_Num2Str(_NumTy num);
 
@@ -50,7 +54,7 @@ LLBC_Num2Str(_NumTy num);
  * llbc framework special function, try convert string to loose bol.
  * Note: This function can recognize true/yes, and return true.
  * @param[in] str                 - the string.
- * @param[in] base                - base of the interpreted integer value¡£
+ * @param[in] base                - base of the interpreted integer valueã€‚
  * @param[in] recognizeTrueAndYes - recognize true/false string, default is true. 
  * @return bool - the bool value.
  */
@@ -89,6 +93,16 @@ std::enable_if_t<std::is_same_v<_NumTy, long> ||
 LLBC_Str2Num(const char *str, int base = 10);
 
 /**
+ * Interprets an enum value in a byte string pointed to by str.
+ * @param[in] str  - pointer to the null-terminated by string to be interpreted.
+ * @param[in] base - base of the interpreted integer value.
+ * @return _NumTy - An integer value corresponding to the contents of str is returned.
+ */
+template <typename _NumTy>
+std::enable_if_t<std::is_enum_v<_NumTy>, _NumTy>
+LLBC_Str2Num(const char *str, int base = 10);
+
+/**
  * Interprets an pointer value in a byte string pointed to by str.
  * Note: !!! In this function implement, will auto normalize <base> param to 16, if str starts with '0x'/'0X' !!!
  * @param[in] str  - pointer to the null-terminated by string to be interpreted.
@@ -112,5 +126,3 @@ LLBC_Str2Num(const char *str, int base = 10);
 __LLBC_NS_END
 
 #include "llbc/core/utils/Util_TextInl.h"
-
-
