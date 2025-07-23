@@ -26,111 +26,401 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/utils/Util_Text test:");
 
-    // Split string test.
-    LLBC_String str = "hello world hello world";
-    LLBC_PrintLn("split string: %s", str.c_str());
-    std::vector<LLBC_String> strs;
-    LLBC_SplitString(str, " ", strs);
-    LLBC_PrintLn("result(sub string count: %lu):", strs.size());
-    for(size_t i = 0; i < strs.size(); ++i)
-    {
-        LLBC_PrintLn("\t%s", strs[i].c_str());
-    }
-    LLBC_Print("\n");
+    LLBC_ErrorAndReturnIf(_Test_Num2Str() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2Num() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2LooseBool() != LLBC_OK, LLBC_FAILED);
 
-    // Filter-out test.
-    LLBC_PrintLn("filter out string: %s", str.c_str());
-    LLBC_PrintLn("result: %s", LLBC_FilterOutString(str, " ").c_str());
-    LLBC_Print("\n");
-    
-    // Upper<->Lower test.
-    str = "AaBbCcDd eEfFgG";
-    LLBC_PrintLn("string [%s] to Upper: %s", str.c_str(), LLBC_ToUpper(str.c_str()).c_str());
-    LLBC_PrintLn("string [%s] to Lower: %s", str.c_str(), LLBC_ToLower(str.c_str()).c_str());
-    LLBC_Print("\n");
-
-    // String -> Number test.
-    str = "-30";
-    LLBC_PrintLn("string [%s] to number(Str2Int32): %d", 
-        str.c_str(), LLBC_Str2Int32(str.c_str()));
-    LLBC_PrintLn("string [%s] to number(Str2Long): %ld", 
-        str.c_str(), LLBC_Str2Long(str.c_str()));
-    LLBC_PrintLn("string [%s] to number(Str2Int64): %lld", 
-        str.c_str(), LLBC_Str2Int64(str.c_str()));
-    LLBC_PrintLn("string [%s] to number(Str2UInt32): %u", 
-        str.c_str(), LLBC_Str2UInt32(str.c_str()));
-    LLBC_PrintLn("string [%s] to number(Str2ULong): %lu", 
-        str.c_str(), LLBC_Str2ULong(str.c_str()));
-    LLBC_PrintLn("string [%s] to pointer(Str2Ptr): %p",
-        "30", LLBC_Str2Ptr("30"));
-    LLBC_PrintLn("string [%s] to pointer(Str2Ptr): %p",
-        "0xcdcdcdcd", LLBC_Str2Ptr("0xcdcdcdcd"));
-    LLBC_PrintLn("string [%s] to number(Str2UInt64): %llu", 
-        str.c_str(), LLBC_Str2UInt64(str.c_str()));
-    LLBC_PrintLn("string [%s] to number(Str2Double): %f", 
-        str.c_str(), LLBC_Str2Double(str.c_str()));
-    LLBC_Print("\n");
-
-    // Number -> String test.
-    {
-        sint8 sint8Val = 'a';
-        LLBC_PrintLn("LLBC_Num2Str<sint8>()[%c] -> string(base:10): %s",
-            sint8Val, LLBC_NumToStr(sint8Val).c_str());
-        uint8 uint8Val = 97;
-        LLBC_PrintLn("LLBC_Num2Str<uint8>()[%d] -> string(base:10): %s",
-            uint8Val, LLBC_NumToStr(uint8Val).c_str());
-
-        sint16 sint16Val = 16;
-        LLBC_PrintLn("LLBC_Num2Str<sint16>()[%d] -> string(base:16): %s",
-            sint16Val, LLBC_NumToStrInHex(sint16Val).c_str());
-        
-        sint16 sint16Val2 = -16;
-        LLBC_PrintLn("LLBC_Num2Str<sint16>()[%d] -> string(base:16): %s",
-            sint16Val2, LLBC_NumToStrInHex(sint16Val2).c_str());
-
-        sint32 sint32Val = -32;
-        LLBC_PrintLn("LLBC_Num2Str<sint32>()[%d] -> string(base:10): %s",
-            sint32Val, LLBC_NumToStr(sint32Val).c_str());
-        uint32 uint32Val = 32;
-        LLBC_PrintLn("LLBC_Num2Str<uint32>()[%u] -> string(base:10): %s",
-            uint32Val, LLBC_NumToStr(uint32Val).c_str());
-
-        long longVal = -1;
-        LLBC_PrintLn("LLBC_Num2Str<long>()[%ld] -> string(base:10): %s",
-            longVal, LLBC_NumToStr(longVal).c_str());
-        LLBC_NS ulong ulongVal = -1;
-        LLBC_PrintLn("LLBC_Num2Str<ulong>()[%lu] -> string(base:10): %s",
-            ulongVal, LLBC_NumToStr(ulongVal).c_str());
-
-        sint64 sint64Val = INT64_MIN;
-        LLBC_PrintLn("LLBC_Num2Str<sint64>()[%lld] -> string(base:10): %s",
-            sint64Val, LLBC_NumToStr(sint64Val).c_str());
-        uint64 uint64Val = UINT64_MAX;
-        LLBC_PrintLn("LLBC_Num2Str<uint64>()[%llu] -> string(base:10): %s",
-            uint64Val, LLBC_NumToStr(uint64Val).c_str());
-
-        float fVal = 1.0f;
-        LLBC_PrintLn("LLBC_Num2Str<float>()[%f] -> string: %s",
-            fVal, LLBC_NumToStr(fVal).c_str());
-        double doubleVal = -1.0f;
-        LLBC_PrintLn("LLBC_Num2Str<double>()[%f] -> string: %s",
-            doubleVal, LLBC_NumToStr(doubleVal).c_str());
-
-        sint64 intPtrAddr = 0x1234cdef;
-        int *intPtr; memcpy(&intPtr, &intPtrAddr, sizeof(int *));
-        LLBC_PrintLn("LLBC_Num2Str<int *>()[%p] -> string: %s",
-            intPtr, LLBC_NumToStrInHex(static_cast<void*>(intPtr)).c_str());
-
-        sint64 voidPtrAddr = 0xfffffffe;
-        const void *voidPtr; memcpy(&voidPtr, &voidPtrAddr, sizeof(void *));
-        LLBC_PrintLn("LLBC_Num2Str<const void *>()[%p] -> string: %s",
-            voidPtr, LLBC_NumToStrInHex(voidPtr).c_str());
-    }
-
-    LLBC_Print("\n");
-
-    LLBC_PrintLn("Press any key to continue ...");
+    LLBC_PrintLn("Press any key to continue...");
     getchar();
 
-    return 0;
+    return LLBC_OK;
+}
+
+int TestCase_Core_Utils_Text::_Test_Num2Str()
+{
+    LLBC_PrintLn("- Num -> Str test:");
+
+    // Num->Str, bool:
+    auto testNum2Str_bool = [](bool boolVal)
+    {
+        size_t strLen;
+        const char *str = LLBC_Num2Str2(boolVal, &strLen);
+        LLBC_PrintLn("  - LLBC_Num2Str2(%s, strLen) return:%s, strLen:%lu",
+                     boolVal ? "true" : "false", str, strLen);
+        llbc_assert(strcmp(str, boolVal ? "1" : "0") == 0);
+
+        const auto &strObj = LLBC_Num2Str(boolVal);
+        LLBC_PrintLn("  - LLBC_Num2Str(%s) return:%s",
+                     boolVal ? "true" : "false", strObj.c_str());
+
+        llbc_assert(strObj == str && "Test[Num->Str, bool] failed");
+    };
+
+    for (auto &boolVal : {true, false})
+        testNum2Str_bool(boolVal);
+
+    // Num->Str, sint8/uint8:
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint8, false>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint8, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<uint8, false>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<uint8, true>() != LLBC_OK), LLBC_FAILED);
+
+    // Num->Str, sint16/uint16:
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint16, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint16, false>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<uint16, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<uint16, false>() != LLBC_OK), LLBC_FAILED);
+
+    // Num->Str, sint32/uint32:
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint32, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint32, false>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<uint32, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<uint32, false>() != LLBC_OK), LLBC_FAILED);
+
+    // Num->Str, long/ulong:
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<long, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<long, false>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<ulong, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<ulong, false>() != LLBC_OK), LLBC_FAILED);
+
+    // Num->Str, sint64/uint64:
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint64, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<sint64, false>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<uint64, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<uint64, false>() != LLBC_OK), LLBC_FAILED);
+
+    // Num->Str, float/double/ldouble:
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<float, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<float, false>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<double, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<double, false>() != LLBC_OK), LLBC_FAILED);
+    // LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<ldouble, true>() != LLBC_OK), LLBC_FAILED);
+    // LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<ldouble, false>() != LLBC_OK), LLBC_FAILED);
+
+    // Num-Str: pointer:
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<void *, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<void *, false>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<int *, true>() != LLBC_OK), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf((_Test_Num2StrImpl<int *, false>() != LLBC_OK), LLBC_FAILED);
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Utils_Text::_Test_Str2Num()
+{
+    LLBC_PrintLn("- Str -> Num test:");
+
+    // Str->Num, bool:
+    auto boolTestFunc = [](const LLBC_String &str, int base, bool expect)
+    {
+        const bool boolVal = LLBC_Str2Num<bool>(str.c_str(), base);
+        LLBC_PrintLn("  - LLBC_Str2Num<bool>(""%s"", %d): return:%s, expect:%s",
+                     str.c_str(),
+                     base,
+                     boolVal ? "true" : "false",
+                     expect ? "true" : "false");
+        if (boolVal != expect)
+        {
+            LLBC_FilePrintLn(stderr, "    - Test failed");
+            llbc_assert(false && "LLBC_Str2Num<bool>() test failed");
+            return LLBC_FAILED;
+        }
+
+        return LLBC_OK;
+    };
+
+    for (auto &boolStr : {"0", "  0", "0    ", "   0   ", "", "   "})
+        LLBC_ErrorAndReturnIf(boolTestFunc(boolStr, 10, false) != LLBC_OK, LLBC_FAILED);
+    for (auto &boolStr : {"0x0", "  0x0", "0x0    ", "   0x0   "})
+        LLBC_ErrorAndReturnIf(boolTestFunc(boolStr, 16, false) != LLBC_OK, LLBC_FAILED);
+    for (auto &boolStr : {"1", "123", "-123", "1.35", "-1.35"})
+        LLBC_ErrorAndReturnIf(boolTestFunc(boolStr, 10, true) != LLBC_OK, LLBC_FAILED);
+    for (auto &boolStr : {"0xfd", "0xdddd"})
+        LLBC_ErrorAndReturnIf(boolTestFunc(boolStr, 16, true) != LLBC_OK, LLBC_FAILED);
+
+    // Str->Num, sint8/uint8:
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<sint8>() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<uint8>() != LLBC_OK, LLBC_FAILED);
+
+    // Str->Num, sint16/uint16:
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<sint16>() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<uint16>() != LLBC_OK, LLBC_FAILED);
+
+    // Str->Num, sint32/uint32:
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<sint32>() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<uint32>() != LLBC_OK, LLBC_FAILED);
+
+    // Str->Num, long/ulong:
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<long>() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<ulong>() != LLBC_OK, LLBC_FAILED);
+
+    // Str->Num, sint64/uint64:
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<sint64>() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<uint64>() != LLBC_OK, LLBC_FAILED);
+
+    // Str->Num, float/double/ldouble:
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<float>() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<double>() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<ldouble>() != LLBC_OK, LLBC_FAILED);
+
+    // Str->Num, void */int *:
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<void *>() != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<int *>() != LLBC_OK, LLBC_FAILED);
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Utils_Text::_Test_Str2LooseBool()
+{
+    // Log.
+    LLBC_PrintLn("- Str -> LooseBool test:");
+
+    // Define test lambda function.
+    auto testFunc = [](const LLBC_String &str, int base, bool recognizeTrueAndYes, bool expect)
+    {
+        const auto ret = LLBC_Str2LooseBool(str.c_str(), base, recognizeTrueAndYes);
+        LLBC_PrintLn("  - LLBC_Str2LooseBool(""%s"", %d, %s) return:%s, expect:%s",
+                     str.c_str(),
+                     base,
+                     recognizeTrueAndYes ? "true" : "false",
+                     ret ? "true" : "false",
+                     expect ? "true" : "false");
+        if (ret != expect)
+        {
+            LLBC_FilePrintLn(stderr, "    - Test failed");
+            llbc_assert(false && "LLBC_Str2LooseBool() test failed");
+
+            return LLBC_FAILED;
+        }
+
+        return LLBC_OK;
+    };
+
+    LLBC_ErrorAndReturnIf(testFunc("", 10, false, false) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    ", 10, false, false) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    0", 10, false, false) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("0    ", 10, false, false) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    1    ", 10, false, true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    1    ", 16, false, true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    0x0    ", 10, false, false) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    0x1234    ", 10, false, true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    0X1234    ", 10, false, true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    0x1234    ", 16, false, true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    0X1234    ", 16, false, true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    TruE ", 10, false, false) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    TruE ", 10, true, true) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    YeS  ", 10, false, false) != LLBC_OK, LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(testFunc("    YeS  ", 10, true, true) != LLBC_OK, LLBC_FAILED);
+
+    return LLBC_OK;
+}
+
+template <typename _NumTy, bool _HexFormat>
+int TestCase_Core_Utils_Text::_Test_Num2StrImpl()
+{
+    // Log:
+    LLBC_PrintLn("  - Test LLBC_Num2Str<%s, %s>():",
+                 typeid(_NumTy).name(), _HexFormat ? "true" : "false");
+
+    // Define test lambda function.
+    auto testFunc = [](_NumTy num, const LLBC_String &expect)
+    {
+        // LLBC_Num2Str2 test.
+        LLBC_String funcDesc = LLBC_String().format("LLBC_Num2Str2<%s, %s>(%s, strLen)",
+                                                    typeid(_NumTy).name(),
+                                                    _HexFormat ? "true" : "false",
+                                                    LLBC_Variant(num).ValueToString().c_str());
+
+        size_t strLen;
+        const char *str = LLBC_Num2Str2<_NumTy, _HexFormat>(num, &strLen);
+        LLBC_PrintLn("    - %s expect:%s, return:%s, returnStrLen:%lu",
+                     funcDesc.c_str(), expect.c_str(), str, strLen);
+        if (!expect.empty() && expect != str)
+        {
+            LLBC_FilePrintLn(stderr, "      - Test Failed");
+            llbc_assert(false && "LLBC_Num2Str2() test failed");
+
+            return LLBC_FAILED;
+        }
+
+        // LLBC_Num2Str test.
+        funcDesc = LLBC_String().format("LLBC_Num2Str<%s, %s>(%s)",
+                                        typeid(_NumTy).name(),
+                                        _HexFormat ? "true" : "false",
+                                        LLBC_Variant(num).ValueToString().c_str());
+        auto strObj = LLBC_Num2Str<_NumTy, _HexFormat>(num);
+        LLBC_PrintLn("    - %s expect:%s, return:%s",
+                     funcDesc.c_str(), expect.c_str(), strObj.c_str());
+        if (!expect.empty() && expect != strObj)
+        {
+            LLBC_FilePrintLn(stderr, "      - Test failed");
+            llbc_assert(false && "LLBC_Num2Str() test failed");
+
+            return LLBC_FAILED;
+        }
+
+        return LLBC_OK;
+    };
+
+    // Test.
+    LLBC_String expect;
+    typedef std::numeric_limits<_NumTy> _NumTyLmt;
+    if constexpr (std::is_pointer_v<_NumTy>)
+    {
+        for (uint64 ptrVal : {0x0llu, 0xfedccdefllu, 0xffffffllu, 0xabcdefllu})
+        {
+            _NumTy ptr;
+            expect.format(_HexFormat ? "0x%llx" : "%llu", ptrVal);
+            memcpy(&ptr, &ptrVal, std::min(sizeof(ptrVal), sizeof(ptr)));
+            LLBC_ErrorAndReturnIf(testFunc(ptr, expect) != LLBC_OK, LLBC_FAILED);
+        }
+    }
+    else
+    {
+        _NumTy vals[]{_NumTyLmt::min(),
+                      _NumTyLmt::min() + static_cast<_NumTy>(50),
+                      _NumTyLmt::min() + static_cast<_NumTy>(100),
+                      _NumTy(),
+                      static_cast<_NumTy>(3.1415926),
+                      _NumTyLmt::max() - static_cast<_NumTy>(50),
+                      _NumTyLmt::max() - static_cast<_NumTy>(100),
+                      _NumTyLmt::max()};
+        for (_NumTy val : vals)
+        {
+            if constexpr (std::is_same_v<_NumTy, sint8> ||
+                          std::is_same_v<_NumTy, sint16> ||
+                          std::is_same_v<_NumTy, sint32>)
+            {
+                if (_HexFormat)
+                    expect.format(val < 0 ? "-0x%x" : "0x%x", std::abs(val));
+                else
+                    expect.format("%d", val);
+            }
+            else if constexpr (std::is_same_v<_NumTy, uint8> ||
+                               std::is_same_v<_NumTy, uint16> ||
+                               std::is_same_v<_NumTy, uint32>)
+            {
+                expect.format(_HexFormat ? "0x%x" : "%u", val);
+            }
+            else if constexpr (std::is_same_v<_NumTy, long>)
+            {
+                if (_HexFormat)
+                    expect.format(val < 0 ? "-0x%lx" : "0x%lx", std::abs(val));
+                else
+                    expect.format("%l", val);
+            }
+            else if constexpr (std::is_same_v<_NumTy, ulong>)
+            {
+                expect.format(_HexFormat ? "0x%lx" : "%lu", val);
+            }
+            else if constexpr (std::is_same_v<_NumTy, sint64>)
+            {
+                if (_HexFormat)
+                    expect.format(val < 0 ? "-0x%llx" : "0x%llx", std::abs(val));
+                else
+                    expect.format("%ll", val);
+            }
+            else if constexpr (std::is_same_v<_NumTy, uint64>)
+            {
+                expect.format(_HexFormat ? "0x%llx" : "%llu", val);
+            }
+            // else if constexpr (std::is_same_v<_NumTy, float>)
+            // {
+            //     expect.format("%.f", val);
+            // }
+            // else if constexpr (std::is_same_v<_NumTy, double>)
+            // {
+            //     expect.format("%.f", val);
+            // }
+            // else if constexpr (std::is_same_v<_NumTy, ldouble>)
+            // {
+            //     expect.format("%Lf", val);
+            // }
+
+            LLBC_ErrorAndReturnIf(testFunc(val, expect) != LLBC_OK, LLBC_FAILED);
+        }
+    }
+
+    return LLBC_OK;
+}
+
+
+template <typename _NumTy>
+int TestCase_Core_Utils_Text::_Test_Str2NumImpl()
+{
+    // Log.
+    LLBC_PrintLn("  - Test LLBC_Str2Num<%s>():", typeid(_NumTy).name());
+
+    // Define test lambda function.
+    auto testFunc = [](const LLBC_String &str, int base, _NumTy expect)
+    {
+        _NumTy num = LLBC_Str2Num<_NumTy>(str.c_str(), base);
+        LLBC_PrintLn("    - Test LLBC_Str2Num<%s>(%s, %d): return:%s, expect:%s",
+            typeid(_NumTy).name(),
+            str.c_str(),
+            base,
+            base == 16 ? LLBC_Num2Str<_NumTy, true>(num).c_str() : LLBC_Num2Str<_NumTy, false>(num).c_str(),
+            base == 16 ? LLBC_Num2Str<_NumTy, true>(expect).c_str() : LLBC_Num2Str<_NumTy, false>(expect).c_str());
+
+        bool equal;
+        if constexpr (std::is_floating_point_v<_NumTy>)
+            equal = LLBC_IsFloatAlmostEqual(num, expect);
+        else
+            equal = num == expect;
+
+        if (!equal)
+        {
+            LLBC_FilePrintLn(stderr, "      - Test failed");
+            llbc_assert(false && "LLBC_Str2Num() test failed");
+            return LLBC_FAILED;
+        }
+
+        return LLBC_OK;
+    };
+
+    // Test.
+    if constexpr (std::is_pointer_v<_NumTy>)
+    {
+        _NumTy ptr = nullptr;
+        uint64 ptrVal = 0x0;
+        std::map<LLBC_String, _NumTy> testPtrs;
+        memcpy(&ptr, &ptrVal, std::min(sizeof(ptr), sizeof(ptrVal)));
+        testPtrs["0x0"] = ptr;
+        testPtrs["0x00"] = ptr;
+        testPtrs["0x00000"] = ptr;
+
+        ptr = nullptr;
+        ptrVal = 0x123456;
+        memcpy(&ptr, &ptrVal, std::min(sizeof(ptr), sizeof(ptrVal)));
+        testPtrs["0x123456"] = ptr;
+
+        for (auto &[testPtrStr, expect] : testPtrs)
+        {
+            LLBC_ErrorAndReturnIf(testFunc(testPtrStr, 10, expect) != LLBC_OK, LLBC_FAILED);
+            LLBC_ErrorAndReturnIf(testFunc(testPtrStr, 16, expect) != LLBC_OK, LLBC_FAILED);
+        }
+    }
+    else
+    {
+        typedef std::numeric_limits<_NumTy> _NumTyLmt;
+        _NumTy testNums[]
+        {
+            _NumTyLmt::min(),
+            _NumTyLmt::min() + static_cast<_NumTy>(50),
+            _NumTyLmt::min() + static_cast<_NumTy>(100),
+            _NumTy(),
+            static_cast<_NumTy>(3.5),
+        };
+
+        for (auto testNum : testNums)
+        {
+            LLBC_String numStr;
+            numStr = LLBC_Num2Str<_NumTy, false>(testNum);
+            LLBC_ErrorAndReturnIf(testFunc(numStr, 10, testNum) != LLBC_OK, LLBC_FAILED);
+            numStr = LLBC_Num2Str<_NumTy, true>(testNum);
+            LLBC_ErrorAndReturnIf(testFunc(numStr, 16, testNum) != LLBC_OK, LLBC_FAILED);
+        }
+    }
+
+    return LLBC_OK;
 }

@@ -33,7 +33,7 @@ public:
 public:
     int Run(int argc, char *argv[]) override
     {
-        PyObject *pyObj = reinterpret_cast<PyObject *>(LLBC_Str2Ptr(argv[0]));
+        PyObject *pyObj = reinterpret_cast<PyObject *>(LLBC_Str2Num<PyObject *>(argv[0]));
 
         PyObject *callable = nullptr;
         pyllbc_ObjAttrOptr optr(pyObj);
@@ -50,7 +50,7 @@ public:
     
         Py_DECREF(callable);
 
-        PyObject *arg = reinterpret_cast<PyObject *>(LLBC_Str2Ptr(argv[1]));
+        PyObject *arg = reinterpret_cast<PyObject *>(LLBC_Str2Num<PyObject *>(argv[1]));
         PyObject *rtn = PyObject_CallMethod(pyObj, const_cast<char *>("run"), const_cast<char *>("N"), arg);
         if (!rtn)
             return LLBC_FAILED;
@@ -116,8 +116,8 @@ LLBC_EXTERN_C PyObject *_pyllbc_RunTestCase(PyObject *self, PyObject *args)
         return nullptr;
 
     char *tcArgs[2] = {nullptr, nullptr};
-    tcArgs[0] = const_cast<char *>(LLBC_NumToStr(self).c_str());
-    tcArgs[1] = const_cast<char *>(LLBC_NumToStr(argObj).c_str());
+    tcArgs[0] = const_cast<char *>(LLBC_Num2Str<void *, true>(self).c_str());
+    tcArgs[1] = const_cast<char *>(LLBC_Num2Str<void *, true>(argObj).c_str());
 
     return Py_BuildValue("i", tc->Run(2, tcArgs));
 }

@@ -576,6 +576,9 @@ private:
     template <typename _Key, typename _Val, typename _BinaryContainer>
     void CpToBinaryCont(_BinaryContainer &binaryCont) const;
 
+    template <typename _64Ty>
+    _64Ty AsSignedOrUnsigned64() const;
+
     bool IsStrX() const;
     bool IsSeqX() const;
     bool IsDictX() const;

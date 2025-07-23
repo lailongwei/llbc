@@ -125,4 +125,34 @@ std::function<Rtn(Args...)> LLBC_BindClassMethod(Obj *obj, Rtn(Obj::*meth)(Args.
     return LLBC_INTERNAL_NS __LLBC_BindClassMethod(obj, meth, LLBC_MakeIntSequence<sizeof...(Args)>{});
 }
 
+/**
+ * Floating point almost equal judge template function.
+ * @param[in] x - the floating point number.
+ * @param[in] y - the floating point number.
+ * @return bool - return true if x almost equal y, otherwise return false.
+ */
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, bool>
+LLBC_IsFloatAlmostEqual(T x, T y)
+{
+    const T absDiff = std::abs(x - y);
+    if (absDiff <= std::numeric_limits<T>::epsilon())
+        return true;
+
+    const T scale = std::max(std::abs(x), std::abs(y));
+    return absDiff <= scale * std::numeric_limits<T>::epsilon();
+}
+
+/**
+ * Check given floating point is zero.
+ * @param[in] x - the floating point number.
+ * @return bool - return true if x is zero, otherwise return false.
+ */
+template <typename T>
+std::enable_if_t<std::is_floating_point_v<T>, bool>
+LLBC_IsFloatZero(T x)
+{
+    return std::abs(x) <= std::numeric_limits<T>::epsilon();
+}
+
 __LLBC_NS_END

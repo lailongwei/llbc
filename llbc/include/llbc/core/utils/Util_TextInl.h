@@ -25,253 +25,224 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-template<typename UIT>
-char *LLBC_UnsignedIntegralToBuff(char* bufferEnd, UIT unsignedIntegralVal)
+template <typename _UIT, bool _HexFormat>
+LLBC_FORCE_INLINE char *__LLBC_UIntegral2StrImpl(_UIT uit, char *strEnd)
 {
-    // format unsignedIntegralVal to buffer ending at bufferEnd
-    static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
-
-    auto valTrunc = unsignedIntegralVal;
     do
     {
-        *--bufferEnd = static_cast<char>('0' + valTrunc % 10);
-        valTrunc /= 10;
-    } while (valTrunc != 0);
-    return bufferEnd;
-}
+        if constexpr (_HexFormat)
+        {
+            auto digit = uit % 16;
+            *--strEnd = static_cast<char>(digit > 9 ? digit - 10 + 'a' : digit + '0');
+            uit /= 16;
+        }
+        else
+        {
+            *--strEnd = static_cast<char>(uit % 10 + '0');
+            uit /= 10;
+        }
+    } while (uit != 0);
 
-template<typename UIT>
-char *LLBC_UnsignedIntegralToBuffInHex(char* bufferEnd, UIT unsignedIntegralVal)
-{
-    // format unsignedIntegralVal to buffer ending at bufferEnd in hex
-    static_assert(std::is_unsigned<UIT>(), "UI must be unsigned");
-
-    do
+    if constexpr (_HexFormat)
     {
-        auto digit = unsignedIntegralVal % 16;
-        *--bufferEnd = static_cast<char>(digit > 9 ? digit - 10 + 'A' : digit + '0');
-        unsignedIntegralVal /= 16;
+        *--strEnd = 'x';
+        *--strEnd = '0';
     }
-    while (unsignedIntegralVal != 0);
-    return bufferEnd;
+
+    return strEnd;
 }
 
-template<typename IT>
-LLBC_NS LLBC_String LLBC_IntegralToStringInHex(const IT& integralVal)
+template <typename _IntegralTy, bool _HexFormat>
+LLBC_FORCE_INLINE char *__LLBC_Integral2Str(_IntegralTy val, size_t *strLen)
 {
-    // convert integral to llbc string in hex
-    static_assert(std::is_integral<IT>(), "IT must be integral");
-    char buffer[21]; // can hole -2^63 and 2^64 - 1
-    char *const bufferEnd = std::end(buffer);
-    char *bufferEndTrunc = bufferEnd;
-    if(integralVal < 0)
+    auto &strBuf = LLBC_NS __LLBC_GetLibTls()->commonTls.num2StrBuf;
+    char *strEnd = &strBuf[sizeof(strBuf) - 1];
+    *strEnd = '\0';
+
+    char *str;
+    if constexpr (std::is_unsigned_v<_IntegralTy>)
     {
-        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc,
-                            typename std::make_unsigned<IT>::type(0 - integralVal));
-        *--bufferEndTrunc = 'x';
-        *--bufferEndTrunc = '0';
-        *--bufferEndTrunc = '-';
+        str = __LLBC_UIntegral2StrImpl<_IntegralTy, _HexFormat>(val, strEnd);
     }
     else
     {
-        bufferEndTrunc = LLBC_UnsignedIntegralToBuffInHex(bufferEndTrunc,
-                            typename std::make_unsigned<IT>::type(integralVal));
-        *--bufferEndTrunc = 'x';
-        *--bufferEndTrunc = '0';
+        str = __LLBC_UIntegral2StrImpl<
+            std::make_unsigned_t<_IntegralTy>, _HexFormat>(
+                std::make_unsigned_t<_IntegralTy>(val < 0 ? -val : val), strEnd);
+        if (val < 0)
+            *--str = '-';
     }
-    
-    return {bufferEndTrunc, static_cast<size_t>(bufferEnd - bufferEndTrunc)};
+
+    if (strLen)
+        *strLen = strEnd - str;
+
+    return str;
 }
 
-template<typename IT>
-LLBC_NS LLBC_String LLBC_IntegralToString(const IT& integralVal)
-{
-    // convert integral to llbc string
-    static_assert(std::is_integral<IT>(), "IT must be integral");
-
-    char buffer[21]; // can hole -2^63 and 2^64 - 1
-    char *const bufferEnd = std::end(buffer);
-    char *bufferEndTrunc = bufferEnd;
-    if(integralVal < 0)
-    {
-        bufferEndTrunc = LLBC_UnsignedIntegralToBuff(bufferEndTrunc,
-                            typename std::make_unsigned<IT>::type(0 - integralVal));
-        *--bufferEndTrunc = '-';
-    }
-    else
-    {
-        bufferEndTrunc = LLBC_UnsignedIntegralToBuff(bufferEndTrunc,
-                            typename std::make_unsigned<IT>::type(integralVal));
-    }
-
-    return {bufferEndTrunc, static_cast<size_t>(bufferEnd - bufferEndTrunc)};
-}
 __LLBC_INTERNAL_NS_END
 
+
 __LLBC_NS_BEGIN
-template <>
-inline LLBC_String LLBC_NumToStr(sint64 val)
+
+template <typename _NumTy, bool _HexFormat>
+std::enable_if_t<std::is_arithmetic_v<_NumTy> || std::is_pointer_v<_NumTy>,
+                 const char *>
+LLBC_Num2Str2(_NumTy num, size_t *strLen)
 {
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+    if constexpr (std::is_same_v<_NumTy, bool>)
+    {
+        if (strLen)
+            *strLen = 1;
+        return num ? "1" : "0";
+    }
+    else if constexpr (std::is_integral_v<_NumTy>)
+    {
+        return LLBC_INL_NS __LLBC_Integral2Str<_NumTy, _HexFormat>(num, strLen);
+    }
+    else if constexpr (std::is_floating_point_v<_NumTy>)
+    {
+        int len;
+        auto &strBuf = __LLBC_GetLibTls()->commonTls.num2StrBuf;
+        if constexpr (std::is_same_v<_NumTy, ldouble>)
+            len = snprintf(strBuf, sizeof(strBuf), "%Lf", num);
+        else
+            len = snprintf(strBuf, sizeof(strBuf), "%f", num);
+        if (UNLIKELY(len <= 0))
+        {
+            strBuf[0] = '0';
+            strBuf[1] = '\0';
+            if (strLen)
+                *strLen = 1;
+
+            return strBuf;
+        }
+
+        if (strLen)
+        {
+            // !!! Note: For win32 platform, snprintf has bug when formatting floating point. !!!
+            #if LLBC_TARGET_PLATFORM_WIN32
+            *strLen = strlen(strBuf);
+            #else
+            *strLen = static_cast<size_t>(len);
+            #endif
+        }
+
+        return strBuf;
+    }
+    else if constexpr (std::is_pointer_v<_NumTy>)
+    {
+        uint64 ptrVal = 0;
+        memcpy(&ptrVal, &num, std::min(sizeof(ptrVal), sizeof(num)));
+        return LLBC_INL_NS __LLBC_Integral2Str<uint64, _HexFormat>(ptrVal, strLen);
+    }
+    else
+    {
+        llbc_assert(false && "Unsupported _NumTy");
+        return "";
+    }
 }
 
-template <>
-inline LLBC_String LLBC_NumToStr(uint64 val)
+template <typename _NumTy, bool _HexFormat>
+std::enable_if_t<std::is_arithmetic_v<_NumTy> || std::is_pointer_v<_NumTy>,
+                 LLBC_String> 
+LLBC_Num2Str(_NumTy num)
 {
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+    size_t strLen;
+    const char *str = LLBC_Num2Str2<_NumTy, _HexFormat>(num, &strLen);
+    return {str, strLen};
 }
 
-template<>
-inline LLBC_String LLBC_NumToStr(long val)
+template <typename _NumTy>
+std::enable_if_t<std::is_same_v<_NumTy, bool>, bool>
+LLBC_Str2Num(const char *str, int base = 10)
 {
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+    return LLBC_Str2LooseBool(str, base, false);
 }
 
-template<>
-inline LLBC_String LLBC_NumToStr(ulong val)
+template <typename _NumTy>
+std::enable_if_t<std::is_same_v<_NumTy, sint8> ||
+                    std::is_same_v<_NumTy, uint8> ||
+                    std::is_same_v<_NumTy, sint16> ||
+                    std::is_same_v<_NumTy, uint16> ||
+                    std::is_same_v<_NumTy, sint32> ||
+                    std::is_same_v<_NumTy, uint32>,
+                 _NumTy>
+LLBC_Str2Num(const char *str, int base)
 {
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+    if constexpr (!std::is_unsigned_v<_NumTy>)
+        return static_cast<_NumTy>(LLBC_Str2Num<long>(str, base));
+    else
+        return static_cast<_NumTy>(LLBC_Str2Num<ulong>(str, base));
 }
 
-template <>
-inline LLBC_String LLBC_NumToStr(sint32 val)
+template <typename _NumTy>
+std::enable_if_t<std::is_same_v<_NumTy, long> ||
+                    std::is_same_v<_NumTy, ulong> ||
+                    std::is_same_v<_NumTy, sint64> ||
+                    std::is_same_v<_NumTy, uint64>,
+                 _NumTy>
+LLBC_Str2Num(const char *str, int base)
 {
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+    if constexpr (std::is_same_v<_NumTy, long>)
+        return LIKELY(str) ? strtol(str, nullptr, base) : 0l;
+    else if constexpr (std::is_same_v<_NumTy, ulong>)
+        return LIKELY(str) ? strtoul(str, nullptr, base) : 0ul;
+    else if constexpr (std::is_same_v<_NumTy, sint64>)
+        return LIKELY(str) ? strtoll(str, nullptr, base) : 0ll;
+    else // uint64
+        return LIKELY(str) ? strtoull(str, nullptr, base) : 0llu;
 }
 
-template <>
-inline LLBC_String LLBC_NumToStr(uint32 val)
+template <typename _NumTy>
+std::enable_if_t<std::is_pointer_v<_NumTy>, _NumTy>
+LLBC_Str2Num(const char *str, int base)
 {
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
+    // If is null, return nullptr.
+    if (UNLIKELY(!str))
+        return nullptr;
+
+    // Normalize base: if str start with '0x'/'0X' and base != 16, normalize to 16.
+    const char *zeroPos;
+    if (base != 16 &&
+        (zeroPos = strchr(str, '0')) != nullptr)
+    {
+        if (*(zeroPos + 1) == 'x' ||
+            *(zeroPos + 1) == 'X')
+            base = 16;
+    }
+
+    // Convert to uint64 value && return.
+    _NumTy ptr = nullptr;
+    uint64 ptrVal = LLBC_Str2Num<uint64>(str, base);
+    memcpy(&ptr, &ptrVal, std::min(sizeof(ptr), sizeof(ptrVal)));
+
+    return ptr;
 }
 
-template <>
-inline LLBC_String LLBC_NumToStr(sint16 val)
+template <typename _NumTy>
+std::enable_if_t<std::is_floating_point_v<_NumTy>, _NumTy>
+LLBC_Str2Num(const char *str, int base)
 {
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
-}
+    LLBC_UNUSED_PARAM(base);
 
-template <>
-inline LLBC_String LLBC_NumToStr(uint16 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
-}
-
-template <>
-inline LLBC_String LLBC_NumToStr(sint8 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
-}
-
-template <>
-inline LLBC_String LLBC_NumToStr(uint8 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToString(val);
-}
-
-
-template <>
-inline LLBC_String LLBC_NumToStr(long double val)
-{
-    char buf[64] = {0};
-    snprintf(buf, sizeof(buf), "%f", static_cast<double>(val));
-    return buf;
-}
-
-template <>
-inline LLBC_String LLBC_NumToStr(double val)
-{
-    char buf[64] = {0};
-    snprintf(buf, sizeof(buf), "%f", val);
-    return buf;
-}
-
-template <>
-inline LLBC_String LLBC_NumToStr(float val)
-{
-    return LLBC_NumToStr<double>(val);
-}
-
-template <typename T>
-LLBC_String LLBC_NumToStr(T val)
-{
-    uint64 ptrVal = 0;
-    memcpy(&ptrVal, &val, sizeof(T) > sizeof(uint64) ? sizeof(uint64) : sizeof(T));
-    return LLBC_NumToStr<uint64>(ptrVal);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(sint64 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);   
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(uint64 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(long val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(ulong val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(sint32 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(uint32 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(sint16 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(uint16 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(sint8 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(uint8 val)
-{
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex(val);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(void *val)
-{
-    uint64 ptrVal = 0;
-    memcpy(&ptrVal, &val, sizeof(uint64));
-    return LLBC_INTERNAL_NS LLBC_IntegralToStringInHex<uint64>(ptrVal);
-}
-
-template<>
-inline LLBC_String LLBC_NumToStrInHex(const void *val)
-{
-    return LLBC_NumToStrInHex(const_cast<void *>(val));
+    if constexpr (std::is_same_v<_NumTy, float>)
+    {
+        return LIKELY(str) ? strtof(str, nullptr) : .0f;
+    }
+    else if constexpr (std::is_same_v<_NumTy, double>)
+    {
+        return LIKELY(str) ? strtod(str, nullptr) : .0;
+    }
+    else if constexpr (std::is_same_v<_NumTy, long double>)
+    {
+        return LIKELY(str) ? strtold(str, nullptr) : .0;
+    }
+    else
+    {
+        llbc_assert(false && "Unsupport floating point type");
+        return _NumTy();
+    }
 }
 
 __LLBC_NS_END
+

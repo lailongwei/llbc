@@ -172,7 +172,7 @@ int TestCase_Comm_CompBase::Run(int argc, char *argv[])
         return LLBC_FAILED;
     }
 
-    const int port = LLBC_Str2Int32(argv[3]);
+    const int port = LLBC_Str2Num<int>(argv[3]);
     const LLBC_String driveType = LLBC_String(argv[1]).tolower();
     if (driveType == "internal-drive")
         return TestInInternalDriveService(argv[2], port);
