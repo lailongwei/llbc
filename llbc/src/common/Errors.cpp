@@ -150,6 +150,8 @@ static const char *__g_errDesc[__LLBC_ERROR_SENTINEL] =
     "timer scheduler canceling all", // 0x0035
     // event manager pre fire failed.
     "event manager pre fire failed", // 0x0036
+    // partial parsed.
+    "partial parsed",           // 0x0037
 };
 
 static std::map<int, LLBC_String> __g_customErrDesc;
@@ -206,19 +208,26 @@ void LLBC_SetLastError(int no, const char *customErrStr)
     libTls->commonTls.errNo = no;
 
     // Set subErrNo.
-    if (LLBC_ERROR_TYPE_IS_CLIB(no))
+    if (no == LLBC_ERROR_SUCCESS)
+    {
+        libTls->commonTls.subErrNo = 0;
+    }
+    else if (LLBC_ERROR_TYPE_IS_CLIB(no))
     {
         libTls->commonTls.subErrNo = errno;
     }
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     else if (LLBC_ERROR_TYPE_IS_OSAPI(no) ||
              LLBC_ERROR_TYPE_IS_NETAPI(no))
     {
         libTls->commonTls.subErrNo = osApiOrNetApiErrNo;
     }
-#endif
+    #endif
     else // Library error or Custom error.
     {
+        // Reset subErrNo.
+        libTls->commonTls.subErrNo = 0;
+
         // Set custom error string(only set when error type is LIBRARY or is CUSTOM errno).
         size_t customErrStrLen;
         if (customErrStr &&

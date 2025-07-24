@@ -36,6 +36,10 @@ private:
 
     template <typename _NumTy, bool _HexFormat>
     int _Test_Num2StrImpl();
+
     template <typename _NumTy>
     int _Test_Str2NumImpl();
+
+    template <typename _NumTy>
+    int _Test_Str2NumExceptionTest(const char *str, int expectErrno, int expectSubErrno);
 };
