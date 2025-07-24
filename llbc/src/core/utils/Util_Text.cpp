@@ -22,10 +22,6 @@
 
 #include "llbc/common/Export.h"
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
- #include <libgen.h>
-#endif // Non-Win32
-
 #include "llbc/core/utils/Util_Text.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
