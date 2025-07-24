@@ -58,7 +58,7 @@ LLBC_Num2Str(_NumTy num);
  * - This function can recognize true/yes, and return true.
  * - This function will never fail, It means, Dont call LLBC_GetLastError() to check error.
  * @param[in] str                 - the string.
- * @param[in] base                - base of the interpreted integer value。
+ * @param[in] base                - base of the interpreted integer value.
  * @param[in] recognizeTrueAndYes - recognize true/false string, default is true. 
  * @return bool - the bool value.
  */
