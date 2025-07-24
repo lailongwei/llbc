@@ -679,6 +679,16 @@ __LLBC_NS_BEGIN
 #define LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED   ((int)(0xc0000036))
 
 //
+// Message Id: LLBC_ERROR_PARTIAL_PARSED
+//
+// MessageText:
+//
+// partial parsed.
+//
+#define __LLBC_ERROR_PARTIAL_PARSED      ((int)(0x00000037))
+#define LLBC_ERROR_PARTIAL_PARSED        ((int)(0xc0000037))
+
+//
 //!! Sentinel error no.
 //
 #define __LLBC_ERROR_SENTINEL            ((int)(0x000000ff))

@@ -204,6 +204,65 @@ int TestCase_Core_Utils_Text::_Test_Str2Num()
     LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<void *>() != LLBC_OK, LLBC_FAILED);
     LLBC_ErrorAndReturnIf(_Test_Str2NumImpl<int *>() != LLBC_OK, LLBC_FAILED);
 
+    // Str->Num exception test:
+    LLBC_PrintLn("  - Str->Num exception test:");
+    _Test_Str2NumExceptionTest<sint32>("9999999999999999", LLBC_ERROR_CLIB, ERANGE);
+    _Test_Str2NumExceptionTest<uint32>("9999999999999999", LLBC_ERROR_CLIB, ERANGE);
+    _Test_Str2NumExceptionTest<long>("999999999999999999999999999", LLBC_ERROR_CLIB, ERANGE);
+    _Test_Str2NumExceptionTest<ulong>("999999999999999999999999999", LLBC_ERROR_CLIB, ERANGE);
+    _Test_Str2NumExceptionTest<sint64>("999999999999999999999999999", LLBC_ERROR_CLIB, ERANGE);
+    _Test_Str2NumExceptionTest<uint64>("999999999999999999999999999", LLBC_ERROR_CLIB, ERANGE);
+
+    _Test_Str2NumExceptionTest<sint64>("xxxxxxxxxxxx", LLBC_ERROR_INVALID, 0);
+    _Test_Str2NumExceptionTest<uint64>("xxxxxxxxxxxx", LLBC_ERROR_INVALID, 0);
+    _Test_Str2NumExceptionTest<uint64>("123xxxxxxx", LLBC_ERROR_PARTIAL_PARSED, 0);
+
+    _Test_Str2NumExceptionTest<float>("XXXXXXXX", LLBC_ERROR_INVALID, 0);
+    _Test_Str2NumExceptionTest<float>("3.5xxxxxxxx", LLBC_ERROR_PARTIAL_PARSED, 0);
+
+    // Str->Num, error effect test.
+    {
+        LLBC_PrintLn("  - LLBC_Str2Num() error effect test:");
+
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        auto ret = LLBC_Str2Num<sint64>("0");
+        LLBC_PrintLn("    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), LLBC_Str2Num<sint64>(""0""): return:%lld, "
+                     "err[errno:%x, subErrno:%d, errStr:%s], expectErr[errno:%x, subErrno:%d, errStr:%s]",
+                     ret,
+                     LLBC_GetLastError(),
+                     LLBC_GetSubErrorNo(),
+                     LLBC_FormatLastError(),
+                     LLBC_ERROR_SUCCESS,
+                     0,
+                     LLBC_StrErrorEx(LLBC_ERROR_SUCCESS, 0));
+        if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS ||
+            LLBC_GetSubErrorNo() != 0 ||
+            ret != 0)
+        {
+            llbc_assert(false && "LLBC_Str2Num() error effect test faild");
+            return LLBC_FAILED;
+        }
+
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        ret = LLBC_Str2Num<sint64>("10086");
+        LLBC_PrintLn("    LLBC_SetLastError(LLBC_ERROR_NOT_FOUND), LLBC_Str2Num<sint64>(""10086""): return:%lld, "
+                     "err[errno:%x, subErrno:%d, errStr:%s], expectErr[errno:%x, subErrno:%d, errStr:%s]",
+                     ret,
+                     LLBC_GetLastError(),
+                     LLBC_GetSubErrorNo(),
+                     LLBC_FormatLastError(),
+                     LLBC_ERROR_NOT_FOUND,
+                     0,
+                     LLBC_StrErrorEx(LLBC_ERROR_NOT_FOUND, 0));
+        if (LLBC_GetLastError() != LLBC_ERROR_NOT_FOUND ||
+            LLBC_GetSubErrorNo() != 0 ||
+            ret != 10086)
+        {
+            llbc_assert(false && "LLBC_Str2Num() error effect test faild");
+            return LLBC_FAILED;
+        }
+    }
+
     return LLBC_OK;
 }
 
@@ -457,6 +516,38 @@ int TestCase_Core_Utils_Text::_Test_Str2NumImpl()
             numStr = LLBC_Num2Str<_NumTy, true>(testNum);
             LLBC_ErrorAndReturnIf(testFunc(numStr, 16, testNum) != LLBC_OK, LLBC_FAILED);
         }
+    }
+
+    return LLBC_OK;
+}
+
+template <typename _NumTy>
+int TestCase_Core_Utils_Text::_Test_Str2NumExceptionTest(const char *str,
+                                                         int expectErrno,
+                                                         int expectSubErrno)
+{
+    auto num = LLBC_Str2Num<_NumTy>(str);
+    LLBC_PrintLn("    - LLBC_Num2Text<%s>(""%s"") exception test: return:%s, "
+                 "retErr[errno:%x, subErrno:%d, errStr:%s], "
+                 "expectErr[errno:%x, subErrno:%d, errStr:%s]",
+                 typeid(_NumTy).name(),
+                 str,
+                 LLBC_Num2Str2<_NumTy>(num),
+                 LLBC_GetLastError(),
+                 LLBC_GetSubErrorNo(),
+                 LLBC_FormatLastError(),
+                 expectErrno,
+                 expectSubErrno,
+                 LLBC_StrErrorEx(expectErrno, expectSubErrno));
+
+    if (LLBC_GetLastError() != expectErrno ||
+        LLBC_GetSubErrorNo() != expectSubErrno)
+    {
+        LLBC_FilePrintLn(stderr,
+                         "      - Test failed, errno:%x, subErrno:%d",
+                         LLBC_GetLastError(), LLBC_GetSubErrorNo());
+        llbc_assert(false && "LLBC_Str2Num() exception test failed");
+        return LLBC_FAILED;
     }
 
     return LLBC_OK;

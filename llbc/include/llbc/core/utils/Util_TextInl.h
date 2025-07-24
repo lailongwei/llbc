@@ -81,7 +81,6 @@ LLBC_FORCE_INLINE char *__LLBC_Integral2Str(_IntegralTy val, size_t *strLen)
 
 __LLBC_INTERNAL_NS_END
 
-
 __LLBC_NS_BEGIN
 
 template <typename _NumTy, bool _HexFormat>
@@ -163,6 +162,29 @@ LLBC_Num2Str(_NumTy num)
     return {str, strLen};
 }
 
+#define __LLBC_InlMacro_Num2StrProcessErr()           \
+    if (errno != 0) {                                 \
+        LLBC_SetLastError(LLBC_ERROR_CLIB);           \
+        return _NumTy();                              \
+    }                                                 \
+    else if (strEnd == str) {                         \
+        LLBC_SetLastError(LLBC_ERROR_INVALID);        \
+        return _NumTy();                              \
+    }                                                 \
+    else if (*strEnd != '\0') {                       \
+        LLBC_SetLastError(LLBC_ERROR_PARTIAL_PARSED); \
+        return _NumTy();                              \
+    }                                                 \
+                                                      \
+    if constexpr (std::is_floating_point_v<_NumTy>) { \
+        if (llbc::LLBC_IsFloatZero(num))              \
+            LLBC_SetLastError(LLBC_ERROR_SUCCESS);    \
+    }                                                 \
+    else {                                            \
+        if (num == _NumTy())                          \
+            LLBC_SetLastError(LLBC_ERROR_SUCCESS);    \
+    }                                                 \
+
 template <typename _NumTy>
 std::enable_if_t<std::is_same_v<_NumTy, bool>, bool>
 LLBC_Str2Num(const char *str, int base = 10)
@@ -181,9 +203,33 @@ std::enable_if_t<std::is_same_v<_NumTy, sint8> ||
 LLBC_Str2Num(const char *str, int base)
 {
     if constexpr (!std::is_unsigned_v<_NumTy>)
-        return static_cast<_NumTy>(LLBC_Str2Num<long>(str, base));
+    {
+        long longNum = LLBC_Str2Num<long>(str, base);
+        if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS &&
+            (longNum < static_cast<long>(std::numeric_limits<_NumTy>::min()) ||
+             longNum > static_cast<long>(std::numeric_limits<_NumTy>::max())))
+        {
+            errno = ERANGE;
+            LLBC_SetLastError(LLBC_ERROR_CLIB);
+            return _NumTy();
+        }
+
+        return static_cast<_NumTy>(longNum);
+    }
     else
-        return static_cast<_NumTy>(LLBC_Str2Num<ulong>(str, base));
+    {
+        const ulong ulongNum = LLBC_Str2Num<ulong>(str, base);
+        if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS &&
+            (ulongNum < static_cast<ulong>(std::numeric_limits<_NumTy>::min()) ||
+             ulongNum > static_cast<ulong>(std::numeric_limits<_NumTy>::max())))
+        {
+            errno = ERANGE;
+            LLBC_SetLastError(LLBC_ERROR_CLIB);
+            return _NumTy();
+        }
+
+        return static_cast<_NumTy>(ulongNum);
+    }
 }
 
 template <typename _NumTy>
@@ -194,14 +240,30 @@ std::enable_if_t<std::is_same_v<_NumTy, long> ||
                  _NumTy>
 LLBC_Str2Num(const char *str, int base)
 {
+    // Reset clib errno(Don't reset library errno).
+    errno = 0;
+    // LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    // Call strtoxx().
+    _NumTy num;
+    char *strEnd = nullptr;
     if constexpr (std::is_same_v<_NumTy, long>)
-        return LIKELY(str) ? strtol(str, nullptr, base) : 0l;
+        num = LIKELY(str) ? strtol(str, &strEnd, base) : 0l;
     else if constexpr (std::is_same_v<_NumTy, ulong>)
-        return LIKELY(str) ? strtoul(str, nullptr, base) : 0ul;
+        num = LIKELY(str) ? strtoul(str, &strEnd, base) : 0ul;
     else if constexpr (std::is_same_v<_NumTy, sint64>)
-        return LIKELY(str) ? strtoll(str, nullptr, base) : 0ll;
+        num = LIKELY(str) ? strtoll(str, &strEnd, base) : 0ll;
     else // uint64
-        return LIKELY(str) ? strtoull(str, nullptr, base) : 0llu;
+        num = LIKELY(str) ? strtoull(str, &strEnd, base) : 0llu;
+
+    // Process error.
+    // - case 1: [FAILED]  errno != 0: clib error, return _NumTy().
+    // - case 2: [FAILED]  parse failed: LLBC_ERROR_INVALID, return _NumTy().
+    // - case 3: [FAILED]  partial parsed: LLBC_ERROR_PARTIAL_PARSED, return num.
+    // - case 4: [SUCCESS] success: return num.
+    __LLBC_InlMacro_Num2StrProcessErr()
+
+    return num;
 }
 
 template <typename _NumTy>
@@ -241,25 +303,44 @@ template <typename _NumTy>
 std::enable_if_t<std::is_floating_point_v<_NumTy>, _NumTy>
 LLBC_Str2Num(const char *str, int base)
 {
+    // Mask base param as unused.
     LLBC_UNUSED_PARAM(base);
 
+    // Reset clib errnor(don't reset llbc framework last error).
+    errno = 0;
+    // LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+
+    // Call strtoxx().
+    _NumTy num = _NumTy();
+    char *strEnd = nullptr;
     if constexpr (std::is_same_v<_NumTy, float>)
     {
-        return LIKELY(str) ? strtof(str, nullptr) : .0f;
+        num = LIKELY(str) ? strtof(str, &strEnd) : .0f;
     }
     else if constexpr (std::is_same_v<_NumTy, double>)
     {
-        return LIKELY(str) ? strtod(str, nullptr) : .0;
+        num = LIKELY(str) ? strtod(str, &strEnd) : .0;
     }
     else if constexpr (std::is_same_v<_NumTy, long double>)
     {
-        return LIKELY(str) ? strtold(str, nullptr) : .0;
+        num = LIKELY(str) ? strtold(str, &strEnd) : .0;
     }
     else
     {
-        llbc_assert(false && "Unsupport floating point type");
-        return _NumTy();
+        llbc_assert(false && "Unsupported floating point type");
+        abort();
     }
+
+    // Process error.
+    // - case 1: [FAILED]  errno != 0: clib error, return _NumTy().
+    // - case 2: [FAILED]  parse failed: LLBC_ERROR_INVALID, return _NumTy().
+    // - case 3: [FAILED]  partial parsed: LLBC_ERROR_PARTIAL_PARSED, return num.
+    // - case 4: [SUCCESS] success: return num.
+    __LLBC_InlMacro_Num2StrProcessErr()
+
+    return num;
 }
+
+#undef __LLBC_InlMacro_Num2StrProcessErr
 
 __LLBC_NS_END
