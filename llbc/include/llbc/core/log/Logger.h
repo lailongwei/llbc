@@ -33,6 +33,8 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 struct LLBC_LogData;
+struct LLBC_LogTrace;
+class LLBC_LogTraceMgr;
 class LLBC_LoggerConfigInfo;
 class LLBC_BaseLogAppender;
 class LLBC_LogRunnable;
@@ -131,6 +133,24 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int SetLogHook(std::initializer_list<int> logLevels, const LLBC_Delegate<void(const LLBC_LogData *)> &logHook);
+
+public:
+    /**
+     * Add log trace to logger.
+     * @param[in] logTrace - the log trace.
+     */
+    void AddLogTrace(const LLBC_LogTrace &logTrace);
+
+    /**
+     * Remove log trace from logger.
+     * @param[in] logTrace - the log trace.
+     */
+    void RemoveLogTrace(const LLBC_LogTrace &logTrace);
+
+    /**
+     * Clear log trace from logger.
+     */
+    void ClearLogTrace();
 
 public:
     /**
@@ -348,6 +368,9 @@ private:
     volatile int _logLevel;
     // Logger config.
     LLBC_LoggerConfigInfo *_config;
+
+    // Log trace manager.
+    LLBC_LogTraceMgr *_logTraceMgr;
 
     // Log runnable object.
     LLBC_LogRunnable *_logRunnable;

@@ -19,81 +19,45 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
 
-#include "llbc/common/Export.h"
-
-#include "llbc/core/objpool/ObjPool.h"
-
-#include "llbc/core/log/LogData.h"
+#include "llbc/core/log/BaseLogToken.h"
 
 __LLBC_NS_BEGIN
-// Note: Some data members don't need init.
-LLBC_LogData::LLBC_LogData()
-// : logger(nullptr)
 
-: msg(nullptr)
-, msgLen(0)
-, msgCap(0)
-
-// , level(-1)
-// , logTime(0)
-
-, fileLen(0)
-, funcLen(0)
-, tagLen(0)
-
-// , line(0)
-
-// , threadId(LLBC_INVALID_NATIVE_THREAD_ID)
-
-, _typedObjPool(nullptr)
+/**
+ * \brief Log Trace type log token calss encapsulation.
+ */
+class LLBC_HIDDEN LLBC_LogTraceToken : public LLBC_BaseLogToken
 {
-}
+public:
+    LLBC_LogTraceToken() = default;
+    ~LLBC_LogTraceToken() override = default;
 
-LLBC_LogData::~LLBC_LogData()
-{
-    if (msg)
-        free(msg);
-}
+public:
+    /**
+     * Initialize the log token.
+     * @param[in] formatter - log formatter.
+     * @param[in] str       - token append string data.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str) override;
 
-void LLBC_LogData::Reuse()
-{
-    // Notes:
-    // - Some data members don't need reset.
-    // - Free msg buf, if cap too large.
+    /**
+     * Get token type.
+     * @return int - token type.
+     */
+    int GetType() const override;
 
-    // logger = nullptr;
+    /**
+     * Format the log data.
+     * @param[in] data           - log data.
+     * @param[out] formattedData - store location for formatted log string.
+     */
+    void Format(const LLBC_LogData &data, LLBC_String &formattedData) const override;
 
-    msgLen = 0;
-    if (msgCap >= MAX(1024, (LLBC_CFG_LOG_FORMAT_BUF_SIZE * 7 / 8)))
-    {
-        free(msg);
-        msg = nullptr;
-        msgCap = 0;
-    }
-
-    // level = -1;
-    // logTime = 0;
-
-    fileLen = 0;
-    funcLen = 0;
-    tagLen = 0;
-
-    logTrace.reset();
-
-    // line = 0;
-
-    // threadId = LLBC_INVALID_NATIVE_THREAD_ID;
-}
-
-LLBC_TypedObjPool<LLBC_LogData> *LLBC_LogData::GetTypedObjPool() const
-{
-    return _typedObjPool;
-}
-
-void LLBC_LogData::SetTypedObjPool(LLBC_TypedObjPool<LLBC_LogData> *typedObjPool)
-{
-    _typedObjPool = typedObjPool;
-}
+private:
+    LLBC_String _envValue;
+};
 
 __LLBC_NS_END

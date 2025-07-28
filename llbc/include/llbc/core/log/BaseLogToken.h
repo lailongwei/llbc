@@ -50,6 +50,7 @@ public:
         MsgToken       = 'm', // %m: message type token.
         TimeToken      = 'T', // %T: time token.
         EnvToken       = 'E', // %E: environment token.
+        LogTraceToken  = 'x', // %x: log trace token.
         EscapeToken    = '%', // %%: escape token.
 
         NullToken      = '?', // null token.
