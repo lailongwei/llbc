@@ -41,6 +41,10 @@ private:
     void DoConditionMacroLogTest();
     int DoLoggerMgrReloadTest();
 
+    void DoLogTraceTest();
+    template <typename _KeyTy, typename _ContentTy>
+    void AddLogTrace(const _KeyTy &key, const _ContentTy &content);
+
     void OnLogHook(const LLBC_LogData *logData);
 
 private:
