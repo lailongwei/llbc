@@ -57,6 +57,8 @@ struct LLBC_EXPORT LLBC_LogData
     char tag[32];           // Tag
     int tagLen;             // Tag length
 
+    std::shared_ptr<LLBC_String> logTrace; // Log trace
+
     int line;               // Log source file line number.
 
     LLBC_ThreadId threadId; // Log native thread Id.

@@ -39,6 +39,7 @@
 #include "llbc/core/log/LogEnvToken.h"
 #include "llbc/core/log/LogEscapeToken.h"
 #include "llbc/core/log/LogTokenBuilder.h"
+#include "llbc/core/log/LogTraceToken.h"
 
 __LLBC_NS_BEGIN
 
@@ -98,6 +99,9 @@ LLBC_BaseLogToken *LLBC_LogTokenBuilder::BuildLogToken(int type) const
 
     case LLBC_LogTokenType::EscapeToken:
         return new LLBC_LogEscapeToken;
+
+    case LLBC_LogTokenType::LogTraceToken:
+        return new LLBC_LogTraceToken;
 
     default:
         return new LLBC_LogNullToken;

@@ -183,6 +183,19 @@
 #define LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE          "root"
 // Log data object pool units size per stripe.
 #define LLBC_CFG_LOG_LOG_DATA_OBJPOOL_UNIT_SIZE_PER_BLOCK   512
+// Log trace key limit(including the terminating null character).
+#define LLBC_CFG_CORE_LOG_TRACE_KEY_LIMIT                   16
+// Log trace content limit(including the terminating null character).
+#define LLBC_CFG_CORE_LOG_TRACE_CONTENT_LIMIT               32
+// Log trace same key content content limit.
+#define LLBC_CFG_CORE_LOG_TRACE_SAME_KEY_CONTENT_COUNT_LIMIT 5
+// Log trace limit(built log trace key&content size, including the terminating null character).
+#define LLBC_CFG_CORE_LOG_TRACE_LIMIT                       256
+// Log trace separators:
+// - [0]: LogTraces separator.
+// - [1]: LogTrace key/content separator.
+// - [2]: logTrace contents separator.
+#define LLBC_CFG_CORE_LOG_TRACE_SEPARATORS                  "|:,"
 
 /**
  * \brief core/timer about configs.

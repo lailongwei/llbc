@@ -34,8 +34,6 @@ int TestCase_Com_Version::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("llbc library version test: ");
 
-    std::cout <<LLBC_TimeSpan::FromMinutes(2) <<std::endl;
-
     LLBC_PrintLn("Major version: %d", LLBC_majorVersion);
     LLBC_PrintLn("Minor version: %d", LLBC_minorVersion);
     LLBC_PrintLn("Update No: %d", LLBC_updateNo);

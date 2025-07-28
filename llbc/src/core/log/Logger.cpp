@@ -30,6 +30,7 @@
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogData.h"
+#include "llbc/core/log/LogTrace.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 #include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/LogAppenderBuilder.h"
@@ -46,6 +47,10 @@ __LLBC_NS_BEGIN
 LLBC_Logger::LLBC_Logger()
 : _logLevel(LLBC_LogLevel::End)
 , _config(nullptr)
+
+, _logTraceMgr(new LLBC_LogTraceMgr(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0],
+               						LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1],
+               						LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2]))
 
 , _logRunnable(nullptr)
 
@@ -283,6 +288,36 @@ int LLBC_Logger::SetLogHook(std::initializer_list<int> logLevels,
     }
 
     return LLBC_OK;
+}
+
+void LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
+{
+    if (UNLIKELY(!_logTraceMgr))
+        return;
+
+    _lock.Lock();
+    _logTraceMgr->AddLogTrace(logTrace);
+    _lock.Unlock();
+}
+
+void LLBC_Logger::RemoveLogTrace(const LLBC_LogTrace &logTrace)
+{
+    if (UNLIKELY(!_logTraceMgr))
+        return;
+
+    _lock.Lock();
+    _logTraceMgr->RemoveLogTrace(logTrace);
+    _lock.Unlock();
+}
+
+void LLBC_Logger::ClearLogTrace()
+{
+    if (UNLIKELY(!_logTraceMgr))
+        return;
+
+    _lock.Lock();
+    _logTraceMgr->ClearLogTrace();
+    _lock.Unlock();
 }
 
 int LLBC_Logger::VOutput(int level,
@@ -540,6 +575,11 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
         logData->tag[logData->tagLen] = '\0';
     }
 
+    // fill: log trace.
+    _lock.Lock();
+    logData->logTrace = _logTraceMgr->GetTraceInfo();
+    _lock.Unlock();
+
     // fill: line.
     logData->line = line;
 
@@ -640,6 +680,8 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
     // Reset basic members.
     _flushInterval = 0;
     _lastFlushTime = 0;
+
+    LLBC_XDelete(_logTraceMgr);
 
     LLBC_XDelete(_config);
     _logLevel = LLBC_LogLevel::End;
