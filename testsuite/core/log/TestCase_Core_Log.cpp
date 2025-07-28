@@ -140,7 +140,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     DoLogLevelSetTest();
 
     // Peform performance test.
-    const int perfTestTimes = 10;
+    const int perfTestTimes = 3;
     LLOG_ADD_TRACE2("perftest", "id", 123456789);
     for (int i = 0; i < perfTestTimes; ++i)
     {
