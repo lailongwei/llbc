@@ -510,6 +510,19 @@ void TestCase_Core_Log::DoLogTraceTest()
         LLOG_INFO("After add too long log trace info...");
     }
 
+    LLBC_PrintLn("- Do same key content limit test:");
+    {
+        LLOG_ADD_TRACE("key", "content1");
+        LLOG_ADD_TRACE("key", "content2");
+        LLOG_ADD_TRACE("key", "content3");
+        LLOG_ADD_TRACE("key", "content4");
+        LLOG_ADD_TRACE("key", "content5");
+        LLOG_ADD_TRACE("key", "content6");
+        LLOG_ADD_TRACE("key", "content7");
+        LLOG_ADD_TRACE("key", "content8");
+        LLOG_INFO("After add 8 same key contents(limit:%d)...", LLBC_CFG_CORE_LOG_TRACE_SAME_KEY_CONTENT_COUNT_LIMIT);
+    }
+
     LLBC_PrintLn("- Do complex log trace test:");
     {
         LLOG_ADD_TRACE("id", 10086);
