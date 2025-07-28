@@ -40,11 +40,13 @@ void LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
         return;
 
     // Insert to _logTraces or add traceTimes.
+    // - Find trace contents.
     bool needRebuild = false;
     auto keyIt = _logTraces.find(logTrace.traceKey);
     if (UNLIKELY(keyIt == _logTraces.end()))
         keyIt = _logTraces.emplace(logTrace.traceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>()).first;
 
+    // - Find content it, incr traceTimes or insert new content.
     auto &traceContents = keyIt->second;
     const auto contentIt = std::find_if(traceContents.begin(),
                                         traceContents.end(),
@@ -53,6 +55,9 @@ void LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
     });
     if (contentIt == traceContents.end())
     {
+        if (UNLIKELY(traceContents.size() >= LLBC_CFG_CORE_LOG_TRACE_SAME_KEY_CONTENT_COUNT_LIMIT))
+            return;
+
         traceContents.emplace_back(logTrace.traceContent, 1);
         needRebuild = true;
     }
