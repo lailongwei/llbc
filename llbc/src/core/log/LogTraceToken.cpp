@@ -22,78 +22,34 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/objpool/ObjPool.h"
+#include "llbc/core/thread/Guard.h"
+
+#include "llbc/core/log/LogTraceToken.h"
 
 #include "llbc/core/log/LogData.h"
 
 __LLBC_NS_BEGIN
-// Note: Some data members don't need init.
-LLBC_LogData::LLBC_LogData()
-// : logger(nullptr)
-
-: msg(nullptr)
-, msgLen(0)
-, msgCap(0)
-
-// , level(-1)
-// , logTime(0)
-
-, fileLen(0)
-, funcLen(0)
-, tagLen(0)
-
-// , line(0)
-
-// , threadId(LLBC_INVALID_NATIVE_THREAD_ID)
-
-, _typedObjPool(nullptr)
+    int LLBC_LogTraceToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
 {
+    SetFormatter(formatter);
+    return LLBC_OK;
 }
 
-LLBC_LogData::~LLBC_LogData()
+int LLBC_LogTraceToken::GetType() const
 {
-    if (msg)
-        free(msg);
+    return LLBC_LogTokenType::LogTraceToken;
 }
 
-void LLBC_LogData::Reuse()
+void LLBC_LogTraceToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    // Notes:
-    // - Some data members don't need reset.
-    // - Free msg buf, if cap too large.
-
-    // logger = nullptr;
-
-    msgLen = 0;
-    if (msgCap >= MAX(1024, (LLBC_CFG_LOG_FORMAT_BUF_SIZE * 7 / 8)))
+    auto logTrace = data.logTrace.get();
+    if (logTrace && !logTrace->empty())
     {
-        free(msg);
-        msg = nullptr;
-        msgCap = 0;
+        const int index = static_cast<int>(formattedData.size());
+
+        formattedData.append(*logTrace);
+        GetFormatter().Format(formattedData, index);
     }
-
-    // level = -1;
-    // logTime = 0;
-
-    fileLen = 0;
-    funcLen = 0;
-    tagLen = 0;
-
-    logTrace.reset();
-
-    // line = 0;
-
-    // threadId = LLBC_INVALID_NATIVE_THREAD_ID;
-}
-
-LLBC_TypedObjPool<LLBC_LogData> *LLBC_LogData::GetTypedObjPool() const
-{
-    return _typedObjPool;
-}
-
-void LLBC_LogData::SetTypedObjPool(LLBC_TypedObjPool<LLBC_LogData> *typedObjPool)
-{
-    _typedObjPool = typedObjPool;
 }
 
 __LLBC_NS_END

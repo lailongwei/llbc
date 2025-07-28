@@ -22,8 +22,9 @@
 #pragma once
 
 #include "llbc/core/singleton/Singleton.h"
-#include "llbc/core/thread/DummyLock.h"
+#include "llbc/core/thread/Guard.h"
 #include "llbc/core/thread/FastLock.h"
+#include "llbc/core/thread/DummyLock.h"
 #include "llbc/core/log/Logger.h"
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
@@ -272,6 +273,32 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
 #define LJLOG_FATAL2(loggerName) LJLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Fatal)
 #define LJLOG_FATAL3(tag) LJLOG(nullptr, tag, LLBC_NS LLBC_LogLevel::Fatal)
 #define LJLOG_FATAL4(loggerName, tag) LJLOG(loggerName, tag, LLBC_NS LLBC_LogLevel::Fatal)
+
+/**
+ * Log trace add macro.
+ */
+#define LLOG_ADD_TRACE(traceKey, traceContent) LLOG_ADD_TRACE2(nullptr, traceKey, traceContent)
+#define LLOG_ADD_TRACE2(loggerName, traceKey, traceContent)                                     \
+    const LLBC_NS LLBC_LogTrace LLBC_Concat(__logTrace__, __LINE__)(traceKey, traceContent);    \
+    LLBC_NS LLBC_Logger *LLBC_Concat(__logTraceLogger__, __LINE__) = nullptr;                   \
+    auto LLBC_Concat(__logTraceLoggerMgr__, __LINE__) = LLBC_LoggerMgrSingleton;                \
+                                                                                                \
+    LLBC_NS LLBC_InvokeGuard LLBC_Concat(__logTraceRemovGuard__, __LINE__)([                    \
+        &LLBC_Concat(__logTrace__, __LINE__),                                                   \
+        &LLBC_Concat(__logTraceLogger__, __LINE__)] () {                                        \
+            if (LLBC_Concat(__logTraceLogger__, __LINE__))                                      \
+                LLBC_Concat(__logTraceLogger__, __LINE__)->RemoveLogTrace(LLBC_Concat(__logTrace__, __LINE__)); \
+    });                                                                                         \
+                                                                                                \
+    if (LIKELY(LLBC_Concat(__logTraceLoggerMgr__, __LINE__)->IsInited())) {                     \
+        if (loggerName != nullptr)                                                              \
+            LLBC_Concat(__logTraceLogger__, __LINE__) = LLBC_Concat(__logTraceLoggerMgr__, __LINE__)->GetLogger(loggerName); \
+        else                                                                                    \
+            LLBC_Concat(__logTraceLogger__, __LINE__) = LLBC_Concat(__logTraceLoggerMgr__, __LINE__)->GetRootLogger(); \
+                                                                                                \
+        if (LIKELY(LLBC_Concat(__logTraceLogger__, __LINE__)))                                  \
+            LLBC_Concat(__logTraceLogger__, __LINE__)->AddLogTrace(LLBC_Concat(__logTrace__, __LINE__)); \
+    }                                                                                           \
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
 /**

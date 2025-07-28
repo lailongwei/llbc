@@ -45,8 +45,8 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    _logCfgFilePath = "LogTestCfg.cfg";
-    // _logCfgFilePath  = "LogTestCfg.xml";
+    // _logCfgFilePath = "LogTestCfg.cfg";
+    _logCfgFilePath  = "LogTestCfg.xml";
     if(LLBC_LoggerMgrSingleton->Initialize(_logCfgFilePath) != LLBC_OK)
 #endif
     {
@@ -124,6 +124,9 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_FATAL2("test", "This is a fatal log message.");
     LLOG_FATAL4("test", "test_tag", "This is a fatal log message.");
 
+    // Log trace test.
+    DoLogTraceTest();
+
     // Log file delete test.
     for (int i = 0; i < 15; ++i)
     {
@@ -137,7 +140,8 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     DoLogLevelSetTest();
 
     // Peform performance test.
-    const int perfTestTimes = 3;
+    const int perfTestTimes = 10;
+    LLOG_ADD_TRACE2("perftest", "id", 123456789);
     for (int i = 0; i < perfTestTimes; ++i)
     {
         LLBC_PrintLn("Press any key to exec performance test(times:%d):", i);
@@ -460,6 +464,105 @@ int TestCase_Core_Log::DoLoggerMgrReloadTest()
     }
 
     return LLBC_OK;
+}
+
+void TestCase_Core_Log::DoLogTraceTest()
+{
+    LLBC_PrintLn("Press any key to start LogTrace test...");
+    getchar();
+
+    LLBC_PrintLn("- Do simple log trace test:");
+    {
+        AddLogTrace(nullptr, "the nullptr trace");
+        AddLogTrace("id", 10086);
+        AddLogTrace("id", 10010);
+        AddLogTrace(false, true);
+        AddLogTrace(false, 1.5);
+        AddLogTrace(3.1415926, LLBC_LogLevel::Error);
+        AddLogTrace("hello", "world");
+        AddLogTrace(std::string("std::string key"), std::string("std::string content"));
+        AddLogTrace(LLBC_String("LLBC_String key"), LLBC_CString("LLBC_String content"));
+        AddLogTrace(LLBC_String(""), LLBC_CString("empty key content"));
+    }
+
+    LLBC_PrintLn("- Do too long key&content test:");
+    {
+        LLBC_String tooLongKey("key:");
+        tooLongKey *= (LLBC_CFG_CORE_LOG_TRACE_KEY_LIMIT * 2);
+        LLBC_String tooLongContent("content:");
+        tooLongContent *= (LLBC_CFG_CORE_LOG_TRACE_CONTENT_LIMIT * 2);
+        AddLogTrace(tooLongKey, tooLongContent);
+    }
+
+    LLBC_PrintLn("- Do too long trace info test:");
+    {
+        LLOG_ADD_TRACE(LLBC_String("hello world") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("Hello world") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("HEllo world") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("HELlo world") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("HELLo world") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("HELLO world") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("WELLO world") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("WELLO World") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("WELLO WOrld") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("WELLO WORld") * 10, LLBC_String("hey judy") * 100);
+        LLOG_ADD_TRACE(LLBC_String("WELLO WORLd") * 10, LLBC_String("hey judy") * 100);
+        LLOG_INFO("After add too long log trace info...");
+    }
+
+    LLBC_PrintLn("- Do complex log trace test:");
+    {
+        LLOG_ADD_TRACE("id", 10086);
+        LLOG_ADD_TRACE("id", 10010);
+        LLOG_ADD_TRACE("name", "Judy");
+        LLOG_INFO("After add some log traces...");
+        {
+            LLOG_ADD_TRACE("id", 9527);
+            LLOG_INFO("After add id:9527");
+
+            LLOG_ADD_TRACE("id", 10086);
+            LLOG_INFO("After repeatly add id:10086...");
+        }
+
+        LLOG_INFO("After remove repeatly log trace: id:10086");
+    }
+
+    LLBC_PrintLn("- Do multi-thread log trace test:");
+    {
+        class TestTask : public LLBC_Task
+        {
+        public:
+            void Svc() override
+            {
+                for (int i = 0; i < 100; ++i)
+                {
+                    LLOG_ADD_TRACE2("logtrace_test", LLBC_Rand(80000, 2000000000), LLBC_Rand(50000, 500000000));
+                    LLOG_INFO2("logtrace_test", "Log Trace test thread, tid:%d", LLBC_GetCurrentThreadId());
+                }
+            }
+
+            void Cleanup() override {  }
+        };
+
+        auto task = new TestTask;
+        task->Activate(10);
+        task->Wait();
+        delete task;
+    }
+
+    LLBC_PrintLn("Press any key to finish LogTrace test...");
+    getchar();
+}
+
+template <typename _KeyTy, typename _ContentTy>
+void TestCase_Core_Log::AddLogTrace(const _KeyTy &key, const _ContentTy &content)
+{
+    const auto keyStr = LLBC_Variant(key).ToString();
+    const auto contentStr = LLBC_Variant(content).ToString();
+
+    LLOG_INFO("Before add %s:%s", keyStr.c_str(), contentStr.c_str());
+    LLOG_ADD_TRACE(key, content)
+    LLOG_INFO("After add %s:%s", keyStr.c_str(), contentStr.c_str());
 }
 
 void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
