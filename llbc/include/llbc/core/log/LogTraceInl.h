@@ -42,10 +42,8 @@ LLBC_LogTrace::TraceData<_TraceStrLimit>::TraceData(const _TraceDataTy &traceDat
         strLen = 0;
         str[0] = '\0';
     }
-    else if constexpr ((std::is_pointer_v<_TraceDataTy> &&
-                        std::is_same_v<std::remove_cv_t<std::remove_pointer_t<_TraceDataTy>>, char>) ||
-                       (std::is_array_v<_TraceDataTy> &&
-                        std::is_same_v<std::remove_cv_t<std::remove_extent_t<_TraceDataTy>>, char>))
+    else if constexpr (std::is_pointer_v<_TraceDataTy> &&
+                       std::is_same_v<std::remove_cv_t<std::remove_pointer_t<_TraceDataTy>>, char>)
     {
         if (UNLIKELY(traceData == nullptr))
         {
@@ -58,6 +56,13 @@ LLBC_LogTrace::TraceData<_TraceStrLimit>::TraceData(const _TraceDataTy &traceDat
             strLen = std::min(traceStrLen, sizeof(str) - 1);
             memcpy(str, traceData, strLen + 1);
         }
+    }
+    else if constexpr (std::is_array_v<_TraceDataTy> &&
+                       std::is_same_v<std::remove_cv_t<std::remove_extent_t<_TraceDataTy>>, char>)
+    {
+        const size_t traceStrLen = strlen(traceData);
+        strLen = std::min(traceStrLen, sizeof(str) - 1);
+        memcpy(str, traceData, strLen + 1);
     }
     else if constexpr (LLBC_IsTemplSpec<_TraceDataTy, std::basic_string>::value ||
                        LLBC_IsTemplSpec<_TraceDataTy, std::basic_string_view>::value ||
