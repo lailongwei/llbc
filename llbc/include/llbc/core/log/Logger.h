@@ -26,6 +26,7 @@
 #include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/log/LogLevel.h"
+#include "llbc/core/log/LogTrace.h"
 
 __LLBC_NS_BEGIN
 
@@ -33,8 +34,6 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 struct LLBC_LogData;
-struct LLBC_LogTrace;
-class LLBC_LogTraceMgr;
 class LLBC_LoggerConfigInfo;
 class LLBC_BaseLogAppender;
 class LLBC_LogRunnable;
@@ -138,14 +137,32 @@ public:
     /**
      * Add log trace to logger.
      * @param[in] logTrace - the log trace.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void AddLogTrace(const LLBC_LogTrace &logTrace);
+    int AddLogTrace(const LLBC_LogTrace &logTrace);
+
+    /**
+     * Add log trace to logger.
+     * @param[in] traceKey     - the trace key.
+     * @param[in] traceContent - the trace content.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename _TraceKeyTy, typename _TraceContentTy>
+    int AddLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent);
 
     /**
      * Remove log trace from logger.
      * @param[in] logTrace - the log trace.
      */
     void RemoveLogTrace(const LLBC_LogTrace &logTrace);
+
+    /**
+     * Remove log trace from logger.
+     * @param[in] traceKey     - the trace key.
+     * @param[in] traceContent - the trace content.
+     */
+    template <typename _TraceKeyTy, typename _TraceContentTy>
+    void RemoveLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent);
 
     /**
      * Clear log trace from logger.
