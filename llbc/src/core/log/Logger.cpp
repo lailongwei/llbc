@@ -305,23 +305,45 @@ int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
     return LLBC_OK;
 }
 
-void LLBC_Logger::RemoveLogTrace(const LLBC_LogTrace &logTrace)
+void LLBC_Logger::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero)
 {
     if (UNLIKELY(!_logTraceMgr))
         return;
 
     _lock.Lock();
-    _logTraceMgr->RemoveLogTrace(logTrace);
+    _logTraceMgr->RemoveLogTrace(logTrace, setTraceTimesToZero);
     _lock.Unlock();
 }
 
-void LLBC_Logger::ClearLogTrace()
+size_t LLBC_Logger::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const
+{
+    if (UNLIKELY(!_logTraceMgr))
+        return 0;
+
+    _lock.Lock();
+    const auto logTraceTimes = _logTraceMgr->GetLogTraceTimes(logTrace);
+    _lock.Unlock();
+
+    return logTraceTimes;
+}
+
+void LLBC_Logger::ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey)
 {
     if (UNLIKELY(!_logTraceMgr))
         return;
 
     _lock.Lock();
-    _logTraceMgr->ClearLogTrace();
+    _logTraceMgr->ClearLogTrace(traceKey);
+    _lock.Unlock();
+}
+
+void LLBC_Logger::ClearAllLogTraces()
+{
+    if (UNLIKELY(!_logTraceMgr))
+        return;
+
+    _lock.Lock();
+    _logTraceMgr->ClearAllLogTraces();
     _lock.Unlock();
 }
 

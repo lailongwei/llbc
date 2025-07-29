@@ -287,7 +287,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
         &LLBC_Concat(__logTrace__, __LINE__),                                                   \
         &LLBC_Concat(__logTraceLogger__, __LINE__)] () {                                        \
             if (LLBC_Concat(__logTraceLogger__, __LINE__))                                      \
-                LLBC_Concat(__logTraceLogger__, __LINE__)->RemoveLogTrace(LLBC_Concat(__logTrace__, __LINE__)); \
+                LLBC_Concat(__logTraceLogger__, __LINE__)->RemoveLogTrace(LLBC_Concat(__logTrace__, __LINE__), false); \
     });                                                                                         \
                                                                                                 \
     if (LIKELY(LLBC_Concat(__logTraceLoggerMgr__, __LINE__)->IsInited())) {                     \
