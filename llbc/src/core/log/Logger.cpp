@@ -290,14 +290,19 @@ int LLBC_Logger::SetLogHook(std::initializer_list<int> logLevels,
     return LLBC_OK;
 }
 
-void LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
+int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
 {
     if (UNLIKELY(!_logTraceMgr))
-        return;
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
 
     _lock.Lock();
     _logTraceMgr->AddLogTrace(logTrace);
     _lock.Unlock();
+
+    return LLBC_OK;
 }
 
 void LLBC_Logger::RemoveLogTrace(const LLBC_LogTrace &logTrace)
