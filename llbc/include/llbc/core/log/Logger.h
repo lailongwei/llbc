@@ -152,22 +152,57 @@ public:
 
     /**
      * Remove log trace from logger.
-     * @param[in] logTrace - the log trace.
+     * @param[in] logTrace            - the log trace.
+     * @param[in] setTraceTimesToZero - set this log trace times to zero flag,
+     *                                  if true, will set trace times to zero and remove this log trace.
      */
-    void RemoveLogTrace(const LLBC_LogTrace &logTrace);
+    void RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero);
 
     /**
      * Remove log trace from logger.
-     * @param[in] traceKey     - the trace key.
-     * @param[in] traceContent - the trace content.
+     * @param[in] traceKey            - the trace key.
+     * @param[in] traceContent        - the trace content.
+     * @param[in] setTraceTimesToZero - set this log trace times to zero flag,
+     *                                  if true, will set trace times to zero and remove this log trace.
      */
     template <typename _TraceKeyTy, typename _TraceContentTy>
-    void RemoveLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent);
+    void RemoveLogTrace(const _TraceKeyTy &traceKey,
+                        const _TraceContentTy &traceContent,
+                        bool setTraceTimesToZero);
 
     /**
-     * Clear log trace from logger.
+     * Get log trace times.
+     * @param logTrace - the log trace obj.
+     * @return size_t - this log trace obj trace times.
      */
-    void ClearLogTrace();
+    size_t GetLogTraceTimes(const LLBC_LogTrace &logTrace) const;
+
+    /**
+     * Get log trace times.
+     * @param[in] traceKey     - the trace key.
+     * @param[in] traceContent - the trace content.
+     * @return size_t - this log trace obj trace times.
+     */
+     template <typename _TraceKeyTy, typename _TraceContentTy>
+    size_t GetLogTraceTimes(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent) const;
+
+    /**
+     * Clear specific key log traces.
+     * @param[in] traceKey - the trace key.
+     */
+    void ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey);
+
+    /**
+     * Clear specific key log traces.
+     * @param[in] traceKey - the trace key.
+     */
+    template <typename _TraceKeyTy>
+    void ClearLogTrace(const _TraceKeyTy &traceKey);
+
+    /**
+     * Clear all log traces from logger.
+     */
+    void ClearAllLogTraces();
 
 public:
     /**

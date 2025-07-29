@@ -47,9 +47,23 @@ int LLBC_Logger::AddLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy 
 }
 
 template <typename _TraceKeyTy, typename _TraceContentTy>
-void LLBC_Logger::RemoveLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent)
+void LLBC_Logger::RemoveLogTrace(const _TraceKeyTy &traceKey,
+                                 const _TraceContentTy &traceContent,
+                                 bool setTraceTimesToZero)
 {
-    RemoveLogTrace(LLBC_LogTrace(traceKey, traceContent));
+    RemoveLogTrace(LLBC_LogTrace(traceKey, traceContent), setTraceTimesToZero);
+}
+
+template <typename _TraceKeyTy, typename _TraceContentTy>
+size_t LLBC_Logger::GetLogTraceTimes(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent) const
+{
+    return GetLogTraceTimes(LLBC_LogTrace(traceKey, traceContent));
+}
+
+template <typename _TraceKeyTy>
+void LLBC_Logger::ClearLogTrace(const _TraceKeyTy &traceKey)
+{
+    return ClearLogTrace(LLBC_LogTrace::TraceKey(traceKey));
 }
 
 #define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
