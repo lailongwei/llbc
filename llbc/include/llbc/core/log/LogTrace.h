@@ -111,14 +111,29 @@ public:
 
     /**
      * Remove log trace.
-     * @param[in] logTrace - the log trace obj.
+     * @param[in] logTrace            - the log trace obj.
+     * @param[in] setTraceTimesToZero - set this log trace times to zero flag,
+     *                                  if true, will set trace times to zero and remove this log trace.
      */
-    void RemoveLogTrace(const LLBC_LogTrace &logTrace);
+    void RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero);
+
+    /**
+     * Get log trace times.
+     * @param logTrace - the log trace obj.
+     * @return size_t - this log trace obj trace times.
+     */
+    size_t GetLogTraceTimes(const LLBC_LogTrace &logTrace) const;
+
+    /**
+     * Clear specific key log traces.
+     * @param[in] traceKey - the trace key.
+     */
+    void ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey);
 
     /**
      * Clear all log traces.
      */
-    void ClearLogTrace();
+    void ClearAllLogTraces();
 
     /**
      * Get trace info(built log traces).
