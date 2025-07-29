@@ -39,6 +39,19 @@ inline const LLBC_ObjPool &LLBC_Logger::GetLoggerObjPool() const
     return _objPool;
 }
 
+
+template <typename _TraceKeyTy, typename _TraceContentTy>
+int LLBC_Logger::AddLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent)
+{
+    return AddLogTrace(LLBC_LogTrace(traceKey, traceContent));
+}
+
+template <typename _TraceKeyTy, typename _TraceContentTy>
+void LLBC_Logger::RemoveLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent)
+{
+    RemoveLogTrace(LLBC_LogTrace(traceKey, traceContent));
+}
+
 #define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
     LLBC_FORCE_INLINE int LLBC_Logger::level(const char *tag, \
                                              const char *file, \

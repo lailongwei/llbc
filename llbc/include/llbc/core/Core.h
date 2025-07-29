@@ -117,7 +117,6 @@
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/BaseLogAppender.h"
-#include "llbc/core/log/LogTrace.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerMgr.h"
 #include "llbc/core/log/LogJsonMsg.h"
