@@ -494,6 +494,44 @@ void TestCase_Core_Log::DoLogTraceTest()
         AddLogTrace(tooLongKey, tooLongContent);
     }
 
+    LLBC_PrintLn("- Do explicit add/remove log trace test:");
+    {
+        auto rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
+        rootLogger->AddLogTrace("id", 8888);
+        rootLogger->AddLogTrace("id", 8888);
+        rootLogger->AddLogTrace("id", 8888);
+        rootLogger->AddLogTrace("id", 9999);
+        LLOG_INFO("After add id:8888<3times>, id:9999, id:8888 traceIimes:%lu, id:9999 traceTimes:%lu...",
+                  rootLogger->GetLogTraceTimes("id", 8888), rootLogger->GetLogTraceTimes("id", 9999));
+
+        rootLogger->RemoveLogTrace("id", 8888, false);
+        rootLogger->RemoveLogTrace("id", 9999, false);
+        LLOG_INFO("After remove id:8888, id:9999, id:8888 traceTimes:%lu, id:9999 traceTimes:%lu...",
+                  rootLogger->GetLogTraceTimes("id", 8888), rootLogger->GetLogTraceTimes("id", 9999));
+
+        rootLogger->AddLogTrace("id", 6666);
+        rootLogger->AddLogTrace("id", 7777);
+        rootLogger->RemoveLogTrace("id", 8888, true);
+        LLOG_INFO("After add id:6666, id:7777, remove id:8888(setTraceTimesToZero=true), id:8888 traceTimes:%lu...",
+                 rootLogger->GetLogTraceTimes("id", 8888));
+
+        rootLogger->ClearLogTrace("id");
+        LLOG_INFO("After clear log trace <id>...");
+
+        rootLogger->AddLogTrace("id", 4444);
+        rootLogger->AddLogTrace("id", 4444);
+        rootLogger->AddLogTrace("id", 5555);
+        rootLogger->AddLogTrace("id", 6666);
+        LLOG_INFO("After add id:4444<2times>, id:5555, id:6666, "
+                  "id:4444 traceTimes:%lu, id:5555 traceTimes:%lu, id:6666 traceTimes:%lu...",
+                  rootLogger->GetLogTraceTimes("id", 4444),
+                  rootLogger->GetLogTraceTimes("id", 5555),
+                  rootLogger->GetLogTraceTimes("id", 6666));
+
+        rootLogger->ClearAllLogTraces();
+        LLOG_INFO("After clear all log traces...");
+    }
+
     LLBC_PrintLn("- Do too long trace info test:");
     {
         LLOG_ADD_TRACE(LLBC_String("hello world") * 10, LLBC_String("hey judy") * 100);

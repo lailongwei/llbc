@@ -70,7 +70,7 @@ void LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
         _RebuildTraceInfo();
 }
 
-void LLBC_LogTraceMgr::RemoveLogTrace(const LLBC_LogTrace &logTrace)
+void LLBC_LogTraceMgr::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero)
 {
     const auto keyIt = _logTraces.find(logTrace.traceKey);
     if (keyIt == _logTraces.end())
@@ -86,14 +86,43 @@ void LLBC_LogTraceMgr::RemoveLogTrace(const LLBC_LogTrace &logTrace)
         return;
 
     auto &traceContentPair = *contentIt;
-    if (--traceContentPair.second > 0)
-        return;
+    if (!setTraceTimesToZero && --traceContentPair.second > 0)
+            return;
 
     traceContents.erase(contentIt);
     _RebuildTraceInfo();
 }
 
-void LLBC_LogTraceMgr::ClearLogTrace()
+void LLBC_LogTraceMgr::ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey)
+{
+    const auto keyIt = _logTraces.find(traceKey);
+    if (keyIt == _logTraces.end())
+        return;
+
+    const bool needRebuild = !keyIt->second.empty();
+    _logTraces.erase(keyIt);
+
+    if (needRebuild)
+        _RebuildTraceInfo();
+}
+
+size_t LLBC_LogTraceMgr::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const
+{
+    const auto keyIt = _logTraces.find(logTrace.traceKey);
+    if (keyIt == _logTraces.end())
+        return 0;
+
+    const auto &traceContents = keyIt->second;
+    const auto contentIt = std::find_if(traceContents.begin(),
+                                        traceContents.end(),
+                                        [&logTrace](const auto &item) {
+        return item.first == logTrace.traceContent;
+    });
+    
+    return contentIt != traceContents.end() ? contentIt->second : 0;
+}
+
+void LLBC_LogTraceMgr::ClearAllLogTraces()
 {
     _traceInfo.reset();
     _logTraces.clear();
