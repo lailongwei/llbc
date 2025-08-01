@@ -54,6 +54,9 @@ public:
         bool operator>=(const TraceData &other) const { return !(*this < other); }
         bool operator==(const TraceData &other) const;
         bool operator!=(const TraceData &other) const { return !(*this == other); }
+
+        explicit operator bool() const;
+        bool operator!() const { return !static_cast<bool>(*this); }
     };
 
 public:
