@@ -471,6 +471,17 @@ void TestCase_Core_Log::DoLogTraceTest()
     LLBC_PrintLn("Press any key to start LogTrace test...");
     getchar();
 
+    LLBC_PrintLn("- Do LogTrace::TraceData operator bool test:");
+    {
+        LLBC_LogTrace::TraceKey traceKey(nullptr);
+        LLBC_PrintLn("  - TraceData(nullptr) operator bool(): %s", (LLBC_LogTrace::TraceKey(nullptr) ? "true" : "false"));
+        LLBC_PrintLn("  - TraceData(nullptr) operator!(): %s", (!LLBC_LogTrace::TraceKey(nullptr) ? "true" : "false"));
+        LLBC_PrintLn("  - TraceData(\"0\") operator bool(): %s", (LLBC_LogTrace::TraceKey("0") ? "true" : "false"));
+        LLBC_PrintLn("  - TraceData(\"0\") operator!(): %s", (!LLBC_LogTrace::TraceKey("0") ? "true" : "false"));
+        LLBC_PrintLn("  - TraceData(\"\") operator bool(): %s", (LLBC_LogTrace::TraceKey("") ? "true" : "false"));
+        LLBC_PrintLn("  - TraceData(\"\") operator!(): %s", (!LLBC_LogTrace::TraceKey("") ? "true" : "false"));
+    }
+
     LLBC_PrintLn("- Do simple log trace test:");
     {
         AddLogTrace(nullptr, "the nullptr trace");

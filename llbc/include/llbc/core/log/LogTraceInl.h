@@ -126,6 +126,12 @@ bool LLBC_LogTrace::TraceData<_TraceStrLimit>::operator==(const TraceData &other
     return strLen == 0 || memcmp(str, other.str, strLen) == 0;
 }
 
+template <size_t _TraceStrLimit>
+LLBC_LogTrace::TraceData<_TraceStrLimit>::operator bool() const
+{
+    return strLen != 0;
+}
+
 template <typename _TraceKeyTy,
           typename TraceContentTy>
 LLBC_LogTrace::LLBC_LogTrace(const _TraceKeyTy &traceKey, const TraceContentTy &traceContent)
