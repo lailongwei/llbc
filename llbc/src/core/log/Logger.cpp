@@ -299,20 +299,25 @@ int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
     }
 
     _lock.Lock();
-    _logTraceMgr->AddLogTrace(logTrace);
+    const auto ret = _logTraceMgr->AddLogTrace(logTrace);
     _lock.Unlock();
 
-    return LLBC_OK;
+    return ret;
 }
 
-void LLBC_Logger::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero)
+int LLBC_Logger::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero)
 {
     if (UNLIKELY(!_logTraceMgr))
-        return;
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
 
     _lock.Lock();
-    _logTraceMgr->RemoveLogTrace(logTrace, setTraceTimesToZero);
+    const auto ret = _logTraceMgr->RemoveLogTrace(logTrace, setTraceTimesToZero);
     _lock.Unlock();
+
+    return ret;
 }
 
 size_t LLBC_Logger::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const

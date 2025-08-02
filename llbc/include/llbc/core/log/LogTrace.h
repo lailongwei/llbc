@@ -109,16 +109,18 @@ public:
     /**
      * Add log trace.
      * @param[in] logTrace - the log trace obj. 
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void AddLogTrace(const LLBC_LogTrace &logTrace);
+    int AddLogTrace(const LLBC_LogTrace &logTrace);
 
     /**
      * Remove log trace.
      * @param[in] logTrace            - the log trace obj.
      * @param[in] setTraceTimesToZero - set this log trace times to zero flag,
      *                                  if true, will set trace times to zero and remove this log trace.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero);
+    int RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero);
 
     /**
      * Get log trace times.

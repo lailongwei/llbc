@@ -47,11 +47,11 @@ int LLBC_Logger::AddLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy 
 }
 
 template <typename _TraceKeyTy, typename _TraceContentTy>
-void LLBC_Logger::RemoveLogTrace(const _TraceKeyTy &traceKey,
-                                 const _TraceContentTy &traceContent,
-                                 bool setTraceTimesToZero)
+int LLBC_Logger::RemoveLogTrace(const _TraceKeyTy &traceKey,
+                                const _TraceContentTy &traceContent,
+                                bool setTraceTimesToZero)
 {
-    RemoveLogTrace(LLBC_LogTrace(traceKey, traceContent), setTraceTimesToZero);
+    return RemoveLogTrace(LLBC_LogTrace(traceKey, traceContent), setTraceTimesToZero);
 }
 
 template <typename _TraceKeyTy, typename _TraceContentTy>
