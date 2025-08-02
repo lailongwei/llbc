@@ -217,7 +217,9 @@ private:
 
     LLBC_Variant *_data;
     LLBC_Delegate<void(LLBC_Timer *)> _timeoutDeleg;
-    LLBC_Delegate<void(LLBC_Timer *)> _cancelDeleg;
+    LLBC_Delegate<void(LLBC_Timer *)> *_cancelDeleg;
+
+    static const LLBC_Delegate<void(LLBC_Timer *)> _invalidCancelDeleg;
 };
 
 __LLBC_NS_END
