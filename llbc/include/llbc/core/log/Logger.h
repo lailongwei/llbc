@@ -155,8 +155,9 @@ public:
      * @param[in] logTrace            - the log trace.
      * @param[in] setTraceTimesToZero - set this log trace times to zero flag,
      *                                  if true, will set trace times to zero and remove this log trace.
+     * @return int - return 0 if success, otherwise return -1.
      */
-    void RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero);
+    int RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero);
 
     /**
      * Remove log trace from logger.
@@ -164,11 +165,12 @@ public:
      * @param[in] traceContent        - the trace content.
      * @param[in] setTraceTimesToZero - set this log trace times to zero flag,
      *                                  if true, will set trace times to zero and remove this log trace.
+     * @return int - return 0 if success, otherwise return -1.
      */
     template <typename _TraceKeyTy, typename _TraceContentTy>
-    void RemoveLogTrace(const _TraceKeyTy &traceKey,
-                        const _TraceContentTy &traceContent,
-                        bool setTraceTimesToZero);
+    int RemoveLogTrace(const _TraceKeyTy &traceKey,
+                       const _TraceContentTy &traceContent,
+                       bool setTraceTimesToZero);
 
     /**
      * Get log trace times.

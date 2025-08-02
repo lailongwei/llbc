@@ -190,7 +190,7 @@
 // Log trace same key content content limit.
 #define LLBC_CFG_CORE_LOG_TRACE_SAME_KEY_CONTENT_COUNT_LIMIT 5
 // Log trace limit(built log trace key&content size, including the terminating null character).
-#define LLBC_CFG_CORE_LOG_TRACE_LIMIT                       256
+#define LLBC_CFG_CORE_LOG_TRACE_BUILT_CONTENT_SIZE_LIMIT     256
 // Log trace separators:
 // - [0]: LogTraces separator.
 // - [1]: LogTrace key/content separator.
