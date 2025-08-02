@@ -31,6 +31,8 @@
 
 __LLBC_NS_BEGIN
 
+const LLBC_Delegate<void(LLBC_Timer *)> LLBC_Timer::_invalidCancelDeleg;
+
 LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
                        const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg,
                        LLBC_TimerScheduler *scheduler)
@@ -39,7 +41,7 @@ LLBC_Timer::LLBC_Timer(const LLBC_Delegate<void(LLBC_Timer *)> &timeoutDeleg,
 
 , _data(nullptr)
 , _timeoutDeleg(timeoutDeleg)
-, _cancelDeleg(cancelDeleg)
+, _cancelDeleg(cancelDeleg ? new LLBC_Delegate<void(LLBC_Timer *)>(cancelDeleg) : nullptr)
 {
 }
 
@@ -54,6 +56,9 @@ LLBC_Timer::~LLBC_Timer()
 
     if (_data)
         delete _data;
+
+    if (_cancelDeleg)
+        delete _cancelDeleg;
 }
 
 LLBC_TimeSpan LLBC_Timer::GetDueTime() const
