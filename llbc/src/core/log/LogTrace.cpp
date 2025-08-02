@@ -33,11 +33,14 @@ LLBC_LogTraceMgr::LLBC_LogTraceMgr(char logTracesSep, char traceKeyContentSep, c
 {
 }
 
-void LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
+int LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
 {
     // Not allow empty trace content.
-    if (UNLIKELY(logTrace.traceContent.strLen == 0))
-        return;
+    if (UNLIKELY(!logTrace.traceContent))
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return LLBC_FAILED;
+    }
 
     // Insert to _logTraces or add traceTimes.
     // - Find trace contents.
@@ -56,7 +59,10 @@ void LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
     if (contentIt == traceContents.end())
     {
         if (UNLIKELY(traceContents.size() >= LLBC_CFG_CORE_LOG_TRACE_SAME_KEY_CONTENT_COUNT_LIMIT))
-            return;
+        {
+            LLBC_SetLastError(LLBC_ERROR_LIMIT);
+            return LLBC_FAILED;
+        }
 
         traceContents.emplace_back(logTrace.traceContent, 1);
         needRebuild = true;
@@ -68,13 +74,18 @@ void LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
 
     if (needRebuild)
         _RebuildTraceInfo();
+
+    return LLBC_OK;
 }
 
-void LLBC_LogTraceMgr::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero)
+int LLBC_LogTraceMgr::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero)
 {
     const auto keyIt = _logTraces.find(logTrace.traceKey);
     if (keyIt == _logTraces.end())
-        return;
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
 
     auto &traceContents = keyIt->second;
     const auto contentIt = std::find_if(traceContents.begin(),
@@ -83,14 +94,19 @@ void LLBC_LogTraceMgr::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTra
         return item.first == logTrace.traceContent;
     });
     if (contentIt == traceContents.end())
-        return;
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
 
     auto &traceContentPair = *contentIt;
     if (!setTraceTimesToZero && --traceContentPair.second > 0)
-            return;
+            return LLBC_OK;
 
     traceContents.erase(contentIt);
     _RebuildTraceInfo();
+
+    return LLBC_OK;
 }
 
 void LLBC_LogTraceMgr::ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey)
@@ -118,7 +134,7 @@ size_t LLBC_LogTraceMgr::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const
                                         [&logTrace](const auto &item) {
         return item.first == logTrace.traceContent;
     });
-    
+
     return contentIt != traceContents.end() ? contentIt->second : 0;
 }
 
@@ -148,7 +164,7 @@ void LLBC_LogTraceMgr::_RebuildTraceInfo()
         if (!newTraceInfo->empty())
             newTraceInfo->append(1, _logTracesSep);
 
-        if (traceKey.strLen > 0)
+        if (traceKey)
         {
             newTraceInfo->append(traceKey.str, traceKey.strLen);
             newTraceInfo->append(1, _logTraceKeyContentSep);
@@ -162,9 +178,9 @@ void LLBC_LogTraceMgr::_RebuildTraceInfo()
             newTraceInfo->append(traceContent.str, traceContent.strLen);
         }
 
-        if (newTraceInfo->size() >= LLBC_CFG_CORE_LOG_TRACE_LIMIT)
+        if (newTraceInfo->size() >= LLBC_CFG_CORE_LOG_TRACE_BUILT_CONTENT_SIZE_LIMIT)
         {
-            newTraceInfo->resize(LLBC_CFG_CORE_LOG_TRACE_LIMIT - 1);
+            newTraceInfo->resize(LLBC_CFG_CORE_LOG_TRACE_BUILT_CONTENT_SIZE_LIMIT - 1);
             break;
         }
     }
