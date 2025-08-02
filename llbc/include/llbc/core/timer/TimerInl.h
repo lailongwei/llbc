@@ -41,18 +41,28 @@ inline void LLBC_Timer::SetTimeoutHandler(const LLBC_Delegate<void(LLBC_Timer *)
 
 inline const LLBC_Delegate<void(LLBC_Timer *)> &LLBC_Timer::GetCancelHandler() const
 {
-    return _cancelDeleg;
+    return _cancelDeleg ? *_cancelDeleg : _invalidCancelDeleg;
 }
 
 template <typename ObjType>
 void LLBC_Timer::SetCancelHandler(ObjType *obj, void (ObjType::*method)(LLBC_Timer *))
 {
-    _cancelDeleg = LLBC_Delegate<void(LLBC_Timer *)>(obj, method);
+    SetCancelHandler(LLBC_Delegate<void(LLBC_Timer *)>(obj, method));
 }
 
 inline void LLBC_Timer::SetCancelHandler(const LLBC_Delegate<void(LLBC_Timer *)> &cancelDeleg)
 {
-    _cancelDeleg = cancelDeleg;
+    if (cancelDeleg)
+    {
+        if (!_cancelDeleg)
+            _cancelDeleg = new LLBC_Delegate<void(LLBC_Timer *)>(cancelDeleg);
+        else
+            *_cancelDeleg = cancelDeleg;
+    }
+    else if (_cancelDeleg)
+    {
+        *_cancelDeleg = nullptr;
+    }
 }
 
 inline void LLBC_Timer::OnTimeout()
@@ -63,8 +73,8 @@ inline void LLBC_Timer::OnTimeout()
 
 inline void LLBC_Timer::OnCancel()
 {
-    if (_cancelDeleg)
-        _cancelDeleg(this);
+    if (_cancelDeleg && *_cancelDeleg)
+        (*_cancelDeleg)(this);
 }
 
 inline int LLBC_Timer::Schedule(const LLBC_Time &firstTime, const LLBC_TimeSpan &period)
