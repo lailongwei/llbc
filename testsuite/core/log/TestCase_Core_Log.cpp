@@ -482,6 +482,38 @@ void TestCase_Core_Log::DoLogTraceTest()
         LLBC_PrintLn("  - TraceData(\"\") operator!(): %s", (!LLBC_LogTrace::TraceKey("") ? "true" : "false"));
     }
 
+    LLBC_PrintLn("- Do LogTrace error about test:");
+    {
+        // Add empty log trace content.
+        auto rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
+        auto ret = rootLogger->AddLogTrace("empty_content", nullptr);
+        LLBC_PrintLn("  - Add empty log trace content, return:%d, err:%s",
+                     ret, LLBC_FormatLastError());
+
+        // Add same key content limit test.
+        LLBC_PrintLn("  - Same key content size limit test:");
+        for (size_t i = 0; i < LLBC_CFG_CORE_LOG_TRACE_SAME_KEY_CONTENT_COUNT_LIMIT + 5; ++i)
+        {
+            ret = rootLogger->AddLogTrace("the_key", i);
+            LLBC_PrintLn("    - Add same key content, key:the_key, times:%lu, limit:%d, ret:%d, err:%s",
+                         i + 1,
+                         LLBC_CFG_CORE_LOG_TRACE_SAME_KEY_CONTENT_COUNT_LIMIT,
+                         ret,
+                         LLBC_FormatLastError());
+        }
+
+        // Remove not exist log trace test.
+        LLBC_PrintLn("  - Remove not exist log trace test(key not exist):");
+        ret = rootLogger->RemoveLogTrace("not_exist_key", 10086, false);
+        LLBC_PrintLn("    - Remove not exist log trace, return:%d, err:%s",
+                     ret, LLBC_FormatLastError());
+
+        LLBC_PrintLn("  - Remove not exist log trace test(content not exist):");
+        ret = rootLogger->RemoveLogTrace("the_key", 10086, false);
+        LLBC_PrintLn("    - Remove not exist log trace, return:%d, err:%s",
+                     ret, LLBC_FormatLastError());
+    }
+
     LLBC_PrintLn("- Do simple log trace test:");
     {
         AddLogTrace(nullptr, "the nullptr trace");
