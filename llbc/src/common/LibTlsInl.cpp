@@ -96,11 +96,9 @@ void __LLBC_CreateLibTls()
 #else
     tlsCreated = ((tlsHandle = ::TlsAlloc()) != TLS_OUT_OF_INDEXES) ? true : false;
 #endif
+    llbc_assert(tlsCreated && "Create llbc library TLS handle failed!");
     if (!tlsCreated)
-    {
-        llbc_assert(!tlsCreated && "Create llbc library TLS handle failed!");
         exit(-1);
-    }
 }
 
 void __LLBC_DestroyLibTls()
