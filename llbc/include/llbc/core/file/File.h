@@ -375,10 +375,25 @@ public:
     sint64 Write(const void *buf, size_t size);
 
     /**
+     * Format write string to file.
+     * @param[in] fmt - the format string.
+     * @param[in] ... - will write format params.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int FormatWrite(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
+
+    /**
      * Flush file.
      * @return int - return 0 if success, otherwise return -1.
      */
     int Flush();
+
+    /**
+     * Truncate file.
+     * @param[in] newSize - the new file size.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Truncate(size_t newSize);
 
 public:
     /**
