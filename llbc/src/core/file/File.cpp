@@ -621,12 +621,6 @@ int LLBC_File::FormatWrite(const char *fmt, ...)
     return writeRet == static_cast<sint64>(len) ? LLBC_OK : LLBC_FAILED;
 }
 
-int LLBC_File::FormatWriteLine(const char *fmt, ...)
-{
-    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_FAILED;
-}
-
 int LLBC_File::Flush()
 {
     if (!IsOpened())
