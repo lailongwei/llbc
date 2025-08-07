@@ -584,6 +584,66 @@ sint64 LLBC_File::Write(const void *buf, size_t size)
     return static_cast<sint64>(actuallyWrote);
 }
 
+int LLBC_File::FormatWrite(const char *fmt, ...)
+{
+    if (!IsOpened())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
+        return LLBC_FAILED;
+    }
+
+    // Try format(Note: Use rtti buf to format).
+    auto &tlsBuf = __LLBC_GetLibTls()->commonTls.fmtBuf;
+
+    va_list ap;
+    va_start(ap, fmt);
+    const int len = vsnprintf(tlsBuf, sizeof(tlsBuf), fmt, ap);
+    va_end(ap);
+    if (len <= 0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+    else if (static_cast<size_t>(len) <= sizeof(tlsBuf))
+    {
+        const auto writeRet = Write(tlsBuf, len);
+        return writeRet == static_cast<sint64>(len) ? LLBC_OK : LLBC_FAILED;
+    }
+
+    // Dynamic alloc buffer to format again.
+    const auto heapBuf  = LLBC_Malloc(char, len);
+
+    va_start(ap, fmt);
+    const int len2 = vsnprintf(heapBuf, len, fmt, ap);
+    va_end(ap);
+    if (UNLIKELY(len2 <= 0))
+    {
+        free(heapBuf);
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+
+        return LLBC_FAILED;
+    }
+    else if (UNLIKELY(len2 != len))
+    {
+        free(heapBuf);
+        LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+
+        return LLBC_FAILED;
+    }
+
+    // Write formatted bytes to file, free heapBuf, and return.
+    const auto writeRet = Write(heapBuf, len);
+    free(heapBuf);
+
+    return writeRet == static_cast<sint64>(len) ? LLBC_OK : LLBC_FAILED;
+}
+
+int LLBC_File::FormatWriteLine(const char *fmt, ...)
+{
+    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    return LLBC_FAILED;
+}
+
 int LLBC_File::Flush()
 {
     if (!IsOpened())
@@ -597,6 +657,39 @@ int LLBC_File::Flush()
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
     }
+
+    return LLBC_OK;
+}
+
+int LLBC_File::Truncate(size_t newSize)
+{
+    if (!IsOpened())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
+        return LLBC_FAILED;
+    }
+
+    if ((_mode & LLBC_FileMode::Write) != LLBC_FileMode::Write)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    #if LLBC_TARGET_PLATFORM_WIN32
+    if (_chsize_s(GetFileNo(), newSize) != 0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+    #else // Non-Win32
+    if (ftruncate(GetFileNo(), newSize) != 0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+    #endif // Win32
+
+    rewind(_handle);
 
     return LLBC_OK;
 }
