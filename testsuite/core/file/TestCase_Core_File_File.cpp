@@ -255,43 +255,43 @@ bool TestCase_Core_File_File::ReadWriteTest()
     file.Seek(LLBC_FileSeekOrigin::Current, -16);
     LLBC_PrintLn("After Seek(Current, -16), file size: %lld, file pos: %lld", file.GetFileSize(), file.GetFilePosition());
 
-    // Test ReadLine/ReadLines, WriteLine/WriteLines, ReadToEnd methods:
-    LLBC_PrintLn("ReOpen file for test ReadLine/WriteLine/ReadToEnd methods:");
+    // Test ReadLn/ReadLns, WriteLn/WriteLns, ReadToEnd methods:
+    LLBC_PrintLn("ReOpen file for test ReadLn/WriteLn/ReadToEnd methods:");
     file.ReOpen(LLBC_FileMode::BinaryReadWrite);
 
-    LLBC_PrintLn("WriteLine(\"Hello World!\"):");
-    file.WriteLine("Hello World!");
-    LLBC_PrintLn("WriteLine(\"Hey, Judy!\"):");
-    file.WriteLine("Hey, Judy!");
-    LLBC_PrintLn("WriteLine(\"\"):");
-    file.WriteLine("");
+    LLBC_PrintLn("WriteLn(\"Hello World!\"):");
+    file.WriteLn("Hello World!");
+    LLBC_PrintLn("WriteLn(\"Hey, Judy!\"):");
+    file.WriteLn("Hey, Judy!");
+    LLBC_PrintLn("WriteLn(\"\"):");
+    file.WriteLn("");
     LLBC_PrintLn("Write(\"Hey, Judy too!\"):");
     file.Write("Hey, Judy too\n");
 
-    LLBC_PrintLn("WriteLines: 5 lines:");
+    LLBC_PrintLn("WriteLns: 5 lines:");
     LLBC_Strings willWriteLines;
     for (int i = 0; i < 5; ++i)
-        willWriteLines.push_back(LLBC_String().format("WriteLines() content: %d", i));
-    file.WriteLines(willWriteLines);
+        willWriteLines.push_back(LLBC_String().format("WriteLns() content: %d", i));
+    file.WriteLns(willWriteLines);
 
     LLBC_PrintLn("Write no line ending line");
     file.Write("No line ending line");
 
     file.SetFilePosition(0);
     LLBC_PrintLn("Read line:");
-    LLBC_PrintLn("First line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
-    LLBC_PrintLn("Second line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
-    LLBC_PrintLn("Third line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
-    LLBC_PrintLn("Fourth line: %s, last error:%d", file.ReadLine().c_str(), LLBC_GetLastError());
+    LLBC_PrintLn("First line: %s, last error:%d", file.ReadLn().c_str(), LLBC_GetLastError());
+    LLBC_PrintLn("Second line: %s, last error:%d", file.ReadLn().c_str(), LLBC_GetLastError());
+    LLBC_PrintLn("Third line: %s, last error:%d", file.ReadLn().c_str(), LLBC_GetLastError());
+    LLBC_PrintLn("Fourth line: %s, last error:%d", file.ReadLn().c_str(), LLBC_GetLastError());
     LLBC_PrintLn("5-10 lines:");
     for (int i = 5; i <= 10; ++i)
-        LLBC_PrintLn("%d line: %s, last error:%d", i, file.ReadLine().c_str(), LLBC_GetLastError());
-    const LLBC_String notExistLine = file.ReadLine();
+        LLBC_PrintLn("%d line: %s, last error:%d", i, file.ReadLn().c_str(), LLBC_GetLastError());
+    const LLBC_String notExistLine = file.ReadLn();
     LLBC_PrintLn("Not exist line: %s, error: %s", notExistLine.c_str(), LLBC_FormatLastError());
 
     LLBC_PrintLn("Read lines:");
     file.SetFilePosition(0);
-    const LLBC_Strings lines = file.ReadLines();
+    const LLBC_Strings lines = file.ReadLns();
     for (size_t i = 0; i < lines.size(); ++i)
         LLBC_PrintLn("%02lu: %s", i, lines[i].c_str());
 
@@ -311,14 +311,14 @@ bool TestCase_Core_File_File::ReadWriteTest()
         false, 10086, 3.1415926, "hello world");
     file.SetFilePosition(0);
     LLBC_PrintLn("- After Call FormatWrite(), filePos:%lld, content:%s",
-                 file.GetFilePosition(), file.ReadLine().c_str());
+                 file.GetFilePosition(), file.ReadLn().c_str());
 
     file.Truncate(0);
     file.FormatWrite("the long string:%s",
                      (LLBC_String("a") * sizeof(__LLBC_GetLibTls()->commonTls.fmtBuf)).c_str());
     file.SetFilePosition(0);
     LLBC_PrintLn("- After Call FormatWrite(), filePos:%lld, content:%s",
-                 file.GetFilePosition(), file.ReadLine().c_str());
+                 file.GetFilePosition(), file.ReadLn().c_str());
 
     LLBC_Print("\n");
 
@@ -403,7 +403,7 @@ bool TestCase_Core_File_File::CopyFileTest()
     }
 
     LLBC_PrintLn("test file[name: %s, will copy] opened, write line string: Hello World!", _testFileName.c_str());
-    file.WriteLine("Hello World");
+    file.WriteLn("Hello World");
 
     LLBC_PrintLn("Begin copy(overlapped): %s ---> %s", _testFileName.c_str(), copyFileName.c_str());
     if (file.CopyFile(copyFileName, true) != LLBC_OK)
@@ -457,7 +457,7 @@ bool TestCase_Core_File_File::MoveFileTest()
     }
 
     LLBC_PrintLn("test file[name: %s, will move] opened, write line string: Hello World!", _testFileName.c_str());
-    file.WriteLine("Hello World");
+    file.WriteLn("Hello World");
 
     LLBC_PrintLn("Begin move(overlapped): %s ---> %s", _testFileName.c_str(), moveFileName.c_str());
     if (file.MoveFile(moveFileName, true) != LLBC_OK)
