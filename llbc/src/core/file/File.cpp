@@ -377,7 +377,7 @@ sint64 LLBC_File::GetReadableSize() const
     return size - pos;
 }
 
-LLBC_String LLBC_File::ReadLine()
+LLBC_String LLBC_File::ReadLn()
 {
     // Read line bytes.
     char ch;
@@ -418,7 +418,7 @@ LLBC_String LLBC_File::ReadLine()
     return line;
 }
 
-LLBC_Strings LLBC_File::ReadLines()
+LLBC_Strings LLBC_File::ReadLns()
 {
     // File opened check.
     if (UNLIKELY(!IsOpened()))
@@ -512,7 +512,7 @@ sint64 LLBC_File::Read(void *buf, size_t size)
     return static_cast<sint64>(actuallyRead);
 }
 
-int LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
+int LLBC_File::WriteLn(const LLBC_String &line, int newLineFormat)
 {
     // Write line content.
     const sint64 contentRet = Write(line.data(), line.size());
@@ -554,11 +554,11 @@ int LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
     return lineEndingRet != requireRet ? LLBC_FAILED : LLBC_OK;
 }
 
-int LLBC_File::WriteLines(const LLBC_Strings &lines, int newLineFormat)
+int LLBC_File::WriteLns(const LLBC_Strings &lines, int newLineFormat)
 {
     for (auto &line : lines)
     {
-        if (WriteLine(line, newLineFormat) != LLBC_OK)
+        if (WriteLn(line, newLineFormat) != LLBC_OK)
             return LLBC_FAILED;
     }
 

@@ -175,12 +175,12 @@ int LLBC_Ini::SaveToFile(const LLBC_String &file, const LLBC_Strings &headerLine
          it != headerLines.end();
          ++it)
     {
-        if (f.WriteLine(LLBC_String().append_format("%c %s", CommentBegin, it->c_str())) != LLBC_OK)
+        if (f.WriteLn(LLBC_String().append_format("%c %s", CommentBegin, it->c_str())) != LLBC_OK)
             return LLBC_FAILED;
     }
 
     if (!headerLines.empty())
-        f.WriteLine("");
+        f.WriteLn("");
 
     return f.Write(content);
 }
