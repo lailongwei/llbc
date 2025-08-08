@@ -296,12 +296,12 @@ bool TestCase_Core_File_File::ReadWriteTest()
         LLBC_PrintLn("%02lu: %s", i, lines[i].c_str());
 
     LLBC_PrintLn("Truncate test:");
-    LLBC_PrintLn("- Before truncate, file size:%lu, file pos:%lu",
+    LLBC_PrintLn("- Before truncate, file size:%lld, file pos:%lld",
                  file.GetFileSize(), file.GetFilePosition());
     for (auto truncateToSize : { 5, 0, 15, 100, 1000, 1000000 })
     {
         file.Truncate(truncateToSize);
-        LLBC_PrintLn("- After truncate to %lu, file size:%lu, file pos:%lu",
+        LLBC_PrintLn("- After truncate to %d, file size:%lld, file pos:%lld",
                      truncateToSize, file.GetFileSize(), file.GetFilePosition());
     }
 
@@ -310,14 +310,14 @@ bool TestCase_Core_File_File::ReadWriteTest()
     file.FormatWrite("the format string, boolVal:%d, intVal:%d, doubleVal:%f, stringVal:%s",
         false, 10086, 3.1415926, "hello world");
     file.SetFilePosition(0);
-    LLBC_PrintLn("- After Call FormatWrite(), filePos:%lu, content:%s",
+    LLBC_PrintLn("- After Call FormatWrite(), filePos:%lld, content:%s",
                  file.GetFilePosition(), file.ReadLine().c_str());
 
     file.Truncate(0);
     file.FormatWrite("the long string:%s",
                      (LLBC_String("a") * sizeof(__LLBC_GetLibTls()->commonTls.fmtBuf)).c_str());
     file.SetFilePosition(0);
-    LLBC_PrintLn("- After Call FormatWrite(), filePos:%lu, content:%s",
+    LLBC_PrintLn("- After Call FormatWrite(), filePos:%lld, content:%s",
                  file.GetFilePosition(), file.ReadLine().c_str());
 
     LLBC_Print("\n");
