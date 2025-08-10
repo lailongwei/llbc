@@ -314,6 +314,12 @@ bool TestCase_Core_File_File::ReadWriteTest()
                  file.GetFilePosition(), file.ReadLn().c_str());
 
     file.Truncate(0);
+    file.FormatWrite("%s", (LLBC_String("a") * sizeof(__LLBC_GetLibTls()->commonTls.fmtBuf)).c_str());
+    file.SetFilePosition(0);
+    LLBC_PrintLn("- After Call FormatWrite(), filePos:%lld, content:%s",
+                 file.GetFilePosition(), file.ReadLn().c_str());
+
+    file.Truncate(0);
     file.FormatWrite("the long string:%s",
                      (LLBC_String("a") * sizeof(__LLBC_GetLibTls()->commonTls.fmtBuf)).c_str());
     file.SetFilePosition(0);

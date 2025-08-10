@@ -544,8 +544,7 @@ int LLBC_File::WriteLn(const LLBC_String &line, int newLineFormat)
         requireRet = 2;
         lineEndingRet = Write("\r\n", 2);
     }
-    else  //  if (newLineFormat == LLBC_FileNewLineFormat::MacStyle ||
-         //       newLineFormat == LLBC_FileNewLineFormat::UnixStyle)
+    else
     {
         requireRet = 1;
         lineEndingRet = Write('\n') == LLBC_OK ? 1 : 0;
@@ -592,31 +591,34 @@ int LLBC_File::FormatWrite(const char *fmt, ...)
         return LLBC_FAILED;
     }
 
-    // Try format(Note: Use rtti buf to format).
+    // Try use tls.fmtBuf to format.
     auto &tlsBuf = __LLBC_GetLibTls()->commonTls.fmtBuf;
 
     va_list ap;
     va_start(ap, fmt);
     const int len = vsnprintf(tlsBuf, sizeof(tlsBuf), fmt, ap);
     va_end(ap);
-    if (len <= 0)
-    {
+    if (len < 0)
+    { 
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
     }
-    else if (static_cast<size_t>(len) <= sizeof(tlsBuf))
+    else if (len == 0)
+    {
+        return LLBC_OK;
+    }
+    else if (static_cast<size_t>(len) < sizeof(tlsBuf))
     {
         const auto writeRet = Write(tlsBuf, len);
         return writeRet == static_cast<sint64>(len) ? LLBC_OK : LLBC_FAILED;
     }
-
-    // Dynamic alloc buffer to format again.
-    const auto heapBuf  = LLBC_Malloc(char, len);
+	// Use heapBuf to format.
+    const auto heapBuf = LLBC_Malloc(char, len + 1);
 
     va_start(ap, fmt);
-    const int len2 = vsnprintf(heapBuf, len, fmt, ap);
+    const int len2 = vsnprintf(heapBuf, len + 1, fmt, ap);
     va_end(ap);
-    if (UNLIKELY(len2 <= 0))
+    if (UNLIKELY(len2 < 0))
     {
         free(heapBuf);
         LLBC_SetLastError(LLBC_ERROR_CLIB);
@@ -631,7 +633,6 @@ int LLBC_File::FormatWrite(const char *fmt, ...)
         return LLBC_FAILED;
     }
 
-    // Write formatted bytes to file, free heapBuf, and return.
     const auto writeRet = Write(heapBuf, len);
     free(heapBuf);
 
