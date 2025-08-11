@@ -404,21 +404,33 @@ public:
     {
          // Formatting format 1 and format 2.
         LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls();
-        const int fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
-                                     sizeof(libTls->coreTls.loggerFmtBuf),
-                                     fmt1, cond, behav);
+        int fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
+                               sizeof(libTls->coreTls.loggerFmtBuf),
+                               fmt1, cond, behav);
+
+        // Check format is valid.
         LLBC_ReturnIf(UNLIKELY(fmt1Len < 0), void());
+
+        // Ensure fmt1Len not exceed buffer size.
+        fmt1Len = std::min(fmt1Len, static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1));
 
         va_list ap;
         va_start(ap, fmt2);
-        int fmtLen = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
-                               sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len,
-                               fmt2, ap);
+        int fmt2Len = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
+                                sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len,
+                                fmt2, ap);
         va_end(ap);
-        LLBC_ReturnIf(UNLIKELY(fmtLen < 0), void());
+
+        // Check format is valid.
+        LLBC_ReturnIf(UNLIKELY(fmt2Len < 0), void());
+
+        // Ensure fmt2Len not exceed buffer size.
+        fmt2Len = std::min(fmt2Len, static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len - 1));
+
+        // Calculate total length.
+        fmt2Len += fmt1Len;
 
         // Output to spec logger(or exec uninit output).
-        fmtLen += fmt1Len;
         auto loggerMgr = LLBC_LoggerMgrSingleton;
         if (LIKELY(loggerMgr->IsInited()))
         {
@@ -432,7 +444,7 @@ public:
                                    funcName,
                                    LLBC_NS LLBC_GetMicroseconds(),
                                    libTls->coreTls.loggerFmtBuf,
-                                   fmtLen);
+                                   fmt2Len);
             }
         }
         else
@@ -443,7 +455,7 @@ public:
                                              lineNo,
                                              funcName,
                                              libTls->coreTls.loggerFmtBuf,
-                                             fmtLen);
+                                             fmt2Len);
         }
     }
 };
@@ -493,7 +505,7 @@ __LLBC_INTERNAL_NS_END
                 __FILE__, __LINE__, __FUNCTION__,                                            \
                 logTag,                                                                      \
                 LLBC_NS LLBC_LogLevel::logLv,                                                \
-                "LLBC_DoIf:<\"%s\"> is true, do:%s. ",                                       \
+                "LLBC_DoIf:<\"%s\"> is true, do:%s. \n",                                     \
                 #cond, #behav, ##__VA_ARGS__);                                               \
             behav;                                                                           \
         }                                                                                    \
@@ -515,7 +527,7 @@ __LLBC_INTERNAL_NS_END
                 __FILE__, __LINE__, __FUNCTION__,                                            \
                 logTag,                                                                      \
                 LLBC_NS LLBC_LogLevel::logLv,                                                \
-                "LLBC_ContinueIf:<\"%s\"> is true. %s",                                      \
+                "LLBC_ContinueIf:<\"%s\"> is true. %s\n",                                    \
                 #cond, "", ##__VA_ARGS__);                                                   \
             continue;                                                                        \
         }                                                                                    \
@@ -537,7 +549,7 @@ __LLBC_INTERNAL_NS_END
                 __FILE__, __LINE__, __FUNCTION__,                                            \
                 logTag,                                                                      \
                 LLBC_NS LLBC_LogLevel::logLv,                                                \
-                "LLBC_LogAndBreakIf:<\"%s\"> is true. %s",                                   \
+                "LLBC_LogAndBreakIf:<\"%s\"> is true. %s\n",                                 \
                 #cond, "", ##__VA_ARGS__);                                                   \
             break;                                                                           \
         }                                                                                    \
@@ -558,7 +570,7 @@ __LLBC_INTERNAL_NS_END
                 __FILE__, __LINE__, __FUNCTION__,                                            \
                 logTag,                                                                      \
                 LLBC_NS LLBC_LogLevel::logLv,                                                \
-                "LLBC_ReturnIf:<\"%s\"> is true, return:%s. ",                               \
+                "LLBC_ReturnIf:<\"%s\"> is true, return:%s. \n",                             \
                 #cond, #ret, ##__VA_ARGS__);                                                 \
             return ret;                                                                      \
         }                                                                                    \
@@ -579,7 +591,7 @@ __LLBC_INTERNAL_NS_END
                 __FILE__, __LINE__, __FUNCTION__,                                            \
                 logTag,                                                                      \
                 LLBC_NS LLBC_LogLevel::logLv,                                                \
-                "LLBC_ExitIf:<\"%s\"> is true, exitCode:%d. ",                               \
+                "LLBC_ExitIf:<\"%s\"> is true, exitCode:%d. \n",                             \
                 #cond, static_cast<int>(exitCode), ##__VA_ARGS__);                           \
                                                                                              \
             if (LLBC_LoggerMgrSingleton->IsInited())                                         \
