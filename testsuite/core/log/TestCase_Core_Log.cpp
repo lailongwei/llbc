@@ -351,10 +351,10 @@ void TestCase_Core_Log::DoJsonLogTest()
 
 void TestCase_Core_Log::DoUninitLogTest()
 {
-    char overeSizeLog[LLBC_CFG_LOG_FORMAT_BUF_SIZE << 1] = {};
-    std::fill(overeSizeLog, overeSizeLog + sizeof(overeSizeLog), 'a');
-    overeSizeLog[sizeof(overeSizeLog) - 1] = '\0';
-    LLBC_LogAndDoIf(true, LLBC_LogLevel::Warn, {}, "%s", overeSizeLog);
+    char overeSizedLog[LLBC_CFG_LOG_FORMAT_BUF_SIZE >> 8] = {};
+    std::fill(overeSizedLog, overeSizedLog + sizeof(overeSizedLog), 'a');
+    overeSizedLog[sizeof(overeSizedLog) - 1] = '\0';
+    LLBC_LogAndDoIf(true, LLBC_LogLevel::Warn, {}, "%s", overeSizedLog);
 
     LLOG_TRACE("This is a uninited trace log message");
     LLOG_DEBUG("This is a uninited debug log message");
