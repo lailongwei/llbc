@@ -404,21 +404,33 @@ public:
     {
          // Formatting format 1 and format 2.
         LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls();
-        const int fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
-                                     sizeof(libTls->coreTls.loggerFmtBuf),
-                                     fmt1, cond, behav);
+        int fmt1Len = snprintf(libTls->coreTls.loggerFmtBuf,
+                               sizeof(libTls->coreTls.loggerFmtBuf),
+                               fmt1, cond, behav);
+
+        // Check format is valid.
         LLBC_ReturnIf(UNLIKELY(fmt1Len < 0), void());
+
+        // Ensure fmt1Len not exceed buffer size.
+        fmt1Len = std::min(fmt1Len, static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1));
 
         va_list ap;
         va_start(ap, fmt2);
-        int fmtLen = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
-                               sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len,
-                               fmt2, ap);
+        int fmt2Len = vsnprintf(libTls->coreTls.loggerFmtBuf + fmt1Len,
+                                sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len,
+                                fmt2, ap);
         va_end(ap);
-        LLBC_ReturnIf(UNLIKELY(fmtLen < 0), void());
+
+        // Check format is valid.
+        LLBC_ReturnIf(UNLIKELY(fmt2Len < 0), void());
+
+        // Ensure fmt2Len not exceed buffer size.
+        fmt2Len = std::min(fmt2Len, static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len - 1));
+
+        // Calculate total length.
+        int totalLen = fmt1Len + fmt2Len;
 
         // Output to spec logger(or exec uninit output).
-        fmtLen += fmt1Len;
         auto loggerMgr = LLBC_LoggerMgrSingleton;
         if (LIKELY(loggerMgr->IsInited()))
         {
@@ -432,7 +444,7 @@ public:
                                    funcName,
                                    LLBC_NS LLBC_GetMicroseconds(),
                                    libTls->coreTls.loggerFmtBuf,
-                                   fmtLen);
+                                   totalLen);
             }
         }
         else
@@ -443,7 +455,7 @@ public:
                                              lineNo,
                                              funcName,
                                              libTls->coreTls.loggerFmtBuf,
-                                             fmtLen);
+                                             totalLen);
         }
     }
 };
