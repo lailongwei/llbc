@@ -376,6 +376,7 @@ void LLBC_LoggerMgr::UnInitNonFormatOutput(int logLv,
                    tag ? tag : "");
 
     fwrite(msg, 1, msgLen, to);
+    fwrite("\n", 1, 1, to);
 
     fflush(to);
 }
