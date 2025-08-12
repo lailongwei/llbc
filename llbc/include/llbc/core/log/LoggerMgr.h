@@ -412,7 +412,7 @@ public:
         LLBC_ReturnIf(UNLIKELY(fmt1Len < 0), void());
 
         // Ensure fmt1Len not exceed buffer size.
-        fmt1Len = std::min(fmt1Len, std::max(0, static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1)));
+        fmt1Len = std::min(fmt1Len, static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - 1));
 
         va_list ap;
         va_start(ap, fmt2);
@@ -425,7 +425,7 @@ public:
         LLBC_ReturnIf(UNLIKELY(fmt2Len < 0), void());
 
         // Ensure fmt2Len not exceed buffer size.
-        fmt2Len = std::min(fmt2Len, std::max(0, static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len - 1)));
+        fmt2Len = std::min(fmt2Len, static_cast<int>(sizeof(libTls->coreTls.loggerFmtBuf) - fmt1Len - 1));
 
         // Calculate total length.
         int totalLen = fmt1Len + fmt2Len;
