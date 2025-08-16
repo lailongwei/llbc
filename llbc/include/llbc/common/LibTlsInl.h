@@ -44,6 +44,7 @@ struct LLBC_EXPORT __LLBC_LibTls
         char clibErrFmtBuf[__LLBC_CLIB_ERROR_FORMAT_BUF_SIZE];
         char pathBuf[LLBC_PATH_MAX + 1];
         char rtti[__LLBC_RTTI_BUF_SIZE];
+        char fmtBuf[__LLBC_FORMAT_BUF_SIZE];
     } commonTls;
 
     /* Core-Module TLS value. */

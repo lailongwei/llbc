@@ -360,7 +360,7 @@ sint64 LLBC_File::GetReadableSize() const
     return size - pos;
 }
 
-LLBC_String LLBC_File::ReadLine()
+LLBC_String LLBC_File::ReadLn()
 {
     // Read line bytes.
     char ch;
@@ -401,7 +401,7 @@ LLBC_String LLBC_File::ReadLine()
     return line;
 }
 
-LLBC_Strings LLBC_File::ReadLines()
+LLBC_Strings LLBC_File::ReadLns()
 {
     // File opened check.
     if (UNLIKELY(!IsOpened()))
@@ -495,7 +495,7 @@ sint64 LLBC_File::Read(void *buf, size_t size)
     return static_cast<sint64>(actuallyRead);
 }
 
-int LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
+int LLBC_File::WriteLn(const LLBC_String &line, int newLineFormat)
 {
     // Write line content.
     const sint64 contentRet = Write(line.data(), line.size());
@@ -527,8 +527,7 @@ int LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
         requireRet = 2;
         lineEndingRet = Write("\r\n", 2);
     }
-    else  //  if (newLineFormat == LLBC_FileNewLineFormat::MacStyle ||
-         //       newLineFormat == LLBC_FileNewLineFormat::UnixStyle)
+    else
     {
         requireRet = 1;
         lineEndingRet = Write('\n') == LLBC_OK ? 1 : 0;
@@ -537,11 +536,11 @@ int LLBC_File::WriteLine(const LLBC_String &line, int newLineFormat)
     return lineEndingRet != requireRet ? LLBC_FAILED : LLBC_OK;
 }
 
-int LLBC_File::WriteLines(const LLBC_Strings &lines, int newLineFormat)
+int LLBC_File::WriteLns(const LLBC_Strings &lines, int newLineFormat)
 {
     for (auto &line : lines)
     {
-        if (WriteLine(line, newLineFormat) != LLBC_OK)
+        if (WriteLn(line, newLineFormat) != LLBC_OK)
             return LLBC_FAILED;
     }
 
@@ -567,6 +566,62 @@ sint64 LLBC_File::Write(const void *buf, size_t size)
     return static_cast<sint64>(actuallyWrote);
 }
 
+int LLBC_File::FormatWrite(const char *fmt, ...)
+{
+    if (!IsOpened())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
+        return LLBC_FAILED;
+    }
+
+    // Try use tls.fmtBuf to format.
+    auto &tlsBuf = __LLBC_GetLibTls()->commonTls.fmtBuf;
+
+    va_list ap;
+    va_start(ap, fmt);
+    const int len = vsnprintf(tlsBuf, sizeof(tlsBuf), fmt, ap);
+    va_end(ap);
+    if (len < 0)
+    { 
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+    else if (len == 0)
+    {
+        return LLBC_OK;
+    }
+    else if (static_cast<size_t>(len) < sizeof(tlsBuf))
+    {
+        const auto writeRet = Write(tlsBuf, len);
+        return writeRet == static_cast<sint64>(len) ? LLBC_OK : LLBC_FAILED;
+    }
+	// Use heapBuf to format.
+    const auto heapBuf = LLBC_Malloc(char, len + 1);
+
+    va_start(ap, fmt);
+    const int len2 = vsnprintf(heapBuf, len + 1, fmt, ap);
+    va_end(ap);
+    if (UNLIKELY(len2 < 0))
+    {
+        free(heapBuf);
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+
+        return LLBC_FAILED;
+    }
+    else if (UNLIKELY(len2 != len))
+    {
+        free(heapBuf);
+        LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+
+        return LLBC_FAILED;
+    }
+
+    const auto writeRet = Write(heapBuf, len);
+    free(heapBuf);
+
+    return writeRet == static_cast<sint64>(len) ? LLBC_OK : LLBC_FAILED;
+}
+
 int LLBC_File::Flush()
 {
     if (!IsOpened())
@@ -580,6 +635,39 @@ int LLBC_File::Flush()
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
     }
+
+    return LLBC_OK;
+}
+
+int LLBC_File::Truncate(size_t newSize)
+{
+    if (!IsOpened())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
+        return LLBC_FAILED;
+    }
+
+    if ((_mode & LLBC_FileMode::Write) != LLBC_FileMode::Write)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    #if LLBC_TARGET_PLATFORM_WIN32
+    if (_chsize_s(GetFileNo(), newSize) != 0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+    #else // Non-Win32
+    if (ftruncate(GetFileNo(), newSize) != 0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+    #endif // Win32
+
+    rewind(_handle);
 
     return LLBC_OK;
 }

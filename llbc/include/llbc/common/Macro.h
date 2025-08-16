@@ -357,7 +357,7 @@
  * RTTI support.
  */
 // Define rtti buffer size.
- #define __LLBC_RTTI_BUF_SIZE    (32 * 1024)
+ #define __LLBC_RTTI_BUF_SIZE    (1024 * 8)
 
 /**
  * Component generic call method convenience macros define.
@@ -414,4 +414,10 @@
 
 #define LLBC_ExitIf(cond, exitCode)                                 \
     { if ((cond)) exit(static_cast<int>(exitCode)); }               \
+
+/**
+ * Misc.
+ */
+// The printf buffer size define.
+#define __LLBC_FORMAT_BUF_SIZE (1024 * 8)
 

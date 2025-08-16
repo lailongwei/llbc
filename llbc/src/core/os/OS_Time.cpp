@@ -51,12 +51,11 @@ void LLBC_TZSet()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     tzset();
- #if defined(_SVID_SOURCE) || defined(_XOPEN_SOURCE)
+ #if defined(_SVID_SOURCE) || defined(_XOPEN_SOURCE) || defined(_DEFAULT_SOURCE)
     LLBC_INTERNAL_NS __g_timezone = static_cast<int>(timezone);
  #else
     time_t now = time(nullptr);
-    LLBC_INTERNAL_NS __g_timezone = 
-        static_cast<int>(localtime(&now)->tm_gmtoff);
+    LLBC_INTERNAL_NS __g_timezone = -static_cast<int>(localtime(&now)->tm_gmtoff);
  #endif // defined _SVID_SOURCE || _XOPEN_SOURCE
 #else // WIN32
     _tzset();
