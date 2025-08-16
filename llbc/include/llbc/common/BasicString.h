@@ -1247,7 +1247,7 @@ public:
         va_list ap;
         const size_type oldSize = this->size();
         va_start(ap, fmt);
-        int len =::vsnprintf(nullptr, 0, fmt, ap);
+        int len = ::vsnprintf(nullptr, 0, fmt, ap);
         va_end(ap);
         if (len <= 0)
             return *this;

@@ -345,7 +345,6 @@ int LLBC_PollerMgr::PushMsgToPoller(int id, LLBC_MessageBlock *block)
 void LLBC_PollerMgr::OnPollerStop(int id)
 {
     _pollerLock.Lock();
-    _pollers[id] = nullptr;
 
     _pollerLock.Unlock();
 }

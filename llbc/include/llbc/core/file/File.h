@@ -293,14 +293,14 @@ public:
      * @return LLBC_String - the line data, if failed, LLBC_GetLastError() return value is non LLBC_ERROR_SUCCESS,
      *                       otherwise, LLBC_GetLastError() return LLBC_ERROR_SUCCESS.
      */
-    LLBC_String ReadLine();
+    LLBC_String ReadLn();
 
     /**
      * Read lines from the file.
      * @return LLBC_Strings - line list, if failed, LLBC_GetLastError() return value is non LLBC_ERROR_SUCCESS,
      *                        otherwise, LLBC_GetLastError() return LLBC_ERROR_SUCCESS.
      */
-    LLBC_Strings ReadLines();
+    LLBC_Strings ReadLns();
 
     /**
      * Read data to end.
@@ -355,7 +355,7 @@ public:
      * @param[in] newLineFormat - the new line format, default is AutoMatch. 
      * @return int - return 0 if success, otherwise return -1.
      */
-    int WriteLine(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
+    int WriteLn(const LLBC_String &line, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
 
     /**
      * Write lines to file.
@@ -363,7 +363,7 @@ public:
      * @param[in] newLineFormat - the new line format, default is auto match.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int WriteLines(const LLBC_Strings &lines, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
+    int WriteLns(const LLBC_Strings &lines, int newLineFormat = LLBC_FileNewLineFormat::AutoMatch);
 
     /**
      * File bytes write method.
@@ -375,10 +375,25 @@ public:
     sint64 Write(const void *buf, size_t size);
 
     /**
+     * Format write string to file.
+     * @param[in] fmt - the format string.
+     * @param[in] ... - will write format params.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int FormatWrite(const char *fmt, ...) LLBC_STRING_FORMAT_CHECK(2, 3);
+
+    /**
      * Flush file.
      * @return int - return 0 if success, otherwise return -1.
      */
     int Flush();
+
+    /**
+     * Truncate file.
+     * @param[in] newSize - the new file size.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int Truncate(size_t newSize);
 
 public:
     /**
