@@ -141,6 +141,7 @@ project "llbc"
         llbc_sln_path .. "/README.md",
 
         llbc_core_lib_path .. "/**.h",
+        llbc_core_lib_path .. "/**.hpp",
         llbc_core_lib_path .. "/**.c",
         llbc_core_lib_path .. "/**.cpp",
 

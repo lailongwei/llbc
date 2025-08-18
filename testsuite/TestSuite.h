@@ -73,6 +73,7 @@
 #include "core/objbase/TestCase_ObjBase_Array.h"
 #include "core/objbase/TestCase_ObjBase_Dictionary.h"
 #include "core/objpool/TestCase_Core_ObjPool.h"
+#include "core/nlohmann/TestCase_NlohmannJson.h"
 #include "comm/TestCase_Comm_EventInSvc.h"
 #include "comm/TestCase_Comm_Timer.h"
 #include "comm/TestCase_Comm_PacketOp.h"
