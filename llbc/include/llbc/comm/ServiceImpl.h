@@ -149,6 +149,12 @@ public:
 
 public:
     /**
+     * Get service thread id
+     * @return LLBC_ThreadId - the service native thread id.
+     */
+    LLBC_ThreadId GetSvcThreadId() const;
+public:
+    /**
      * Create a session and listening.
      * Note:
      *      If service not start when call this method, connection operation will

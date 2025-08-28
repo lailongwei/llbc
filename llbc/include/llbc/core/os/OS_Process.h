@@ -48,9 +48,9 @@ LLBC_EXPORT int LLBC_GetCurrentProcessId();
  * @param[in] crashCallback - the crash callback delegate.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_HandleCrash(const LLBC_String &dumpFilePath = "",
-                                 const LLBC_Delegate<void(const char *stackBacktrace,
-                                                          int sig)> &crashCallback = nullptr);
+LLBC_EXPORT int LLBC_SetHandleCrash(const LLBC_String &dumpFilePath = "",
+    const LLBC_Delegate<void(const char* stackBacktrace,
+        int sig)>& crashCallback = nullptr, const LLBC_String &hookName = "");
 
 /**
  * Cancel handle crash.

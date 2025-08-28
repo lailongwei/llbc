@@ -49,7 +49,7 @@
 int TestSuite_Main(int argc, char* argv[])
 {
     LLBC_Startup();
-    LLBC_HandleCrash();
+    LLBC_SetHandleCrash();
     __TraitsLoop<__TEST_CASE_COUNT>::Generate();
 
     while (true)
