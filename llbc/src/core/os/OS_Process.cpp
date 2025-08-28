@@ -65,6 +65,8 @@ struct OS_ProcessCrashHook
 static int __crashCallbackCount = 0;
 static OS_ProcessCrashHook __crashCallbacks[MAX_CRASH_CALLBACK_ARRAY_LENGTH];
 
+static LLBC_NS LLBC_SpinLock __CrashHandleLock;
+
 __LLBC_INTERNAL_NS_END
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -442,9 +444,75 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-static int LLBC_SetHandleCrashImpl(const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &crashCallback,
-                               const LLBC_String &hookName)
+int LLBC_SetCrashDumpPath(const LLBC_String& dumpFilePath)
 {
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __CrashHandleLock);
+    
+#if LLBC_TARGET_PLATFORM_WIN32
+    LLBC_String nmlDumpFilePath = dumpFilePath;
+    if (nmlDumpFilePath.empty())
+    {
+        const auto now = LLBC_Time::Now();
+        nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0];
+        nmlDumpFilePath.append_format("_%d_%s.dmp",
+            LLBC_GetCurrentProcessId(),
+            now.Format("%Y%m%d_%H%M%S").c_str());
+    }
+
+    if (nmlDumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    memcpy(LLBC_INL_NS __dumpFilePath, nmlDumpFilePath.c_str(), nmlDumpFilePath.size());
+    LLBC_INL_NS __dumpFilePath[nmlDumpFilePath.size()] = '\0';
+
+    return LLBC_OK;
+
+#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+    // Use system default core pattern if dumpFilePath is empty.
+    // if (dumpFilePath.empty())
+    //    return LLBC_OK;
+
+    if (!dumpFilePath.empty())
+    {
+        // Save old core pattern.
+        const auto oldCorePattern = LLBC_File::ReadToEnd(LLBC_INL_NS __corePatternPath);
+        if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
+            return LLBC_FAILED;
+
+        // Write new core pattern(may not have permission to open core_pattern file, ignore error).
+        LLBC_File corePatternFile;
+        if (corePatternFile.Open(LLBC_INL_NS __corePatternPath, LLBC_FileMode::Write) == LLBC_OK)
+        {
+            // If failed, try write old core pattern.
+            if (corePatternFile.Write(dumpFilePath) != LLBC_OK)
+            {
+                corePatternFile.Seek(LLBC_FileSeekOrigin::Begin, 0);
+                corePatternFile.Write(oldCorePattern);
+
+                return LLBC_FAILED;
+            }
+        }
+    }
+
+    return LLBC_OK;
+
+#else // Unsupported platforms
+    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    return LLBC_FAILED;
+#endif // Win32
+}
+
+int LLBC_SetCrashHandle(const LLBC_String &hookName,
+                        const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &crashCallback)
+{
+
+#if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __CrashHandleLock);
+
     size_t needDeleteIdx = SIZE_MAX;
     bool found = false;
     for (size_t i = 0; i < static_cast<size_t>(LLBC_INL_NS __crashCallbackCount) && i < MAX_CRASH_CALLBACK_ARRAY_LENGTH; i++)
@@ -481,70 +549,29 @@ static int LLBC_SetHandleCrashImpl(const LLBC_Delegate<void(const char *stackBac
     }
 
     return LLBC_OK;
+
+#else // Unsupported platforms
+    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    return LLBC_FAILED;
+#endif // Win32
 }
 
-int LLBC_SetHandleCrash(const LLBC_String &dumpFilePath,
-                        const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &crashCallback,
-                        const LLBC_String &hookName)
+int LLBC_OpenCrashHandle()
 {
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __CrashHandleLock);
+
 #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_String nmlDumpFilePath = dumpFilePath;
-    if (nmlDumpFilePath.empty())
-    {
-        const auto now = LLBC_Time::Now();
-        nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0];
-        nmlDumpFilePath.append_format("_%d_%s.dmp",
-                                      LLBC_GetCurrentProcessId(),
-                                      now.Format("%Y%m%d_%H%M%S").c_str());
-    }
-
-    if (nmlDumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
-
-    memcpy(LLBC_INL_NS __dumpFilePath, nmlDumpFilePath.c_str(), nmlDumpFilePath.size());
-    LLBC_INL_NS __dumpFilePath[nmlDumpFilePath.size()] = '\0';
-
     if (!LLBC_INL_NS __hookedCrashSignals)
     {
         ::SetUnhandledExceptionFilter(LLBC_INL_NS __Win32CrashHandler);
-        #ifdef LLBC_RELEASE
+#ifdef LLBC_RELEASE
         LLBC_INL_NS __PreventSetUnhandledExceptionFilter();
-        #endif
-
+#endif
         LLBC_INL_NS __hookedCrashSignals = true;
     }
 
-    return LLBC_SetHandleCrashImpl(crashCallback, hookName);
+    return LLBC_OK;
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
-    // Use system default core pattern if dumpFilePath is empty.
-    // if (dumpFilePath.empty())
-    //    return LLBC_OK;
-
-    if (!dumpFilePath.empty())
-    {
-        // Save old core pattern.
-        const auto oldCorePattern = LLBC_File::ReadToEnd(LLBC_INL_NS __corePatternPath);
-        if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-            return LLBC_FAILED;
-
-        // Write new core pattern(may not have permission to open core_pattern file, ignore error).
-        LLBC_File corePatternFile;
-        if (corePatternFile.Open(LLBC_INL_NS __corePatternPath, LLBC_FileMode::Write) == LLBC_OK)
-        {
-            // If failed, try write old core pattern.
-            if (corePatternFile.Write(dumpFilePath) != LLBC_OK)
-            {
-                corePatternFile.Seek(LLBC_FileSeekOrigin::Begin, 0);
-                corePatternFile.Write(oldCorePattern);
-
-                return LLBC_FAILED;
-            }
-        }
-    }
-
     // Set signals handler.
     if (!LLBC_INL_NS __hookedCrashSignals)
     {
@@ -554,7 +581,7 @@ int LLBC_SetHandleCrash(const LLBC_String &dumpFilePath,
         struct sigaction sa;
         memset(&sa, 0, sizeof(sa));
         sa.sa_handler = LLBC_INL_NS __NonWin32CrashHandler;
-        for (auto &sig : LLBC_INL_NS __crashSignals)
+        for (auto& sig : LLBC_INL_NS __crashSignals)
         {
             sigaddset(&ss, sig);
             sigaction(sig, &sa, nullptr);
@@ -566,16 +593,17 @@ int LLBC_SetHandleCrash(const LLBC_String &dumpFilePath,
         LLBC_INL_NS __hookedCrashSignals = true;
     }
 
-    return LLBC_SetHandleCrashImpl(crashCallback, hookName);
-
+    return LLBC_OK;
 #else // Unsupported platforms
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
 #endif // Win32
 }
 
-void LLBC_CancelHandleCrash()
+void LLBC_CancelCrashHandle()
 {
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __CrashHandleLock);
+
     if (!LLBC_INL_NS __hookedCrashSignals)
         return;
 

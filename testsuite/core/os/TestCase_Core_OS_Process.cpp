@@ -51,13 +51,34 @@ int TestCase_Core_OS_Process::TestCrash()
 #if LLBC_SUPPORT_HANDLE_CRASH
     // Set crash hook handle array
     std::cout << "Handle crash..." << std::endl;
-    if (LLBC_SetHandleCrash("", TestCase_Core_OS_Process_Crash_Hook_test, "hook_test") != LLBC_OK)
+    // open crash handle
+    if(LLBC_OpenCrashHandle() != LLBC_OK)
+    {
+        std::cerr << "Open handle crash failed, err:" << LLBC_FormatLastError() << std::endl;
+        return LLBC_FAILED;
+    }
+
+    //set crash dump path
+    if (LLBC_SetCrashDumpPath() != LLBC_OK)
+    {
+        std::cerr << "Set dump file path failed, err:" << LLBC_FormatLastError() << std::endl;
+        return LLBC_FAILED;
+    }
+    
+    //set crash hook1
+    if (LLBC_SetCrashHandle("hook_test", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {
         std::cerr << "Handle crash 1 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
-
-    if (LLBC_SetHandleCrash("", TestCase_Core_OS_Process_Crash_Hook_test, "hook_test2") != LLBC_OK)
+    //set crash hook2
+    if (LLBC_SetCrashHandle("hook_test2", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    {
+        std::cerr << "Handle crash 2 failed, err:" << LLBC_FormatLastError() << std::endl;
+        return LLBC_FAILED;
+    }
+    //set crash hook3
+    if (LLBC_SetCrashHandle("hook_test3", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {
         std::cerr << "Handle crash 2 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;

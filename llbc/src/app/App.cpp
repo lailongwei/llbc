@@ -245,7 +245,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadImpl(false, false) != LLBC_OK, LLBC_FAILED);
 
     // Handle progress crash.
-    LLBC_ReturnIf(LLBC_SetHandleCrash() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(LLBC_OpenCrashHandle() != LLBC_OK || LLBC_SetCrashDumpPath() != LLBC_OK, LLBC_FAILED);
 
     // Install required signal handlers.
     // - App stop signals.
@@ -422,7 +422,7 @@ void LLBC_App::Stop()
 #endif // Non-Win32
 
     // Cancel handle crash.
-    LLBC_CancelHandleCrash();
+    LLBC_CancelCrashHandle();
 
     // Cleanup members.
     _cfgPath.clear();
