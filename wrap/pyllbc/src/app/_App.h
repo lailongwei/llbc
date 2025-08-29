@@ -29,7 +29,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_HandleCrash(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "s", &dumpFile))
         return nullptr;
 
-    if (LLBC_OpenCrashHandle() != LLBC_OK || LLBC_SetCrashDumpPath(dumpFile) != LLBC_OK)
+    if (LLBC_EnableCrashHandle() != LLBC_OK || LLBC_SetCrashDumpFilePath(dumpFile) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, "When set dump file");
         return nullptr;

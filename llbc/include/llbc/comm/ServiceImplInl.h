@@ -69,7 +69,7 @@ inline int LLBC_ServiceImpl::GetFrameInterval() const
     return fps != static_cast<int>(LLBC_INFINITE) ? 1000 / fps : 0;
 }
 
-inline LLBC_ThreadId LLBC_ServiceImpl::GetSvcThreadId() const
+inline LLBC_ThreadId LLBC_ServiceImpl::GetServiceThreadId() const
 {
     return _svcThreadId;
 }
