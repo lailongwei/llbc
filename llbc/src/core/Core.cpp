@@ -66,6 +66,12 @@ int __LLBC_CoreStartup()
     if (LLBC_ThreadSpecObjPool::Initialize() != LLBC_OK)
         return LLBC_FAILED;
 
+    //Prepare crash handle environment.
+    #if LLBC_SUPPORT_HANDLE_CRASH
+    if (__LLBC_PrepareCrashHandleEnv() != LLBC_OK)
+        return LLBC_FAILED;
+    #endif // LLBC_SUPPORT_HANDLE_CRASH
+  
     return LLBC_OK;
 }
 
@@ -111,9 +117,10 @@ void __LLBC_CoreCleanup()
     (void)LLBC_CleanupSymbol();
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
-    // Cancel handle crash.
+    // Disable handle crash.
     #if LLBC_SUPPORT_HANDLE_CRASH
-    LLBC_CancelHandleCrash();
+    LLBC_DisableCrashHandle();
+    __LLBC_CleanUpCrashHandleEnv();
     #endif // LLBC_SUPPORT_HANDLE_CRASH
 }
 
