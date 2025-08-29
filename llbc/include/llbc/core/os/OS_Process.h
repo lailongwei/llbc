@@ -41,12 +41,22 @@ LLBC_EXPORT int LLBC_GetCurrentProcessId();
 #if LLBC_SUPPORT_HANDLE_CRASH
 
 /**
- * Set default dump file path.
- *  -in Windows platform, set default dump file path is <your_app_path>.dmp.
- *  -in Non-Windows platform, default dump file path use system default config.
+ * Prepare crash handle env. Include：
+ * 1) allocate crash handle lock and crash handler infos container;
+ * 2) set default dump file path:
+ *      -in Windows platform, set default dump file path is <your_app_path>.dmp.
+ *      -in Non-Windows platform, default dump file path use system default config.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int __LLBC_PrepareCrashHandleEnv();
+LLBC_HIDDEN int __LLBC_PrepareCrashHandleEnv();
+
+/**
+ * Clean up crash handle env. Include:
+ * 1) free crash handle lock and crash handler infos container;
+ * 2) reset default dump file path:
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_HIDDEN int __LLBC_CleanUpCrashHandleEnv();
 
 /**
  * Set user-defined crash dump file path.

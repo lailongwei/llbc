@@ -449,15 +449,26 @@ int __LLBC_PrepareCrashHandleEnv()
     memcpy(LLBC_INL_NS __dumpFilePath, nmlDumpFilePath.c_str(), nmlDumpFilePath.size());
     LLBC_INL_NS __dumpFilePath[nmlDumpFilePath.size()] = '\0';
 
-    return LLBC_OK;
-
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     // No-win32 not support set default crash dump file path. will use system default config.
-    return LLBC_OK;
-#else // Unsupported platforms
-    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_FAILED;
+#else 
+    // Unsupported platforms
 #endif // Win32
+    
+    return LLBC_OK;
+}
+
+int __LLBC_CleanUpCrashHandleEnv()
+{
+    memset(&LLBC_INL_NS __dumpFilePath, 0, sizeof(LLBC_INL_NS __dumpFilePath));
+    
+    delete LLBC_INL_NS __crashInfoLock;
+    LLBC_INL_NS __crashInfoLock = nullptr;
+
+    delete LLBC_INL_NS __crashHandlerInfos;
+    LLBC_INL_NS __crashHandlerInfos = nullptr;
+
+    return LLBC_OK;
 }
 
 int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
