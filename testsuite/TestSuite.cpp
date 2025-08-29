@@ -50,7 +50,7 @@ int TestSuite_Main(int argc, char* argv[])
 {
     LLBC_Startup();
 
-    LLBC_ReturnIf(LLBC_EnableCrashHandle() != LLBC_OK, LLBC_FAILED);
+    LLBC_EnableCrashHandle();
 
     __TraitsLoop<__TEST_CASE_COUNT>::Generate();
 

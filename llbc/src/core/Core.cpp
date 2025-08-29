@@ -77,6 +77,13 @@ int __LLBC_CoreStartup()
 
 void __LLBC_CoreCleanup()
 {
+#if LLBC_SUPPORT_HANDLE_CRASH
+    // Clean up crash handle environment.
+    LLBC_Defer(__LLBC_CleanUpCrashHandleEnv());
+    // Disable handle crash.
+    LLBC_Defer(LLBC_DisableCrashHandle());
+#endif // LLBC_SUPPORT_HANDLE_CRASH
+
     // Finalize logger manager.
     LLBC_LoggerMgrSingleton->Finalize();
 
@@ -117,11 +124,6 @@ void __LLBC_CoreCleanup()
     (void)LLBC_CleanupSymbol();
     #endif // LLBC_CFG_OS_IMPL_SYMBOL
 
-    // Disable handle crash.
-    #if LLBC_SUPPORT_HANDLE_CRASH
-    LLBC_DisableCrashHandle();
-    __LLBC_CleanUpCrashHandleEnv();
-    #endif // LLBC_SUPPORT_HANDLE_CRASH
 }
 
 __LLBC_NS_END

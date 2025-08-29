@@ -41,7 +41,7 @@ LLBC_EXPORT int LLBC_GetCurrentProcessId();
 #if LLBC_SUPPORT_HANDLE_CRASH
 
 /**
- * Prepare crash handle env. Include：
+ * Prepare crash handle env, include:
  * 1) allocate crash handle lock and crash handler infos container;
  * 2) set default dump file path:
  *      -in Windows platform, set default dump file path is <your_app_path>.dmp.
@@ -51,9 +51,9 @@ LLBC_EXPORT int LLBC_GetCurrentProcessId();
 LLBC_HIDDEN int __LLBC_PrepareCrashHandleEnv();
 
 /**
- * Clean up crash handle env. Include:
+ * Clean up crash handle env, include:
  * 1) free crash handle lock and crash handler infos container;
- * 2) reset default dump file path:
+ * 2) reset default dump file path.
  * @return int - return 0 if success, otherwise return -1.
  */
 LLBC_HIDDEN int __LLBC_CleanUpCrashHandleEnv();
@@ -68,8 +68,8 @@ LLBC_HIDDEN int __LLBC_CleanUpCrashHandleEnv();
 LLBC_EXPORT int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath = "");
 
 /**
- * Set process crash handler
- * @param[in] crashHandlerName - set crash handler name.
+ * Set crash handler.
+ * @param[in] crashHandlerName - the crash handler name.
  * @param[in] crashHandler     - the crash callback delegate.
  * @return int - return 0 if success, otherwise return -1.
  */
