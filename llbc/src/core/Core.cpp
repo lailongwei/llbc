@@ -66,8 +66,8 @@ int __LLBC_CoreStartup()
     if (LLBC_ThreadSpecObjPool::Initialize() != LLBC_OK)
         return LLBC_FAILED;
 
-    //set default crash dump file path
-    LLBC_SetDefaultCrashDumpFilePath();
+    //Set default crash dump file path.
+    __LLBC_PrepareCrashHandleEnv();
 
     return LLBC_OK;
 }

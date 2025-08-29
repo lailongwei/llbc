@@ -55,10 +55,10 @@ __LLBC_INTERNAL_NS_BEGIN
 static bool __hookedCrashSignals = false;
 static char __stackBacktrace[128 * 1024 + 1] {'\0'};
 
-static LLBC_NS LLBC_SpinLock __crashInfoLock;
+static LLBC_NS LLBC_SpinLock *__crashInfoLock = nullptr;
 typedef std::pair<LLBC_NS LLBC_String, 
                   LLBC_NS LLBC_Delegate<void(const char *stackBacktrace, int sig)>> __CrashHandlerInfo;
-std::list<__CrashHandlerInfo> __crashHandlerInfos;
+static std::list<__CrashHandlerInfo> *__crashHandlerInfos = nullptr;
 
 __LLBC_INTERNAL_NS_END
 
@@ -202,7 +202,7 @@ static LONG WINAPI __Win32CrashHandler(::EXCEPTION_POINTERS *exception)
     mbTitle.format("Unhandled Exception(%s)", LLBC_NS LLBC_Directory::ModuleFileName().c_str());
     ::MessageBoxA(nullptr, errMsg.c_str(), mbTitle.c_str(), MB_ICONERROR | MB_OK);
 
-    for (auto &crashHanlderInfo : LLBC_INL_NS __crashHandlerInfos)
+    for (auto &crashHanlderInfo : *LLBC_INL_NS __crashHandlerInfos)
         crashHanlderInfo.second(__stackBacktrace, 0);
 
     LLBC_LoggerMgrSingleton->Finalize();
@@ -393,7 +393,7 @@ static void __NonWin32CrashHandler(int sig)
     }
 
     // Call callback delegate.
-    if (LLBC_INL_NS __crashHandlerInfos.size() > 0)
+    if (LLBC_INL_NS __crashHandlerInfos->size() > 0)
     {
         if (lseek(coreDescFileFd, 0, SEEK_SET) == -1)
         {
@@ -407,7 +407,7 @@ static void __NonWin32CrashHandler(int sig)
 
         close(coreDescFileFd);
 
-        for (auto &crashHanlderInfo : LLBC_INL_NS __crashHandlerInfos)
+        for (auto &crashHanlderInfo : *LLBC_INL_NS __crashHandlerInfos)
             crashHanlderInfo.second(__stackBacktrace, sig);
     }
     else
@@ -427,10 +427,13 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int LLBC_SetDefaultCrashDumpFilePath()
+int __LLBC_PrepareCrashHandleEnv()
 {
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashInfoLock);
-    
+    //Init crash handle lock and infos container.
+    LLBC_INL_NS __crashInfoLock = new LLBC_NS LLBC_SpinLock;
+    LLBC_INL_NS __crashHandlerInfos = new std::list<LLBC_INL_NS __CrashHandlerInfo>;
+
+    // Set default crash dump file path.
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String nmlDumpFilePath(LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0]);
     nmlDumpFilePath.append_format("_%d_%s.dmp",
@@ -449,7 +452,7 @@ int LLBC_SetDefaultCrashDumpFilePath()
     return LLBC_OK;
 
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
-    // no win32 not support set default crash dump file path. will use system default config.
+    // No-win32 not support set default crash dump file path. will use system default config.
     return LLBC_OK;
 #else // Unsupported platforms
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
@@ -459,7 +462,7 @@ int LLBC_SetDefaultCrashDumpFilePath()
 
 int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
 {
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashInfoLock);
+    LLBC_NS LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
     
     if(dumpFilePath.empty())
     {
@@ -517,7 +520,7 @@ int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
 {
 
 #if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashInfoLock);
+    LLBC_NS LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
 
     if (crashHandlerName.empty())
     {
@@ -525,23 +528,23 @@ int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
         return LLBC_FAILED;
     }
 
-    auto foundIt = std::find_if(LLBC_INL_NS __crashHandlerInfos.begin(),
-                                LLBC_INL_NS __crashHandlerInfos.end(),
+    auto foundIt = std::find_if(LLBC_INL_NS __crashHandlerInfos->begin(),
+                                LLBC_INL_NS __crashHandlerInfos->end(),
                                 [&crashHandlerName](const LLBC_INL_NS __CrashHandlerInfo &info) {
                                     return info.first == crashHandlerName;
                                 });
 
-    if (foundIt == LLBC_INL_NS __crashHandlerInfos.end())
+    if (foundIt == LLBC_INL_NS __crashHandlerInfos->end())
     {
         if (!crashHandler)
             return LLBC_OK;
         
-        LLBC_INL_NS __crashHandlerInfos.emplace_back(crashHandlerName, crashHandler);
+        LLBC_INL_NS __crashHandlerInfos->emplace_back(crashHandlerName, crashHandler);
         return LLBC_OK;
     }
 
     if (!crashHandler)
-        LLBC_INL_NS __crashHandlerInfos.erase(foundIt);
+        LLBC_INL_NS __crashHandlerInfos->erase(foundIt);
     else
         (*foundIt).second = crashHandler;
 
@@ -555,7 +558,7 @@ int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
 
 int LLBC_EnableCrashHandle()
 {
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashInfoLock);
+    LLBC_NS LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
 
 #if LLBC_TARGET_PLATFORM_WIN32
     if (!LLBC_INL_NS __hookedCrashSignals)
@@ -599,7 +602,7 @@ int LLBC_EnableCrashHandle()
 
 void LLBC_DisableCrashHandle()
 {
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashInfoLock);
+    LLBC_NS LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
 
     if (!LLBC_INL_NS __hookedCrashSignals)
         return;

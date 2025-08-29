@@ -148,7 +148,7 @@ public:
     int GetFrameInterval() const override;
 
     /**
-     * Get service thread id
+     * Get service thread id.
      * @return LLBC_ThreadId - the service thread id.
      */
     LLBC_ThreadId GetServiceThreadId() const;
