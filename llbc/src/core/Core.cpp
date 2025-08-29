@@ -113,7 +113,7 @@ void __LLBC_CoreCleanup()
 
     // Cancel handle crash.
     #if LLBC_SUPPORT_HANDLE_CRASH
-    LLBC_CancelCrashHandle();
+    LLBC_DisableCrashHandle();
     #endif // LLBC_SUPPORT_HANDLE_CRASH
 }
 

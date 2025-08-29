@@ -55,17 +55,14 @@ __LLBC_INTERNAL_NS_BEGIN
 static bool __hookedCrashSignals = false;
 static char __stackBacktrace[128 * 1024 + 1] {'\0'};
 
-struct OS_ProcessCrashHook
+struct CrashHandlerInfo
 {
-    LLBC_NS LLBC_String hookName_ = "";
-    LLBC_NS LLBC_Delegate<void(const char* stackBacktrace, int sig)> crashCallback_ = nullptr;
+    LLBC_NS LLBC_String crashHandlerName;
+    LLBC_NS LLBC_Delegate<void(const char *stackBacktrace, int sig)> crashHandler;
 };
 
-#define MAX_CRASH_CALLBACK_ARRAY_LENGTH 3
-static int __crashCallbackCount = 0;
-static OS_ProcessCrashHook __crashCallbacks[MAX_CRASH_CALLBACK_ARRAY_LENGTH];
-
-static LLBC_NS LLBC_SpinLock __CrashHandleLock;
+static LLBC_NS LLBC_SpinLock __crashHandlerInfosLock;
+static std::list<CrashHandlerInfo *> __crashHandlerInfos;
 
 __LLBC_INTERNAL_NS_END
 
@@ -209,14 +206,12 @@ static LONG WINAPI __Win32CrashHandler(::EXCEPTION_POINTERS *exception)
     mbTitle.format("Unhandled Exception(%s)", LLBC_NS LLBC_Directory::ModuleFileName().c_str());
     ::MessageBoxA(nullptr, errMsg.c_str(), mbTitle.c_str(), MB_ICONERROR | MB_OK);
 
-    for(size_t i = 0; i < static_cast<size_t>(LLBC_INL_NS __crashCallbackCount) && i < MAX_CRASH_CALLBACK_ARRAY_LENGTH; i++)
+    for (auto &crashHanlderInfo : LLBC_INL_NS __crashHandlerInfos)
     {
-        if (LLBC_INL_NS __crashCallbacks[i].crashCallback_)
-        {
-            LLBC_INL_NS __crashCallbacks[i].crashCallback_(__stackBacktrace, 0);
-        }
+        if (crashHanlderInfo->crashHandler)
+            crashHanlderInfo->crashHandler(__stackBacktrace, 0);
     }
-
+    
     LLBC_LoggerMgrSingleton->Finalize();
 
     return EXCEPTION_EXECUTE_HANDLER;
@@ -405,7 +400,7 @@ static void __NonWin32CrashHandler(int sig)
     }
 
     // Call callback delegate.
-    if (LLBC_INL_NS __crashCallbackCount > 0)
+    if (LLBC_INL_NS __crashHandlerInfos.size() > 0)
     {
         if (lseek(coreDescFileFd, 0, SEEK_SET) == -1)
         {
@@ -419,12 +414,10 @@ static void __NonWin32CrashHandler(int sig)
 
         close(coreDescFileFd);
 
-        for(size_t i = 0; i < static_cast<size_t>(LLBC_INL_NS __crashCallbackCount) && i < MAX_CRASH_CALLBACK_ARRAY_LENGTH; i++)
+        for (auto &crashHanlderInfo : LLBC_INL_NS __crashHandlerInfos)
         {
-            if (LLBC_INL_NS __crashCallbacks[i].crashCallback_)
-            {
-                LLBC_INL_NS __crashCallbacks[i].crashCallback_(__stackBacktrace, sig);
-            }
+            if (crashHanlderInfo->crashHandler)
+                crashHanlderInfo->crashHandler(__stackBacktrace, sig);
         }
     }
     else
@@ -444,9 +437,9 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int LLBC_SetCrashDumpPath(const LLBC_String& dumpFilePath)
+int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
 {
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __CrashHandleLock);
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashHandlerInfosLock);
     
 #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String nmlDumpFilePath = dumpFilePath;
@@ -455,8 +448,8 @@ int LLBC_SetCrashDumpPath(const LLBC_String& dumpFilePath)
         const auto now = LLBC_Time::Now();
         nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0];
         nmlDumpFilePath.append_format("_%d_%s.dmp",
-            LLBC_GetCurrentProcessId(),
-            now.Format("%Y%m%d_%H%M%S").c_str());
+                                      LLBC_GetCurrentProcessId(),
+                                      now.Format("%Y%m%d_%H%M%S").c_str());
     }
 
     if (nmlDumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))
@@ -505,48 +498,44 @@ int LLBC_SetCrashDumpPath(const LLBC_String& dumpFilePath)
 #endif // Win32
 }
 
-int LLBC_SetCrashHandle(const LLBC_String &hookName,
-                        const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &crashCallback)
+int LLBC_SetCrashHandler(const LLBC_String &crashHandlerName,
+                         const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &crashHandler)
 {
 
 #if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
 
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __CrashHandleLock);
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashHandlerInfosLock);
 
-    size_t needDeleteIdx = SIZE_MAX;
-    bool found = false;
-    for (size_t i = 0; i < static_cast<size_t>(LLBC_INL_NS __crashCallbackCount) && i < MAX_CRASH_CALLBACK_ARRAY_LENGTH; i++)
-    {
-        if (LLBC_INL_NS __crashCallbacks[i].hookName_ == hookName)
-        {
-            if (crashCallback)
-                LLBC_INL_NS __crashCallbacks[i].crashCallback_ = crashCallback;
-            else
-                needDeleteIdx = i;
-            
-            found = true;
-            break;
-        }
-    }
+    auto foundIt = std::find_if(LLBC_INL_NS __crashHandlerInfos.begin(),
+                                LLBC_INL_NS __crashHandlerInfos.end(),
+                                [&crashHandlerName](LLBC_INL_NS CrashHandlerInfo* info) {
+                                    return info->crashHandlerName == crashHandlerName;
+                                });
 
-    if (!found)
+    if (foundIt == LLBC_INL_NS __crashHandlerInfos.end())
     {
-        if (LLBC_INL_NS __crashCallbackCount >= MAX_CRASH_CALLBACK_ARRAY_LENGTH)
-        {
-            LLBC_SetLastError(LLBC_ERROR_LIMIT);
-            return LLBC_FAILED;
-        }
-        LLBC_INL_NS __crashCallbacks[LLBC_INL_NS __crashCallbackCount].hookName_ = hookName;
-        LLBC_INL_NS __crashCallbacks[LLBC_INL_NS __crashCallbackCount].crashCallback_ = crashCallback;
-        LLBC_INL_NS __crashCallbackCount++;
+        auto info = new LLBC_INL_NS CrashHandlerInfo();
+        info->crashHandlerName = crashHandlerName;
+        info->crashHandler = crashHandler;
+        LLBC_INL_NS __crashHandlerInfos.emplace_back(info);
         return LLBC_OK;
     }
 
-    if (needDeleteIdx != SIZE_MAX)
+    if (UNLIKELY(*foundIt == nullptr))
     {
-        LLBC_INL_NS __crashCallbacks[needDeleteIdx] = LLBC_INL_NS __crashCallbacks[LLBC_INL_NS __crashCallbackCount - 1];
-        LLBC_INL_NS __crashCallbackCount--;
+        LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+        return LLBC_FAILED;
     }
+
+    if(crashHandler == nullptr)
+    {
+        delete *foundIt;
+
+        LLBC_INL_NS __crashHandlerInfos.erase(foundIt);
+        return LLBC_OK;
+    }
+
+    (*foundIt)->crashHandler = crashHandler;
 
     return LLBC_OK;
 
@@ -556,9 +545,9 @@ int LLBC_SetCrashHandle(const LLBC_String &hookName,
 #endif // Win32
 }
 
-int LLBC_OpenCrashHandle()
+int LLBC_EnableCrashHandle()
 {
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __CrashHandleLock);
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashHandlerInfosLock);
 
 #if LLBC_TARGET_PLATFORM_WIN32
     if (!LLBC_INL_NS __hookedCrashSignals)
@@ -581,7 +570,7 @@ int LLBC_OpenCrashHandle()
         struct sigaction sa;
         memset(&sa, 0, sizeof(sa));
         sa.sa_handler = LLBC_INL_NS __NonWin32CrashHandler;
-        for (auto& sig : LLBC_INL_NS __crashSignals)
+        for (auto &sig : LLBC_INL_NS __crashSignals)
         {
             sigaddset(&ss, sig);
             sigaction(sig, &sa, nullptr);
@@ -600,9 +589,9 @@ int LLBC_OpenCrashHandle()
 #endif // Win32
 }
 
-void LLBC_CancelCrashHandle()
+void LLBC_DisableCrashHandle()
 {
-    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __CrashHandleLock);
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashHandlerInfosLock);
 
     if (!LLBC_INL_NS __hookedCrashSignals)
         return;

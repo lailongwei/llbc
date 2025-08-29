@@ -47,26 +47,26 @@ LLBC_EXPORT int LLBC_GetCurrentProcessId();
  *                            in Non-Windows platform, is a core pattern, if is empty, will use system default config.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_SetCrashDumpPath(const LLBC_String &dumpFilePath = "");
+LLBC_EXPORT int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath = "");
 
 /**
- * Set process crash handle
- * @param[in] crashCallback - the crash callback delegate.
- * @param[in] hookName - set hook name.
+ * Set process crash handler
+ * @param[in] crashHandlerName - set crash handler name.
+ * @param[in] crashHandler - the crash callback delegate.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_SetCrashHandle(const LLBC_String &hookName = "",
+LLBC_EXPORT int LLBC_SetCrashHandler(const LLBC_String &crashHandlerName = "",
                                     const LLBC_Delegate<void(const char *stackBacktrace,
-                                                             int sig)> &crashCallback = nullptr);
+                                                             int sig)> &crashHandler = nullptr);
 /**
- * Open handle crash.
+ * Enable crash handle.
  */
-LLBC_EXPORT int LLBC_OpenCrashHandle();
+LLBC_EXPORT int LLBC_EnableCrashHandle();
 
 /**
- * Cancel handle crash.
+ * Disable crash handle.
  */
-LLBC_EXPORT void LLBC_CancelCrashHandle();
+LLBC_EXPORT void LLBC_DisableCrashHandle();
 
 #endif // LLBC_SUPPORT_HANDLE_CRASH
 

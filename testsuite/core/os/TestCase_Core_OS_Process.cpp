@@ -38,7 +38,7 @@ int TestCase_Core_OS_Process::Run(int argc, char *argvp[])
     return 0;
 }
 
-static void TestCase_Core_OS_Process_Crash_Hook_test(const char* traceback, int sig)
+static void TestCase_Core_OS_Process_Crash_Hook_test(const char *traceback, int sig)
 {
     std::cout << std::endl;
     std::cout << "TestCase_Core_OS_Process_Crash_Hook_test success. times:" << __Test_Os_Process_Hook_Times++ << std::endl;
@@ -49,36 +49,36 @@ int TestCase_Core_OS_Process::TestCrash()
     std::cout << "Crash hook test:" << std::endl;
 
 #if LLBC_SUPPORT_HANDLE_CRASH
-    // Set crash hook handle array
+    // Set crash hook handle list
     std::cout << "Handle crash..." << std::endl;
-    // open crash handle
-    if(LLBC_OpenCrashHandle() != LLBC_OK)
+    // enable crash handle
+    if(LLBC_EnableCrashHandle() != LLBC_OK)
     {
         std::cerr << "Open handle crash failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
 
-    //set crash dump path
-    if (LLBC_SetCrashDumpPath() != LLBC_OK)
+    //set crash dump filepath
+    if (LLBC_SetCrashDumpFilePath() != LLBC_OK)
     {
         std::cerr << "Set dump file path failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
     
     //set crash hook1
-    if (LLBC_SetCrashHandle("hook_test", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    if (LLBC_SetCrashHandler("hook_test", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {
         std::cerr << "Handle crash 1 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
     //set crash hook2
-    if (LLBC_SetCrashHandle("hook_test2", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    if (LLBC_SetCrashHandler("hook_test2", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {
         std::cerr << "Handle crash 2 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
     //set crash hook3
-    if (LLBC_SetCrashHandle("hook_test3", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    if (LLBC_SetCrashHandler("hook_test3", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {
         std::cerr << "Handle crash 2 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
