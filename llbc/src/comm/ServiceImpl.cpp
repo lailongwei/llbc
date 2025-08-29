@@ -269,6 +269,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         // Process startup failed.
         if (_runningPhase != LLBC_ServiceRunningPhase::CompsStarted)
         {
+            Wait();
             LLBC_SetLastError(_startErrNo);
             LLBC_SetSubErrorNo(_startSubErrNo);
             _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
