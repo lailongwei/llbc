@@ -58,13 +58,6 @@ int TestCase_Core_OS_Process::TestCrash()
         return LLBC_FAILED;
     }
 
-    //set crash dump filepath
-    if (LLBC_SetCrashDumpFilePath() != LLBC_OK)
-    {
-        std::cerr << "Set dump file path failed, err:" << LLBC_FormatLastError() << std::endl;
-        return LLBC_FAILED;
-    }
-    
     //set crash hook1
     if (LLBC_SetCrashHandler("hook_test", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {

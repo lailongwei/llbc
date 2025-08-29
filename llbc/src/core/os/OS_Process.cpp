@@ -57,8 +57,8 @@ static char __stackBacktrace[128 * 1024 + 1] {'\0'};
 
 static LLBC_NS LLBC_SpinLock __crashInfoLock;
 typedef std::pair<LLBC_NS LLBC_String, 
-                  LLBC_NS LLBC_Delegate<void(const char *stackBacktrace, int sig)>> CrashHandlerInfo;
-std::list<CrashHandlerInfo> __crashHandlerInfos;
+                  LLBC_NS LLBC_Delegate<void(const char *stackBacktrace, int sig)>> __CrashHandlerInfo;
+std::list<__CrashHandlerInfo> __crashHandlerInfos;
 
 __LLBC_INTERNAL_NS_END
 
@@ -203,10 +203,8 @@ static LONG WINAPI __Win32CrashHandler(::EXCEPTION_POINTERS *exception)
     ::MessageBoxA(nullptr, errMsg.c_str(), mbTitle.c_str(), MB_ICONERROR | MB_OK);
 
     for (auto &crashHanlderInfo : LLBC_INL_NS __crashHandlerInfos)
-    {
         crashHanlderInfo.second(__stackBacktrace, 0);
-    }
-    
+
     LLBC_LoggerMgrSingleton->Finalize();
 
     return EXCEPTION_EXECUTE_HANDLER;
@@ -410,9 +408,7 @@ static void __NonWin32CrashHandler(int sig)
         close(coreDescFileFd);
 
         for (auto &crashHanlderInfo : LLBC_INL_NS __crashHandlerInfos)
-        {
             crashHanlderInfo.second(__stackBacktrace, sig);
-        }
     }
     else
     {
@@ -431,20 +427,15 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
+int LLBC_SetDefaultCrashDumpFilePath()
 {
     LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashInfoLock);
     
 #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_String nmlDumpFilePath = dumpFilePath;
-    if (nmlDumpFilePath.empty())
-    {
-        const auto now = LLBC_Time::Now();
-        nmlDumpFilePath = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0];
-        nmlDumpFilePath.append_format("_%d_%s.dmp",
-                                      LLBC_GetCurrentProcessId(),
-                                      now.Format("%Y%m%d_%H%M%S").c_str());
-    }
+    LLBC_String nmlDumpFilePath(LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0]);
+    nmlDumpFilePath.append_format("_%d_%s.dmp",
+                                  LLBC_GetCurrentProcessId(),
+                                  LLBC_Time::Now().Format("%Y%m%d_%H%M%S").c_str());
 
     if (nmlDumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))
     {
@@ -458,31 +449,60 @@ int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
     return LLBC_OK;
 
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+    // no win32 not support set default crash dump file path. will use system default config.
+    return LLBC_OK;
+#else // Unsupported platforms
+    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    return LLBC_FAILED;
+#endif // Win32
+}
+
+int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
+{
+    LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashInfoLock);
+    
+    if(dumpFilePath.empty())
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+#if LLBC_TARGET_PLATFORM_WIN32
+    if (dumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    memcpy(LLBC_INL_NS __dumpFilePath, dumpFilePath.c_str(), dumpFilePath.size());
+    LLBC_INL_NS __dumpFilePath[dumpFilePath.size()] = '\0';
+
+    return LLBC_OK;
+#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     // Use system default core pattern if dumpFilePath is empty.
     // if (dumpFilePath.empty())
     //    return LLBC_OK;
 
-    if (!dumpFilePath.empty())
+    // Save old core pattern.
+    const auto oldCorePattern = LLBC_File::ReadToEnd(LLBC_INL_NS __corePatternPath);
+    if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
+        return LLBC_FAILED;
+
+    // Write new core pattern(may not have permission to open core_pattern file, ignore error).
+    LLBC_File corePatternFile;
+    if (corePatternFile.Open(LLBC_INL_NS __corePatternPath, LLBC_FileMode::Write) == LLBC_OK)
     {
-        // Save old core pattern.
-        const auto oldCorePattern = LLBC_File::ReadToEnd(LLBC_INL_NS __corePatternPath);
-        if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
-            return LLBC_FAILED;
-
-        // Write new core pattern(may not have permission to open core_pattern file, ignore error).
-        LLBC_File corePatternFile;
-        if (corePatternFile.Open(LLBC_INL_NS __corePatternPath, LLBC_FileMode::Write) == LLBC_OK)
+        // If failed, try write old core pattern.
+        if (corePatternFile.Write(dumpFilePath) != LLBC_OK)
         {
-            // If failed, try write old core pattern.
-            if (corePatternFile.Write(dumpFilePath) != LLBC_OK)
-            {
-                corePatternFile.Seek(LLBC_FileSeekOrigin::Begin, 0);
-                corePatternFile.Write(oldCorePattern);
+            corePatternFile.Seek(LLBC_FileSeekOrigin::Begin, 0);
+            corePatternFile.Write(oldCorePattern);
 
-                return LLBC_FAILED;
-            }
+            return LLBC_FAILED;
         }
     }
+    else
+        return LLBC_FAILED;
 
     return LLBC_OK;
 
@@ -499,25 +519,31 @@ int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
 #if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     LLBC_NS LLBC_LockGuard guard(LLBC_INL_NS __crashInfoLock);
 
+    if (crashHandlerName.empty())
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
     auto foundIt = std::find_if(LLBC_INL_NS __crashHandlerInfos.begin(),
                                 LLBC_INL_NS __crashHandlerInfos.end(),
-                                [&crashHandlerName](const LLBC_INL_NS CrashHandlerInfo &info) {
+                                [&crashHandlerName](const LLBC_INL_NS __CrashHandlerInfo &info) {
                                     return info.first == crashHandlerName;
                                 });
 
     if (foundIt == LLBC_INL_NS __crashHandlerInfos.end())
     {
+        if (!crashHandler)
+            return LLBC_OK;
+        
         LLBC_INL_NS __crashHandlerInfos.emplace_back(crashHandlerName, crashHandler);
         return LLBC_OK;
     }
 
-    if(crashHandler == nullptr)
-    {
+    if (!crashHandler)
         LLBC_INL_NS __crashHandlerInfos.erase(foundIt);
-        return LLBC_OK;
-    }
-
-    (*foundIt).second = crashHandler;
+    else
+        (*foundIt).second = crashHandler;
 
     return LLBC_OK;
 
