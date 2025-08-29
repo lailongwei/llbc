@@ -269,6 +269,7 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         // Process startup failed.
         if (_runningPhase != LLBC_ServiceRunningPhase::CompsStarted)
         {
+            Wait();
             LLBC_SetLastError(_startErrNo);
             LLBC_SetSubErrorNo(_startSubErrNo);
             _runningPhase = LLBC_ServiceRunningPhase::NotStarted;
@@ -1279,7 +1280,7 @@ void LLBC_ServiceImpl::Cleanup()
     StopComps();
 
     // Destroy comps if needed.
-    LLBC_DoIf(_destroyCompWhenStop, DestroyComps(); _destroyCompWhenStop = false);
+    LLBC_DoIf(_destroyCompWhenStop, DestroyComps(false); _destroyCompWhenStop = false);
 
     // Post-Stop.
     PostStop();
@@ -1941,11 +1942,14 @@ int LLBC_ServiceImpl::InitComps()
     }
 
     // Late-Init comps.
-    for (auto &comp : _compList)
+    if (compsInitSucc)
     {
-        // Late-Init comp.
-        if (comp->_runningPhase == _CompRunningPhase::Inited)
-            __LLBC_Inl_InitComp(comp, OnLateInit, LateInited, LLBC_ERROR_COMP_LATE_INIT_FAILED);
+        for (auto &comp : _compList)
+        {
+            // Late-Init comp.
+            if (comp->_runningPhase == _CompRunningPhase::Inited)
+                __LLBC_Inl_InitComp(comp, OnLateInit, LateInited, LLBC_ERROR_COMP_LATE_INIT_FAILED);
+        }
     }
 
     if (!compsInitSucc)
