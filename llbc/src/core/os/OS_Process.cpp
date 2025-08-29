@@ -460,8 +460,10 @@ int __LLBC_PrepareCrashHandleEnv()
 
 int __LLBC_CleanUpCrashHandleEnv()
 {
+#if LLBC_TARGET_PLATFORM_WIN32
     memset(&LLBC_INL_NS __dumpFilePath, 0, sizeof(LLBC_INL_NS __dumpFilePath));
-    
+#endif
+
     delete LLBC_INL_NS __crashInfoLock;
     LLBC_INL_NS __crashInfoLock = nullptr;
 
