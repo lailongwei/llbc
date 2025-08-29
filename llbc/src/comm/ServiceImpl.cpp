@@ -1279,7 +1279,7 @@ void LLBC_ServiceImpl::Cleanup()
     StopComps();
 
     // Destroy comps if needed.
-    LLBC_DoIf(_destroyCompWhenStop, DestroyComps(); _destroyCompWhenStop = false);
+    LLBC_DoIf(_destroyCompWhenStop, DestroyComps(false); _destroyCompWhenStop = false);
 
     // Post-Stop.
     PostStop();
