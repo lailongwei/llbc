@@ -1941,11 +1941,14 @@ int LLBC_ServiceImpl::InitComps()
     }
 
     // Late-Init comps.
-    for (auto &comp : _compList)
+    if (compsInitSucc)
     {
-        // Late-Init comp.
-        if (comp->_runningPhase == _CompRunningPhase::Inited)
-            __LLBC_Inl_InitComp(comp, OnLateInit, LateInited, LLBC_ERROR_COMP_LATE_INIT_FAILED);
+        for (auto &comp : _compList)
+        {
+            // Late-Init comp.
+            if (comp->_runningPhase == _CompRunningPhase::Inited)
+                __LLBC_Inl_InitComp(comp, OnLateInit, LateInited, LLBC_ERROR_COMP_LATE_INIT_FAILED);
+        }
     }
 
     if (!compsInitSucc)
