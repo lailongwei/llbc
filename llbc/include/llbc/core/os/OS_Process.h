@@ -41,21 +41,50 @@ LLBC_EXPORT int LLBC_GetCurrentProcessId();
 #if LLBC_SUPPORT_HANDLE_CRASH
 
 /**
- * Handle process crash(and set user-defined dump file path and additional crash callback).
- * @param[in] dumpFilePath  - the dump file path.
- *                            in Windows platform, is a dump file path, if is empty, dump file path is <your_app_path>.dmp.
- *                            in Non-Windows platform, is a core pattern, if is empty, will use system default config.
- * @param[in] crashCallback - the crash callback delegate.
+ * Prepare crash handle env, include:
+ * 1) allocate crash handle lock and crash handler infos container;
+ * 2) set default dump file path:
+ *      -in Windows platform, set default dump file path is <your_app_path>.dmp.
+ *      -in Non-Windows platform, default dump file path use system default config.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_HandleCrash(const LLBC_String &dumpFilePath = "",
-                                 const LLBC_Delegate<void(const char *stackBacktrace,
-                                                          int sig)> &crashCallback = nullptr);
+LLBC_HIDDEN int __LLBC_PrepareCrashHandleEnv();
 
 /**
- * Cancel handle crash.
+ * Clean up crash handle env, include:
+ * 1) free crash handle lock and crash handler infos container;
+ * 2) reset default dump file path.
+ * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT void LLBC_CancelHandleCrash();
+LLBC_HIDDEN int __LLBC_CleanUpCrashHandleEnv();
+
+/**
+ * Set user-defined crash dump file path.
+ * @param[in] dumpFilePath  - the dump file path.
+ *                            in Windows platform, is a dump file path, fobid empty file path.
+ *                            in Non-Windows platform, is a core pattern, fobid empty file path.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXPORT int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath = "");
+
+/**
+ * Set crash handler.
+ * @param[in] crashHandlerName - the crash handler name.
+ * @param[in] crashHandler     - the crash callback delegate.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXPORT int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName = "",
+                                     const LLBC_Delegate<void(const char *stackBacktrace,
+                                                              int sig)> &crashHandler = nullptr);
+/**
+ * Enable crash handle.
+ */
+LLBC_EXPORT int LLBC_EnableCrashHandle();
+
+/**
+ * Disable crash handle.
+ */
+LLBC_EXPORT void LLBC_DisableCrashHandle();
 
 #endif // LLBC_SUPPORT_HANDLE_CRASH
 

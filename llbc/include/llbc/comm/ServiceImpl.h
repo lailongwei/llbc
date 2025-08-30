@@ -147,6 +147,12 @@ public:
      */
     int GetFrameInterval() const override;
 
+    /**
+     * Get service thread id.
+     * @return LLBC_ThreadId - the service thread id.
+     */
+    LLBC_ThreadId GetServiceThreadId() const override;
+    
 public:
     /**
      * Create a session and listening.
@@ -592,7 +598,7 @@ private:
     int _id; // Service Id.
     LLBC_String _name; // Service Name.
     LLBC_ServiceDriveMode::ENUM _driveMode; // Drive mode(ExternalDrive or InternalDrive).
-    LLBC_ThreadId _svcThreadId; // Service thread Id(which thread drive this service).
+    volatile LLBC_ThreadId _svcThreadId; // Service thread Id(which thread drive this service).
     volatile bool _inCleaning; // Cleaning flag.
     volatile bool _sinkIntoOnSvcLoop; // Sink into OnSvc() loop flag.
     LLBC_ServiceMgr &_svcMgr; // Owned service manager.
