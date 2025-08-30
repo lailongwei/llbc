@@ -8,6 +8,7 @@ require "premake5_com"
 llbc_disable_cxx11_abi = false -- true/false.
 
 -- enable/disable asan support.
+-- Note: This config option only available in non-windows platform and c/c++ projects.
 llbc_enable_asan_support = false
 
 -- c/c++ compile toolset setting.
