@@ -40,48 +40,6 @@ function set_custom_ccpp_toolset(toolset_bin_path)
     premake.tools.custom_ccpp_toolset = custom_ccpp_toolset
 end
 
--- llbc project fast include function.
-function include_llbc_core_lib()
-    -- includedirs.
-    includedirs {
-        llbc_core_lib_path .. "/include",
-    }
-
-    -- links.
-    libdirs { llbc_output_dir }
-    filter { "system:linux" }
-        links {
-            "dl",
-			"pthread",
-        }
-
-    filter { "system:not windows", "configurations:debug*" }
-        links {
-            "llbc_debug",
-        }
-
-    filter { "system:not windows", "configurations:release*" }
-        links {
-            "llbc",
-        }
-
-    filter { "system:windows" }
-        links {
-            "ws2_32",
-        }
-
-    filter { "system:windows", "configurations:debug*" }
-        links {
-            "libllbc_debug",
-        }
-
-    filter { "system:windows", "configurations:release*" }
-        links {
-            "libllbc",
-        }
-    filter {}
-end
-
 -- determine system type.
 llbc_system_types = {
     ['windows'] = 'windows',
