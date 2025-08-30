@@ -8,6 +8,48 @@ require "premake5_cfg"
 print(string.format(
     '-------- system type: %s, arch type: %s --------', llbc_system_type, llbc_arch_type))
 
+-- llbc project fast include function.
+function include_llbc_core_lib()
+    -- includedirs.
+    includedirs {
+        llbc_core_lib_path .. "/include",
+    }
+
+    -- links - llbc core lib dependency libs.
+    libdirs { llbc_output_dir }
+    filter { "system:linux" }
+        links {
+            "dl",
+			"pthread",
+        }
+    filter { "system:windows" }
+        links {
+            "ws2_32",
+        }
+    filter {}
+
+    -- links - llbc core lib.
+    if llbc_system_type ~= llbc_system_types.windows then
+        if llbc_enable_asan_support then
+            filter { "configurations:debug*" }
+                links { "llbc_asan_debug" }
+            filter { "configurations:release*" }
+                links { "llbc_asan" }
+        else
+            filter { "configurations:debug*" }
+                links { "llbc_debug" }
+            filter { "configurations:release*" }
+                links { "llbc" }
+        end
+    else
+        filter { "configurations:debug*" }
+            links { "libllbc_debug" }
+        filter { "configurations:release*" }
+            links { "libllbc" }
+    end
+    filter {}
+end
+
 -- llbc workspace define.
 workspace ("llbc_" .. _ACTION)
     -- location define.
@@ -87,9 +129,22 @@ workspace ("llbc_" .. _ACTION)
     filter {}
 
     -- set debug target suffix.
-    filter { "configurations:debug*" }
-        targetsuffix "_debug"
-    filter {}
+    if llbc_system_type ~= llbc_system_types.windows and llbc_enable_asan_support then
+        filter { "configurations:debug*", "language:c++" }
+            targetsuffix "_asan_debug"
+        filter {}
+        filter { "configurations:release*", "language:c++" }
+            targetsuffix "_asan"
+        filter {}
+
+        filter { "configurations:debug*", "language:non c++" }
+            targetsuffix "_debug"
+        filter {}
+    else
+        filter { "configurations:debug*" }
+            targetsuffix "_debug"
+        filter {}
+    end
 
     -- enable multithread compile(only avabilable on windows).
     filter { "system:windows" }
@@ -107,7 +162,7 @@ workspace ("llbc_" .. _ACTION)
     filter {}
 
     -- enable asan support
-    if llbc_enable_asan_support then
+    if llbc_system_type ~= llbc_system_types.windows and llbc_enable_asan_support then
         filter { "system:not windows", "language:c++" }
             buildoptions { "-fsanitize=address", "-g" }
             linkoptions { "-fsanitize=address" }
@@ -197,8 +252,6 @@ project "llbc"
         }
     filter {}
 
-    targetname "llbc"
-
     -- prebuild.
     local prebuild_script = '../../tools/building_script/llbc_prebuild.py'
     local prebuild_cmd = string.format('%s %s %%s %%s %s',
@@ -212,6 +265,16 @@ project "llbc"
     filter { "configurations:release64" }
     prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
+    if llbc_system_type ~= llbc_system_types.windows then
+        prebuildcommands {
+            string.format([=[grep -E 'LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD *%d' '%s' > /dev/null && sed -i 's|\(#define LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD\)\([[:space:]]*\)%d|\1\2%d|g' %s; echo 'do nothing' > /dev/null]=],
+                llbc_enable_asan_support and 0 or 1,
+                llbc_core_lib_path .. '/include/llbc/common/Config.h',
+                llbc_enable_asan_support and 0 or 1,
+                llbc_enable_asan_support and 1 or 0,          
+                llbc_core_lib_path .. '/include/llbc/common/Config.h')
+        }
+    end
 
 group "tests"
 -- ****************************************************************************

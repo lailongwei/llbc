@@ -253,6 +253,10 @@ int TestCase_Com_StreamFunc::AttachTest()
     }
 
     // Test attach from buf.
+    #if LLBC_TARGET_PLATFORM_NON_WIN32
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wfree-nonheap-object"
+    #endif
     {
         LLBC_PrintLn("- Test attach from buf:");
 
@@ -269,6 +273,9 @@ int TestCase_Com_StreamFunc::AttachTest()
 
         LLBC_ErrorAndReturnIf(stream.GetWritableSize() != 0, LLBC_FAILED);
     }
+    #if LLBC_TARGET_PLATFORM_NON_WIN32
+    #pragma GCC diagnostic pop
+    #endif
 
     // Test reattach.
     {
