@@ -471,7 +471,7 @@ __LLBC_NS_BEGIN
 int __LLBC_PrepareCrashHandleEnv()
 {
     //Init crash handle lock and infos container.
-    LLBC_INL_NS __crashInfoLock = new LLBC_NS LLBC_SpinLock;
+    LLBC_INL_NS __crashInfoLock = new LLBC_SpinLock;
     LLBC_INL_NS __crashHandlerInfos = new std::list<LLBC_INL_NS __CrashHandlerInfo>;
 
     // Set default crash dump file path.
@@ -491,7 +491,7 @@ int __LLBC_PrepareCrashHandleEnv()
     LLBC_INL_NS __dumpFilePath[nmlDumpFilePath.size()] = '\0';
 
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
-    // No-win32 not support set default crash dump file path. will use system default config.
+    // No-win32 not support set default crash dump file path, will use system default config.
 #else 
     // Unsupported platforms.
 #endif // Win32
@@ -501,21 +501,20 @@ int __LLBC_PrepareCrashHandleEnv()
 
 int __LLBC_CleanUpCrashHandleEnv()
 {
+    // Clear crash dump file path.
 #if LLBC_TARGET_PLATFORM_WIN32
     memset(&LLBC_INL_NS __dumpFilePath, 0, sizeof(LLBC_INL_NS __dumpFilePath));
 #endif
+    // Delete crash handle lock and infos container.
     LLBC_XDelete(LLBC_INL_NS __crashInfoLock);
-    LLBC_INL_NS __crashInfoLock = nullptr;
-
     LLBC_XDelete(LLBC_INL_NS __crashHandlerInfos);
-    LLBC_INL_NS __crashHandlerInfos = nullptr;
 
     return LLBC_OK;
 }
 
 int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
 {
-    LLBC_NS LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
+    LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
     
     if(dumpFilePath.empty())
     {
@@ -535,10 +534,6 @@ int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
 
     return LLBC_OK;
 #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
-    // Use system default core pattern if dumpFilePath is empty.
-    // if (dumpFilePath.empty())
-    //    return LLBC_OK;
-
     // Save old core pattern.
     const auto oldCorePattern = LLBC_File::ReadToEnd(LLBC_INL_NS __corePatternPath);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
@@ -546,24 +541,19 @@ int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
 
     // Write new core pattern(may not have permission to open core_pattern file, ignore error).
     LLBC_File corePatternFile;
-    if (corePatternFile.Open(LLBC_INL_NS __corePatternPath, LLBC_FileMode::Write) == LLBC_OK)
-    {
-        // If failed, try write old core pattern.
-        if (corePatternFile.Write(dumpFilePath) != LLBC_OK)
-        {
-            corePatternFile.Seek(LLBC_FileSeekOrigin::Begin, 0);
-            corePatternFile.Write(oldCorePattern);
+    if (corePatternFile.Open(LLBC_INL_NS __corePatternPath, LLBC_FileMode::Write) != LLBC_OK)
+        return LLBC_FAILED;
 
-            return LLBC_FAILED;
-        }
-    }
-    else
+    // If failed, try write old core pattern.
+    if (corePatternFile.Write(dumpFilePath) != LLBC_OK)
     {
+        corePatternFile.Seek(LLBC_FileSeekOrigin::Begin, 0);
+        corePatternFile.Write(oldCorePattern);
+
         return LLBC_FAILED;
     }
 
     return LLBC_OK;
-
 #else // Unsupported platforms
     LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
     return LLBC_FAILED;
@@ -575,7 +565,7 @@ int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
 {
 
 #if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
-    LLBC_NS LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
+    LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
 
     if (crashHandlerName.empty())
     {
@@ -613,7 +603,7 @@ int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
 
 int LLBC_EnableCrashHandle()
 {
-    LLBC_NS LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
+    LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
 
 #if LLBC_TARGET_PLATFORM_WIN32
     if (!LLBC_INL_NS __hookedCrashSignals)
@@ -657,7 +647,7 @@ int LLBC_EnableCrashHandle()
 
 void LLBC_DisableCrashHandle()
 {
-    LLBC_NS LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
+    LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
 
     if (!LLBC_INL_NS __hookedCrashSignals)
         return;
