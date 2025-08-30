@@ -22,6 +22,8 @@
 
 #include "core/os/TestCase_Core_OS_Process.h"
 
+static int __Test_Os_Process_Hook_Times = 0;
+
 int TestCase_Core_OS_Process::Run(int argc, char *argvp[])
 {
     std::cout <<"core/os/process test:" <<std::endl;
@@ -36,16 +38,42 @@ int TestCase_Core_OS_Process::Run(int argc, char *argvp[])
     return 0;
 }
 
+static void TestCase_Core_OS_Process_Crash_Hook_test(const char *traceback, int sig)
+{
+    std::cerr << std::endl;
+    std::cerr << "TestCase_Core_OS_Process_Crash_Hook_test success. times:" << __Test_Os_Process_Hook_Times++ << std::endl;
+}
+
 int TestCase_Core_OS_Process::TestCrash()
 {
     std::cout << "Crash hook test:" << std::endl;
 
 #if LLBC_SUPPORT_HANDLE_CRASH
-    // Set crash hook.
+    // Set crash hook handle list.
     std::cout << "Handle crash..." << std::endl;
-    if (LLBC_HandleCrash() != LLBC_OK)
+    // Enable crash handle.
+    if(LLBC_EnableCrashHandle() != LLBC_OK)
     {
-        std::cerr << "Handle crash failed, err:" << LLBC_FormatLastError() << std::endl;
+        std::cerr << "Open handle crash failed, err:" << LLBC_FormatLastError() << std::endl;
+        return LLBC_FAILED;
+    }
+
+    //Set crash hook1.
+    if (LLBC_SetCrashHandler("hook_test", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    {
+        std::cerr << "Handle crash 1 failed, err:" << LLBC_FormatLastError() << std::endl;
+        return LLBC_FAILED;
+    }
+    //Set crash hook2.
+    if (LLBC_SetCrashHandler("hook_test2", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    {
+        std::cerr << "Handle crash 2 failed, err:" << LLBC_FormatLastError() << std::endl;
+        return LLBC_FAILED;
+    }
+    //Set crash hook3.
+    if (LLBC_SetCrashHandler("hook_test3", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    {
+        std::cerr << "Handle crash 3 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
 

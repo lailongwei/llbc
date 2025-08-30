@@ -555,7 +555,7 @@ int LLBC_ThreadMgr::WaitOrCancelThread(LLBC_Handle handle, bool wait)
     LLBC_ReturnIf(nativeHandle == LLBC_INVALID_NATIVE_THREAD_HANDLE, LLBC_FAILED);
 
     // Join/Cancel thread.
-    const int rtn = wait ?  LLBC_JoinThread(nativeHandle) : LLBC_CancelThread(nativeHandle);
+    const int rtn = wait ? LLBC_JoinThread(nativeHandle) : LLBC_CancelThread(nativeHandle);
     if (rtn == LLBC_OK)
     {
         LLBC_LockGuard guard(_lock);
