@@ -151,7 +151,7 @@ public:
      * Get service thread id.
      * @return LLBC_ThreadId - the service thread id.
      */
-    LLBC_ThreadId GetServiceThreadId() const;
+    LLBC_ThreadId GetServiceThreadId() const override;
     
 public:
     /**
