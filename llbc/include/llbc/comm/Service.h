@@ -251,6 +251,12 @@ public:
      */
     virtual int GetFrameInterval() const = 0;
 
+    /**
+    * Get service thread id.
+    * @return LLBC_ThreadId - the service thread id.
+    */
+    virtual LLBC_ThreadId GetServiceThreadId() const = 0;
+
 public:
     /**
      * Create a session and listening.
