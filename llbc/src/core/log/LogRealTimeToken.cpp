@@ -72,7 +72,7 @@ void LLBC_LogRealTimeToken::Format(const LLBC_LogData &data, LLBC_String &format
     #if LLBC_TARGET_PLATFORM_WIN32
         localtime_s(&timeStruct, &realTimeInSeconds);
     #else
-        localtime_r(&timeInSecond, &timeStruct);
+        localtime_r(&realTimeInSeconds, &timeStruct);
     #endif
         _lastFmtTime = realTimeInSeconds;
         _cacheLen = strftime(_fmtCache,
