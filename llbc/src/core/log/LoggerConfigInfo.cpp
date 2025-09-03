@@ -1,4 +1,4 @@
-// The MIT License (MIT)
+    // The MIT License (MIT)
 
 // Copyright (c) 2013 lailongwei<lailongwei@126.com>
 // 
@@ -46,6 +46,8 @@ __LLBC_NS_BEGIN
 LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 : _notConfigUseRoot(false)
 
+, _logTimeAccessor(nullptr)
+
 , _asyncMode(false)
 , _independentThread(false)
 , _flushInterval(0)
@@ -76,7 +78,8 @@ LLBC_LoggerConfigInfo::~LLBC_LoggerConfigInfo()
 
 int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
                                       const LLBC_Variant &cfg,
-                                      const LLBC_LoggerConfigInfo *rootCfg)
+                                      const LLBC_LoggerConfigInfo *rootCfg,
+                                      const LLBC_LogTimeAccessor &logTimeAccessor)
 {
     // LoggerName.
     _loggerName = loggerName;
@@ -90,6 +93,9 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     else
         notCfgUseOpt = LLBC_CFG_LOG_DEFAULT_NOT_CONFIG_OPTION_USE;
     _notConfigUseRoot = notCfgUseOpt.strip().tolower() == "root" && rootCfg;
+
+    // Log time accessor.
+    _logTimeAccessor = &logTimeAccessor;
 
     _asyncMode = __LLBC_GetLogCfg(
         "asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);

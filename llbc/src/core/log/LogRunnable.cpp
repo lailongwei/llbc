@@ -22,17 +22,17 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/os/OS_Time.h"
 #include "llbc/core/objpool/ObjPool.h"
 
 #include "llbc/core/log/LogData.h"
+#include "llbc/core/log/LogTimeAccessor.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LogRunnable.h"
 
 __LLBC_NS_BEGIN
-
-LLBC_LogRunnable::LLBC_LogRunnable()
+    LLBC_LogRunnable::LLBC_LogRunnable()
 : _stopping(false)
+, _logTimeAccessor(nullptr)
 {
     for (size_t i = 0; i < sizeof(_logDatas) / sizeof(_logDatas[0]); ++i)
         _logDatas[i].reserve(4096);
@@ -40,6 +40,11 @@ LLBC_LogRunnable::LLBC_LogRunnable()
 
 LLBC_LogRunnable::~LLBC_LogRunnable()
 {
+}
+
+void LLBC_LogRunnable::SetLogTimeAccessor(const LLBC_LogTimeAccessor &logTimeAccessor)
+{
+    _logTimeAccessor = &logTimeAccessor;
 }
 
 int LLBC_LogRunnable::AddLogger(LLBC_Logger* logger)
@@ -82,16 +87,6 @@ void LLBC_LogRunnable::PushLogData(LLBC_LogData *logData)
     _logDataLock.Unlock();
 }
 
-void LLBC_LogRunnable::Cleanup()
-{
-    (void)TryPopAndProcLogDatas();
-
-    FlushLoggers(true, 0);
-    _loggers.clear();
-
-    _stopping = false;
-}
-
 void LLBC_LogRunnable::Svc()
 {
     while (LIKELY(!_stopping))
@@ -99,8 +94,20 @@ void LLBC_LogRunnable::Svc()
         if (!TryPopAndProcLogDatas())
             LLBC_Sleep(1);
 
-        FlushLoggers(false, LLBC_GetMilliseconds());
+        FlushLoggers(false, _logTimeAccessor->NowInMilliseconds());
     }
+}
+
+void LLBC_LogRunnable::Cleanup()
+{
+    (void)TryPopAndProcLogDatas();
+
+    FlushLoggers(true, 0);
+    _loggers.clear();
+
+    _logTimeAccessor = nullptr;
+
+    _stopping = false;
 }
 
 LLBC_FORCE_INLINE bool LLBC_LogRunnable::TryPopAndProcLogDatas()

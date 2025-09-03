@@ -50,7 +50,7 @@ LLBC_LogTokenChain::~LLBC_LogTokenChain()
     Cleanup();
 }
 
-int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
+int LLBC_LogTokenChain::Build(const LLBC_String &pattern, const LLBC_LogTimeAccessor &logTimeAccessor)
 {
     if (_head)
     {
@@ -111,7 +111,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
                     if (!buf.empty())
                     {
                         token = tokenBuilder->BuildLogToken(LLBC_LogTokenType::StrToken);
-                        token->Initialize(formatter, buf);
+                        token->Initialize(formatter, logTimeAccessor, buf);
                         AppendToken(token);
 
                         buf.clear();
@@ -149,7 +149,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
             buf.erase(buf.rfind(LLBC_LogTokenType::EscapeToken));
             token = tokenBuilder->BuildLogToken(ch);
 
-            token->Initialize(formatter, "");
+            token->Initialize(formatter, logTimeAccessor, "");
             AppendToken(token);
 
             formatter.Reset();
@@ -190,7 +190,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
 
                 // Build token.
                 token = tokenBuilder->BuildLogToken(buf[tokenPos]);
-                token->Initialize(formatter, "");
+                token->Initialize(formatter, logTimeAccessor, "");
                 AppendToken(token);
 
                 formatter.Reset();
@@ -211,7 +211,7 @@ int LLBC_LogTokenChain::Build(const LLBC_String &pattern)
     {
         formatter.Reset();
         token = tokenBuilder->BuildLogToken(LLBC_LogTokenType::StrToken);
-        token->Initialize(formatter, buf);
+        token->Initialize(formatter, logTimeAccessor, buf);
         AppendToken(token);
 
         buf.clear();

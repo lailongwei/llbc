@@ -31,12 +31,15 @@
 
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogLevel.h"
+#include "llbc/core/log/LogTimeAccessor.h"
 #include "llbc/core/log/LogRollingMode.h"
 #include "llbc/core/log/LogTokenChain.h"
 #include "llbc/core/log/LogFileAppender.h"
 
+#include "llbc/core/log/LogTimeAccessor.h"
+
 __LLBC_INTERNAL_NS_BEGIN
-const static int __LogFileCheckInterval = 500000; // In micro-seconds.
+    const static int __LogFileCheckInterval = 500000; // In micro-seconds.
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
@@ -107,7 +110,7 @@ int LLBC_LogFileAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
         return LLBC_OK;
 
     // Force check and update file one time.
-    CheckAndUpdateLogFile(LLBC_GetMicroseconds());
+    CheckAndUpdateLogFile(GetLogTimeAccessor().NowInMicroseconds());
 
     return LLBC_OK;
 }

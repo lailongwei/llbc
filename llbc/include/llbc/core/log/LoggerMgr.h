@@ -22,9 +22,12 @@
 #pragma once
 
 #include "llbc/core/singleton/Singleton.h"
+
 #include "llbc/core/thread/Guard.h"
 #include "llbc/core/thread/FastLock.h"
 #include "llbc/core/thread/DummyLock.h"
+
+#include "llbc/core/log/LogTimeAccessor.h"
 #include "llbc/core/log/Logger.h"
 
 #if LLBC_CFG_LOG_USING_WITH_STREAM
@@ -56,10 +59,12 @@ public:
 public:
     /**
      * Initialize logger manager using config file.
-     * @param[in] cfgFilePath - config file, for now, supported properties/xml format.
+     * @param[in] cfgFilePath   - config file, for now, supported properties/xml format.
+     * @param[in] logTimeOffset - the log time offset, default is zero.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_String &cfgFilePath);
+    int Initialize(const LLBC_String &cfgFilePath,
+                   const LLBC_TimeSpan &logTimeOffset = LLBC_TimeSpan::zero);
 
     /**
      * Reload logger manager using config file.
@@ -127,13 +132,20 @@ public:
                                int line,
                                const char *func,
                                const char *msg,
-                               size_t msgLen);    
-                               
+                               size_t msgLen);
+
+public:
+    /**
+     * Get log time accessor.
+     * @return const LLBC_LogTimeAccessor & - the log time accessor.
+     */
+    const LLBC_LogTimeAccessor &GetLogTimeAccessor() const;
 
 private:
     mutable LLBC_DummyLock _lock;
 
     LLBC_String _cfgFilePath;
+    LLBC_LogTimeAccessor _logTimeAccessor;
     LLBC_LogRunnable *_sharedLogRunnable;
 
     LLBC_Logger * volatile _rootLogger;
@@ -434,7 +446,7 @@ public:
         auto loggerMgr = LLBC_LoggerMgrSingleton;
         if (LIKELY(loggerMgr->IsInited()))
         {
-            auto l= loggerMgr->GetLogger(logger);
+            auto l = loggerMgr->GetLogger(logger);
             if (l && logLv >= l->GetLogLevel())
             {
                 l->NonFormatOutput(logLv,
@@ -442,7 +454,7 @@ public:
                                    fileName,
                                    lineNo,
                                    funcName,
-                                   LLBC_NS LLBC_GetMicroseconds(),
+                                   l->GetLogTimeAccessor().NowInMicroseconds(),
                                    libTls->coreTls.loggerFmtBuf,
                                    totalLen);
             }
@@ -474,10 +486,10 @@ public:
                        const char *cond,
                        const char *behav)
     {
-        auto loggerMgr = LLBC_LoggerMgrSingleton;     
+        auto loggerMgr = LLBC_LoggerMgrSingleton;
         if (LIKELY(loggerMgr->IsInited()))
         {
-            auto l = loggerMgr->GetLogger(logger);   
+            auto l = loggerMgr->GetLogger(logger);
             if (l && logLv >= l->GetLogLevel())
                 l->Output(logLv, logTag, fileName, lineNo, funcName, fmt, cond, behav);
         }

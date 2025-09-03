@@ -19,45 +19,49 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
-
-#include "llbc/core/log/BaseLogToken.h"
+#include "llbc/core/os/OS_Time.h"
 
 __LLBC_NS_BEGIN
 
-/**
- * \brief The pattern log token class encapsulation.
- */
-class LLBC_HIDDEN LLBC_LogNewLineToken : public LLBC_BaseLogToken
+inline LLBC_LogTimeAccessor::LLBC_LogTimeAccessor()
+: _logTimeOffset(0)
 {
-public:
-    LLBC_LogNewLineToken() = default;
-    ~LLBC_LogNewLineToken() override = default;
+}
 
-public:
-    /**
-     * Initialize the log token.
-     * @param[in] formatter       - log formatter.
-     * @param[in] logTimeAccessor - log time accessor.
-     * @param[in] str             - token append string data.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int Initialize(const LLBC_LogFormattingInfo &formatter,
-                   const LLBC_LogTimeAccessor &logTimeAccessor,
-                   const LLBC_String &str) override;
+LLBC_FORCE_INLINE
+sint64 LLBC_LogTimeAccessor::GetLogTimeOffset() const
+{
+    return _logTimeOffset;
+}
 
-    /**
-     * Get token type.
-     * @return int - token type.
-     */
-    int GetType() const override;
+LLBC_FORCE_INLINE
+void LLBC_LogTimeAccessor::SetLogTimeOffset(const LLBC_TimeSpan &logTimeOffset)
+{
+    _logTimeOffset = logTimeOffset.GetTotalMicros();
+}
 
-    /**
-     * Format the log data.
-     * @param[in] data           - log data.
-     * @param[out] formattedData - store location for formatted log string.
-     */
-    void Format(const LLBC_LogData &data, LLBC_String &formattedData) const override;
-};
+LLBC_FORCE_INLINE
+sint64 LLBC_LogTimeAccessor::NowInMilliseconds() const
+{
+    return LLBC_GetMilliseconds() + _logTimeOffset / 1000;
+}
+
+LLBC_FORCE_INLINE
+sint64 LLBC_LogTimeAccessor::RealNowInMilliseconds() const
+{
+    return LLBC_GetMilliseconds();
+}
+
+LLBC_FORCE_INLINE
+sint64 LLBC_LogTimeAccessor::NowInMicroseconds() const
+{
+    return LLBC_GetMicroseconds() + _logTimeOffset;
+}
+
+LLBC_FORCE_INLINE
+sint64 LLBC_LogTimeAccessor::RealNowInMicroseconds() const
+{
+    return LLBC_GetMicroseconds();
+}
 
 __LLBC_NS_END

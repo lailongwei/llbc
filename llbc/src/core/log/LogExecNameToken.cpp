@@ -34,7 +34,9 @@ LLBC_LogExecNameToken::LLBC_LogExecNameToken()
 {
 }
 
-int LLBC_LogExecNameToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
+int LLBC_LogExecNameToken::Initialize(const LLBC_LogFormattingInfo &formatter,
+                                      const LLBC_LogTimeAccessor &logTimeAccessor,
+                                      const LLBC_String &str)
 {
     SetFormatter(formatter);
 

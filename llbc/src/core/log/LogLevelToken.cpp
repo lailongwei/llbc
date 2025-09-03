@@ -34,7 +34,9 @@ LLBC_LogLevelToken::LLBC_LogLevelToken()
 {
 }
 
-int LLBC_LogLevelToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
+int LLBC_LogLevelToken::Initialize(const LLBC_LogFormattingInfo &formatter,
+                                   const LLBC_LogTimeAccessor &logTimeAccessor,
+                                   const LLBC_String &str)
 {
     SetFormatter(formatter);
     _shortLevelStr = (formatter.addiParam.strip().tolower() == "short");

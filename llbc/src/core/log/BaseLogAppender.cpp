@@ -30,9 +30,10 @@ __LLBC_NS_BEGIN
 
 LLBC_BaseLogAppender::LLBC_BaseLogAppender()
 : _logLevel(LLBC_LogLevel::End)
-
 , _chain(nullptr)
 , _next(nullptr)
+
+, _logTimeAccessor(nullptr)
 {
 }
 
@@ -51,17 +52,21 @@ int LLBC_BaseLogAppender::Initialize(const LLBC_LogAppenderInitInfo &initInfo)
     _logLevel = initInfo.logLevel;
 
     _chain = new LLBC_LogTokenChain;
-    if (_chain->Build(initInfo.pattern) != LLBC_OK)
+    if (_chain->Build(initInfo.pattern, *initInfo.logTimeAccessor) != LLBC_OK)
     {
         LLBC_XDelete(_chain);
         return LLBC_FAILED;
     }
+
+    _logTimeAccessor = initInfo.logTimeAccessor;
 
     return LLBC_OK;
 }
 
 void LLBC_BaseLogAppender::Finalize()
 {
+    _logTimeAccessor = nullptr;
+
     LLBC_XDelete(_chain);
     _logLevel = LLBC_LogLevel::End;
 }
