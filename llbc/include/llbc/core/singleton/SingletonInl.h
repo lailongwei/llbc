@@ -37,7 +37,7 @@ LLBC_Tls<T> *LLBC_Singleton<T, LockType, ThreadUnit>::_tls;
 template <typename T, typename LockType, bool ThreadUnit>
 T *LLBC_Singleton<T, LockType, ThreadUnit>::Instance()
 {
-    if (UNLIKELY(ThreadUnit))
+    if constexpr (ThreadUnit)
     {
         if (UNLIKELY(!_tls))
         {
@@ -55,23 +55,25 @@ T *LLBC_Singleton<T, LockType, ThreadUnit>::Instance()
 
         return _tls->GetValue();
     }
-
-    if (UNLIKELY(!_instance))
+    else
     {
-        _lock.Lock();
-        if (!_instance)
-            _instance = new T;
+        if (UNLIKELY(!_instance))
+        {
+            _lock.Lock();
+            if (LIKELY(!_instance))
+                _instance = new T;
 
-        _lock.Unlock();
+            _lock.Unlock();
+        }
+
+        return _instance;
     }
-
-    return _instance;
 }
 
 template <typename T, typename LockType, bool ThreadUnit>
 void LLBC_Singleton<T, LockType, ThreadUnit>::Release()
 {
-    if (UNLIKELY(ThreadUnit))
+    if constexpr (ThreadUnit)
     {
         if (!_tls)
             return;
@@ -79,16 +81,16 @@ void LLBC_Singleton<T, LockType, ThreadUnit>::Release()
         _lock.Lock();
         LLBC_XDelete(_tls);
         _lock.Unlock();
-
-        return;
     }
+    else
+    {
+        if (!_instance)
+            return;
 
-    if (!_instance)
-        return;
-
-    _lock.Lock();
-    LLBC_XDelete(_instance);
-    _lock.Unlock();
+        _lock.Lock();
+        LLBC_XDelete(_instance);
+        _lock.Unlock();
+    }
 }
 
 __LLBC_NS_END
