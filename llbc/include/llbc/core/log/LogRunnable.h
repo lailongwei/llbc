@@ -31,6 +31,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Logger;
 struct LLBC_LogData;
+class LLBC_LogTimeAccessor;
 
 __LLBC_NS_END
 
@@ -49,6 +50,12 @@ public:
     ~LLBC_LogRunnable() override;
 
 public:
+    /**
+     * Set log time accessor to log runnable.
+     * @param[in] logTimeAccessor - the log time accessor.
+     */
+    void SetLogTimeAccessor(const LLBC_LogTimeAccessor &logTimeAccessor);
+
     /**
      * Add logger to runnable.
      * @param[in] logger - the logger.
@@ -69,14 +76,14 @@ public:
 
 public:
     /**
-     * Cleanup method, when task terminated, will call this method.
-     */
-    void Cleanup() override;
-
-    /**
      * Task service routine.
      */
     void Svc() override;
+
+    /**
+     * Cleanup method, when task terminated, will call this method.
+     */
+    void Cleanup() override;
 
 private:
     /**
@@ -95,6 +102,7 @@ private:
 private:
     volatile bool _stopping;
     std::vector<LLBC_Logger *> _loggers;
+    const LLBC_LogTimeAccessor *_logTimeAccessor;
 
     LLBC_SpinLock _logDataLock;
     std::vector<LLBC_LogData *> _logDatas[2];

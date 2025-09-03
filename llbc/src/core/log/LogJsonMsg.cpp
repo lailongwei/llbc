@@ -26,6 +26,7 @@
 #include "llbc/core/os/OS_Console.h"
 #include "llbc/core/objpool/ThreadSpecObjPool.h"
 
+#include "llbc/core/log/LogTimeAccessor.h"
 #include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerMgr.h"
 
@@ -80,7 +81,8 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
         return;
 
     // Add time.
-    const sint64 now = LLBC_GetMicroseconds();
+    const sint64 now =
+            LIKELY(_logger) ? _logger->GetLogTimeAccessor().NowInMicroseconds() : LLBC_GetMicroseconds();
     if (LIKELY(_logger) && _logger->IsAddTimestampInJsonLog())
         this->Add("timestamp", now);
 

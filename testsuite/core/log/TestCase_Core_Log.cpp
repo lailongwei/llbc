@@ -45,9 +45,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     if(LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
 #else
 
-    // _logCfgFilePath = "LogTestCfg.cfg";
-    _logCfgFilePath  = "LogTestCfg.xml";
-    if(LLBC_LoggerMgrSingleton->Initialize(_logCfgFilePath) != LLBC_OK)
+    _logCfgFilePath = "LogTestCfg.cfg";
+    // _logCfgFilePath  = "LogTestCfg.xml";
+    const LLBC_TimeSpan logTimeOffset = LLBC_TimeSpan::FromHours(10, 30, 30);
+    if(LLBC_LoggerMgrSingleton->Initialize(_logCfgFilePath, logTimeOffset) != LLBC_OK)
 #endif
     {
         LLBC_FilePrintLn(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());

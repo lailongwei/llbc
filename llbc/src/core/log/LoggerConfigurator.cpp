@@ -38,6 +38,7 @@ __LLBC_NS_BEGIN
 
 LLBC_LoggerConfigurator::LLBC_LoggerConfigurator()
 : _rootConfig(nullptr)
+, _logTimeAccessor(nullptr)
 {
 }
 
@@ -46,7 +47,8 @@ LLBC_LoggerConfigurator::~LLBC_LoggerConfigurator()
     LLBC_STLHelper::DeleteContainer(_configs);
 }
 
-int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath)
+int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath,
+                                        const LLBC_LogTimeAccessor &logTimeAccessor)
 {
     // Load config content.
     LLBC_Variant cfg;
@@ -87,19 +89,32 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath)
         return LLBC_FAILED;
     }
 
+    // Save config file path.
+    _cfgFilePath = cfgFilePath;
+    // Save log time accessor.
+    _logTimeAccessor = &logTimeAccessor;
+
     // Create root logger config info.
     const LLBC_Variant &rootCfg = cfg[LLBC_CFG_LOG_ROOT_LOGGER_NAME];
     if (UNLIKELY(!rootCfg.IsDict()))
     {
+        _cfgFilePath.clear();
+        _logTimeAccessor = nullptr;
+
         LLBC_SetLastError(LLBC_ERROR_INVALID);
+
         return LLBC_FAILED;
     }
 
     // Create root logger config info.
     _rootConfig = new LLBC_LoggerConfigInfo;
-    if (_rootConfig->Initialize(LLBC_CFG_LOG_ROOT_LOGGER_NAME, rootCfg, nullptr) != LLBC_OK)
+    if (_rootConfig->Initialize(LLBC_CFG_LOG_ROOT_LOGGER_NAME, rootCfg, nullptr, logTimeAccessor) != LLBC_OK)
     {
         LLBC_XDelete(_rootConfig);
+
+        _cfgFilePath.clear();
+        _logTimeAccessor = nullptr;
+
         return LLBC_FAILED;
     }
 
@@ -113,18 +128,19 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath)
             continue;
 
         LLBC_LoggerConfigInfo *info = new LLBC_LoggerConfigInfo;
-        if (info->Initialize(loggerName, cfgItem.second, _rootConfig) != LLBC_OK)
+        if (info->Initialize(loggerName, cfgItem.second, _rootConfig, logTimeAccessor) != LLBC_OK)
         {
             delete info;
             LLBC_STLHelper::DeleteContainer(_configs);
+
+            _cfgFilePath.clear();
+            _logTimeAccessor = nullptr;
+
             return LLBC_FAILED;
         }
 
         _configs.insert(std::make_pair(loggerName, info));
     }
-
-    // Save config file path.
-    _cfgFilePath = cfgFilePath;
 
     return LLBC_OK;
 }
@@ -166,7 +182,7 @@ int LLBC_LoggerConfigurator::Config(const LLBC_String &name,
     if (it == _configs.end())
     {
         LLBC_LoggerConfigInfo *info = new LLBC_LoggerConfigInfo;
-        if (info->Initialize(name, LLBC_Variant::nil, _rootConfig) != LLBC_OK)
+        if (info->Initialize(name, LLBC_Variant::nil, _rootConfig, *_logTimeAccessor) != LLBC_OK)
         {
             delete info;
             return LLBC_FAILED;

@@ -34,7 +34,9 @@ LLBC_LogProcessIdToken::LLBC_LogProcessIdToken()
     _processIdSize = snprintf(_processId, sizeof(_processId), "%d", LLBC_GetCurrentProcessId());
 }
 
-int LLBC_LogProcessIdToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
+int LLBC_LogProcessIdToken::Initialize(const LLBC_LogFormattingInfo &formatter,
+                                       const LLBC_LogTimeAccessor &logTimeAccessor,
+                                       const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;

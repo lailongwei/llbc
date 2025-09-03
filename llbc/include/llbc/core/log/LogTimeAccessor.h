@@ -21,43 +21,60 @@
 
 #pragma once
 
-#include "llbc/core/log/BaseLogToken.h"
+#include "llbc/core/time/TimeSpan.h"
 
 __LLBC_NS_BEGIN
 
 /**
- * \brief The pattern log token class encapsulation.
+ * \brief The log time accessor class encapsulation.
  */
-class LLBC_HIDDEN LLBC_LogNewLineToken : public LLBC_BaseLogToken
+class LLBC_EXPORT LLBC_LogTimeAccessor
 {
 public:
-    LLBC_LogNewLineToken() = default;
-    ~LLBC_LogNewLineToken() override = default;
+    /**
+     * Default ctor.
+     */
+    LLBC_LogTimeAccessor();
 
 public:
     /**
-     * Initialize the log token.
-     * @param[in] formatter       - log formatter.
-     * @param[in] logTimeAccessor - log time accessor.
-     * @param[in] str             - token append string data.
-     * @return int - return 0 if success, otherwise return -1.
+     * Get log time offset.
+     * @return sint64 - the log time offset, in microseconds.
      */
-    int Initialize(const LLBC_LogFormattingInfo &formatter,
-                   const LLBC_LogTimeAccessor &logTimeAccessor,
-                   const LLBC_String &str) override;
+    sint64 GetLogTimeOffset() const;
 
     /**
-     * Get token type.
-     * @return int - token type.
+     * @param[in] logTimeOffset - the log time offset.
      */
-    int GetType() const override;
+    void SetLogTimeOffset(const LLBC_TimeSpan &logTimeOffset);
 
     /**
-     * Format the log data.
-     * @param[in] data           - log data.
-     * @param[out] formattedData - store location for formatted log string.
+     * Get now log time in milliseconds.
+     * @return sint64 - now log time in milliseconds.
      */
-    void Format(const LLBC_LogData &data, LLBC_String &formattedData) const override;
+    sint64 NowInMilliseconds() const;
+
+    /**
+     * Get real now log time in milliseconds.
+     * @return sint64 - real now log time in milliseconds.
+     */
+    sint64 RealNowInMilliseconds() const;
+
+    /**
+     * Get now log time in microseconds.
+     * @return sint64 - now log time in microseconds.
+     */
+    sint64 NowInMicroseconds() const;
+    /**
+     * Get real now time in microseconds.
+     * @return sint64 - real now time in microseconds.
+     */
+    sint64 RealNowInMicroseconds() const;
+
+private:
+    sint64 _logTimeOffset;
 };
 
 __LLBC_NS_END
+
+#include "llbc/core/log/LogTimeAccessorInl.h"

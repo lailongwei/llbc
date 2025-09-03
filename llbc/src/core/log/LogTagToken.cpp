@@ -27,7 +27,9 @@
 
 __LLBC_NS_BEGIN
 
-int LLBC_LogTagToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
+int LLBC_LogTagToken::Initialize(const LLBC_LogFormattingInfo &formatter,
+                                 const LLBC_LogTimeAccessor &logTimeAccessor,
+                                 const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;
