@@ -165,6 +165,8 @@ public:
     constexpr LLBC_TimeSpan AddMillis(sint64 millis) const;
     constexpr LLBC_TimeSpan AddMicros(sint64 micros) const;
 
+    constexpr LLBC_TimeSpan operator-() const;
+
     constexpr LLBC_TimeSpan operator+(const LLBC_TimeSpan &span) const;
     constexpr LLBC_TimeSpan operator-(const LLBC_TimeSpan &span) const;
     constexpr LLBC_TimeSpan operator*(double scale) const;
