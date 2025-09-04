@@ -30,6 +30,7 @@ __LLBC_NS_BEGIN
  */
 class LLBC_Logger;
 class LLBC_LogRunnable;
+class LLBC_LogTimeAccessor;
 class LLBC_LoggerConfigInfo;
 
 __LLBC_NS_END
@@ -48,10 +49,12 @@ public:
 public:
     /**
      * Initialize logger configurator by cfg file.
-     * @param[in] cfgFilePath - the config file path.
+     * @param[in] cfgFilePath     - the config file path.
+     * @param[in] logTimeAccessor - the log time accessor.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_String &cfgFilePath);
+    int Initialize(const LLBC_String &cfgFilePath,
+                   const LLBC_LogTimeAccessor &logTimeAccessor);
 
     /**
      * @brief Get the config file path.
@@ -91,6 +94,7 @@ public:
 private:
     LLBC_String _cfgFilePath;
     LLBC_LoggerConfigInfo *_rootConfig;
+    const LLBC_LogTimeAccessor *_logTimeAccessor;
     std::map<LLBC_String, LLBC_LoggerConfigInfo *> _configs;
 };
 

@@ -22,15 +22,15 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/thread/Guard.h"
-
 #include "llbc/core/log/LogTraceToken.h"
 
 #include "llbc/core/log/LogData.h"
 
 __LLBC_NS_BEGIN
 
-int LLBC_LogTraceToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
+int LLBC_LogTraceToken::Initialize(const LLBC_LogFormattingInfo &formatter,
+                                   const LLBC_LogTimeAccessor &logTimeAccessor,
+                                   const LLBC_String &str)
 {
     SetFormatter(formatter);
     return LLBC_OK;

@@ -22,48 +22,59 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/time/Time.h"
-
 #include "llbc/core/log/LogData.h"
-#include "llbc/core/log/LogTimeToken.h"
+#include "llbc/core/log/LogTimeAccessor.h"
+#include "llbc/core/log/LogRealTimeToken.h"
 
 __LLBC_NS_BEGIN
 
-LLBC_LogTimeToken::LLBC_LogTimeToken()
+LLBC_LogRealTimeToken::LLBC_LogRealTimeToken()
 : _lastFmtTime(0)
 , _cacheLen(0)
 , _fmtCache{}
+
+, _alwaysFormat(false)
+, _logTimeAccessor(nullptr)
 {
 }
 
-int LLBC_LogTimeToken::Initialize(const LLBC_LogFormattingInfo &formatter,
-                                  const LLBC_LogTimeAccessor &logTimeAccessor,
-                                  const LLBC_String &str)
+int LLBC_LogRealTimeToken::Initialize(const LLBC_LogFormattingInfo &formatter,
+                                      const LLBC_LogTimeAccessor &logTimeAccessor,
+                                      const LLBC_String &str)
 {
     SetFormatter(formatter);
+
+    _alwaysFormat = (formatter.addiParam.tolower() == "alwaysformat");
+    _logTimeAccessor = &logTimeAccessor;
+
     return LLBC_OK;
 }
 
-int LLBC_LogTimeToken::GetType() const
+int LLBC_LogRealTimeToken::GetType() const
 {
     return LLBC_LogTokenType::TimeToken;
 }
 
-void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
+void LLBC_LogRealTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
+    // If don't need format when log time offset is zero, return.
+    if (!_alwaysFormat && _logTimeAccessor->GetLogTimeOffset() == 0)
+        return;
+
     // Format non millisecond part.
     const int index = static_cast<int>(formattedData.size());
-    const time_t timeInSeconds = static_cast<time_t>(data.logTime / 1000000);
+    const sint64 realTimeInMicros = data.logTime - _logTimeAccessor->GetLogTimeOffset();
+    const time_t realTimeInSeconds = static_cast<time_t>((realTimeInMicros) / 1000000);
 
-    if (timeInSeconds != _lastFmtTime)
+    if (realTimeInSeconds != _lastFmtTime)
     {
         tm timeStruct;
     #if LLBC_TARGET_PLATFORM_WIN32
-        localtime_s(&timeStruct, &timeInSeconds);
+        localtime_s(&timeStruct, &realTimeInSeconds);
     #else
-        localtime_r(&timeInSeconds, &timeStruct);
+        localtime_r(&realTimeInSeconds, &timeStruct);
     #endif
-        _lastFmtTime = timeInSeconds;
+        _lastFmtTime = realTimeInSeconds;
         _cacheLen = strftime(_fmtCache,
                              sizeof(_fmtCache),
                              "%y-%m-%d %H:%M:%S.", &timeStruct);
@@ -72,7 +83,7 @@ void LLBC_LogTimeToken::Format(const LLBC_LogData &data, LLBC_String &formattedD
     formattedData.append(_fmtCache, _cacheLen);
 
     // Format millisecond part.
-    formattedData.append_format("%06d", static_cast<int>(data.logTime % 1000000));
+    formattedData.append_format("%06d", static_cast<int>(realTimeInMicros % 1000000));
 
     GetFormatter().Format(formattedData, index);
 }

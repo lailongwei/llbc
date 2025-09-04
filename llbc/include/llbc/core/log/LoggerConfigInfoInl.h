@@ -33,6 +33,11 @@ inline bool LLBC_LoggerConfigInfo::IsNotConfigUseRoot() const
     return _notConfigUseRoot;
 }
 
+inline const LLBC_LogTimeAccessor &LLBC_LoggerConfigInfo::GetLogTimeAccessor() const
+{
+    return *_logTimeAccessor;
+}
+
 inline int LLBC_LoggerConfigInfo::GetLogLevel() const
 {
     return MIN(_consoleLogLevel, _fileLogLevel);

@@ -26,13 +26,19 @@
 __LLBC_NS_BEGIN
 
 /**
- * \brief The pattern log token class encapsulation.
+ * Pre-Declare classes.
  */
-class LLBC_HIDDEN LLBC_LogNewLineToken : public LLBC_BaseLogToken
+class LLBC_LogTimeAccessor;
+
+/**
+ * \brief The real time log token class encapsulation.
+ */
+class LLBC_HIDDEN LLBC_LogRealTimeToken : public LLBC_BaseLogToken
 {
 public:
-    LLBC_LogNewLineToken() = default;
-    ~LLBC_LogNewLineToken() override = default;
+    LLBC_LogRealTimeToken();
+
+    ~LLBC_LogRealTimeToken() override = default;
 
 public:
     /**
@@ -58,6 +64,14 @@ public:
      * @param[out] formattedData - store location for formatted log string.
      */
     void Format(const LLBC_LogData &data, LLBC_String &formattedData) const override;
+
+private:
+    mutable time_t _lastFmtTime;
+    mutable size_t _cacheLen;
+    mutable char _fmtCache[32];
+
+    bool _alwaysFormat;
+    const LLBC_LogTimeAccessor *_logTimeAccessor;
 };
 
 __LLBC_NS_END

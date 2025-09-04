@@ -29,6 +29,7 @@ __LLBC_NS_BEGIN
  * Pre-declare some classes.
  */
 struct LLBC_LogData;
+class LLBC_LogTimeAccessor;
 class LLBC_BaseLogToken;
 
 __LLBC_NS_END
@@ -47,10 +48,11 @@ public:
 public:
     /**
      * Build token chain by given pattern string.
-     * @param[in] pattern - the log pattern.
+     * @param[in] pattern         - the log pattern.
+     * @param[in] logTimeAccessor - the log time accessor.
      * @return int - return 0 if successed, otherwise return -1.
      */
-    int Build(const LLBC_String &pattern);
+    int Build(const LLBC_String &pattern, const LLBC_LogTimeAccessor &logTimeAccessor);
 
     /**
      * Format specific log data.

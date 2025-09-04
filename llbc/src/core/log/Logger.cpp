@@ -32,6 +32,7 @@
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogTrace.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
+#include "llbc/core/log/LogTimeAccessor.h"
 #include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/LogAppenderBuilder.h"
 #include "llbc/core/log/LogRunnable.h"
@@ -99,6 +100,8 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     _logLevel = config->GetLogLevel();
     _config = new LLBC_LoggerConfigInfo(*config);
 
+    _logTimeAccessor = &_config->GetLogTimeAccessor();
+
     _flushInterval = _config->GetFlushInterval();
 
     // Create console appender, if acquire.
@@ -108,6 +111,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         appenderInitInfo.logLevel = _config->GetConsoleLogLevel();
         appenderInitInfo.pattern = _config->GetConsolePattern();
         appenderInitInfo.colourfulOutput = _config->IsColourfulOutput();
+        appenderInitInfo.logTimeAccessor = &_config->GetLogTimeAccessor();
 
         LLBC_BaseLogAppender *appender = 
             LLBC_LogAppenderBuilderSingleton->BuildAppender(LLBC_LogAppenderType::Console);
@@ -128,6 +132,8 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
         LLBC_LogAppenderInitInfo appenderInitInfo;
         appenderInitInfo.logLevel = _config->GetFileLogLevel();
         appenderInitInfo.pattern = _config->GetFilePattern();
+        appenderInitInfo.logTimeAccessor = &_config->GetLogTimeAccessor();
+
         appenderInitInfo.filePath = _config->GetLogFile();
         appenderInitInfo.fileSuffix = _config->GetLogFileSuffix();
         appenderInitInfo.fileRollingMode = _config->GetFileRollingMode();
@@ -156,7 +162,16 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     // Set/Create log runnable.
     if (_config->IsAsyncMode())
     {
-        _logRunnable = _config->IsIndependentThread() ? new LLBC_LogRunnable : sharedLogRunnable;
+        if (_config->IsIndependentThread())
+        {
+            _logRunnable = new LLBC_LogRunnable;
+            _logRunnable->SetLogTimeAccessor(*_logTimeAccessor);
+        }
+        else
+        {
+            _logRunnable = sharedLogRunnable;
+        }
+
         _logRunnable->AddLogger(this);
 
         if (_config->IsIndependentThread())
@@ -409,7 +424,7 @@ int LLBC_Logger::NonFormatOutput(int level,
                                       file,
                                       line,
                                       func,
-                                      time != 0 ? time : LLBC_GetMicroseconds(),
+                                      time != 0 ? time : _logTimeAccessor->NowInMicroseconds(),
                                       msg,
                                       msgLen);
     if (_logHooks[level])
@@ -474,7 +489,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                              file,
                              line,
                              func,
-                             LLBC_GetMicroseconds(),
+                             _logTimeAccessor->NowInMicroseconds(),
                              data,
                              libTls);
 
@@ -658,7 +673,7 @@ void LLBC_Logger::Flush(bool force, sint64 now)
     if (!force)
     {
         if (now == 0)
-            now = LLBC_GetMilliseconds();
+            now = _logTimeAccessor->NowInMilliseconds();
         sint64 diff = now - _lastFlushTime;
         if (diff >= 0 && diff < _flushInterval)
             return;
@@ -668,7 +683,7 @@ void LLBC_Logger::Flush(bool force, sint64 now)
     FlushAppenders();
 
     // Update last flush time(use flushed time to avoid logger performance problem).
-    _lastFlushTime = now != 0 ? now : LLBC_GetMilliseconds();
+    _lastFlushTime = now != 0 ? now : _logTimeAccessor->NowInMilliseconds();
 }
 
 void LLBC_Logger::FlushAppenders()
@@ -714,6 +729,8 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
     _lastFlushTime = 0;
 
     LLBC_XDelete(_logTraceMgr);
+
+    _logTimeAccessor = nullptr;
 
     LLBC_XDelete(_config);
     _logLevel = LLBC_LogLevel::End;

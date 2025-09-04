@@ -28,7 +28,9 @@
 
 __LLBC_NS_BEGIN
 
-int LLBC_LogEnvToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
+int LLBC_LogEnvToken::Initialize(const LLBC_LogFormattingInfo &formatter,
+                                 const LLBC_LogTimeAccessor &logTimeAccessor,
+                                 const LLBC_String &str)
 {
     SetFormatter(formatter);
     if (!formatter.addiParam.empty())

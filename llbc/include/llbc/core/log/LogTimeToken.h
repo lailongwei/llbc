@@ -38,11 +38,14 @@ public:
 public:
     /**
      * Initialize the log token.
-     * @param[in] formatter - log formatter.
-     * @param[in] str       - token append string data.
+     * @param[in] formatter       - log formatter.
+     * @param[in] logTimeAccessor - log time accessor.
+     * @param[in] str             - token append string data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str) override;
+    int Initialize(const LLBC_LogFormattingInfo &formatter,
+                   const LLBC_LogTimeAccessor &logTimeAccessor,
+                   const LLBC_String &str) override;
 
     /**
      * Get token type.

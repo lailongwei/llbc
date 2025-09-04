@@ -30,6 +30,7 @@ __LLBC_NS_BEGIN
  */
 struct LLBC_LogData;
 class LLBC_LogTokenChain;
+class LLBC_LogTimeAccessor;
 
 __LLBC_NS_END
 
@@ -67,20 +68,21 @@ public:
  */
 struct LLBC_LogAppenderInitInfo
 {
-    int logLevel;                   // log level.
-    LLBC_String pattern;            // output pattern.
-    bool colourfulOutput;           // colourful output flag.
+    int logLevel;                                // log level.
+    LLBC_String pattern;                         // output pattern.
+    bool colourfulOutput;                        // colourful output flag.
+    const LLBC_LogTimeAccessor *logTimeAccessor; // log time accessor.
 
-    LLBC_String filePath;           // log file path, used in File type appender.
-    LLBC_String fileSuffix;         // log file suffix name, used in File type appender.
-    int fileRollingMode;            // file rolling mode flag, used in File type appender.
-    sint64 maxFileSize;             // max log file size, int bytes, used in File type appender.
-    int maxBackupIndex;             // max backup index, used in File type appender.
-    int fileBufferSize;             // file buffer size, used in File type appender.
-    bool lazyCreateLogFile;         // logfile create option, used in File type appender
+    LLBC_String filePath;                        // log file path, used in File type appender.
+    LLBC_String fileSuffix;                      // log file suffix name, used in File type appender.
+    int fileRollingMode;                         // file rolling mode flag, used in File type appender.
+    sint64 maxFileSize;                          // max log file size, int bytes, used in File type appender.
+    int maxBackupIndex;                          // max backup index, used in File type appender.
+    int fileBufferSize;                          // file buffer size, used in File type appender.
+    bool lazyCreateLogFile;                      // logfile create option, used in File type appender
 
-    LLBC_String ip;                 // Ip address, used in Network type appender.
-    uint16 port;                    // port, used in Network type appender.
+    LLBC_String ip;                              // Ip address, used in Network type appender.
+    uint16 port;                                 // port, used in Network type appender.
 };
 
 /**
@@ -151,6 +153,12 @@ protected:
     void SetAppenderNext(LLBC_BaseLogAppender *appender);
 
     /**
+     * Get log time accessor.
+     * @return const LLBC_LogTimeAccessor & - the log time accessor.
+     */
+    const LLBC_LogTimeAccessor &GetLogTimeAccessor() const;
+
+    /**
      * Get log formatter buffer.
      * @return LLBC_String & - log format buffer.
      */
@@ -175,6 +183,8 @@ private:
     volatile int _logLevel;
     LLBC_LogTokenChain *_chain;
     LLBC_BaseLogAppender *_next;
+
+    const LLBC_LogTimeAccessor *_logTimeAccessor;
 
     LLBC_String _logFmtBuf;
 };
