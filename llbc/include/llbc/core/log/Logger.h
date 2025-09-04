@@ -35,6 +35,7 @@ __LLBC_NS_BEGIN
  */
 struct LLBC_LogData;
 class LLBC_LoggerConfigInfo;
+class LLBC_LogTimeAccessor;
 class LLBC_BaseLogAppender;
 class LLBC_LogRunnable;
 
@@ -109,6 +110,12 @@ public:
      * @return bool - add timestamp in json log flag.
      */
     bool IsAddTimestampInJsonLog() const;
+
+    /**
+     * Get log time accessor.
+     * @return const LLBC_LogTimeAccessor & - the log time accessor.
+     */
+    const LLBC_LogTimeAccessor &GetLogTimeAccessor() const;
 
     /**
      * Get logger object pool.
@@ -422,6 +429,9 @@ private:
     volatile int _logLevel;
     // Logger config.
     LLBC_LoggerConfigInfo *_config;
+
+    // Log time accessor.
+    const LLBC_LogTimeAccessor *_logTimeAccessor;
 
     // Log trace manager.
     LLBC_LogTraceMgr *_logTraceMgr;

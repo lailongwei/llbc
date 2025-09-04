@@ -49,6 +49,7 @@ public:
         NewLineToken   = 'n', // %n: new line type.
         MsgToken       = 'm', // %m: message type token.
         TimeToken      = 'T', // %T: time token.
+        RealTimeToken  = 'R', // %R: same as %T, but output real time token.
         EnvToken       = 'E', // %E: environment token.
         LogTraceToken  = 'x', // %x: log trace token.
         EscapeToken    = '%', // %%: escape token.
@@ -61,6 +62,7 @@ public:
  * Pre-declare some classes.
  */
 struct LLBC_LogData;
+class LLBC_LogTimeAccessor;
 
 /**
  * \brief The basic log token class encapsulation.
@@ -74,11 +76,14 @@ public:
 public:
     /**
      * Initialize the log token.
-     * @param[in] formatter - log formatter.
-     * @param[in] str       - token append string data.
+     * @param[in] formatter       - log formatter.
+     * @param[in] logTimeAccessor - log time accessor.
+     * @param[in] str             - token append string data.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str) = 0;
+    virtual int Initialize(const LLBC_LogFormattingInfo &formatter,
+                           const LLBC_LogTimeAccessor &logTimeAccessor,
+                           const LLBC_String &str) = 0;
 
     /**
      * Get token type.

@@ -28,4 +28,9 @@ inline bool LLBC_LoggerMgr::IsInited() const
     return _rootLogger != nullptr;
 }
 
+inline const LLBC_LogTimeAccessor &LLBC_LoggerMgr::GetLogTimeAccessor() const
+{
+    return _logTimeAccessor;
+}
+
 __LLBC_NS_END

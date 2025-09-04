@@ -26,7 +26,9 @@
 
 __LLBC_NS_BEGIN
 
-int LLBC_LogNullToken::Initialize(const LLBC_LogFormattingInfo &formatter, const LLBC_String &str)
+int LLBC_LogNullToken::Initialize(const LLBC_LogFormattingInfo &formatter,
+                                  const LLBC_LogTimeAccessor &logTimeAccessor,
+                                  const LLBC_String &str)
 {
     return LLBC_OK;
 }

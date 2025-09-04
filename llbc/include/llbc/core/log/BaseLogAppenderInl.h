@@ -58,6 +58,11 @@ inline void LLBC_BaseLogAppender::SetAppenderNext(LLBC_BaseLogAppender *next)
     _next = next;
 }
 
+inline const LLBC_LogTimeAccessor &LLBC_BaseLogAppender::GetLogTimeAccessor() const
+{
+    return *_logTimeAccessor;
+}
+
 inline LLBC_String &LLBC_BaseLogAppender::GetLogFormatBuf()
 {
     return _logFmtBuf;

@@ -33,6 +33,12 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
     return _logLevel;
 }
 
+LLBC_FORCE_INLINE
+const LLBC_LogTimeAccessor &LLBC_Logger::GetLogTimeAccessor() const
+{
+    return *_logTimeAccessor;
+}
+
 inline const LLBC_ObjPool &LLBC_Logger::GetLoggerObjPool() const
 {
     LLBC_LockGuard guard(_lock);

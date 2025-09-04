@@ -57,12 +57,13 @@
                  %n: 换行符标记.
                  %m: 打印日志消息本身.
                  %T: 打印本地化时间格式的时间,如:'1970-01-01 00:00:00'.
+                 %R: 同%T格式类似, 不过打印的是进程真实时间(llbc 日志框架支持在初始化的时候设置log time offset, %T打印的其实是offset后的时间, 在不设置的情况下, 这两个时间是一样的)
                  %E{EnvName}: 打印环境变量, 如:%E{USER}.
                  %x: 日志追踪内容
                  %%: 打印一个字符'%'.
                  * : 其它字符将不被转议,照常打印.
             默认的格式(即不配置这一项的情况下采用的格式)为:'%T [%L] - %m%n' -->
-        <consolePattern>%T [tag:%g][logger:%N][thread_Id:%t][process_Id:%7p][%-5L][%f:%l,%F][Env(USERNAME):%E{USERNAME}][Env(HOME):%E{HOME}][%x] - %m%n</consolePattern>
+        <consolePattern>%T [tag:%g][logger:%N][thread_Id:%t][process_Id:%7p][%-5L][%f:%l,%F][Env(USERNAME):%E{USERNAME}][Env(HOME):%E{HOME}][realTime:%R{AlwaysFormat}][%x] - %m%n</consolePattern>
         <!-- 是否控制台输出时多彩输出. -->
         <colourfulOutput>true</colourfulOutput>
 
@@ -96,7 +97,7 @@
         <!-- 日志文件缓冲大小,在异步模式有效,默认40K. -->
         <fileBufferSize>8192</fileBufferSize>
         <!-- 文件输出时的日志格式. -->
-        <filePattern>%T [%-5L][%f:%l]&lt;exec:%-20e&gt;&lt;tag:%g&gt;&lt;logger:%N&gt;&lt;%x&gt; - %m%n</filePattern>
+        <filePattern>%T [%-5L][%f:%l]&lt;exec:%-20e&gt;&lt;tag:%g&gt;&lt;logger:%N&gt;&lt;realTime:%R&gt;&lt;%x&gt; - %m%n</filePattern>
         <!-- 文件滚动方式, 默认不滚动, 支持:
              - 不滚动: NoRolling/No
              - 按小时滚动: HourlyRolling/Hourly

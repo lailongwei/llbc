@@ -29,6 +29,7 @@ __LLBC_NS_BEGIN
  * Previous declare some classes.
  */
 class LLBC_Variant;
+class LLBC_LogTimeAccessor;
 
 __LLBC_NS_END
 
@@ -46,14 +47,16 @@ public:
 public:
     /**
      * Initialize logger config.
-     * @param[in] loggerName - the logger name.
-     * @param[in] cfg        - config property.
-     * @param[in] rootCfg    - the root logger config.
+     * @param[in] loggerName      - the logger name.
+     * @param[in] cfg             - config property.
+     * @param[in] rootCfg         - the root logger config.
+     * @param[in] logTimeAccessor - the log time accessor.
      * @return int - return 0 if success, otherwise return -1.
      */
     int Initialize(const LLBC_String &loggerName,
                    const LLBC_Variant &cfg,
-                   const LLBC_LoggerConfigInfo *rootCfg);
+                   const LLBC_LoggerConfigInfo *rootCfg,
+                   const LLBC_LogTimeAccessor &logTimeAccessor);
 
 public:
     /**
@@ -67,6 +70,12 @@ public:
      * @return bool - the use root option.
      */
     bool IsNotConfigUseRoot() const;
+
+    /**
+     * Get log time accessor.
+     * @return const LLBC_LogTimeAccessor & - the log time accessor.
+     */
+    const LLBC_LogTimeAccessor &GetLogTimeAccessor() const;
 
 public:
     /**
@@ -243,6 +252,8 @@ private:
 private:
     LLBC_String _loggerName;
     bool _notConfigUseRoot;
+
+    const LLBC_LogTimeAccessor *_logTimeAccessor;
 
     bool _asyncMode;
     bool _independentThread;

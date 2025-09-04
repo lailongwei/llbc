@@ -26,15 +26,13 @@
 
 #include "llbc/core/os/OS_Console.h"
 
-#include "llbc/core/helper/STLHelper.h"
-
 #include "llbc/core/thread/Guard.h"
 
 #include "llbc/core/log/LogLevel.h"
-#include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LoggerConfigurator.h"
-#include "llbc/core/log/LoggerMgr.h"
+#include "llbc/core/log/Logger.h"
 #include "llbc/core/log/LogRunnable.h"
+#include "llbc/core/log/LoggerMgr.h"
 
 __LLBC_NS_BEGIN
 
@@ -52,7 +50,8 @@ LLBC_LoggerMgr::~LLBC_LoggerMgr()
     Finalize();
 }
 
-int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath)
+int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath,
+                               const LLBC_TimeSpan &logTimeOffset)
 {
     LLBC_LockGuard guard(_lock);
 
@@ -63,15 +62,24 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath)
         return LLBC_FAILED;
     }
 
+    // Set log time offset to log time accessor.
+    _logTimeAccessor.SetLogTimeOffset(logTimeOffset);
+
     // Initialize logger configurator.
     LLBC_LoggerConfigurator *logConfigurator = new LLBC_LoggerConfigurator;
     LLBC_Defer(delete logConfigurator);
-    if (logConfigurator->Initialize(cfgFilePath) != LLBC_OK)
+    if (logConfigurator->Initialize(cfgFilePath, _logTimeAccessor) != LLBC_OK)
+    {
+        _logTimeAccessor.SetLogTimeOffset(LLBC_TimeSpan::zero);
         return LLBC_FAILED;
+    }
 
     // Create shared log runnable.
     if (logConfigurator->HasSharedAsyncLoggerConfigs())
+    {
         _sharedLogRunnable = new LLBC_LogRunnable;
+        _sharedLogRunnable->SetLogTimeAccessor(_logTimeAccessor);
+    }
 
     // Config root logger.
     _rootLogger = new LLBC_Logger;
@@ -80,6 +88,8 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath)
     {
         LLBC_XDelete(_rootLogger);
         LLBC_XDelete(_sharedLogRunnable);
+
+        _logTimeAccessor.SetLogTimeOffset(LLBC_TimeSpan::zero);
 
         return LLBC_FAILED;
     }
@@ -139,8 +149,8 @@ int LLBC_LoggerMgr::Reload(const LLBC_String &newCfgFilePath)
     // Load config file(use temporary LoggerConfigurator).
     auto logConfigurator = new LLBC_LoggerConfigurator;
     LLBC_Defer(delete logConfigurator);
-    if (logConfigurator->Initialize(
-            !newCfgFilePath.empty() ? newCfgFilePath : _cfgFilePath) != LLBC_OK)
+    if (logConfigurator->Initialize(!newCfgFilePath.empty() ? newCfgFilePath : _cfgFilePath,
+                                    _logTimeAccessor) != LLBC_OK)
         return LLBC_FAILED;
 
     // Re-Config root logger.
@@ -185,6 +195,8 @@ void LLBC_LoggerMgr::Finalize()
 
     // Clear _cfgFilePath.
     _cfgFilePath.clear();
+    // Reset _logTimeAccessor.
+    _logTimeAccessor.SetLogTimeOffset(LLBC_TimeSpan::zero);
 }
 
 LLBC_Logger *LLBC_LoggerMgr::GetRootLogger() const
