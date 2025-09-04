@@ -225,6 +225,11 @@ constexpr LLBC_TimeSpan LLBC_TimeSpan::AddMicros(sint64 micros) const
     return span;
 }
 
+constexpr LLBC_TimeSpan LLBC_TimeSpan::operator-() const
+{
+    return LLBC_TimeSpan(-_span);
+}
+
 constexpr LLBC_TimeSpan LLBC_TimeSpan::operator+(const LLBC_TimeSpan &span) const
 {
     return LLBC_TimeSpan(_span + span._span);
