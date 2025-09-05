@@ -1264,6 +1264,7 @@ LLBC_FORCE_INLINE void LLBC_Stream::Clear()
     {
         _readPos = _writePos = 0;
     }
+    _endian = LLBC_DefaultEndian;
 }
 
 LLBC_FORCE_INLINE LLBC_TypedObjPool<LLBC_Stream> *LLBC_Stream::GetTypedObjPool() const
