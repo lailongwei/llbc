@@ -43,6 +43,7 @@ private:
     int NonTrivialClsSerTest();
     int SerializableClsSerTest();
     int MovableReadTest();
+    int EndianThreadSpecObjPoolTest();
 
 private:
     static void GenRandStr(LLBC_String &str,
