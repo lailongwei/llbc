@@ -784,8 +784,15 @@ int TestCase_Com_Stream::EndianThreadSpecObjPoolTest()
 
     allocateStreamAndChangeEndian();
     auto stream = LLBC_ThreadSpecObjPool::GuardedUnsafeAcquire<LLBC_Stream>();
-    LLBC_PrintLn("- Reallocation stream obj. Obj endian field init value:%s, obj ptr:%p.",
-                 LLBC_Endian::Type2Str(stream->GetEndian()), stream.Get());
+    if (stream->GetEndian() != LLBC_DefaultEndian)
+    {
+        LLBC_PrintLn("- Reallocation stream obj. Obj endian field init value:%s not reset to default:%s, obj ptr:%p.",
+                     LLBC_Endian::Type2Str(stream->GetEndian()), LLBC_Endian::Type2Str(LLBC_DefaultEndian), stream.Get());
+        return LLBC_FAILED;
+    }
+
+    LLBC_PrintLn("- Reallocation stream obj. Obj endian field init value:%s reset to default:%s, obj ptr:%p.",
+                 LLBC_Endian::Type2Str(stream->GetEndian()), LLBC_Endian::Type2Str(LLBC_DefaultEndian), stream.Get());
 
     return LLBC_OK;
 }
