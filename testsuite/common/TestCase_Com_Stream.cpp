@@ -238,6 +238,7 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     LLBC_ReturnIf(NonTrivialClsSerTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(SerializableClsSerTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(MovableReadTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(EndianThreadSpecObjPoolTest() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -759,6 +760,39 @@ int TestCase_Com_Stream::MovableReadTest()
     LLBC_PrintLn("- After called Read<MovableCls>():");
     LLBC_PrintLn("  - stream:%s", stream.ToString().c_str());
     LLBC_PrintLn("  - movableObj2:%d %s", movableObj2.intVal, movableObj2.strVal.c_str());
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_Stream::EndianThreadSpecObjPoolTest()
+{
+    // Stream obj pool test: reallocate stream obj and check whether the endian field of the stream is reset.
+    LLBC_PrintLn("EndianThreadSpecObjPoolTest test:");
+    LLBC_PrintLn("- Default endian:%s", LLBC_Endian::Type2Str(LLBC_DefaultEndian));
+
+    auto allocateStreamAndChangeEndian = []()
+    {
+        auto stream = LLBC_ThreadSpecObjPool::GuardedUnsafeAcquire<LLBC_Stream>();
+        int initEndian = stream->GetEndian();
+        if (initEndian == LLBC_Endian::BigEndian)
+            stream->SetEndian(LLBC_Endian::LittleEndian);
+        else
+            stream->SetEndian(LLBC_Endian::BigEndian);
+        LLBC_PrintLn("- Change obj pool stream obj endian field. Field init value:%s, change to value:%s, obj ptr:%p.",
+                     LLBC_Endian::Type2Str(initEndian), LLBC_Endian::Type2Str(stream->GetEndian()), stream.Get());
+    };
+
+    allocateStreamAndChangeEndian();
+    auto stream = LLBC_ThreadSpecObjPool::GuardedUnsafeAcquire<LLBC_Stream>();
+    if (stream->GetEndian() != LLBC_DefaultEndian)
+    {
+        LLBC_PrintLn("- Reallocation stream obj. Obj endian field init value:%s not reset to default:%s, obj ptr:%p.",
+                     LLBC_Endian::Type2Str(stream->GetEndian()), LLBC_Endian::Type2Str(LLBC_DefaultEndian), stream.Get());
+        return LLBC_FAILED;
+    }
+
+    LLBC_PrintLn("- Reallocation stream obj. Obj endian field init value:%s reset to default:%s, obj ptr:%p.",
+                 LLBC_Endian::Type2Str(stream->GetEndian()), LLBC_Endian::Type2Str(LLBC_DefaultEndian), stream.Get());
 
     return LLBC_OK;
 }
