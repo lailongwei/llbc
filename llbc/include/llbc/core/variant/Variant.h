@@ -165,14 +165,23 @@ public:
 
             union ObjType
             {
-                Str *str;
-                Dict *dict;
-                Seq *seq;
+                Str str;
+                Dict dict;
+                Seq seq;
+
+                ObjType() {}
+                ~ObjType() {}
             } obj;
+
+            DataType() {}
+            ~DataType() {}
         } data;
 
-        Holder();
-        ~Holder();
+        Holder() = default;
+        ~Holder() { Clear(); }
+
+        Holder(const Holder& other);
+        Holder& operator=(const Holder& other);
 
         LLBC_VariantType::ENUM GetFirstType() const;
 
@@ -590,7 +599,7 @@ private:
     Dict::size_type DictEraseKey(const Dict::key_type &key);
 
 private:
-    struct Holder _holder;
+    struct Holder _holder = {};
     static Str **_num2StrFastAccessTbl;
 };
 
