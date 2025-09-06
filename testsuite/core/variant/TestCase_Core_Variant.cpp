@@ -21,46 +21,22 @@
 
 
 #include "core/variant/TestCase_Core_Variant.h"
-#include "TestCase_Core_Variant.h"
 
 int TestCase_Core_Variant::Run(int argc, char *argv[])
 {
-    std::cout << "LLBC_Variant test:" << std::endl;
-
-    BasicTest();
-    std::cout << std::endl;
-
-    StringTest();
-    std::cout << std::endl;
-
-    EnumTest();
-    std::cout << std::endl;
-
-    CompareTest();
-    std::cout << std::endl;
-
-    CompositeKeyTest();
-    std::cout << std::endl;
-
-    ArithmeticTest();
-    std::cout << std::endl;
-
-    PairTest();
-    std::cout << std::endl;
-
-    SeqTest();
-    std::cout << std::endl;
-
-    DictTest();
-    std::cout << std::endl;
-
-    SerializeTest();
-    std::cout << std::endl;
-
-    HashTest();
-    std::cout << std::endl;
-
-    ConvertToUnurderedStlContainerTest();
+    LLBC_Expect(BasicTest() == LLBC_OK);
+    LLBC_Expect(BecomeTest() == LLBC_OK);
+    LLBC_Expect(StringTest() == LLBC_OK);
+    LLBC_Expect(EnumTest() == LLBC_OK);
+    LLBC_Expect(CompareTest() == LLBC_OK);
+    LLBC_Expect(CompositeKeyTest() == LLBC_OK);
+    LLBC_Expect(ArithmeticTest() == LLBC_OK);
+    LLBC_Expect(PairTest() == LLBC_OK);
+    LLBC_Expect(SeqTest() == LLBC_OK);
+    LLBC_Expect(DictTest() == LLBC_OK);
+    LLBC_Expect(SerializeTest() == LLBC_OK);
+    LLBC_Expect(HashTest() == LLBC_OK);
+    LLBC_Expect(ObjTest() == LLBC_OK);
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();
@@ -68,120 +44,95 @@ int TestCase_Core_Variant::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Variant::BasicTest()
+int TestCase_Core_Variant::BasicTest()
 {
-    std::cout << "Basic test:" << std::endl;
+    LLBC_PrintLn("LLBC Variant Basic test: ");
 
+    // Nil value test.
     LLBC_Variant nilVal;
-    LLBC_Variant boolVal(true);
-    LLBC_Variant int8Val((sint8)-8);
-    LLBC_Variant uint8Val((uint8)8);
-    LLBC_Variant int16Val((sint16)-16);
-    LLBC_Variant uint16Val((uint16)16);
-    LLBC_Variant int32Val((sint32)-32);
-    LLBC_Variant uint32Val((uint32)32);
-    LLBC_Variant longVal((long)-10086);
-    LLBC_Variant ulongVal((LLBC_NS ulong)10086);
-    uint64 ptrAddr = 0x80000000;
-    void *ptr; memcpy(&ptr, &ptrAddr, sizeof(void *));
+    LLBC_Expect(nilVal.IsNil() == true);
+
+    // Bool value test.
+    LLBC_Variant boolVal1(true);
+    LLBC_Expect(boolVal1.IsBool() == true && boolVal1 == true);
+
+    LLBC_Variant boolVal2(false);
+    LLBC_Expect(boolVal2.IsBool() == true && boolVal2 == false);
+
+    // Sint8 value test.
+    LLBC_Variant int8Val1(std::numeric_limits<sint8>::min());
+    LLBC_Expect(int8Val1.IsInt8() == true && int8Val1 == std::numeric_limits<sint8>::min());
+
+    LLBC_Variant int8Val2(std::numeric_limits<sint8>::max());
+    LLBC_Expect(int8Val2.IsInt8() == true && int8Val2 == std::numeric_limits<sint8>::max());
+
+    // Uint8 value test.
+    LLBC_Variant uint8Val1(std::numeric_limits<uint8>::min());
+    LLBC_Expect(uint8Val1.IsUInt8() == true && uint8Val1 == std::numeric_limits<uint8>::min());
+
+    LLBC_Variant uint8Val2(std::numeric_limits<uint8>::max());
+    LLBC_Expect(uint8Val2.IsUInt8() == true && uint8Val2 == std::numeric_limits<uint8>::max());
+
+    // Sint16 value test.
+    LLBC_Variant int16Val1(std::numeric_limits<sint16>::min());
+    LLBC_Expect(int16Val1.IsInt16() == true && int16Val1 == std::numeric_limits<sint16>::min());
+
+    LLBC_Variant int16Val2(std::numeric_limits<sint16>::max());
+    LLBC_Expect(int16Val2.IsInt16() == true && int16Val2 == std::numeric_limits<sint16>::max());
+
+    // Uint16 value test.
+    LLBC_Variant uint16Val1(std::numeric_limits<uint16>::min());
+    LLBC_Expect(uint16Val1.IsUInt16() == true && uint16Val1 == std::numeric_limits<uint16>::min());
+
+    LLBC_Variant uint16Val2(std::numeric_limits<uint16>::max());
+    LLBC_Expect(uint16Val2.IsUInt16() == true && uint16Val2 == std::numeric_limits<uint16>::max());
+
+    // Int32 value test.
+    LLBC_Variant int32Val1(std::numeric_limits<sint32>::min());
+    LLBC_Expect(int32Val1.IsInt32() == true && int32Val1 == std::numeric_limits<sint32>::min());
+
+    LLBC_Variant int32Val2(std::numeric_limits<sint32>::max());
+    LLBC_Expect(int32Val2.IsInt32() == true && int32Val2 == std::numeric_limits<sint32>::max());
+
+    // Int64 value test.
+    LLBC_Variant int64Val1(std::numeric_limits<sint64>::min());
+    LLBC_Expect(int64Val1.IsInt64() == true && int64Val1 == std::numeric_limits<sint64>::min());
+
+    LLBC_Variant int64Val2(std::numeric_limits<sint64>::max());
+    LLBC_Expect(int64Val2.IsInt64() == true && int64Val2 == std::numeric_limits<sint64>::max());
+
+    // Uint64 value test.
+    LLBC_Variant uint64Val1(std::numeric_limits<uint64>::min());
+    LLBC_Expect(uint64Val1.IsUInt64() == true && uint64Val1 == std::numeric_limits<uint64>::min());
+
+    LLBC_Variant uint64Val2(std::numeric_limits<uint64>::max());
+    LLBC_Expect(uint64Val2.IsUInt64() == true && uint64Val2 == std::numeric_limits<uint64>::max());
+
+    // Float value test.
+    LLBC_Variant floatVal1(std::numeric_limits<float>::min());
+    LLBC_Expect(floatVal1.IsFloat() == true && floatVal1 == std::numeric_limits<float>::min());
+
+    LLBC_Variant floatVal2(std::numeric_limits<float>::max());
+    LLBC_Expect(floatVal2.IsFloat() == true && floatVal2 == std::numeric_limits<float>::max());
+
+    // Double value test.
+    LLBC_Variant doubleVal1(std::numeric_limits<double>::min());
+    LLBC_Expect(doubleVal1.IsDouble() == true && doubleVal1 == std::numeric_limits<double>::min());
+
+    LLBC_Variant doubleVal2(std::numeric_limits<double>::max());
+    LLBC_Expect(doubleVal2.IsDouble() == true && doubleVal2 == std::numeric_limits<double>::max());
+
+    // Pointer value test.
+    void *ptr = reinterpret_cast<void *>(0x12345678ABCDEF00);
     LLBC_Variant ptrVal(ptr);
-    LLBC_Variant int64Val((sint64)-64);
-    LLBC_Variant uint64Val((uint64)64);
-    LLBC_Variant floatVal((float)88.0);
-    LLBC_Variant doubleVal((double)-88.0);
-    LLBC_Variant strVal("Hello");
-    LLBC_Variant looseBoolVal1("   true ");
-    LLBC_Variant looseBoolVal2("   yes ");
-    LLBC_Variant looseBoolVal3("   false ");
-    LLBC_Variant looseBoolVal4("   -4 ");
-    LLBC_Variant looseBoolVal5("   0 ");
-    LLBC_Variant looseBoolVal6("   0.0 ");
-    LLBC_Variant looseBoolVal7("   1.3 ");
+    LLBC_Expect(ptrVal.IsPtr() == true && ptrVal == ptr);
 
-    std::cout << "nil val, isNil: "
-        << (nilVal.IsNil() ? "true" : "false") << ", ToString: " << nilVal << std::endl;
-    std::cout << "bool val, isBool: "
-        << (boolVal.IsBool() ? "true" : "false") << ", ToString: " << boolVal << std::endl;
-    std::cout << "int8Val, isInt8: "
-        << (int8Val.IsInt8() ? "true" : "false") << ", ToString: " << int8Val << std::endl;
-    std::cout << "uint8Val, isUInt8: "
-        << (uint8Val.IsUInt8() ? "true" : "false") << ", ToString: " << uint8Val << std::endl;
-    std::cout << "int16Val, isInt16: "
-        << (int16Val.IsInt16() ? "true" : "false") << ", ToString: " << int16Val << std::endl;
-    std::cout << "uint16Val, isUInt16: "
-        << (uint16Val.IsUInt16() ? "true" : "false") << ", ToString: " << uint16Val << std::endl;
-    std::cout << "int32Val, isInt32: "
-        << (int32Val.IsInt32() ? "true" : "false") << ", ToString: " << int32Val << std::endl;
-    std::cout << "uint32Val, isUInt32: "
-        << (uint32Val.IsUInt32() ? "true" : "false") << ", ToString: " << uint32Val << std::endl;
-    std::cout << "longVal, isLong: "
-        << (longVal.IsLong() ? "true" : "false") << ", ToString: " << longVal << std::endl;
-    std::cout << "ulongVal, isULong: "
-        << (ulongVal.IsULong() ? "true" : "false") << ", ToString: " << ulongVal << std::endl;
-    std::cout << "ptrVal, isPtr: "
-        << (ptrVal.IsPtr() ? "true" : "false") << ", ToString: " << ptrVal << std::endl;
-    std::cout << "int64Val, isInt64: "
-        << (int64Val.IsInt64() ? "true" : "false") << ", ToString: " << int64Val << std::endl;
-    std::cout << "uint64Val, isUInt64: "
-        << (uint64Val.IsUInt64() ? "true" : "false") << ", ToString: " << uint64Val << std::endl;
-    std::cout << "floatVal, isFloat: "
-        << (floatVal.IsFloat() ? "true" : "false") << ", ToString: " << floatVal << std::endl;
-    std::cout << "doubleVal, isDouble: "
-        << (doubleVal.IsDouble() ? "true" : "false") << ", ToString: " << doubleVal << std::endl;
-    std::cout << "strVal, isStr: "
-        << (strVal.IsStr() ? "true" : "false") << ", ToString: " << strVal << std::endl;
-    std::cout << "looseBoolVal1: "
-        << looseBoolVal1 << ", AsBool(): " << looseBoolVal1.AsLooseBool() << std::endl;
-    std::cout << "looseBoolVal2: "
-        << looseBoolVal2 << ", AsBool(): " << looseBoolVal2.AsLooseBool() << std::endl;
-    std::cout << "looseBoolVal3: "
-        << looseBoolVal3 << ", AsBool(): " << looseBoolVal3.AsLooseBool() << std::endl;
-    std::cout << "looseBoolVal4: "
-        << looseBoolVal4 << ", AsBool(): " << looseBoolVal4.AsLooseBool() << std::endl;
-    std::cout << "looseBoolVal5: "
-        << looseBoolVal5 << ", AsBool(): " << looseBoolVal5.AsLooseBool() << std::endl;
-    std::cout << "looseBoolVal6: "
-        << looseBoolVal6 << ", AsBool(): " << looseBoolVal6.AsLooseBool() << std::endl;
-    std::cout << "looseBoolVal7: "
-        << looseBoolVal7 << ", AsBool(): " << looseBoolVal7.AsLooseBool() << std::endl;
-    std::cout << std::endl;
+    // String value test.
+    LLBC_Variant strVal("Hello LLBC Variant");
+    LLBC_Expect(strVal.IsStr() == true && strVal == "Hello LLBC Variant");
 
-    LLBC_Variant become(3);
-    std::cout << "origin value: " << become << std::endl;
-    become.BecomeStr();
-    std::cout << "become to Sring: " << become << std::endl;
-    become.BecomeBool();
-    std::cout << "become bool: " << become << std::endl;
-    become.BecomeInt8();
-    std::cout << "become int8: " << become << std::endl;
-    become.BecomeUInt8();
-    std::cout << "become uint8: " << become << std::endl;
-    become.BecomeInt16();
-    std::cout << "become int16: " << become << std::endl;
-    become.BecomeUInt16();
-    std::cout << "become uint16: " << become << std::endl;
-    become.BecomeInt32();
-    std::cout << "become int32: " << become << std::endl;
-    become.BecomeUInt32();
-    std::cout << "become uint32: " << become << std::endl;
-    become.BecomeLong();
-    std::cout << "become long: " << become << std::endl;
-    become.BecomeULong();
-    std::cout << "become ulong: " << become << std::endl;
-    become.BecomePtr();
-    std::cout << "become ptr: " << become << std::endl;
-    become.BecomeInt64();
-    std::cout << "become int64: " << become << std::endl;
-    become.BecomeUInt64();
-    std::cout << "become uint64: " << become << std::endl;
-    become.BecomeFloat();
-    std::cout << "become float: " << become << std::endl;
-    become.BecomeDouble();
-    std::cout << "become double: " << become << std::endl;
-    become.BecomeNil();
-    std::cout << "become Nil: " << become << std::endl;
-    become.BecomeBool();
-    std::cout << "become bool: " << become << std::endl;
+    LLBC_PrintLn("passed");
+    return LLBC_OK;
 
     int intData = 300;
     ptrVal = &intData;
@@ -209,46 +160,147 @@ void TestCase_Core_Variant::BasicTest()
     std::cout << "- construct from mstr:\"" << mutableHeyStr << "\":" << constructFromMStr <<std::endl;
 }
 
-void TestCase_Core_Variant::StringTest()
+int TestCase_Core_Variant::BecomeTest()
 {
+    LLBC_PrintLn("LLBC Variant Become test: ");
+
+    LLBC_Variant variant;
+
+    // Nil become test.
+    variant.BecomeNil();
+    LLBC_Expect(variant.IsNil() == true);
+
+    // Bool become test.
+    variant.BecomeBool();
+    LLBC_Expect(variant.IsBool() == true && variant == false);
+
+    // Sint8 become test.
+    variant.BecomeInt8();
+    LLBC_Expect(variant.IsInt8() == true && variant == 0);
+
+    // Uint8 become test.
+    variant.BecomeUInt8();
+    LLBC_Expect(variant.IsUInt8() == true && variant == 0);
+
+    // Sint16 become test.
+    variant.BecomeInt16();
+    LLBC_Expect(variant.IsInt16() == true && variant == 0);
+
+    // Uint16 become test.
+    variant.BecomeUInt16();
+    LLBC_Expect(variant.IsUInt16() == true && variant == 0);
+
+    // Sint32 become test.
+    variant.BecomeInt32();
+    LLBC_Expect(variant.IsInt32() == true && variant == 0);
+
+    // Uint32 become test.
+    variant.BecomeUInt32();
+    LLBC_Expect(variant.IsUInt32() == true && variant == 0);
+
+    // Sint64 become test.
+    variant.BecomeInt64();
+    LLBC_Expect(variant.IsInt64() == true && variant == 0);
+
+    // Uint64 become test.
+    variant.BecomeUInt64();
+    LLBC_Expect(variant.IsUInt64() == true && variant == 0);
+
+    // Float become test.
+    variant.BecomeFloat();
+    LLBC_Expect(variant.IsFloat() == true && variant == 0.0f);
+
+    // Double become test.
+    variant.BecomeDouble();
+    LLBC_Expect(variant.IsDouble() == true && variant == 0.0);
+
+    // Pointer become test.
+    variant.BecomePtr();
+    LLBC_Expect(variant.IsPtr() == true && variant == nullptr);
+
+    // String become test.
+    variant.BecomeStr();
+    LLBC_Expect(variant.IsStr() == true && variant == "");
+
+    LLBC_PrintLn("passed");
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::StringTest()
+{
+    LLBC_PrintLn("LLBC Variant String test: ");
+
+    // Construct test.
     LLBC_Variant v1("Hello world");
-    std::cout << "String test: " << std::endl;
-    std::cout << "  - default construct: " << v1 << std::endl;
+    LLBC_Expect(v1.IsStr() == true && v1 == "Hello world");
 
     LLBC_Variant v2(std::string("Hello world"));
-    std::cout << "  - construct(std::string): " << v2 << std::endl;
+    LLBC_Expect(v2.IsStr() == true && v2 == "Hello world");
 
     LLBC_Variant v3(LLBC_String("Hello world"));
-    std::cout << "  - construct(LLBC_String): " << v3 << std::endl;
+    LLBC_Expect(v3.IsStr() == true && v3 == "Hello world");
 
     LLBC_Variant v4(LLBC_CString("Hello world"));
-    std::cout << "  - construct(LLBC_CString): " << v4 << std::endl;
+    LLBC_Expect(v4.IsStr() == true && v4 == "Hello world");
 
+    // Assignment operator test.
     LLBC_Variant v5;
     v5 = "Hello world";
-    std::cout << "  - operator=(const char *): " << v5 << std::endl;
+    LLBC_Expect(v5.IsStr() == true && v5 == "Hello world");
 
     LLBC_Variant v6;
     v6 = std::string("Hello world");
-    std::cout << "  - operator=(std::string): " << v6 << std::endl;
+    LLBC_Expect(v6.IsStr() == true && v6 == "Hello world");
 
     LLBC_Variant v7;
     v7 = LLBC_String("Hello world");
-    std::cout << "  - operator=(LLBC_String): " << v7 << std::endl;
+    LLBC_Expect(v7.IsStr() == true && v7 == "Hello world");
 
     LLBC_Variant v8;
     v8 = LLBC_CString("Hello world");
-    std::cout << "  - operator=(LLBC_CString): " << v8 << std::endl;
+    LLBC_Expect(v8.IsStr() == true && v8 == "Hello world");
+
+    // Copy construct test.
+    LLBC_Variant v9(v1);
+    LLBC_Expect(v9.IsStr() == true && v9 == "Hello world");
+
+    // Copy assignment test.
+    LLBC_Variant v10;
+    v10 = v1;
+    LLBC_Expect(v10.IsStr() == true && v10 == "Hello world");
+
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::EnumTest()
+int TestCase_Core_Variant::EnumTest()
 {
+    LLBC_PrintLn("LLBC Variant Enum test: ");
+
     enum TraditionalStyleEnum
     {
         A = 3,
         B = 4,
         C = 5
     };
+
+    // Traditional style enum test.
+    // Traditional style enum construct test.
+    LLBC_Variant tse1(TraditionalStyleEnum::A);
+    LLBC_Expect(tse1 == TraditionalStyleEnum::A);
+
+    // Traditional style enum AsEnum<> test.
+    LLBC_Variant tse2(4);
+    LLBC_Expect(tse2.AsEnum<TraditionalStyleEnum>() == TraditionalStyleEnum::B);
+
+    // Traditional style enum operator<Enum> test.
+    TraditionalStyleEnum tse3 = tse1;
+    LLBC_Expect(tse3 == TraditionalStyleEnum::A);
+
+    // Traditional style enum operator=(Enum) test.
+    LLBC_Variant tse4;
+    tse4 = TraditionalStyleEnum::C;
+    LLBC_Expect(tse4 == TraditionalStyleEnum::C);
+
 
     enum class ClassStyleEnum
     {
@@ -257,268 +309,341 @@ void TestCase_Core_Variant::EnumTest()
         Z = -1
     };
 
-    std::cout << "Enum test: " << std::endl;
-    {
-        std::cout << "- Triditional style enum:" << std::endl;
+    // Class style enum test.
+    // Class style enum construct test.
+    LLBC_Variant cste1(ClassStyleEnum::X);
+    LLBC_Expect(cste1 == ClassStyleEnum::X);
 
-        LLBC_Variant tse1(TraditionalStyleEnum::A);
-        std::cout << "  - default construct: " << tse1 << std::endl;
+    // Class style enum AsEnum<> test.
+    LLBC_Variant cste2(-2);
+    LLBC_Expect(cste2.AsEnum<ClassStyleEnum>() == ClassStyleEnum::Y);
 
-        LLBC_Variant tse2(3);
-        std::cout << "  - AsEnum<> return: " << tse2.AsEnum<TraditionalStyleEnum>() << std::endl;
+    // Class style enum operator<Enum> test.
+    ClassStyleEnum cste3 = cste1;
+    LLBC_Expect(cste3 == ClassStyleEnum::X);
 
-        TraditionalStyleEnum tse3 = tse1;
-        std::cout << "  - operator<Enum> return: " << tse3 << std::endl;
+    // Class style enum operator=(Enum) test.
+    LLBC_Variant cste4;
+    cste4 = ClassStyleEnum::Z;
+    LLBC_Expect(cste4 == ClassStyleEnum::Z);
 
-        LLBC_Variant tse4;
-        tse4 = TraditionalStyleEnum::C;
-        std::cout << "  - operator=(Enum): " << tse4 << std::endl;
-
-        std::cout << "  - static_cast<Enum>(nil): " << static_cast<TraditionalStyleEnum>(LLBC_Variant()) << std::endl;
-    }
-
-    {
-        std::cout << "- Class style enum:" << std::endl;
-
-        LLBC_Variant cse1(ClassStyleEnum::X);
-        std::cout << "  - default construct: " << cse1<< std::endl;
-
-        LLBC_Variant cse2(-2);
-        std::cout << "  - AsEnum<> return: "
-                  << static_cast<int>(cse2.AsEnum<ClassStyleEnum>()) << std::endl;
-
-        ClassStyleEnum cse3 = cse1;
-        std::cout << "  - operator<Enum> return: "
-                  << static_cast<int>(cse3) << std::endl;
-
-        LLBC_Variant cse4;
-        cse4 = ClassStyleEnum::Z;
-        std::cout << "  - operator(Enum): " << cse4 << std::endl;
-
-        std::cout << "  - static_cast<Enum>(nil): "
-                  << static_cast<int>(static_cast<ClassStyleEnum>(LLBC_Variant())) << std::endl;
-    }
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::CompareTest()
+int TestCase_Core_Variant::CompareTest()
 {
-    std::cout << "Compare test: " << std::endl;
+    LLBC_PrintLn("LLBC Variant Compare test: ");
 
+    // Nil compare test.
     LLBC_Variant nil;
+    LLBC_Expect((nil < nil) == false);
+    LLBC_Expect((nil > nil) == false);
+    LLBC_Expect((nil == nil) == true);
+
+    // Bool compare test.
     LLBC_Variant boolTrue(true);
     LLBC_Variant boolFalse(false);
-    std::cout << "nil < nil?: " << (nil < nil) << ", nil == nil?: " << (nil == nil) << std::endl;
-    std::cout << "nil < boolTrue?: " << (nil < boolTrue) << ", nil == boolTrue?: " << (nil == boolTrue) << std::endl;
-    std::cout << "nil < boolFalse?: " << (nil < boolFalse) << ", nil == boolFalse?: " << (nil == boolFalse) << std::endl;
-    std::cout << "boolTrue < boolTrue?: " << (boolTrue < boolTrue) << ", boolTrue == boolTrue?: " << (boolTrue == boolTrue) << std::endl;
-    std::cout << "boolFalse < boolFalse?: " << (boolFalse < boolFalse) << ", boolFalse == boolFalse?: " << (boolFalse == boolFalse) << std::endl;
-    std::cout << "boolTrue < boolFalse?: " << (boolTrue < boolFalse) << ", boolTrue == boolFalse?: " << (boolTrue == boolFalse) << std::endl;
-    std::cout << "boolFalse < boolTrue?: " << (boolFalse < boolTrue) << ", boolFalse == boolTrue?: " << (boolFalse == boolTrue) << std::endl;
 
+    LLBC_Expect((boolTrue < boolTrue) == false);
+    LLBC_Expect((boolTrue > boolTrue) == false);
+    LLBC_Expect((boolTrue == boolTrue) == true);
+
+    LLBC_Expect((boolFalse < boolFalse) == false);
+    LLBC_Expect((boolFalse > boolFalse) == false);
+    LLBC_Expect((boolFalse == boolFalse) == true);
+
+    LLBC_Expect((boolTrue < boolFalse) == false);
+    LLBC_Expect((boolTrue > boolFalse) == true);
+    LLBC_Expect((boolTrue == boolFalse) == false);
+    LLBC_Expect((boolFalse < boolTrue) == true);
+    LLBC_Expect((boolFalse > boolTrue) == false);
+    LLBC_Expect((boolFalse == boolTrue) == false);
+
+    // Int compare test.
     LLBC_Variant int0(0);
     LLBC_Variant int1(1);
-    LLBC_Variant int10010(10010);
-    LLBC_Variant int10086(10086);
-    std::cout << "nil < int10010?: " << (nil < int10010) << ", nil == int10010?: " << (nil == int10010) << std::endl;
-    std::cout << "int0 < boolFalse?: " << (int0 < boolFalse) << ", int0 == boolFalse?: " << (int0 == boolFalse) << std::endl;
-    std::cout << "int1 < boolTrue?: " << (int1 < boolTrue) << ", int1 == boolTrue?: " << (int1 == boolTrue) << std::endl;
-    std::cout << "int10010 < int10086?: " << (int10010 < int10086) << ", int10010 == int10086?: " << (int10010 == int10086) << std::endl;
-    std::cout << "int10086 < int10010?: " << (int10086 < int10010) << ", int10086 == int10010?: " << (int10086 == int10010) << std::endl;
-    std::cout << "int10086 < int10086?: " << (int10086 < int10086) << ", int10086 == int10086?: " << (int10086 == int10086) << std::endl;
+    LLBC_Variant int2(-1);
 
+    LLBC_Expect((int0 < int0) == false);
+    LLBC_Expect((int0 > int0) == false);
+    LLBC_Expect((int0 == int0) == true);
+
+    LLBC_Expect((int1 < int1) == false);
+    LLBC_Expect((int1 > int1) == false);
+    LLBC_Expect((int1 == int1) == true);
+
+    LLBC_Expect((int2 < int2) == false);
+    LLBC_Expect((int2 > int2) == false);
+    LLBC_Expect((int2 == int2) == true);
+
+    LLBC_Expect((int0 < int1) == true);
+    LLBC_Expect((int0 > int1) == false);
+    LLBC_Expect((int0 == int1) == false);
+
+    LLBC_Expect((int1 < int0) == false);
+    LLBC_Expect((int1 > int0) == true);
+    LLBC_Expect((int1 == int0) == false);
+
+    LLBC_Expect((int2 < int0) == true);
+    LLBC_Expect((int2 > int0) == false);
+    LLBC_Expect((int2 == int0) == false);
+
+    LLBC_Expect((int0 < int2) == false);
+    LLBC_Expect((int0 > int2) == true);
+    LLBC_Expect((int0 == int2) == false);
+
+    // Double compare test.
     LLBC_Variant dbl10010(10010.0);
     LLBC_Variant dbl10086(10086.0);
-    std::cout << "nil < dbl10010?: " << (nil < dbl10010) << ", nil == dbl10010?:" << (nil == dbl10010) << std::endl;
-    std::cout << "int0 < dbl10010?: " << (int0 < dbl10010) << ", int0 == dbl10010?: " << (int0 == dbl10010) << std::endl;
-    std::cout << "int10010 < dbl10010?: " << (int10010 < dbl10010) << ", int10010 == dbl10010?: " << (int10010 == dbl10010) << std::endl;
-    std::cout << "dbl10010 < int10010?: " << (dbl10010 < int10010) << ", dbl10010 == int10010?: " << (dbl10010 == int10010) << std::endl;
-    std::cout << "dbl10010 < dbl10086?: " << (dbl10010 < dbl10086) << ", dbl10010 == dbl10086?: " << (dbl10010 == dbl10086) << std::endl;
-    std::cout << "dbl10086 < dbl10086?: " << (dbl10086 < dbl10086) << ", dbl10086 == dbl10086?: " << (dbl10086 == dbl10086) << std::endl;
 
+    LLBC_Expect((dbl10010 < dbl10010) == false);
+    LLBC_Expect((dbl10010 > dbl10010) == false);
+    LLBC_Expect((dbl10010 == dbl10010) == true);
+
+    LLBC_Expect((dbl10010 < dbl10086) == true);
+    LLBC_Expect((dbl10010 > dbl10086) == false);
+    LLBC_Expect((dbl10010 == dbl10086) == false);
+
+    LLBC_Expect((dbl10086 < dbl10010) == false);
+    LLBC_Expect((dbl10086 > dbl10010) == true);
+    LLBC_Expect((dbl10086 == dbl10010) == false);
+
+    // String compare test.
     LLBC_Variant str1_FromStringLiteral("Hello world(string literal)");
     LLBC_Variant str1_FromStlString(std::string("Hello world(stl string)"));
     LLBC_Variant str1_FromLLBCString(LLBC_String("Hello world(llbc string)"));
-    LLBC_Variant str2_FromStringLiteral("Hello world(string literal)");
-    std::cout << "str1_FromStringLiteral: " << str1_FromStringLiteral << std::endl;
-    std::cout << "str2_FromStringLiteral: " << str2_FromStringLiteral << std::endl;
-    std::cout << "str1_FromStlString: " << str1_FromStlString << std::endl;
-    std::cout << "str1_FromLLBCString: " << str1_FromLLBCString << std::endl;
-    std::cout << "str1_FromStringLiteral == str1_FromStlString?: " << (str1_FromStringLiteral == str1_FromStlString) << std::endl;
-    std::cout << "str1_FromStringLiteral == str2_FromStringLiteral?: " << (str1_FromStringLiteral == str2_FromStringLiteral) << std::endl;
-    std::cout << "str1_FromStringLiteral == dbl10086?: " << (str1_FromStringLiteral == dbl10086) << std::endl;
 
+    LLBC_Expect((str1_FromStringLiteral < str1_FromStringLiteral) == false);
+    LLBC_Expect((str1_FromStringLiteral > str1_FromStringLiteral) == false);
+    LLBC_Expect((str1_FromStringLiteral == str1_FromStringLiteral) == true);
+    LLBC_Expect((str1_FromStringLiteral < str1_FromStlString) == false);
+    LLBC_Expect((str1_FromStringLiteral > str1_FromStlString) == true);
+    LLBC_Expect((str1_FromStringLiteral == str1_FromStlString) == false);
+    LLBC_Expect((str1_FromStlString < str1_FromStringLiteral) == true);
+    LLBC_Expect((str1_FromStlString > str1_FromStringLiteral) == false);
+    LLBC_Expect((str1_FromStlString == str1_FromStringLiteral) == false);
+
+    // Sequence compare test.
     LLBC_Variant seq1;
     LLBC_Variant seq2;
     LLBC_Variant seq2Clone;
     seq1.SeqPushBack(LLBC_Variant::nil);
     seq2.SeqPushBack(1);
     seq2Clone = seq2;
-    std::cout << "nil < seq1?: " << (nil < seq1) << ", nil == seq1?: " << (nil == seq1) << std::endl;
-    std::cout << "boolTrue < seq1?: " << (boolTrue < seq1) << ", boolTrue == seq1?: " << (boolTrue == seq1) << std::endl;
-    std::cout << "int10086 < seq1?: " << (int10086 < seq1) << ", int10086 == seq1?: " << (int10086 == seq1) << std::endl;
-    std::cout << "dbl10086 < seq1?: " << (dbl10086 < seq1) << ", dbl10086 == seq1?: " << (dbl10086 == seq1) << std::endl;
-    std::cout << "seq1 < seq1?: " << (seq1 < seq1) << ", seq1 == seq1?: " << (seq1 == seq1) << std::endl;
-    std::cout << "seq1 < seq2?: " << (seq1 < seq2) << ", seq1 == seq2?: " << (seq1 == seq2) << std::endl;
-    std::cout << "seq2 < seq2Clone?: " << (seq2 < seq2Clone) << ", seq2 == seq2Clone?: " << (seq2 == seq2Clone) << std::endl;
+    LLBC_Expect((seq1 < seq1) == false);
+    LLBC_Expect((seq1 > seq1) == false);
+    LLBC_Expect((seq1 == seq1) == true);
 
+    LLBC_Expect((seq1 < seq2) == true);
+    LLBC_Expect((seq1 > seq2) == false);
+    LLBC_Expect((seq1 == seq2) == false);
+
+    LLBC_Expect((seq2 < seq2Clone) == false);
+    LLBC_Expect((seq2 > seq2Clone) == false);
+    LLBC_Expect((seq2 == seq2Clone) == true);
+
+    // Dictionary compare test.
     LLBC_Variant dict1;
     LLBC_Variant dict2;
     dict1["Key1"] = "Value1";
     dict2["Key1"] = "Value2";
-    std::cout << "nil < ?: dict1?: " << (nil < dict1) << ", nil == dict1?: " << (nil == dict1) << std::endl;
-    std::cout << "boolTrue < dict1?: " << (boolTrue < dict1) << ", boolTrue == dict1?: " << (boolTrue == dict1) << std::endl;
-    std::cout << "int10086 < dict1?: " << (int10086 < dict1) << ", int10086 == dict1?: " << (int10086 == dict1) << std::endl;
-    std::cout << "dbl10086 < dict1?: " << (dbl10086 < dict1) << ", dbl10086 == dict1?: " << (dbl10086 == dict1) << std::endl;
-    std::cout << "seq1 < dict1?: " << (seq1 < dict1) << ", seq1 == dict1?: " << (seq1 == dict1) << std::endl;
-    std::cout << "dict1 < dict1?: " << (dict1 < dict1) << ", dict1 == dict1?: " << (dict1 == dict1) << std::endl;
-    std::cout << "dict1 < dict2?: " << (dict1 < dict2) << ", dict1 == dict2?: " << (dict1 == dict2) << std::endl;
+
+    LLBC_Expect((dict1 < dict1) == false);
+    LLBC_Expect((dict1 > dict1) == false);
+    LLBC_Expect((dict1 == dict1) == true);
+
+    LLBC_Expect((dict1 < dict2) == true);
+    LLBC_Expect((dict1 > dict2) == false);
+    LLBC_Expect((dict1 == dict2) == false);
+
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::CompositeKeyTest()
+int TestCase_Core_Variant::CompositeKeyTest()
 {
-    std::cout <<"Composite key test:" <<std::endl;
+    LLBC_PrintLn("LLBC Variant Composite Key test: ");
 
+    // Composite key test.
     LLBC_Variant v;
     v["The str key 1"] = "The str value 1";
+    LLBC_Expect(v["The str key 1"] == "The str value 1");
+
     v[100] = 100;
+    LLBC_Expect(v[100] == 100);
+
     v[-100] = -100;
+    LLBC_Expect(v[-100] == -100);
+
     v[true] = true;
+    LLBC_Expect(v[true] == true);
+
     v[false] = false;
+    LLBC_Expect(v[false] == false);
+
     v[LLBC_Variant::nil] = LLBC_Variant::nil;
+    LLBC_Expect(v[LLBC_Variant::nil] == LLBC_Variant::nil);
+
     v[LLBC_Variant::nil] = "The nil value";
+    LLBC_Expect(v[LLBC_Variant::nil] == "The nil value");
 
+    // Nested structure test: sequence inside dict and dict inside dict.
+    LLBC_Variant nested;
+    nested["inner_seq"].BecomeSeq();
+    nested["inner_seq"].SeqPushBack(1);
+    nested["inner_seq"].SeqPushBack("two");
+    nested["inner_seq"].SeqPushBack(false);
+
+    nested["inner_dict"]["subkey"] = 3.14;
+    nested["inner_dict"]["subdict"]["deep"] = "deep value";
+
+    // Composite key built from a variant sequence.
+    LLBC_Variant complexKey;
+    complexKey.SeqPushBack("k1");
+    complexKey.SeqPushBack(42);
+    complexKey.SeqPushBack(LLBC_Variant::nil);
+
+    v[complexKey] = nested;
+
+    // Verify nested contents.
+    LLBC_Expect(v[complexKey]["inner_seq"][0] == 1);
+    LLBC_Expect(v[complexKey]["inner_seq"][1] == "two");
+    LLBC_Expect(v[complexKey]["inner_seq"][2] == false);
+
+    LLBC_Expect(v[complexKey]["inner_dict"]["subkey"] == 3.14);
+    LLBC_Expect(v[complexKey]["inner_dict"]["subdict"]["deep"] == "deep value");
+
+    // Copy / assignment of nested variant.
+    LLBC_Variant recovered = v[complexKey];
+    LLBC_Expect(recovered.IsDict());
+    LLBC_Expect(recovered["inner_seq"].Size() == 3);
+    LLBC_Expect(recovered["inner_dict"]["subdict"]["deep"] == "deep value");
+
+    // Use a dict (with nested seq) as a key.
     LLBC_Variant dictKey;
-    dictKey["embedded key 1"] = "embedded value 1";
-    dictKey["embedded key 2"] = "embedded value 2";
-    v[dictKey] = "The dict value";
+    dictKey["a"] = 1;
+    dictKey["b"].BecomeSeq();
+    dictKey["b"].SeqPushBack("x");
+    dictKey["b"].SeqPushBack("y");
 
-    std::cout <<"The composite variant: " <<v <<std::endl;
+    v[dictKey] = "mixed key value";
+    LLBC_Expect(v[dictKey] == "mixed key value");
+
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::ArithmeticTest()
+int TestCase_Core_Variant::ArithmeticTest()
 {
-    std::cout <<"Arithmetic test:" <<std::endl;
+    LLBC_PrintLn("LLBC Variant Arithmetic test: ");
 
-    LLBC_Variant left((sint32)3);
-    LLBC_Variant right((sint64)-5);
-    std::cout <<"[" <<left <<"] + [" <<right <<"] = " <<left + right <<std::endl;
-    std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
-    std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
-    right = right.AsDouble();
-    std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
-    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
-    std::cout <<std::endl;
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Woverflow"
+    #endif
 
-    left = -15;
-    right = 32;
-    std::cout <<"[" <<left <<"] + [" <<right <<"] = " <<left + right <<std::endl;
-    std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
-    std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
-    right = right.AsDouble();
-    std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right.BecomeDouble() <<std::endl;
-    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right.BecomeDouble() <<std::endl;
-    std::cout <<std::endl;
+    constexpr auto leftValue1 = std::numeric_limits<sint64>::min();
+    LLBC_Variant left1(leftValue1);
 
-    left = 3;
-    right = -4;
-    std::cout <<"[" <<left <<"] += [" <<right <<"] = ";
-    std::cout <<(left += right) <<std::endl;
-    std::cout <<"[" <<left <<"] -= [" <<right <<"] = ";
-    std::cout <<(left -= right) <<std::endl;
-    std::cout <<"[" <<left <<"] *= [" <<right <<"] = ";
-    std::cout <<(left *= right) <<std::endl;
-    std::cout <<"[" <<left <<"] /= [" <<right <<"] = ";
-    std::cout <<(left /= right) <<std::endl;
-    std::cout <<"[" <<left <<"] %= [" <<right <<"] = ";
-    std::cout <<(left %= right) <<std::endl;
-    std::cout <<std::endl;
+    constexpr auto rightValue1 = std::numeric_limits<sint64>::max();
+    LLBC_Variant right1(rightValue1);
 
-    left = "hello ";
-    right = "world!";
-    std::cout <<"[" <<left <<"] + [" <<right <<"] = " <<left + right <<std::endl;
-    std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
-    std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
-    std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
-    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
-    std::cout <<std::endl;
+    LLBC_Expect(left1 + right1 == leftValue1 + rightValue1);
+    LLBC_Expect(right1 + left1 == rightValue1 + leftValue1);
+    LLBC_Expect(left1 - right1 == leftValue1 - rightValue1);
+    LLBC_Expect(right1 - left1 == rightValue1 - leftValue1);
+    LLBC_Expect(left1 * right1 == leftValue1 * rightValue1);
+    LLBC_Expect(right1 * left1 == rightValue1 * leftValue1);
+    LLBC_Expect(left1 / right1 == leftValue1 / rightValue1);
+    LLBC_Expect(right1 / left1 == rightValue1 / leftValue1);
+    LLBC_Expect(left1 % right1 == leftValue1 % rightValue1);
+    LLBC_Expect(right1 % left1 == rightValue1 % leftValue1);
 
-    left = "he333llo";
-    right = 333;
-    std::cout <<"[" <<left <<"] + [" <<right <<"] = " <<left + right <<std::endl;
-    std::cout <<"[" <<left <<"] - [" <<right <<"] = " <<left - right <<std::endl;
-    std::cout <<"[" <<left <<"] * [" <<right <<"] = " <<left * right <<std::endl;
-    std::cout <<"[" <<left <<"] / [" <<right <<"] = " <<left / right <<std::endl;
-    std::cout <<"[" <<left <<"] % [" <<right <<"] = " <<left % right <<std::endl;
-    std::cout <<std::endl;
-    std::cout <<"[" <<right <<"] + [" <<left <<"] = " <<right + left <<std::endl;
-    std::cout <<"[" <<right <<"] - [" <<left <<"] = " <<right - left <<std::endl;
-    std::cout <<"[" <<right <<"] * [" <<left <<"] = " <<right * left <<std::endl;
-    std::cout <<"[" <<right <<"] / [" <<left <<"] = " <<right / left <<std::endl;
-    std::cout <<"[" <<right <<"] % [" <<left <<"] = " <<right % left <<std::endl;
-    std::cout <<std::endl;
+    constexpr auto leftValue2 = "hello, ";
+    LLBC_Variant left2(leftValue2);
+    constexpr auto rightValue2 = "world!";
+    LLBC_Variant right2(rightValue2);
+
+    LLBC_Expect(left2 + right2 == LLBC_String(leftValue2) + LLBC_String(rightValue2));
+    LLBC_Expect(right2 + left2 == LLBC_String(rightValue2) + LLBC_String(leftValue2));
+
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC
+    #pragma GCC diagnostic pop
+    #endif
+
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::PairTest()
+int TestCase_Core_Variant::PairTest()
 {
-    std::cout << "Pair test" << std::endl;
+    LLBC_PrintLn("LLBC Variant Pair test: ");
 
-    LLBC_Variant var1(std::make_pair(3, "Hello"));
-    std::cout << "Construct from pair:" << var1 << std::endl;
+    LLBC_Variant var1(std::make_pair(std::make_pair(1, "hello"), std::make_pair(2, "world")));
+    LLBC_Expect(var1.IsSeq() && var1.Size() == 2);
+    LLBC_Expect(LLBC_Variant(var1[0]) == std::make_pair(1, "hello"));
+    LLBC_Expect(LLBC_Variant(var1[1]) == std::make_pair(2, "world"));
 
-    std::pair<std::vector<int>, std::map<int, int> > pa;
+    std::pair<std::vector<int>, std::map<int, int>> var2;
     for (int i = 0; i < 10; ++i)
     {
-        pa.first.push_back(i);
-        pa.second.emplace(i, i * 100);
+        var2.first.push_back(i);
+        var2.second.emplace(i, i * 100);
     }
-    LLBC_Variant var2;
-    var2 = pa;
-    std::cout << "Copy from pair:" << var2 << std::endl;
+    LLBC_Variant var3(var2);
+    LLBC_Expect(var3.IsSeq() && var3.Size() == 2);
+    LLBC_Expect(LLBC_Variant(var3[0]).IsSeq() && LLBC_Variant(var3[0]).Size() == 10);
+    for (int i = 0; i < 10; ++i)
+        LLBC_Expect(LLBC_Variant(var3[0])[i] == i);
+    LLBC_Expect(LLBC_Variant(var3[1]).IsDict() && LLBC_Variant(var3[1]).Size() == 10);
+    for (int i = 0; i < 10; ++i)
+        LLBC_Expect(LLBC_Variant(var3[1])[i] == i * 100);
+    LLBC_Expect(var3 == var2);
 
-    pa.first.clear();
-    pa.second.clear();
-    // For compatibility with vs2017
-    pa = static_cast<std::pair<std::vector<int>, std::map<int, int> >>(var2);
-    std::cout << "Recover from Variant, pair.first:" << LLBC_Variant(pa.first)
-        << ", pair.second:" << LLBC_Variant(pa.second) << std::endl;
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::SeqTest()
+int TestCase_Core_Variant::SeqTest()
 {
-    std::cout << "Sequence test" << std::endl;
+    LLBC_PrintLn("LLBC Variant Basic test: ");
 
-    // Construct default sequence.
     LLBC_Variant subSeq;
     subSeq["Hello"] = 3;
+    LLBC_Expect(subSeq["Hello"] == 3);
+
     subSeq[LLBC_Variant::nil] = "The nil key value";
+    LLBC_Expect(subSeq[LLBC_Variant::nil] == "The nil key value");
 
     LLBC_Variant seq1;
     seq1.SeqPushBack(3);
+    LLBC_Expect(seq1[0] == 3);
+
     seq1.SeqPushBack(false);
+    LLBC_Expect(seq1[1] == false);
+
     seq1.SeqPushBack("Hello World");
+    LLBC_Expect(seq1[2] == "Hello World");
+
     seq1.SeqPushBack(subSeq);
-    std::cout << "seq1 data:" << seq1 << std::endl;
+    LLBC_Expect(seq1[3]["Hello"] == 3);
+    LLBC_Expect(seq1[3][LLBC_Variant::nil] == "The nil key value");
+    LLBC_Expect(seq1.Size() == 4);
 
     // Non-Const sequence subscript access test.
     LLBC_Variant seqForSubscriptTest;
     for (int i = 0; i < 10; ++i)
         seqForSubscriptTest.SeqPushBack(i);
-    std::cout << "Before access <seqForSubscriptTest>:" << seqForSubscriptTest << std::endl;
-    std::cout << "Access <seqForSubscriptTest[10086]>:" << seqForSubscriptTest[10086] << std::endl;
-    std::cout << "After access <seqForSubscriptTest>, size:" << seqForSubscriptTest.Size() << std::endl;
-    llbc_assert(seqForSubscriptTest[10086 - 1].IsNil());
-    llbc_assert(seqForSubscriptTest.Size() == 10086 + 1 && seqForSubscriptTest[10085] == LLBC_Variant::nil);
+    LLBC_Expect(seqForSubscriptTest.Size() == 10);
+    LLBC_Expect(seqForSubscriptTest[10086] == LLBC_Variant::nil);
 
     // Const sequence subscript access test.
     const LLBC_Variant constSeqForSubscriptTest;
-    std::cout << "Before access <constSeqForSubscriptTest>:" << constSeqForSubscriptTest << std::endl;
-    std::cout << "Access <constSeqForSubscriptTest[10086]>:" << constSeqForSubscriptTest[10086] << std::endl;
-    std::cout << "After access <constSeqForSubscriptTest>, size:" << constSeqForSubscriptTest.Size() << std::endl;
-    llbc_assert(constSeqForSubscriptTest.IsNil() && constSeqForSubscriptTest.Size() == 0);
+    LLBC_Expect(constSeqForSubscriptTest.IsNil() && constSeqForSubscriptTest.Size() == 0);
+    LLBC_Expect(constSeqForSubscriptTest[10086] == LLBC_Variant::nil);
 
     // Assignment test.
     LLBC_Variant seq2 = seq1;
-    std::cout << "seq2 = seq1, seq2: " << seq2 << std::endl;
+    LLBC_Expect(seq2.Size() == seq1.Size());
+    for (size_t i = 0; i < seq1.Size(); ++i)
+        LLBC_Expect(seq2[i] == seq1[i]);
+    LLBC_Expect(seq2 == seq1);
 
     // Arithmetic test.
     LLBC_Variant left;
@@ -532,35 +657,45 @@ void TestCase_Core_Variant::SeqTest()
     right.SeqPushBack(3);
     right.SeqPushBack(3);
     right.SeqPushBack(4);
-    std::cout << "Perform sequence arithmetic test, left:" << left << ", right:" << right << std::endl;
-    std::cout << "left + right: " << left + right << std::endl;
-    std::cout << "left - right: " << left - right << std::endl;
-    std::cout << "left * right: " << left * right << std::endl;
-    std::cout << "left / right: " << left / right << std::endl;
-    std::cout << "left % right: " << left % right << std::endl;
+
+    LLBC_Expect(left != right);
+    LLBC_Expect(left + right == LLBC_Variant(std::vector{1, 2, 2, 3, 2, 3, 3, 4}));
+    LLBC_Expect(left - right == LLBC_Variant(std::vector{1}));
+    LLBC_Expect(left * right == LLBC_Variant(std::vector{2, 2, 3}));
+    LLBC_Expect(left / right == LLBC_Variant(std::vector{1, 2, 2, 3}));
+    LLBC_Expect(left % right == LLBC_Variant(std::vector{1, 2, 2, 3}));
 
     // Sequence + - * / non sequence test.
     LLBC_Variant seq10;
     seq10.SeqPushBack(10);
     seq10.SeqPushBack("Hello world");
     seq10.SeqPushBack(false);
-    std::cout << "Perform sequence +-*/ non seuqnce test:" << std::endl;
-    std::cout << "seq10: " << seq10 << std::endl;
-    std::cout << "seq10 + 10086: " << seq10 + 10086 << std::endl;
-    std::cout << "seq10 + nil: " << seq10 + LLBC_Variant::nil << std::endl;
-    std::cout << "seq10 + hello world: " << seq10 + "hello world" << std::endl;
-    std::cout << "seq10 - false: " << seq10 - false << std::endl;
+    LLBC_Variant seq11 = seq10;
+    seq11.SeqPushBack(10086);
+    LLBC_Expect(seq10 + 10086 == seq11);
+
+    seq11.SeqPopBack();
+    seq11.SeqPushBack(LLBC_Variant::nil);
+    LLBC_Expect(seq10 + LLBC_Variant::nil == seq11);
+
+    seq11.SeqPopBack();
+    seq11.SeqPushBack("hello world");
+    LLBC_Expect(seq10 + "hello world" == seq11);
 
     // Sequence batch push back test.
-    std::cout <<"Sequence batch push back test:" <<std::endl;
     LLBC_Variant batchPushBackTestSeq;
-    batchPushBackTestSeq.SeqPushBack(true, false, 1, LLBC_Variant(2), "Hello world", 5.8, LLBC_Variant::nil);
-    std::cout <<"- After batch push back:" <<batchPushBackTestSeq <<std::endl;
+    batchPushBackTestSeq.SeqPushBack(10, "Hello world", false, 5.8, LLBC_Variant::nil);
+    seq11 = seq10;
+    seq11.SeqPushBack(5.8);
+    seq11.SeqPushBack(LLBC_Variant::nil);
+    LLBC_Expect(batchPushBackTestSeq == seq11);
+
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::DictTest()
+int TestCase_Core_Variant::DictTest()
 {
-    std::cout <<"Dict test" <<std::endl;
+    LLBC_PrintLn("LLBC Variant Dictionary test: ");
 
     // Raw key type dictionary test.
     LLBC_Variant seqKey;
@@ -571,7 +706,7 @@ void TestCase_Core_Variant::DictTest()
     seqKey.SeqPushBack(4);
     seqKey.SeqPushBack(false);
     seqKey.SeqPushBack("Hello World");
-    seqKey.SeqInsert(seqKey.SeqBegin() + 3, LLBC_Variant::nil);
+    LLBC_Expect(seqKey.IsSeq() && seqKey.Size() == 4);
 
     LLBC_Variant rawDict1;
     rawDict1.DictInsert(1, "Hello");
@@ -581,20 +716,23 @@ void TestCase_Core_Variant::DictTest()
     rawDict1.DictInsert(5.0, "Jack");
     rawDict1.DictInsert(false, 34);
     rawDict1[seqKey] = "The seq key value";
-    std::cout <<"rawDict1 data: " <<rawDict1 <<std::endl;
+    LLBC_Expect(rawDict1.Size() == 7);
+    LLBC_Expect(rawDict1[1] == "Hello");
+    LLBC_Expect(rawDict1[2] == "World");
+    LLBC_Expect(rawDict1[3] == "Hey");
+    LLBC_Expect(rawDict1[4] == "Judy");
+    LLBC_Expect(rawDict1[5.0] == "Jack");
+    LLBC_Expect(rawDict1[false] == 34);
+    LLBC_Expect(rawDict1[seqKey] == "The seq key value");
 
     LLBC_Variant rawDict2(rawDict1);
-    std::cout <<"rawDict2(copy from rawDict1) data: " <<rawDict2 <<std::endl;
-    rawDict2[1] = "hello";
-    rawDict2[2] = "worlld";
-    rawDict2[3] = "hey";
-    rawDict2[4] = "judy";
-    rawDict2[5.0] = "jack";
-    rawDict2[false] = 35;
-    std::cout <<"rawDict2(change idx:1 value) data: " <<rawDict2 <<std::endl;
-
-    std::cout <<"rawDict1 == rawDict2 ? " <<(rawDict1 == rawDict2) <<std::endl;
-    std::cout <<"rawDict1 < rawDict2 ? " <<(rawDict1 < rawDict2) <<std::endl;
+    LLBC_Expect(rawDict2.Size() == rawDict1.Size());
+    for (auto it = rawDict1.DictBegin(); it != rawDict1.DictEnd(); ++it)
+    {
+        LLBC_Expect(rawDict2.DictFind(it->first) != rawDict2.DictEnd());
+        LLBC_Expect(rawDict2.DictFind(it->first)->second == it->second);
+    }
+    LLBC_Expect(rawDict2 == rawDict1);
 
     // Dictionary collection operation test.
     LLBC_Variant set1;
@@ -603,17 +741,31 @@ void TestCase_Core_Variant::DictTest()
     set1[2] = true;
     set2[2] = true;
     set2[3] = true;
-    std::cout << "Dictionary collection operation test:" << std::endl;
-    std::cout <<"union op: set1[" <<set1 <<"] + set2[" <<set2 <<"] = " <<set1 + set2 <<std::endl;
-    std::cout <<"difference op: set1[" <<set1 <<"] - set2[" <<set2 <<"] = " <<set1 - set2 <<std::endl;
-    std::cout <<"intersection op: set1[" <<set1 <<"] * set2[" <<set2 <<"] = " <<set1 * set2 <<std::endl;
-    std::cout <<"union difference op: set1[" <<set1 <<"] / set2[" <<set2 <<"] = " <<set1 / set2 <<std::endl;
+    LLBC_Variant setPlus;
+    setPlus[1] = true;
+    setPlus[2] = true;
+    setPlus[3] = true;
+    LLBC_Expect(set1 + set2 == setPlus);
+
+    LLBC_Variant setMinus;
+    setMinus[1] = true;
+    LLBC_Expect(set1 - set2 == setMinus);
+
+    LLBC_Variant setIntersect;
+    setIntersect[2] = true;
+    LLBC_Expect(set1 * set2 == setIntersect);
+
+    LLBC_Variant setUnionDiff;
+    setUnionDiff[1] = true;
+    setUnionDiff[2] = true;
+    LLBC_Expect(set1 / set2 == setUnionDiff);
 
     // Use dictionary as key(low-performance)
     LLBC_Variant lowPerfDict;
     lowPerfDict[rawDict1] = "Hello";
+    LLBC_Expect(lowPerfDict[rawDict1] == "Hello");
     lowPerfDict[rawDict2] = "World";
-    std::cout <<"lowPerfDict: " <<lowPerfDict <<std::endl;
+    LLBC_Expect(lowPerfDict[rawDict2] == "World");
 
     // Batch erase test.
     LLBC_Variant batchEraseTestDict;
@@ -622,43 +774,111 @@ void TestCase_Core_Variant::DictTest()
     batchEraseTestDict[true] = "Hey Judy";
     batchEraseTestDict[6] = true;
     batchEraseTestDict[5] = true;
-    std::cout <<"Batch erase dict test:" <<std::endl;
-    std::cout <<"- Before erase(\"a\", false, 5):" <<batchEraseTestDict <<std::endl;
-    auto batchEraseRet = batchEraseTestDict.DictErase("a", false, LLBC_Variant(5));
-    std::cout <<"- After erase:" <<batchEraseTestDict <<std::endl;
-    std::cout <<"- Erase return:" <<batchEraseRet <<std::endl;
+    batchEraseTestDict.DictErase("a", false, LLBC_Variant(5));
+    LLBC_Variant expectedAfterErase;
+    expectedAfterErase[true] = "Hey Judy";
+    expectedAfterErase[6] = true;
+    LLBC_Expect(batchEraseTestDict == expectedAfterErase);
 
-    batchEraseTestDict.DictErase(batchEraseTestDict.DictFind(true));
-    std::cout <<"- After call DictErase(iter(true)):" <<batchEraseTestDict <<std::endl;
-
-    batchEraseTestDict.DictErase(6);
-    std::cout <<"- After call DictErase(6):" <<batchEraseTestDict <<std::endl;
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::SerializeTest()
+int TestCase_Core_Variant::ObjTest()
 {
-    std::cout <<"Serialize test" <<std::endl;
+    LLBC_PrintLn("LLBC Variant Obj test: ");
+
+    LLBC_Variant obj;
+    obj.BecomeSeq();
+    LLBC_Expect(obj.IsSeq());
+    LLBC_Expect(obj.AsSeq() == LLBC_Variant::Seq());
+
+    obj.BecomeBool();
+    LLBC_Expect(obj.IsBool());
+    LLBC_Expect(obj.IsDict() == false);
+    LLBC_Expect(obj.IsStr() == false);
+    LLBC_Expect(obj.IsSeq() == false);
+
+    obj.BecomeSeq();
+    obj.BecomeDict();
+    obj.BecomeStr();
+    obj.BecomeDict();
+    obj.BecomeSeq();
+    obj.BecomeStr();
+
+    obj = std::vector<int>{1, 2, 3};
+    LLBC_Expect(obj.IsSeq());
+    LLBC_Expect(obj.IsDict() == false);
+    LLBC_Expect(obj.IsStr() == false);
+    LLBC_Expect(obj.AsSeq() == LLBC_Variant(std::vector<int>{1, 2, 3}).AsSeq());
+
+    obj.BecomeBool();
+    LLBC_Expect(obj.IsBool());
+    LLBC_Expect(obj.IsDict() == false);
+    LLBC_Expect(obj.IsStr() == false);
+    LLBC_Expect(obj.IsSeq() == false);
+
+    obj.BecomeSeq();
+    obj.BecomeDict();
+    obj.BecomeStr();
+    obj.BecomeDict();
+    obj.BecomeSeq();
+    obj.BecomeStr();
+
+    obj = "hello world";
+    LLBC_Expect(obj.IsStr());
+    LLBC_Expect(obj.AsStr() == "hello world");
+    LLBC_Expect(obj.IsStr());
+    LLBC_Expect(obj.IsSeq() == false);
+    LLBC_Expect(obj.IsDict() == false);
+
+    obj.BecomeBool();
+    LLBC_Expect(obj.IsBool());
+    LLBC_Expect(obj.IsDict() == false);
+    LLBC_Expect(obj.IsStr() == false);
+    LLBC_Expect(obj.IsSeq() == false);
+
+    obj.BecomeSeq();
+    obj.BecomeDict();
+    obj.BecomeStr();
+    obj.BecomeDict();
+    obj.BecomeSeq();
+    obj.BecomeStr();
+
+    obj = std::map<int, int>{{1, 100}, {2, 200}, {3, 300}};
+    LLBC_Expect(obj.IsDict());
+    LLBC_Expect(obj.AsDict() == LLBC_Variant(std::map<int, int>{{1, 100}, {2, 200}, {3, 300}}).AsDict());
+    LLBC_Expect(obj.IsDict());
+    LLBC_Expect(obj.IsStr() == false);
+    LLBC_Expect(obj.IsSeq() == false);
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::SerializeTest()
+{
+    LLBC_PrintLn("LLBC Variant Serialize test: ");
 
     // Serialize & Deserialize raw type.
     LLBC_Stream stream;
     LLBC_Variant raw(-64);
     stream << raw;
-    std::cout << "Raw obj[" << raw << "] serialized size: " << stream.GetWritePos() << std::endl;
+    LLBC_Expect(stream.GetWritePos() == 10);
+
 
     LLBC_Variant deserRaw;
     stream >> deserRaw;
-    std::cout << "Deserialized from stream: [" << deserRaw << "]" << std::endl;
+    LLBC_Expect(deserRaw == raw);
 
     // Serialize & Deserialize string type.
     LLBC_Variant str("Hello World!");
     stream.SetReadPos(0);
     stream.SetWritePos(0);
     stream << str;
-    std::cout <<"String obj[" <<str <<"] serialized size: " <<stream.GetWritePos() <<std::endl;
+    LLBC_Expect(stream.GetWritePos() == 18);
 
     LLBC_Variant deserStr;
     stream >> deserStr;
-    std::cout << "Deserialized from stream: [" << deserStr << "]" << std::endl;
+    LLBC_Expect(deserStr == str);
 
     // Serialize & Deserialize seq type.
     LLBC_Variant seq;
@@ -668,11 +888,12 @@ void TestCase_Core_Variant::SerializeTest()
     stream.SetReadPos(0);
     stream.SetWritePos(0);
     stream << seq;
+    LLBC_Expect(stream.GetWritePos() == 43);
     std::cout << "Seq obj[" << seq << "] serialized size: " << stream.GetWritePos() << std::endl;
 
     LLBC_Variant deserSeq;
     stream >> deserSeq;
-    std::cout << "Deserialized from stream:[" << deserSeq << "]" << std::endl;
+    LLBC_Expect(deserSeq == seq);
 
     // Serialize & Deserialize dict type.
     LLBC_Variant dict;
@@ -681,34 +902,31 @@ void TestCase_Core_Variant::SerializeTest()
     stream.SetReadPos(0);
     stream.SetWritePos(0);
     stream << dict;
-    std::cout << "Dict obj[" << dict << "] serialized size: " << stream.GetWritePos() << std::endl;
+    LLBC_Expect(stream.GetWritePos() ==  59);
 
     LLBC_Variant deserDict;
     stream >> deserDict;
-    std::cout << "Deserialized from stream: [" << deserDict << "]" << std::endl;
+    LLBC_Expect(deserDict == dict);
+
+    return LLBC_OK;
 }
 
-void TestCase_Core_Variant::HashTest()
+int TestCase_Core_Variant::HashTest()
 {
-    std::cout <<"Hash test" <<std::endl;
+    LLBC_PrintLn("LLBC Variant Hash test: ");
 
-    auto doHash = [](const LLBC_Variant &v)
-    {
-        std::cout <<"Hash " <<v <<": " <<std::hash<LLBC_Variant>()(v) <<std::endl;
-    };
-
-    doHash(LLBC_Variant::nil); 
-    doHash(LLBC_Variant(true));
-    doHash(LLBC_Variant(false));
-    doHash(LLBC_Variant(0));
-    doHash(LLBC_Variant(1));
-    doHash(LLBC_Variant(2));
-    doHash(LLBC_Variant(-1));
-    doHash(LLBC_Variant(-2));
-    doHash(LLBC_Variant(3.1415926f));
-    doHash(LLBC_Variant(6.18));
-    doHash(LLBC_Variant("Hello world"));
-    doHash(LLBC_Variant(""));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant::nil) == std::hash<LLBC_Variant>()(LLBC_Variant::nil));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(true)) == std::hash<LLBC_Variant>()(LLBC_Variant(true)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(false)) == std::hash<LLBC_Variant>()(LLBC_Variant(false)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(0)) == std::hash<LLBC_Variant>()(LLBC_Variant(0)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(1)) == std::hash<LLBC_Variant>()(LLBC_Variant(1)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(2)) == std::hash<LLBC_Variant>()(LLBC_Variant(2)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(-1)) == std::hash<LLBC_Variant>()(LLBC_Variant(-1)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(-2)) == std::hash<LLBC_Variant>()(LLBC_Variant(-2)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(3.1415926f)) == std::hash<LLBC_Variant>()(LLBC_Variant(3.1415926f)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant(6.18)) == std::hash<LLBC_Variant>()(LLBC_Variant(6.18)));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant("Hello world")) == std::hash<LLBC_Variant>()(LLBC_Variant("Hello world")));
+    LLBC_Expect(std::hash<LLBC_Variant>()(LLBC_Variant("")) == std::hash<LLBC_Variant>()(LLBC_Variant("")));
 
     LLBC_Variant seq;
     seq.SeqPushBack(LLBC_Variant(true));
@@ -716,22 +934,17 @@ void TestCase_Core_Variant::HashTest()
     seq.SeqPushBack(LLBC_Variant(3.1415926));
     seq.SeqPushBack(LLBC_Variant());
     seq[seq.Size() - 1].DictInsert("hello world", 6.18);
-    doHash(seq);
-}
+    LLBC_Variant seq2 = seq;
+    LLBC_Expect(std::hash<LLBC_Variant>()(seq) == std::hash<LLBC_Variant>()(seq2));
 
-void TestCase_Core_Variant::ConvertToUnurderedStlContainerTest()
-{
-    std::cout <<"Convert to unordered stl container test:" <<std::endl;
+    LLBC_Variant dict;
+    dict["bool"] = true;
+    dict["int"] = 9527;
+    dict["double"] = 3.1415926;
+    dict["obj"] = LLBC_Variant();
+    dict["obj"]["hello world"] = 6.18;
+    LLBC_Variant dict2 = dict;;
+    LLBC_Expect(std::hash<LLBC_Variant>()(dict) == std::hash<LLBC_Variant>()(dict2));
 
-    LLBC_Variant v;
-    v["hello world"] = 3;
-    v[false] = "hey judy";
-    v[LLBC_Variant::nil] = LLBC_Variant::nil;
-    v[3.1415926] = 9527;
-
-    std::unordered_set<LLBC_Variant> us = v;
-    std::cout <<"Variant: " <<v <<std::endl;
-    std::cout <<"Convert to " <<LLBC_GetTypeName(us) <<"(size:" <<us.size() <<"):" <<std::endl;
-    for (auto &elem : us)
-        std::cout <<"- " <<elem <<std::endl;
+    return LLBC_OK;
 }
