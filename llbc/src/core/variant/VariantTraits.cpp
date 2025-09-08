@@ -66,6 +66,7 @@ void LLBC_VariantTraits::assign(LLBC_Variant &left, const LLBC_Variant &right)
     }
     else if (right.IsDict()) // Do DICT type data assignment.
     {
+        left.BecomeDict();
         left.GetMutableHolder()->data.obj.dict = right.GetHolder().data.obj.dict;
     }
 }
