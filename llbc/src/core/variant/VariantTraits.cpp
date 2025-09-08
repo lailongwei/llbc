@@ -304,7 +304,7 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
         LLBC_Variant::Seq &lSeq = left.GetMutableHolder()->data.obj.seq;
         if (right.IsDict())
         {
-            const LLBC_Variant::Dict rDict = right.GetHolder().data.obj.dict;
+            const LLBC_Variant::Dict &rDict = right.GetHolder().data.obj.dict;
             if (rDict.empty())
                 return;
 
