@@ -26,44 +26,44 @@
 int TestCase_Core_Variant::Run(int argc, char *argv[])
 {
     std::cout << "LLBC_Variant test:" << std::endl;
-    //
-    // BasicTest();
-    // std::cout << std::endl;
-    //
-    // StringTest();
-    // std::cout << std::endl;
-    //
-    // EnumTest();
-    // std::cout << std::endl;
-    //
-    // CompareTest();
-    // std::cout << std::endl;
-    //
-    // CompositeKeyTest();
-    // std::cout << std::endl;
-    //
-    // ArithmeticTest();
-    // std::cout << std::endl;
-    //
-    // PairTest();
-    // std::cout << std::endl;
-    //
-    // SeqTest();
-    // std::cout << std::endl;
-    //
-    // DictTest();
-    // std::cout << std::endl;
-    //
-    // SerializeTest();
-    // std::cout << std::endl;
-    //
-    // HashTest();
-    // std::cout << std::endl;
+
+    BasicTest();
+    std::cout << std::endl;
+
+    StringTest();
+    std::cout << std::endl;
+
+    EnumTest();
+    std::cout << std::endl;
+
+    CompareTest();
+    std::cout << std::endl;
+
+    CompositeKeyTest();
+    std::cout << std::endl;
+
+    ArithmeticTest();
+    std::cout << std::endl;
+
+    PairTest();
+    std::cout << std::endl;
+
+    SeqTest();
+    std::cout << std::endl;
+
+    DictTest();
+    std::cout << std::endl;
+
+    SerializeTest();
+    std::cout << std::endl;
+
+    HashTest();
+    std::cout << std::endl;
 
     ObjTest();
     std::cout << std::endl;
 
-    // ConvertToUnurderedStlContainerTest();
+    ConvertToUnurderedStlContainerTest();
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
     getchar();
