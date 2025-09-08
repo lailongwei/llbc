@@ -455,7 +455,7 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
                 return;
 
             LLBC_Variant::DictConstIter rEndIt = rDict.end();
-            for (LLBC_Variant::DictConstIter rIt = rDict.begin(); rEndIt != rDict.end(); ++rIt)
+            for (LLBC_Variant::DictConstIter rIt = rDict.begin(); rIt != rEndIt; ++rIt)
             {
                 lSeq.erase(std::remove_if(lSeq.begin(), lSeq.end(),
                             [&rIt](const LLBC_Variant &elem) { return elem == rIt->second; }), lSeq.end());
