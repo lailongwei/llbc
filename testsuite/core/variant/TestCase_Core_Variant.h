@@ -39,6 +39,7 @@ private:
     void PairTest();
     void SeqTest();
     void DictTest();
+    void ObjTest();
     void SerializeTest();
     void HashTest();
     void ConvertToUnurderedStlContainerTest();
