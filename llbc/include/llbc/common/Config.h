@@ -47,7 +47,7 @@
  * \brief Common about config options define.
  */
 // Enable/Disable llbc framework assert macro.
-#define LLBC_CFG_COM_ENABLE_LLBC_ASSERT                     1
+#define LLBC_CFG_COM_ENABLE_LLBC_ASSERT                     0
 // The stream object auto resize increment limit, in bytes.
 #define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          512
 
