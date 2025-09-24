@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "llbc/core/rapidjson/json.h"
+#include "llbc/common/Common.h"
+#include "llbc/core/json/nlohmann/json.hpp"
 
 // Disable some warnings.
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -691,8 +692,7 @@ private:
     static void Collect_s(void *typedObjPool, bool deep);
 
     // Get typed object pool statistics static method.
-    static LLBC_Json::Value GetStatistics_s(void *typedObjPool,
-                                            LLBC_Json::MemoryPoolAllocator<> &jsonAlloc);
+    static LLBC_Json GetStatistics_s(void *typedObjPool);
 
     // Find free stripe.
     _ObjStripe *FindFreeStripe();
@@ -700,7 +700,7 @@ private:
     void DeleteStripe(_ObjStripe *stripe);
 
     // Get statistics.
-    LLBC_Json::Value GetStatistics(LLBC_Json::MemoryPoolAllocator<> &jsonAlloc) const;
+    LLBC_Json GetStatistics() const;
 
 private:
     bool _threadSafe; // Thread safe flag.
@@ -819,7 +819,7 @@ private:
         void (*ReleaseObj)(void *, void *);
         void (*Destruct)(void *);
         void (*Collect)(void *, bool);
-        LLBC_Json::Value (*GetStatistics)(void *, LLBC_Json::MemoryPoolAllocator<> &);
+        LLBC_Json (*GetStatistics)(void *);
 
         uint8 typedObjPool[0];
     };
@@ -860,7 +860,7 @@ private:
         bool IsBack(const LLBC_String &name) const;
 
         // Get ordered delete tree.
-        LLBC_Json::Value GetOrderedDeleteTree(LLBC_Json::Document &jsonDoc) const;
+        LLBC_Json GetOrderedDeleteTree(LLBC_Json &jsonDoc) const;
 
     private:
         LLBC_CString _name;
