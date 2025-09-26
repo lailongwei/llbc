@@ -86,6 +86,12 @@ public:
     int GetLogLevel() const;
 
     /**
+     * is in logColorFilterList
+     * @return bool - is in logColorFilterList.
+     */
+    bool InLogColorFilterList() const;
+
+    /**
      * @brief Set log level.
      * @param[in] appenderType - the log appender type.
      * @param[in] logLevel     - the log level(End will disabled logger).
@@ -268,6 +274,7 @@ public:
      * @param[in] file   - log file name.
      * @param[in] line   - log file line.
      * @param[in] func   - log function.
+     * @param[in] inColorList - log color fitler.
      * @param[in] fmt    - format control string.
      * @param[in] ...    - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
@@ -277,8 +284,9 @@ public:
                const char *file,
                int line,
                const char *func,
+               const bool inColorList,
                const char *fmt,
-               ...) LLBC_STRING_FORMAT_CHECK(7, 8);
+               ...) LLBC_STRING_FORMAT_CHECK(8, 9);
 
     /**
      * Output message by va_list.
@@ -287,6 +295,7 @@ public:
      * @param[in] file  - log file name.
      * @param[in] line  - log file line.
      * @param[in] func  - log function.
+     * @param[in] inColorList - log color fitler.
      * @param[in] fmt   - format control string.
      * @param[in] va    - variadic parameter list.
      * @return int - return 0 if success, otherwise return -1.
@@ -296,6 +305,7 @@ public:
                 const char *file,
                 int line,
                 const char *func,
+                const bool inColorList,
                 const char *fmt,
                 va_list va);
 
@@ -328,6 +338,7 @@ private:
      * @param[in] file  - log file name.
      * @param[in] line  - log file line.
      * @param[in] func  - log function.
+     * @param[in] inColorList - log color fitler.
      * @param[in] fmt   - log format control string.
      * @param[in] va    - the message variable parameter list.
      * @return LLBC_LogData * - the log data.
@@ -337,6 +348,7 @@ private:
                                const char *file,
                                int line,
                                const char *func,
+                               const bool inColorList,
                                const char *fmt,
                                va_list va);
 
@@ -367,6 +379,7 @@ private:
      * @param[in] file    - log file name.
      * @param[in] line    - log file line.
      * @param[in] func    - log function.
+     * @param[in] inColorList - log color fitler.
      * @param[in] time    - log time.
      * @param[in] logData - log data.
      * @param[in] libTls  - log tls.
@@ -376,6 +389,7 @@ private:
                                   const char *file,
                                   int line,
                                   const char *func,
+                                  const bool inColorList,
                                   sint64 time,
                                   LLBC_LogData *logData,
                                   __LLBC_LibTls *libTls);

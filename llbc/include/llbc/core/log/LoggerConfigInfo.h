@@ -85,6 +85,12 @@ public:
     int GetLogLevel() const;
 
     /**
+     * get log color filter list 
+     * @return LLBC_Strings* - logColorFilterList.
+     */
+    const LLBC_Strings* GetLogColorFilterList() const;
+
+    /**
      * Get appender log level.
      * 
      * @param[in] appenderType - log appender type.
@@ -280,7 +286,7 @@ private:
     int _maxBackupIndex;
     int _fileBufferSize;
     bool _lazyCreateLogFile;
-
+    LLBC_Strings _logColorFilterList;
     bool _takeOver;
 };
 

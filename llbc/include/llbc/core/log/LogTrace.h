@@ -141,6 +141,12 @@ public:
     void ClearAllLogTraces();
 
     /**
+     * Get trace content(built log traces).
+     * @return std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>> - the trace content.
+     */
+    const std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>* GetLogTraceContents(const LLBC_LogTrace::TraceKey &traceKey) const;
+
+    /**
      * Get trace info(built log traces).
      * @return std::shared_ptr<LLBC_String> - the trace info.
      */
