@@ -194,6 +194,7 @@ int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
     for(int i = 2; i <= 20; i += 2)
     {
         int status = dict.Erase(i);
+        LLBC_UNUSED_PARAM(status);
         llbc_assert(status == LLBC_OK && "Dictionary internal error, check it!");
     }
 
