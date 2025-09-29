@@ -60,6 +60,9 @@ int TestCase_Core_Variant::Run(int argc, char *argv[])
     HashTest();
     std::cout << std::endl;
 
+    ObjTest();
+    std::cout << std::endl;
+
     ConvertToUnurderedStlContainerTest();
 
     std::cout <<"Press any key to continue ... ..." <<std::endl;
@@ -633,6 +636,77 @@ void TestCase_Core_Variant::DictTest()
 
     batchEraseTestDict.DictErase(6);
     std::cout <<"- After call DictErase(6):" <<batchEraseTestDict <<std::endl;
+}
+
+void TestCase_Core_Variant::ObjTest()
+{
+    std::cout << "Object test" <<std::endl;
+
+    LLBC_Variant obj;
+    obj.BecomeSeq();
+    llbc_assert(obj.IsSeq());
+    llbc_assert(obj.AsSeq() == LLBC_Variant::Seq());
+
+    obj.BecomeBool();
+    llbc_assert(obj.IsBool());
+    llbc_assert(obj.IsDict() == false);
+    llbc_assert(obj.IsStr() == false);
+    llbc_assert(obj.IsSeq() == false);
+
+    obj.BecomeSeq();
+    obj.BecomeDict();
+    obj.BecomeStr();
+    obj.BecomeDict();
+    obj.BecomeSeq();
+    obj.BecomeStr();
+
+    obj = std::vector<int>{1, 2, 3};
+    llbc_assert(obj.IsSeq());
+    llbc_assert(obj.IsDict() == false);
+    llbc_assert(obj.IsStr() == false);
+    llbc_assert(obj.AsSeq() == LLBC_Variant(std::vector<int>{1, 2, 3}).AsSeq());
+
+    obj.BecomeBool();
+    llbc_assert(obj.IsBool());
+    llbc_assert(obj.IsDict() == false);
+    llbc_assert(obj.IsStr() == false);
+    llbc_assert(obj.IsSeq() == false);
+
+    obj.BecomeSeq();
+    obj.BecomeDict();
+    obj.BecomeStr();
+    obj.BecomeDict();
+    obj.BecomeSeq();
+    obj.BecomeStr();
+
+    obj = "hello world";
+    llbc_assert(obj.IsStr());
+    llbc_assert(obj.AsStr() == "hello world");
+    llbc_assert(obj.IsStr());
+    llbc_assert(obj.IsSeq() == false);
+    llbc_assert(obj.IsDict() == false);
+
+    obj.BecomeBool();
+    llbc_assert(obj.IsBool());
+    llbc_assert(obj.IsDict() == false);
+    llbc_assert(obj.IsStr() == false);
+    llbc_assert(obj.IsSeq() == false);
+
+    obj.BecomeSeq();
+    obj.BecomeDict();
+    obj.BecomeStr();
+    obj.BecomeDict();
+    obj.BecomeSeq();
+    obj.BecomeStr();
+
+    obj = std::map<int, int>{{1, 100}, {2, 200}, {3, 300}};
+    llbc_assert(obj.IsDict());
+    llbc_assert(obj.AsDict() == LLBC_Variant(std::map<int, int>{{1, 100}, {2, 200}, {3, 300}}).AsDict());
+    llbc_assert(obj.IsDict());
+    llbc_assert(obj.IsStr() == false);
+    llbc_assert(obj.IsSeq() == false);
+
+    std::cout << "Obj test pass" << std::endl;
 }
 
 void TestCase_Core_Variant::SerializeTest()
