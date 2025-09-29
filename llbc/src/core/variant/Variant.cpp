@@ -873,7 +873,7 @@ LLBC_Variant &LLBC_Variant::operator=(const Seq &seq)
 
 LLBC_Variant &LLBC_Variant::operator=(const Dict &dict)
 {
-    BecomeSeq();
+    BecomeDict();
     if (dict.empty())
     {
         if (_holder.data.obj.dict)
