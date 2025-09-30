@@ -97,6 +97,19 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     // Log time accessor.
     _logTimeAccessor = &logTimeAccessor;
 
+    // log_color_filter_list
+    auto logColorFilterList = cfg["logColorFilterList"].AsStr().strip().split(",;|", -1, true, true);
+    for (auto& elem : logColorFilterList)
+    {
+        auto normalizedElem = elem.strip();
+        if (!normalizedElem.empty()) 
+            _logColorFilterList.push_back(normalizedElem);
+    }
+
+    // log color filter local test
+    // auto testFilterListValue = cfg["logColorFilterListValue"].AsStr();
+    // _logColorFilterList.push_back(testFilterListValue);
+
     _asyncMode = __LLBC_GetLogCfg(
         "asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
     if (_asyncMode)

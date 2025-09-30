@@ -122,6 +122,16 @@ void LLBC_LogTraceMgr::ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey)
         _RebuildTraceInfo();
 }
 
+const std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>* LLBC_LogTraceMgr::GetLogTraceContents(const LLBC_LogTrace::TraceKey &traceKey) const
+{
+    const auto keyIt = _logTraces.find(traceKey);
+    if (keyIt == _logTraces.end())
+    {
+        return nullptr;
+    }
+    return &(keyIt->second);
+}
+
 size_t LLBC_LogTraceMgr::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const
 {
     const auto keyIt = _logTraces.find(logTrace.traceKey);
@@ -190,4 +200,3 @@ void LLBC_LogTraceMgr::_RebuildTraceInfo()
 
 
 __LLBC_NS_END
-

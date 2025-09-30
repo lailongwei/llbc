@@ -85,7 +85,7 @@ void LLBC_Logger::ClearLogTrace(const _TraceKeyTy &traceKey)
                                                   \
         va_list va;                               \
         va_start(va, fmt);                        \
-        int ret = VOutput(LLBC_LogLevel::level, tag, file, line, func, fmt, va); \
+        int ret = VOutput(LLBC_LogLevel::level, tag, file, line, func, false, fmt, va); \
         va_end(va);                               \
                                                   \
         return ret;                               \
@@ -103,15 +103,16 @@ inline int LLBC_Logger::Output(int level,
                                const char *file,
                                int line,
                                const char *func,
+                               const bool inColorList,
                                const char *fmt,
                                ...)
 {
-    if (level < _logLevel)
+    if (!inColorList && level < _logLevel)
         return LLBC_OK;
 
     va_list va;
     va_start(va, fmt);
-    const int ret = VOutput(level, tag, file, line, func, fmt, va);
+    const int ret = VOutput(level, tag, file, line, func, inColorList, fmt, va);
     va_end(va);
 
     return ret;
