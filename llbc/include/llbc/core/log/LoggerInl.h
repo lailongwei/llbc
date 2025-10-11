@@ -103,16 +103,16 @@ inline int LLBC_Logger::Output(int level,
                                const char *file,
                                int line,
                                const char *func,
-                               const bool inColorList,
+                               const bool logColorTag,
                                const char *fmt,
                                ...)
 {
-    if (!inColorList && level < _logLevel)
+    if (!logColorTag && level < _logLevel)
         return LLBC_OK;
 
     va_list va;
     va_start(va, fmt);
-    const int ret = VOutput(level, tag, file, line, func, inColorList, fmt, va);
+    const int ret = VOutput(level, tag, file, line, func, logColorTag, fmt, va);
     va_end(va);
 
     return ret;

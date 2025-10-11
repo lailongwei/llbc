@@ -84,7 +84,7 @@ int LLBC_LogConsoleAppender::Output(const LLBC_LogData &data)
     }
 
     const int logLevel = data.level;
-    if (!data.inColorList && logLevel < GetLogLevel())
+    if (!data.logColorTag && logLevel < GetLogLevel())
         return LLBC_OK;
 
     FILE *out = nullptr;

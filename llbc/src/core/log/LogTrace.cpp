@@ -23,6 +23,7 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/log/LogTrace.h"
+#include "llbc/core/log/LoggerConfigInfo.h"
 
 __LLBC_NS_BEGIN
 
@@ -122,14 +123,9 @@ void LLBC_LogTraceMgr::ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey)
         _RebuildTraceInfo();
 }
 
-const std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>* LLBC_LogTraceMgr::GetLogTraceContents(const LLBC_LogTrace::TraceKey &traceKey) const
+const std::map<LLBC_LogTrace::TraceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>> &LLBC_LogTraceMgr::GetLogTraces() const
 {
-    const auto keyIt = _logTraces.find(traceKey);
-    if (keyIt == _logTraces.end())
-    {
-        return nullptr;
-    }
-    return &(keyIt->second);
+    return _logTraces;
 }
 
 size_t LLBC_LogTraceMgr::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const

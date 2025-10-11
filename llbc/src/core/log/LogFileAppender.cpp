@@ -145,7 +145,7 @@ int LLBC_LogFileAppender::Output(const LLBC_LogData &data)
         return LLBC_FAILED;
     }
 
-    if (!data.inColorList && data.level < GetLogLevel())
+    if (!data.logColorTag && data.level < GetLogLevel())
         return LLBC_OK;
 
     CheckAndUpdateLogFile(data.logTime);

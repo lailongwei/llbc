@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/common/Common.h"
+#include "llbc/core/log/LogTrace.h"
 
 __LLBC_NS_BEGIN
 
@@ -83,12 +84,11 @@ public:
      * @return int - the logger log level.
      */
     int GetLogLevel() const;
-
     /**
      * get log color filter list 
-     * @return LLBC_Strings* - logColorFilterList.
+     * @return std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> - logColorFilterList.
      */
-    const LLBC_Strings* GetLogColorFilterList() const;
+    const std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> &GetLogColorFilterList() const;
 
     /**
      * Get appender log level.
@@ -286,7 +286,7 @@ private:
     int _maxBackupIndex;
     int _fileBufferSize;
     bool _lazyCreateLogFile;
-    LLBC_Strings _logColorFilterList;
+    std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> _logColorFilterList;
     bool _takeOver;
 };
 

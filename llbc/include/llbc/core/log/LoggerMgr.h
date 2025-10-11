@@ -185,8 +185,8 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
             else {                                        \
                 __l__ = __loggerMgr__->GetRootLogger();   \
             }                                             \
-            bool inColorList = __l__->InLogColorFilterList(); \
-            if (!inColorList && (level) < __l__->GetLogLevel()) \
+            bool logColorTag =  __l__->GetLogColorTag();  \
+            if (!logColorTag && (level) < __l__->GetLogLevel()) \
                 break;                                    \
                                                           \
             __l__->Output(level,                          \
@@ -194,7 +194,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
                           __FILE__,                       \
                           __LINE__,                       \
                           __FUNCTION__,                   \
-                          inColorList,                    \
+                          logColorTag,             \
                           fmt,                            \
                           ##__VA_ARGS__);                 \
         }                                                 \

@@ -97,18 +97,30 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     // Log time accessor.
     _logTimeAccessor = &logTimeAccessor;
 
-    // log_color_filter_list
-    auto logColorFilterList = cfg["logColorFilterList"].AsStr().strip().split(",;|", -1, true, true);
-    for (auto& elem : logColorFilterList)
+    // Log color filter list
+    auto keyValueGroups = cfg["logColorFilterList"].AsStr().strip().split('|', -1, true);
+    for (auto &group : keyValueGroups)
     {
-        auto normalizedElem = elem.strip();
-        if (!normalizedElem.empty()) 
-            _logColorFilterList.push_back(normalizedElem);
-    }
+        auto keyValuePair = group.strip().split(':', 1, true);
+        if (keyValuePair.size() != 2)
+            continue; // Invalid format​ 
+        
+        LLBC_String key = keyValuePair[0].strip();
+        LLBC_String valueListStr = keyValuePair[1].strip();
+        if (key.empty() || valueListStr.empty())
+            continue;
+        
+        auto values = valueListStr.split(',', -1, true);
+        std::vector<LLBC_LogTrace::TraceContent> valueVec(values.size());
+        for (auto &value : values) {
+            auto normalizedValue = value.strip();
+            if (!normalizedValue.empty()) 
+                valueVec.emplace_back(std::move(normalizedValue)); 
+        }
 
-    // log color filter local test
-    // auto testFilterListValue = cfg["logColorFilterListValue"].AsStr();
-    // _logColorFilterList.push_back(testFilterListValue);
+        if (!valueVec.empty())
+            _logColorFilterList.emplace(LLBC_LogTrace::TraceKey(key), std::move(valueVec)); 
+    }
 
     _asyncMode = __LLBC_GetLogCfg(
         "asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
