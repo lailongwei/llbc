@@ -87,11 +87,8 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
         PyString_AsStringAndSize(obj, &str, &strLen);
 
         var.BecomeStr();
-        LLBC_String *&holdedStr = var.GetMutableHolder()->data.obj.str;
-        if (!holdedStr)
-            holdedStr = new LLBC_String(str, static_cast<size_t>(strLen));
-        else
-            holdedStr->assign(str, static_cast<size_t>(strLen));
+        LLBC_String &holdedStr = var.GetMutableHolder()->data.obj.str;
+        holdedStr.assign(str, static_cast<size_t>(strLen));
 
         return LLBC_OK;
     }
@@ -110,7 +107,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
         PyString_AsStringAndSize(utf8Obj, &str, &strLen);
 
         var.BecomeStr();
-        var.GetMutableHolder()->data.obj.str->assign(str, static_cast<size_t>(strLen));
+        var.GetMutableHolder()->data.obj.str.assign(str, static_cast<size_t>(strLen));
 
         Py_DECREF(utf8Obj);
 
@@ -221,7 +218,7 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
     else if (var.IsStr()) // Str type
     {
         if (!var.IsEmpty())
-            return PyString_FromStringAndSize(var.GetHolder().data.obj.str->c_str(), var.GetHolder().data.obj.str->size());
+            return PyString_FromStringAndSize(var.GetHolder().data.obj.str.c_str(), var.GetHolder().data.obj.str.size());
         else
             return PyString_FromStringAndSize(nullptr, 0);
     }
