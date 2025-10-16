@@ -315,6 +315,7 @@ int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
 
     _lock.Lock();
     const auto ret = _logTraceMgr->AddLogTrace(logTrace);
+    UpdateLogColorTag();
     _lock.Unlock();
 
     return ret;
@@ -330,6 +331,7 @@ int LLBC_Logger::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTime
 
     _lock.Lock();
     const auto ret = _logTraceMgr->RemoveLogTrace(logTrace, setTraceTimesToZero);
+    UpdateLogColorTag();
     _lock.Unlock();
 
     return ret;
@@ -354,6 +356,7 @@ void LLBC_Logger::ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey)
 
     _lock.Lock();
     _logTraceMgr->ClearLogTrace(traceKey);
+    UpdateLogColorTag();
     _lock.Unlock();
 }
 
@@ -364,7 +367,45 @@ void LLBC_Logger::ClearAllLogTraces()
 
     _lock.Lock();
     _logTraceMgr->ClearAllLogTraces();
+    _logColorTag = false;
     _lock.Unlock();
+}
+
+void LLBC_Logger::UpdateLogColorTag()
+{ 
+    if (UNLIKELY(!_logTraceMgr)) 
+    {
+        _logColorTag = false;
+        return;
+    }
+    
+    const auto &colorList = _config->GetLogColorFilterList();
+    const auto &logTraces = _logTraceMgr->GetLogTraces();
+    for (const auto &logTrace : logTraces)
+    {  
+        // check key
+        auto keyValues = colorList.find(logTrace.first);
+        if (keyValues == colorList.end())
+            continue;
+
+        const auto &values = keyValues->second;
+        const auto &traceContents = logTrace.second;
+        for (const auto &content : traceContents)
+        { 
+            auto vecIt = std::find(values.begin(), values.end(), content.first);
+            if (vecIt != values.end()) 
+            {
+                _logColorTag = true;
+                return;
+            }
+        }
+    }
+    _logColorTag = false;
+}
+
+bool LLBC_Logger::GetLogColorTag() 
+{
+    return _logColorTag;
 }
 
 int LLBC_Logger::VOutput(int level,
@@ -372,10 +413,11 @@ int LLBC_Logger::VOutput(int level,
                          const char *file,
                          int line,
                          const char *func,
+                         const bool logColorTag,                         
                          const char *fmt,
                          va_list va) 
 {
-    if (_logLevel > level)
+    if (!logColorTag && level < _logLevel)
         return LLBC_OK;
 
     LLBC_LogData *data = BuildLogData(level,
@@ -383,6 +425,7 @@ int LLBC_Logger::VOutput(int level,
                                       file,
                                       line,
                                       func,
+                                      logColorTag,
                                       fmt,
                                       va);
     if (UNLIKELY(!data))
@@ -451,6 +494,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                                                           const char *file,
                                                           int line,
                                                           const char *func,
+                                                          const bool logColorTag,
                                                           const char *fmt,
                                                           va_list va)
 {
@@ -489,6 +533,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                              file,
                              line,
                              func,
+                             logColorTag,
                              _logTimeAccessor->NowInMicroseconds(),
                              data,
                              libTls);
@@ -538,6 +583,7 @@ LLBC_FORCE_INLINE LLBC_LogData *LLBC_Logger::BuildLogData(int level,
                              file,
                              line,
                              func,
+                             false,
                              time,
                              data,
                              __LLBC_GetLibTls());
@@ -550,6 +596,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
                                                              const char *file,
                                                              int line,
                                                              const char *func,
+                                                             const bool logColorTag,
                                                              sint64 time,
                                                              LLBC_LogData *logData,
                                                              __LLBC_LibTls *libTls)
@@ -562,6 +609,9 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
 
     // fill: log time.
     logData->logTime = time;
+
+    // fill: is in LogColorFilterList
+    logData->logColorTag = logColorTag;
 
     // fill: file, func.
     if (file)
