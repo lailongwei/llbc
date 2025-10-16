@@ -142,7 +142,7 @@ public:
 
     /**
      * Get _logTraces
-     * @return _logTraces
+     * @return {traceKey: [<traceContent, traceTimes>]} - _logTraces
      */
     const std::map<LLBC_LogTrace::TraceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>> &GetLogTraces() const;
 

@@ -92,6 +92,7 @@ public:
 
     /**
      * Get log color tag
+     * @return bool - _logColorTag val
      */
     bool GetLogColorTag();
 

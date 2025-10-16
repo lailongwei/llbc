@@ -56,7 +56,7 @@ struct LLBC_EXPORT LLBC_LogData
     int funcLen;            // Func length
     char tag[32];           // Tag
     int tagLen;             // Tag length
-    bool logColorTag;       // Log color tag, not subject to log level filtering
+    bool logColorTag;       // Log color tag, not affected by log level filtering
 
     std::shared_ptr<LLBC_String> logTrace; // Log trace
 

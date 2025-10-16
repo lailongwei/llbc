@@ -111,15 +111,15 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
             continue;
         
         auto values = valueListStr.split(',', -1, true);
-        std::vector<LLBC_LogTrace::TraceContent> valueVec(values.size());
+        std::vector<LLBC_LogTrace::TraceContent> valueVec;
         for (auto &value : values) {
             auto normalizedValue = value.strip();
             if (!normalizedValue.empty()) 
-                valueVec.emplace_back(std::move(normalizedValue)); 
+                valueVec.emplace_back(normalizedValue); 
         }
 
         if (!valueVec.empty())
-            _logColorFilterList.emplace(LLBC_LogTrace::TraceKey(key), std::move(valueVec)); 
+            _logColorFilterList.emplace(LLBC_LogTrace::TraceKey(key), valueVec); 
     }
 
     _asyncMode = __LLBC_GetLogCfg(

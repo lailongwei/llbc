@@ -84,9 +84,10 @@ public:
      * @return int - the logger log level.
      */
     int GetLogLevel() const;
+
     /**
      * get log color filter list 
-     * @return std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> - logColorFilterList.
+     * @return {traceKey, [traceContent]} - _logColorFilterList
      */
     const std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> &GetLogColorFilterList() const;
 
@@ -286,6 +287,7 @@ private:
     int _maxBackupIndex;
     int _fileBufferSize;
     bool _lazyCreateLogFile;
+    // {traceKey, [traceContent]}
     std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> _logColorFilterList;
     bool _takeOver;
 };

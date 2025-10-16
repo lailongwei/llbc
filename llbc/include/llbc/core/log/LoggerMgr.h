@@ -185,7 +185,7 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
             else {                                        \
                 __l__ = __loggerMgr__->GetRootLogger();   \
             }                                             \
-            bool logColorTag =  __l__->GetLogColorTag();  \
+            const bool logColorTag =  __l__->GetLogColorTag();  \
             if (!logColorTag && (level) < __l__->GetLogLevel()) \
                 break;                                    \
                                                           \
