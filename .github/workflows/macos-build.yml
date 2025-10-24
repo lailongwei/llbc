@@ -38,6 +38,7 @@ jobs:
 
       - name: Build all target by cmake
         run: |
+          cmake --version
           mkdir cmake_build
           cd cmake_build
           cmake ..
