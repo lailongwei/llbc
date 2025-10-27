@@ -40,6 +40,7 @@ private:
     void SyncLoggerMultiThreadTest();
     void DoConditionMacroLogTest();
     int DoLoggerMgrReloadTest();
+    void DoLogColorFilterTest();
 
     void DoLogTraceTest();
     template <typename _KeyTy, typename _ContentTy>
