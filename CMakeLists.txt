@@ -1,5 +1,5 @@
 # CMake minimum version.
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.20)
 
 # Setup c/cxx compilers and linker(if needed).
 # set(CMAKE_C_COMPILER "<path/to/your/c_compiler>")
