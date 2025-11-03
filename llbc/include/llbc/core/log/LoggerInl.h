@@ -33,6 +33,11 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
     return _logLevel;
 }
 
+LLBC_FORCE_INLINE bool LLBC_Logger::GetLogColorTag() const
+{
+    return _logColorTag;
+}
+
 LLBC_FORCE_INLINE
 const LLBC_LogTimeAccessor &LLBC_Logger::GetLogTimeAccessor() const
 {
@@ -85,7 +90,7 @@ void LLBC_Logger::ClearLogTrace(const _TraceKeyTy &traceKey)
                                                   \
         va_list va;                               \
         va_start(va, fmt);                        \
-        int ret = VOutput(LLBC_LogLevel::level, tag, file, line, func, false, fmt, va); \
+        int ret = VOutput(LLBC_LogLevel::level, tag, file, line, func, fmt, va); \
         va_end(va);                               \
                                                   \
         return ret;                               \
@@ -103,16 +108,15 @@ inline int LLBC_Logger::Output(int level,
                                const char *file,
                                int line,
                                const char *func,
-                               const bool logColorTag,
                                const char *fmt,
                                ...)
 {
-    if (!logColorTag && level < _logLevel)
+    if (level < _logLevel && !_logColorTag)
         return LLBC_OK;
 
     va_list va;
     va_start(va, fmt);
-    const int ret = VOutput(level, tag, file, line, func, logColorTag, fmt, va);
+    const int ret = VOutput(level, tag, file, line, func, fmt, va);
     va_end(va);
 
     return ret;

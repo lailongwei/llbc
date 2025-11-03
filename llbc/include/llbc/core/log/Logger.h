@@ -86,15 +86,10 @@ public:
     int GetLogLevel() const;
 
     /**
-     * Update log color tag
+     * Get log color tag.
+     * @return bool.
      */
-    void UpdateLogColorTag();
-
-    /**
-     * Get log color tag
-     * @return bool - _logColorTag val
-     */
-    bool GetLogColorTag();
+    bool GetLogColorTag() const;
 
     /**
      * @brief Set log level.
@@ -274,14 +269,13 @@ public:
 
     /**
      * Output fmt using given level.
-     * @param[in] level          - log level.
-     * @param[in] tag            - log tag, can set to nullptr.
-     * @param[in] file           - log file name.
-     * @param[in] line           - log file line.
-     * @param[in] func           - log function.
-     * @param[in] logColorTag    - log color tag.
-     * @param[in] fmt            - format control string.
-     * @param[in] ...            - optional arguments.
+     * @param[in] level  - log level.
+     * @param[in] tag    - log tag, can set to nullptr.
+     * @param[in] file   - log file name.
+     * @param[in] line   - log file line.
+     * @param[in] func   - log function.
+     * @param[in] fmt    - format control string.
+     * @param[in] ...    - optional arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
     int Output(int level,
@@ -289,20 +283,18 @@ public:
                const char *file,
                int line,
                const char *func,
-               const bool logColorTag,
                const char *fmt,
-               ...) LLBC_STRING_FORMAT_CHECK(8, 9);
+               ...) LLBC_STRING_FORMAT_CHECK(7, 8);
 
     /**
      * Output message by va_list.
-     * @param[in] level          - log level.
-     * @param[in] tag            - log tag, can set to nullptr.
-     * @param[in] file           - log file name.
-     * @param[in] line           - log file line.
-     * @param[in] func           - log function.
-     * @param[in] logColorTag    - log color tag.
-     * @param[in] fmt            - format control string.
-     * @param[in] va             - variadic parameter list.
+     * @param[in] level - log level.
+     * @param[in] tag   - log tag, can set to nullptr.
+     * @param[in] file  - log file name.
+     * @param[in] line  - log file line.
+     * @param[in] func  - log function.
+     * @param[in] fmt   - format control string.
+     * @param[in] va    - variadic parameter list.
      * @return int - return 0 if success, otherwise return -1.
      */
     int VOutput(int level,
@@ -310,7 +302,6 @@ public:
                 const char *file,
                 int line,
                 const char *func,
-                const bool logColorTag,
                 const char *fmt,
                 va_list va);
 
@@ -338,14 +329,13 @@ public:
 private:
     /**
      * Build log data by format control string and variable parameter list.
-     * @param[in] level          - log level.
-     * @param[in] tag            - log tag.
-     * @param[in] file           - log file name.
-     * @param[in] line           - log file line.
-     * @param[in] func           - log function.
-     * @param[in] logColorTag    - log color tag.
-     * @param[in] fmt            - log format control string.
-     * @param[in] va             - the message variable parameter list.
+     * @param[in] level - log level.
+     * @param[in] tag   - log tag.
+     * @param[in] file  - log file name.
+     * @param[in] line  - log file line.
+     * @param[in] func  - log function.
+     * @param[in] fmt   - log format control string.
+     * @param[in] va    - the message variable parameter list.
      * @return LLBC_LogData * - the log data.
      */
     LLBC_LogData *BuildLogData(int level,
@@ -353,7 +343,6 @@ private:
                                const char *file,
                                int line,
                                const char *func,
-                               const bool logColorTag,
                                const char *fmt,
                                va_list va);
 
@@ -379,22 +368,20 @@ private:
 
     /**
      * Fill log data non-msg members.
-     * @param[in] level          - log level.
-     * @param[in] tag            - log tag.
-     * @param[in] file           - log file name.
-     * @param[in] line           - log file line.
-     * @param[in] func           - log function.
-     * @param[in] logColorTag    - log color tag.
-     * @param[in] time           - log time.
-     * @param[in] logData        - log data.
-     * @param[in] libTls         - log tls.
+     * @param[in] level   - log level.
+     * @param[in] tag     - log tag.
+     * @param[in] file    - log file name.
+     * @param[in] line    - log file line.
+     * @param[in] func    - log function.
+     * @param[in] time    - log time.
+     * @param[in] logData - log data.
+     * @param[in] libTls  - log tls.
      */
     void FillLogDataNonMsgMembers(int level,
                                   const char *tag,
                                   const char *file,
                                   int line,
                                   const char *func,
-                                  const bool logColorTag,
                                   sint64 time,
                                   LLBC_LogData *logData,
                                   __LLBC_LibTls *libTls);
@@ -470,7 +457,7 @@ private:
     // LLBC_LogData typed object pool.
     LLBC_TypedObjPool<LLBC_LogData> &_logDataTypedObjPool;
 
-    // Log whether color tag
+    // Log whether color tag.
     bool _logColorTag = false; 
 
     // Log hooks.

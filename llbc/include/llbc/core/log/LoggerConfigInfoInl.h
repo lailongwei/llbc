@@ -43,9 +43,9 @@ inline int LLBC_LoggerConfigInfo::GetLogLevel() const
     return MIN(_consoleLogLevel, _fileLogLevel);
 }
 
-inline const std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> &LLBC_LoggerConfigInfo::GetLogColorFilterList() const
+inline LLBC_LogTraces &LLBC_LoggerConfigInfo::GetRequireColorLogTraces()
 {
-    return _logColorFilterList;
+    return _requireColorLogTraces;
 }
 
 inline bool LLBC_LoggerConfigInfo::IsAsyncMode() const

@@ -89,6 +89,12 @@ public:
     LLBC_LogTrace &operator=(const LLBC_LogTrace &other);
 };
 
+
+// Log traces: {traceKey: [traceContent]}
+typedef std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> LLBC_LogTraces;
+// Log traces extent: {traceKey: [<traceContent, traceTimes>]}
+typedef std::map<LLBC_LogTrace::TraceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>> LLBC_LogTracesEx;
+
 /**
  * The log trace manager(used for manage log traces.
  */
@@ -141,17 +147,41 @@ public:
     void ClearAllLogTraces();
 
     /**
-     * Get _logTraces
-     * @return {traceKey: [<traceContent, traceTimes>]} - _logTraces
-     */
-    const std::map<LLBC_LogTrace::TraceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>> &GetLogTraces() const;
-
-    /**
      * Get trace info(built log traces).
      * @return std::shared_ptr<LLBC_String> - the trace info.
      */
     std::shared_ptr<LLBC_String> GetTraceInfo() const { return _traceInfo; }
 
+public:
+    /**
+     * Init require color log traces.
+     */
+    void InitRequireColorLogTraces(LLBC_LogTraces requireColorLogTraces);
+
+    /**
+     * Update require color log traces.
+     * @return bool - _colorTag val.
+     */
+    bool UpdateColorTag();
+
+    /**
+     * Clear color tag.
+     */
+    void ClearColorTag();
+
+    /**
+     * Add key and content to _requireLogColorLogTraces.
+     * @param[in] traceKey - the trace key, traceContent - the trace content.
+     */
+    void AddLogColorKeyContent(LLBC_LogTrace::TraceKey traceKey, LLBC_LogTrace::TraceContent traceContent);
+
+    /**
+     * Remove content from the key in _requireLogColorLogTraces.
+     * @param[in] traceKey - the trace key, traceContent - the trace content.
+     */
+    int RemoveLogColorKeyContent(LLBC_LogTrace::TraceKey traceKey, LLBC_LogTrace::TraceContent traceContent);
+
+public:
     /**
      * Set trace separators.
      * @param[in] logTracesSep       - the traces separator.
@@ -177,9 +207,14 @@ private:
     // The trace info.
     std::shared_ptr<LLBC_String> _traceInfo;
 
-    // all log traces.
+    // All log traces.
     // {traceKey: [<traceContent, traceTimes>]}
-    std::map<LLBC_LogTrace::TraceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>> _logTraces;
+    LLBC_LogTracesEx _logTracesEx;
+
+    // Log color tag.
+    bool _colorTag = false;
+    // Require color trace: {traceKey: [traceContent]}
+    LLBC_LogTraces _requireColorLogTraces;
 };
 
 __LLBC_NS_END

@@ -86,10 +86,10 @@ public:
     int GetLogLevel() const;
 
     /**
-     * get log color filter list 
-     * @return {traceKey, [traceContent]} - _logColorFilterList
+     * Get require color log traces list. 
+     * @return {traceKey, [traceContent]} - _requireColorLogTraces.
      */
-    const std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> &GetLogColorFilterList() const;
+    LLBC_LogTraces &GetRequireColorLogTraces();
 
     /**
      * Get appender log level.
@@ -288,12 +288,10 @@ private:
     int _fileBufferSize;
     bool _lazyCreateLogFile;
     // {traceKey, [traceContent]}
-    std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> _logColorFilterList;
+    LLBC_LogTraces _requireColorLogTraces;
     bool _takeOver;
 };
 
 __LLBC_NS_END
 
 #include "llbc/core/log/LoggerConfigInfoInl.h"
-
-

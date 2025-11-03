@@ -663,30 +663,30 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     // 10086 in log color filter list, log_level: WARN
     LLBC_PrintLn("fileLogLevel: %s", LLBC_LogLevel::GetLevelStr(rootLogger->GetLogLevel()).c_str());
 
-    LLOG_WARN("10086 in log color filter list, log_level: WARN 预期输出 4~6");
+    LLOG_WARN("10086 in log color filter list, log_level: WARN, will output 4~6");
     LLOG_TRACE("This is a uninited trace log message 1");
     LLOG_DEBUG("This is a uninited debug log message 2");
     LLOG_INFO("This is a uninited info log message 3");
-    LLOG_WARN("This is a uninited warn log message 4");     // 以下输出 (4~6)
+    LLOG_WARN("This is a uninited warn log message 4");     // output (4~6)
     LLOG_ERROR("This is a uninited error log message 5");
     LLOG_FATAL("This is a uninited fatal log message 6");
 
     LLOG_FATAL("--------------------------------------------------------------------");
 
     rootLogger->AddLogTrace("uin", 1088); // logTrace: uin-1088
-    LLOG_WARN("Key uin:1088(not in)  预期输出 10~12");
+    LLOG_WARN("Key uin:1088(not in) will output 10~12");
     LLOG_TRACE("This is a uninited trace log message 7");
     LLOG_DEBUG("This is a uninited debug log message 8");
     LLOG_INFO("This is a uninited info log message 9");
-    LLOG_WARN("This is a uninited warn log message 10");    // 以下输出(10~12)
+    LLOG_WARN("This is a uninited warn log message 10");    // output(10~12)
     LLOG_ERROR("This is a uninited error log message 11");
     LLOG_FATAL("This is a uninited fatal log message 12");
     
     LLOG_FATAL("--------------------------------------------------------------------");
     
     rootLogger->AddLogTrace("uin", 1086); // logTrace: uin-1088, 1086
-    LLOG_WARN("Add uin:1086; [uin:1088(not in),1086(in)]  预期输出 13~18");
-    LLOG_TRACE("This is a uninited trace log message 13");  // 以下输出 (13~18)
+    LLOG_WARN("Add uin:1086; [uin:1088(not in),1086(in)] will output 13~18");
+    LLOG_TRACE("This is a uninited trace log message 13");  // output (13~18)
     LLOG_DEBUG("This is a uninited debug log message 14");
     LLOG_INFO("This is a uninited info log message 15");
     LLOG_WARN("This is a uninited warn log message 16");
@@ -697,7 +697,7 @@ void TestCase_Core_Log::DoLogColorFilterTest()
 
     rootLogger->RemoveLogTrace("uin", 1086, true); // logTrace: uin-1088
     rootLogger->AddLogTrace("coroid", 100001);      // logTrace: uin-1088, coroid:10001
-    LLOG_WARN("Remove uin:1086 add coroid:10001; [uin:1088(not in)|coroid:100001(in)]  预期输出 19~24");
+    LLOG_WARN("Remove uin:1086 add coroid:10001; [uin:1088(not in)|coroid:100001(in)] will output 19~24");
     LLOG_TRACE("This is a uninited trace log message 19");
     LLOG_DEBUG("This is a uninited debug log message 20");
     LLOG_INFO("This is a uninited info log message 21");
@@ -709,7 +709,7 @@ void TestCase_Core_Log::DoLogColorFilterTest()
 
     rootLogger->AddLogTrace("uin", 1087); ; // logTrace: uin-1088, 1087  coroid:10001
     rootLogger->RemoveLogTrace("coroid", 100001, true); // logTrace: uin-1088, 1087
-    LLOG_WARN("Remove coroid:10001 add key uin:1087; [uin:1088(not in),1087(in)]预期输出 25~30");
+    LLOG_WARN("Remove coroid:10001 add key uin:1087; [uin:1088(not in),1087(in)] will output 25~30");
     LLOG_TRACE("This is a uninited trace log message 25");
     LLOG_DEBUG("This is a uninited debug log message 26");
     LLOG_INFO("This is a uninited info log message 27");
@@ -720,7 +720,7 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_FATAL("--------------------------------------------------------------------");
 
     rootLogger->RemoveLogTrace("uin", 1088, true); // logTrace: 1087
-    LLOG_WARN("Remove uin:1088; [uin:1087(in)]预期输出 31~36");
+    LLOG_WARN("Remove uin:1088; [uin:1087(in)] will output 31~36");
     LLOG_TRACE("This is a uninited trace log message 31");
     LLOG_DEBUG("This is a uninited debug log message 32");
     LLOG_INFO("This is a uninited info log message 33");
@@ -728,8 +728,8 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_ERROR("This is a uninited error log message 35");
     LLOG_FATAL("This is a uninited fatal log message 36");
 
-    rootLogger->RemoveLogTrace("uin", 1087, true); // logTrace: 1
-    LLOG_WARN("Remove 1087; []  预期输出 40~42");
+    rootLogger->RemoveLogTrace("uin", 1087, true);
+    LLOG_WARN("Remove 1087; [] will output 40~42");
     LLOG_TRACE("This is a uninited trace log message 37");
     LLOG_DEBUG("This is a uninited debug log message 38");
     LLOG_INFO("This is a uninited info log message 39");

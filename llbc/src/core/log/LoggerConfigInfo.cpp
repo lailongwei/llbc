@@ -97,29 +97,30 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     // Log time accessor.
     _logTimeAccessor = &logTimeAccessor;
 
-    // Log color filter list
-    auto keyValueGroups = cfg["logColorFilterList"].AsStr().strip().split('|', -1, true);
-    for (auto &group : keyValueGroups)
+    // Require color log traces list.
+    auto keyContentsGroups =
+        cfg["requireColorLogTracesList"].AsStr().strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0], -1, true);
+    for (auto &group : keyContentsGroups)
     {
-        auto keyValuePair = group.strip().split(':', 1, true);
-        if (keyValuePair.size() != 2)
+        auto keyContentsPair = group.strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1], 1, true);
+        if (keyContentsPair.size() != 2)
             continue; // Invalid format​ 
         
-        LLBC_String key = keyValuePair[0].strip();
-        LLBC_String valueListStr = keyValuePair[1].strip();
-        if (key.empty() || valueListStr.empty())
+        LLBC_String key = keyContentsPair[0].strip();
+        LLBC_String contentListStr = keyContentsPair[1].strip();
+        if (key.empty() || contentListStr.empty())
             continue;
         
-        auto values = valueListStr.split(',', -1, true);
-        std::vector<LLBC_LogTrace::TraceContent> valueVec;
-        for (auto &value : values) {
-            auto normalizedValue = value.strip();
-            if (!normalizedValue.empty()) 
-                valueVec.emplace_back(normalizedValue); 
+        auto contents = contentListStr.split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2], -1, true);
+        std::vector<LLBC_LogTrace::TraceContent> contentVec;
+        for (auto &content : contents) {
+            auto normalizedContent = content.strip();
+            if (!normalizedContent.empty()) 
+                contentVec.emplace_back(normalizedContent); 
         }
 
-        if (!valueVec.empty())
-            _logColorFilterList.emplace(LLBC_LogTrace::TraceKey(key), valueVec); 
+        if (!contentVec.empty())
+            _requireColorLogTraces.emplace(LLBC_LogTrace::TraceKey(key), contentVec); 
     }
 
     _asyncMode = __LLBC_GetLogCfg(
