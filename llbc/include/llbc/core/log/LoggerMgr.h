@@ -172,41 +172,40 @@ template class LLBC_EXPORT LLBC_NS LLBC_Singleton<LLBC_NS LLBC_LoggerMgr>;
  * @param[in] fmt        - the log message format string.
  * @param[in] ...        - the variadic log message parameters.
  */
-#define LLOG(loggerName, tag, level, fmt, ...)                  \
-    do {                                                        \
-        auto __loggerMgr__ = LLBC_LoggerMgrSingleton;           \
-        if (LIKELY(__loggerMgr__->IsInited())) {                \
-            LLBC_NS LLBC_Logger *__l__;                         \
-            if (loggerName != nullptr) {                        \
-                __l__ = __loggerMgr__->GetLogger(loggerName);   \
-                if (UNLIKELY(__l__ == nullptr))                 \
-                    break;                                      \
-            }                                                   \
-            else {                                              \
-                __l__ = __loggerMgr__->GetRootLogger();         \
-            }                                                   \
-            const bool colorTag =  __l__->GetLogColorTag();     \
-            if ((level) < __l__->GetLogLevel() && !colorTag)    \
-                break;                                          \
-                                                                \
-            __l__->Output(level,                                \
-                          tag,                                  \
-                          __FILE__,                             \
-                          __LINE__,                             \
-                          __FUNCTION__,                         \
-                          fmt,                                  \
-                          ##__VA_ARGS__);                       \
-        }                                                       \
-        else {                                                  \
-            __loggerMgr__->UnInitOutput(level,                  \
-                                        tag,                    \
-                                        __FILE__,               \
-                                        __LINE__,               \
-                                        __FUNCTION__,           \
-                                        fmt,                    \
-                                        ##__VA_ARGS__);         \
-        }                                                       \
-    } while (false)                                             \
+#define LLOG(loggerName, tag, level, fmt, ...)                              \
+    do {                                                                    \
+        auto __loggerMgr__ = LLBC_LoggerMgrSingleton;                       \
+        if (LIKELY(__loggerMgr__->IsInited())) {                            \
+            LLBC_NS LLBC_Logger *__l__;                                     \
+            if (loggerName != nullptr) {                                    \
+                __l__ = __loggerMgr__->GetLogger(loggerName);               \
+                if (UNLIKELY(__l__ == nullptr))                             \
+                    break;                                                  \
+            }                                                               \
+            else {                                                          \
+                __l__ = __loggerMgr__->GetRootLogger();                     \
+            }                                                               \
+            if ((level) < __l__->GetLogLevel() && !__l__->GetLogColorTag()) \
+                break;                                                      \
+                                                                            \
+            __l__->Output(level,                                            \
+                          tag,                                              \
+                          __FILE__,                                         \
+                          __LINE__,                                         \
+                          __FUNCTION__,                                     \
+                          fmt,                                              \
+                          ##__VA_ARGS__);                                   \
+        }                                                                   \
+        else {                                                              \
+            __loggerMgr__->UnInitOutput(level,                              \
+                                        tag,                                \
+                                        __FILE__,                           \
+                                        __LINE__,                           \
+                                        __FUNCTION__,                       \
+                                        fmt,                                \
+                                        ##__VA_ARGS__);                     \
+        }                                                                   \
+    } while (false)                                                         \
 
 #define LLOG_DEBUG(fmt, ...) LLOG(nullptr, nullptr, LLBC_NS LLBC_LogLevel::Debug, fmt, ##__VA_ARGS__)
 #define LLOG_DEBUG2(loggerName, fmt, ...) LLOG(loggerName, nullptr, LLBC_NS LLBC_LogLevel::Debug, fmt, ##__VA_ARGS__)

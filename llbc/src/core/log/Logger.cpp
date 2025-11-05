@@ -99,7 +99,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
 
     _logLevel = config->GetLogLevel();
     _config = new LLBC_LoggerConfigInfo(*config);
-    _logTraceMgr->InitRequireColorLogTraces(_config->GetRequireColorLogTraces());
+    _logTraceMgr->UpdateColorLogTraces(_config->GetRequireColorLogTraces());
 
     _logTimeAccessor = &_config->GetLogTimeAccessor();
 
@@ -316,7 +316,6 @@ int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
 
     _lock.Lock();
     const auto ret = _logTraceMgr->AddLogTrace(logTrace);
-    _logColorTag =_logTraceMgr->UpdateColorTag();
     _lock.Unlock();
 
     return ret;
@@ -332,7 +331,6 @@ int LLBC_Logger::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTime
 
     _lock.Lock();
     const auto ret = _logTraceMgr->RemoveLogTrace(logTrace, setTraceTimesToZero);
-    _logColorTag =_logTraceMgr->UpdateColorTag();
     _lock.Unlock();
 
     return ret;
@@ -357,7 +355,6 @@ void LLBC_Logger::ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey)
 
     _lock.Lock();
     _logTraceMgr->ClearLogTrace(traceKey);
-    _logColorTag = _logTraceMgr->UpdateColorTag();
     _lock.Unlock();
 }
 
@@ -368,8 +365,6 @@ void LLBC_Logger::ClearAllLogTraces()
 
     _lock.Lock();
     _logTraceMgr->ClearAllLogTraces();
-    _logTraceMgr->ClearColorTag();
-    _logColorTag = false;
     _lock.Unlock();
 }
 
@@ -381,7 +376,7 @@ int LLBC_Logger::VOutput(int level,
                          const char *fmt,
                          va_list va) 
 {
-    if (level < _logLevel && !_logColorTag)
+    if (level < _logLevel && !GetLogColorTag())
         return LLBC_OK;
 
     LLBC_LogData *data = BuildLogData(level,
@@ -570,7 +565,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->logTime = time;
 
     // fill: is in LogColorFilterList.
-    logData->logColorTag = _logColorTag;
+    logData->logColorTag = GetLogColorTag();
 
     // fill: file, func.
     if (file)

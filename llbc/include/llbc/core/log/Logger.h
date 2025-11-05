@@ -89,7 +89,7 @@ public:
      * Get log color tag.
      * @return bool.
      */
-    bool GetLogColorTag() const;
+    const bool GetLogColorTag() const;
 
     /**
      * @brief Set log level.
@@ -456,9 +456,6 @@ private:
     LLBC_ObjPool _objPool;
     // LLBC_LogData typed object pool.
     LLBC_TypedObjPool<LLBC_LogData> &_logDataTypedObjPool;
-
-    // Log whether color tag.
-    bool _logColorTag = false; 
 
     // Log hooks.
     LLBC_Delegate<void(const LLBC_LogData *)> _logHooks[LLBC_LogLevel::End];

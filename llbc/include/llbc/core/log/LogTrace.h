@@ -154,32 +154,39 @@ public:
 
 public:
     /**
-     * Init require color log traces.
+     * Update color log traces.
+     * @param[in] requireColorLogTraces - conf log traces.
      */
-    void InitRequireColorLogTraces(LLBC_LogTraces requireColorLogTraces);
+    void UpdateColorLogTraces(LLBC_LogTraces &requireColorLogTraces);
 
     /**
      * Update require color log traces.
-     * @return bool - _colorTag val.
      */
-    bool UpdateColorTag();
+    void UpdateColorTag();
 
     /**
      * Clear color tag.
+     * @return bool - color tag val.
      */
-    void ClearColorTag();
+    const bool GetColorTag() const { return _colorTag; };
 
     /**
      * Add key and content to _requireLogColorLogTraces.
      * @param[in] traceKey - the trace key, traceContent - the trace content.
      */
-    void AddLogColorKeyContent(LLBC_LogTrace::TraceKey traceKey, LLBC_LogTrace::TraceContent traceContent);
+    void AddLogColorKeyContent(const LLBC_LogTrace::TraceKey &traceKey, const LLBC_LogTrace::TraceContent &traceContent);
 
     /**
      * Remove content from the key in _requireLogColorLogTraces.
      * @param[in] traceKey - the trace key, traceContent - the trace content.
      */
-    int RemoveLogColorKeyContent(LLBC_LogTrace::TraceKey traceKey, LLBC_LogTrace::TraceContent traceContent);
+    int RemoveLogColorKeyContent(const LLBC_LogTrace::TraceKey &traceKey, const LLBC_LogTrace::TraceContent &traceContent);
+
+    /**
+     * Remove key.
+     * @param[in] traceKey - the trace key.
+     */
+    int RemoveLogColorKey(const LLBC_LogTrace::TraceKey &traceKey);
 
 public:
     /**

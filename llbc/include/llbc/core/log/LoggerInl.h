@@ -33,9 +33,9 @@ LLBC_FORCE_INLINE int LLBC_Logger::GetLogLevel() const
     return _logLevel;
 }
 
-LLBC_FORCE_INLINE bool LLBC_Logger::GetLogColorTag() const
+LLBC_FORCE_INLINE const bool LLBC_Logger::GetLogColorTag() const
 {
-    return _logColorTag;
+    return _logTraceMgr->GetColorTag();
 }
 
 LLBC_FORCE_INLINE
@@ -111,7 +111,7 @@ inline int LLBC_Logger::Output(int level,
                                const char *fmt,
                                ...)
 {
-    if (level < _logLevel && !_logColorTag)
+    if (level < _logLevel && !GetLogColorTag())
         return LLBC_OK;
 
     va_list va;

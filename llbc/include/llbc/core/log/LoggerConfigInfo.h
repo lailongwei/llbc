@@ -287,7 +287,6 @@ private:
     int _maxBackupIndex;
     int _fileBufferSize;
     bool _lazyCreateLogFile;
-    // {traceKey, [traceContent]}
     LLBC_LogTraces _requireColorLogTraces;
     bool _takeOver;
 };
