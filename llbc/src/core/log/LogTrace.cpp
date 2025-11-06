@@ -255,7 +255,7 @@ int LLBC_LogTraceMgr::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey)
     return LLBC_OK;
 }
 
-void LLBC_LogTraceMgr::ClearAllColorLogTrace()
+void LLBC_LogTraceMgr::ClearAllColorLogTraces()
 {
     _requireColorLogTraces.clear();
     _colorLogTag = false;

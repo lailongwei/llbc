@@ -361,13 +361,13 @@ int LLBC_Logger::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey)
     return ret;
 }
 
-void LLBC_Logger::ClearAllColorLogTrace()
+void LLBC_Logger::ClearAllColorLogTraces()
 {
     if (!_logTraceMgr)
         return;
     
      _lock.Lock();
-     _logTraceMgr->ClearAllColorLogTrace();
+     _logTraceMgr->ClearAllColorLogTraces();
     _lock.Unlock();
 }
 

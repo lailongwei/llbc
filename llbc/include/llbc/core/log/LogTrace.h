@@ -187,9 +187,9 @@ public:
     int RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey);
 
     /**
-     * Clear all color log trace.
+     * Clear all color log traces.
      */
-    void ClearAllColorLogTrace();
+    void ClearAllColorLogTraces();
 
 public:
     /**

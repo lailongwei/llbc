@@ -178,9 +178,9 @@ public:
     int RemoveColorLogKey(const _TraceKeyTy &traceKey);
 
     /**
-     * Clear all color log trace.
+     * Clear all color log traces.
      */
-    void ClearAllColorLogTrace();
+    void ClearAllColorLogTraces();
 
 public:
     /**
