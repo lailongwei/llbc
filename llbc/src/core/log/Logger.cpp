@@ -306,6 +306,58 @@ int LLBC_Logger::SetLogHook(std::initializer_list<int> logLevels,
     return LLBC_OK;
 }
 
+bool LLBC_Logger::GetColorLogTag() const
+{
+    if (UNLIKELY(!_logTraceMgr))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+    return _logTraceMgr->GetColorLogTag();
+}
+
+int LLBC_Logger::AddColorLogTrace(const LLBC_LogTrace &logTrace)
+{
+    if (!_logTraceMgr)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+     _lock.Lock();
+    const auto ret = _logTraceMgr->AddColorLogTrace(logTrace);
+    _lock.Unlock();
+
+    return ret;
+}
+
+int LLBC_Logger::RemoveColorLogTrace(const LLBC_LogTrace &logTrace)
+{
+    if (!_logTraceMgr)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+     _lock.Lock();
+    const auto ret = _logTraceMgr->RemoveColorLogTrace(logTrace);
+    _lock.Unlock();
+
+    return ret;
+}
+
+int LLBC_Logger::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey)
+{
+    if (!_logTraceMgr)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+     _lock.Lock();
+    const auto ret = _logTraceMgr->RemoveColorLogKey(traceKey);
+    _lock.Unlock();
+
+    return ret;
+}
+
 int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
 {
     if (UNLIKELY(!_logTraceMgr))
@@ -372,11 +424,11 @@ int LLBC_Logger::VOutput(int level,
                          const char *tag,
                          const char *file,
                          int line,
-                         const char *func,               
+                         const char *func, 
                          const char *fmt,
                          va_list va) 
 {
-    if (level < _logLevel && !GetLogColorTag())
+    if (level < _logLevel && !GetColorLogTag())
         return LLBC_OK;
 
     LLBC_LogData *data = BuildLogData(level,
@@ -565,7 +617,7 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
     logData->logTime = time;
 
     // fill: is in LogColorFilterList.
-    logData->logColorTag = GetLogColorTag();
+    logData->logColorTag = GetColorLogTag();
 
     // fill: file, func.
     if (file)

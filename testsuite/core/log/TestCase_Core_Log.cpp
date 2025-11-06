@@ -737,6 +737,53 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_ERROR("This is a uninited error log message 41");
     LLOG_FATAL("This is a uninited fatal log message 42");
 
+    rootLogger->AddColorLogTrace("NickName", "playerA");
+    rootLogger->AddColorLogTrace("NickName", "playerC");
+
+    rootLogger->AddLogTrace("NickName", "playerB");
+    LLOG_WARN("add key NickName:PlayerB; ["":playerB(not in)] will output 46~48");
+    LLOG_TRACE("This is a uninited trace log message 43");
+    LLOG_DEBUG("This is a uninited debug log message 44");
+    LLOG_INFO("This is a uninited info log message 45"); 
+    LLOG_WARN("This is a uninited warn log message 46"); // output(46~48)
+    LLOG_ERROR("This is a uninited error log message 47");
+    LLOG_FATAL("This is a uninited fatal log message 48");
+
+    rootLogger->AddLogTrace("NickName", "playerA");
+    LLOG_WARN("[add key NickName:PlayerA: playerB(not in), PlayerA(in)] will output 49~54");
+    LLOG_TRACE("This is a uninited trace log message 49"); // output(49~54)
+    LLOG_DEBUG("This is a uninited debug log message 50");
+    LLOG_INFO("This is a uninited info log message 51"); 
+    LLOG_WARN("This is a uninited warn log message 52"); 
+    LLOG_ERROR("This is a uninited error log message 53");
+    LLOG_FATAL("This is a uninited fatal log message 54");
+
+    rootLogger->RemoveColorLogTrace("NickName", "playerA");
+    LLOG_WARN("[remove NickName:PlayerA: playerB(not in -> not in)] will output 57~60");
+    LLOG_TRACE("This is a uninited trace log message 55"); 
+    LLOG_DEBUG("This is a uninited debug log message 56");
+    LLOG_INFO("This is a uninited info log message 57"); // output(57~60)
+    LLOG_WARN("This is a uninited warn log message 58"); 
+    LLOG_ERROR("This is a uninited error log message 59");
+    LLOG_FATAL("This is a uninited fatal log message 60");
+
+    rootLogger->AddLogTrace("NickName", "playerC");
+    LLOG_WARN("[add key NickName:PlayerC: playerB(not in), playerA(not in), playerC(in)] will output 61~66");
+    LLOG_TRACE("This is a uninited trace log message 61");  // output(61~66)
+    LLOG_DEBUG("This is a uninited debug log message 62");
+    LLOG_INFO("This is a uninited info log message 63");
+    LLOG_WARN("This is a uninited warn log message 64"); 
+    LLOG_ERROR("This is a uninited error log message 65");
+    LLOG_FATAL("This is a uninited fatal log message 66");
+
+    rootLogger->RemoveColorLogKey("NickName");
+    LLOG_WARN("[Remove all key. NickName :playerB(not in), playerA(not in), PlayerC(in -> not in)] will output 70~72");
+    LLOG_TRACE("This is a uninited trace log message 67"); 
+    LLOG_DEBUG("This is a uninited debug log message 68");
+    LLOG_INFO("This is a uninited info log message 69"); 
+    LLOG_WARN("This is a uninited warn log message 70"); // output(70~72)
+    LLOG_ERROR("This is a uninited error log message 71");
+    LLOG_FATAL("This is a uninited fatal log message 72");
 }
 
 template <typename _KeyTy, typename _ContentTy>

@@ -86,12 +86,6 @@ public:
     int GetLogLevel() const;
 
     /**
-     * Get log color tag.
-     * @return bool.
-     */
-    const bool GetLogColorTag() const;
-
-    /**
      * @brief Set log level.
      * @param[in] appenderType - the log appender type.
      * @param[in] logLevel     - the log level(End will disabled logger).
@@ -128,6 +122,60 @@ public:
      * @return const LLBC_ObjPool & - logger object pool.
      */
     const LLBC_ObjPool &GetLoggerObjPool() const;
+
+public:
+    /**
+     * Get color log tag.
+     * @return bool - the color log tag.
+     */
+    bool GetColorLogTag() const;
+
+    /**
+     * Add key and content to _requireLogColorLogTraces.
+     * @param[in] logTrace - the log trace.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddColorLogTrace(const LLBC_LogTrace &logTrace);
+
+    /**
+     * Add log key and content to _requireLogColorLogTraces.
+     * @param[in] traceKey     - the trace key.
+     * @param[in] traceContent - the trace content.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename _TraceKeyTy, typename _TraceContentTy>
+    int AddColorLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent);
+
+    /**
+     * Remove specific log color key contents.
+     * @param[in] logTrace - the log trace.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveColorLogTrace(const LLBC_LogTrace &logTrace);
+
+    /**
+     * Remove specific log color key contents.
+     * @param[in] traceKey     - the trace key.
+     * @param[in] traceContent - the trace content.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename _TraceKeyTy, typename _TraceContentTy>
+    int RemoveColorLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent);
+
+    /**
+     * Remove specific color key.
+     * @param[in] traceKey - the trace key.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey);
+
+    /**
+     * Clear specific key log traces.
+     * @param[in] traceKey - the trace key.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    template <typename _TraceKeyTy>
+    int RemoveColorLogKey(const _TraceKeyTy &traceKey);
 
 public:
     /**

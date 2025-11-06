@@ -104,16 +104,17 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     {
         auto keyContentsPair = group.strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1], 1, true);
         if (keyContentsPair.size() != 2)
-            continue; // Invalid format​ 
+            continue;
         
         LLBC_String key = keyContentsPair[0].strip();
         LLBC_String contentListStr = keyContentsPair[1].strip();
         if (key.empty() || contentListStr.empty())
             continue;
-        
-        auto contents = contentListStr.split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2], -1, true);
+
         std::vector<LLBC_LogTrace::TraceContent> contentVec;
-        for (auto &content : contents) {
+        auto contents = contentListStr.split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2], -1, true);
+        for (auto &content : contents)
+        {
             auto normalizedContent = content.strip();
             if (!normalizedContent.empty()) 
                 contentVec.emplace_back(normalizedContent); 
