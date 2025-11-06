@@ -323,6 +323,7 @@ int LLBC_Logger::AddColorLogTrace(const LLBC_LogTrace &logTrace)
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
+
      _lock.Lock();
     const auto ret = _logTraceMgr->AddColorLogTrace(logTrace);
     _lock.Unlock();
@@ -337,6 +338,7 @@ int LLBC_Logger::RemoveColorLogTrace(const LLBC_LogTrace &logTrace)
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
+
      _lock.Lock();
     const auto ret = _logTraceMgr->RemoveColorLogTrace(logTrace);
     _lock.Unlock();
@@ -351,11 +353,22 @@ int LLBC_Logger::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey)
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
+    
      _lock.Lock();
     const auto ret = _logTraceMgr->RemoveColorLogKey(traceKey);
     _lock.Unlock();
 
     return ret;
+}
+
+void LLBC_Logger::ClearAllColorLogTrace()
+{
+    if (!_logTraceMgr)
+        return;
+    
+     _lock.Lock();
+     _logTraceMgr->ClearAllColorLogTrace();
+    _lock.Unlock();
 }
 
 int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)

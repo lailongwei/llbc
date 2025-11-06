@@ -166,7 +166,7 @@ public:
     bool GetColorLogTag() const;
 
     /**
-     * Add key and content to _requireLogColorLogTraces.
+     * Add key and content to color log trace.
      * @param[in] logTrace - the log trace.
      * @return int - return 0 if success, otherwise return -1.
      */
@@ -185,6 +185,11 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     int RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey);
+
+    /**
+     * Clear all color log trace.
+     */
+    void ClearAllColorLogTrace();
 
 public:
     /**

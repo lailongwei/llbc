@@ -23,7 +23,6 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/log/LogTrace.h"
-#include "llbc/core/log/LoggerConfigInfo.h"
 
 __LLBC_NS_BEGIN
 
@@ -206,8 +205,10 @@ int LLBC_LogTraceMgr::AddColorLogTrace(const LLBC_LogTrace &logTrace)
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
+
     contents.emplace_back(logTrace.traceContent);
     UpdateColorLogTag();
+
     return LLBC_OK;
 }
 
@@ -239,7 +240,7 @@ int LLBC_LogTraceMgr::RemoveColorLogTrace(const LLBC_LogTrace &logTrace)
     return LLBC_OK;
 }
 
-int LLBC_LogTraceMgr::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey) 
+int LLBC_LogTraceMgr::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey)
 {
     const auto keyContentsIt = _requireColorLogTraces.find(traceKey);
     if (keyContentsIt == _requireColorLogTraces.end())
@@ -247,10 +248,17 @@ int LLBC_LogTraceMgr::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey)
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
+
     _requireColorLogTraces.erase(keyContentsIt);
     UpdateColorLogTag();
 
     return LLBC_OK;
+}
+
+void LLBC_LogTraceMgr::ClearAllColorLogTrace()
+{
+    _requireColorLogTraces.clear();
+    _colorLogTag = false;
 }
 
 void LLBC_LogTraceMgr::SetSeparators(char logTracesSep, char traceKeyContentSep, char traceContentsSep)

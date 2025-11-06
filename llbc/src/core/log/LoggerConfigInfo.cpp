@@ -97,9 +97,9 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     // Log time accessor.
     _logTimeAccessor = &logTimeAccessor;
 
-    // Require color log traces list.
+    // Require color log traces.
     auto keyContentsGroups =
-        cfg["requireColorLogTracesList"].AsStr().strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0], -1, true);
+        cfg["requireColorLogTraces"].AsStr().strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0], -1, true);
     for (auto &group : keyContentsGroups)
     {
         auto keyContentsPair = group.strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1], 1, true);
