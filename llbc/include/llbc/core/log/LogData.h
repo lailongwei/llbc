@@ -50,12 +50,12 @@ struct LLBC_EXPORT LLBC_LogData
     int level;              // Log level.
     sint64 logTime;         // Log time.
 
-    char file[128];         // File
-    int fileLen;            // File length
-    char func[48];          // Func
-    int funcLen;            // Func length
-    char tag[32];           // Tag
-    int tagLen;             // Tag length
+    char file[128];         // File.
+    int fileLen;            // File length.
+    char func[48];          // Func.
+    int funcLen;            // Func length.
+    char tag[32];           // Tag.
+    int tagLen;             // Tag length.
     bool logColorTag;       // Log color tag, not affected by log level filtering.
 
     std::shared_ptr<LLBC_String> logTrace; // Log trace
