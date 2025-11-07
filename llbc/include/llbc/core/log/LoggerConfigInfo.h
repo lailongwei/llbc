@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/common/Common.h"
+#include "llbc/core/log/LogTrace.h"
 
 __LLBC_NS_BEGIN
 
@@ -83,6 +84,12 @@ public:
      * @return int - the logger log level.
      */
     int GetLogLevel() const;
+
+    /**
+     * Get require color log traces list. 
+     * @return {traceKey, [traceContent]} - _requireColorLogTraces.
+     */
+    LLBC_LogTraces &GetRequireColorLogTraces();
 
     /**
      * Get appender log level.
@@ -280,12 +287,10 @@ private:
     int _maxBackupIndex;
     int _fileBufferSize;
     bool _lazyCreateLogFile;
-
+    LLBC_LogTraces _requireColorLogTraces;
     bool _takeOver;
 };
 
 __LLBC_NS_END
 
 #include "llbc/core/log/LoggerConfigInfoInl.h"
-
-

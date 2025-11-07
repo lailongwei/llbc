@@ -89,6 +89,12 @@ public:
     LLBC_LogTrace &operator=(const LLBC_LogTrace &other);
 };
 
+
+// Log traces: {traceKey: [traceContent]}
+typedef std::map<LLBC_LogTrace::TraceKey, std::vector<LLBC_LogTrace::TraceContent>> LLBC_LogTraces;
+// Log traces extent: {traceKey: [<traceContent, traceTimes>]}
+typedef std::map<LLBC_LogTrace::TraceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>> LLBC_LogTracesEx;
+
 /**
  * The log trace manager(used for manage log traces.
  */
@@ -144,8 +150,48 @@ public:
      * Get trace info(built log traces).
      * @return std::shared_ptr<LLBC_String> - the trace info.
      */
-    std::shared_ptr<LLBC_String> GetTraceInfo() const { return _traceInfo; }
+    std::shared_ptr<LLBC_String> GetTraceInfo() const;
 
+public:
+    /**
+     * Update color log traces.
+     * @param[in] requireColorLogTraces - conf log traces.
+     */
+    void UpdateColorLogTraces(const LLBC_LogTraces &requireColorLogTraces);
+
+    /**
+     * Get color log tag.
+     * @return bool - color log tag val.
+     */
+    bool GetColorLogTag() const;
+
+    /**
+     * Add key and content to color log trace.
+     * @param[in] logTrace - the log trace.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddColorLogTrace(const LLBC_LogTrace &logTrace);
+
+    /**
+     * Remove specific log color key contents.
+     * @param[in] logTrace - the log trace.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveColorLogTrace(const LLBC_LogTrace &logTrace);
+
+    /**
+     * Remove specific color key.
+     * @param[in] traceKey - the trace key.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey);
+
+    /**
+     * Clear all color log traces.
+     */
+    void ClearAllColorLogTraces();
+
+public:
     /**
      * Set trace separators.
      * @param[in] logTracesSep       - the traces separator.
@@ -160,7 +206,12 @@ private:
     /**
      * Rebuild trace info.
      */
-    void _RebuildTraceInfo();
+    void RebuildTraceInfo();
+
+    /**
+     * Update require color log tag.
+     */
+    void UpdateColorLogTag();
 
 private:
     // The log trace separators.
@@ -171,9 +222,14 @@ private:
     // The trace info.
     std::shared_ptr<LLBC_String> _traceInfo;
 
-    // all log traces.
+    // All log traces.
     // {traceKey: [<traceContent, traceTimes>]}
-    std::map<LLBC_LogTrace::TraceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>> _logTraces;
+    LLBC_LogTracesEx _logTracesEx;
+
+    // Color log tag.
+    volatile bool _colorLogTag;
+    // Require color trace: {traceKey: [traceContent]}
+    LLBC_LogTraces _requireColorLogTraces;
 };
 
 __LLBC_NS_END
