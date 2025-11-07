@@ -222,6 +222,9 @@ int LLBC_LoggerConfigurator::ReConfig(LLBC_Logger *logger) const
             LLBC_GetLastError() != LLBC_ERROR_NOT_FOUND)
             return LLBC_FAILED;
 
+        // - Update color log traces.
+        logger->UpdateColorLogTraces(info->GetRequireColorLogTraces());
+
         // - Re-Config other appender attributes.
         // ... ...
     }
