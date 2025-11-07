@@ -89,7 +89,7 @@ public:
      * Get require color log traces list. 
      * @return {traceKey, [traceContent]} - _requireColorLogTraces.
      */
-    LLBC_LogTraces &GetRequireColorLogTraces();
+    const LLBC_LogTraces &GetRequireColorLogTraces() const;
 
     /**
      * Get appender log level.
