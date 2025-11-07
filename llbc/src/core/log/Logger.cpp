@@ -371,6 +371,16 @@ void LLBC_Logger::ClearAllColorLogTraces()
     _lock.Unlock();
 }
 
+void LLBC_Logger::UpdateColorLogTraces(const LLBC_LogTraces &requireColorLogTraces)
+{
+    if (!_logTraceMgr)
+        return;
+
+     _lock.Lock();
+     _logTraceMgr->UpdateColorLogTraces(requireColorLogTraces);
+    _lock.Unlock();
+}
+
 int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
 {
     if (UNLIKELY(!_logTraceMgr))
