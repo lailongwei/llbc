@@ -50,7 +50,7 @@ LLBC_Logger::LLBC_Logger()
 , _config(nullptr)
 
 , _logTraceMgr(new LLBC_LogTraceMgr(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0],
-               						LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1],
+                                    LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1],
                						LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2]))
 
 , _logRunnable(nullptr)
@@ -99,6 +99,7 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
 
     _logLevel = config->GetLogLevel();
     _config = new LLBC_LoggerConfigInfo(*config);
+    _logTraceMgr->UpdateColorLogTraces(_config->GetRequireColorLogTraces());
 
     _logTimeAccessor = &_config->GetLogTimeAccessor();
 
@@ -305,6 +306,71 @@ int LLBC_Logger::SetLogHook(std::initializer_list<int> logLevels,
     return LLBC_OK;
 }
 
+bool LLBC_Logger::GetColorLogTag() const
+{
+    if (UNLIKELY(!_logTraceMgr))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+    return _logTraceMgr->GetColorLogTag();
+}
+
+int LLBC_Logger::AddColorLogTrace(const LLBC_LogTrace &logTrace)
+{
+    if (!_logTraceMgr)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+     _lock.Lock();
+    const auto ret = _logTraceMgr->AddColorLogTrace(logTrace);
+    _lock.Unlock();
+
+    return ret;
+}
+
+int LLBC_Logger::RemoveColorLogTrace(const LLBC_LogTrace &logTrace)
+{
+    if (!_logTraceMgr)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+     _lock.Lock();
+    const auto ret = _logTraceMgr->RemoveColorLogTrace(logTrace);
+    _lock.Unlock();
+
+    return ret;
+}
+
+int LLBC_Logger::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey)
+{
+    if (!_logTraceMgr)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+    
+     _lock.Lock();
+    const auto ret = _logTraceMgr->RemoveColorLogKey(traceKey);
+    _lock.Unlock();
+
+    return ret;
+}
+
+void LLBC_Logger::ClearAllColorLogTraces()
+{
+    if (!_logTraceMgr)
+        return;
+    
+     _lock.Lock();
+     _logTraceMgr->ClearAllColorLogTraces();
+    _lock.Unlock();
+}
+
 int LLBC_Logger::AddLogTrace(const LLBC_LogTrace &logTrace)
 {
     if (UNLIKELY(!_logTraceMgr))
@@ -371,11 +437,11 @@ int LLBC_Logger::VOutput(int level,
                          const char *tag,
                          const char *file,
                          int line,
-                         const char *func,
+                         const char *func, 
                          const char *fmt,
                          va_list va) 
 {
-    if (_logLevel > level)
+    if (level < _logLevel && !GetColorLogTag())
         return LLBC_OK;
 
     LLBC_LogData *data = BuildLogData(level,
@@ -562,6 +628,9 @@ LLBC_FORCE_INLINE void LLBC_Logger::FillLogDataNonMsgMembers(int level,
 
     // fill: log time.
     logData->logTime = time;
+
+    // fill: is in LogColorFilterList.
+    logData->logColorTag = GetColorLogTag();
 
     // fill: file, func.
     if (file)

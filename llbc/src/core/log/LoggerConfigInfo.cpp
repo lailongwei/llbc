@@ -97,6 +97,33 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     // Log time accessor.
     _logTimeAccessor = &logTimeAccessor;
 
+    // Require color log traces.
+    auto keyContentsGroups =
+        cfg["requireColorLogTraces"].AsStr().strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0], -1, true);
+    for (auto &group : keyContentsGroups)
+    {
+        auto keyContentsPair = group.strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1], 1, true);
+        if (keyContentsPair.size() != 2)
+            continue;
+        
+        LLBC_String key = keyContentsPair[0].strip();
+        LLBC_String contentListStr = keyContentsPair[1].strip();
+        if (key.empty() || contentListStr.empty())
+            continue;
+
+        std::vector<LLBC_LogTrace::TraceContent> contentVec;
+        auto contents = contentListStr.split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2], -1, true);
+        for (auto &content : contents)
+        {
+            auto normalizedContent = content.strip();
+            if (!normalizedContent.empty()) 
+                contentVec.emplace_back(normalizedContent); 
+        }
+
+        if (!contentVec.empty())
+            _requireColorLogTraces.emplace(LLBC_LogTrace::TraceKey(key), contentVec); 
+    }
+
     _asyncMode = __LLBC_GetLogCfg(
         "asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
     if (_asyncMode)
