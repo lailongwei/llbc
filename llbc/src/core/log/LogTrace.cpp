@@ -31,6 +31,7 @@ LLBC_LogTraceMgr::LLBC_LogTraceMgr(char logTracesSep, char traceKeyContentSep, c
 , _logTraceKeyContentSep(traceKeyContentSep)
 , _traceContentsSep(traceContentsSep)
 {
+    _colorLogTag = false;
 }
 
 int LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
@@ -42,12 +43,12 @@ int LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
         return LLBC_FAILED;
     }
 
-    // Insert to _logTraces or add traceTimes.
+    // Insert to _logTracesEx or add traceTimes.
     // - Find trace contents.
     bool needRebuild = false;
-    auto keyIt = _logTraces.find(logTrace.traceKey);
-    if (UNLIKELY(keyIt == _logTraces.end()))
-        keyIt = _logTraces.emplace(logTrace.traceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>()).first;
+    auto keyIt = _logTracesEx.find(logTrace.traceKey);
+    if (UNLIKELY(keyIt == _logTracesEx.end()))
+        keyIt = _logTracesEx.emplace(logTrace.traceKey, std::vector<std::pair<LLBC_LogTrace::TraceContent, sint64>>()).first;
 
     // - Find content it, incr traceTimes or insert new content.
     auto &traceContents = keyIt->second;
@@ -73,15 +74,17 @@ int LLBC_LogTraceMgr::AddLogTrace(const LLBC_LogTrace &logTrace)
     }
 
     if (needRebuild)
-        _RebuildTraceInfo();
-
+    {
+        RebuildTraceInfo();
+        UpdateColorLogTag();
+    }
     return LLBC_OK;
 }
 
 int LLBC_LogTraceMgr::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTraceTimesToZero)
 {
-    const auto keyIt = _logTraces.find(logTrace.traceKey);
-    if (keyIt == _logTraces.end())
+    const auto keyIt = _logTracesEx.find(logTrace.traceKey);
+    if (keyIt == _logTracesEx.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
@@ -104,28 +107,30 @@ int LLBC_LogTraceMgr::RemoveLogTrace(const LLBC_LogTrace &logTrace, bool setTrac
             return LLBC_OK;
 
     traceContents.erase(contentIt);
-    _RebuildTraceInfo();
+    RebuildTraceInfo();
+    UpdateColorLogTag();
 
     return LLBC_OK;
 }
 
 void LLBC_LogTraceMgr::ClearLogTrace(const LLBC_LogTrace::TraceKey &traceKey)
 {
-    const auto keyIt = _logTraces.find(traceKey);
-    if (keyIt == _logTraces.end())
+    const auto keyIt = _logTracesEx.find(traceKey);
+    if (keyIt == _logTracesEx.end())
         return;
 
     const bool needRebuild = !keyIt->second.empty();
-    _logTraces.erase(keyIt);
+    _logTracesEx.erase(keyIt);
+    UpdateColorLogTag();
 
     if (needRebuild)
-        _RebuildTraceInfo();
+        RebuildTraceInfo();
 }
 
 size_t LLBC_LogTraceMgr::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const
 {
-    const auto keyIt = _logTraces.find(logTrace.traceKey);
-    if (keyIt == _logTraces.end())
+    const auto keyIt = _logTracesEx.find(logTrace.traceKey);
+    if (keyIt == _logTracesEx.end())
         return 0;
 
     const auto &traceContents = keyIt->second;
@@ -141,7 +146,119 @@ size_t LLBC_LogTraceMgr::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const
 void LLBC_LogTraceMgr::ClearAllLogTraces()
 {
     _traceInfo.reset();
-    _logTraces.clear();
+    _logTracesEx.clear();
+    _colorLogTag = false;
+}
+
+void LLBC_LogTraceMgr::UpdateColorLogTraces(const LLBC_LogTraces &requireColorLogTraces)
+{
+    _requireColorLogTraces = requireColorLogTraces;
+    UpdateColorLogTag();
+}
+
+std::shared_ptr<LLBC_String> LLBC_LogTraceMgr::GetTraceInfo() const
+{
+    return _traceInfo;
+}
+
+bool LLBC_LogTraceMgr::GetColorLogTag() const
+{
+    return _colorLogTag;
+}
+
+void LLBC_LogTraceMgr::UpdateColorLogTag()
+{
+    for (const auto &logTrace : _logTracesEx)
+    {  
+        // Check key.
+        auto requireColorKeyContentsIt = _requireColorLogTraces.find(logTrace.first);
+        if (requireColorKeyContentsIt == _requireColorLogTraces.end())
+            continue;
+
+        const auto &requireColorContents = requireColorKeyContentsIt->second;
+        const auto &traceContents = logTrace.second;
+        for (const auto &traceContent : traceContents)
+        { 
+            auto requireContentIt = std::find(requireColorContents.begin(), requireColorContents.end(), traceContent.first);
+            if (requireContentIt != requireColorContents.end()) 
+            {
+                _colorLogTag = true;
+                return;
+            }
+        }
+    }
+
+    _colorLogTag = false;
+}
+
+int LLBC_LogTraceMgr::AddColorLogTrace(const LLBC_LogTrace &logTrace) 
+{
+    auto keyContentsIt = _requireColorLogTraces.find(logTrace.traceKey);
+    if (keyContentsIt == _requireColorLogTraces.end())
+       keyContentsIt = _requireColorLogTraces.emplace(logTrace.traceKey, std::vector<LLBC_LogTrace::TraceContent>()).first;
+
+    // - Find content it, insert new content.
+    auto &contents = keyContentsIt->second;
+    const auto contentIt = std::find(contents.begin(), contents.end(), logTrace.traceContent);
+    if (contentIt != contents.end()) 
+    {
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
+        return LLBC_FAILED;
+    }
+
+    contents.emplace_back(logTrace.traceContent);
+    UpdateColorLogTag();
+
+    return LLBC_OK;
+}
+
+int LLBC_LogTraceMgr::RemoveColorLogTrace(const LLBC_LogTrace &logTrace) 
+{
+    const auto keyContentsIt = _requireColorLogTraces.find(logTrace.traceKey);
+    if (keyContentsIt == _requireColorLogTraces.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    // - Find content it, delete content.
+    auto &contents = keyContentsIt->second;
+    const auto contentIt = std::find(contents.begin(), contents.end(), logTrace.traceContent);
+    if (contentIt == contents.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    // - Delete from contents list.
+    contents.erase(contentIt);
+    if (contents.empty()) 
+        _requireColorLogTraces.erase(keyContentsIt);
+
+    UpdateColorLogTag();
+
+    return LLBC_OK;
+}
+
+int LLBC_LogTraceMgr::RemoveColorLogKey(const LLBC_LogTrace::TraceKey &traceKey)
+{
+    const auto keyContentsIt = _requireColorLogTraces.find(traceKey);
+    if (keyContentsIt == _requireColorLogTraces.end())
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        return LLBC_FAILED;
+    }
+
+    _requireColorLogTraces.erase(keyContentsIt);
+    UpdateColorLogTag();
+
+    return LLBC_OK;
+}
+
+void LLBC_LogTraceMgr::ClearAllColorLogTraces()
+{
+    _requireColorLogTraces.clear();
+    _colorLogTag = false;
 }
 
 void LLBC_LogTraceMgr::SetSeparators(char logTracesSep, char traceKeyContentSep, char traceContentsSep)
@@ -150,13 +267,13 @@ void LLBC_LogTraceMgr::SetSeparators(char logTracesSep, char traceKeyContentSep,
     _logTraceKeyContentSep = traceKeyContentSep;
     _traceContentsSep = traceContentsSep;
 
-    _RebuildTraceInfo();
+    RebuildTraceInfo();
 }
 
-void LLBC_LogTraceMgr::_RebuildTraceInfo()
+void LLBC_LogTraceMgr::RebuildTraceInfo()
 {
     auto newTraceInfo = new LLBC_String;
-    for (auto &[traceKey, traceContents] : _logTraces)
+    for (auto &[traceKey, traceContents] : _logTracesEx)
     {
         if (traceContents.empty())
             continue;
@@ -190,4 +307,3 @@ void LLBC_LogTraceMgr::_RebuildTraceInfo()
 
 
 __LLBC_NS_END
-

@@ -45,7 +45,6 @@ inline const LLBC_ObjPool &LLBC_Logger::GetLoggerObjPool() const
     return _objPool;
 }
 
-
 template <typename _TraceKeyTy, typename _TraceContentTy>
 int LLBC_Logger::AddLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent)
 {
@@ -71,6 +70,25 @@ void LLBC_Logger::ClearLogTrace(const _TraceKeyTy &traceKey)
 {
     return ClearLogTrace(LLBC_LogTrace::TraceKey(traceKey));
 }
+
+template <typename _TraceKeyTy, typename _TraceContentTy>
+int LLBC_Logger::AddColorLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent)
+{
+    return AddColorLogTrace(LLBC_LogTrace(traceKey, traceContent));
+}
+
+template <typename _TraceKeyTy, typename _TraceContentTy>
+int LLBC_Logger::RemoveColorLogTrace(const _TraceKeyTy &traceKey, const _TraceContentTy &traceContent)
+{
+    return RemoveColorLogTrace(LLBC_LogTrace(traceKey, traceContent));
+}
+
+template <typename _TraceKeyTy>
+int LLBC_Logger::RemoveColorLogKey(const _TraceKeyTy &traceKey)
+{
+    return RemoveColorLogKey(LLBC_LogTrace::TraceKey(traceKey));
+}
+
 
 #define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
     LLBC_FORCE_INLINE int LLBC_Logger::level(const char *tag, \
@@ -106,7 +124,7 @@ inline int LLBC_Logger::Output(int level,
                                const char *fmt,
                                ...)
 {
-    if (level < _logLevel)
+    if (level < _logLevel && !GetColorLogTag())
         return LLBC_OK;
 
     va_list va;
