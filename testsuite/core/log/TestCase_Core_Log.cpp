@@ -728,6 +728,8 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_ERROR("This is a uninited error log message 35");
     LLOG_FATAL("This is a uninited fatal log message 36");
 
+    LLOG_FATAL("--------------------------------------------------------------------");
+
     rootLogger->RemoveLogTrace("uin", 1087, true);
     LLOG_WARN("Remove 1087; [] will output 40~42");
     LLOG_TRACE("This is a uninited trace log message 37");
@@ -736,6 +738,8 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_WARN("This is a uninited warn log message 40");
     LLOG_ERROR("This is a uninited error log message 41");
     LLOG_FATAL("This is a uninited fatal log message 42");
+
+    LLOG_FATAL("--------------------------------------------------------------------");
 
     rootLogger->AddColorLogTrace("NickName", "playerA");
     rootLogger->AddColorLogTrace("NickName", "playerC");
@@ -749,6 +753,8 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_ERROR("This is a uninited error log message 47");
     LLOG_FATAL("This is a uninited fatal log message 48");
 
+    LLOG_FATAL("--------------------------------------------------------------------");
+
     rootLogger->AddLogTrace("NickName", "playerA");
     LLOG_WARN("[add key NickName:PlayerA: playerB(not in), PlayerA(in)] will output 49~54");
     LLOG_TRACE("This is a uninited trace log message 49"); // output(49~54)
@@ -757,6 +763,8 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_WARN("This is a uninited warn log message 52"); 
     LLOG_ERROR("This is a uninited error log message 53");
     LLOG_FATAL("This is a uninited fatal log message 54");
+
+    LLOG_FATAL("--------------------------------------------------------------------");
 
     rootLogger->RemoveColorLogTrace("NickName", "playerA");
     LLOG_WARN("[remove NickName:PlayerA: playerB(not in -> not in)] will output 57~60");
@@ -767,6 +775,8 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_ERROR("This is a uninited error log message 59");
     LLOG_FATAL("This is a uninited fatal log message 60");
 
+    LLOG_FATAL("--------------------------------------------------------------------");
+
     rootLogger->AddLogTrace("NickName", "playerC");
     LLOG_WARN("[add key NickName:PlayerC: playerB(not in), playerA(not in), playerC(in)] will output 61~66");
     LLOG_TRACE("This is a uninited trace log message 61");  // output(61~66)
@@ -776,6 +786,8 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_ERROR("This is a uninited error log message 65");
     LLOG_FATAL("This is a uninited fatal log message 66");
 
+    LLOG_FATAL("--------------------------------------------------------------------");
+
     rootLogger->RemoveColorLogKey("NickName");
     LLOG_WARN("[Remove all key. NickName :playerB(not in), playerA(not in), PlayerC(in -> not in)] will output 70~72");
     LLOG_TRACE("This is a uninited trace log message 67"); 
@@ -784,6 +796,30 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_WARN("This is a uninited warn log message 70"); // output(70~72)
     LLOG_ERROR("This is a uninited error log message 71");
     LLOG_FATAL("This is a uninited fatal log message 72");
+
+    LLOG_FATAL("--------------------------------------------------------------------");
+
+    rootLogger->ClearAllLogTraces();
+    rootLogger->AddLogTrace("TestReload", 12345); // logTrace: TestReload-12345
+    LLOG_TRACE("This is a uninited trace log message reload_1");
+    LLOG_DEBUG("This is a uninited debug log message reload_2");
+    LLOG_INFO("This is a uninited info log message reload_3");
+    LLOG_WARN("This is a uninited warn log message reload_4");     // output (4~6)
+    LLOG_ERROR("This is a uninited error log message reload_5");
+    LLOG_FATAL("This is a uninited fatal log message reload_6");
+    
+    LLOG_FATAL("--------------------------------------------------------------------");
+    // test reload.
+    LLBC_PrintLn("Please try update logger config file, and reload...!");
+    getchar();
+    LLBC_LoggerMgrSingleton->Reload();
+
+    LLOG_TRACE("This is a uninited trace log message reload_7"); // output (7~12)
+    LLOG_DEBUG("This is a uninited debug log message reload_8");
+    LLOG_INFO("This is a uninited info log message reload_9");
+    LLOG_WARN("This is a uninited warn log message reload_10");     
+    LLOG_ERROR("This is a uninited error log message reload_11");
+    LLOG_FATAL("This is a uninited fatal log message reload_12");
 }
 
 template <typename _KeyTy, typename _ContentTy>
