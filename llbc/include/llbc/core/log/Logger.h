@@ -182,6 +182,12 @@ public:
      */
     void ClearAllColorLogTraces();
 
+    /**
+     * Update color log traces.
+     * @param[in] requireColorLogTraces - conf log traces.
+     */
+    void UpdateColorLogTraces(const LLBC_LogTraces &requireColorLogTraces);
+
 public:
     /**
      * Set log hook.

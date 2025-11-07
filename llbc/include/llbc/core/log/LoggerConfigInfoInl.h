@@ -43,7 +43,7 @@ inline int LLBC_LoggerConfigInfo::GetLogLevel() const
     return MIN(_consoleLogLevel, _fileLogLevel);
 }
 
-inline LLBC_LogTraces &LLBC_LoggerConfigInfo::GetRequireColorLogTraces()
+inline const LLBC_LogTraces &LLBC_LoggerConfigInfo::GetRequireColorLogTraces() const
 {
     return _requireColorLogTraces;
 }
