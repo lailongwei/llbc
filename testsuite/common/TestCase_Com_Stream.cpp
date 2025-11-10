@@ -103,7 +103,7 @@ struct SerializableCls
 
     bool Deserialize(LLBC_Stream &stream)
     {
-        LLBC_STREAM_BEGIN_READ(stream, bool, false);
+        LLBC_STREAM_BEGIN_READ(stream, false);
 
         LLBC_STREAM_READ(bVal);
         LLBC_STREAM_READ(intVal);
