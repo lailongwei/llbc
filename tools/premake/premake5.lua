@@ -265,16 +265,18 @@ project "llbc"
     filter { "configurations:release64" }
     prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
     filter {}
-    if llbc_system_type ~= llbc_system_types.windows then
-        prebuildcommands {
-            string.format([=[grep -E 'LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD *%d' '%s' > /dev/null && sed -i 's|\(#define LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD\)\([[:space:]]*\)%d|\1\2%d|g' %s; echo 'do nothing' > /dev/null]=],
-                llbc_enable_asan_support and 0 or 1,
-                llbc_core_lib_path .. '/include/llbc/common/Config.h',
-                llbc_enable_asan_support and 0 or 1,
-                llbc_enable_asan_support and 1 or 0,          
-                llbc_core_lib_path .. '/include/llbc/common/Config.h')
-        }
-    end
+
+    -- Note: For now, disable auto update mechanism of LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD macro.
+    -- if llbc_system_type ~= llbc_system_types.windows then
+    --     prebuildcommands {
+    --         string.format([=[grep -E 'LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD *%d' '%s' > /dev/null && sed -i 's|\(#define LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD\)\([[:space:]]*\)%d|\1\2%d|g' %s; echo 'do nothing' > /dev/null]=],
+    --             llbc_enable_asan_support and 0 or 1,
+    --             llbc_core_lib_path .. '/include/llbc/common/Config.h',
+    --             llbc_enable_asan_support and 0 or 1,
+    --             llbc_enable_asan_support and 1 or 0,          
+    --             llbc_core_lib_path .. '/include/llbc/common/Config.h')
+    --     }
+    -- end
 
 group "tests"
 -- ****************************************************************************
