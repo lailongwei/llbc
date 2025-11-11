@@ -229,22 +229,22 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
     // Get wrap obj.
     auto wrappedObj = reinterpret_cast<_WrappedObj *>(reinterpret_cast<uint8 *>(obj) - _objOffset);
 
-    // Lock.
-    __LLBC_INL_LockObjPool();
-
     // Exec required checks.
     llbc_assert(wrappedObj->unFlags.flags.inUsing && "Repeated release object");
     llbc_assert(wrappedObj->magicNum == LLBC_CFG_CORE_OBJPOOL_OBJ_MAGIC_NUMBER &&
                 "The object is not a objpool object");
 
-    // Reuse/Delete obj.
+    // Reuse/Delete obj & lock typed objpool.
     if constexpr (LLBC_ObjReflector::IsReusable<Obj>())
     {
         LLBC_ObjReflector::Reuse<Obj>(wrappedObj->buff);
+        __LLBC_INL_LockObjPool();
     }
     else
     {
         LLBC_ObjReflector::Delete<Obj>(wrappedObj->buff);
+
+        __LLBC_INL_LockObjPool();
         wrappedObj->unFlags.flags.constructed = false;
     }
     wrappedObj->unFlags.flags.inUsing = false;
