@@ -334,5 +334,3 @@
 #else // Non-Win32
 #define LLBC_CFG_APP_RELOAD_SIGNALS                  {SIGUSR2}
 #endif // Win32
-
-
