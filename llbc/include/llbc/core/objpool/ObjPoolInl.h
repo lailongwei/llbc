@@ -229,6 +229,9 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
     // Get wrap obj.
     auto wrappedObj = reinterpret_cast<_WrappedObj *>(reinterpret_cast<uint8 *>(obj) - _objOffset);
 
+    // Lock.
+    __LLBC_INL_LockObjPool();
+
     // Exec required checks.
     llbc_assert(wrappedObj->unFlags.flags.inUsing && "Repeated release object");
     llbc_assert(wrappedObj->magicNum == LLBC_CFG_CORE_OBJPOOL_OBJ_MAGIC_NUMBER &&
@@ -248,9 +251,6 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
 
     // Get stripe.
     auto stripe = wrappedObj->stripeOrNextFreeObj.stripe;
-
-    // Lock.
-    __LLBC_INL_LockObjPool();
 
     // Stat reusable object count.
     if constexpr (LLBC_ObjReflector::IsReusable<Obj>())
