@@ -935,6 +935,17 @@ private:
 
 public:
     /**
+     * Serialize, serialize to self is not allowed
+     * serialize interval [_readPos, _writePos)
+     */
+    void Serialize(LLBC_Stream& stream) const;
+
+    /**
+     * Deserialize, deserialize to self is not allowed
+     */
+    bool Deserialize(LLBC_Stream& stream);
+public:
+    /**
      * Peek data[use Read()], but don't modify stream object.
      * @param[out] obj - will deserialize's object.
      * @return bool - return true if successed, otherwise return false.

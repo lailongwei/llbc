@@ -240,6 +240,7 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     LLBC_ReturnIf(MovableReadTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(EndianThreadSpecObjPoolTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(BatchReadAndWriteTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(SelfSerializeAndDeserialize() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -837,6 +838,47 @@ int TestCase_Com_Stream::BatchReadAndWriteTest()
     {
         LLBC_PrintLn("Batch read/write test success");
     }
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_Stream::SelfSerializeAndDeserialize()
+{
+    LLBC_PrintLn("SelfSerializeAndDeserialize:");
+    LLBC_Stream stream1, stream2, stream3;
+    LLBC_String str1 = "str1", str2;
+
+    stream1 << str1;
+    LLBC_PrintLn("- stream1 << \"str1\", stream1:%s", stream1.ToString().c_str());
+    stream2 << stream1;
+    LLBC_PrintLn("- stream2 << stream1, stream1:%s", stream2.ToString().c_str());
+    stream2 >> stream1;
+    LLBC_PrintLn("- stream2 >> stream1, stream1:%s", stream1.ToString().c_str());
+    stream1 >> str2;
+    LLBC_PrintLn("- stream1 >> str2, str2:%s", str2.c_str());
+   
+    str1 = "test2";
+    stream1.Clear();
+    stream2.Clear();
+    stream1 << str1;
+    stream2 << stream1;
+    stream3 << stream2;
+    stream3 >> stream2;
+    stream2 << "test2.1";
+    stream2 >> stream1;
+    stream1 >> str2;
+    stream2 >> str1;
+    LLBC_PrintLn("str1:%s,stream1:%s stream2:%s stream3:%s, str2:%s",
+        str1.c_str(), stream1.ToString().c_str(), stream2.ToString().c_str(),
+        stream3.ToString().c_str(), str2.c_str());
+    LLBC_ReturnIf(str1 != "test2.1" || str2 != "test2", LLBC_FAILED);
+
+
+    stream2 >> stream2;
+    LLBC_PrintLn("stream2 >> stream2, error %s", LLBC_FormatLastError());
+
+    stream1 << stream1;
+    LLBC_PrintLn("stream1 << stream1, error %s", LLBC_FormatLastError());
 
     return LLBC_OK;
 }

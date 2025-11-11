@@ -24,6 +24,7 @@
 #include "llbc/common/Macro.h"
 #include "llbc/common/Endian.h"
 #include "llbc/common/TemplateDeduction.h"
+#include "llbc/common/Errors.h"
 
 __LLBC_NS_BEGIN
 
@@ -1223,6 +1224,39 @@ std::enable_if_t<!std::is_trivial_v<T> >
 LLBC_Stream::WriteImpl(const T &obj, ...)
 {
     llbc_assert(false && "Write non-trivial object is unsupported for now!");
+}
+
+
+LLBC_FORCE_INLINE void LLBC_Stream::Serialize(LLBC_Stream& stream) const
+{
+    if (this == &stream)
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return;
+    }
+    uint32 serSize = static_cast<uint32>(GetReadableSize());
+    stream.Write(serSize);
+    if (UNLIKELY(serSize == 0))
+        return;
+
+    stream.Write(GetBufStartWithReadPos(), serSize);
+}
+
+LLBC_FORCE_INLINE bool LLBC_Stream::Deserialize(LLBC_Stream& stream)
+{
+    if (this == &stream) {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return false;
+    }
+
+    _readPos = _writePos = 0;
+    uint32 bufSize = 0;
+    stream.Read(bufSize);
+    if (bufSize == 0) 
+        return true;
+    Write(stream.GetBufStartWithReadPos(), bufSize);
+
+    return stream.SkipRead(bufSize);
 }
 
 template <typename T>
