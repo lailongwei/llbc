@@ -31,7 +31,7 @@ __LLBC_NS_BEGIN
 class LLBC_HIDDEN LLBC_LogTraceToken : public LLBC_BaseLogToken
 {
 public:
-    LLBC_LogTraceToken() = default;
+    LLBC_LogTraceToken();
     ~LLBC_LogTraceToken() override = default;
 
 public:
@@ -60,7 +60,7 @@ public:
     void Format(const LLBC_LogData &data, LLBC_String &formattedData) const override;
 
 private:
-    LLBC_String _envValue;
+    int _enableLogLevel;
 };
 
 __LLBC_NS_END
