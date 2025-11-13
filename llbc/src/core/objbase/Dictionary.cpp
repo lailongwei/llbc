@@ -442,10 +442,11 @@ LLBC_Object *LLBC_Dictionary::Clone() const
     return clone;
 }
 
-void LLBC_Dictionary::Serialize(LLBC_Stream &s) const
+bool LLBC_Dictionary::Serialize(LLBC_Stream &s) const
 {
-    s <<static_cast<uint32>(_bucketSize)
-      <<static_cast<uint32>(_size);
+    LLBC_STREAM_BEGIN_WRITE(s, false);
+
+    LLBC_STREAM_BATCH_WRITE(static_cast<uint32>(_bucketSize), static_cast<uint32>(_size));
 
     ConstIter it = Begin(), endIt = End();
     for (; it != endIt; ++it)
@@ -453,15 +454,21 @@ void LLBC_Dictionary::Serialize(LLBC_Stream &s) const
         const LLBC_DictionaryElem * const elem = it.Elem();
 
         const uint8 intKeyFlag = elem->IsIntKey() ? 1 : 0;
-        s <<intKeyFlag;
+        LLBC_STREAM_WRITE(intKeyFlag);
 
         if (intKeyFlag)
-            s <<elem->GetIntKey();
+        {
+            LLBC_STREAM_WRITE(elem->GetIntKey());
+        }
         else
-            s <<elem->GetStrKey();
+        {
+            LLBC_STREAM_WRITE(elem->GetStrKey());
+        }
 
-        s <<*it;
+        LLBC_STREAM_WRITE(*it);
     }
+
+    LLBC_STREAM_END_WRITE_RET(true);
 }
 
 bool LLBC_Dictionary::Deserialize(LLBC_Stream &s)

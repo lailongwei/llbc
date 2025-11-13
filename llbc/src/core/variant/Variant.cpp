@@ -904,49 +904,52 @@ LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var) noexcept
     return *this;
 }
 
-void LLBC_Variant::Serialize(LLBC_Stream &stream) const
+bool LLBC_Variant::Serialize(LLBC_Stream &stream) const
 {
-    stream.Write(_holder.type);
+    LLBC_STREAM_BEGIN_WRITE(stream, false);
+
+    LLBC_STREAM_WRITE(_holder.type);
 
     if (IsRaw())
     {
-        stream.Write(_holder.data.raw.uint64Val);
+        LLBC_STREAM_WRITE(_holder.data.raw.uint64Val);
     }
     else if (IsStr())
     {
-        stream.Write(_holder.data.obj.str ? *_holder.data.obj.str : LLBC_INL_NS __g_nullStr);
+        LLBC_STREAM_WRITE(_holder.data.obj.str ? *_holder.data.obj.str : LLBC_INL_NS __g_nullStr);
     }
     else if (IsSeq())
     {
         if (!_holder.data.obj.seq)
         {
-            stream.Write(static_cast<uint32>(0));
-            return;
+            LLBC_STREAM_WRITE(static_cast<uint32>(0));
+            return true;
         }
 
-        stream.Write(static_cast<uint32>(_holder.data.obj.seq->size()));
+        LLBC_STREAM_WRITE(static_cast<uint32>(_holder.data.obj.seq->size()));
 
         const Seq::const_iterator seqEnd = _holder.data.obj.seq->end();
         for (SeqConstIter it = _holder.data.obj.seq->begin(); it != seqEnd; ++it)
-            stream.Write(*it);
+            LLBC_STREAM_WRITE(*it);
     }
     else if (IsDict())
     {
         if (!_holder.data.obj.dict)
         {
-            stream.Write(static_cast<uint32>(0));
-            return;
+            LLBC_STREAM_WRITE(static_cast<uint32>(0));
+            return true;
         }
 
-        stream.Write(static_cast<uint32>(_holder.data.obj.dict->size()));
+        LLBC_STREAM_WRITE(static_cast<uint32>(_holder.data.obj.dict->size()));
 
         const Dict::const_iterator dictEnd = _holder.data.obj.dict->end();
         for (DictConstIter it = _holder.data.obj.dict->begin(); it != dictEnd; ++it)
         {
-            stream.Write(it->first);
-            stream.Write(it->second);
+            LLBC_STREAM_BATCH_WRITE(it->first, it->second);
         }
     }
+
+    LLBC_STREAM_END_WRITE_RET(true);
 }
 
 bool LLBC_Variant::Deserialize(LLBC_Stream &stream)

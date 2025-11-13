@@ -101,10 +101,12 @@ LLBC_String LLBC_Object::ToString() const
     return LLBC_String().format("Object[%p, ref:%d, autoRef:%d]", this, _ref, _autoRef);
 }
 
-void LLBC_Object::Serialize(LLBC_Stream &s) const
+bool LLBC_Object::Serialize(LLBC_Stream &s) const
 {
     // Do nothing.
     // ... ...
+
+    return true;
 }
 
 bool LLBC_Object::Deserialize(LLBC_Stream &s)

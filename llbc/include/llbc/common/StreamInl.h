@@ -25,6 +25,7 @@
 #include "llbc/common/Endian.h"
 #include "llbc/common/TemplateDeduction.h"
 #include "llbc/common/Errors.h"
+#include "llbc/common/Exceptions.h"
 
 __LLBC_NS_BEGIN
 
@@ -48,8 +49,9 @@ template <>
 struct LLBC_Stream::__LLBC_STLArrayWriter<0>
 {
     template <typename Arr>
-    static void Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
+    static bool Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
     {
+        return true;
     }
 };
 
@@ -73,8 +75,9 @@ template <>
 struct LLBC_Stream::__LLBC_TupleWriter<0>
 {
     template <typename Tup>
-    static void Write(const Tup &tup, LLBC_Stream &stream)
+    static bool Write(const Tup &tup, LLBC_Stream &stream)
     {
+        return true;
     }
 };
 
@@ -460,13 +463,18 @@ LLBC_FORCE_INLINE bool LLBC_Stream::Read(void *buf, size_t size)
     return true;
 }
 
-LLBC_FORCE_INLINE void LLBC_Stream::Write(const void *buf, size_t size)
+LLBC_FORCE_INLINE bool LLBC_Stream::Write(const void *buf, size_t size)
 {
     if (UNLIKELY((!buf || size <= 0) || !ReserveWritableSize(size)))
-        return;
+    {
+        LLBC_SetLastError(LLBC_ERROR_NO_SUCH);
+        return false;
+    }
 
     memcpy(_buf + _writePos, buf, size);
     _writePos += size;
+
+    return true;
 }
 
 template <typename T1, typename... OtherTypes>
@@ -475,10 +483,10 @@ bool LLBC_Stream::BatchRead(T1 &val1, OtherTypes &... otherVals)
     return Read(val1) && (Read(otherVals) && ...);
 }
 
-template <typename... T>
-void LLBC_Stream::BatchWrite(const T&... vals)
+template <typename T1, typename... OtherTypes>
+bool LLBC_Stream::BatchWrite(const T1& val1, const OtherTypes &... otherVals)
 {
-    (Write(vals), ...);
+    return Write(val1) && (Write(otherVals) && ...);
 }
 
 template <typename T>
@@ -945,98 +953,99 @@ LLBC_Stream::ReadImpl(T &obj, ...)
 }
 
 template <typename T>
-std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T> >
+std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>, bool>
 LLBC_Stream::Write(const T &obj)
 {
     if (_endian != LLBC_MachineEndian)
     {
         const T obj2 = LLBC_ReverseBytes(obj);
-        Write(&obj2, sizeof(T));
+        return Write(&obj2, sizeof(T));
     }
     else
     {
-        Write(&obj, sizeof(T));
+        return Write(&obj, sizeof(T));
     }
 }
 
 template <typename T>
 std::enable_if_t<std::is_pointer_v<T> &&
-                 std::is_same_v<typename LLBC_ExtractPureType<T>::type, char> >
+                 std::is_same_v<typename LLBC_ExtractPureType<T>::type, char>, bool>
 LLBC_Stream::Write(const T &str)
 {
     if (UNLIKELY(!str))
     {
-        Write(0u);
-        return;
+        return Write(0u);
     }
 
     const uint32 strLen = strlen(str);
-    Write(strLen);
+    if (UNLIKELY(!Write(strLen)))
+    {
+        return false;
+    }
+
     if (strLen > 0)
-        Write(str, strLen);
+        return Write(str, strLen);
+    return true;
 }
 
 template <typename T>
 std::enable_if_t<std::is_pointer_v<T> &&
-                 std::is_same_v<typename LLBC_ExtractPureType<T>::type, void> >
+                 std::is_same_v<typename LLBC_ExtractPureType<T>::type, void>, bool>
 LLBC_Stream::Write(const T &voidPtr)
 {
     uint64 pointVal = 0;
     memcpy(&pointVal, &voidPtr, sizeof(voidPtr));
 
-    Write(pointVal);
+    return Write(pointVal);
 }
 
 template <typename T>
 std::enable_if_t<std::is_pointer<T>::value &&
                  !std::is_same_v<typename LLBC_ExtractPureType<T>::type, char> &&
-                 !std::is_same_v<typename LLBC_ExtractPureType<T>::type, void> >
+                 !std::is_same_v<typename LLBC_ExtractPureType<T>::type, void>, bool>
 LLBC_Stream::Write(const T &ptr)
 {
-    LIKELY(ptr) ?
-        Write(*ptr) :
-            Write(typename LLBC_ExtractPureType<T>::type());
+    return LIKELY(ptr) ?
+                Write(*ptr) :
+                    Write(typename LLBC_ExtractPureType<T>::type());
 }
 
 template <typename T, size_t _ArrLen>
-std::enable_if_t<std::is_arithmetic_v<T> && std::is_same_v<T, char> >
+std::enable_if_t<std::is_arithmetic_v<T> && std::is_same_v<T, char>, bool>
 LLBC_Stream::Write(const T (&arr)[_ArrLen])
 {
     if (_ArrLen == 0)
     {
-        Write(0u);
+        return Write(0u);
     }
     else if (arr[_ArrLen - 1] == '\0')
     {
         if (_ArrLen == 1)
         {
-            Write(0u);
+            return Write(0u);
         }
         else
         {
-            Write(static_cast<uint32>(_ArrLen - 1));
-            Write(&arr[0], sizeof(T) * (_ArrLen - 1));
+            return Write(static_cast<uint32>(_ArrLen - 1)) && Write(&arr[0], sizeof(T) * (_ArrLen - 1));
         }
     }
     else
     {
-        Write(static_cast<uint32>(_ArrLen));
-        Write(&arr[0], sizeof(T) * _ArrLen);
+        return Write(static_cast<uint32>(_ArrLen)) && Write(&arr[0], sizeof(T) * _ArrLen);
     }
 }
 
 template <typename T, size_t _ArrLen>
-std::enable_if_t<std::is_arithmetic_v<T> && (std::is_same_v<T, uint8>|| std::is_same_v<T, bool>)>
+std::enable_if_t<std::is_arithmetic_v<T> && (std::is_same_v<T, uint8>|| std::is_same_v<T, bool>), bool>
 LLBC_Stream::Write(const T (&arr)[_ArrLen])
 {
     if (_ArrLen == 0)
     {
-        Write(0u);
+        return Write(0u);
     }
     else
     {
-        Write(static_cast<uint32>(_ArrLen));
-        Write(&arr[0], sizeof(T) * _ArrLen);
+        return Write(static_cast<uint32>(_ArrLen)) && Write(&arr[0], sizeof(T) * _ArrLen);
     }
 }
 
@@ -1045,21 +1054,32 @@ std::enable_if_t<(std::is_arithmetic_v<T> &&
                   (!std::is_same_v<T, char> &&
                    !std::is_same_v<T, uint8> &&
                    !std::is_same_v<T, bool>)) ||
-                 !std::is_arithmetic_v<T> >
+                 !std::is_arithmetic_v<T>, bool>
 LLBC_Stream::Write(const T (&arr)[_ArrLen])
 {
-    Write(static_cast<uint32>(_ArrLen));
+    if (UNLIKELY(!Write(static_cast<uint32>(_ArrLen))))
+    {
+        return false;
+    }
+
     for (size_t i = 0; i < _ArrLen; ++i)
-        Write(arr[i]);
+    {
+        if (UNLIKELY(!Write(arr[i])))
+        {
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 template <typename T>
 std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value ||
-                 LLBC_IsTemplSpec<T, LLBC_BasicString>::value>
+                 LLBC_IsTemplSpec<T, LLBC_BasicString>::value,
+                bool>
 LLBC_Stream::Write(const T &str)
 {
-    Write(static_cast<uint32>(str.size()));
-    Write(str.data(), str.size());
+    return Write(static_cast<uint32>(str.size())) && Write(str.data(), str.size());
 }
 
 template <typename T>
@@ -1067,69 +1087,81 @@ std::enable_if_t<LLBC_IsTemplSpec<T, std::vector>::value ||
                  LLBC_IsTemplSpec<T, std::list>::value ||
                  LLBC_IsTemplSpec<T, std::deque>::value ||
                  LLBC_IsTemplSpec<T, std::set>::value ||
-                 LLBC_IsTemplSpec<T, std::unordered_set>::value>
+                 LLBC_IsTemplSpec<T, std::unordered_set>::value,
+                bool>
 LLBC_Stream::Write(const T &container)
 {
-    Write(static_cast<uint32>(container.size()));
+    if (UNLIKELY(!Write(static_cast<uint32>(container.size()))))
+        return false;
+
     if (container.empty())
-        return;
-
-    const typename T::const_iterator endIt = container.end();
-    for (typename T::const_iterator it = container.begin();
-         it != endIt;
-         ++it)
-        Write(*it);
-}
-
-template <typename T>
-std::enable_if_t<LLBC_IsTemplSpec<T, std::queue>::value ||
-                 LLBC_IsTemplSpec<T, std::stack>::value>
-LLBC_Stream::Write(const T &container)
-{
-    llbc_assert(false && "Write std::queue/std::stack is not supported for now");
-}
-
-template <typename T>
-std::enable_if_t<LLBC_IsTemplSpec<T, std::map>::value ||
-                 LLBC_IsTemplSpec<T, std::unordered_map>::value>
-LLBC_Stream::Write(const T &container)
-{
-    Write(static_cast<uint32>(container.size()));
-    if (container.empty())
-        return;
+        return true;
 
     const typename T::const_iterator endIt = container.end();
     for (typename T::const_iterator it = container.begin();
          it != endIt;
          ++it)
     {
-        Write(it->first);
-        Write(it->second);
+        if (UNLIKELY(!Write(*it)))
+            return false;
     }
+
+    return true;
 }
 
 template <typename T>
-std::enable_if_t<LLBC_IsSTLArraySpec<T, std::array>::value>
+std::enable_if_t<LLBC_IsTemplSpec<T, std::queue>::value ||
+                 LLBC_IsTemplSpec<T, std::stack>::value, bool>
+LLBC_Stream::Write(const T &container)
+{
+    llbc_assert(false && "Write std::queue/std::stack is not supported for now");
+    return false;
+}
+
+template <typename T>
+std::enable_if_t<LLBC_IsTemplSpec<T, std::map>::value ||
+                 LLBC_IsTemplSpec<T, std::unordered_map>::value, bool>
+LLBC_Stream::Write(const T &container)
+{
+    if (UNLIKELY(!Write(static_cast<uint32>(container.size()))))
+        return false;
+
+    if (container.empty())
+        return true;
+
+    const typename T::const_iterator endIt = container.end();
+    for (typename T::const_iterator it = container.begin();
+         it != endIt;
+         ++it)
+    {
+        if (UNLIKELY(!Write(it->first) || !Write(it->second)))
+            return false;
+    }
+
+    return true;
+}
+
+template <typename T>
+std::enable_if_t<LLBC_IsSTLArraySpec<T, std::array>::value, bool>
 LLBC_Stream::Write(const T &arr)
 {
-    Write(static_cast<uint32>(std::tuple_size<T>::value));
-    __LLBC_STLArrayWriter<std::tuple_size<T>::value>::Write(arr, *this);
+    return Write(static_cast<uint32>(std::tuple_size<T>::value)) && 
+               __LLBC_STLArrayWriter<std::tuple_size<T>::value>::Write(arr, *this);
 }
 
 template <typename T>
-std::enable_if_t<LLBC_IsTemplSpec<T, std::tuple>::value>
+std::enable_if_t<LLBC_IsTemplSpec<T, std::tuple>::value, bool>
 LLBC_Stream::Write(const T &tup)
 {
-    Write(static_cast<uint32>(std::tuple_size<T>::value));
-    __LLBC_TupleWriter<std::tuple_size<T>::value>::Write(tup, *this);
+    return Write(static_cast<uint32>(std::tuple_size<T>::value)) &&
+               __LLBC_TupleWriter<std::tuple_size<T>::value>::Write(tup, *this);
 }
 
 template <typename T>
-std::enable_if_t<LLBC_IsTemplSpec<T, std::pair>::value>
+std::enable_if_t<LLBC_IsTemplSpec<T, std::pair>::value, bool>
 LLBC_Stream::Write(const T &p)
 {
-    Write(p.first);
-    Write(p.second);
+    return Write(p.first) && Write(p.second);
 }
 
 template <typename T>
@@ -1150,38 +1182,39 @@ std::enable_if_t<!std::is_arithmetic_v<T> &&
                  !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
                  !LLBC_IsTemplSpec<T, std::tuple>::value &&
                  !LLBC_IsSTLArraySpec<T, std::array>::value &&
-                 !LLBC_IsTemplSpec<T, std::pair>::value>
+                 !LLBC_IsTemplSpec<T, std::pair>::value,
+                 bool>
 LLBC_Stream::Write(const T &obj)
 {
-    WriteImpl<T>(obj, 0);
+    return WriteImpl<T>(obj, 0);
 }
 
 template <typename T>
-void LLBC_Stream::WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *)
+bool LLBC_Stream::WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *)
 {
-    obj.Serialize(*this);
+    return obj.Serialize(*this);
 }
 
 template <typename T>
-void LLBC_Stream::WriteImpl(const T &obj, upper_camel_case_short_serializable_type<T, &T::Ser> *)
+bool LLBC_Stream::WriteImpl(const T &obj, upper_camel_case_short_serializable_type<T, &T::Ser> *)
 {
-    obj.Ser(*this);
+    return obj.Ser(*this);
 }
 
 template <typename T>
-void LLBC_Stream::WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *)
+bool LLBC_Stream::WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *)
 {
-    obj.serialize(*this);
+    return obj.serialize(*this);
 }
 
 template <typename T>
-void LLBC_Stream::WriteImpl(const T &obj, lower_camel_case_short_serializable_type<T, &T::ser> *)
+bool LLBC_Stream::WriteImpl(const T &obj, lower_camel_case_short_serializable_type<T, &T::ser> *)
 {
-    obj.ser(*this);
+    return obj.ser(*this);
 }
 
 template <typename T>
-void LLBC_Stream::WriteImpl(const T &obj, protobuf2_type<T, &T::IsInitialized, &T::ByteSize> *)
+bool LLBC_Stream::WriteImpl(const T &obj, protobuf2_type<T, &T::IsInitialized, &T::ByteSize> *)
 {
     // Check initialized first.
     obj.CheckInitialized();
@@ -1189,15 +1222,20 @@ void LLBC_Stream::WriteImpl(const T &obj, protobuf2_type<T, &T::IsInitialized, &
     // Recap Stream.
     const size_t needSize = static_cast<size_t>(obj.ByteSize());
     if (!ReserveWritableSize(needSize + sizeof(uint32)))
-        return;
+    {
+        LLBC_SetLastError(LLBC_ERROR_NO_SUCH);
+        return false;
+    }
 
     Write(static_cast<uint32>(needSize));
-    obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _writePos, static_cast<int>(needSize));
+    obj.SerializeToArray(reinterpret_cast<char*>(_buf) + _writePos, static_cast<int>(needSize));
     _writePos += needSize;
+
+    return true;
 }
 
 template <typename T>
-void LLBC_Stream::WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *)
+bool LLBC_Stream::WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *)
 {
     // Check initialized first.
     obj.CheckInitialized();
@@ -1205,46 +1243,55 @@ void LLBC_Stream::WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &
     // Recap Stream.
     const size_t needSize = obj.ByteSizeLong();
     if (!ReserveWritableSize(needSize + sizeof(uint32)))
-        return;
+    {
+        LLBC_SetLastError(LLBC_ERROR_NO_SUCH);
+        return false;
+    }
 
     Write(static_cast<uint32>(needSize));
     obj.SerializeToArray(reinterpret_cast<char *>(_buf) + _writePos, static_cast<int>(needSize));
     _writePos += needSize;
+
+    return true;
 }
 
 template <typename T>
-std::enable_if_t<std::is_trivial_v<T> >
+std::enable_if_t<std::is_trivial_v<T>, bool>
 LLBC_Stream::WriteImpl(const T &obj, ...)
 {
-    Write(&obj, sizeof(obj));
+    return Write(&obj, sizeof(obj));
 }
 
 template <typename T>
-std::enable_if_t<!std::is_trivial_v<T> >
+std::enable_if_t<!std::is_trivial_v<T>, bool>
 LLBC_Stream::WriteImpl(const T &obj, ...)
 {
     llbc_assert(false && "Write non-trivial object is unsupported for now!");
+    return false;
 }
 
 
-LLBC_FORCE_INLINE void LLBC_Stream::Serialize(LLBC_Stream& stream) const
+LLBC_FORCE_INLINE bool LLBC_Stream::Serialize(LLBC_Stream& stream) const
 {
-    if (this == &stream)
+    if (UNLIKELY(this == &stream))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
-        return;
+        return false;
     }
-    uint32 serSize = static_cast<uint32>(GetReadableSize());
-    stream.Write(serSize);
-    if (UNLIKELY(serSize == 0))
-        return;
 
-    stream.Write(GetBufStartWithReadPos(), serSize);
+    uint32 serSize = static_cast<uint32>(GetReadableSize());
+    if (UNLIKELY(!stream.Write(serSize)))
+        return false;
+
+    if (UNLIKELY(serSize == 0))
+        return true;
+
+    return stream.Write(GetBufStartWithReadPos(), serSize);
 }
 
 LLBC_FORCE_INLINE bool LLBC_Stream::Deserialize(LLBC_Stream& stream)
 {
-    if (this == &stream) {
+    if (UNLIKELY(this == &stream)) {
         LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
         return false;
     }
@@ -1252,11 +1299,10 @@ LLBC_FORCE_INLINE bool LLBC_Stream::Deserialize(LLBC_Stream& stream)
     _readPos = _writePos = 0;
     uint32 bufSize = 0;
     stream.Read(bufSize);
-    if (bufSize == 0) 
+    if (UNLIKELY(bufSize == 0)) 
         return true;
-    Write(stream.GetBufStartWithReadPos(), bufSize);
-
-    return stream.SkipRead(bufSize);
+    
+    return Write(stream.GetBufStartWithReadPos(), bufSize) && stream.SkipRead(bufSize);
 }
 
 template <typename T>
@@ -1272,14 +1318,18 @@ bool LLBC_Stream::Peek(T &obj)
 template<typename T>
 LLBC_Stream &LLBC_Stream::operator>>(T &val)
 {
-    Read(val);
+    if (!Read(val))
+        LLBC_THROW(LLBC_IOException, "LLBC_Stream Read failed!");
+
     return *this;
 }
 
 template<typename T>
 LLBC_Stream &LLBC_Stream::operator<<(const T &val)
 {
-    Write(val);
+    if (!Write(val))
+        LLBC_THROW(LLBC_IOException, "LLBC_Stream Write failed!");
+
     return *this;
 }
 

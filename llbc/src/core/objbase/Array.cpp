@@ -456,12 +456,16 @@ LLBC_Object *LLBC_Array::Clone() const
     return clone;
 }
 
-void LLBC_Array::Serialize(LLBC_Stream &s) const
+bool LLBC_Array::Serialize(LLBC_Stream &s) const
 {
-    s <<static_cast<uint32>(_size);
+    LLBC_STREAM_BEGIN_WRITE(s, false);
+
+    LLBC_STREAM_WRITE(static_cast<uint32>(_size));
     ConstIter it = Begin(), endIt = End();
     for (; it != endIt; ++it)
-        s <<*it;
+        LLBC_STREAM_WRITE(*it);
+    
+    LLBC_STREAM_END_WRITE_RET(true);
 }
 
 bool LLBC_Array::Deserialize(LLBC_Stream &s)

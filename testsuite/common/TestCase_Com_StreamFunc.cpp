@@ -1024,10 +1024,12 @@ int TestCase_Com_StreamFunc::SerializableObjSerTest()
         bool deserCalled = false;
 
     protected:
-        void _Ser(LLBC_Stream &s) const
+        bool _Ser(LLBC_Stream &s) const
         {
             serCalled = true;
-            s << intVal << dblVal << strVal;
+            LLBC_STREAM_BEGIN_WRITE(s, false);
+            LLBC_STREAM_BATCH_WRITE(intVal, dblVal, strVal);
+            LLBC_STREAM_END_WRITE_RET(true);
         }
 
         bool _Deser(LLBC_Stream &s)
@@ -1050,9 +1052,9 @@ int TestCase_Com_StreamFunc::SerializableObjSerTest()
                     this->strVal = strVal; \
                 } \
                  \
-                void serMeth(LLBC_Stream &s) const { \
+                bool serMeth(LLBC_Stream &s) const { \
                     LLBC_PrintLn(" - " #clsName "::%s Called", __FUNCTION__); \
-                    _Ser(s); \
+                    return _Ser(s); \
                 } \
                  \
                 bool deserMeth(LLBC_Stream &s) { \
@@ -1081,14 +1083,14 @@ int TestCase_Com_StreamFunc::SerializableObjSerTest()
 
     // Ser/Deser.
     __SERIALIZABLE_TEST_CODE_GEN(SerCls, Ser, Deser);
-    // Ser/DeSer.
-    __SERIALIZABLE_TEST_CODE_GEN(SerCls, Ser, DeSer);
+    // Ser/deser.
+    __SERIALIZABLE_TEST_CODE_GEN(SerCls, Ser, deser);
     // ser/deser.
     __SERIALIZABLE_TEST_CODE_GEN(SerCls, ser, deser);
     // Serialize/Deserialize.
     __SERIALIZABLE_TEST_CODE_GEN(SerCls, Serialize, Deserialize);
-    // Serialize/DeSerialize.
-    __SERIALIZABLE_TEST_CODE_GEN(SerCls, Serialize, DeSerialize);
+    // serialize/DeSerialize.
+    __SERIALIZABLE_TEST_CODE_GEN(SerCls, serialize, DeSerialize);
     // serialize/deserialize.
     __SERIALIZABLE_TEST_CODE_GEN(SerCls, serialize, deserialize);
 

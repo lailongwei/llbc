@@ -285,9 +285,9 @@ inline bool LLBC_Time::operator<=(const LLBC_Time &time) const
     return _time <= time._time;
 }
 
-inline void LLBC_Time::Serialize(LLBC_Stream &stream) const
+inline bool LLBC_Time::Serialize(LLBC_Stream &stream) const
 {
-    stream.Write(_time);
+    return stream.Write(_time);
 }
 
 inline LLBC_Time::LLBC_Time(const sint64 &clendarTimeInMicroseconds)

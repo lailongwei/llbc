@@ -73,19 +73,26 @@
 
 /*  Serialize/Write about macros define  */
 // Begin write macro define, use to simple begin write object.
-#define LLBC_STREAM_BEGIN_WRITE(stream)                  \
+#define LLBC_STREAM_BEGIN_WRITE(stream, failRetVal)      \
     do {                                                 \
+        decltype(failRetVal) __r_failRet = (failRetVal); \
         LLBC_NS LLBC_Stream &__w_stream = (stream)       \
 
 // Serialize macro define.
 #define LLBC_STREAM_WRITE(field)                         \
-    __w_stream.Write(field)                              \
+    if (!__w_stream.Write(field)) {                      \
+        return __r_failRet;                              \
+    }                                                    \
 
 #define LLBC_STREAM_WRITE_BUF(buf, len)                  \
-    __w_stream.Write(buf, len)                           \
+    if (!__w_stream.Write(buf, len)) {                   \
+        return __r_failRet;                              \
+    }                                                    \
 
 #define LLBC_STREAM_BATCH_WRITE(...)                     \
-    __w_stream.BatchWrite(__VA_ARGS__)                   \
+    if (!__w_stream.BatchWrite(__VA_ARGS__)) {           \
+        return __r_failRet;                              \
+    }
 
 // End write macro define, use to stop stream write.
 #define LLBC_STREAM_END_WRITE()                          \
@@ -360,7 +367,7 @@ public:
      * @param[in] buf  - buffer pointer.
      * @param[in] size - buffer size, in bytes.
      */
-    void Write(const void *buf, size_t size);
+    bool Write(const void *buf, size_t size);
 
 public:
     /**
@@ -374,8 +381,8 @@ public:
      * Batch write buffer data to stream.
      *
      */
-    template <typename... T>
-    void BatchWrite(const T&... vals);
+    template <typename T1, typename... OtherTypes>
+    bool BatchWrite(const T1& val1, const OtherTypes &... otherVals);
 
 public:
     /**
@@ -695,7 +702,7 @@ public:
      * @param[in] obj - the will write object.
      */
     template <typename T>
-    std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T> >
+    std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>, bool>
     Write(const T &obj);
 
     /**
@@ -704,7 +711,7 @@ public:
      */
     template <typename T>
     std::enable_if_t<std::is_pointer_v<T> &&
-                     std::is_same_v<typename LLBC_ExtractPureType<T>::type, char> >
+                     std::is_same_v<typename LLBC_ExtractPureType<T>::type, char>, bool>
     Write(const T &str);
 
     /**
@@ -713,7 +720,7 @@ public:
      */
     template <typename T>
     std::enable_if_t<std::is_pointer_v<T> &&
-                     std::is_same_v<typename LLBC_ExtractPureType<T>::type, void> >
+                     std::is_same_v<typename LLBC_ExtractPureType<T>::type, void>, bool>
     Write(const T &voidPtr);
 
     /**
@@ -723,7 +730,7 @@ public:
     template <typename T>
     std::enable_if_t<std::is_pointer<T>::value &&
                      !std::is_same_v<typename LLBC_ExtractPureType<T>::type, char> &&
-                     !std::is_same_v<typename LLBC_ExtractPureType<T>::type, void> >
+                     !std::is_same_v<typename LLBC_ExtractPureType<T>::type, void>, bool>
     Write(const T &ptr);
 
     /**
@@ -731,7 +738,7 @@ public:
      * @param[in] arr - the char arithmetic array.
      */
     template <typename T, size_t _ArrLen>
-    std::enable_if_t<std::is_arithmetic_v<T> && std::is_same_v<T, char> >
+    std::enable_if_t<std::is_arithmetic_v<T> && std::is_same_v<T, char>, bool>
     Write(const T(&arr)[_ArrLen]);
 
     /**
@@ -739,7 +746,7 @@ public:
      * @param[in] arr - the uint8/bool arithmetic array.
      */
     template <typename T, size_t _ArrLen>
-    std::enable_if_t<std::is_arithmetic_v<T> && (std::is_same_v<T, uint8>|| std::is_same_v<T, bool>)>
+    std::enable_if_t<std::is_arithmetic_v<T> && (std::is_same_v<T, uint8>|| std::is_same_v<T, bool>), bool>
     Write(const T(&arr)[_ArrLen]);
 
     /**
@@ -751,7 +758,7 @@ public:
                       (!std::is_same_v<T, char> &&
                        !std::is_same_v<T, uint8> &&
                        !std::is_same_v<T, bool>)) ||
-                     !std::is_arithmetic_v<T> >
+                     !std::is_arithmetic_v<T>, bool>
     Write(const T(&arr)[_ArrLen]);
 
     /**
@@ -760,7 +767,7 @@ public:
      */
     template <typename T>
     std::enable_if_t<LLBC_IsTemplSpec<T, std::basic_string>::value ||
-                     LLBC_IsTemplSpec<T, LLBC_BasicString>::value>
+                     LLBC_IsTemplSpec<T, LLBC_BasicString>::value, bool>
     Write(const T &str);
 
     /**
@@ -772,7 +779,8 @@ public:
                      LLBC_IsTemplSpec<T, std::list>::value ||
                      LLBC_IsTemplSpec<T, std::deque>::value ||
                      LLBC_IsTemplSpec<T, std::set>::value ||
-                     LLBC_IsTemplSpec<T, std::unordered_set>::value>
+                     LLBC_IsTemplSpec<T, std::unordered_set>::value,
+                     bool>
     Write(const T &container);
 
     /**
@@ -781,7 +789,7 @@ public:
      */
     template <typename T>
     std::enable_if_t<LLBC_IsTemplSpec<T, std::queue>::value ||
-                     LLBC_IsTemplSpec<T, std::stack>::value>
+                     LLBC_IsTemplSpec<T, std::stack>::value, bool>
     Write(const T &container);
 
     /**
@@ -790,7 +798,7 @@ public:
      */
     template <typename T>
     std::enable_if_t<LLBC_IsTemplSpec<T, std::map>::value ||
-                     LLBC_IsTemplSpec<T, std::unordered_map>::value>
+                     LLBC_IsTemplSpec<T, std::unordered_map>::value, bool>
     Write(const T &container);
 
 private:
@@ -801,10 +809,10 @@ private:
     struct __LLBC_STLArrayWriter
     {
         template <typename Arr>
-        static void Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
+        static bool Write(const Arr &arr, LLBC_NS LLBC_Stream &stream)
         {
-            stream.Write(arr[N - 1]);
-            __LLBC_STLArrayWriter<N - 1>::Write(arr, stream);
+            return stream.Write(arr[N - 1]) &&
+                    __LLBC_STLArrayWriter<N - 1>::Write(arr, stream);
         }
     };
 
@@ -814,7 +822,7 @@ public:
      * @param[in] arr - the will write object.
      */
     template <typename T>
-    std::enable_if_t<LLBC_IsSTLArraySpec<T, std::array>::value>
+    std::enable_if_t<LLBC_IsSTLArraySpec<T, std::array>::value, bool>
     Write(const T &arr);
 
 private:
@@ -825,10 +833,12 @@ private:
     struct __LLBC_TupleWriter
     {
         template <typename Tup>
-        static void Write(const Tup &tup, LLBC_Stream &stream)
+        static bool Write(const Tup &tup, LLBC_Stream &stream)
         {
-            stream.Write(std::get<N - 1>(tup));
-            __LLBC_TupleWriter<N - 1>::Write(tup, stream);
+            if (!stream.Write(std::get<N - 1>(tup)))
+                return false;
+
+            return __LLBC_TupleWriter<N - 1>::Write(tup, stream);
         }
     };
 
@@ -838,7 +848,7 @@ public:
      * @param[in] tup - the will write object.
      */
     template <typename T>
-    std::enable_if_t<LLBC_IsTemplSpec<T, std::tuple>::value>
+    std::enable_if_t<LLBC_IsTemplSpec<T, std::tuple>::value, bool>
     Write(const T &tup);
 
     /**
@@ -846,7 +856,7 @@ public:
      * @param[in] p - the will write object.
      */
     template <typename T>
-    std::enable_if_t<LLBC_IsTemplSpec<T, std::pair>::value>
+    std::enable_if_t<LLBC_IsTemplSpec<T, std::pair>::value, bool>
     Write(const T &p);
 
     /**
@@ -871,66 +881,67 @@ public:
                      !LLBC_IsTemplSpec<T, std::unordered_map>::value &&
                      !LLBC_IsTemplSpec<T, std::tuple>::value &&
                      !LLBC_IsSTLArraySpec<T, std::array>::value &&
-                     !LLBC_IsTemplSpec<T, std::pair>::value>
+                     !LLBC_IsTemplSpec<T, std::pair>::value,
+                     bool>
     Write(const T &obj);
 
 private:
     /**
      * Try adapt T::Serialize.
      */
-    template <typename T, void (T::*)(LLBC_Stream &) const>
+    template <typename T, bool (T::*)(LLBC_Stream &) const>
     struct upper_camel_case_serializable_type;
     template <typename T>
-    void WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *);
+    bool WriteImpl(const T &obj, upper_camel_case_serializable_type<T, &T::Serialize> *);
 
     /**
      * Try adapt T::Ser.
      */
-    template <typename T, void (T::*)(LLBC_Stream &) const>
+    template <typename T, bool (T::*)(LLBC_Stream &) const>
     struct upper_camel_case_short_serializable_type;
     template <typename T>
-    void WriteImpl(const T &obj, upper_camel_case_short_serializable_type<T, &T::Ser> *);
+    bool WriteImpl(const T &obj, upper_camel_case_short_serializable_type<T, &T::Ser> *);
 
     /**
      * Try adapt T::serialize.
      */
-    template <typename T, void (T::*)(LLBC_Stream &) const>
+    template <typename T, bool (T::*)(LLBC_Stream &) const>
     struct lower_camel_case_serializable_type;
     template <typename T>
-    void WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *);
+    bool WriteImpl(const T &obj, lower_camel_case_serializable_type<T, &T::serialize> *);
 
     /**
      * Try adapt T::ser.
      */
-    template <typename T, void (T::*)(LLBC_Stream &) const>
+    template <typename T, bool (T::*)(LLBC_Stream &) const>
     struct lower_camel_case_short_serializable_type;
     template <typename T>
-    void WriteImpl(const T &obj, lower_camel_case_short_serializable_type<T, &T::ser> *);
+    bool WriteImpl(const T &obj, lower_camel_case_short_serializable_type<T, &T::ser> *);
 
     /**
      * Try adapt protobuf2 message object.
      */
     template <typename T>
-    void WriteImpl(const T &obj, protobuf2_type<T, &T::IsInitialized, &T::ByteSize> *);
+    bool WriteImpl(const T &obj, protobuf2_type<T, &T::IsInitialized, &T::ByteSize> *);
 
     /**
      * Try adapt protobuf3 message object.
      */
     template <typename T>
-    void WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *);
+    bool WriteImpl(const T &obj, protobuf3_type<T, &T::IsInitialized, &T::ByteSizeLong> *);
 
     /**
      * Final write implement: memcpy obj memory.
      */
     template <typename T>
-    std::enable_if_t<std::is_trivial_v<T> >
+    std::enable_if_t<std::is_trivial_v<T>, bool>
     WriteImpl(const T &obj, ...);
 
     /**
      * Forbid non-trivial object write.
      */
     template <typename T>
-    std::enable_if_t<!std::is_trivial_v<T> >
+    std::enable_if_t<!std::is_trivial_v<T>, bool>
     WriteImpl(const T &obj, ...);
 
 public:
@@ -938,7 +949,7 @@ public:
      * Serialize, serialize to self is not allowed
      * serialize interval [_readPos, _writePos)
      */
-    void Serialize(LLBC_Stream& stream) const;
+    bool Serialize(LLBC_Stream& stream) const;
 
     /**
      * Deserialize, deserialize to self is not allowed

@@ -398,7 +398,7 @@ public:
     /**
      * Serialize/Deserialize support.
      */
-    void Serialize(LLBC_Stream &s) const override;
+    bool Serialize(LLBC_Stream &s) const override;
     bool Deserialize(LLBC_Stream &s) override;
 
     /**

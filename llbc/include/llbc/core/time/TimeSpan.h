@@ -199,7 +199,7 @@ public:
     /**
      * Serialize&Deserialize support.
      */
-    void Serialize(LLBC_Stream &stream) const;
+    bool Serialize(LLBC_Stream &stream) const;
     bool Deserialize(LLBC_Stream &stream);
 
 private:

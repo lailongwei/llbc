@@ -80,25 +80,23 @@ struct SerializableCls
 
     std::vector<std::list<std::map<sint32, LLBC_String>>> complexVal;
 
-    void Serialize(LLBC_Stream &stream) const
+    bool Serialize(LLBC_Stream &stream) const
     {
-        stream << bVal
-            << intVal
-
-            << str
-            << strs
-
-            << int32Vec
-            << int32List
-            << int32Set
-            << int32USet
-            << int32ToStrMap
-            << int32ToStrUMap
-
-            << arr
-            << pa
-
-            << complexVal;
+        LLBC_STREAM_BEGIN_WRITE(stream, false);
+        LLBC_STREAM_BATCH_WRITE(bVal,
+            intVal,
+            str,
+            strs,
+            int32Vec,
+            int32List,
+            int32Set,
+            int32USet,
+            int32ToStrMap,
+            int32ToStrUMap,
+            arr,
+            pa,
+            complexVal);
+        LLBC_STREAM_END_WRITE_RET(true);
     }
 
     bool Deserialize(LLBC_Stream &stream)
@@ -208,9 +206,9 @@ struct MovableCls
         return *this;
     }
 
-    void Serialize(LLBC_Stream &stream) const
+    bool Serialize(LLBC_Stream &stream) const
     {
-        stream << intVal << strVal;
+        return stream.Write(intVal);
     }
 
     bool Deserialize(LLBC_Stream &stream)
@@ -241,6 +239,7 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     LLBC_ReturnIf(EndianThreadSpecObjPoolTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(BatchReadAndWriteTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(SelfSerializeAndDeserialize() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(StreamException() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -355,7 +354,11 @@ int TestCase_Com_Stream::ConstructAndAssignmentTest()
         int intVal = 0;
         double dblVal = 0.0;
         LLBC_String strVal;
-        stream >> bVal >> intVal >> dblVal >> strVal;
+        try {
+            stream >> bVal >> intVal >> dblVal >> strVal;
+        } catch (const LLBC_IOException& e) {
+            LLBC_PrintLn("stream exception: %s", e.what());
+        }
         LLBC_PrintLn("- %s content:bVal:%d, intVal:%d, dblVal:%f, strVal:%s, stream2:%s",
                      streamName, bVal, intVal, dblVal, strVal.c_str(), stream.ToString().c_str());
     };
@@ -423,8 +426,12 @@ int TestCase_Com_Stream::AttachTest()
     // Attach(buf, size):
     char buf[128];
     LLBC_Stream stream5(buf, sizeof(buf), true);
-    stream5 << "Hello world";
-    LLBC_PrintLn("- Stream::Stream(buf, size):%s", stream5.ToString().c_str());
+    try {
+        stream5 << "Hello world";
+    }
+    catch (const LLBC_IOException& e) {
+        LLBC_PrintLn("- Stream::Stream(buf, size):%s, exception:%s", stream5.ToString().c_str(), e.what());
+    }
 
     return LLBC_OK;
 }
@@ -810,9 +817,11 @@ int TestCase_Com_Stream::BatchReadAndWriteTest()
     LLBC_String str1 = "str1";
     LLBC_String str2 = "str2";
 
-    LLBC_STREAM_BEGIN_WRITE(stream);
+    LLBC_STREAM_BEGIN_WRITE(stream, LLBC_FAILED);
     LLBC_STREAM_BATCH_WRITE(intVal1, intVal2, str1, str2);
-    LLBC_STREAM_END_WRITE();
+    LLBC_STREAM_END_WRITE_RET(LLBC_OK);
+
+    LLBC_PrintLn("stream %s\n", stream.ToString().c_str());
 
     auto batchRead = [](LLBC_Stream &stream) -> bool
     {
@@ -851,15 +860,13 @@ int TestCase_Com_Stream::SelfSerializeAndDeserialize()
     stream1 << str1;
     LLBC_PrintLn("- stream1 << \"str1\", stream1:%s", stream1.ToString().c_str());
     stream2 << stream1;
-    LLBC_PrintLn("- stream2 << stream1, stream1:%s", stream2.ToString().c_str());
+    LLBC_PrintLn("- stream2 << stream1, stream1:%s, stream2:%s", stream1.ToString().c_str(), stream2.ToString().c_str());
     stream2 >> stream1;
-    LLBC_PrintLn("- stream2 >> stream1, stream1:%s", stream1.ToString().c_str());
+    LLBC_PrintLn("- stream2 >> stream1, stream1:%s, stream2:%s", stream1.ToString().c_str(), stream2.ToString().c_str());
     stream1 >> str2;
     LLBC_PrintLn("- stream1 >> str2, str2:%s", str2.c_str());
    
     str1 = "test2";
-    stream1.Clear();
-    stream2.Clear();
     stream1 << str1;
     stream2 << stream1;
     stream3 << stream2;
@@ -873,12 +880,54 @@ int TestCase_Com_Stream::SelfSerializeAndDeserialize()
         stream3.ToString().c_str(), str2.c_str());
     LLBC_ReturnIf(str1 != "test2.1" || str2 != "test2", LLBC_FAILED);
 
-
-    stream2 >> stream2;
     LLBC_PrintLn("stream2 >> stream2, error %s", LLBC_FormatLastError());
+    try {
+        stream2 >> stream2;
+    }
+    catch (const std::exception &e) {
+        LLBC_PrintLn("stream2 >> stream2 exception:%s", e.what());
+    }
 
-    stream1 << stream1;
-    LLBC_PrintLn("stream1 << stream1, error %s", LLBC_FormatLastError());
+    try {
+        stream1 << stream1;
+    }
+    catch (const std::exception &e) {
+        LLBC_PrintLn("stream1 << stream1, exception:%s", e.what());
+    }    
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_Stream::StreamException()
+{
+    LLBC_PrintLn("StreamException:");
+    LLBC_Stream stream1;
+
+    char buf[128];
+    stream1.Attach(buf, sizeof(buf));
+    
+    try {
+        stream1 << 123;
+    }
+    catch (LLBC_IOException& e)
+    {
+        LLBC_PrintLn("1. exception:%s, error:%s", e.what(), LLBC_FormatLastError());
+    }
+
+    try {
+        stream1 << stream1;
+    }
+    catch (LLBC_IOException& e)
+    {
+        LLBC_PrintLn("2. exception:%s, error:%s", e.what(), LLBC_FormatLastError());
+    }
+
+    try {
+        stream1 >> stream1;
+    }
+    catch (LLBC_IOException& e) {
+        LLBC_PrintLn("3. exception:%s, error:%s", e.what(), LLBC_FormatLastError());
+    }
 
     return LLBC_OK;
 }

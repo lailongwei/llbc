@@ -332,9 +332,9 @@ inline LLBC_String LLBC_TimeSpan::ToString() const
     GetDays(), GetHours(), GetMinutes(), GetSeconds(), GetMillis() * 1000 + GetMicros());
 }
 
-inline void LLBC_TimeSpan::Serialize(LLBC_Stream &stream) const
+inline bool LLBC_TimeSpan::Serialize(LLBC_Stream &stream) const
 {
-    stream.Write(_span);
+    return stream.Write(_span);
 }
 
 inline bool LLBC_TimeSpan::Deserialize(LLBC_Stream &stream)

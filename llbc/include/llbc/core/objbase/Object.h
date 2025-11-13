@@ -99,7 +99,7 @@ public:
      * Serialize method, use to serialize the object to stream.
      * @param[out] s - the stream object.
      */
-    virtual void Serialize(LLBC_Stream &s) const;
+    virtual bool Serialize(LLBC_Stream &s) const;
 
     /**
      * Deserialize method, use to deserialize the object from stream.

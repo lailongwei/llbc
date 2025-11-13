@@ -46,6 +46,7 @@ private:
     int EndianThreadSpecObjPoolTest();
     int BatchReadAndWriteTest();
     int SelfSerializeAndDeserialize();
+    int StreamException();
 
 private:
     static void GenRandStr(LLBC_String &str,

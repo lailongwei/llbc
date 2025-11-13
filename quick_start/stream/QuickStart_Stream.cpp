@@ -53,23 +53,19 @@ struct PlayerData
     }
 
     // 序列化支持
-    void Serialize(LLBC_Stream &stream) const
+    bool Serialize(LLBC_Stream &stream) const
     {
-        stream << playerId
-               << playerName
-               << level
-               << sex;
+        LLBC_STREAM_BEGIN_WRITE(stream, false);
+        LLBC_STREAM_BATCH_WRITE(playerId, playerName, level, sex);
+        LLBC_STREAM_END_WRITE_RET(true);
     }
 
     // 反序列化支持
     bool Deserialize(LLBC_Stream &stream)
     {
-        stream >> playerId
-               >> playerName
-               >> level
-               >> sex;
-
-        return true;
+        LLBC_STREAM_BEGIN_READ(stream, false);
+        LLBC_STREAM_BATCH_READ(playerId, playerName, level, sex);
+        LLBC_STREAM_END_READ_RET(true);
     }
 };
 
