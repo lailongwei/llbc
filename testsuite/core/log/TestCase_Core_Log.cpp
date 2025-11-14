@@ -58,8 +58,11 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Defer finalize logger mgr.
     LLBC_Defer(LLBC_LoggerMgrSingleton->Finalize());
 
-    // log color filter test
+    // log color filter test.
     DoLogColorFilterTest();
+
+    // log trace enable level test.
+    DoLogTraceEnableLevelTest();
 
     // Set log hook(to root logger).
     LLBC_Logger *rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
@@ -820,6 +823,33 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_WARN("This is a uninited warn log message reload_10");     
     LLOG_ERROR("This is a uninited error log message reload_11");
     LLOG_FATAL("This is a uninited fatal log message reload_12");
+}
+
+void TestCase_Core_Log::DoLogTraceEnableLevelTest()
+{
+    LLBC_PrintLn("DoLogTraceEnableLevelTest begin");
+
+    constexpr const char *testLoggerName = "logtrace_enable_level";
+
+    auto logTraceEnablerLogger = LLBC_LoggerMgrSingleton->GetLogger(testLoggerName);
+    LLBC_PrintLn("Log trace enable level test, test logger name:%s, default level:%s",
+                 logTraceEnablerLogger->GetLoggerName().c_str(),
+                 LLBC_LogLevel::GetLevelStr(logTraceEnablerLogger->GetLogLevel()).c_str());
+
+    LLBC_PrintLn("fileLogLevel: %s", LLBC_LogLevel::GetLevelStr(logTraceEnablerLogger->GetLogLevel()).c_str());
+
+    auto ret = logTraceEnablerLogger->AddLogTrace("LOG_TRACE_ENABLE_LEVEL_TEST", 12345678);
+    LLBC_PrintLn("  - Add test log trace content, return:%d, err:%s",
+                 ret, LLBC_FormatLastError());
+
+    LLOG_TRACE2(testLoggerName, "test log trace enable level in trace.");
+    LLOG_DEBUG2(testLoggerName, "test log trace enable level in debug.");
+    LLOG_INFO2(testLoggerName, "test log trace enable level in info.");
+    LLOG_WARN2(testLoggerName, "test log trace enable level in warn.");
+    LLOG_ERROR2(testLoggerName, "test log trace enable level in error.");
+    LLOG_FATAL2(testLoggerName, "test log trace enable level in FATAL.");
+
+    LLOG_FATAL("--------------------------------------------------------------------");
 }
 
 template <typename _KeyTy, typename _ContentTy>
