@@ -58,10 +58,10 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Defer finalize logger mgr.
     LLBC_Defer(LLBC_LoggerMgrSingleton->Finalize());
 
-    // log color filter test
+    // log color filter test.
     DoLogColorFilterTest();
 
-    // log trace enable level test
+    // log trace enable level test.
     DoLogTraceEnableLevelTest();
 
     // Set log hook(to root logger).
@@ -824,7 +824,6 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_ERROR("This is a uninited error log message reload_11");
     LLOG_FATAL("This is a uninited fatal log message reload_12");
 }
-
 
 void TestCase_Core_Log::DoLogTraceEnableLevelTest()
 {
