@@ -41,6 +41,7 @@ private:
     void DoConditionMacroLogTest();
     int DoLoggerMgrReloadTest();
     void DoLogColorFilterTest();
+    void DoLogTraceEnableLevelTest();
 
     void DoLogTraceTest();
     template <typename _KeyTy, typename _ContentTy>
