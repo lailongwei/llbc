@@ -25,14 +25,32 @@
 #include "llbc/core/log/LogTraceToken.h"
 
 #include "llbc/core/log/LogData.h"
+#include "llbc/core/log/LogLevel.h"
 
 __LLBC_NS_BEGIN
+
+LLBC_LogTraceToken::LLBC_LogTraceToken()
+: _enableLogLevel(LLBC_LogLevel::Trace)
+{
+}
 
 int LLBC_LogTraceToken::Initialize(const LLBC_LogFormattingInfo &formatter,
                                    const LLBC_LogTimeAccessor &logTimeAccessor,
                                    const LLBC_String &str)
 {
     SetFormatter(formatter);
+
+    const LLBC_String &rawParam = formatter.addiParam;
+    const size_t colonPos = rawParam.find(':');
+    if (colonPos != LLBC_String::npos)
+    {
+        if (rawParam.substr(0, colonPos).strip().tolower() == "enablelevel")
+        {
+            const LLBC_String valueStr = rawParam.substr(colonPos + 1).strip();
+            _enableLogLevel = LLBC_LogLevel::GetLevelEnum(valueStr);
+        }
+    }
+
     return LLBC_OK;
 }
 
@@ -43,6 +61,9 @@ int LLBC_LogTraceToken::GetType() const
 
 void LLBC_LogTraceToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
+    if (data.level < _enableLogLevel)
+        return;
+
     auto logTrace = data.logTrace.get();
     if (logTrace && !logTrace->empty())
     {
