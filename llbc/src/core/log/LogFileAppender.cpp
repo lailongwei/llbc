@@ -124,6 +124,8 @@ void LLBC_LogFileAppender::Finalize()
     _maxFileSize = LONG_MAX;
     _maxBackupIndex = INT_MAX;
 
+    // Discard file page cache before close.
+    _file.DiscardPageCache();
     _file.Close();
     _fileSize = 0;
 
@@ -279,6 +281,8 @@ int LLBC_LogFileAppender::ReOpenFile(const LLBC_String &newFileName, bool clear)
     // Close old file.
     if (LIKELY(_file.IsOpened()))
     {
+        // Discard file page cache before close.
+        _file.DiscardPageCache();
         _file.Close();
         _fileSize = 0;
     }
@@ -333,6 +337,8 @@ void LLBC_LogFileAppender::BackupFiles()
         return;
 
     const LLBC_String filePath = _file.GetFilePath();
+    // Discard file page cache before close.
+    _file.DiscardPageCache();
     _file.Close();
     _fileSize = 0;
 
