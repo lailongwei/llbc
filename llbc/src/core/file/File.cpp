@@ -234,6 +234,23 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
     return LLBC_OK;
 }
 
+void LLBC_File::DiscardPageCache() const
+{
+#if LLBC_TARGET_PLATFORM_LINUX
+    if (!IsOpened())
+        return;
+
+    const int fd = GetFileNo();
+    if (fd == -1)
+        return;
+
+    // This allows the kernel to free the page cache associated with this file,
+    // making memory available for other processes. It is a performance optimization,
+    // especially useful when dealing with large files that are read only once
+    (void)posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
+#endif
+}
+
 sint64 LLBC_File::GetFileSize() const
 {
     if (!IsOpened())
