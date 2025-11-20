@@ -156,16 +156,6 @@ void LLBC_LogTraceMgr::UpdateColorLogTraces(const LLBC_LogTraces &requireColorLo
     UpdateColorLogTag();
 }
 
-std::shared_ptr<LLBC_String> LLBC_LogTraceMgr::GetTraceInfo() const
-{
-    return _traceInfo;
-}
-
-bool LLBC_LogTraceMgr::GetColorLogTag() const
-{
-    return _colorLogTag;
-}
-
 void LLBC_LogTraceMgr::UpdateColorLogTag()
 {
     for (const auto &logTrace : _logTracesEx)
