@@ -5,7 +5,7 @@
 require "premake5_com"
 
 -- disable/enable cxx11 abi support.
-llbc_disable_cxx11_abi = false -- true/false.
+llbc_disable_cxx11_abi = true -- true/false.
 
 -- enable/disable asan support.
 -- Note: This config option only available in non-windows platform and c/c++ projects.
