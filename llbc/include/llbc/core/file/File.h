@@ -230,6 +230,7 @@ public:
 
     /**
      * Discard file page cache.
+     * @return int - return 0 if success, otherwise return -1.
      */
     int DiscardPageCache() const;
 
