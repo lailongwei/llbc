@@ -61,7 +61,7 @@ int LLBC_LogTraceToken::GetType() const
 
 void LLBC_LogTraceToken::Format(const LLBC_LogData &data, LLBC_String &formattedData) const
 {
-    if (data.level < _enableLogLevel)
+    if (data.level < _enableLogLevel && !data.logColorTag)
         return;
 
     auto logTrace = data.logTrace.get();

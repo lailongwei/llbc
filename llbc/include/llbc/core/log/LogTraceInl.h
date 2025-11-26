@@ -157,4 +157,14 @@ inline LLBC_LogTrace &LLBC_LogTrace::operator=(const LLBC_LogTrace &other)
     return *this;
 }
 
+inline std::shared_ptr<LLBC_String> LLBC_LogTraceMgr::GetTraceInfo() const
+{
+    return _traceInfo;
+}
+
+inline bool LLBC_LogTraceMgr::GetColorLogTag() const
+{
+    return _colorLogTag;
+}
+
 __LLBC_NS_END

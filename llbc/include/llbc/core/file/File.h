@@ -228,6 +228,12 @@ public:
      */
     int SetBufferMode(int bufferMode, size_t size);
 
+    /**
+     * Discard file page cache.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int DiscardPageCache() const;
+
 public:
     /**
      * Get file size.

@@ -469,7 +469,7 @@ bool LLBC_Array::Deserialize(LLBC_Stream &s)
     if (UNLIKELY(!_objFactory))
         return false;
 
-    LLBC_STREAM_BEGIN_READ(s, bool, false);
+    LLBC_STREAM_BEGIN_READ(s, false);
 
     uint32 size = 0;
     LLBC_STREAM_READ(size);
