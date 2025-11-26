@@ -231,7 +231,7 @@ public:
     /**
      * Discard file page cache.
      */
-    void DiscardPageCache() const;
+    int DiscardPageCache() const;
 
 public:
     /**
