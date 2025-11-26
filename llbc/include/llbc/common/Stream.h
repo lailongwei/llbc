@@ -28,66 +28,66 @@
 /** Some stream helper macros define **/
 /*  Deserialize/Read about macros define  */
 // Begin read macro define, use to simple begin read object.
-#define LLBC_STREAM_BEGIN_READ(stream, failRetType, failRetVal) \
-    do {                                                        \
-        failRetType __r_failRet = (failRetVal);                 \
-        LLBC_NS LLBC_Stream &__r_stream = (stream)              \
+#define LLBC_STREAM_BEGIN_READ(stream, failRetVal)       \
+    do {                                                 \
+        decltype(failRetVal) __r_failRet = (failRetVal); \
+        LLBC_NS LLBC_Stream &__r_stream = (stream)       \
 
 // Deserialize macro define.
-#define LLBC_STREAM_READ(field)                                 \
-    if (!__r_stream.Read(field)) {                              \
-        return __r_failRet;                                     \
-    }                                                           \
+#define LLBC_STREAM_READ(field)                          \
+    if (!__r_stream.Read(field)) {                       \
+        return __r_failRet;                              \
+    }                                                    \
 
-#define LLBC_STREAM_READ_BUF(buf, len)                          \
-    if (!__r_stream.Read(buf, len)) {                           \
-        return __r_failRet;                                     \
-    }                                                           \
+#define LLBC_STREAM_READ_BUF(buf, len)                   \
+    if (!__r_stream.Read(buf, len)) {                    \
+        return __r_failRet;                              \
+    }                                                    \
 
 // Peek macro define.
-#define LLBC_STREAM_PEEK(field)                                 \
-    if (!__r_stream.Peek(field)) {                              \
-        return __r_failRet;                                     \
-    }                                                           \
+#define LLBC_STREAM_PEEK(field)                          \
+    if (!__r_stream.Peek(field)) {                       \
+        return __r_failRet;                              \
+    }                                                    \
 
 // Skip macro define, use to skip stream.
-#define LLBC_STREAM_SKIP(size)                                  \
-    if (!__r_stream.Skip(size)) {                               \
-        return __r_failRet;                                     \
-    }                                                           \
+#define LLBC_STREAM_SKIP(size)                           \
+    if (!__r_stream.Skip(size)) {                        \
+        return __r_failRet;                              \
+    }                                                    \
 
 // End read macro define, use to stop stream read.
-#define LLBC_STREAM_END_READ()                                  \
-    } while(0)                                                  \
+#define LLBC_STREAM_END_READ()                           \
+    } while(0)                                           \
 
 // End read macro define, like with previous, but this
 // macro will return given value to stop function call.
-#define LLBC_STREAM_END_READ_RET(retVal)                        \
-    } while(0);                                                 \
-    return (retVal)                                             \
+#define LLBC_STREAM_END_READ_RET(retVal)                 \
+    } while(0);                                          \
+    return (retVal)                                      \
 
 /*  Serialize/Write about macros define  */
 // Begin write macro define, use to simple begin write object.
-#define LLBC_STREAM_BEGIN_WRITE(stream)                         \
-    do {                                                        \
-        LLBC_NS LLBC_Stream &__w_stream = (stream)              \
+#define LLBC_STREAM_BEGIN_WRITE(stream)                  \
+    do {                                                 \
+        LLBC_NS LLBC_Stream &__w_stream = (stream)       \
 
 // Serialize macro define.
-#define LLBC_STREAM_WRITE(field)                                \
-    __w_stream.Write(field)                                     \
+#define LLBC_STREAM_WRITE(field)                         \
+    __w_stream.Write(field)                              \
 
-#define LLBC_STREAM_WRITE_BUF(buf, len)                         \
-    __w_stream.Write(buf, len)                                  \
+#define LLBC_STREAM_WRITE_BUF(buf, len)                  \
+    __w_stream.Write(buf, len)                           \
 
 // End write macro define, use to stop stream write.
-#define LLBC_STREAM_END_WRITE()                                 \
-    } while(0)                                                  \
+#define LLBC_STREAM_END_WRITE()                          \
+    } while(0)                                           \
 
 // End write macro define, like with previous, but this
 // macro will return given value to stop function call.
-#define LLBC_STREAM_END_WRITE_RET(retVal)                       \
-    } while(0);                                                 \
-    return (retVal)                                             \
+#define LLBC_STREAM_END_WRITE_RET(retVal)                \
+    } while(0);                                          \
+    return (retVal)                                      \
 
 
 __LLBC_NS_BEGIN

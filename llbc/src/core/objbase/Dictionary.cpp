@@ -469,7 +469,7 @@ bool LLBC_Dictionary::Deserialize(LLBC_Stream &s)
     if (!_objFactory)
         return false;
 
-    LLBC_STREAM_BEGIN_READ(s, bool, false);
+    LLBC_STREAM_BEGIN_READ(s, false);
 
     uint32 bucketSize = 0;
     LLBC_STREAM_READ(bucketSize);
