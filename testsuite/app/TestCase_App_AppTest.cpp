@@ -65,6 +65,12 @@ namespace
             // LLBC_XDelete(_testSvc);
         }
 
+        void OnReload() override
+        {
+            LLBC_PrintLn("Application reload");
+            LLBC_PrintLn("- App config: %s", GetConfig().ToString().c_str());
+        }
+
     private:
         LLBC_Service *_testSvc;
     };
