@@ -597,53 +597,58 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
 
 int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
 {
-    // Lock and check.
-    LLBC_LockGuard guard(_loadLock);
-    LLBC_SetErrAndReturnIf(checkAppStarted && !IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
-    LLBC_SetErrAndReturnIf(_loading > 0, LLBC_ERROR_REENTRY, LLBC_FAILED);
-
-    // - Reload detail: Reload logger mgr(ignore error).
-    if (LLBC_LoggerMgrSingleton->IsInited())
-        LLBC_LoggerMgrSingleton->Reload();
-
-    // - Reload detail: Reload config.
-    LLBC_AtomicFetchAndAdd(&_loading, 1);
-    LLBC_Defer(LLBC_AtomicFetchAndSub(&_loading, 1));
-    LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadConfig() != LLBC_OK, LLBC_FAILED);
-
-    // - Reload application fps.
-    for (auto cfgItem : _cfg.AsDict())
+    // Execute reload logic.
     {
-        if (_cfgType == LLBC_AppConfigType::Ini)
-        {
-            auto sectionName = cfgItem.first.AsStr().tolower();
-            if (sectionName != "app" && sectionName != "application")
-                break;
+        // Lock and check.
+        LLBC_LockGuard guard(_loadLock);
+        LLBC_SetErrAndReturnIf(checkAppStarted && !IsStarted(), LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
+        LLBC_SetErrAndReturnIf(_loading > 0, LLBC_ERROR_REENTRY, LLBC_FAILED);
 
-            for (auto cfgSecItem : cfgItem.second.AsDict())
+        // - Reload detail: Reload logger mgr(ignore error).
+        if (LLBC_LoggerMgrSingleton->IsInited())
+            LLBC_LoggerMgrSingleton->Reload();
+
+        // - Reload detail: Reload config.
+        LLBC_AtomicFetchAndAdd(&_loading, 1);
+        LLBC_Defer(LLBC_AtomicFetchAndSub(&_loading, 1));
+        LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadConfig() != LLBC_OK, LLBC_FAILED);
+
+        // - Reload application fps.
+        for (auto cfgItem : _cfg.AsDict())
+        {
+            if (_cfgType == LLBC_AppConfigType::Ini)
             {
-                if (cfgSecItem.first.AsStr().tolower() == "fps")
-                {
-                    SetFPS(cfgSecItem.second);
+                auto sectionName = cfgItem.first.AsStr().tolower();
+                if (sectionName != "app" && sectionName != "application")
                     break;
+
+                for (auto cfgSecItem : cfgItem.second.AsDict())
+                {
+                    if (cfgSecItem.first.AsStr().tolower() == "fps")
+                    {
+                        SetFPS(cfgSecItem.second);
+                        break;
+                    }
                 }
+
+                break;
             }
 
-            break;
+            if (cfgItem.first.AsStr().tolower() == "fps")
+            {
+                const auto& fps =
+                    _cfgType == LLBC_AppConfigType::Xml ?
+                        cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
+                SetFPS(fps);
+                break;
+            }
         }
 
-        if (cfgItem.first.AsStr().tolower() == "fps")
-        {
-            const auto& fps = _cfgType == LLBC_AppConfigType::Xml ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
-            SetFPS(fps);
-            break;
-        }
+        // Note: Execute other application level resource(s) reload.
+        // ... ...
     }
 
-    // Note: Execute other application level resource(s) reload.
-    // ... ...
-
-    // Call reload event method.
+    // Call reload event method(released _loadLock).
     if (callEvMeth)
     {
         OnReload();
