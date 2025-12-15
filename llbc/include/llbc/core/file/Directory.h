@@ -196,6 +196,14 @@ public:
      * @return LLBC_String - the cache directory.
      */
     static LLBC_String CacheDir();
+
+private:
+    /**
+     * Find the end position of directory in path.
+     * @param[in] path - the path.
+     * @return size_t - the directory end position, or LLBC_String::npos if not found.
+     */
+    static size_t FindDirEndPos(const LLBC_String &path);
 };
 
 __LLBC_NS_END
