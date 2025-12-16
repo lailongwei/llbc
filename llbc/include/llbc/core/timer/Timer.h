@@ -65,10 +65,16 @@ public:
 
 public:
     /**
-     * Get due time.
-     * @return LLBC_TimeSpan - due time.
+     * Get timer Id.
+     * @return LLBC_TimerId - timer Id.
      */
-    LLBC_TimeSpan GetDueTime() const;
+    LLBC_TimerId GetTimerId() const;
+
+    /**
+     * Get timer first period.
+     * @return LLBC_TimeSpan - timer first period.
+     */
+    LLBC_TimeSpan GetFirstPeriod() const;
 
     /**
      * Get timer period.
@@ -77,16 +83,16 @@ public:
     LLBC_TimeSpan GetPeriod() const;
 
     /**
-     * Get timer Id.
-     * @return LLBC_TimerId - timer Id.
+     * Get total trigger count, if timer unscheduled, return LLBC_INFINITE.
+     * @return size_t - max trigger count.
      */
-    LLBC_TimerId GetTimerId() const;
+    size_t GetTotalTriggerCount() const;
 
     /**
-     * Get timeout times.
-     * @return sint64 - timeout times.
+     * Get triggered count, if timer unscheduled, return 0.
+     * @return size_t - has been trigger count.
      */
-    sint64 GetTimeoutTimes() const;
+    size_t GetTriggeredCount() const;
 
 public:
     /**
@@ -157,19 +163,26 @@ public:
 public:
     /**
      * Schedule timer.
-     * @param[in] firstTime - first timeout time, must be >= LLBC_Time::Now().
-     * @param[in] period    - period time, if is zero, will use firstTime - LLBC_Time::Now().
+     * @param[in] firstTime    - first timeout time, must be >= LLBC_Time::Now().
+     * @param[in] period       - period time, if is zero, will use firstTime - LLBC_Time::Now().
+     * @param[in] triggerCount - trigger count, default is LLBC_INFINITE, if triggerCount is 0, will normalize to 1.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(const LLBC_Time &firstTime, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
+    virtual int Schedule(const LLBC_Time &firstTime,
+                         const LLBC_TimeSpan &period = LLBC_TimeSpan::zero,
+                         size_t triggerCount = LLBC_INFINITE);
 
     /**
      * Schedule timer.
-     * @param[in] firstPeriod - first period time.
-     * @param[in] period      - period time, if is zero, wll use firstPeriod.
+     * @param[in] firstPeriod  - first period time, the minimum period value depends on the scheduling precision of
+     *                           LLBC_TimerScheduler::Update().
+     * @param[in] period       - period time, if is zero, will use firstPeriod.
+     * @param[in] triggerCount - trigger count, default is LLBC_INFINITE, if triggerCount is 0, will normalize to 1.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero);
+    virtual int Schedule(const LLBC_TimeSpan &firstPeriod,
+                         const LLBC_TimeSpan &period = LLBC_TimeSpan::zero,
+                         size_t triggerCount = LLBC_INFINITE);
 
     /**
      * Cancel this timer.
@@ -178,22 +191,22 @@ public:
     virtual int Cancel();
 
     /**
-     * Check timer is the scheduling or not(this function not set last error).
+     * Check timer scheduled or not(this function not set last error).
      * @return bool - return true if is scheduling, otherwise return false.
      */
-    bool IsScheduling() const;
+    bool IsScheduled() const;
 
     /**
-     * Check timer is timeouting or not(this function not set last error).
-     * @return bool - return true if is timeouting, otherwise return false.
+     * Check timer is timeout handling or not(this function not set last error).
+     * @return bool - return true if is timeout handling, otherwise return false.
      */
-    bool IsTimeouting() const;
+    bool IsHandlingTimeout() const;
 
     /**
-     * Check timer is cancelling or not(this function not set last error).
-     * @return bool - return true if is canceling, otherwise return false.
+     * Check timer is cancel handling or not(this function not set last error).
+     * @return bool - return true if is cancel handling, otherwise return false.
      */
-    bool IsCancelling() const;
+    bool IsHandlingCancel() const;
 
 public:
     /**

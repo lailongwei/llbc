@@ -23,6 +23,7 @@
 #include "llbc/common/Export.h"
 
 #include "llbc/core/os/OS_Time.h"
+#include "llbc/core/os/OS_Atomic.h"
 
 #include "llbc/core/timer/Timer.h"
 #include "llbc/core/timer/TimerData.h"
@@ -30,9 +31,10 @@
 
 __LLBC_NS_BEGIN
 
+sint64 LLBC_TimerScheduler::_maxTimerId = 1;
+
 LLBC_TimerScheduler::LLBC_TimerScheduler()
-: _maxTimerId(0)
-, _enabled(true)
+: _enabled(true)
 , _destroying(false)
 , _cancelingAll(false)
 {
@@ -44,12 +46,15 @@ LLBC_TimerScheduler::~LLBC_TimerScheduler()
     for(auto &elem : _heap)
     {
         LLBC_TimerData *data = elem;
-        if (data->validate)
+        if (data->unStatus.status.isScheduled)
         {
-            data->validate = false;
-            data->cancelling = true;
+            llbc_assert(!data->unStatus.status.isHandlingTimeout && !data->unStatus.status.isHandlingCancel &&
+                        "Not allow delete <LLBC_TimerScheduler> during timer timeout/cancel handling");
+
+            data->unStatus.status.isScheduled = false;
+            data->unStatus.status.isHandlingCancel = true;
             data->timer->OnCancel();
-            data->cancelling = false;
+            data->unStatus.status.isHandlingCancel = false;
         }
 
         if (--data->refCount == 0)
@@ -65,23 +70,22 @@ LLBC_TimerScheduler::_This *LLBC_TimerScheduler::GetCurrentThreadScheduler()
 
 void LLBC_TimerScheduler::Update()
 {
-    LLBC_ReturnIf(_enabled == false || _heap.empty(), void());
+    if (_enabled == false || _heap.empty())
+        return;
 
-    sint64 now = LLBC_GetMilliseconds();
-    while (_heap.empty() == false)
+    const sint64 now = LLBC_GetMilliseconds();
+    do
     {
+        // Get top timerData, if not timeout, break.
         LLBC_TimerData *data = _heap.top();
-        if(data == nullptr)
-        {
-            _heap.pop();
-            continue;
-        }
-
         if (now < data->handle)
             break;
 
+        // Pop top timerData.
         _heap.pop();
-        if (!data->validate)
+
+        // Process cancelled timerData.
+        if (!data->unStatus.status.isScheduled)
         {
             if (--data->refCount == 0)
                 delete data;
@@ -89,39 +93,34 @@ void LLBC_TimerScheduler::Update()
             continue;
         }
 
-        data->timeouting = true;
+        // Incr refCount && Mark is timeout-handling.
+        ++data->refCount;
+        data->unStatus.status.isHandlingTimeout = true;
+        // Incr has been timeout times.
+        ++data->triggeredCount;
 
+        // Call OnTimeout.
         bool reSchedule = true;
         LLBC_Timer *timer = data->timer;
-#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
-        sint64 pseudoNow = now;
-        while (pseudoNow >= data->handle)
-#endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
+        timer->OnTimeout();
+
+        // If Cancel() or Schedule() called during OnTimeout() call, set reSchedule flag to false.
+        if (!data->unStatus.status.isScheduled)
+            reSchedule = false;
+
+        // Reach max schedule times, reset <isScheduled> flag && reset reSchedule flag.
+        if (data->totalTriggerCount != LLBC_INFINITE &&
+            data->triggeredCount >= data->totalTriggerCount)
         {
-            ++data->repeatTimes;
-            timer->OnTimeout();
-
-            // Cancel() or Schedule() called.
-            if (!data->validate)
-            {
-                reSchedule = false;
-#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
-                break;
-#endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
-            }
-
-#if LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
-            if (data->period == 0)
-                break;
-
-            if (UNLIKELY(pseudoNow < data->period))
-                break;
-
-            pseudoNow -= data->period;
-#endif // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
+            data->unStatus.status.isScheduled = false;
+            reSchedule = false;
         }
 
-        data->timeouting = false;
+        // Reset isHandlingTimeout flag && Decr refCount.
+        data->unStatus.status.isHandlingTimeout = false;
+        --data->refCount;
+
+        // Reschedule or try delete timerData.
         if (reSchedule)
         {
             sint64 delay = (data->period != 0) ? (now - data->handle) % data->period : 0;
@@ -130,10 +129,10 @@ void LLBC_TimerScheduler::Update()
         }
         else
         {
-            if (--data->refCount == 0)
+            if (data->refCount == 0 || --data->refCount == 0)
                 delete data;
         }
-    }
+    } while (!_heap.empty());
 }
 
 bool LLBC_TimerScheduler::IsEnabled() const
@@ -156,28 +155,33 @@ bool LLBC_TimerScheduler::IsDestroyed() const
     return _destroying;
 }
 
-int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 period)
+int LLBC_TimerScheduler::Schedule(LLBC_Timer *timer,
+                                  sint64 firstPeriod,
+                                  sint64 period,
+                                  size_t triggerCount)
 {
     if (UNLIKELY(_destroying))
     {
         LLBC_SetLastError(LLBC_ERROR_TIMER_SCHEDULER_DESTROYING);
         return LLBC_FAILED;
     }
-    else if (UNLIKELY(_cancelingAll))
+
+    if (UNLIKELY(_cancelingAll))
     {
         LLBC_SetLastError(LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL);
         return LLBC_FAILED;
     }
 
     auto *data = new LLBC_TimerData;
-    memset(data, 0, sizeof(LLBC_TimerData));
-    data->handle = LLBC_GetMilliseconds() + dueTime;
-    data->timerId = ++_maxTimerId;
-    data->dueTime = dueTime;
+    data->handle = LLBC_GetMilliseconds() + firstPeriod;
+    data->timerId = static_cast <LLBC_TimerId>(LLBC_AtomicFetchAndAdd(&_maxTimerId, 1));
+    data->firstPeriod = firstPeriod;
     data->period = period;
+    data->totalTriggerCount = triggerCount;
+    data->triggeredCount = 0;
     data->timer = timer;
-    data->validate = true;
-    data->refCount = 2;
+    data->unStatus.statusVal = 0x1; // isScheduled = true
+    data->refCount = 2; // LLBC_TimerScheduler:1, LLBC_Timer:1
 
     if (timer->_timerData)
     {
@@ -203,12 +207,12 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     llbc_assert(data->timer == timer && 
                 "Timer scheduler internal error, LLBC_TimerData::timer != argument: timer!");
 
-    data->validate = false;
-    data->cancelling = true;
+    data->unStatus.status.isScheduled = false;
+    data->unStatus.status.isHandlingCancel = true;
     timer->OnCancel();
-    data->cancelling = false;
+    data->unStatus.status.isHandlingCancel = false;
 
-    if (data->timeouting)
+    if (data->unStatus.status.isHandlingTimeout)
         return LLBC_OK;
 
     if (!_cancelingAll &&
@@ -234,7 +238,7 @@ void LLBC_TimerScheduler::CancelAll()
     for(auto &elem : _heap)
     {
         LLBC_TimerData *data = elem;
-        if (LIKELY(data->validate))
+        if (LIKELY(data->unStatus.status.isScheduled))
             data->timer->Cancel();
     }
 

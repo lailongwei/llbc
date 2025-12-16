@@ -239,8 +239,11 @@ private:
     {
         timer.SetTimeoutHandler([this, phaseDesc, exceptTimeout](LLBC_Timer *timer) {
             assert(exceptTimeout);
-            LLBC_PrintLn("%s-%s Timeout: timeout times:%lld",
-                         LLBC_GetTypeName(*this), phaseDesc, timer->GetTimeoutTimes());
+            LLBC_PrintLn("%s-%s Timeout: timeout times:%zu/%zu",
+                         LLBC_GetTypeName(*this),
+                         phaseDesc,
+                         timer->GetTriggeredCount(),
+                         timer->GetTotalTriggerCount());
         });
 
         timer.Schedule(LLBC_TimeSpan::FromMillis(LLBC_Rand(200, 400)));

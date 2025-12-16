@@ -98,12 +98,16 @@ private:
 
     /**
      * Schedule timer.
-     * @param[in] timer   - timer object.
-     * @param[in] dueTime - due time, in milli-seconds.
-     * @param[in] period  - period time, in milli-seconds.
+     * @param[in] timer        - timer object.
+     * @param[in] firstPeriod  - first period time, in milli-seconds.
+     * @param[in] period       - period time, in milli-seconds.
+     * @param[in] triggerCount - trigger count.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int Schedule(LLBC_Timer *timer, sint64 dueTime, sint64 period);
+    virtual int Schedule(LLBC_Timer *timer,
+                         sint64 firstPeriod,
+                         sint64 period,
+                         size_t triggerCount);
 
     /**
      * Cancel timer.
@@ -116,7 +120,7 @@ private:
     LLBC_DISABLE_ASSIGNMENT(LLBC_TimerScheduler);
 
 private:
-    LLBC_TimerId _maxTimerId;
+    static sint64 _maxTimerId;
     bool _enabled;
     bool _destroying;
     bool _cancelingAll;

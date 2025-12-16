@@ -77,9 +77,11 @@ inline void LLBC_Timer::OnCancel()
         (*_cancelDeleg)(this);
 }
 
-inline int LLBC_Timer::Schedule(const LLBC_Time &firstTime, const LLBC_TimeSpan &period)
+inline int LLBC_Timer::Schedule(const LLBC_Time &firstTime,
+                                const LLBC_TimeSpan &period,
+                                size_t triggerCount)
 {
-    return Schedule(firstTime - LLBC_Time::Now(), period);
+    return Schedule(firstTime - LLBC_Time::Now(), period, triggerCount);
 }
 
 __LLBC_NS_END

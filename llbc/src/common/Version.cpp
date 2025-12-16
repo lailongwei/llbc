@@ -106,7 +106,7 @@ LLBC_String LLBC_GetVersionInfo(bool verbose)
     desc.append_format("    default log file buffer size: %d\n", LLBC_CFG_LOG_DEFAULT_LOG_FILE_BUFFER_SIZE);
     desc.append_format("    lazy create log file?: %s\n", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE ? "true" : "false");
     desc.append_format("  timer info: \n");
-    desc.append_format("    strict timer schedule: %s\n", LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE ? "true" : "false");
+    desc.append_format("    timer long timeout time threshold(milliseconds): %d\n", LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME);
     desc.append_format("  object pool info: \n");
     desc.append_format("    object pool stripe capacity: %d\n", LLBC_CFG_CORE_OBJPOOL_STRIPE_CAPACITY);
 

@@ -61,10 +61,15 @@ LLBC_Timer::~LLBC_Timer()
         delete _cancelDeleg;
 }
 
-LLBC_TimeSpan LLBC_Timer::GetDueTime() const
+LLBC_TimerId LLBC_Timer::GetTimerId() const
+{
+    return _timerData ? _timerData->timerId : LLBC_INVALID_TIMER_ID;
+}
+
+LLBC_TimeSpan LLBC_Timer::GetFirstPeriod() const
 {
     return _timerData ?
-        LLBC_TimeSpan::FromMillis(_timerData->dueTime) : LLBC_TimeSpan::zero;
+        LLBC_TimeSpan::FromMillis(_timerData->firstPeriod) : LLBC_TimeSpan::zero;
 }
 
 LLBC_TimeSpan LLBC_Timer::GetPeriod() const
@@ -73,14 +78,14 @@ LLBC_TimeSpan LLBC_Timer::GetPeriod() const
         LLBC_TimeSpan::FromMillis(_timerData->period) : LLBC_TimeSpan::zero;
 }
 
-LLBC_TimerId LLBC_Timer::GetTimerId() const
+size_t LLBC_Timer::GetTotalTriggerCount() const
 {
-    return _timerData ? _timerData->timerId : LLBC_INVALID_TIMER_ID;
+    return _timerData ? _timerData->totalTriggerCount : LLBC_INFINITE;
 }
 
-sint64 LLBC_Timer::GetTimeoutTimes() const
+size_t LLBC_Timer::GetTriggeredCount() const
 {
-    return _timerData ? _timerData->repeatTimes : 0;
+    return _timerData ? _timerData->triggeredCount : 0;
 }
 
 LLBC_Variant &LLBC_Timer::GetTimerData()
@@ -100,10 +105,12 @@ LLBC_Time LLBC_Timer::GetTimeoutTime() const
             LLBC_Time::utcBegin;
 }
 
-int LLBC_Timer::Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &period)
+int LLBC_Timer::Schedule(const LLBC_TimeSpan &firstPeriod,
+                         const LLBC_TimeSpan &period,
+                         size_t triggerCount)
 {
     // Note: Allow reschedule in <OnCancel> event meth.
-    // if (_timerData && _timerData->cancelling)
+    // if (_timerData && _timerData->unFlags.flags.isHandlingCancel)
     // {
     //     LLBC_SetLastError(LLBC_ERROR_ILLEGAL);
     //     return LLBC_FAILED;
@@ -129,47 +136,59 @@ int LLBC_Timer::Schedule(const LLBC_TimeSpan &firstPeriod, const LLBC_TimeSpan &
     if (periodMillis == 0ll)
         periodMillis = firstPeriodInMillis;
 
-    return _scheduler->Schedule(this, firstPeriodInMillis, periodMillis);
+    if (UNLIKELY(triggerCount == 0))
+        triggerCount = 1;
+
+    return _scheduler->Schedule(this, firstPeriodInMillis, periodMillis, triggerCount);
 }
 
 int LLBC_Timer::Cancel()
 {
-    if (!_timerData || !_timerData->validate)
+    // Make sure timer scheduled.
+    if (!_timerData ||
+        !_timerData->unStatus.status.isScheduled ||
+        !_scheduler)
         return LLBC_OK;
 
-    if (UNLIKELY(!_scheduler))
+    // Not allow call Cancel() during cancel handling.
+    if (UNLIKELY(_timerData->unStatus.status.isHandlingCancel))
     {
-        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
 
+    // Cancel timer in timer scheduler.
     return _scheduler->Cancel(this);
 }
 
-bool LLBC_Timer::IsScheduling() const
+bool LLBC_Timer::IsScheduled() const
 {
-    return (_timerData && _timerData->validate);
+    return (_timerData && _timerData->unStatus.status.isScheduled);
 }
 
-bool LLBC_Timer::IsTimeouting() const
+bool LLBC_Timer::IsHandlingTimeout() const
 {
-    return _timerData ? _timerData->timeouting : false;
+    return _timerData ? _timerData->unStatus.status.isHandlingTimeout: false;
 }
 
-bool LLBC_Timer::IsCancelling() const
+bool LLBC_Timer::IsHandlingCancel() const
 {
-    return _timerData ? _timerData->cancelling: false;
+    return _timerData ? _timerData->unStatus.status.isHandlingCancel: false;
 }
 
 LLBC_String LLBC_Timer::ToString() const
 {
     return LLBC_String().format(
-        "timerId:%llu, dueTime:%llums, period:%llums, timeoutTimes:%lld, scheduling:%s",
+        "LLBC_Timer(%llu, firstPeriod:%llu ms, period:%llu ms, "
+        "trigger:%zu/%lld, status:[scheduled:%s handlingTimeout:%s handlingCancel:%s])",
         GetTimerId(),
-        GetDueTime().GetTotalMillis(),
+        GetFirstPeriod().GetTotalMillis(),
         GetPeriod().GetTotalMillis(),
-        GetTimeoutTimes(),
-        IsScheduling()? "true" : "false");
+        GetTriggeredCount(),
+        GetTotalTriggerCount() == LLBC_INFINITE ? -1ll : static_cast<sint64>(GetTotalTriggerCount()),
+        IsScheduled() ? "true" : "false",
+        IsHandlingTimeout() ? "true" : "false",
+        IsHandlingCancel() ? "true" : "false");
 }
 
 __LLBC_NS_END

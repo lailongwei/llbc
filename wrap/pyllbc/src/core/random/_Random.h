@@ -27,14 +27,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewRandom(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "i", &seed))
         return nullptr;
 
-    return PyLong_FromLongLong(reinterpret_cast<sint64>(new LLBC_Random(seed)));
+    LLBC_Random *randomObj = new LLBC_Random(seed);
+    return PyLong_FromVoidPtr(randomObj);
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_DelRandom(PyObject *self, PyObject *args)
 {
     LLBC_Random *random;
-    if (!PyArg_ParseTuple(args, "l", &random))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(random, "");
 
     delete random;
 
@@ -45,8 +45,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SeedRand(PyObject *self, PyObject *args)
 {
     int seed;
     LLBC_Random *random;
-    if (!PyArg_ParseTuple(args, "li", &random, &seed))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(random, "i", &seed);
 
     random->Seed(seed);
 
@@ -58,8 +57,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Rand(PyObject *self, PyObject *args)
     LLBC_Random *random;
     PyObject *beginObj = nullptr;
     PyObject *endObj = nullptr;
-    if (!PyArg_ParseTuple(args, "l|OO", &random, &beginObj, &endObj))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(random, "|OO", &beginObj, &endObj);
 
     const bool isObj1None = !beginObj || PyObject_IsInstance(beginObj, PYLLBC_NONE_CLS);
     const bool isObj1Int = beginObj && PyObject_IsInstance(beginObj, PYLLBC_INT_CLS);
@@ -114,8 +112,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Rand(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_RandReal(PyObject *self, PyObject *args)
 {
     LLBC_Random *random;
-    if (!PyArg_ParseTuple(args, "l", &random))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(random, "");
 
     return PyFloat_FromDouble(random->RandReal());
 }
@@ -123,8 +120,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_RandReal(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_BoolJudge(PyObject *self, PyObject *args)
 {
     LLBC_Random *random;
-    if (!PyArg_ParseTuple(args, "l", &random))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(random, "");
 
     PyObject *judgeResult = random->BoolJudge() ? Py_True : Py_False;
     Py_INCREF(judgeResult);

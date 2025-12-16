@@ -33,15 +33,15 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewService(PyObject *self, PyObject *args)
 
     pyllbc_Service *svc = new pyllbc_Service(svcName, useNormalProtocolFactory, pySvc);
 
-    return Py_BuildValue("l", svc);
+    return PyLong_FromVoidPtr(svc);
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_DelService(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "l", &svc))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "");
 
+    LLBC_FilePrintLn(stderr, "DelService called, svc:%p", svc);
     delete svc;
 
     Py_RETURN_NONE;
@@ -50,8 +50,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelService(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_GetServiceId(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "l", &svc))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "");
 
     return PyInt_FromLong(svc->GetId());
 }
@@ -59,8 +58,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetServiceId(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_GetServiceFPS(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "l", &svc))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "");
 
     return PyInt_FromLong(svc->GetFPS());
 }
@@ -69,9 +67,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetServiceFPS(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
     int fps = LLBC_CFG_COMM_DFT_SERVICE_FPS;
-
-    if (!PyArg_ParseTuple(args, "l|i", &svc, &fps))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "|i", &fps);
 
     if (svc->SetFPS(fps) != LLBC_OK)
         return nullptr;
@@ -82,8 +78,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetServiceFPS(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_GetServiceFrameInterval(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "l", &svc))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "");
 
     return PyFloat_FromDouble(svc->GetFrameInterval() / 1000.0);
 }
@@ -91,8 +86,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetServiceFrameInterval(PyObject *self, PyObject
 LLBC_EXTERN_C PyObject *_pyllbc_SuppressServiceCoderNotFoundWarning(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "l", &svc))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "");
 
     Py_RETURN_NONE;
 }
@@ -101,9 +95,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_StartService(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
     int pollerCount = 0;
-
-    if (!PyArg_ParseTuple(args, "l|i", &svc, &pollerCount))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "|i", &pollerCount);
 
     if (svc->Start(pollerCount) != LLBC_OK)
         return nullptr;
@@ -120,8 +112,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_StartService(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_StopService(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "l", &svc))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "");
 
     svc->Stop();
 
@@ -138,8 +129,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_AddComponent(PyObject *self, PyObject *args)
 {
     PyObject *comp;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "lO", &svc, &comp))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "O", &comp);
 
     if (svc->AddComponent(comp) != LLBC_OK)
         return nullptr;
@@ -152,8 +142,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_AddLibComponent(PyObject *self, PyObject *args)
     pyllbc_Service *svc;
     const char *compName, *libPath;
     PyObject *compCls = nullptr;
-    if (!PyArg_ParseTuple(args, "lss|O", &svc, &compName, &libPath, &compCls))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "ss|O", &compName, &libPath, &compCls);
 
     PyObject *comp;
     if (svc->AddComponent(compName, libPath, compCls, comp) != LLBC_OK)
@@ -167,8 +156,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_AddDecoder(PyObject *self, PyObject *args)
     int opcode;
     PyObject *decoder;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "liO", &svc, &opcode, &decoder))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "iO", &opcode, &decoder);
 
     if (svc->AddDecoder(opcode, decoder) != LLBC_OK)
         return nullptr;
@@ -181,8 +169,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Listen(PyObject *self, PyObject *args)
     char *ip;
     int port;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "lsi", &svc, &ip, &port))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "si", &ip, &port);
 
     int sessionId;
     if ((sessionId = svc->Listen(ip, port)) == 0)
@@ -196,8 +183,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Connect(PyObject *self, PyObject *args)
     char *ip;
     int port;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "lsi", &svc, &ip, &port))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "si", &ip, &port);
 
     int sessionId;
     if ((sessionId = svc->Connect(ip, port)) == 0)
@@ -211,8 +197,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_AsyncConn(PyObject *self, PyObject *args)
     char *ip;
     int port;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "lsi", &svc, &ip, &port))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "si", &ip, &port);
 
     int sid = svc->AsyncConn(ip, port);
     if (sid == 0)
@@ -225,8 +210,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_IsSessionValidate(PyObject *self, PyObject *args
 {
     int sid;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "li", &svc, &sid))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "i", &sid);
 
     if (svc->IsSessionValidate(sid))
         Py_RETURN_TRUE;
@@ -240,8 +224,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_RemoveSession(PyObject *self, PyObject *args)
     pyllbc_Service *svc;
     char *reason = nullptr;
     PyObject *strict = nullptr;
-    if (!PyArg_ParseTuple(args, "li|sO", &svc, &sid, &reason, &strict))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "i|sO", &sid, &reason, &strict);
 
     if (svc->RemoveSession(sid, reason) != LLBC_OK)
     {
@@ -259,8 +242,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SendData(PyObject *self, PyObject *args)
     PyObject *data;
     int sessionId, opcode, status = 0;
     sint64 extData1 = 0, extData2 = 0, extData3 = 0;
-    if (!PyArg_ParseTuple(args, "liiO|iLLL", &svc, &sessionId, &opcode, &data, &status, &extData1, &extData2, &extData3))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "iiO|iLLL", &sessionId, &opcode, &data, &status, &extData1, &extData2, &extData3);
 
     if (svc->Send(sessionId, opcode, data, status, extData1, extData2, extData3) != LLBC_OK)
         return nullptr;
@@ -277,8 +259,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Multicast(PyObject *self, PyObject *args)
 
     int opcode, status = 0;
 
-    if (!PyArg_ParseTuple(args, "lOiO|i", &svc, &pySessionIds, &opcode, &data, &status))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "OiO|i", &pySessionIds, &opcode, &data, &status);
 
     if (!PySequence_Check(pySessionIds))
     {
@@ -334,8 +315,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Broadcast(PyObject *self, PyObject *args)
 
     PyObject *data;
     int opcode, status = 0;
-    if (!PyArg_ParseTuple(args, "liO|i", &svc, &opcode, &data, &status))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "iO|i", &opcode, &data, &status);
 
     if (svc->Broadcast(opcode, data, status) != LLBC_OK)
         return nullptr;
@@ -348,8 +328,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Subscribe(PyObject *self, PyObject *args)
     pyllbc_Service *svc;
     int opcode;
     PyObject *handler;
-    if (!PyArg_ParseTuple(args, "liO", &svc, &opcode, &handler))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "iO", &opcode, &handler);
 
     if (svc->Subscribe(opcode, handler) != LLBC_OK)
         return nullptr;
@@ -362,8 +341,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_PreSubscribe(PyObject *self, PyObject *args)
     pyllbc_Service *svc;
     int opcode;
     PyObject *handler;
-    if (!PyArg_ParseTuple(args, "liO", &svc, &opcode, &handler))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "iO", &opcode, &handler);
 
     if (svc->PreSubscribe(opcode, handler) != LLBC_OK)
         return nullptr;
@@ -376,8 +354,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_UnifyPreSubscribe(PyObject *self, PyObject *args
 #if LLBC_CFG_COMM_ENABLE_UNIFY_PRESUBSCRIBE
     pyllbc_Service *svc;
     PyObject *handler;
-    if (!PyArg_ParseTuple(args, "lO", &svc, &handler))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "O", &handler);
 
     if (svc->UnifyPreSubscribe(handler) != LLBC_OK)
         return nullptr;
@@ -395,8 +372,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SubscribeEvent(PyObject *self, PyObject *args)
     int evId;
     pyllbc_Service *svc;
     PyObject *listener;
-    if (!PyArg_ParseTuple(args, "liO", &svc, &evId, &listener))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "iO", &evId, &listener);
 
     LLBC_ListenerStub stub = svc->SubscribeEvent(evId, listener);
     if (stub == 0)
@@ -409,8 +385,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_UnsubscribeEventById(PyObject *self, PyObject *a
 {
     int evId;
     pyllbc_Service *svc;
-    if (!PyArg_ParseTuple(args, "li", &svc, &evId))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "i", &evId);
 
     svc->UnsubscribeEvent(evId);
 
@@ -421,8 +396,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_UnsubscribeEventByStub(PyObject *self, PyObject 
 {
     pyllbc_Service *svc;
     unsigned PY_LONG_LONG stub;
-    if (!PyArg_ParseTuple(args, "lK", &svc, &stub))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "K", &stub);
 
     svc->UnsubscribeEvent(static_cast<LLBC_ListenerStub>(stub));
 
@@ -433,8 +407,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_FireEvent(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
     PyObject *ev;
-    if (!PyArg_ParseTuple(args, "lO", &svc, &ev))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "O", &ev);
 
     if (svc->FireEvent(ev) != LLBC_OK)
         return nullptr;
@@ -475,8 +448,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_Post(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
     PyObject *callable;
-    if (!PyArg_ParseTuple(args, "lO", &svc, &callable))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "O", &callable);
 
     if (svc->Post(callable) != LLBC_OK)
         return nullptr;
@@ -489,8 +461,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_CallComponentMethod(PyObject *self, PyObject *ar
     LLBC_Component *comp;
     const char *meth;
     PyObject *arg;
-    if (!PyArg_ParseTuple(args, "lsO", &comp, &meth, &arg))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(comp, "sO", &meth, &arg);
 
     LLBC_Variant nativeArg;
     if (pyllbc_ObjUtil::Obj2Variant(arg, nativeArg) != LLBC_OK)
@@ -510,8 +481,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_CallComponentMethod(PyObject *self, PyObject *ar
 LLBC_EXTERN_C PyObject *_pyllbc_ServiceMainLoop(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
-    if (UNLIKELY(!PyArg_ParseTuple(args, "l", &svc)))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(svc, "");
 
     PyObject *rtn = svc->MainLoop() ? Py_True : Py_False;
     if (PyErr_Occurred())

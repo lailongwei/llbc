@@ -48,7 +48,7 @@ public:
     int OnEarlyStart(int argc, char *argv[], bool &earlyStartFinished) override
     {
         // Log app will start.
-        if (!_phaseTimers[0]->IsScheduling())
+        if (!_phaseTimers[0]->IsScheduled())
             LLBC_PrintLn("App[%s] will start...", GetName().c_str());
 
         return _OnPhase(0, earlyStartFinished);
@@ -78,7 +78,7 @@ public:
     void OnEarlyStop(bool &earlyStopFinished) override
     {
         // Log app will stop & Cancel update timer.
-        if (!_phaseTimers[2]->IsScheduling())
+        if (!_phaseTimers[2]->IsScheduled())
         {
             LLBC_PrintLn("App will stop...");
             _updateTimer.Cancel();
@@ -109,7 +109,7 @@ private:
         auto phaseName = _phaseNames[phaseIndex];
         auto &phaseTimer = *_phaseTimers[phaseIndex];
         auto &phaseMaxWaitTime = _phaseMaxWaitTimes[phaseIndex];
-        if (!phaseTimer.IsScheduling())
+        if (!phaseTimer.IsScheduled())
         {
             _phaseBeginTime = now;
             phaseTimer.SetTimeoutHandler([phaseName](LLBC_Timer *timer) {

@@ -58,7 +58,7 @@ class TestCase_Com_LibConfig : ITestCase
         Console.WriteLine();
 
         Console.WriteLine("Timer about configs:");
-        Console.WriteLine("  Used strict scuedule: {0}", LibConfig.timerStrictSchedule);
+        Console.WriteLine("  Long timeout time(in milliseconds): {0}", LibConfig.timerLongTimeoutTime);
         Console.WriteLine();
 
         Console.WriteLine("Communication about configs:");
