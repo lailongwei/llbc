@@ -434,14 +434,14 @@
                 LLBC_NS LLBC_ConsoleColor::Fg_Green :                                                     \
                     (LLBC_NS LLBC_ConsoleColor::Fg_Red | LLBC_NS LLBC_ConsoleColor::Highlight_Fg);        \
                                                                                                           \
-        LLBC_FilePrint(LLBC_Concat(outputFile, __LINE__), ">>> %s ........ [", "LLBC_Expect(" #cond ")"); \
+        LLBC_FilePrint(LLBC_Concat(outputFile, __LINE__), ">>> %s ...... [", "LLBC_Expect(" #cond ")");   \
         LLBC_SetConsoleColor(LLBC_Concat(outputFile, __LINE__), LLBC_Concat(consoleColor, __LINE__));     \
         LLBC_FilePrint(LLBC_Concat(outputFile, __LINE__), LLBC_Concat(expectStr, __LINE__));              \
         LLBC_SetConsoleColor(LLBC_Concat(outputFile, __LINE__), LLBC_NS LLBC_ConsoleColor::Fg_Default);   \
         LLBC_FilePrintLn(LLBC_Concat(outputFile, __LINE__), "]");                                         \
                                                                                                           \
         if constexpr (std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value != 0)                \
-            LLBC_FilePrintLn(LLBC_Concat(outputFile, __LINE__), "    >>> " ##__VA_ARGS__);                \
+            LLBC_FilePrintLn(LLBC_Concat(outputFile, __LINE__), "    >>> " __VA_ARGS__);                  \
                                                                                                           \
         LLBC_FlushFile(LLBC_Concat(outputFile, __LINE__));                                                \
                                                                                                           \

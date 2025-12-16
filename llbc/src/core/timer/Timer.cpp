@@ -185,7 +185,9 @@ LLBC_String LLBC_Timer::ToString() const
         GetFirstPeriod().GetTotalMillis(),
         GetPeriod().GetTotalMillis(),
         GetTriggeredCount(),
-        GetTotalTriggerCount() == LLBC_INFINITE ? -1ll : static_cast<sint64>(GetTotalTriggerCount()),
+        GetTotalTriggerCount() == static_cast<size_t>(LLBC_INFINITE) ?
+            -1ll :
+                static_cast<sint64>(GetTotalTriggerCount()),
         IsScheduled() ? "true" : "false",
         IsHandlingTimeout() ? "true" : "false",
         IsHandlingCancel() ? "true" : "false");

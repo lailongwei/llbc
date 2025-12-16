@@ -109,7 +109,7 @@ void LLBC_TimerScheduler::Update()
             reSchedule = false;
 
         // Reach max schedule times, reset <isScheduled> flag && reset reSchedule flag.
-        if (data->totalTriggerCount != LLBC_INFINITE &&
+        if (data->totalTriggerCount != static_cast<size_t>(LLBC_INFINITE) &&
             data->triggeredCount >= data->totalTriggerCount)
         {
             data->unStatus.status.isScheduled = false;

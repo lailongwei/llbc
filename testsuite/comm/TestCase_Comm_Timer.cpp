@@ -88,7 +88,7 @@ private:
 
         // GetTotalTriggerCount()/GetTriggeredCount():
         LLBC_PrintLn("- GetTotalTriggerCount()/GetTriggeredCount():");
-        LLBC_Expect_EQ(timer.GetTotalTriggerCount(), LLBC_INFINITE);
+        LLBC_Expect_EQ(timer.GetTotalTriggerCount(), static_cast<size_t>(LLBC_INFINITE));
         LLBC_Expect_EQ(timer.GetTriggeredCount(), 0);
 
         // IsScheduled()/IsHandlingTimeout()/IsHandlingCancel():
@@ -394,7 +394,7 @@ private:
             LLBC_Expect(timer->GetTriggeredCount() <= timer->GetTotalTriggerCount());
             if (timer->GetTriggeredCount() == timer->GetTotalTriggerCount())
             {
-                LLBC_Defer(timer);
+                LLBC_Defer(delete timer);
                 LLBC_PrintLn("- Test done, exec next test");
 
                 // Exec next test.
@@ -406,7 +406,7 @@ private:
         });
 
         // Schedule timer.
-        const auto ret = testTimer->Schedule(firstPeriod, period, triggerCount);
+        LLBC_Expect(testTimer->Schedule(firstPeriod, period, triggerCount) == LLBC_OK);
 
         return LLBC_OK;
     }
