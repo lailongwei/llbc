@@ -26,9 +26,9 @@ namespace
 {
 class TestComp final : public LLBC_Component
 {
-    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-lambda-capture"
+    #if LLBC_CUR_COMP == LLBC_COMP_CLANG
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wunused-lambda-capture"
     #endif
 
 public:
@@ -542,8 +542,8 @@ private:
         return LLBC_OK;
     }
 
-    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
-    #pragma GCC diagnostic pop
+    #if LLBC_CUR_COMP == LLBC_COMP_CLANG
+    #pragma clang diagnostic pop
     #endif
 private:
     bool _testStarted = false;
