@@ -350,7 +350,7 @@ private:
 
         // Create timer & set timeout handler.
         auto testTimer = new LLBC_Timer;
-        testTimer->SetTimeoutHandler([this, rescheduleTimeout](LLBC_Timer *timer) {
+        testTimer->SetTimeoutHandler([rescheduleTimeout](LLBC_Timer *timer) {
             const auto oldTimerId = timer->GetTimerId();
             LLBC_PrintLn("- Timeout, timer: %s", timer->ToString().c_str());
 
@@ -386,7 +386,7 @@ private:
         // Create timer and set timeout handler.
         constexpr size_t triggerCount= 10;
         auto testTimer = new LLBC_Timer;
-        testTimer->SetTimeoutHandler([this, firstPeriod, period, triggerCount](LLBC_Timer *timer) {
+        testTimer->SetTimeoutHandler([this, firstPeriod, period](LLBC_Timer *timer) {
             LLBC_PrintLn("- Timeout, timer:%s", timer->ToString().c_str());
             LLBC_Expect(timer->GetFirstPeriod() == firstPeriod);
             LLBC_Expect(timer->GetPeriod() == period);
@@ -501,10 +501,7 @@ private:
         for (size_t i = 0; i < timerCount; ++i)
         {
             auto timer = new LLBC_Timer;
-            timer->SetTimeoutHandler([this,
-                                         timerCount,
-                                         testTriggerCount,
-                                         maxTimeoutTimeInMs](LLBC_Timer *timer) {
+            timer->SetTimeoutHandler([this](LLBC_Timer *timer) {
                 #ifdef LLBC_DEBUG
                 if (++_perfTest_TriggeredCount % 500 == 0)
                 #else
