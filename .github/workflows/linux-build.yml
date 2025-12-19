@@ -2,9 +2,9 @@ name: Linux build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "*" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "*" ]
 
 env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
