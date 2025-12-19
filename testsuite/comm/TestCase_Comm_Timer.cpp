@@ -26,6 +26,11 @@ namespace
 {
 class TestComp final : public LLBC_Component
 {
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-lambda-capture"
+    #endif
+
 public:
     int OnInit(bool &initFinished) override
     {
@@ -386,7 +391,7 @@ private:
         // Create timer and set timeout handler.
         constexpr size_t triggerCount= 10;
         auto testTimer = new LLBC_Timer;
-        testTimer->SetTimeoutHandler([this, firstPeriod, period](LLBC_Timer *timer) {
+        testTimer->SetTimeoutHandler([this, firstPeriod, period, triggerCount](LLBC_Timer *timer) {
             LLBC_PrintLn("- Timeout, timer:%s", timer->ToString().c_str());
             LLBC_Expect(timer->GetFirstPeriod() == firstPeriod);
             LLBC_Expect(timer->GetPeriod() == period);
@@ -501,7 +506,7 @@ private:
         for (size_t i = 0; i < timerCount; ++i)
         {
             auto timer = new LLBC_Timer;
-            timer->SetTimeoutHandler([this](LLBC_Timer *timer) {
+            timer->SetTimeoutHandler([this, testTriggerCount, timerCount, maxTimeoutTimeInMs](LLBC_Timer *timer) {
                 #ifdef LLBC_DEBUG
                 if (++_perfTest_TriggeredCount % 500 == 0)
                 #else
@@ -537,6 +542,9 @@ private:
         return LLBC_OK;
     }
 
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    #pragma GCC diagnostic pop
+    #endif
 private:
     bool _testStarted = false;
     bool _testFinished = false;
