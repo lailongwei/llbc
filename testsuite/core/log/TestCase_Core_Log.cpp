@@ -130,6 +130,18 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     LLOG_FATAL2("test", "This is a fatal log message.");
     LLOG_FATAL4("test", "test_tag", "This is a fatal log message.");
 
+    // Log fadvise test
+    LLBC_PrintLn("Press any key to begin log advise test");
+    getchar();
+    
+    constexpr size_t ONE_MEGABYTE = 1024 * 100;
+    const LLBC_String largeStringTmp(ONE_MEGABYTE, 'A');
+    for (int i = 0; i < 200 * 1024; ++i) 
+    {
+        LLOG_INFO2("fadvise", "idx:%d discard test:%s", i, largeStringTmp.c_str());
+        LLBC_Sleep(10);
+    }
+
     // Log trace test.
     DoLogTraceTest();
 
