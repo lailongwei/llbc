@@ -260,7 +260,7 @@ int LLBC_File::DiscardPageCache() const
 #elif LLBC_TARGET_PLATFORM_MAC
     // Flush all dirty data (modified but not written to disk cache) to storage device (synchronous).
     // Discard all cache data (both clean and dirty) associated with this file from memory.
-    if (fcntl(fd, F_PURGEFSYNC) == -1)
+    if (fcntl(fd, F_FULLFSYNC) == -1)
     {
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         ret = LLBC_FAILED;
