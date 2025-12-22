@@ -607,53 +607,31 @@ LLBC_String LLBC_Directory::ModuleFileName(bool readLink)
 
 LLBC_String LLBC_Directory::DirName(const LLBC_String &path)
 {
-#if LLBC_TARGET_PLATFORM_WIN32
-    size_t found = path.rfind('\\');
+    const size_t found = FindDirEndPos(path);
     if (found == LLBC_String::npos)
-    {
-        found = path.rfind('/');
-        if (found == LLBC_String::npos)
-            return LLBC_String();
-    }
+        return LLBC_String();
 
+#if LLBC_TARGET_PLATFORM_WIN32
     if (path.length() == 3 &&
         (LLBC_String::isalpha(path[0]) &&
          path[1] == ':' &&
          (path[2] == '\\' || path[2] == '/')))
         return path;
-
-    return path.substr(0, found);
 #else
-    const size_t found = path.rfind('/');
-    if (found == LLBC_String::npos)
-        return LLBC_String();
-
     if (path.length() == 1)
         return path;
-    else 
-        return path.substr(0, found);
 #endif
+
+    return path.substr(0, found);
 }
 
 LLBC_String LLBC_Directory::BaseName(const LLBC_String &path)
 {
-#if LLBC_TARGET_PLATFORM_WIN32
-    size_t found = path.rfind('\\');
-    if (found == LLBC_String::npos)
-    {
-        found = path.rfind('/');
-        if (found == LLBC_String::npos)
-            return path;
-    }
-
-    return path.substr(found + 1);
-#else
-    const size_t found = path.rfind('/');
+    const size_t found = FindDirEndPos(path);
     if (found == LLBC_String::npos)
         return path;
     else
         return path.substr(found + 1);
-#endif
 }
 
 LLBC_String LLBC_Directory::CurDir()
@@ -709,6 +687,20 @@ int LLBC_Directory::SetCurDir(const LLBC_String &path)
 
     return LLBC_OK;
 #endif // Non-Win32
+}
+
+size_t LLBC_Directory::FindDirEndPos(const LLBC_String& path)
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    size_t slashPos = path.rfind('/');
+    size_t backSlashPos = path.rfind('\\');
+    if (slashPos != LLBC_String::npos && backSlashPos != LLBC_String::npos)
+        return MAX(slashPos, backSlashPos);
+    else
+        return MIN(slashPos, backSlashPos);
+#else
+    return path.rfind('/');
+#endif
 }
 
 __LLBC_NS_END

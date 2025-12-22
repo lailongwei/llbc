@@ -196,6 +196,8 @@ public:
      * @return LLBC_String - the cache directory.
      */
     static LLBC_String CacheDir();
+private:
+    static size_t FindDirEndPos(const LLBC_String& path);
 };
 
 __LLBC_NS_END
