@@ -239,6 +239,7 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     LLBC_ReturnIf(SerializableClsSerTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(MovableReadTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(EndianThreadSpecObjPoolTest() != LLBC_OK, LLBC_FAILED);
+    LLBC_ReturnIf(BatchReadAndWriteTest() != LLBC_OK, LLBC_FAILED);
 
     return LLBC_OK;
 }
@@ -793,6 +794,49 @@ int TestCase_Com_Stream::EndianThreadSpecObjPoolTest()
 
     LLBC_PrintLn("- Reallocation stream obj. Obj endian field init value:%s reset to default:%s, obj ptr:%p.",
                  LLBC_Endian::Type2Str(stream->GetEndian()), LLBC_Endian::Type2Str(LLBC_DefaultEndian), stream.Get());
+
+    return LLBC_OK;
+}
+
+int TestCase_Com_Stream::BatchReadAndWriteTest()
+{
+    LLBC_PrintLn("Batch read and write test:");
+
+    LLBC_Stream stream;
+
+    sint32 intVal1 = 1;
+    sint32 intVal2 = 2;
+    LLBC_String str1 = "str1";
+    LLBC_String str2 = "str2";
+
+    LLBC_STREAM_BEGIN_WRITE(stream);
+    LLBC_STREAM_BATCH_WRITE(intVal1, intVal2, str1, str2);
+    LLBC_STREAM_END_WRITE();
+
+    auto batchRead = [](LLBC_Stream &stream) -> bool
+    {
+        sint32 intVal1;
+        sint32 intVal2;
+        LLBC_String str1;
+        LLBC_String str2;
+        LLBC_STREAM_BEGIN_READ(stream, false);
+
+        LLBC_STREAM_BATCH_READ(intVal1, intVal2, str1, str2);
+
+        LLBC_STREAM_END_READ();
+
+        return intVal1 == 1 && intVal2 == 2 && str1 == "str1" && str2 == "str2";
+    };
+
+    if (!batchRead(stream))
+    {
+        LLBC_PrintLn("Batch read/write test failed");
+        return LLBC_FAILED;
+    }
+    else
+    {
+        LLBC_PrintLn("Batch read/write test success");
+    }
 
     return LLBC_OK;
 }
