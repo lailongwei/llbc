@@ -152,7 +152,7 @@ public:
 
     struct LLBC_EXPORT Holder
     {
-        LLBC_VariantType::ENUM type;
+        LLBC_VariantType::ENUM type = LLBC_VariantType::NIL;
 
         union DataType
         {
