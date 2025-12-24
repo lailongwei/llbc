@@ -413,29 +413,14 @@ inline LLBC_Variant &LLBC_Variant::BecomeStr()
     return Become(LLBC_VariantType::STR_DFT);
 }
 
-inline LLBC_Variant &LLBC_Variant::BecomeStrX()
-{
-    return BecomeStr();
-}
-
 inline LLBC_Variant &LLBC_Variant::BecomeSeq()
 {
     return Become(LLBC_VariantType::SEQ_DFT);
 }
 
-inline LLBC_Variant &LLBC_Variant::BecomeSeqX()
-{
-    return BecomeSeq();
-}
-
 inline LLBC_Variant &LLBC_Variant::BecomeDict()
 {
     return Become(LLBC_VariantType::DICT_DFT);
-}
-
-inline LLBC_Variant &LLBC_Variant::BecomeDictX()
-{
-    return BecomeDict();
 }
 
 inline LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM ty)
@@ -462,7 +447,8 @@ inline LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM ty)
                 new (&_holder.data.obj.dict) Dict;
                 break;
             }
-            default: break;
+            default:
+                break;
         }
     }
 
@@ -592,13 +578,13 @@ template <>
 inline LLBC_Variant::operator char *() const
 {
     thread_local char emptyMutableEmptyStr[1] = {'\0'};
-    return IsStrX() ?  const_cast<char *>(_holder.data.obj.str.c_str()) : emptyMutableEmptyStr;
+    return IsStr() ?  const_cast<char *>(_holder.data.obj.str.c_str()) : emptyMutableEmptyStr;
 }
 
 template <>
 inline LLBC_Variant::operator const char *() const
 {
-    return IsStrX() ? _holder.data.obj.str.c_str() : "";
+    return IsStr() ? _holder.data.obj.str.c_str() : "";
 }
 
 inline LLBC_Variant::operator sint64() const
@@ -652,7 +638,7 @@ template <typename _ElemTy>
 LLBC_Variant::operator std::vector<_ElemTy>() const
 {
     std::vector<_ElemTy> v;
-    if (IsSeqX() && !IsEmpty())
+    if (IsSeq() && !IsEmpty())
     {
         const Seq &seq = _holder.data.obj.seq;
 
@@ -766,7 +752,7 @@ template <typename _Key, typename _Val>
 LLBC_Variant::operator std::map<_Key, _Val>() const
 {
     std::map<_Key, _Val> m;
-    if (IsDictX())
+    if (IsDict())
         CpToBinaryCont<_Key, _Val, std::map<_Key, _Val> >(m);
 
     return m;
@@ -776,7 +762,7 @@ template <typename _Key, typename _Val>
 LLBC_Variant::operator std::unordered_map<_Key, _Val>() const
 {
     std::map<_Key, _Val> m;
-    if (IsDictX())
+    if (IsDict())
         CpToBinaryCont<_Key, _Val, std::map<_Key, _Val> >(m);
 
     return m;
@@ -784,11 +770,11 @@ LLBC_Variant::operator std::unordered_map<_Key, _Val>() const
 
 inline void LLBC_Variant::Clear()
 {
-    if (IsStrX())
+    if (IsStr())
         _holder.data.obj.str.clear();
-    else if (IsSeqX())
+    else if (IsSeq())
         _holder.data.obj.seq.clear();
-    else if (IsDictX())
+    else if (IsDict())
         _holder.data.obj.dict.clear();
     else if (IsRaw())
         _holder.data.raw.int64Val = 0;
@@ -903,7 +889,7 @@ LLBC_Variant &LLBC_Variant::operator=(const _T * const &ptr)
 template <typename _T1, typename _T2>
 LLBC_Variant &LLBC_Variant::operator=(const std::pair<_T1, _T2> &pa)
 {
-    BecomeSeqX();
+    BecomeSeq();
     _holder.data.obj.seq.clear();
 
     _holder.data.obj.seq.emplace_back(pa.first);
@@ -1271,21 +1257,6 @@ _64Ty LLBC_Variant::AsSignedOrUnsigned64() const
         return _holder.data.raw.uint64Val;
     else
         return _holder.data.raw.int64Val;
-}
-
-inline bool LLBC_Variant::IsStrX() const
-{
-    return IsStr();
-}
-
-inline bool LLBC_Variant::IsSeqX() const
-{
-    return IsSeq();
-}
-
-inline bool LLBC_Variant::IsDictX() const
-{
-    return IsDict();
 }
 
 inline void LLBC_Variant::SeqPushBack()
