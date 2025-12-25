@@ -27,10 +27,6 @@
 
 __LLBC_NS_BEGIN
 
-inline LLBC_Variant::LLBC_Variant()
-{
-}
-
 inline LLBC_Variant::LLBC_Variant(const bool &b)
 {
     _holder.type = LLBC_VariantType::RAW_BOOL;
@@ -578,7 +574,7 @@ template <>
 inline LLBC_Variant::operator char *() const
 {
     thread_local char emptyMutableEmptyStr[1] = {'\0'};
-    return IsStr() ?  const_cast<char *>(_holder.data.obj.str.c_str()) : emptyMutableEmptyStr;
+    return IsStr() ? const_cast<char *>(_holder.data.obj.str.c_str()) : emptyMutableEmptyStr;
 }
 
 template <>
@@ -1226,7 +1222,7 @@ _64Ty LLBC_Variant::AsSignedOrUnsigned64() const
 
     if (firstType == LLBC_VariantType::STR)
     {
-        const auto &str = _holder.data.obj.str;
+        const Str &str = _holder.data.obj.str;
         if (str.empty())
             return 0;
 

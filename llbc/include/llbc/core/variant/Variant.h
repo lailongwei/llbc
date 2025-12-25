@@ -152,7 +152,7 @@ public:
 
     struct LLBC_EXPORT Holder
     {
-        LLBC_VariantType::ENUM type = LLBC_VariantType::NIL;
+        LLBC_VariantType::ENUM type;
 
         union DataType
         {
@@ -177,13 +177,13 @@ public:
             ~DataType() {}
         } data;
 
-        Holder() = default;
+        Holder() : type(LLBC_VariantType::NIL) { data.raw.uint64Val = 0; }
         ~Holder() { Clear(); }
 
         Holder(const Holder &other);
         Holder &operator=(const Holder &other);
-        Holder(Holder&& other) noexcept;
-        Holder &operator=(Holder&& other) noexcept;
+        Holder(Holder &&other) noexcept;
+        Holder &operator=(Holder &&other) noexcept;
 
         LLBC_VariantType::ENUM GetFirstType() const;
 
@@ -201,7 +201,7 @@ public:
     static void DestroyNumber2StrFastAccessTable();
 
 public:
-    LLBC_Variant();
+    LLBC_Variant() = default;
 
     // Constructors(all parameter constructors is explicit, copy constructor is non-explicit).
     explicit LLBC_Variant(const bool &b);

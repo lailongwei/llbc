@@ -89,9 +89,8 @@ std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Variant &variant)
 
 __LLBC_NS_BEGIN
 
-LLBC_Variant::Holder::Holder(const Holder& other)
+LLBC_Variant::Holder::Holder(const Holder& other) : type(other.type)
 {
-    type = other.type;
     if (type == LLBC_VariantType::STR_DFT)
         new (&data.obj.str) Str(other.data.obj.str);
     else if (type == LLBC_VariantType::SEQ_DFT)
@@ -120,9 +119,8 @@ LLBC_Variant::Holder& LLBC_Variant::Holder::operator=(const Holder& other)
     return *this;
 }
 
-LLBC_Variant::Holder::Holder(Holder&& other) noexcept
+LLBC_Variant::Holder::Holder(Holder &&other) noexcept : type(other.type)
 {
-    type = other.type;
     if (type == LLBC_VariantType::STR_DFT)
         new (&data.obj.str) Str(std::move(other.data.obj.str));
     else if (type == LLBC_VariantType::SEQ_DFT)
@@ -136,7 +134,7 @@ LLBC_Variant::Holder::Holder(Holder&& other) noexcept
     other.data.raw.uint64Val = 0;
 }
 
-LLBC_Variant::Holder& LLBC_Variant::Holder::operator=(Holder&& other) noexcept
+LLBC_Variant::Holder& LLBC_Variant::Holder::operator=(Holder &&other) noexcept
 {
     if (this != &other)
     {
@@ -960,9 +958,8 @@ bool LLBC_Variant::Deserialize(LLBC_Stream &stream)
         return false;
 
     if (streamType != _holder.type)
-        BecomeNil();
+        Become(streamType);
 
-    _holder.type = streamType;
     if (IsNil())
         return true;
 
@@ -970,7 +967,7 @@ bool LLBC_Variant::Deserialize(LLBC_Stream &stream)
     {
         if (!stream.Read(_holder.data.raw.uint64Val))
         {
-            _holder.type = LLBC_VariantType::NIL;
+            BecomeNil();
             return false;
         }
 
