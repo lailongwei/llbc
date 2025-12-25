@@ -126,6 +126,11 @@ private:
      */
     int GetBackupFilesCount(const LLBC_String &logFileName) const;
 
+    /**
+     * Update advise discard file page cache.
+     */
+    void UpdateAdviseDiscardPageCache();
+
 private:
     LLBC_String _fileDir;
     LLBC_String _fileBasePath;
@@ -137,12 +142,18 @@ private:
     sint64 _maxFileSize;
     int _maxBackupIndex;
 
+    bool _fadviseDiscardEnabled;
+    sint64 _fadviseDiscardSize;
+    sint64 _fadviseDiscardRetainSize;
+
 private:
     LLBC_File _file;
     sint64 _fileSize;
 
     sint64 _notFlushLogCount;
     sint64 _logFileLastCheckTime;
+
+    sint64 _lastAdviseEndOffset;
 };
 
 __LLBC_NS_END

@@ -234,7 +234,7 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
     return LLBC_OK;
 }
 
-int LLBC_File::DiscardPageCache() const
+int LLBC_File::DiscardPageCache(sint64 offset, sint64 len)
 {
     if (!IsOpened())
     {
@@ -246,31 +246,30 @@ int LLBC_File::DiscardPageCache() const
     if (UNLIKELY(fd == -1))
         return LLBC_FAILED;
 
-    int ret = LLBC_OK;
+    // If file opened for write or append write mode, flush first.
+    if ((_mode & (LLBC_FileMode::Write | LLBC_FileMode::AppendWrite)) != 0) 
+    {
+        if (UNLIKELY(Flush() != LLBC_OK))
+            return LLBC_FAILED;
+    }
 
 #if LLBC_TARGET_PLATFORM_LINUX
     // This allows the kernel to free the page cache associated with this file,
     // making memory available for other processes. It is a performance optimization,
-    // especially useful when dealing with large files that are read only once
-    if (UNLIKELY(posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED) != 0))
+    // especially useful when dealing with large files that are read only once.
+    int status = posix_fadvise(fd, static_cast<off_t>(offset), static_cast<off_t>(len), POSIX_FADV_DONTNEED);
+    if (UNLIKELY(status != 0))
     {
+        errno = status;
         LLBC_SetLastError(LLBC_ERROR_CLIB);
-        ret = LLBC_FAILED;
-    }
-#elif LLBC_TARGET_PLATFORM_MAC
-    // Flush all dirty data (modified but not written to disk cache) to storage device (synchronous).
-    // Discard all cache data (both clean and dirty) associated with this file from memory.
-    if (fcntl(fd, F_FULLFSYNC) == -1)
-    {
-        LLBC_SetLastError(LLBC_ERROR_CLIB);
-        ret = LLBC_FAILED;
+        return LLBC_FAILED;
     }
 #else
     LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
-    ret = LLBC_FAILED;
+    return LLBC_FAILED;
 #endif
 
-    return ret;
+    return LLBC_OK;
 }
 
 
