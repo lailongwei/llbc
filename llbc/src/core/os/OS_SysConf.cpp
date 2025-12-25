@@ -27,7 +27,7 @@ sint64 LLBC_pageSize = 0;
 
 int __LLBC_InitSysConf()
 {
-#if LLBC_TARGET_PLATFORM_LINUX
+    #if LLBC_TARGET_PLATFORM_LINUX
     errno = 0;
     int tmpValue = sysconf(_SC_PAGESIZE);
     if (UNLIKELY(tmpValue == -1))
@@ -38,12 +38,13 @@ int __LLBC_InitSysConf()
         LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
     }
+
     LLBC_pageSize = tmpValue;
-#elif LLBC_TARGET_PLATFORM_WIN32
+    #elif LLBC_TARGET_PLATFORM_WIN32
     SYSTEM_INFO si;
     GetSystemInfo(&si);
     LLBC_pageSize = si.dwPageSize;
-#endif
+    #endif
 
     return LLBC_OK;
 }
