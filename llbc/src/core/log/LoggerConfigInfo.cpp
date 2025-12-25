@@ -28,7 +28,6 @@
 #include  "llbc/core/file/Directory.h"
 #include "llbc/core/variant/Variant.h"
 
-
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogRollingMode.h"
 #include "llbc/core/log/BaseLogAppender.h"
