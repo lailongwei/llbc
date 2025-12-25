@@ -168,13 +168,10 @@ public:
                 Str str;
                 Dict dict;
                 Seq seq;
-
-                ObjType() {}
-                ~ObjType() {}
             } obj;
 
             DataType() {}
-            ~DataType() {}
+            ~DataType() {};
         } data;
 
         Holder() : type(LLBC_VariantType::NIL) { data.raw.uint64Val = 0; }
