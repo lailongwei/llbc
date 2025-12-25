@@ -229,6 +229,24 @@ public:
      */
     int GetFileBufferSize() const;
 
+    /**
+     * Is fadvise discard file page cache enabled.
+     * @return bool - is fadvise discard file page cache enabled.
+     */
+    bool IsFadviseDiscardEnabled() const;
+
+    /**
+     * Get fadvise discard file page cache size.
+     * @return sint64 - the fadvise discard file page cache size.
+     */
+    sint64 GetFadviseDiscardSize() const;
+
+    /**
+     * Get fadvise discard retain size.
+     * @return sint64 - the fadvise discard retain size.
+     */
+    sint64 GetFadviseDiacardRetainSize() const;
+
 public:
     /**
      * Get take over option.
@@ -250,11 +268,14 @@ private:
     void NormalizeLogFileName();
 
     /**
-     * Normalize log file size.
-     * @param logFileSize - the un-normalized log file size.
-     * @return sint64 - the normalized log file size.
+     * Normalize str of size.
+     * @param sizeStr       - the un-normalized size str.
+     * @param defaultSize   - default size, if sizeStr invalid.
+     * @param low           - the min value.
+     * @param high          - the max value.
+     * @return sint64 - the normalized size str.
      */
-    sint64 NormalizeLogFileSize(const LLBC_String &logFileSize);
+    sint64 NormalizeSizeStr(const LLBC_String &sizeStr, sint64 defaultSize, sint64 low, sint64 high);
 
 private:
     LLBC_String _loggerName;
@@ -286,6 +307,9 @@ private:
     sint64 _maxFileSize;
     int _maxBackupIndex;
     int _fileBufferSize;
+    bool _fadviseDiscardEnabled;
+    sint64 _fadviseDiscardSize;
+    sint64 _fadviseDiscardRetainSize;
     bool _lazyCreateLogFile;
     LLBC_LogTraces _requireColorLogTraces;
     bool _takeOver;

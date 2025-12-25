@@ -79,6 +79,9 @@ struct LLBC_LogAppenderInitInfo
     sint64 maxFileSize;                          // max log file size, int bytes, used in File type appender.
     int maxBackupIndex;                          // max backup index, used in File type appender.
     int fileBufferSize;                          // file buffer size, used in File type appender.
+    bool fadviseDiscardEnabled;                  // is fadvise discard page cache enabled, used in File type appender.
+    sint64 fadviseDiscardSize;                   // fadvise discard page cache size, used in File type appender.
+    sint64 fadviseDiscardRetainSize;             // fadvise discard retain page cache size, used in File type appender.
     bool lazyCreateLogFile;                      // logfile create option, used in File type appender
 
     LLBC_String ip;                              // Ip address, used in Network type appender.

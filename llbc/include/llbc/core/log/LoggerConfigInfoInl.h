@@ -158,6 +158,21 @@ inline bool LLBC_LoggerConfigInfo::IsTakeOver() const
     return _takeOver;
 }
 
+inline bool LLBC_LoggerConfigInfo::IsFadviseDiscardEnabled() const
+{
+    return _fadviseDiscardEnabled;
+}
+
+inline sint64 LLBC_LoggerConfigInfo::GetFadviseDiscardSize() const
+{
+    return _fadviseDiscardSize;
+}
+
+inline sint64 LLBC_LoggerConfigInfo::GetFadviseDiacardRetainSize() const
+{
+    return _fadviseDiscardRetainSize;
+}
+
 inline bool LLBC_LoggerConfigInfo::IsLazyCreateLogFile() const
 {
     return _lazyCreateLogFile;
