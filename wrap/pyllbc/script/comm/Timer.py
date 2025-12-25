@@ -52,29 +52,40 @@ class pyllbcTimer(object):
     def __del__(self):
         llbc.inl.DelPyTimer(self.__c_obj)
 
+    def __str__(self):
+        return llbc.inl.PyTimerToString(self.__c_obj)
+
     @property
-    def timerid(self):
+    def timer_id(self):
         return llbc.inl.PyTimerGetTimerId(self.__c_obj)
 
     @property
-    def duetime(self):
-        return llbc.inl.PyTimerGetDueTime(self.__c_obj)
+    def first_period(self):
+        return llbc.inl.PyTimerGetFirstPeriod(self.__c_obj)
 
     @property
     def period(self):
         return llbc.inl.PyTimerGetPeriod(self.__c_obj)
 
     @property
-    def isscheduling(self):
-        return llbc.inl.PyTimerIsScheduling(self.__c_obj)
+    def is_scheduled(self):
+        return llbc.inl.PyTimerIsScheduled(self.__c_obj)
 
     @property
-    def istimeouting(self):
-        return llbc.inl.PyTimerIsTimeouting(self.__c_obj)
+    def is_handling_timeout(self):
+        return llbc.inl.PyTimerIsHandlingTimeout(self.__c_obj)
 
     @property
-    def iscancelling(self):
-        return llbc.inl.PyTimerIsCancelling(self.__c_obj)
+    def is_handling_cancel(self):
+        return llbc.inl.PyTimerIsHandlingCancel(self.__c_obj)
+
+    @property
+    def total_trigger_count(self):
+        return llbc.inl.PyTimerGetTotalTriggerCount(self.__c_obj)
+
+    @property
+    def triggered_count(self):
+        return llbc.inl.PyTimerGetTriggeredCount(self.__c_obj)
 
     @property
     def ignored_dead_ref(self):
@@ -84,36 +95,36 @@ class pyllbcTimer(object):
     def ignored_dead_ref(self, flag):
         llbc.inl.PyTimerSetIgnoredDeadRef(self.__c_obj, flag)
 
-    def schedule(self, duetime, period=None):
+    def schedule(self, first_period, period=None, trigger_count=-1):
         """Schedule timer"""
         if period is None:
-            period = duetime
+            period = first_period 
 
-        llbc.inl.PyTimerSchedule(self.__c_obj, duetime, period)
+        llbc.inl.PyTimerSchedule(self.__c_obj, first_period, period, trigger_count)
 
-    def schedule2(self, duetime, period, fmtstr='%Y-%m-%d %H:%M:%S'):
+    def schedule2(self, first_time, period=None, fmtstr='%Y-%m-%d %H:%M:%S', trigger_count=-1):
         """
         Schedule timer, arguments is datetime type object, str type object, or numeric type object,
-            if duetime type is datetime type object, will use it as expire time.
-            if duetime type is str type, will convert to datetime type to use.
-            if duetime type is numeric type, will as timestamp to use, as seconds.
+            if first_time type is datetime type object, will use it as expire time.
+            if first_time type is str type, will convert to datetime type to use.
+            if first_time type is numeric type, will as timestamp to use, as seconds.
         If not specified the tzinfo, llbc will automatic use local tzinfo to fill.
         """
-        if isinstance(duetime, unicode):
-            duetime = duetime.decode('utf-8')
-        if isinstance(duetime, str):
-            duetime = _dt.strptime(duetime, fmtstr)
+        if isinstance(first_time, unicode):
+            first_time = first_time.decode('utf-8')
+        if isinstance(first_time, str):
+            first_time = _dt.strptime(first_time, fmtstr)
 
-        if isinstance(duetime, _dt):
-            ts = _time.mktime(duetime.timetuple()) + duetime.microsecond / 1000000.0
+        if isinstance(first_time, _dt):
+            ts = _time.mktime(first_time.timetuple()) + first_time.microsecond / 1000000.0
         else:
-            ts = duetime
+            ts = first_time
 
         now = _time.time()
         if ts < now:
-            raise llbc.error('duetime[{}] < nowtime[{}], schedule timer failed'.format(duetime, _dt.fromtimestamp(now)))
+            raise llbc.error('first_time[{}] < nowtime[{}], schedule timer failed'.format(first_time, _dt.fromtimestamp(now)))
 
-        self.schedule(int((ts - now) * 1000), int(period * 1000))
+        self.schedule(int((ts - now) * 1000), int(period * 1000), trigger_count)
 
     def cancel(self):
         """Cancel timer"""

@@ -45,7 +45,7 @@ int csllbc_Timer_Schedule(csllbc_Timer *timer, sint64 dueTime, sint64 period)
 
 int csllbc_Timer_IsScheduling(csllbc_Timer *timer)
 {
-    return static_cast<int>(timer->IsScheduling());
+    return static_cast<int>(timer->IsScheduled());
 }
 
 void csllbc_Timer_Cancel(csllbc_Timer *timer)
@@ -55,7 +55,7 @@ void csllbc_Timer_Cancel(csllbc_Timer *timer)
 
 uint64 csllbc_Timer_GetDueTime(csllbc_Timer *timer)
 {
-    return timer->GetDueTime().GetTotalMillis();
+    return timer->GetFirstPeriod().GetTotalMillis();
 }
 
 uint64 csllbc_Timer_GetPeriod(csllbc_Timer *timer)

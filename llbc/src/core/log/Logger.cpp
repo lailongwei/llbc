@@ -311,12 +311,7 @@ int LLBC_Logger::SetLogHook(std::initializer_list<int> logLevels,
 
 bool LLBC_Logger::GetColorLogTag() const
 {
-    if (UNLIKELY(!_logTraceMgr))
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-    return _logTraceMgr->GetColorLogTag();
+    return LIKELY(_logTraceMgr) ? _logTraceMgr->GetColorLogTag() : false;
 }
 
 int LLBC_Logger::AddColorLogTrace(const LLBC_LogTrace &logTrace)

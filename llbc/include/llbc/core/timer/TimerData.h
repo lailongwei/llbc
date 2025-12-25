@@ -34,7 +34,6 @@ __LLBC_NS_BEGIN
 /**
  * \brief The timer data structure encapsulation.
  */
-#pragma pack(push, 1)
 struct LLBC_HIDDEN LLBC_TimerData
 {
     // Timer handle, use to build timer heap.
@@ -43,28 +42,44 @@ struct LLBC_HIDDEN LLBC_TimerData
     // Timer Id.
     LLBC_TimerId timerId;
 
-    // Due time.
-    sint64 dueTime; 
+    // First period.
+    sint64 firstPeriod; 
     // Period.
     sint64 period;
 
-    // Repeat times.
-    sint64 repeatTimes;
+    // Total trigger count.
+    size_t totalTriggerCount;
+    // Triggered count.
+    size_t triggeredCount;
 
     // timer object.
     LLBC_Timer *timer;
 
-    // Validate flag.
-    bool validate;
-    // Cancelling flag.
-    bool cancelling;
-    // Timeouting flag.
-    bool timeouting;
+    // timer status.
+    union
+    {
+        uint8 statusVal;
+        struct
+        {
+            // Scheduled status.
+            uint8 isScheduled:1;
+            // Handling timeout status.
+            uint8 isHandlingTimeout:1;
+            // Handling cancel status.
+            uint8 isHandlingCancel:1;
+
+            // Unused status.
+            uint8 unused:5;
+        } status;
+    } unStatus;
 
     // ref count.
     uint8 refCount;
+
+    // Unused bytes.
+    uint16 unused1;
+    uint32 unused2;
 };
-#pragma pack(pop)
 
 __LLBC_NS_END
 

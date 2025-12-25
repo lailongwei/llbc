@@ -62,14 +62,17 @@ void pyllbc_AddCommObjs()
     inlMod->AddMethod(methods.DelPyTimer);
     inlMod->AddMethod(methods.PyTimerIsIgnoredDeadRef);
     inlMod->AddMethod(methods.PyTimerSetIgnoredDeadRef);
-    inlMod->AddMethod(methods.PyTimerGetDueTime);
+    inlMod->AddMethod(methods.PyTimerGetFirstPeriod);
     inlMod->AddMethod(methods.PyTimerGetPeriod);
     inlMod->AddMethod(methods.PyTimerGetTimerId);
     inlMod->AddMethod(methods.PyTimerSchedule);
     inlMod->AddMethod(methods.PyTimerCancel);
-    inlMod->AddMethod(methods.PyTimerIsScheduling);
-    inlMod->AddMethod(methods.PyTimerIsTimeouting);
-    inlMod->AddMethod(methods.PyTimerIsCancelling);
+    inlMod->AddMethod(methods.PyTimerIsScheduled);
+    inlMod->AddMethod(methods.PyTimerIsHandlingTimeout);
+    inlMod->AddMethod(methods.PyTimerIsHandlingCancel);
+    inlMod->AddMethod(methods.PyTimerGetTotalTriggerCount);
+    inlMod->AddMethod(methods.PyTimerGetTriggeredCount);
+    inlMod->AddMethod(methods.PyTimerToString);
     inlMod->AddMethod(methods.PyTimerUpdateAllTimers);
 
     // Add all packet about methods to inl module.

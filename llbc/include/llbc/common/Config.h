@@ -214,10 +214,8 @@
 /**
  * \brief core/timer about configs.
  */
-// Strict timer schedule mode.
-#define LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE                 0
-// Long timeout time, in milli-seconds, when a timer timeout time >= <this value>, when call Cancel(), will force remove from binary heap.
-#define LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME               864000000 // 10 days
+// Long timeout time, in milliseconds, when a timer timeout time >= <this value>, when call Cancel(), will force remove from binary heap.
+#define LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME               86400000 // 1 day
 
 /**
 * \brief core/objectpool about configs.

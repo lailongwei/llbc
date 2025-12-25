@@ -1,10 +1,8 @@
 name: MacOS build
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  push: {}
+  pull_request: {}
 
 jobs:
   macos-build:

@@ -68,12 +68,12 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerSetIgnoredDeadRef(PyObject *self, PyObjec
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_PyTimerGetDueTime(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerGetFirstPeriod(PyObject *self, PyObject *args)
 {
     pyllbc_Timer *timer;
     PYLLBC_ParseCObjBeginArgs(timer, "");
 
-    return PyLong_FromLongLong(timer->GetDueTime().GetTotalMillis());
+    return PyLong_FromLongLong(timer->GetFirstPeriod().GetTotalMillis());
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_PyTimerGetPeriod(PyObject *self, PyObject *args)
@@ -96,10 +96,15 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerSchedule(PyObject *self, PyObject *args)
 {
     pyllbc_Timer *timer;
     PY_LONG_LONG dueTime, period;
-    PYLLBC_ParseCObjBeginArgs(timer, "LL", &dueTime, &period);
+    long triggerCount = -1;
+    PYLLBC_ParseCObjBeginArgs(timer, "LL|l", &dueTime, &period, &triggerCount);
+
+    if (triggerCount == 0)
+        triggerCount = -1;
 
     if (timer->Schedule(LLBC_TimeSpan::FromMillis(dueTime), 
-                        LLBC_TimeSpan::FromMillis(period)) != LLBC_OK)
+                        LLBC_TimeSpan::FromMillis(period),
+                        static_cast<size_t>(triggerCount)) != LLBC_OK)
     {
         pyllbc_TransferLLBCError(__FILE__, __LINE__, timer->ToString());
         return nullptr;
@@ -122,37 +127,62 @@ LLBC_EXTERN_C PyObject *_pyllbc_PyTimerCancel(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsScheduling(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsScheduled(PyObject *self, PyObject *args)
 {
     pyllbc_Timer *timer;
     PYLLBC_ParseCObjBeginArgs(timer, "");
 
-    PyObject *rtn = timer->IsScheduling() ? Py_True : Py_False;
+    PyObject *rtn = timer->IsScheduled() ? Py_True : Py_False;
     Py_INCREF(rtn);
 
     return rtn;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsTimeouting(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsHandlingTimeout(PyObject *self, PyObject *args)
 {
     pyllbc_Timer *timer;
     PYLLBC_ParseCObjBeginArgs(timer, "");
 
-    PyObject *rtn = timer->IsTimeouting() ? Py_True : Py_False;
+    PyObject *rtn = timer->IsHandlingTimeout() ? Py_True : Py_False;
     Py_INCREF(rtn);
 
     return rtn;
 }
 
-LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsCancelling(PyObject *self, PyObject *args)
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerIsHandlingCancel(PyObject *self, PyObject *args)
 {
     pyllbc_Timer *timer;
     PYLLBC_ParseCObjBeginArgs(timer, "");
 
-    PyObject *rtn = timer->IsCancelling() ? Py_True : Py_False;
+    PyObject *rtn = timer->IsHandlingCancel() ? Py_True : Py_False;
     Py_INCREF(rtn);
 
     return rtn;
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerGetTotalTriggerCount(PyObject *self, PyObject *args)
+{
+    pyllbc_Timer *timer;
+    PYLLBC_ParseCObjBeginArgs(timer, "");
+
+    return PyLong_FromLong(static_cast<long>(timer->GetTotalTriggerCount()));
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerGetTriggeredCount(PyObject *self, PyObject *args)
+{
+    pyllbc_Timer *timer;
+    PYLLBC_ParseCObjBeginArgs(timer, "");
+
+    return PyLong_FromLong(static_cast<long>(timer->GetTriggeredCount()));
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_PyTimerToString(PyObject *self, PyObject *args)
+{
+    pyllbc_Timer *timer;
+    PYLLBC_ParseCObjBeginArgs(timer, "");
+
+    const LLBC_String timerStrRepr = timer->ToString();
+    return PyString_FromStringAndSize(timerStrRepr.c_str(), timerStrRepr.size());
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_PyTimerUpdateAllTimers(PyObject *self, PyObject *args)

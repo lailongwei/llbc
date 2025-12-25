@@ -421,3 +421,38 @@
 // The printf buffer size define.
 #define __LLBC_FORMAT_BUF_SIZE (1024 * 8)
 
+// The expect macro define(temporary).
+#define LLBC_Expect(cond, ...)                                                                            \
+    do {                                                                                                  \
+        const auto LLBC_Concat(llbcExpectCond, __LINE__) = !!(cond);                                      \
+        FILE *LLBC_Concat(outputFile, __LINE__) =                                                         \
+            LLBC_Concat(llbcExpectCond, __LINE__) ? stdout : stderr;                                      \
+        const auto LLBC_Concat(expectStr, __LINE__) =                                                     \
+            LLBC_Concat(llbcExpectCond, __LINE__) ? "Ok" : "Failed";                                      \
+        const auto LLBC_Concat(consoleColor, __LINE__) =                                                  \
+            LLBC_Concat(llbcExpectCond, __LINE__) ?                                                       \
+                LLBC_NS LLBC_ConsoleColor::Fg_Green :                                                     \
+                    (LLBC_NS LLBC_ConsoleColor::Fg_Red | LLBC_NS LLBC_ConsoleColor::Highlight_Fg);        \
+                                                                                                          \
+        LLBC_FilePrint(LLBC_Concat(outputFile, __LINE__), ">>> %s ...... [", "LLBC_Expect(" #cond ")");   \
+        LLBC_SetConsoleColor(LLBC_Concat(outputFile, __LINE__), LLBC_Concat(consoleColor, __LINE__));     \
+        LLBC_FilePrint(LLBC_Concat(outputFile, __LINE__), LLBC_Concat(expectStr, __LINE__));              \
+        LLBC_SetConsoleColor(LLBC_Concat(outputFile, __LINE__), LLBC_NS LLBC_ConsoleColor::Fg_Default);   \
+        LLBC_FilePrintLn(LLBC_Concat(outputFile, __LINE__), "]");                                         \
+                                                                                                          \
+        if constexpr (std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value != 0)                \
+            LLBC_FilePrintLn(LLBC_Concat(outputFile, __LINE__), "    >>> " __VA_ARGS__);                  \
+                                                                                                          \
+        LLBC_FlushFile(LLBC_Concat(outputFile, __LINE__));                                                \
+                                                                                                          \
+        if (!LLBC_Concat(llbcExpectCond, __LINE__))                                                       \
+            abort();                                                                                      \
+    } while (false)
+
+#define LLBC_Expect_EQ(val1, val2, ...)  LLBC_Expect((val1) == (val2), ##__VA_ARGS__)
+#define LLBC_Expect_NEQ(val1, val2, ...) LLBC_Expect((val1) != (val2), ##__VA_ARGS__)
+#define LLBC_Expect_GT(val1, val2, ...)  LLBC_Expect((val1) > (val2), ##__VA_ARGS__)
+#define LLBC_Expect_LT(val1, val2, ...)  LLBC_Expect((val1) < (val2), ##__VA_ARGS__)
+#define LLBC_Expect_GET(val1, val2, ...) LLBC_Expect((val1) >= (val2), ##__VA_ARGS__)
+#define LLBC_Expect_LET(val1, val2, ...) LLBC_Expect((val1) <= (val2), ##__VA_ARGS__)
+

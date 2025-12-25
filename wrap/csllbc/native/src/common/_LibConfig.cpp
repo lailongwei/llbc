@@ -142,9 +142,9 @@ int csllbc_LibConfig_Thread_GuardDebug()
     return LLBC_CFG_THREAD_GUARD_DEBUG;
 }
 
-int csllbc_LibConfig_Timer_StrictSchedule()
+int csllbc_LibConfig_Timer_LongTimeoutTime()
 {
-    return LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE;
+    return LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME;
 }
 
 int csllbc_LibConfig_Comm_IsNetOrder()

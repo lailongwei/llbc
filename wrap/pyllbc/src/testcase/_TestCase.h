@@ -27,10 +27,6 @@
 class LLBC_HIDDEN pyllbc_TestCase : public LLBC_BaseTestCase
 {
 public:
-    pyllbc_TestCase() {  }
-    ~pyllbc_TestCase() override {  }
-
-public:
     int Run(int argc, char *argv[]) override
     {
         PyObject *pyObj = reinterpret_cast<PyObject *>(LLBC_Str2Num<PyObject *>(argv[0]));
@@ -73,14 +69,13 @@ LLBC_EXTERN_C PyObject *_pyllbc_NewTestCase(PyObject *self, PyObject *args)
     pyllbc_TestCase *tc = new pyllbc_TestCase;
     tc->SetName(tcName);
 
-    return Py_BuildValue("l", tc);
+    return PyLong_FromVoidPtr(tc);
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_DelTestCase(PyObject *self, PyObject *args)
 {
     pyllbc_TestCase *tc;
-    if (!PyArg_ParseTuple(args, "l", &tc))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(tc, "");
 
     delete tc;
 
@@ -90,8 +85,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_DelTestCase(PyObject *self, PyObject *args)
 LLBC_EXTERN_C PyObject *_pyllbc_GetTestCaseName(PyObject *self, PyObject *args)
 {
     pyllbc_TestCase *tc;
-    if (!PyArg_ParseTuple(args, "l", &tc))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(tc, "");
 
     return PyString_FromString(tc->GetName().c_str());
 }
@@ -100,8 +94,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_SetTestCaseName(PyObject *self, PyObject *args)
 {
     char *tcName;
     pyllbc_TestCase *tc;
-    if (!PyArg_ParseTuple(args, "ls", &tc, &tcName))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(tc, "s", &tcName);
 
     tc->SetName(tcName);
 
@@ -112,8 +105,7 @@ LLBC_EXTERN_C PyObject *_pyllbc_RunTestCase(PyObject *self, PyObject *args)
 {
     PyObject *argObj;
     pyllbc_TestCase *tc;
-    if (!PyArg_ParseTuple(args, "lN", &tc, &argObj))
-        return nullptr;
+    PYLLBC_ParseCObjBeginArgs(tc, "N", &argObj);
 
     char *tcArgs[2] = {nullptr, nullptr};
     tcArgs[0] = const_cast<char *>(LLBC_Num2Str<void *, true>(self).c_str());

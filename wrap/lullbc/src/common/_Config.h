@@ -98,8 +98,8 @@ LULLBC_LUA_METH int _lullbc_SetLibConfigToLua(lua_State *l)
     lua_setfield(l, 1, "CFG_LOG_LAZY_CREATE_LOG_FILE");
 
     // Timer
-    lua_pushboolean(l, LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE);
-    lua_setfield(l, 1, "CFG_CORE_TIMER_STRICT_SCHEDULE");
+    lua_pushinteger(l, LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME);
+    lua_setfield(l, 1, "LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME");
 
     // Push objbase module about config.
     lua_pushinteger(l, LLBC_CFG_OBJBASE_DICT_DFT_BUCKET_SIZE);

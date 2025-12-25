@@ -73,7 +73,7 @@ LULLBC_LUA_METH int _lullbc_Timer_GetTimerId(lua_State *l)
 LULLBC_LUA_METH int _lullbc_Timer_IsScheduling(lua_State *l)
 {
     lullbc_Timer *timer = __Get_LuTimer(l);
-    lua_pushboolean(l, timer->IsScheduling());
+    lua_pushboolean(l, timer->IsScheduled());
 
     return 1;
 }
@@ -82,7 +82,7 @@ LULLBC_LUA_METH int _lullbc_Timer_IsScheduling(lua_State *l)
 LULLBC_LUA_METH int _lullbc_Timer_GetDueTime(lua_State *l)
 {
     lullbc_Timer *timer = __Get_LuTimer(l);
-    lua_pushnumber(l, timer->GetDueTime().GetTotalMillis() / 1000.0);
+    lua_pushnumber(l, timer->GetFirstPeriod().GetTotalMillis() / 1000.0);
 
     return 1;
 }

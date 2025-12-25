@@ -58,12 +58,16 @@ public:
 
 public:
     /**
-     * Schedule timer(rewrite).
-     * @param[in] dueTime - due time.
-     * @param[in] period  - period value.
+     * Schedule timer.
+     * @param[in] firstPeriod  - first period time, the minimum period value depends on the scheduling precision of
+     *                           LLBC_TimerScheduler::Update().
+     * @param[in] period       - period time, if is zero, will use firstPeriod.
+     * @param[in] triggerCount - trigger count, default is LLBC_INFINITE, if triggerCount is 0, will normalize to 1.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Schedule(const LLBC_TimeSpan &dueTime, const LLBC_TimeSpan &period = LLBC_TimeSpan::zero) override;
+    int Schedule(const LLBC_TimeSpan &firstPeriod,
+                 const LLBC_TimeSpan &period = LLBC_TimeSpan::zero,
+                 size_t triggerCount = LLBC_INFINITE) override;
 
 public:
     /**

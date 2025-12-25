@@ -141,5 +141,9 @@ namespace llbc
 
         static public uint LLBC_ERROR_TIMER_SCHEDULER_CANCELING_ALL= 0xc0000035;
 
+        static public uint LLBC_ERROR_EVENT_MANAGER_PRE_FIRE_FAILED= 0xc0000036;
+
+        static public uint LLBC_ERROR_PARTIAL_PARSED         = 0xc0000037;
+
     }
 }

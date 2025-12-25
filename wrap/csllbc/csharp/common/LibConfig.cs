@@ -259,12 +259,12 @@ namespace llbc
 
         #region timer about configs
         /// <summary>
-        /// Timer used strict schedule or not.
+        /// Long timeout time, in milliseconds.
         /// <para>config layer: llbc core library</para>
         /// </summary>
-        public static bool timerStrictSchedule
+        public static int timerLongTimeoutTime
         {
-            get { return LLBCNative.csllbc_LibConfig_Timer_StrictSchedule() != 0; }
+            get { return LLBCNative.csllbc_LibConfig_Timer_LongTimeoutTime(); }
         }
         #endregion
 

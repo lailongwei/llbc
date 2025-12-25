@@ -83,7 +83,7 @@ LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Thread_GuardDebug();
 // Timer about configs.
 //
 // LLBC_CFG_CORE_TIMER_STRICT_SCHEDULE
-LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Timer_StrictSchedule();
+LLBC_EXTERN_C CSLLBC_EXPORT int csllbc_LibConfig_Timer_LongTimeoutTime();
 
 //
 // Network about configs.

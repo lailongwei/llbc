@@ -1,10 +1,8 @@
 name: Linux build
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  push: {}
+  pull_request: {}
 
 env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
