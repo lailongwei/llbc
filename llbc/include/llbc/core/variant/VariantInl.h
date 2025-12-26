@@ -766,7 +766,14 @@ LLBC_Variant::operator std::unordered_map<_Key, _Val>() const
 
 inline void LLBC_Variant::Clear()
 {
-    _holder.Clear();
+    if (IsStr())
+        _holder.data.obj.str.clear();
+    else if (IsSeq())
+        _holder.data.obj.seq.clear();
+    else if (IsDict())
+        _holder.data.obj.dict.clear();
+    else if (IsRaw())
+        _holder.data.raw.int64Val = 0;
 }
 
 template <typename _Ty>
