@@ -30,16 +30,17 @@ public:
     int Run(int argc, char *argv[]) override;
 
 private:
-    void BasicTest();
-    void StringTest();
-    void EnumTest();
-    void CompareTest();
-    void CompositeKeyTest();
-    void ArithmeticTest();
-    void PairTest();
-    void SeqTest();
-    void DictTest();
-    void SerializeTest();
-    void HashTest();
-    void ConvertToUnurderedStlContainerTest();
+    int BasicTest();
+    int BecomeTest();
+    int StringTest();
+    int EnumTest();
+    int CompareTest();
+    int CompositeKeyTest();
+    int ArithmeticTest();
+    int PairTest();
+    int SeqTest();
+    int DictTest();
+    int ObjTest();
+    int SerializeTest();
+    int HashTest();
 };

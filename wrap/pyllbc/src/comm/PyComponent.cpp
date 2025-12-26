@@ -192,7 +192,8 @@ void pyllbc_Component::OnEvent(int eventType, const LLBC_Variant &eventParams)
             OnUnHandledPacket(*eventParams.AsPtr<LLBC_Packet>());
             break;
         }
-        default: break;
+        default:
+            break;
     }
 }
 

@@ -165,14 +165,22 @@ public:
 
             union ObjType
             {
-                Str *str;
-                Dict *dict;
-                Seq *seq;
+                Str str;
+                Dict dict;
+                Seq seq;
             } obj;
+
+            DataType() {}
+            ~DataType() {};
         } data;
 
-        Holder();
-        ~Holder();
+        Holder() : type(LLBC_VariantType::NIL) { data.raw.uint64Val = 0; }
+        ~Holder() { Clear(); }
+
+        Holder(const Holder &other);
+        Holder &operator=(const Holder &other);
+        Holder(Holder &&other) noexcept;
+        Holder &operator=(Holder &&other) noexcept;
 
         LLBC_VariantType::ENUM GetFirstType() const;
 
@@ -180,7 +188,6 @@ public:
 
     private:
         friend class LLBC_Variant;
-        void ClearData();
     };
 
 public:
@@ -190,7 +197,7 @@ public:
     static void DestroyNumber2StrFastAccessTable();
 
 public:
-    LLBC_Variant();
+    LLBC_Variant() = default;
 
     // Constructors(all parameter constructors is explicit, copy constructor is non-explicit).
     explicit LLBC_Variant(const bool &b);
@@ -285,11 +292,8 @@ public:
     LLBC_Variant &BecomeFloat();
     LLBC_Variant &BecomeDouble();
     LLBC_Variant &BecomeStr();
-    LLBC_Variant &BecomeStrX();
     LLBC_Variant &BecomeSeq();
-    LLBC_Variant &BecomeSeqX();
     LLBC_Variant &BecomeDict();
-    LLBC_Variant &BecomeDictX();
     LLBC_Variant &Become(LLBC_VariantType::ENUM ty);
 
     // Real data fetch.
@@ -565,7 +569,6 @@ private:
     friend class LLBC_VariantTraits;
 
     void SetType(int type);
-    void ClearData();
 
     void CtFromRaw(uint64 raw, LLBC_VariantType::ENUM ty);
     template <typename _T, typename _UnaryContainer>
@@ -579,10 +582,6 @@ private:
     template <typename _64Ty>
     _64Ty AsSignedOrUnsigned64() const;
 
-    bool IsStrX() const;
-    bool IsSeqX() const;
-    bool IsDictX() const;
-
     void SeqPushBack();
     void SeqPushBackElem(const Seq::value_type &val);
 
@@ -590,7 +589,7 @@ private:
     Dict::size_type DictEraseKey(const Dict::key_type &key);
 
 private:
-    struct Holder _holder;
+    Holder _holder;
     static Str **_num2StrFastAccessTbl;
 };
 
