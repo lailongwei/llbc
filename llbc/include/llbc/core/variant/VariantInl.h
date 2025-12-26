@@ -423,7 +423,7 @@ inline LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM ty)
 {
     if (_holder.type != ty)
     {
-        _holder.ClearData();
+        _holder.Clear();
         _holder.type = ty;
 
         switch (ty)
@@ -766,14 +766,7 @@ LLBC_Variant::operator std::unordered_map<_Key, _Val>() const
 
 inline void LLBC_Variant::Clear()
 {
-    if (IsStr())
-        _holder.data.obj.str.clear();
-    else if (IsSeq())
-        _holder.data.obj.seq.clear();
-    else if (IsDict())
-        _holder.data.obj.dict.clear();
-    else if (IsRaw())
-        _holder.data.raw.int64Val = 0;
+    _holder.Clear();
 }
 
 template <typename _Ty>
@@ -863,7 +856,7 @@ template <typename _T,
           typename std::enable_if<std::is_enum<_T>::value, int>::type>
 LLBC_Variant &LLBC_Variant::operator=(const _T &en)
 {
-    _holder.ClearData();
+    _holder.Clear();
 
     _holder.type = LLBC_VariantType::RAW_SINT64;
     _holder.data.raw.int64Val = static_cast<sint64>(en);
@@ -874,7 +867,7 @@ LLBC_Variant &LLBC_Variant::operator=(const _T &en)
 template <typename _T>
 LLBC_Variant &LLBC_Variant::operator=(const _T * const &ptr)
 {
-    _holder.ClearData();
+    _holder.Clear();
     _holder.type = LLBC_VariantType::RAW_PTR;
 
     memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
@@ -1121,11 +1114,6 @@ inline void LLBC_Variant::SetType(int type)
     _holder.type = static_cast<LLBC_VariantType::ENUM>(type);
 }
 
-inline void LLBC_Variant::ClearData()
-{
-    _holder.ClearData();
-}
-
 inline const LLBC_String &LLBC_Variant::TypeToString() const
 {
     return LLBC_VariantType::Type2Str(_holder.type);
@@ -1200,7 +1188,7 @@ void LLBC_Variant::CtFromBinaryCont(const _BinaryContainer &binaryCont)
     for (typename _BinaryContainer::const_iterator it = binaryCont.begin();
          it != endIt;
          ++it)
-        dict.emplace(LLBC_Variant(it->first), LLBC_Variant(it->second));
+        dict.emplace(it->first, it->second);
 }
 
 template <typename _Key, typename _Val, typename _BinaryContainer>
@@ -1208,7 +1196,7 @@ void LLBC_Variant::CpToBinaryCont(_BinaryContainer &binaryCont) const
 {
     const DictConstIter endIt = _holder.data.obj.dict.end();
     for (DictConstIter it = _holder.data.obj.dict.begin(); it != endIt; ++it)
-        binaryCont.emplace(LLBC_Variant(it->first), LLBC_Variant(it->second));
+        binaryCont.emplace(it->first, it->second);
 }
 
 template <typename _64Ty>

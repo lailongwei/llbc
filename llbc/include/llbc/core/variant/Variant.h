@@ -188,7 +188,6 @@ public:
 
     private:
         friend class LLBC_Variant;
-        void ClearData();
     };
 
 public:
@@ -570,7 +569,6 @@ private:
     friend class LLBC_VariantTraits;
 
     void SetType(int type);
-    void ClearData();
 
     void CtFromRaw(uint64 raw, LLBC_VariantType::ENUM ty);
     template <typename _T, typename _UnaryContainer>
