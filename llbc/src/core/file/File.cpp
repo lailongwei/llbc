@@ -251,6 +251,14 @@ int LLBC_File::DiscardPageCache(sint64 offset, sint64 len)
     {
         if (UNLIKELY(Flush() != LLBC_OK))
             return LLBC_FAILED;
+
+        #if LLBC_TARGET_PLATFORM_LINUX
+        if (UNLIKELY(fdatasync(fd) != LLBC_OK))
+        {
+            LLBC_SetLastError(LLBC_ERROR_OSAPI);
+            return LLBC_FAILED;
+        }
+        #endif
     }
 
 #if LLBC_TARGET_PLATFORM_LINUX
