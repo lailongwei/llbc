@@ -22,6 +22,7 @@
 
 #include "llbc/common/Export.h"
 
+#include "llbc/core/os/OS_SysConf.h"
 #include "llbc/core/os/OS_Process.h"
 #include "llbc/core/utils/Util_Text.h"
 #include  "llbc/core/file/Directory.h"
@@ -66,6 +67,9 @@ LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 , _maxFileSize(INT_MAX)
 , _maxBackupIndex(0)
 , _fileBufferSize(0)
+, _fadviseDiscardEnabled(false)
+, _fadviseDiscardSize(0)
+, _fadviseDiscardRetainSize(0)
 , _lazyCreateLogFile(false)
 
 , _takeOver(false)
@@ -227,7 +231,10 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
         // Max file size.
         if (cfg["maxFileSize"])
-            _maxFileSize = NormalizeLogFileSize(cfg["maxFileSize"]);
+            _maxFileSize = NormalizeSizeStr(cfg["maxFileSize"],
+                                            LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE,
+                                            LLBC_CFG_LOG_MIN_FILE_SIZE_LIMIT,
+                                            LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT);
         else if (_notConfigUseRoot)
             _maxFileSize = rootCfg->GetMaxFileSize();
         else
@@ -243,6 +250,32 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         if (_asyncMode)
             _fileBufferSize = __LLBC_GetLogCfg(
                 "fileBufferSize", LOG_FILE_BUFFER_SIZE, GetFileBufferSize, AsInt32);
+        
+        // Advise discard file page cache.
+        _fadviseDiscardEnabled = LLBC_CFG_LOG_DEFAULT_ENABLE_FADVISE_DISCARD;
+        if (!cfg["enableFadviseDiscard"].AsStr().strip().empty())
+            _fadviseDiscardEnabled = cfg["enableFadviseDiscard"].AsLooseBool();
+
+        if (_fadviseDiscardEnabled) 
+        {
+            // Fadvise discard size.
+            _fadviseDiscardSize = NormalizeSizeStr(cfg["fadviseDiscardSize"],
+                                                   LLBC_CFG_LOG_DEFAULT_FADVISE_DISCARD_SIZE,
+                                                   LLBC_CFG_LOG_FADVISE_DISCARD_SIZE_MIN,
+                                                   _maxFileSize);
+            // Align fadvise discard size.
+            _fadviseDiscardSize = _fadviseDiscardSize & ~(LLBC_pageSize - 1);
+
+            // File page cache retain size.
+            int fadviseDiscardRetainPercent = LLBC_CFG_LOG_DEFAULT_FADVISE_DISCARD_RETAIN_PERCENT;
+            if (!cfg["fadviseDiscardRetainPercent"].AsStr().strip().empty())
+                fadviseDiscardRetainPercent = std::clamp(cfg["fadviseDiscardRetainPercent"].AsInt32(),
+                                                         LLBC_CFG_LOG_FADVISE_DISCARD_RETAIN_PERCENT_MIN,
+                                                         LLBC_CFG_LOG_FADVISE_DISCARD_RETAIN_PERCENT_MAX);
+            
+            // Align page cache retain size.
+            _fadviseDiscardRetainSize = (_fadviseDiscardSize * fadviseDiscardRetainPercent / 100) & ~(LLBC_pageSize - 1);
+        }
     }
 
     // Misc configs.
@@ -362,26 +395,26 @@ void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 #endif // LLBC_TARGET_PLATFORM_IPHONE
 }
 
-sint64 LLBC_LoggerConfigInfo::NormalizeLogFileSize(const LLBC_String &logFileSize)
+sint64 LLBC_LoggerConfigInfo::NormalizeSizeStr(const LLBC_String &sizeStr, sint64 defaultSize, sint64 low, sint64 high)
 {
     // strip.
-    const LLBC_String nmlLogFileSizeStr = logFileSize.strip();
+    const LLBC_String nmlSizeStr = sizeStr.strip();
 
     // If is empty, use default.
-    if (nmlLogFileSizeStr.empty())
-        return LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
+    if (nmlSizeStr.empty())
+        return defaultSize;
 
     // Find storage unit.
     LLBC_String::size_type unitPos = 0;
-    for (; unitPos < nmlLogFileSizeStr.size(); ++unitPos)
+    for (; unitPos < nmlSizeStr.size(); ++unitPos)
     {
-        if (!isdigit(nmlLogFileSizeStr[unitPos]) && nmlLogFileSizeStr[unitPos] != '.')
+        if (!isdigit(nmlSizeStr[unitPos]) && nmlSizeStr[unitPos] != '.')
             break;
     }
 
     // normalize storage unit.
-    const LLBC_String unit = nmlLogFileSizeStr.substr(unitPos).strip().tolower();
-    double nmlLogFileSize = LLBC_Variant(nmlLogFileSizeStr.substr(0, unitPos));
+    const LLBC_String unit = nmlSizeStr.substr(unitPos).strip().tolower();
+    double nmlLogFileSize = LLBC_Variant(nmlSizeStr.substr(0, unitPos));
     // - k/kb, kib
     if (unit == "k" || unit == "kb")
         nmlLogFileSize *= 1000.0;
@@ -402,8 +435,7 @@ sint64 LLBC_LoggerConfigInfo::NormalizeLogFileSize(const LLBC_String &logFileSiz
     //     // ... ...
 
     // Clamp.
-    return MIN(MAX(1024ll, static_cast<sint64>(nmlLogFileSize)),
-               LLBC_CFG_LOG_MAX_FILE_SIZE_LIMIT);
+    return std::clamp(static_cast<sint64>(nmlLogFileSize), low, high);
 }
 
 __LLBC_NS_END
