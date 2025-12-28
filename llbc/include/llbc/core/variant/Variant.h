@@ -175,16 +175,17 @@ public:
         } data;
 
         Holder() : type(LLBC_VariantType::NIL) { data.raw.uint64Val = 0; }
-        ~Holder() { Clear(); }
+        ~Holder() { Reset(); }
 
         Holder(const Holder &other);
-        Holder &operator=(const Holder &other);
         Holder(Holder &&other) noexcept;
+
+        Holder &operator=(const Holder &other);
         Holder &operator=(Holder &&other) noexcept;
 
         LLBC_VariantType::ENUM GetFirstType() const;
 
-        void Clear();
+        void Reset();
 
     private:
         friend class LLBC_Variant;
