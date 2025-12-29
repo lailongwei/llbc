@@ -145,7 +145,7 @@ LLBC_Variant::Holder &LLBC_Variant::Holder::operator=(const Holder &other)
     return *this;
 }
 
-LLBC_Variant::Holder& LLBC_Variant::Holder::operator=(Holder &&other) noexcept
+LLBC_Variant::Holder &LLBC_Variant::Holder::operator=(Holder &&other) noexcept
 {
     if (UNLIKELY(this == &other))
         return *this;
