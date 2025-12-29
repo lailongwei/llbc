@@ -86,7 +86,8 @@ std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Variant &variant)
 
 __LLBC_NS_BEGIN
 
-LLBC_Variant::Holder::Holder(const Holder& other) : type(other.type)
+LLBC_Variant::Holder::Holder(const Holder &other)
+: type(other.type)
 {
     if (type == LLBC_VariantType::STR_DFT)
         new (&data.obj.str) Str(other.data.obj.str);
@@ -98,25 +99,8 @@ LLBC_Variant::Holder::Holder(const Holder& other) : type(other.type)
         data.raw.uint64Val = other.data.raw.uint64Val;
 }
 
-LLBC_Variant::Holder& LLBC_Variant::Holder::operator=(const Holder& other)
-{
-    if (this != &other)
-        Clear();
-
-    type = other.type;
-    if (type == LLBC_VariantType::STR_DFT)
-        new (&data.obj.str) Str(other.data.obj.str);
-    else if (type == LLBC_VariantType::SEQ_DFT)
-        new (&data.obj.seq) Seq(other.data.obj.seq);
-    else if (type == LLBC_VariantType::DICT_DFT)
-        new (&data.obj.dict) Dict(other.data.obj.dict);
-    else
-        data.raw.uint64Val = other.data.raw.uint64Val;
-
-    return *this;
-}
-
-LLBC_Variant::Holder::Holder(Holder &&other) noexcept : type(other.type)
+LLBC_Variant::Holder::Holder(Holder &&other) noexcept
+: type(other.type)
 {
     if (type == LLBC_VariantType::STR_DFT)
         new (&data.obj.str) Str(std::move(other.data.obj.str));
@@ -126,17 +110,60 @@ LLBC_Variant::Holder::Holder(Holder &&other) noexcept : type(other.type)
         new (&data.obj.dict) Dict(std::move(other.data.obj.dict));
     else
         data.raw.uint64Val = other.data.raw.uint64Val;
+}
 
-    other.type = LLBC_VariantType::NIL;
-    other.data.raw.uint64Val = 0;
+LLBC_Variant::Holder &LLBC_Variant::Holder::operator=(const Holder &other)
+{
+    if (UNLIKELY(this == &other))
+        return *this;
+
+    if (type == other.type)
+    {
+        if (type == LLBC_VariantType::STR_DFT)
+            data.obj.str = other.data.obj.str;
+        else if (type == LLBC_VariantType::SEQ_DFT)
+            data.obj.seq = other.data.obj.seq;
+        else if (type == LLBC_VariantType::DICT_DFT)
+            data.obj.dict = other.data.obj.dict;
+        else
+            data.raw.uint64Val = other.data.raw.uint64Val;
+    }
+    else
+    {
+        Reset();
+        type = other.type;
+        if (type == LLBC_VariantType::STR_DFT)
+            new (&data.obj.str) Str(other.data.obj.str);
+        else if (type == LLBC_VariantType::SEQ_DFT)
+            new (&data.obj.seq) Seq(other.data.obj.seq);
+        else if (type == LLBC_VariantType::DICT_DFT)
+            new (&data.obj.dict) Dict(other.data.obj.dict);
+        else
+            data.raw.uint64Val = other.data.raw.uint64Val;
+    }
+
+    return *this;
 }
 
 LLBC_Variant::Holder& LLBC_Variant::Holder::operator=(Holder &&other) noexcept
 {
-    if (this != &other)
-    {
-        Clear();
+    if (UNLIKELY(this == &other))
+        return *this;
 
+    if (type == other.type)
+    {
+        if (type == LLBC_VariantType::STR_DFT)
+            data.obj.str = std::move(other.data.obj.str);
+        else if (type == LLBC_VariantType::SEQ_DFT)
+            data.obj.seq = std::move(other.data.obj.seq);
+        else if (type == LLBC_VariantType::DICT_DFT)
+            data.obj.dict = std::move(other.data.obj.dict);
+        else
+            data.raw.uint64Val = other.data.raw.uint64Val;
+    }
+    else
+    {
+        Reset();
         type = other.type;
         if (type == LLBC_VariantType::STR_DFT)
             new (&data.obj.str) Str(std::move(other.data.obj.str));
@@ -146,9 +173,6 @@ LLBC_Variant::Holder& LLBC_Variant::Holder::operator=(Holder &&other) noexcept
             new (&data.obj.dict) Dict(std::move(other.data.obj.dict));
         else
             data.raw.uint64Val = other.data.raw.uint64Val;
-
-        other.type = LLBC_VariantType::NIL;
-        other.data.raw.uint64Val = 0;
     }
 
     return *this;
@@ -159,7 +183,7 @@ LLBC_VariantType::ENUM LLBC_Variant::Holder::GetFirstType() const
     return static_cast<LLBC_VariantType::ENUM>(type & LLBC_VariantType::MASK_FIRST_TYPE);
 }
 
-void LLBC_Variant::Holder::Clear()
+void LLBC_Variant::Holder::Reset()
 {
     if (type == LLBC_VariantType::STR_DFT)
         data.obj.str.~Str();
@@ -167,8 +191,9 @@ void LLBC_Variant::Holder::Clear()
         data.obj.seq.~Seq();
     else if (type == LLBC_VariantType::DICT_DFT)
         data.obj.dict.~Dict();
-    else
-        data.raw.int64Val = 0;
+
+    data.raw.int64Val = 0;
+    type = LLBC_VariantType::NIL;
 }
 
 LLBC_Variant::Str **LLBC_Variant::_num2StrFastAccessTbl = nullptr;
@@ -675,7 +700,7 @@ const LLBC_Variant &LLBC_Variant::operator[](const LLBC_Variant &key) const
 
 LLBC_Variant &LLBC_Variant::operator=(bool b)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_BOOL;
     _holder.data.raw.int64Val = b ? 1 : 0;
@@ -685,7 +710,7 @@ LLBC_Variant &LLBC_Variant::operator=(bool b)
 
 LLBC_Variant &LLBC_Variant::operator=(sint8 i8)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_SINT8;
     _holder.data.raw.int64Val = static_cast<sint64>(i8);
@@ -695,7 +720,7 @@ LLBC_Variant &LLBC_Variant::operator=(sint8 i8)
 
 LLBC_Variant &LLBC_Variant::operator=(uint8 ui8)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_UINT8;
     _holder.data.raw.uint64Val = ui8;
@@ -705,7 +730,7 @@ LLBC_Variant &LLBC_Variant::operator=(uint8 ui8)
 
 LLBC_Variant &LLBC_Variant::operator=(sint16 i16)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_SINT16;
     _holder.data.raw.int64Val = i16;
@@ -715,7 +740,7 @@ LLBC_Variant &LLBC_Variant::operator=(sint16 i16)
 
 LLBC_Variant &LLBC_Variant::operator=(uint16 ui16)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_UINT16;
     _holder.data.raw.uint64Val = ui16;
@@ -725,7 +750,7 @@ LLBC_Variant &LLBC_Variant::operator=(uint16 ui16)
 
 LLBC_Variant &LLBC_Variant::operator=(sint32 i32)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_SINT32;
     _holder.data.raw.int64Val = i32;
@@ -735,7 +760,7 @@ LLBC_Variant &LLBC_Variant::operator=(sint32 i32)
 
 LLBC_Variant &LLBC_Variant::operator=(uint32 ui32)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_UINT32;
     _holder.data.raw.uint64Val = ui32;
@@ -745,7 +770,7 @@ LLBC_Variant &LLBC_Variant::operator=(uint32 ui32)
 
 LLBC_Variant &LLBC_Variant::operator=(long l)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_LONG;
     _holder.data.raw.int64Val = l;
@@ -755,7 +780,7 @@ LLBC_Variant &LLBC_Variant::operator=(long l)
 
 LLBC_Variant &LLBC_Variant::operator=(ulong ul)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_ULONG;
     _holder.data.raw.uint64Val = ul;
@@ -778,7 +803,7 @@ LLBC_Variant &LLBC_Variant::operator=(const char * const &str)
 
 LLBC_Variant &LLBC_Variant::operator=(const sint64 &i64)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_SINT64;
     _holder.data.raw.int64Val = i64;
@@ -788,7 +813,7 @@ LLBC_Variant &LLBC_Variant::operator=(const sint64 &i64)
 
 LLBC_Variant &LLBC_Variant::operator=(const uint64 &ui64)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_UINT64;
     _holder.data.raw.uint64Val = ui64;
@@ -798,7 +823,7 @@ LLBC_Variant &LLBC_Variant::operator=(const uint64 &ui64)
 
 LLBC_Variant &LLBC_Variant::operator=(float f)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_FLOAT;
     _holder.data.raw.doubleVal = f;
@@ -808,7 +833,7 @@ LLBC_Variant &LLBC_Variant::operator=(float f)
 
 LLBC_Variant &LLBC_Variant::operator=(const double &d)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_DOUBLE;
     _holder.data.raw.doubleVal = d;
@@ -897,7 +922,7 @@ LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var) noexcept
     if (this == &var)
         return *this;
 
-    _holder.Clear();
+    _holder.Reset();
     _holder = var._holder;
 
     var._holder.type = LLBC_VariantType::NIL;

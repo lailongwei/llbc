@@ -122,20 +122,20 @@ LLBC_Variant::LLBC_Variant(const _T &en)
 
 inline LLBC_Variant::LLBC_Variant(const std::string &str)
 {
-    BecomeStr();
-    _holder.data.obj.str = str;
+    _holder.type = LLBC_VariantType::STR_DFT;
+    new (&_holder.data.obj.str) Str(str);
 }
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_String &str)
 {
-    BecomeStr();
-    _holder.data.obj.str = str;
+    _holder.type = LLBC_VariantType::STR_DFT;
+    new (&_holder.data.obj.str) Str(str);
 }
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_CString &str)
 {
-    BecomeStr();
-    _holder.data.obj.str = str;
+    _holder.type = LLBC_VariantType::STR_DFT;
+    new (&_holder.data.obj.str) Str(str);
 }
 
 template <typename _T1, typename _T2>
@@ -148,8 +148,8 @@ LLBC_Variant::LLBC_Variant(const std::pair<_T1, _T2> &pa)
 
 inline LLBC_Variant::LLBC_Variant(const Seq &seq)
 {
-    BecomeSeq();
-    _holder.data.obj.seq = seq;
+    _holder.type = LLBC_VariantType::SEQ_DFT;
+    new (&_holder.data.obj.seq) Seq(seq);
 }
 
 template <typename _T>
@@ -188,8 +188,8 @@ LLBC_Variant::LLBC_Variant(const std::unordered_set<_T> &us)
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_Variant::Dict &dict)
 {
-    BecomeDict();
-    _holder.data.obj.dict = dict;
+    _holder.type = LLBC_VariantType::DICT_DFT;
+    new (&_holder.data.obj.dict) Dict(dict);
 }
 
 template <typename _Key, typename _Val>
@@ -423,29 +423,15 @@ inline LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM ty)
 {
     if (_holder.type != ty)
     {
-        _holder.Clear();
-        _holder.type = ty;
+        _holder.Reset();
 
-        switch (ty)
-        {
-            case LLBC_VariantType::STR_DFT:
-            {
-                new (&_holder.data.obj.str) Str;
-                break;
-            }
-            case LLBC_VariantType::SEQ_DFT:
-            {
-                new (&_holder.data.obj.seq) Seq;
-                break;
-            }
-            case LLBC_VariantType::DICT_DFT:
-            {
-                new (&_holder.data.obj.dict) Dict;
-                break;
-            }
-            default:
-                break;
-        }
+        _holder.type = ty;
+        if (ty == LLBC_VariantType::STR_DFT)
+            new (&_holder.data.obj.str) Str;
+        else if (ty == LLBC_VariantType::SEQ_DFT)
+            new (&_holder.data.obj.seq) Seq;
+        else if (ty == LLBC_VariantType::DICT_DFT)
+            new (&_holder.data.obj.dict) Dict;
     }
 
     return *this;
@@ -863,7 +849,7 @@ template <typename _T,
           typename std::enable_if<std::is_enum<_T>::value, int>::type>
 LLBC_Variant &LLBC_Variant::operator=(const _T &en)
 {
-    _holder.Clear();
+    _holder.Reset();
 
     _holder.type = LLBC_VariantType::RAW_SINT64;
     _holder.data.raw.int64Val = static_cast<sint64>(en);
@@ -874,7 +860,7 @@ LLBC_Variant &LLBC_Variant::operator=(const _T &en)
 template <typename _T>
 LLBC_Variant &LLBC_Variant::operator=(const _T * const &ptr)
 {
-    _holder.Clear();
+    _holder.Reset();
     _holder.type = LLBC_VariantType::RAW_PTR;
 
     memcpy(&_holder.data.raw.uint64Val, &ptr, sizeof(_T *));
@@ -1336,5 +1322,3 @@ struct hash<LLBC_NS LLBC_Variant>
 };
 
 }
-
-
