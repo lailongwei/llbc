@@ -27,7 +27,7 @@
 
 __LLBC_NS_BEGIN
 
-inline LLBC_Variant::Holder::Holder(const bool& b) : type(LLBC_VariantType::RAW_BOOL)
+inline LLBC_Variant::Holder::Holder(const bool &b) : type(LLBC_VariantType::RAW_BOOL)
 {
     data.raw.int64Val = b ? 1 : 0;
 }
