@@ -155,6 +155,60 @@ private:
     static uint64 _frequency;
 };
 
+/**
+ * \brief Provides a struct to trace function cost and mem change.
+ */
+class LLBC_EXPORT FuncTraceStruct final
+{
+public:
+    /**
+     * Construct func trace struct.
+     * @param[in] fileName - file name.
+     * @param[in] lineNo   - line number.
+     * @param[in] funcName - function name.
+     * @param[in] uin      - user unique id.
+     * @param[in] traceMem - trace memory flag.
+     */
+    FuncTraceStruct(const char *fileName, int lineNo, const char *funcName, uint32 uin, bool traceMem);
+
+    /**
+     * Destructor. Log function cost and mem change.
+     */
+    ~FuncTraceStruct();
+
+    /**
+     * Get memory snapshot.
+     * @param[out] memVirt - virtual memory size.
+     * @param[out] memRes  - resident memory size.
+     * @param[out] memShr  - shared memory size.
+     * @return bool - success return true, otherwise return false.
+     */
+    static bool GetMemSnapshot(sint64& memVirt, sint64& memRes, sint64& memShr);
+
+private:
+    bool _traceEnabled;
+    const char *_fileName;
+    int _lineNo;
+    const char *_funcName;
+    uint32 _uin;
+    bool _traceMem;
+
+    uint64 _enterTime;
+    sint64 _enterMemVirt;
+    sint64 _enterMemRes;
+    sint64 _enterMemShr;
+};
+
+#define FUNC_TRACE(uin) FUNC_TRACE_EX(uin, false)
+
+#ifdef LLBC_CFG_CORE_UTILS_FUNC_TRACE_ENABLED 
+    #define FUNC_TRACE_EX(uin, trace_mem)                                      \
+        FuncTraceStruct LLBC_Concat(__funcTracer_, __LINE__)(                  \
+            __FILE__, __LINE__, __FUNCTION__, (uin), (trace_mem))
+#else
+    #define FUNC_TRACE_EX(uin, trace_mem) ((void)0)
+#endif
+
 __LLBC_NS_END
 
 /**

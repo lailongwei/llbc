@@ -34,6 +34,7 @@
 #pragma warning(disable:4091)
  #include <DbgHelp.h>
 #pragma warning(default:4091)
+#include <Psapi.h>
 #endif // LLBC_TARGET_PLATFORM_WIN32
 
 #include <sys/stat.h>
