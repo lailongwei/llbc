@@ -22,8 +22,12 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/os/OS_Time.h"
 #include "llbc/core/utils/Util_Debug.h"
+
+#include "llbc/core/os/OS_SysConf.h"
+#include "llbc/core/os/OS_Time.h"
+#include "llbc/core/os/OS_Process.h"
+#include "llbc/core/log/LoggerMgr.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(disable:4996)
@@ -100,6 +104,121 @@ LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep, size_t li
 }
 
 uint64 LLBC_Stopwatch::_frequency = 0;
+
+FuncTraceStruct::FuncTraceStruct(const char* fileName,
+                                 int lineNo,
+                                 const char* funcName,
+                                 uint32 uin,
+                                 bool traceMem)
+: _traceEnabled(false)
+, _fileName(nullptr)
+, _lineNo(lineNo)
+, _funcName(funcName)
+, _uin(uin)
+, _traceMem(traceMem)
+
+, _enterTime(LLBC_RdTsc())
+, _enterMemVirt(0)
+, _enterMemRes(0)
+, _enterMemShr(0)
+{
+    const LLBC_Logger *rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
+    if (UNLIKELY(!rootLogger) || rootLogger->GetLogLevel() > LLBC_LogLevel::Trace)
+        return;
+
+    _traceEnabled = true;
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    _fileName = strrchr(fileName, '/');
+#else
+    _fileName = strrchr(fileName, '\\');
+#endif
+    _fileName = _fileName ? _fileName + 1 : fileName;
+
+    LLOG_TRACE3("FuncTrace",
+                "%s:%d|(%s)|%u|Enter(trace mem?:%d)",
+                _fileName,
+                _lineNo,
+                _funcName,
+                _uin,
+                _traceMem);
+
+    if (_traceMem)
+        GetMemSnapshot(_enterMemVirt, _enterMemRes, _enterMemShr);
+}
+
+FuncTraceStruct::~FuncTraceStruct()
+{
+    if(!_traceEnabled)
+        return;
+    auto cost = LLBC_Stopwatch(LLBC_RdTsc() - _enterTime).Elapsed();
+    if (_traceMem)
+    {
+        sint64 exitMemVirt, exitMemRes, exitMemShr;
+        sint64 diffMemVirt = -1, diffMemRes = -1, diffMemShr = -1;
+        if (GetMemSnapshot(exitMemVirt, exitMemRes, exitMemShr))
+        {
+            diffMemVirt = exitMemVirt - _enterMemVirt;
+            diffMemRes = exitMemRes - _enterMemRes;
+            diffMemShr = exitMemShr - _enterMemShr;
+        }
+
+        LLOG_TRACE3("FuncTrace",
+                    "%s:%d|(%s)|%u|Leave, cost:%lld.%03lld ms, memDiff(VIRT:%lld, RES:%lld, SHR:%lld)",
+                    _fileName,
+                    _lineNo,
+                    _funcName,
+                    _uin,
+                    cost.GetTotalMillis(),
+                    cost.GetTotalMicros() % 1000,
+                    diffMemVirt,
+                    diffMemRes,
+                    diffMemShr);
+    }
+    else
+    {
+        LLOG_TRACE3("FuncTrace",
+                    "%s:%d|(%s)|%u|Leave, cost:%lld.%03lld ms",
+                    _fileName,
+                    _lineNo,
+                    _funcName,
+                    _uin,
+                    cost.GetTotalMillis(),
+                    cost.GetTotalMicros() % 1000);
+    }
+}
+
+bool FuncTraceStruct::GetMemSnapshot(sint64& memVirt, sint64& memRes, sint64& memShr)
+{
+#if LLBC_TARGET_PLATFORM_LINUX
+    static thread_local char statmFpath[32] { 0 };
+    if (UNLIKELY(statmFpath[0] == '\0'))
+        sprintf(statmFpath, "/proc/%d/statm", LLBC_GetCurrentProcessId());
+
+    auto statmFile = fopen(statmFpath, "r");
+    if (statmFile) 
+    {
+        (void)fscanf(statmFile, "%lld %lld %lld", &memVirt, &memRes, &memShr);
+        fclose(statmFile);
+        memVirt *= LLBC_pageSize;
+        memRes *= LLBC_pageSize;
+        memShr *= LLBC_pageSize;
+        return true;
+    }
+#elif LLBC_TARGET_PLATFORM_WIN32
+    const HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, LLBC_GetCurrentProcessId());
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+
+    if (GetProcessMemoryInfo(hProcess, reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc), sizeof(pmc)))
+    {
+        memVirt = pmc.PagefileUsage;
+        memRes = pmc.WorkingSetSize;
+        memShr = pmc.WorkingSetSize - pmc.PrivateUsage;
+        CloseHandle(hProcess);
+        return true;
+    }
+#endif
+    return false;
+}
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(default:4996)
