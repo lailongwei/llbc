@@ -44,6 +44,11 @@
         return __r_failRet;                              \
     }                                                    \
 
+#define LLBC_STREAM_BATCH_READ(...)                      \
+    if (!__r_stream.BatchRead(__VA_ARGS__)) {            \
+        return __r_failRet;                              \
+    }                                                    \
+
 // Peek macro define.
 #define LLBC_STREAM_PEEK(field)                          \
     if (!__r_stream.Peek(field)) {                       \
@@ -78,6 +83,9 @@
 
 #define LLBC_STREAM_WRITE_BUF(buf, len)                  \
     __w_stream.Write(buf, len)                           \
+
+#define LLBC_STREAM_BATCH_WRITE(...)                     \
+    __w_stream.BatchWrite(__VA_ARGS__)                   \
 
 // End write macro define, use to stop stream write.
 #define LLBC_STREAM_END_WRITE()                          \
@@ -353,6 +361,21 @@ public:
      * @param[in] size - buffer size, in bytes.
      */
     void Write(const void *buf, size_t size);
+
+public:
+    /**
+     * Batch read buffer data from stream.
+     *
+     */
+    template <typename T1, typename... OtherTypes>
+    bool BatchRead(T1 &val1, OtherTypes &... otherVals);
+
+    /**
+     * Batch write buffer data to stream.
+     *
+     */
+    template <typename... T>
+    void BatchWrite(const T&... vals);
 
 public:
     /**
