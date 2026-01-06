@@ -96,7 +96,42 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         LLBC_PrintLn("- After sleep 618ms, watcher: %s", sw.ToString().c_str());
     }
 
+    LLBC_PrintLn("Press any key to continue ...");
+    getchar();
+
     LLBC_Print("\n");
+    {
+        // Initialize logger manager.
+#if LLBC_TARGET_PLATFORM_IPHONE
+        const LLBC_Bundle* mainBundle = LLBC_Bundle::GetMainBundle();
+        if (LLBC_LoggerMgrSingleton->Initialize(mainBundle->GetBundlePath() + "/" + "LogTestCfg.cfg") != LLBC_OK)
+#else
+        const LLBC_CString logCfgFilePath = "LogTestCfg.cfg";
+        const LLBC_TimeSpan logTimeOffset = LLBC_TimeSpan::FromHours(10, 30, 30);
+        if (LLBC_LoggerMgrSingleton->Initialize(logCfgFilePath, logTimeOffset) != LLBC_OK)
+#endif
+        {
+            LLBC_FilePrintLn(stderr, "Initialize logger manager failed, err: %s", LLBC_FormatLastError());
+            LLBC_FilePrintLn(stderr, "Forgot copy LogTestCfg.cfg test config file to test dir?");
+            return -1;
+        }
+
+        // Defer finalize logger mgr.
+        LLBC_Defer(LLBC_LoggerMgrSingleton->Finalize());
+        LLOG_TRACE("test func trace start.");
+        {
+            LLBC_FUNC_TRACE_EX(true, "TestAllocationScope");
+            constexpr int num = 10 * 1024 * 1024; // 40MB
+            int* data = new int[num];
+            std::fill(data, data + num, 1);
+            
+            //delete[] data;
+        }
+        {
+            LLBC_FUNC_TRACE_EX(true, "test addtional param:%s %d", "tttteststr", 345);
+        }
+        LLOG_TRACE("test func trace end.");
+    }
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();

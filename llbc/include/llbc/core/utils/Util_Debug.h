@@ -155,6 +155,76 @@ private:
     static uint64 _frequency;
 };
 
+/**
+ * \brief Provides a class to trace function cost and mem change.
+ */
+class LLBC_EXPORT LLBC_FuncTracer final
+{
+public:
+    /**
+     * Disable default construct.
+     */
+    LLBC_FuncTracer() = delete;
+
+    /**
+     * Construct func trace obj.
+     * @param[in] fileName - file name.
+     * @param[in] lineNo   - line number.
+     * @param[in] funcName - function name.
+     * @param[in] traceMem - enable trace memory.
+     * @param[in] fmt      - format control string.
+     * @param[in] ...      - optional addtional args.
+     */
+    LLBC_FuncTracer(const char *fileName, int lineNo, const char *funcName, bool traceMem, const char *fmt, ...);
+
+    /**
+     * Destructor. Log function cost and mem change.
+     */
+    ~LLBC_FuncTracer();
+
+private:
+    /**
+     * Get memory snapshot.
+     * @param[out] memVirt - virtual memory size.
+     * @param[out] memRes  - resident memory size.
+     * @param[out] memShr  - shared memory size.
+     * @return bool - success return true, otherwise return false.
+     */
+    static bool GetMemSnapshot(sint64 &memVirt, sint64 &memRes, sint64 &memShr);
+
+private:
+    bool _traceEnabled;
+    bool _traceMem;
+
+    const char *_fileName;
+    int _lineNo;
+    const char *_funcName;
+    LLBC_String _traceParam;
+
+    uint64 _enterTime;
+    sint64 _enterMemVirt;
+    sint64 _enterMemRes;
+    sint64 _enterMemShr;
+};
+
+#ifdef LLBC_CFG_CORE_ENABLE_UTILS_FUNC_TRACE
+    /**
+     * @brief Extended function tracing macro.
+     * @param[in] traceMem   - Flag to enable/disable memory usage tracing.
+     * @param[in] fmt        - Format string for the trace message.
+     * @param[in] ...        - Variadic arguments for the format string.
+     */
+#define LLBC_FUNC_TRACE_EX(traceMem, fmt, ...)                              \
+    LLBC_FuncTracer LLBC_Concat(__funcTracer_, __LINE__)(__FILE__,          \
+                                                         __LINE__,          \
+                                                         __FUNCTION__,      \
+                                                         traceMem,          \
+                                                         fmt,               \
+                                                         ##__VA_ARGS__);
+#else
+    #define LLBC_FUNC_TRACE_EX(traceMem, fmt, ...) ((void)0)
+#endif
+
 __LLBC_NS_END
 
 /**
