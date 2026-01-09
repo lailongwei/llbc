@@ -112,14 +112,14 @@ public:
 
     template <typename Obj>
     static constexpr
-    typename std::enable_if<LLBC_IsTemplSpec<Obj, std::unordered_set>::value ||
-                            LLBC_IsTemplSpec<Obj, std::unordered_map>::value, bool>::type
+    std::enable_if_t<LLBC_IsTemplSpec<Obj, std::unordered_set>::value ||
+                     LLBC_IsTemplSpec<Obj, std::unordered_map>::value, bool>
     IsReusable() { return true; }
 
     template <typename Obj>
     static constexpr
-    typename std::enable_if<!LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
-                            !LLBC_IsTemplSpec<Obj, std::unordered_map>::value, bool>::type
+    std::enable_if_t<!LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
+                     !LLBC_IsTemplSpec<Obj, std::unordered_map>::value, bool>
     IsReusable() { return IsReusableInl<Obj>(0); }
 
 private:
@@ -199,14 +199,14 @@ public:
 
     template <typename Obj>
     static
-    typename std::enable_if<LLBC_IsTemplSpec<Obj, std::unordered_set>::value ||
-                            LLBC_IsTemplSpec<Obj, std::unordered_map>::value, void>::type
+    std::enable_if_t<LLBC_IsTemplSpec<Obj, std::unordered_set>::value ||
+                     LLBC_IsTemplSpec<Obj, std::unordered_map>::value, void>
     Reuse(void *mem) { reinterpret_cast<Obj *>(mem)->clear(); }
 
     template <typename Obj>
     static
-    typename std::enable_if<!LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
-                            !LLBC_IsTemplSpec<Obj, std::unordered_map>::value, void>::type
+    std::enable_if_t<!LLBC_IsTemplSpec<Obj, std::unordered_set>::value &&
+                     !LLBC_IsTemplSpec<Obj, std::unordered_map>::value, void>
     Reuse(void *mem) { ReuseInl<Obj>(mem, 0); }
 
 private:
@@ -275,15 +275,15 @@ public:
     // Object pool reflection support.
     template <typename Obj>
     static constexpr
-    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, bool>::type
+    std::enable_if_t<std::is_base_of_v<LLBC_PoolObj, Obj>, bool>
     IsSupportedObjPoolReflection() { return true; }
 
     template <typename Obj>
     static constexpr
-    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value, bool>::type
+    std::enable_if_t<!std::is_base_of_v<LLBC_PoolObj, Obj>, bool>
     IsSupportedObjPoolReflection()
     {
-        return IsSupportedObjPoolReflectionInl<Obj>(0);
+        return IsSupportedObjPoolReflectionInl<Obj>(nullptr);
     }
 
 private:
@@ -309,8 +309,7 @@ public:
     // GetTypedObjPool implement.
     template <typename Obj>
     static
-    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value,
-                            LLBC_TypedObjPool<Obj> *>::type
+    std::enable_if_t<std::is_base_of_v<LLBC_PoolObj, Obj>, LLBC_TypedObjPool<Obj> *>
     GetTypedObjPool(void *mem)
     {
         return reinterpret_cast<LLBC_TypedObjPool<Obj> *>(
@@ -319,11 +318,10 @@ public:
 
     template <typename Obj>
     static
-    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value,
-                            LLBC_TypedObjPool<Obj> *>::type
+    std::enable_if_t<!std::is_base_of_v<LLBC_PoolObj, Obj>, LLBC_TypedObjPool<Obj> *>
     GetTypedObjPool(void *mem)
     {
-        return GetTypedObjPoolInl<Obj>(mem, 0);
+        return GetTypedObjPoolInl<Obj>(mem, nullptr);
     }
 
 private:
@@ -345,7 +343,7 @@ public:
     // SetTypedObjPool implement.
     template <typename Obj>
     static
-    typename std::enable_if <std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
+    std::enable_if_t<std::is_base_of_v<LLBC_PoolObj, Obj>, void>
     SetTypedObjPool(void *mem, LLBC_TypedObjPool<Obj> *typedObjPool)
     {
         reinterpret_cast<Obj *>(mem)->SetTypedObjPool(typedObjPool);
@@ -353,10 +351,10 @@ public:
 
     template <typename Obj>
     static
-    typename std::enable_if <!std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
+    std::enable_if_t<!std::is_base_of_v<LLBC_PoolObj, Obj>, void>
     SetTypedObjPool(void *mem, LLBC_TypedObjPool<Obj> *typedObjPool)
     {
-        SetTypedObjPoolInl<Obj>(mem, typedObjPool, 0);
+        SetTypedObjPoolInl<Obj>(mem, typedObjPool, nullptr);
     }
 
 private:
@@ -380,7 +378,7 @@ public:
     template <typename Obj>
     static size_t GetStripeCapacity()
     {
-        return GetStripeCapacityInl<Obj>(0);
+        return GetStripeCapacityInl<Obj>(nullptr);
     }
 
 private:
@@ -413,7 +411,7 @@ public:
     template <typename Obj>
     static void OnTypedObjPoolCreated(LLBC_TypedObjPool<Obj> *typedObjPool)
     {
-        OnTypedObjPoolCreatedInl<Obj>(typedObjPool, 0);
+        OnTypedObjPoolCreatedInl<Obj>(typedObjPool, nullptr);
     }
 
 private:
@@ -446,7 +444,7 @@ public:
     // Recycle object.
     template <typename Obj>
     static
-    typename std::enable_if<std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
+    std::enable_if_t<std::is_base_of_v<LLBC_PoolObj, Obj>, void>
     Recycle(Obj *obj)
     {
         LLBC_ReturnIf(UNLIKELY(obj == nullptr), void());
@@ -467,7 +465,7 @@ public:
 
     template <typename Obj>
     static
-    typename std::enable_if<!std::is_base_of<LLBC_PoolObj, Obj>::value, void>::type
+    std::enable_if_t<!std::is_base_of_v<LLBC_PoolObj, Obj>, void>
     Recycle(Obj *obj)
     {
         LLBC_ReturnIf(UNLIKELY(obj == nullptr), void());
@@ -478,7 +476,7 @@ public:
             return;
         }
 
-        RecycleInl<Obj>(obj, 0);
+        RecycleInl<Obj>(obj, nullptr);
     }
 
     template <typename Obj>
