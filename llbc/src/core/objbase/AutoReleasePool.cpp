@@ -93,6 +93,7 @@ int LLBC_AutoReleasePool::RemoveObject(LLBC_Object *o)
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
+    
     if (o->_autoRef == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);

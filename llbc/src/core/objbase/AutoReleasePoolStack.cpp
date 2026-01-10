@@ -74,12 +74,6 @@ int LLBC_AutoReleasePoolStack::RemoveObject(LLBC_Object *o)
         return LLBC_FAILED;
     }
 
-    if (UNLIKELY(!_head))
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_FAILED;
-    }
-
     _Pool *pool = _head;
     for (; pool != nullptr; pool = pool->GetPoolNext())
     {

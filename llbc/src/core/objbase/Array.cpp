@@ -247,29 +247,34 @@ LLBC_Array::Iter LLBC_Array::Erase(LLBC_Array::difference_type n0, LLBC_Array::d
     return Erase(Begin() + n0, Begin() + n1);
 }
 
-bool LLBC_Array::EraseSwap(LLBC_Array::Obj* o, bool releaseObj)
+bool LLBC_Array::EraseSwap(LLBC_Array::Obj *o, bool releaseObj)
 {
-    if (UNLIKELY(o == nullptr)) {
+    if (UNLIKELY(o == nullptr)) 
+    {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return false;
     }
 
     for (difference_type i = 0; i < _size; ++i) 
     {
-        if (_objs[i] == o) {
+        if (_objs[i] == o) 
+        {
             if (releaseObj)
+            {
                 _objs[i]->Release();
+            }
 
             // Swap-and-pop: swap with last element and decrement size
             // This achieves O(1) removal instead of O(n) memmove
             difference_type lastIdx = _size - 1;
             if (i != lastIdx)
+            {
                 _objs[i] = _objs[lastIdx];
+            }
 
             _objs[lastIdx] = nullptr;
             --_size;
 
-            LLBC_SetLastError(LLBC_ERROR_SUCCESS);
             return true;
         }
     }
