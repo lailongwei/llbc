@@ -49,6 +49,18 @@ LLBC_AutoReleasePoolStack::~LLBC_AutoReleasePoolStack()
 
 int LLBC_AutoReleasePoolStack::AddObject(LLBC_Object *o)
 {
+    if (UNLIKELY(!o))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    if (UNLIKELY(!_head))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
     return _head->AddObject(o);
 }
 
@@ -59,6 +71,12 @@ int LLBC_AutoReleasePoolStack::RemoveObject(LLBC_Object *o)
     if (UNLIKELY(!o))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
+    if (UNLIKELY(!_head))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
