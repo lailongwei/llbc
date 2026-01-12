@@ -647,7 +647,7 @@ class LLBC_TypedObjPool final
         uint16 cap; // Stripe capacity, in object.
         uint16 used; // Used stripe memory, in object.
         #if LLBC_64BIT_PROCESSOR
-        uint8 __unused__[4]; // Uunused.
+        uint8 __unused__[4]; // Unused.
         #endif
 
         _WrappedObj *freeObjs; // Free objects.
