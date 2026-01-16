@@ -468,6 +468,18 @@ LLBC_FORCE_INLINE void LLBC_Stream::Write(const void *buf, size_t size)
     _writePos += size;
 }
 
+template <typename T1, typename... OtherTypes>
+bool LLBC_Stream::BatchRead(T1 &val1, OtherTypes &... otherVals)
+{
+    return Read(val1) && (Read(otherVals) && ...);
+}
+
+template <typename... T>
+void LLBC_Stream::BatchWrite(const T&... vals)
+{
+    (Write(vals), ...);
+}
+
 template <typename T>
 T LLBC_Stream::Read()
 {

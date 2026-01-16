@@ -44,6 +44,7 @@ private:
     int SerializableClsSerTest();
     int MovableReadTest();
     int EndianThreadSpecObjPoolTest();
+    int BatchReadAndWriteTest();
 
 private:
     static void GenRandStr(LLBC_String &str,
