@@ -1,25 +1,87 @@
 # 对象池 - LLBC_ObjPool
 
-## 简述
-LLBC对象池的核心目的是**提升对象创建及销毁的性能**，通过对象池技术，可以极大减少内存分配及释放的开销，从而提升系统整体性能。
 
-### 特性
-1. **类型安全的对象池(Typed Pool)**: 与"一个 pool 管所有对象"的简单设计不同，LLBC 采用每个类型一个 TypedObjPool:
-    - 不同类型对象大小不同，避免统一 pool 的内存浪费.
-    - 对象复用逻辑可以按类型定制.
-    - 支持类型级统计、回收、销毁顺序控制. 
-2. **自动对象复用(Reuse Detection)**: 通过编译期反射(SFINAE)检测对象是否支持复用, 如果对象有以下方法之一:
-   - clear / Clear.
-   - reset / Reset.
-   - reuse / Reuse.
-   - 或是 STL 容器(如 unordered_map).
-   
-   则对象释放时不会析构, 而是调用对应的"重置方法"并回收到池中. 因为是在编译器确定, 因此没有虚函数, RTTI 等开销.
-3. **可选对象池反射(Pool Reflection)**: 对象可以选择感知自己来自哪个对象池:
-   1. 方式一: 继承自 LLBC_PoolObject 基类.
-   2. 方式二: 实现 `GetTypedObjPool() / SetTypedObjPool()` 方法, 适合轻量化非继承形式对象池管理.
-4. **线程安全可选(Thread Safety Optional)**: 对象池可选线程安全模式.
-5. **支持多种回收风格**:
-   1. 对象池显式回收: `Obj *obj = pool.Acquire<Obj>(); pool.Release(obj);`.
-   2. 自动回收(RAII 风格): `auto obj = pool.AcquireGuarded<Obj>();`.
-   3. 全局回收: `LLBC_ObjReflector::Recycle(obj);`.
+## 使用实例
+1. 申请释放对象: 最常见的使用方式, 申请某一类型的对象, 使用完毕后归还到对象池中.
+
+```cpp
+LLBC_ObjPool objPool;
+auto str = objPool.Acquire<std::string>();
+objPool.Release(str);
+
+auto packet = objPool.Acquire<LLBC_Packet>();
+objPool.Release(packet);
+```
+
+3. 申请 Guarded 对象: 在作用域中申请, 离开作用域释放. 原理是申请返回的是 `LLBC_GuaredPoolObj` 栈对象, 重载 `operator * / operator ->`, 离开作用域时析构将实际对象归还对象池.
+
+```cpp
+{
+	LLBC_ObjPool objPool;
+	auto testObj = objPool.AcquireGuarded<ReflectMethTest>();
+}
+```
+
+3. 对象支持复用: 为避免对象构造析构开销, 对象实现方法, 支持编译器反射(SFINAE)决定对象回收时不执行析构, 而是调用服用方法.
+
+```cpp
+// 支持的反射方法
+// clear / Clear
+// reset / Reset
+// reuse / Reuse
+class ReusableClass
+{
+public:
+	void Reuse() {}
+}
+
+LLBC_ObjPool objPool;
+auto c = objPool.Acquire<ReusableClass>();
+objPool.Release(c);
+```
+
+## 对象池结构
+### ObjPool
+
+![](obj_pool_struct_obj_pool.jpg)
+
+ObjPool 使用 RTTI name 作为 key 管理所有 TypedObjPool.
+
+```cpp
+// 申请对象时, 根据对象类型找到对应的 TypedObjPool
+template <typename Obj> Obj *Acquire()
+{
+	auto* typedObjPool = GetTypedObjPool<Obj>();
+	return typedObjPool->Acquire(); 
+}
+
+// ObjPool 维护了以 RTTI name 为 key 的所有 TypedObjPool
+LLBC_TypedObjPool<Obj> *LLBC_ObjPool::GetTypedObjPool()
+{
+	static const LLBC_CString rttiName(typeid(Obj).name());
+	return _typedObjPools[rttiName];
+}
+```
+### TypedObjPool
+![](obj_pool_struct_typed_obj_pool.jpg)
+TypedObjPool 以 Stripe(条带) 的方式维护 Obj. 每个条带有 Capacity(默认 1024) 个 Obj. 这样的好处是:
+1. 连续内存, cache-friendly.
+2. 批量分配, 批量释放.
+3. 如果对象没有复用方法, 会将对象进行析构, 但仍 hold 住所在内存块, 下次申请时进行 placement new, 减少 malloc / free 系统调用.
+   因此 LLBC_Obj 不仅是对象池, 同时也是内存池.
+
+```cpp
+void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
+{
+    if constexpr (LLBC_ObjReflector::IsReusable<Obj>())
+        LLBC_ObjReflector::Reuse<Obj>(wrappedObj->buff);
+    else
+    {
+        LLBC_ObjReflector::Delete<Obj>(wrappedObj->buff);
+        wrappedObj->unFlags.flags.constructed = false;
+    }
+}
+```
+
+### 整体结构
+![](obj_pool_struct_whole.jpg)
