@@ -1,0 +1,90 @@
+/* =========================
+ * Docsify TOC - Right Fixed
+ * ========================= */
+
+/* TOC 容器 */
+.toc-nav {
+    position: fixed;
+    top: 80px;                 /* 避开顶部导航 */
+    right: 24px;
+    width: 260px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+
+    padding: 12px 14px;
+    border-left: 1px solid #eee;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    background: transparent;
+
+    z-index: 20;              /* 确保在正文之上，可点击 */
+    pointer-events: auto;     /* 防止被遮挡导致无法点击 */
+}
+
+/* 正文区域宽度控制，避免与右侧 TOC 交叠 */
+.markdown-section {
+    box-sizing: border-box;
+    max-width: 900px;
+}
+
+/* TOC 标题（如果插件生成） */
+.toc-nav strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+}
+
+/* TOC 列表 */
+.toc-nav ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+/* 各级条目 */
+.toc-nav li {
+    margin: 4px 0;
+}
+
+/* 链接样式 */
+.toc-nav a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+/* hover / active */
+.toc-nav a:hover {
+    color: #42b983; /* vue 绿，与你的主题一致 */
+}
+
+/* 层级缩进 */
+.toc-nav li.toc-level-2 {
+    padding-left: 8px;
+}
+
+.toc-nav li.toc-level-3 {
+    padding-left: 16px;
+}
+
+.toc-nav li.toc-level-4 {
+    padding-left: 24px;
+}
+
+/* 当前高亮（插件支持时） */
+.toc-nav .active > a {
+    color: #42b983;
+    font-weight: 500;
+}
+
+/* 小屏幕隐藏 TOC */
+@media screen and (max-width: 1200px) {
+    .toc-nav {
+        display: none;
+    }
+}
