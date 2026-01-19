@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "llbc/core/rapidjson/json.h"
+#include "llbc/common/Common.h"
+#include "llbc/core/json/nlohmann/json.hpp"
 
 __LLBC_NS_BEGIN
 
@@ -68,7 +69,7 @@ private:
     int _line;
     const char *_func;
 
-    LLBC_Json::Document &_doc;
+    LLBC_Json &_doc;
 };
 
 __LLBC_NS_END
