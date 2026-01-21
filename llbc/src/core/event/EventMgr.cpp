@@ -338,7 +338,15 @@ void LLBC_EventMgr::AfterFireEvent(LLBC_Event *ev)
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
 
     // Decrease firing flag.
-    if (--_firing != 0)
+    --_firing;
+
+    // The event hook manager do post-fire.
+    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+    if (_eventHookMgr)
+        _eventHookMgr->PostFire(ev);
+    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
+
+    if (_firing != 0)
         return;
 
     // Assert: make sure _firing >= 0.
@@ -349,13 +357,6 @@ void LLBC_EventMgr::AfterFireEvent(LLBC_Event *ev)
     llbc_assert(_firingEventIds.empty() &&
                 "llbc framework internal error: LLBC_EventMgr._firingEventIds is not empty!");
     #endif // LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
-
-    // The event hook manager do post-fire.
-    #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
-    if (_eventHookMgr)
-        _eventHookMgr->PostFire(ev);
-    #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
-
 
     // Process pending event ops(add/remove).
     for (auto &pendingEventOp : _pendingEventOps)
