@@ -521,6 +521,55 @@ int TestCase_Core_Event::EventHookTest()
     evMgr.RemoveAllListeners();
     subEvMgr.RemoveAllListeners();
 
+    LLBC_PrintLn("----------------------------------");
+    LLBC_PrintLn("Custom Case: Nested Event Fire [Event1 -> Event2]:");
+
+    int preHookCount = 0;
+    int postHookCount = 0;
+    int event1Count = 0;
+    int event2Count = 0;
+
+    subEvMgr.AddListener(EventIds::Event1, [&](LLBC_Event &ev) {
+        LLBC_PrintLn("\t\tListener: Event1 fired, now firing Event2...");
+        event1Count++;
+        subEvMgr.BeginFire(EventIds::Event2).Fire();
+        });
+
+    subEvMgr.AddListener(EventIds::Event2, [&](LLBC_Event &ev) {
+        LLBC_PrintLn("\t\tListener: Event2 fired.");
+        event2Count++;
+        });
+
+    subEvHookMgr.AddPreFireHook("NestedPreHook", [&](LLBC_Event *ev) -> bool {
+        LLBC_PrintLn("\t[PreHook] Firing EventId: %d", ev->GetId());
+        preHookCount++;
+        return true;
+        });
+
+    subEvHookMgr.AddPostFireHook("NestedPostHook", [&](LLBC_Event *ev) {
+        LLBC_PrintLn("\t[PostHook] Finished EventId: %d", ev->GetId());
+        postHookCount++;
+        });
+
+    subEvMgr.BeginFire(EventIds::Event1).Fire();
+
+    // PreHook(E1) -> Listener(E1) -> PreHook(E2) -> Listener(E2) -> PostHook(E2) -> PostHook(E1)
+    LLBC_PrintLn("Results: PreHooks:%d, PostHooks:%d, E1:%d, E2:%d",
+                 preHookCount,
+                 postHookCount,
+                 event1Count,
+                 event2Count);
+
+    llbc_assert(preHookCount == 2 && "PreHook should be called twice!");
+    llbc_assert(postHookCount == 2 && "PostHook should be called twice!");
+    llbc_assert(event1Count == 1 && event2Count == 1);
+
+    subEvHookMgr.RemoveAllPreFireHooks();
+    subEvHookMgr.RemoveAllPostFireHooks();
+    subEvMgr.RemoveAllListeners();
+
+    LLBC_PrintLn("----------------------------------");
+
     LLBC_PrintLn("Event hook test finished");
     LLBC_PrintLn("==================================");
     return LLBC_OK;
