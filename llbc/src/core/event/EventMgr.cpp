@@ -339,6 +339,10 @@ void LLBC_EventMgr::AfterFireEvent(LLBC_Event *ev)
 
     // Decrease firing flag.
     --_firing;
+    
+    // Assert: make sure _firing >= 0.
+    llbc_assert(_firing >= 0 &&
+        "llbc framework internal error: LLBC_EventMgr._firing < 0");
 
     // The event hook manager do post-fire.
     #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
@@ -349,9 +353,6 @@ void LLBC_EventMgr::AfterFireEvent(LLBC_Event *ev)
     if (_firing != 0)
         return;
 
-    // Assert: make sure _firing >= 0.
-    llbc_assert(_firing >= 0 &&
-                "llbc framework internal error: LLBC_EventMgr._firing < 0");
     // Assert: make sure _firingEventIds is empty.
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     llbc_assert(_firingEventIds.empty() &&
