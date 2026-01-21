@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file    TestSuite.cs
  * @author  Longwei Lai<lailongwei@126.com>
  * @date    2016/01/25
