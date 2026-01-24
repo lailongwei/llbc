@@ -6,3 +6,4 @@
   * [App&Timer](charpter_03/app_timer.md)
   * [时间&时间跨度](charpter_03/time_timespan.md)
   * [对象池](charpter_03/obj_pool.md)
+  * [变体](charpter_03/variant.md)

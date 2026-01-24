@@ -1,7 +1,6 @@
 # 对象池 - LLBC_ObjPool
 
-
-## 使用实例
+## 使用示例
 1. 申请释放对象: 最常见的使用方式, 申请某一类型的对象, 使用完毕后归还到对象池中.
 
 ```cpp
@@ -13,7 +12,7 @@ auto packet = objPool.Acquire<LLBC_Packet>();
 objPool.Release(packet);
 ```
 
-3. 申请 Guarded 对象: 在作用域中申请, 离开作用域释放. 原理是申请返回的是 `LLBC_GuaredPoolObj` 栈对象, 重载 `operator * / operator ->`, 离开作用域时析构将实际对象归还对象池.
+2. 申请 Guarded 对象: 在作用域中申请, 离开作用域释放. 原理是申请返回的是 `LLBC_GuaredPoolObj` 栈对象, 重载 `operator * / operator ->`, 离开作用域时析构将实际对象归还对象池.
 
 ```cpp
 {
@@ -85,3 +84,12 @@ void LLBC_TypedObjPool<Obj>::Release(Obj *obj)
 
 ### 整体结构
 ![](obj_pool_struct_whole.jpg)
+
+### 使用场景
+LLBC 对象池设计的核心目的是减少对象频繁创建/销毁带来的构造析构和系统调用的开销, 以及减少内存的碎片化.
+适合的使用场景: 大小相对固定的的对象, 高频创建释放.
+例如: 网络包头, 可复用交互 option.
+
+反之不适合的使用场景: 大小不固定的对象, 低频使用.
+例如: vector 等 stl 容器, 内部会再在堆上申请内存.
+
