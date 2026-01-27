@@ -22,8 +22,9 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/os/OS_Time.h"
 #include "llbc/core/utils/Util_Debug.h"
+
+#include "llbc/core/os/OS_Time.h"
 #include "llbc/core/log/LoggerMgr.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -111,13 +112,13 @@ LLBC_FuncTracer::LLBC_FuncTracer(const LLBC_CString &fileName,
                                  const LLBC_CString &funcName, 
                                  bool traceMem,
                                  sint64 uniqueId,
-                                 const LLBC_Logger *logger)
+                                 const LLBC_CString &loggerName)
 : _logger(nullptr)
 , _stopWatch(true, traceMem)
 {
     LLBC_String uniqueStr;
     uniqueStr.format("%lld", uniqueId);
-    Init(fileName, lineNo, funcName, traceMem, uniqueStr);
+    Init(fileName, lineNo, funcName, traceMem, uniqueStr, loggerName);
 }
 
 LLBC_FuncTracer::LLBC_FuncTracer(const LLBC_CString &fileName, 
@@ -125,27 +126,31 @@ LLBC_FuncTracer::LLBC_FuncTracer(const LLBC_CString &fileName,
                                  const LLBC_CString &funcName, 
                                  bool traceMem,
                                  const LLBC_CString &uniqueStr,
-                                 const LLBC_Logger *logger)
-: _logger(logger)
+                                 const LLBC_CString &loggerName)
+: _logger(nullptr)
 , _stopWatch(true, traceMem)
 {
-    Init(fileName, lineNo, funcName, traceMem, uniqueStr);
+    Init(fileName, lineNo, funcName, traceMem, uniqueStr, loggerName);
 }
 
 void LLBC_FuncTracer::Init(const LLBC_CString &fileName, 
                            int lineNo,
                            const LLBC_CString &funcName, 
                            bool traceMem,
-                           const LLBC_CString &uniqueStr)
+                           const LLBC_CString &uniqueStr,
+                           const LLBC_CString &loggerName)
 {
-    if(!_logger)
+    if (!loggerName.empty())
+        _logger = LLBC_LoggerMgrSingleton->GetLogger(loggerName);
+
+    if (UNLIKELY(!_logger))
     {
         _logger = LLBC_LoggerMgrSingleton->GetRootLogger();
         if (UNLIKELY(!_logger))
             return;
     }
-
-    if (_logger->GetLogLevel() > LLBC_LogLevel::Trace)
+    
+    if (_logger->GetLogLevel() != LLBC_LogLevel::Trace)
         return;
 
     _traceUniqInfo.format("%s:%d:%s:%s",
@@ -154,24 +159,36 @@ void LLBC_FuncTracer::Init(const LLBC_CString &fileName,
                           funcName.c_str(),
                           uniqueStr.c_str());
 
-    LLOG_TRACE3("FuncTrace", "%s|Enter(trace mem?:%s)", _traceUniqInfo.c_str(), traceMem ? "true" : "false");
+    LLOG_TRACE4(_logger->GetLoggerName().c_str(), 
+                "FuncTrace", 
+                "%s|Enter(trace mem?:%s)",
+                _traceUniqInfo.c_str(),
+                traceMem ? "true" : "false");
 }
 
 LLBC_FuncTracer::~LLBC_FuncTracer()
 {
-    if (LIKELY(_logger) && _logger->GetLogLevel() >= LLBC_LogLevel::Trace) 
+    if (LIKELY(_logger) && _logger->GetLogLevel() == LLBC_LogLevel::Trace) 
     {
         const auto memDiff = _stopWatch.GetMemSnapshotDiff();
         const auto cost = _stopWatch.Elapsed();
-        LLOG_TRACE3("FuncTrace",
-                    "%s|Leave(trace mem?:%s) cost:%lld.%03lld ms, memory diff(virt:%lld res:%lld share:%lld)",
-                    _traceUniqInfo.c_str(),
-                    _stopWatch.IsTraceMemEnabled() ? "true" : "false",
-                    cost.GetTotalMillis(),
-                    cost.GetTotalMicros() % 1000,
-                    memDiff._memVirt,
-                    memDiff._memRes,
-                    memDiff._memShr);
+        if (_stopWatch.IsTraceMemEnabled())
+            LLOG_TRACE4(_logger->GetLoggerName().c_str(), 
+                        "FuncTrace",
+                        "%s|Leave cost:%lld.%03lld ms, memory diff(virt:%lld res:%lld share:%lld)",
+                        _traceUniqInfo.c_str(),
+                        cost.GetTotalMillis(),
+                        cost.GetTotalMicros() % 1000,
+                        memDiff._memVirt,
+                        memDiff._memRes,
+                        memDiff._memShr);
+        else
+            LLOG_TRACE4(_logger->GetLoggerName().c_str(),
+                        "FuncTrace",
+                        "%s|Leave cost:%lld.%03lld ms",
+                        _traceUniqInfo.c_str(),
+                        cost.GetTotalMillis(),
+                        cost.GetTotalMicros() % 1000);
     }
 }
 __LLBC_NS_END

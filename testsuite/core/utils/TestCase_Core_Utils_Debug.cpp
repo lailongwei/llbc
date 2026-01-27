@@ -99,6 +99,7 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
 
+    // - Func trace test.
     LLBC_Print("\n");
     {
         // Initialize logger manager.
@@ -119,6 +120,7 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
         // Defer finalize logger mgr.
         LLBC_Defer(LLBC_LoggerMgrSingleton->Finalize());
         LLOG_TRACE("test func trace start.");
+
         // case 1. test func trace with new operator and not delete.
         {
             LLBC_FUNC_TRACE_EX("TestAllocationScope", true);
@@ -140,6 +142,11 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
             LLBC_FUNC_TRACE(true);
         }
 
+        // case 4. test func trace with other logger.
+        {
+            LLBC_String uniqInfo("FuncTraceLoggerTest");
+            LLBC_FuncTracer funcTraceTest(__FILE__, __LINE__, __FUNCTION__, false, uniqInfo, "logtrace_test");
+        }
         LLOG_TRACE("test func trace end.");
     }
 

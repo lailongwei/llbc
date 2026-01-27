@@ -38,10 +38,10 @@ inline LLBC_Stopwatch::LLBC_Stopwatch(bool autoStart, bool traceMem)
 , _elapsedTime(0llu)
 
 , _traceMemEnabled(traceMem)
-, _beginMemSnap{0LL, 0LL, 0LL}
+, _beginMemSnapshot{0LL, 0LL, 0LL}
 {
     if (_traceMemEnabled)
-        GetMemSnapshot(_beginMemSnap);
+        GetMemSnapshot(_beginMemSnapshot);
 }
 
 inline LLBC_Stopwatch::LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring)
@@ -49,7 +49,7 @@ inline LLBC_Stopwatch::LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasurin
 , _elapsedTime(elapsedTicks)
 
 , _traceMemEnabled(false)
-, _beginMemSnap{0LL, 0LL, 0LL}
+, _beginMemSnapshot{0LL, 0LL, 0LL}
 {
 }
 
@@ -73,7 +73,7 @@ inline void LLBC_Stopwatch::Reset()
     _beginTime = 0;
     _elapsedTime = 0;
 
-    _beginMemSnap = {0LL, 0LL, 0LL};
+    _beginMemSnapshot = {0LL, 0LL, 0LL};
 }
 
 inline void LLBC_Stopwatch::Restart()
@@ -81,7 +81,7 @@ inline void LLBC_Stopwatch::Restart()
     _elapsedTime = 0;
     _beginTime = LLBC_RdTsc();
 
-    _beginMemSnap = {0LL, 0LL, 0LL};
+    _beginMemSnapshot = {0LL, 0LL, 0LL};
 }
 
 inline LLBC_TimeSpan LLBC_Stopwatch::Elapsed() const
@@ -133,13 +133,13 @@ inline LLBC_MemSnapshot LLBC_Stopwatch::GetMemSnapshotDiff() const
     if (!_traceMemEnabled)
         return {};
 
-    LLBC_MemSnapshot endMemSnap{};
-    if(!GetMemSnapshot(endMemSnap))
+    LLBC_MemSnapshot endMemSnapshot{};
+    if (!GetMemSnapshot(endMemSnapshot))
         return {};
 
-    return {endMemSnap._memVirt - _beginMemSnap._memVirt,
-            endMemSnap._memRes - _beginMemSnap._memRes,
-            endMemSnap._memShr - _beginMemSnap._memShr};
+    return {endMemSnapshot._memVirt - _beginMemSnapshot._memVirt,
+            endMemSnapshot._memRes - _beginMemSnapshot._memRes,
+            endMemSnapshot._memShr - _beginMemSnapshot._memShr};
 }
 
 inline LLBC_String LLBC_Stopwatch::ToString() const
@@ -148,7 +148,7 @@ inline LLBC_String LLBC_Stopwatch::ToString() const
     const auto memDiff = GetMemSnapshotDiff();
 
     LLBC_String repr;
-    if(_traceMemEnabled)
+    if (_traceMemEnabled)
         repr.format("%.03f ms, memDiff(virt:%lld res:%lld shr:%lld)", 
                     nanos / 1000000.0,
                     memDiff._memVirt, 
