@@ -2,13 +2,20 @@
 name: AI 自动审查 PR（OpenAI）
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, edited, reopened, synchronize, ready_for_review]
 
 jobs:
   ai-pr-review:
     runs-on: ubuntu-latest
+
+    if: github.event.pull_request.head.repo.full_name == github.repository
+
+    permissions:
+      pull-requests: write
+      contents: read
+    
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -20,7 +27,7 @@ jobs:
           HEAD="${{ github.event.pull_request.head.sha }}"
           git fetch origin "$BASE" "$HEAD" || true
           git diff --unified=0 "$BASE" "$HEAD" > pr.diff || true
-          head -c 153600 pr.diff > pr_limited.diff || true
+          head -c 20000 pr.diff > pr_limited.diff || true
           DIFF_CONTENT=$(sed 's/"/\\"/g; s/$/\\n/' pr_limited.diff | tr -d '\r' | sed ':a;N;$!ba;s/\n/\\n/g')
           echo "DIFF<<EOF" >> $GITHUB_OUTPUT
           echo -e "$DIFF_CONTENT" >> $GITHUB_OUTPUT
@@ -49,8 +56,8 @@ jobs:
                 {\"role\":\"system\",\"content\":\"$SYSTEM\"},
                 {\"role\":\"user\",\"content\":\"$USER\"}
               ],
-              \"temperature\": 0.0,
-              \"max_tokens\": 1200
+              \"temperature\": 0.2,
+              \"max_tokens\": 2000
             }")
           REVIEW_TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null || echo "AI 未返回内容")
           echo "comment_body<<EOF" >> $GITHUB_OUTPUT
