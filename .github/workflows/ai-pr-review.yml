@@ -1,4 +1,5 @@
 # AI 自动审查 PR（OpenAI）
+name: AI 自动审查 PR（OpenAI）
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
