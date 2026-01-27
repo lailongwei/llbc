@@ -159,13 +159,13 @@ public:
 public:
     /**
      * Get is trace memory.
-     *  @return bool - true if trace memory enabled, otherwise return false.
+     * @return bool - true if trace memory enabled, otherwise return false.
      */
     bool IsTraceMemEnabled() const;
 
     /**
      * Get memory diff.
-     *  @return LLBC_MemSnapshot - memory snapshot diff.
+     * @return LLBC_MemSnapshot - memory snapshot diff.
      */
     LLBC_MemSnapshot GetMemSnapshotDiff() const;
 
@@ -196,7 +196,7 @@ private:
     static uint64 _frequency;
 
     bool _traceMemEnabled;
-    LLBC_MemSnapshot _beginMemSnap;
+    LLBC_MemSnapshot _beginMemSnapshot;
 };
 
 /**
@@ -219,7 +219,7 @@ public:
                     const LLBC_CString &funcName,
                     bool traceMem,
                     sint64 uniqueId,
-                    const LLBC_Logger *logger = nullptr);
+                    const LLBC_CString &loggerName = "");
 
     /**
      * Construct func tracer obj with unique string.
@@ -235,7 +235,7 @@ public:
                     const LLBC_CString &funcName,
                     bool traceMem,
                     const LLBC_CString &uniqueStr,
-                    const LLBC_Logger *logger = nullptr);
+                    const LLBC_CString &loggerName = "");
 
     /**
      * Destructor. Log function cost and memory diff.
@@ -255,7 +255,12 @@ private:
               int lineNo,
               const LLBC_CString &funcName,
               bool traceMem,
-              const LLBC_CString &uniqueStr);
+              const LLBC_CString &uniqueStr,
+              const LLBC_CString &loggerName);
+
+private:
+    // Disable assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_FuncTracer);
 
 private:
     LLBC_String _traceUniqInfo;
