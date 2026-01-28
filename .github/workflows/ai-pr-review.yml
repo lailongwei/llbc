@@ -1,95 +1,61 @@
-name: AI PR Review
+name: AI PR Preview
 
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened, synchronize, ready_for_review]
 
 permissions:
-  contents: read
   pull-requests: write
+  contents: read
 
 jobs:
-  ai-pr-review:
+  ai-preview:
     runs-on: ubuntu-latest
 
+    # 防止 fork PR 泄露 secrets
+    # if: github.event.pull_request.head.repo.full_name == github.repository
+
     steps:
-      - name: Fetch PR diff via GitHub API
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Get PR diff
         id: diff
-        shell: bash
         run: |
-          set -uo pipefail
+          git fetch origin ${{ github.base_ref }}
+          git diff origin/${{ github.base_ref }}...HEAD > pr.diff
+          echo "DIFF<<EOF" >> $GITHUB_OUTPUT
+          head -c 20000 pr.diff >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-          echo "Fetching PR diff from GitHub API..."
-
-          DIFF=$(curl -s \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github.v3.diff" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}")
-
-          echo "DIFF length: ${#DIFF}"
-
-          {
-            echo "DIFF<<EOF"
-            echo "$DIFF"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Call OpenAI for PR review
-        id: ai
-        shell: bash
+      - name: AI review PR
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DIFF: ${{ steps.diff.outputs.DIFF }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -uo pipefail
-          echo "Calling OpenAI..."
-          REQUEST_BODY=$(cat <<EOF
-          {
-            "model": "gpt-4o-mini",
-            "messages": [
-              {
-                "role": "system",
-                "content": "You are a senior engineer reviewing a pull request."
-              },
-              {
-                "role": "user",
-                "content": "Please review the following GitHub pull request diff and provide concise, actionable feedback:\n\n$DIFF"
-              }
-            ],
-            "temperature": 0.2
-          }
-          EOF
-          )
-
-          RESPONSE=$(curl -s \
+          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
             -H "Content-Type: application/json" \
-            https://api.openai.com/v1/chat/completions \
-            -d "$REQUEST_BODY")
+            -d '{
+              "model": "gpt-4o-mini",
+              "messages": [
+                {
+                  "role": "system",
+                  "content": "You are a senior engineer doing a concise PR review."
+                },
+                {
+                  "role": "user",
+                  "content": "Please review the following git diff and give a short PR preview:\n\n'"$DIFF"'"
+                }
+              ],
+              "temperature": 0.2
+            }')
 
-          COMMENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
-
-          if [ -z "$COMMENT" ]; then
-            COMMENT="⚠️ AI review failed or returned empty content."
-          fi
-
-          {
-            echo "COMMENT<<EOF"
-            echo "$COMMENT"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Comment on PR
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMENT: ${{ steps.ai.outputs.COMMENT }}
-        run: |
-          set -uo pipefail
-
-          echo "Posting comment to PR..."
+          COMMENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
 
           gh pr comment ${{ github.event.pull_request.number }} \
             --body "$COMMENT"
