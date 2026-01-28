@@ -1,87 +1,59 @@
-# AI 自动审查 PR（OpenAI）
-name: AI 自动审查 PR（OpenAI）
+name: AI PR Preview
+
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize, ready_for_review]
+    types: [opened, reopened, synchronize, ready_for_review]
 
 jobs:
-  ai-pr-review:
+  ai-preview:
     runs-on: ubuntu-latest
 
+    # 防止 fork PR 泄露 secrets
     # if: github.event.pull_request.head.repo.full_name == github.repository
 
     permissions:
       pull-requests: write
       contents: read
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Prepare diff (limit size)
-        id: prepare
+      - name: Get PR diff
+        id: diff
         run: |
-          BASE="${{ github.event.pull_request.base.sha }}"
-          HEAD="${{ github.event.pull_request.head.sha }}"
-          git fetch origin "$BASE" "$HEAD" || true
-          git diff --unified=0 "$BASE" "$HEAD" > pr.diff || true
-          head -c 20000 pr.diff > pr_limited.diff || true
-          DIFF_CONTENT=$(sed 's/"/\\"/g; s/$/\\n/' pr_limited.diff | tr -d '\r' | sed ':a;N;$!ba;s/\n/\\n/g')
+          git fetch origin ${{ github.base_ref }}
+          git diff origin/${{ github.base_ref }}...HEAD > pr.diff
           echo "DIFF<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$DIFF_CONTENT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
-          git diff --name-only "$BASE" "$HEAD"
+          head -c 20000 pr.diff >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Call OpenAI to review diff
-        id: ai
+      - name: AI review PR
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          DIFF: ${{ steps.prepare.outputs.DIFF }}
-          CHANGED_FILES: ${{ steps.prepare.outputs.CHANGED_FILES }}
+          DIFF: ${{ steps.diff.outputs.DIFF }}
         run: |
-          set -uxo pipefail
-          echo "check steps.prepare.outputs.DIFF..."
-          echo "CHANGED_FILES; ${CHANGED_FILES}"
-          echo "diff is: ${DIFF}"
-          echo "diff is: ${steps.prepare.outputs.DIFF}"
-          if [ -z "${{ steps.prepare.outputs.DIFF }}" ]; then
-            echo "comment_body<<EOF" >> $GITHUB_OUTPUT
-            echo "No diff or diff too large." >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          echo "check finished"
-
-          SYSTEM='你是专业的 C/C++ 后端代码审查机器人，同时你也是llbc框架的专家（请详细学习llbc框架: https://github.com/lailongwei/llbc），请基于下面的 diff 提出问题、潜在 bug、性能/安全/并发隐患、以及可行修复建议。按文件组织输出。'
-          USER="Diff:\n${{ steps.prepare.outputs.DIFF }}"
-          RESPONSE=$(curl -v https://api.openai.com/v1/chat/completions \
-            -H "Content-Type: application/json" \
+          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -d "{
-              \"model\": \"gpt-4o-mini\",
-              \"messages\": [
-                {\"role\":\"system\",\"content\":\"$SYSTEM\"},
-                {\"role\":\"user\",\"content\":\"$USER\"}
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "gpt-4o-mini",
+              "messages": [
+                {
+                  "role": "system",
+                  "content": "You are a senior engineer doing a concise PR review."
+                },
+                {
+                  "role": "user",
+                  "content": "Please review the following git diff and give a short PR preview:\n\n'"$DIFF"'"
+                }
               ],
-              \"temperature\": 0.2,
-              \"max_tokens\": 2000
-            }" 2>&1)
-          echo "============================"
-          echo "$RESPONSE"
-          echo "============================"
-          REVIEW_TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null || echo "AI 未返回内容")
-          echo "comment_body<<EOF" >> $GITHUB_OUTPUT
-          echo -e "### 🤖 AI 自动审查\n\n$REVIEW_TEXT\n\n*AI 建议仅供参考，请人工复核。*" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+              "temperature": 0.2
+            }')
 
-      - name: Post comment
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: ${{ steps.ai.outputs.comment_body }}
-          edit-mode: replace
+          COMMENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "$COMMENT"
