@@ -47,7 +47,7 @@ jobs:
 
           SYSTEM='你是专业的 C/C++ 后端代码审查机器人，同时你也是llbc框架的专家（请详细学习llbc框架: https://github.com/lailongwei/llbc），请基于下面的 diff 提出问题、潜在 bug、性能/安全/并发隐患、以及可行修复建议。按文件组织输出。'
           USER="Diff:\n${{ steps.prepare.outputs.DIFF }}"
-          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+          RESPONSE=$(curl -v https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
             -d "{
