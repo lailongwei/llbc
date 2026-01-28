@@ -1178,6 +1178,17 @@ public:
     // format operation: format
     _This &format(const _Elem *fmt, ...)
     {
+        va_list ap;
+        va_start(ap, fmt);
+        _This &ret = this->vformat(fmt, ap);
+        va_end(ap);
+
+        return ret;
+    }
+
+    // format operation: va_list format
+    _This &vformat(const _Elem *fmt, va_list ap)
+    {
         if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
             return *this;
 
@@ -1189,12 +1200,12 @@ public:
         }
 
         // if string obj is empty, try detach format require buffers and resize it.
-        va_list ap;
+        va_list apCopy;
         if (this->empty())
         {
-            va_start(ap, fmt);
-            int len = vsnprintf(nullptr, 0, fmt, ap);
-            va_end(ap);
+            va_copy(apCopy, ap);
+            int len = vsnprintf(nullptr, 0, fmt, apCopy);
+            va_end(apCopy);
 
             if (len <= 0)
                 return *this;
@@ -1203,12 +1214,12 @@ public:
         }
 
         // try format.
-        va_start(ap, fmt);
+        va_copy(apCopy, ap);
         int len = vsnprintf(const_cast<char *>(this->data()),
                             this->size() + 1,
                             fmt,
-                            ap);
-        va_end(ap);
+                            apCopy);
+        va_end(apCopy);
         if (len <= static_cast<int>(this->size()))
         {
             if (len < 0)
@@ -1221,12 +1232,12 @@ public:
 
         // resize, try format again.
         this->resize(len);
-        va_start(ap, fmt);
+        va_copy(apCopy, ap);
         len = vsnprintf(const_cast<char *>(this->data()),
                         this->size() + 1,
                         fmt,
-                        ap);
-        va_end(ap);
+                        apCopy);
+        va_end(apCopy);
         if (len != static_cast<int>(this->size()))
             this->clear();
 

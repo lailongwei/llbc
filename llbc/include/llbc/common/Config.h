@@ -95,6 +95,8 @@
 #define LLBC_CFG_CORE_UTILS_IMPL__UI64TOA                   0
 // Determine define win32-styled string datatypes or not, eg:LPSTR/LPTSTR/...
 #define LLBC_CFG_CORE_UTILS_DEF_WIN32_STYLED_STR_DATATYPES  0
+// Determine enable function trace or not, default is enabled.
+#define LLBC_CFG_CORE_UTILS_ENABLE_FUNC_TRACE               1
 
 /**
  * \brief core/sampler about config options define.

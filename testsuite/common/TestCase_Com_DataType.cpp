@@ -139,8 +139,72 @@ void TestCase_Com_DataType::StringBaseTest()
     LLBC_PrintLn("%s starts with 'hello'?: %s", str.c_str(), str.startswith("hello") ? "true" : "false");
     LLBC_PrintLn("%s ends with 'world!'?: %s", str.c_str(), str.endswith("world!") ? "true" : "false");
     LLBC_PrintLn("%s starts with 'world!!'?: %s", str.c_str(), str.endswith("world!!") ? "true" : "false");
+ 
+    // vformat test.
+    LLBC_PrintLn("===============start test LLBC_String vformat fuction===============");
+    // 1. normal format test
+    auto res1 = StringVFormatTestHelper("Hello %s, ID: %d", "vformatTest", 100);
+    if (res1 == "Hello vformatTest, ID: 100")
+    {
+        LLBC_PrintLn("  - normal format test passed");
+    }
+    else
+    {
+        LLBC_PrintLn("  - normal format test failed, expected: 'Hello vformatTest, ID: 100', actual: '%s'", res1.c_str());
+        return;
+    }
+
+    // 2. float and multi param test.
+    llbc::LLBC_String res2 = StringVFormatTestHelper("PI: %.2f, Hex: 0x%x", 3.1415, 255);
+    if (res2 == "PI: 3.14, Hex: 0xff")
+    {
+        LLBC_PrintLn("  - float format test passed");
+    }
+    else
+    {
+        LLBC_PrintLn("  - float format test failed, expected: 'PI: 3.14, Hex: 0xff', actual: '%s'", res2.c_str());
+        return;
+    }
+
+    // 3. big data and long string test.
+    std::string longStr(512, 'a');
+    llbc::LLBC_String res3 = StringVFormatTestHelper("Long: %s", longStr.c_str());
+    if (res3.length() > 512 && res3.find("aaaaa") != llbc::LLBC_String::npos)
+    {
+        LLBC_PrintLn("  - big data format test passed");
+    }
+    else
+    {
+        LLBC_PrintLn("  - big data format test failed, expected: long string with 'aaaaa', actual: '%s'", res3.c_str());
+        return;
+    }
+
+    // 4. empty format test.
+    llbc::LLBC_String res4 = StringVFormatTestHelper("");
+    if (res4.empty())
+    {
+        LLBC_PrintLn("  - empty format test passed");
+    }
+    else
+    {
+        LLBC_PrintLn("  - empty format test failed, expected: empty string, actual: '%s'", res4.c_str());
+        return;
+    }
+    LLBC_PrintLn("===============end test LLBC_String vformat fuction===============");
 
     LLBC_PrintLn("\n");
+}
+
+LLBC_String TestCase_Com_DataType::StringVFormatTestHelper(const char* fmt, ...)
+{
+    LLBC_String str;
+    va_list ap;
+    va_start(ap, fmt);
+
+    str.vformat(fmt, ap);
+
+    va_end(ap);
+    return str;
 }
 
 void TestCase_Com_DataType::StringCompareTest()
