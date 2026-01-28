@@ -1,26 +1,136 @@
-name: AI Code Review
+name: AI PR Review with Coderabbit
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
-    branches: [main, master]
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main, master, develop]
 
 permissions:
   contents: read
   pull-requests: write
+  issues: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   review:
     runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.draft == false }}
+    
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: AI Code Review
         uses: coderabbitai/ai-pr-reviewer@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
-          # 可选配置
-          language: "zh-CN"  # 使用中文
-          review_simple_changes: false  # 小变更不评论
-          review_comment_lgtm: false  # 不自动LGTM
-          openai_model: "gpt-4o-mini"  # 或 "gpt-3.5-turbo"
+          # OpenAI 配置
+          openai_model: "gpt-4-turbo-preview"  # 可选: gpt-4, gpt-4-turbo-preview, gpt-3.5-turbo
+          openai_base_url: ""  # 可选: 自定义 OpenAI 兼容 API 端点
+          openai_organization: ""  # 可选: OpenAI 组织 ID
+          
+          # 语言配置
+          language: "zh-CN"  # 可选: en-US, ja-JP, ko-KR, es-ES, fr-FR, de-DE, it-IT
+          
+          # 审查行为配置
+          review_simple_changes: true  # 是否审查小的变更
+          review_comment_lgtm: false   # 是否在审查通过时添加 LGTM 评论
+          review_status: true          # 是否设置审查状态
+          review_mentions: true        # 是否 @ 提及相关人员
+          
+          # 评论配置
+          max_comments: 25             # 最大评论数量
+          comment_summary: true        # 是否生成总结评论
+          comment_summary_in_main_thread: true  # 总结是否在主线程
+          auto_review_comment_label: "ai-review"  # 自动添加标签
+          
+          # 变更分析配置
+          ignore_paths: |
+            **/*.md
+            **/*.txt
+            **/*.json
+            **/*.yml
+            **/*.yaml
+            **/.gitignore
+            **/package-lock.json
+            **/yarn.lock
+            **/pnpm-lock.yaml
+            **/*.min.*
+            **/*.bundle.*
+            dist/**
+            build/**
+            node_modules/**
+            .next/**
+            .nuxt/**
+            .output/**
+            coverage/**
+            .cache/**
+            .DS_Store
+          critical_files: |
+            **/*.ts
+            **/*.tsx
+            **/*.jsx
+            **/*.js
+            **/*.py
+            **/*.java
+            **/*.go
+            **/*.rs
+            **/*.cpp
+            **/*.c
+            **/Dockerfile
+            **/docker-compose.yml
+            **/package.json
+            **/requirements.txt
+            **/go.mod
+            **/Cargo.toml
+          
+          # 安全配置
+          enable_code_suggestions: true  # 是否启用代码建议
+          enable_security_scan: true     # 是否启用安全扫描
+          enable_performance_review: true # 是否启用性能审查
+          
+          # 成本控制
+          cost_limit: 5.00  # 每次 PR 审查的成本限制（美元）
+          max_diff_length: 8000  # diff 的最大长度
+          
+          # 自定义指令
+          instructions: |
+            请作为资深代码审查专家，提供详细的 PR 分析：
+            1. 首先评估代码变更的整体质量
+            2. 检查潜在的安全漏洞和性能问题
+            3. 确保代码符合最佳实践
+            4. 提供具体的改进建议
+            5. 识别重复代码和设计问题
+            6. 检查测试覆盖和边界情况
+            7. 使用中文回复，保持专业友好的语气
+            
+            特别注意：
+            - 函数和变量命名是否清晰
+            - 错误处理是否完备
+            - 日志记录是否恰当
+            - 是否考虑国际化和可访问性
+            - 是否有内存泄漏风险
+            - API 设计是否合理
+          
+          # 高级配置
+          debug: false  # 启用调试模式
+          summarize_refresh_interval: 300  # 总结刷新间隔（秒）
+          summarize_timeout: 600  # 总结超时时间（秒）
+          path_filters: ""  # 路径过滤器
+          
+          # 代码建议配置
+          suggest_refactor: true  # 是否建议重构
+          suggest_tests: true     # 是否建议测试
+          suggest_documentation: true  # 是否建议文档更新
+          
+          # 通知配置
+          slack_webhook_url: ""  # 可选: Slack webhook URL
+          teams_webhook_url: ""  # 可选: Microsoft Teams webhook URL
+          discord_webhook_url: ""  # 可选: Discord webhook URL
