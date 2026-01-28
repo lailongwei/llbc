@@ -59,6 +59,9 @@ jobs:
               \"temperature\": 0.2,
               \"max_tokens\": 2000
             }" 2>&1)
+          echo "============================"
+          echo "$RESPONSE"
+          echo "============================"
           REVIEW_TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null || echo "AI 未返回内容")
           echo "comment_body<<EOF" >> $GITHUB_OUTPUT
           echo -e "### 🤖 AI 自动审查\n\n$REVIEW_TEXT\n\n*AI 建议仅供参考，请人工复核。*" >> $GITHUB_OUTPUT
