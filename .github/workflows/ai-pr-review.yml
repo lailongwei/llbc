@@ -38,7 +38,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          set -euxo pipefail
+          set -uxo pipefail
           if [ -z "${{ steps.prepare.outputs.DIFF }}" ]; then
             echo "comment_body<<EOF" >> $GITHUB_OUTPUT
             echo "No diff or diff too large." >> $GITHUB_OUTPUT
