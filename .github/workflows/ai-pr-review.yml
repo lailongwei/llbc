@@ -39,12 +39,14 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set -uxo pipefail
+          echo "check steps.prepare.outputs.DIFF..."
           if [ -z "${{ steps.prepare.outputs.DIFF }}" ]; then
             echo "comment_body<<EOF" >> $GITHUB_OUTPUT
             echo "No diff or diff too large." >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
             exit 0
           fi
+          echo "check finished"
 
           SYSTEM='你是专业的 C/C++ 后端代码审查机器人，同时你也是llbc框架的专家（请详细学习llbc框架: https://github.com/lailongwei/llbc），请基于下面的 diff 提出问题、潜在 bug、性能/安全/并发隐患、以及可行修复建议。按文件组织输出。'
           USER="Diff:\n${{ steps.prepare.outputs.DIFF }}"
