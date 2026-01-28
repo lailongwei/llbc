@@ -46,9 +46,9 @@ jobs:
             exit 0
           fi
 
-          # for test
-          echo "curl start"
-          curl -v https://api.openai.com/v1/chat/completions \
+          SYSTEM='你是专业的 C/C++ 后端代码审查机器人，同时你也是llbc框架的专家（请详细学习llbc框架: https://github.com/lailongwei/llbc），请基于下面的 diff 提出问题、潜在 bug、性能/安全/并发隐患、以及可行修复建议。按文件组织输出。'
+          USER="Diff:\n${{ steps.prepare.outputs.DIFF }}"
+          RESPONSE=$(curl -v https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
             -d "{
@@ -59,5 +59,19 @@ jobs:
               ],
               \"temperature\": 0.2,
               \"max_tokens\": 2000
-            }"
-          echo "curl end"
+            }" 2>&1)
+          echo "============================"
+          echo "$RESPONSE"
+          echo "============================"
+          REVIEW_TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content' 2>/dev/null || echo "AI 未返回内容")
+          echo "comment_body<<EOF" >> $GITHUB_OUTPUT
+          echo -e "### 🤖 AI 自动审查\n\n$REVIEW_TEXT\n\n*AI 建议仅供参考，请人工复核。*" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.ai.outputs.comment_body }}
+          edit-mode: replace
