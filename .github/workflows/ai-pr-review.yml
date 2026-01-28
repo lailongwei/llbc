@@ -32,12 +32,16 @@ jobs:
           echo "DIFF<<EOF" >> $GITHUB_OUTPUT
           echo -e "$DIFF_CONTENT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_OUTPUT
+          git diff --name-only "$BASE" "$HEAD"
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Call OpenAI to review diff
         id: ai
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DIFF: ${{ steps.prepare.outputs.DIFF }}
+          CHANGED_FILES: ${{ steps.prepare.outputs.CHANGED_FILES }}
         run: |
           set -uxo pipefail
           echo "check steps.prepare.outputs.DIFF..."
