@@ -45,6 +45,7 @@ jobs:
         run: |
           set -uxo pipefail
           echo "check steps.prepare.outputs.DIFF..."
+          echo "CHANGED_FILES; ${CHANGED_FILES}"
           echo "diff is: ${DIFF}"
           echo "diff is: ${steps.prepare.outputs.DIFF}"
           if [ -z "${{ steps.prepare.outputs.DIFF }}" ]; then
