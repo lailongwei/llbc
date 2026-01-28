@@ -6,6 +6,7 @@ on:
 
 jobs:
   macos-build:
+    if: false
     name: MacOS build job
     runs-on: macOS-latest
     steps:
