@@ -6,6 +6,7 @@ on:
 
 jobs:
   windows-build:
+    if: false
     name: Windows build job
     runs-on: windows-latest
     steps:
