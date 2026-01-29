@@ -34,10 +34,10 @@ class LLBC_BasicString : public
 {
     static_assert(sizeof(_Elem) <= 2, "LLBC_BasicString not support sizeof(_Elem) > 2 element type!");
 
-    typedef LLBC_BasicString<_Elem, _Traits, _Ax> _This;
+    typedef LLBC_BasicString _This;
     typedef std::basic_string<_Elem, _Traits, _Ax> _Base;
 
-    typedef std::vector<LLBC_BasicString<_Elem, _Traits, _Ax> > _These;
+    typedef std::vector<LLBC_BasicString> _These;
 
 public:
     typedef typename _Base::size_type size_type;
@@ -60,7 +60,7 @@ public:
     // Constructors.
     explicit LLBC_BasicString(const _Ax &al = _Ax()):_Base(al) {  }
     LLBC_BasicString(const _This &rhs):_Base(rhs) {  }
-    LLBC_BasicString(_This &&rhs):_Base(std::move(rhs)) {  }
+    LLBC_BasicString(_This &&rhs) noexcept :_Base(std::move(rhs)) {  }
     LLBC_BasicString(const _Base &rhs):_Base(rhs) {  }
     LLBC_BasicString(_Base &&rhs):_Base(std::move(rhs)) {  }
     LLBC_BasicString(const LLBC_BasicCString<_Elem> &rhs):_Base(rhs.c_str(), rhs.size()) {  }
@@ -1188,46 +1188,29 @@ public:
             return *this;
         }
 
-        // if string obj is empty, try detach format require buffers and resize it.
+        // calculate required length
         va_list ap;
-        if (this->empty())
-        {
-            va_start(ap, fmt);
-            int len = vsnprintf(nullptr, 0, fmt, ap);
-            va_end(ap);
-
-            if (len <= 0)
-                return *this;
-
-            this->resize(len);
-        }
-
-        // try format.
         va_start(ap, fmt);
-        int len = vsnprintf(const_cast<char *>(this->data()),
-                            this->size() + 1,
-                            fmt,
-                            ap);
+        int len = vsnprintf(nullptr, 0, fmt, ap);
         va_end(ap);
-        if (len <= static_cast<int>(this->size()))
-        {
-            if (len < 0)
-                this->clear();
-            else if (len < static_cast<int>(this->size()))
-                this->resize(len);
 
+        if (UNLIKELY(len <= 0))
+        {
+            this->clear();
             return *this;
         }
 
-        // resize, try format again.
+        // resize to exact length(string guarantees trailing '\0').
         this->resize(len);
+
+        // format once
         va_start(ap, fmt);
-        len = vsnprintf(const_cast<char *>(this->data()),
-                        this->size() + 1,
-                        fmt,
-                        ap);
+        const int writtenLen = vsnprintf(const_cast<char *>(this->data()),
+                                         this->size() + 1,
+                                         fmt,
+                                         ap);
         va_end(ap);
-        if (len != static_cast<int>(this->size()))
+        if (UNLIKELY(writtenLen != static_cast<int>(this->size())))
             this->clear();
 
         return *this;
