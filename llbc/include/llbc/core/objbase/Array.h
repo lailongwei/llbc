@@ -433,7 +433,7 @@ public:
      * Erase single object using swap-and-pop strategy (O(1) removal).
      * Note: This method does NOT preserve element order.
      */
-    bool EraseSwap(Obj *o, bool releaseObj);
+    bool UnstableErase(Obj *o, bool releaseObj);
 
     /**
      * Push front/back, Pop front/back support.
