@@ -73,7 +73,8 @@ inline void LLBC_Stopwatch::Reset()
     _beginTime = 0;
     _elapsedTime = 0;
 
-    _beginMemSnapshot = {0LL, 0LL, 0LL};
+    if (_traceMemEnabled)
+        GetMemSnapshot(_beginMemSnapshot);
 }
 
 inline void LLBC_Stopwatch::Restart()
@@ -81,7 +82,8 @@ inline void LLBC_Stopwatch::Restart()
     _elapsedTime = 0;
     _beginTime = LLBC_RdTsc();
 
-    _beginMemSnapshot = {0LL, 0LL, 0LL};
+    if (_traceMemEnabled)
+        GetMemSnapshot(_beginMemSnapshot);
 }
 
 inline LLBC_TimeSpan LLBC_Stopwatch::Elapsed() const

@@ -171,7 +171,7 @@ public:
 
 public:
     /**
-     * Get elapsed time string reprsentation.
+     * Get elapsed time string representation.
      * @return LLBC_String - the elapsed time string representation, in milli-seconds.
      */
     LLBC_String ToString() const;
@@ -207,12 +207,12 @@ class LLBC_EXPORT LLBC_FuncTracer final
 public:
     /**
      * Construct func tracer obj with unique id.
-     * @param[in] fileName - file name.
-     * @param[in] lineNo   - line number.
-     * @param[in] funcName - function name.
-     * @param[in] traceMem - enable trace memory.
-     * @param[in] uniqueId - unique id.
-     * @param[in] logger   - logger, if nullptr, use root logger.
+     * @param[in] fileName      - file name.
+     * @param[in] lineNo        - line number.
+     * @param[in] funcName      - function name.
+     * @param[in] traceMem      - trace memory or not.
+     * @param[in] uniqueId      - unique id.
+     * @param[in] loggerName    - logger name, if empty, use root logger.
      */
     LLBC_FuncTracer(const LLBC_CString &fileName,
                     int lineNo,
@@ -223,12 +223,12 @@ public:
 
     /**
      * Construct func tracer obj with unique string.
-     * @param[in] fileName  - file name.
-     * @param[in] lineNo    - line number.
-     * @param[in] funcName  - function name.
-     * @param[in] traceMem  - enable trace memory.
-     * @param[in] uniqueStr - unique string.
-     * @param[in] logger    - logger, if nullptr, use root logger.
+     * @param[in] fileName      - file name.
+     * @param[in] lineNo        - line number.
+     * @param[in] funcName      - function name.
+     * @param[in] traceMem      - trace memory or not.
+     * @param[in] uniqueStr     - unique string.
+     * @param[in] loggerName    - logger name, if empty, use root logger.
      */
     LLBC_FuncTracer(const LLBC_CString &fileName,
                     int lineNo,
@@ -245,11 +245,12 @@ public:
 private:
     /**
      * Initialize func tracer.
-     * @param[in] fileName  - file name.
-     * @param[in] lineNo    - line number.
-     * @param[in] funcName  - function name.
-     * @param[in] traceMem  - enable trace memory.
-     * @param[in] uniqueStr - unique string.
+     * @param[in] fileName      - file name.
+     * @param[in] lineNo        - line number.
+     * @param[in] funcName      - function name.
+     * @param[in] traceMem      - trace memory or not.
+     * @param[in] uniqueStr     - unique string.
+     * @param[in] loggerName    - logger name.
      */
     void Init(const LLBC_CString &fileName, 
               int lineNo,
@@ -259,8 +260,9 @@ private:
               const LLBC_CString &loggerName);
 
 private:
-    // Disable assignment.
+    // Disable assignment and move assignment.
     LLBC_DISABLE_ASSIGNMENT(LLBC_FuncTracer);
+    LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_FuncTracer);
 
 private:
     LLBC_String _traceUniqInfo;
