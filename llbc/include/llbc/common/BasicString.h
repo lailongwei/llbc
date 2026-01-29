@@ -37,7 +37,7 @@ class LLBC_BasicString : public
     typedef LLBC_BasicString _This;
     typedef std::basic_string<_Elem, _Traits, _Ax> _Base;
 
-    typedef std::vector<LLBC_BasicString > _These;
+    typedef std::vector<LLBC_BasicString> _These;
 
 public:
     typedef typename _Base::size_type size_type;
@@ -1194,13 +1194,13 @@ public:
         int len = vsnprintf(nullptr, 0, fmt, ap);
         va_end(ap);
 
-        if (len <= 0)
+        if (UNLIKELY(len <= 0))
         {
             this->clear();
             return *this;
         }
 
-        // resize to exact length(string guarantees trailing '\0')
+        // resize to exact length(string guarantees trailing '\0').
         this->resize(len);
 
         // format once
@@ -1210,7 +1210,7 @@ public:
                                          fmt,
                                          ap);
         va_end(ap);
-        if (writtenLen != static_cast<int>(this->size()))
+        if (UNLIKELY(writtenLen != static_cast<int>(this->size())))
             this->clear();
 
         return *this;
