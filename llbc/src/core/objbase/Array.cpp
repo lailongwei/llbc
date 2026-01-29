@@ -262,7 +262,7 @@ bool LLBC_Array::UnstableErase(LLBC_Array::Obj *o, bool releaseObj)
             if (releaseObj)
                 _objs[i]->Release();
 
-            // Swap-and-pop: swap with last element and decrement size
+            // Swap-and-pop: swap with last element and decrement size.
             // This achieves O(1) removal instead of O(n) memmove.
             difference_type lastIdx = _size - 1;
             if (i != lastIdx)
