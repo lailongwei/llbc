@@ -1203,7 +1203,7 @@ public:
         // resize to exact length(string guarantees trailing '\0').
         this->resize(len);
 
-        // format once
+        // format once.
         va_start(ap, fmt);
         const int writtenLen = vsnprintf(const_cast<char *>(this->data()),
                                          this->size() + 1,
