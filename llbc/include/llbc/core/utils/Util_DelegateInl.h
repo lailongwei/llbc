@@ -25,28 +25,28 @@ __LLBC_NS_BEGIN
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(std::nullptr_t _)
-: _cfunc(nullptr)
+: _cFunc(nullptr)
 , _stlFunc()
 {
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const CFunc &cfunc)
-: _cfunc(cfunc)
+LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const CFunc &cFunc)
+: _cFunc(cFunc)
 , _stlFunc()
 {
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(StlFunc &&stlFunc)
-: _cfunc(nullptr)
+: _cFunc(nullptr)
 , _stlFunc(std::move(stlFunc))
 {
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const StlFunc &stlFunc)
-: _cfunc(nullptr)
+: _cFunc(nullptr)
 , _stlFunc(stlFunc)
 {
 }
@@ -54,7 +54,7 @@ LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const StlFunc &stlFunc)
 template <typename Rtn, typename ...Args>
 template <typename Obj>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(Obj *obj, Rtn(Obj::*meth)(Args...))
-: _cfunc(nullptr)
+: _cFunc(nullptr)
 , _stlFunc(LLBC_BindClassMethod(obj, meth))
 {
 }
@@ -62,22 +62,22 @@ LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(Obj *obj, Rtn(Obj::*meth)(Args...))
 template <typename Rtn, typename ...Args>
 template <typename Obj>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(Obj *obj, Rtn(Obj::*constMeth)(Args...) const)
-: _cfunc(nullptr)
+: _cFunc(nullptr)
 , _stlFunc(LLBC_BindClassMethod(obj, constMeth))
 {
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(LLBC_Delegate &&another) noexcept
-: _cfunc(another._cfunc)
+: _cFunc(another._cFunc)
 , _stlFunc(std::move(another._stlFunc))
 {
-    another._cfunc = nullptr;
+    another._cFunc = nullptr;
 }
 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const LLBC_Delegate &another)
-: _cfunc(another._cfunc)
+: _cFunc(another._cFunc)
 , _stlFunc(another._stlFunc)
 {
 }
@@ -85,7 +85,7 @@ LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const LLBC_Delegate &another)
 template <typename Rtn, typename ...Args>
 template <typename Func>
 LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const Func &func)
-: _cfunc(nullptr)
+: _cFunc(nullptr)
 , _stlFunc(func)
 {
 }
@@ -93,26 +93,26 @@ LLBC_Delegate<Rtn(Args...)>::LLBC_Delegate(const Func &func)
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)>::operator bool() const
 {
-    return _cfunc != nullptr || _stlFunc != nullptr;
+    return _cFunc != nullptr || _stlFunc != nullptr;
 }
 
 template <typename Rtn, typename ...Args>
 bool LLBC_Delegate<Rtn(Args...)>::operator==(std::nullptr_t _) const
 {
-    return _cfunc == nullptr && _stlFunc == nullptr;
+    return _cFunc == nullptr && _stlFunc == nullptr;
 }
 
 template <typename Rtn, typename ...Args>
 bool LLBC_Delegate<Rtn(Args...)>::operator!=(std::nullptr_t _) const
 {
-    return _cfunc != nullptr || _stlFunc != nullptr;
+    return _cFunc != nullptr || _stlFunc != nullptr;
 }
 
 template <typename Rtn, typename ...Args>
 Rtn LLBC_Delegate<Rtn(Args...)>::operator()(Args... args) const
 {
-    if (_cfunc)
-        return (*_cfunc)(std::forward<Args>(args)...);
+    if (_cFunc)
+        return (*_cFunc)(std::forward<Args>(args)...);
     else
         return _stlFunc(std::forward<Args>(args)...);
 }
@@ -120,16 +120,16 @@ Rtn LLBC_Delegate<Rtn(Args...)>::operator()(Args... args) const
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(std::nullptr_t _)
 {
-    _cfunc = nullptr;
+    _cFunc = nullptr;
     _stlFunc = nullptr;
 
     return *this;
 }
 
 template <typename Rtn, typename ...Args>
-LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const CFunc &cfunc)
+LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const CFunc &cFunc)
 {
-    _cfunc = cfunc;
+    _cFunc = cFunc;
     _stlFunc = nullptr;
 
     return *this;
@@ -139,7 +139,7 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const CFunc 
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(StlFunc &&stlFunc) noexcept
 {
-    _cfunc = nullptr;
+    _cFunc = nullptr;
     _stlFunc = std::move(stlFunc);
 
     return *this;
@@ -148,7 +148,7 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(StlFunc &&st
 template <typename Rtn, typename ...Args>
 LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const StlFunc &stlFunc)
 {
-    _cfunc = nullptr;
+    _cFunc = nullptr;
     _stlFunc = stlFunc;
 
     return *this;
@@ -160,16 +160,16 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(LLBC_Delegat
     if (UNLIKELY(&another == this))
         return *this;
 
-    if (another._cfunc)
+    if (another._cFunc)
     {
-        _cfunc = another._cfunc;
-        another._cfunc = nullptr;
+        _cFunc = another._cFunc;
+        another._cFunc = nullptr;
         _stlFunc = nullptr;
     }
     else
     {
         _stlFunc = std::move(another._stlFunc);
-        _cfunc = nullptr;
+        _cFunc = nullptr;
     }
 
     return *this;
@@ -181,14 +181,14 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const LLBC_D
     if (UNLIKELY(&another == this))
         return *this;
 
-    if (another._cfunc)
+    if (another._cFunc)
     {
-        _cfunc = another._cfunc;
+        _cFunc = another._cFunc;
         _stlFunc = nullptr;
     }
     else
     {
-        _cfunc = nullptr;
+        _cFunc = nullptr;
         _stlFunc = another._stlFunc;
     }
 
@@ -197,10 +197,10 @@ LLBC_Delegate<Rtn(Args...)> &LLBC_Delegate<Rtn(Args...)>::operator=(const LLBC_D
 
 template <typename Rtn, typename ...Args>
 template <typename Func>
-typename std::enable_if<!std::is_same<Func, LLBC_Delegate<Rtn(Args...)> >::value, LLBC_Delegate<Rtn(Args...)> &>::type
+std::enable_if_t<!std::is_same_v<Func, LLBC_Delegate<Rtn(Args...)> >, LLBC_Delegate<Rtn(Args...)> &>
 LLBC_Delegate<Rtn(Args...)>::operator=(const Func &func)
 {
-    _cfunc = nullptr;
+    _cFunc = nullptr;
     _stlFunc = func;
 
     return *this;

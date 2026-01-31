@@ -60,7 +60,7 @@ public:
     /**
      * @brief Construct delegate object by c-style function pointer.
      */
-    LLBC_Delegate(const CFunc &cfunc);
+    LLBC_Delegate(const CFunc &cFunc);
 
     /**
      * @brief Construct a new Delegate object by stl function object.
@@ -133,7 +133,7 @@ public:
     /**
      * @brief Assignment by c-styled function.
      */
-    LLBC_Delegate &operator=(const CFunc &cfunc);
+    LLBC_Delegate &operator=(const CFunc &cFunc);
 
     /**
      * @brief Assignment by stl function.
@@ -151,11 +151,11 @@ public:
      * @brief Assignment by callable object.
      */
     template <typename Func>
-    typename std::enable_if<!std::is_same<Func, LLBC_Delegate>::value, LLBC_Delegate &>::type
+    std::enable_if_t<!std::is_same_v<Func, LLBC_Delegate>, LLBC_Delegate &>
     operator=(const Func &func);
 
 private:
-    CFunc _cfunc;
+    CFunc _cFunc;
     StlFunc _stlFunc;
 };
 
