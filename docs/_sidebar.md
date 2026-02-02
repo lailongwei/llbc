@@ -8,3 +8,4 @@
   * [对象池](charpter_03/obj_pool.md)
   * [变体](charpter_03/variant.md)
   * [委托](charpter_03/delegate.md)
+  * [对象](charpter_03/object.md)
