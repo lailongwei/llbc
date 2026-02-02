@@ -107,37 +107,11 @@ uint64 LLBC_Stopwatch::_frequency = 0;
 #pragma warning(default:4996)
 #endif
 
-LLBC_FuncTracer::LLBC_FuncTracer(const LLBC_CString &fileName, 
-                                 int lineNo,
-                                 const LLBC_CString &funcName, 
-                                 bool traceMem,
-                                 sint64 uniqueId,
-                                 const LLBC_CString &loggerName)
-: _logger(nullptr)
-, _stopWatch(true, traceMem)
-{
-    LLBC_String uniqueStr;
-    uniqueStr.format("%lld", uniqueId);
-    Init(fileName, lineNo, funcName, traceMem, uniqueStr, loggerName);
-}
-
-LLBC_FuncTracer::LLBC_FuncTracer(const LLBC_CString &fileName, 
-                                 int lineNo,
-                                 const LLBC_CString &funcName, 
-                                 bool traceMem,
-                                 const LLBC_CString &uniqueStr,
-                                 const LLBC_CString &loggerName)
-: _logger(nullptr)
-, _stopWatch(true, traceMem)
-{
-    Init(fileName, lineNo, funcName, traceMem, uniqueStr, loggerName);
-}
-
 void LLBC_FuncTracer::Init(const LLBC_CString &fileName, 
                            int lineNo,
                            const LLBC_CString &funcName, 
                            bool traceMem,
-                           const LLBC_CString &uniqueStr,
+                           const LLBC_CString &tagInfoStr,
                            const LLBC_CString &loggerName)
 {
     if (!loggerName.empty())
@@ -153,16 +127,16 @@ void LLBC_FuncTracer::Init(const LLBC_CString &fileName,
     if (_logger->GetLogLevel() != LLBC_LogLevel::Trace)
         return;
 
-    _traceUniqInfo.format("%s:%d:%s:%s",
+    _tagInfo.format("%s:%d:%s:%s",
                           LLBC_Directory::BaseName(fileName).c_str(),
                           lineNo,
                           funcName.c_str(),
-                          uniqueStr.c_str());
+                          tagInfoStr.c_str());
 
     LLOG_TRACE4(_logger->GetLoggerName().c_str(), 
                 "FuncTrace", 
                 "%s|Enter(trace mem?:%s)",
-                _traceUniqInfo.c_str(),
+                _tagInfo.c_str(),
                 traceMem ? "true" : "false");
 }
 
@@ -176,17 +150,17 @@ LLBC_FuncTracer::~LLBC_FuncTracer()
             LLOG_TRACE4(_logger->GetLoggerName().c_str(), 
                         "FuncTrace",
                         "%s|Leave cost:%lld.%03lld ms, memory diff(virt:%lld res:%lld share:%lld)",
-                        _traceUniqInfo.c_str(),
+                        _tagInfo.c_str(),
                         cost.GetTotalMillis(),
                         cost.GetTotalMicros() % 1000,
-                        memDiff._memVirt,
-                        memDiff._memRes,
-                        memDiff._memShr);
+                        memDiff._virt,
+                        memDiff._res,
+                        memDiff._shr);
         else
             LLOG_TRACE4(_logger->GetLoggerName().c_str(),
                         "FuncTrace",
                         "%s|Leave cost:%lld.%03lld ms",
-                        _traceUniqInfo.c_str(),
+                        _tagInfo.c_str(),
                         cost.GetTotalMillis(),
                         cost.GetTotalMicros() % 1000);
     }

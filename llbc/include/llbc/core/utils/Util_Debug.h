@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/core/time/TimeSpan.h"
+#include "llbc/core/variant/Variant.h"
 
 __LLBC_NS_BEGIN
 /**
@@ -37,9 +38,9 @@ __LLBC_NS_BEGIN
  */
 struct LLBC_HIDDEN LLBC_MemSnapshot
 {
-    sint64 _memVirt;
-    sint64 _memRes;
-    sint64 _memShr;
+    sint64 _virt;
+    sint64 _res;
+    sint64 _shr;
 };
 __LLBC_NS_END
 
@@ -86,10 +87,11 @@ public:
 
     /**
      * Construct stopwatch object by elapsed ticks.
-     * @param[in] elapsedTicks      - elapsed ticks.
-     * @param[in] continueMeasuring - continue measuring flag, default is false.
+     * @param[in] elapsedTicks          - elapsed ticks.
+     * @param[in] continueMeasuring     - continue measuring flag, default is false.
+     * @param[in] traceMem              - trace memory usage flag, default is false.
      */
-    explicit LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring = false);
+    explicit LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring = false, bool traceMem = false);
 
 public:
     /**
@@ -206,36 +208,29 @@ class LLBC_EXPORT LLBC_FuncTracer final
 {
 public:
     /**
-     * Construct func tracer obj with unique id.
+     * Construct func tracer obj with tag value.
      * @param[in] fileName      - file name.
      * @param[in] lineNo        - line number.
      * @param[in] funcName      - function name.
      * @param[in] traceMem      - trace memory or not.
-     * @param[in] uniqueId      - unique id.
+     * @param[in] tagValue      - tag value, support arithmetic type and string likely type.
      * @param[in] loggerName    - logger name, if empty, use root logger.
      */
+    template <typename _TagValueType,
+              std::enable_if_t<std::is_arithmetic_v<_TagValueType> ||
+              std::is_convertible_v<_TagValueType, LLBC_CString>, int> = 0>
     LLBC_FuncTracer(const LLBC_CString &fileName,
                     int lineNo,
                     const LLBC_CString &funcName,
                     bool traceMem,
-                    sint64 uniqueId,
-                    const LLBC_CString &loggerName = "");
-
-    /**
-     * Construct func tracer obj with unique string.
-     * @param[in] fileName      - file name.
-     * @param[in] lineNo        - line number.
-     * @param[in] funcName      - function name.
-     * @param[in] traceMem      - trace memory or not.
-     * @param[in] uniqueStr     - unique string.
-     * @param[in] loggerName    - logger name, if empty, use root logger.
-     */
-    LLBC_FuncTracer(const LLBC_CString &fileName,
-                    int lineNo,
-                    const LLBC_CString &funcName,
-                    bool traceMem,
-                    const LLBC_CString &uniqueStr,
-                    const LLBC_CString &loggerName = "");
+                    const _TagValueType &tagValue,
+                    const LLBC_CString &loggerName = "")
+    : _logger(nullptr)
+    , _stopWatch(true, traceMem)
+    {
+        LLBC_Variant tagValueVar(tagValue);
+        Init(fileName, lineNo, funcName, traceMem, tagValueVar.ValueToString(), loggerName);
+    }
 
     /**
      * Destructor. Log function cost and memory diff.
@@ -265,23 +260,23 @@ private:
     LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_FuncTracer);
 
 private:
-    LLBC_String _traceUniqInfo;
+    LLBC_String _tagInfo;
     const LLBC_Logger *_logger;
     LLBC_Stopwatch _stopWatch;
 };
 
 #if LLBC_CFG_CORE_UTILS_ENABLE_FUNC_TRACE
-    #define LLBC_FUNC_TRACE_EX(uniqInfo, traceMem)                                             \
+    #define LLBC_FUNC_TRACE_EX(tagValue, traceMem)                                             \
         LLBC_FuncTracer LLBC_Concat(__funcTracer_, __LINE__)(__FILE__,                         \
                                                              __LINE__,                         \
                                                              __FUNCTION__,                     \
                                                              traceMem,                         \
-                                                             uniqInfo);
+                                                             tagValue)
     
     #define LLBC_FUNC_TRACE(traceMem)                                                          \
         LLBC_FUNC_TRACE_EX("", traceMem)
 #else
-    #define LLBC_FUNC_TRACE_EX(uniqInfo, traceMem) (static_cast<void>(0))
+    #define LLBC_FUNC_TRACE_EX(tagValue, traceMem) (static_cast<void>(0))
     #define LLBC_FUNC_TRACE(traceMem) (static_cast<void>(0))
 #endif
 

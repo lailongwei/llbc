@@ -44,13 +44,15 @@ inline LLBC_Stopwatch::LLBC_Stopwatch(bool autoStart, bool traceMem)
         GetMemSnapshot(_beginMemSnapshot);
 }
 
-inline LLBC_Stopwatch::LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring)
+inline LLBC_Stopwatch::LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring, bool traceMem)
 : _beginTime(continueMeasuring ? LLBC_RdTsc() : 0llu)
 , _elapsedTime(elapsedTicks)
 
-, _traceMemEnabled(false)
+, _traceMemEnabled(traceMem)
 , _beginMemSnapshot{0LL, 0LL, 0LL}
 {
+    if (_traceMemEnabled)
+        GetMemSnapshot(_beginMemSnapshot);
 }
 
 inline void LLBC_Stopwatch::Resume()
@@ -139,9 +141,9 @@ inline LLBC_MemSnapshot LLBC_Stopwatch::GetMemSnapshotDiff() const
     if (!GetMemSnapshot(endMemSnapshot))
         return {};
 
-    return {endMemSnapshot._memVirt - _beginMemSnapshot._memVirt,
-            endMemSnapshot._memRes - _beginMemSnapshot._memRes,
-            endMemSnapshot._memShr - _beginMemSnapshot._memShr};
+    return {endMemSnapshot._virt - _beginMemSnapshot._virt,
+            endMemSnapshot._res - _beginMemSnapshot._res,
+            endMemSnapshot._shr - _beginMemSnapshot._shr};
 }
 
 inline LLBC_String LLBC_Stopwatch::ToString() const
@@ -153,9 +155,9 @@ inline LLBC_String LLBC_Stopwatch::ToString() const
     if (_traceMemEnabled)
         repr.format("%.03f ms, memDiff(virt:%lld res:%lld shr:%lld)", 
                     nanos / 1000000.0,
-                    memDiff._memVirt, 
-                    memDiff._memRes,
-                    memDiff._memShr);
+                    memDiff._virt, 
+                    memDiff._res,
+                    memDiff._shr);
     else
         repr.format("%.03f ms", nanos / 1000000.0);
 
@@ -183,9 +185,9 @@ inline bool LLBC_Stopwatch::GetMemSnapshot(LLBC_MemSnapshot &snapshot)
 
         if (readCount == 3) 
         {
-            snapshot._memVirt = memVirt * LLBC_pageSize;
-            snapshot._memRes = memRes * LLBC_pageSize;
-            snapshot._memShr = memShr * LLBC_pageSize;
+            snapshot._virt = memVirt * LLBC_pageSize;
+            snapshot._res = memRes * LLBC_pageSize;
+            snapshot._shr = memShr * LLBC_pageSize;
             return true;
         }
     }
@@ -194,9 +196,9 @@ inline bool LLBC_Stopwatch::GetMemSnapshot(LLBC_MemSnapshot &snapshot)
     PROCESS_MEMORY_COUNTERS_EX pmc;
     if (GetProcessMemoryInfo(hProcess, reinterpret_cast<PROCESS_MEMORY_COUNTERS *>(&pmc), sizeof(pmc))) 
     {
-        snapshot._memVirt = static_cast<sint64>(pmc.PrivateUsage);
-        snapshot._memRes = static_cast<sint64>(pmc.WorkingSetSize);
-        snapshot._memShr = static_cast<sint64>(pmc.WorkingSetSize - pmc.PrivateUsage);
+        snapshot._virt = static_cast<sint64>(pmc.PrivateUsage);
+        snapshot._res = static_cast<sint64>(pmc.WorkingSetSize);
+        snapshot._shr = static_cast<sint64>(pmc.WorkingSetSize - pmc.PrivateUsage);
         return true;
     }
 #endif

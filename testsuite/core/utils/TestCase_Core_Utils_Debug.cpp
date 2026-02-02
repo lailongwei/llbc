@@ -147,6 +147,37 @@ int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
             LLBC_String uniqInfo("FuncTraceLoggerTest");
             LLBC_FuncTracer funcTraceTest(__FILE__, __LINE__, __FUNCTION__, false, uniqInfo, "logtrace_test");
         }
+
+        // case 5. test tag value type.
+        {
+            // 5.1. value type (int)
+            LLBC_FUNC_TRACE_EX(12345, false);
+
+            // 5.2. test negative value type (sint64)
+            sint64 negativeId = -999999;
+            LLBC_FUNC_TRACE_EX(negativeId, false);
+
+            // 5.3. test bool value type
+            LLBC_FUNC_TRACE_EX(true, false);
+
+            // 5.4. test uint32 / uint64
+            uint32 u32Val = 4294967295U; 
+            LLBC_FUNC_TRACE_EX(u32Val, false);
+
+            // 5.5. test uint0 value type
+            LLBC_FUNC_TRACE_EX(0U, false);
+
+            // 5.6. test const string value type
+            LLBC_FUNC_TRACE_EX("Static_String_Tag", false);
+
+            // 5.7. test std::string value type
+            std::string stdStr = "Dynamic_Std_String";
+            LLBC_FUNC_TRACE_EX(stdStr, false);
+
+            // 5.8. test LLBC_CString value type
+            LLBC_CString llbcStr = "LLBC_Specific_String";
+            LLBC_FUNC_TRACE_EX(llbcStr, false);
+        }
         LLOG_TRACE("test func trace end.");
     }
 
