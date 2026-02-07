@@ -218,7 +218,7 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
     if (!_cancelingAll &&
         data->handle - LLBC_GetMilliseconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
     {
-        _heap.erase(data);
+        _heap.erase(data, true);
         if (--data->refCount == 0)
         {
             delete data;

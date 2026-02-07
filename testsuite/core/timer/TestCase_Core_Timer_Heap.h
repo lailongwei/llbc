@@ -34,7 +34,9 @@ public:
     int Run(int argc, char *argv[]) override;
 
 private:
-    void MaxHeapTest();
-    void MinHeapTest();
+    template <typename Heap>
+    void BaseTest(bool isMaxHeap);
+
+    void PerfTest();
 };
 
