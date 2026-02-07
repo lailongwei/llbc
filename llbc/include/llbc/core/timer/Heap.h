@@ -61,7 +61,7 @@ public:
         else
         {
             it = std::find(c.begin(), c.end(), value);
-            LLBC_ReturnIf(it == this->c.end(), void());
+            LLBC_ReturnIf(it == c.end(), void());
         }
 
         // If it is the first element, call pop() and return.
