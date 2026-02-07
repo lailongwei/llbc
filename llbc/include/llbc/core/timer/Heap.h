@@ -41,23 +41,75 @@ public:
     auto end() const -> decltype(this->c.end()) { return this->c.end(); }
 
     /**
-     * \brief Remove the specified value from the heap.
-     *
-     * \param value - the value to remove.
+     * Remove the specified value from the heap.
+     * @param[in] value - the value to remove.
+     * @param[in] reverse_find - if true, search from the end of the container.
      */
-    void erase(const T &value)
+    void erase(const T &value, bool reverse_find = false)
     {
-        auto it = std::find(this->c.begin(), this->c.end(), value);
-        LLBC_ReturnIf(it == this->c.end(), void());
+        typename Container::iterator it;
 
-        if(it == this->c.begin())
+        // Find the target value in the container.
+        auto &c = this->c;
+        if (reverse_find)
+        {
+            const auto rit = std::find(c.rbegin(), c.rend(), value);
+            LLBC_ReturnIf(rit == c.rend(), void());
+
+            it = --(rit.base());
+        }
+        else
+        {
+            it = std::find(c.begin(), c.end(), value);
+            LLBC_ReturnIf(it == this->c.end(), void());
+        }
+
+        // If it is the first element, call pop() and return.
+        if(it == c.begin())
         {
             this->pop();
             return;
         }
+        // If it is the last element, erase it directly and return.
+        if (it == --c.end())
+        {
+            c.erase(it);
+            return;
+        }
 
-        this->c.erase(it);
-        std::make_heap(this->c.begin(), this->c.end(), this->comp);
+        // Move the last element to the current position.
+        *it = std::move(c[c.size() - 1]);
+        c.pop_back();
+
+        // Restore heap property by percolating down.
+        percolate_down(it - c.begin());
+    }
+
+private:
+    /**
+     * Percolate down operation to restore heap property.
+     * @param[in] index - the index of the element to percolate down.
+     */
+    LLBC_FORCE_INLINE void percolate_down(size_t index)
+    {
+        auto &c = this->c;
+        const auto &comp = this->comp;
+
+        size_t child;
+        T elem = std::move(c[index]);
+        const size_t size = c.size();
+        for (; (child = index * 2 + 1) < size; index = child)
+        {
+            if (child != (size - 1) && comp(c[child], c[child + 1]))
+                ++child;
+
+            if (comp(elem, c[child]))
+                c[index] = std::move(c[child]);
+            else
+                break;
+        }
+
+        c[index] = std::move(elem);
     }
 };
 
