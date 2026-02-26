@@ -35,7 +35,7 @@ public:
 
 private:
     template <typename Heap>
-    void BaseTest(bool isMaxHeap);
+    int BaseTest(bool isMaxHeap);
 
     void PerfTest();
 };

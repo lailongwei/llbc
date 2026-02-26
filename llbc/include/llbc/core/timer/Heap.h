@@ -34,6 +34,12 @@ template <typename T,
 class LLBC_Heap : public std::priority_queue<T, Container, Compare>
 {
 public:
+    LLBC_Heap(): std::priority_queue<T, Container, Compare>() {}
+    LLBC_Heap(const Container &cont): std::priority_queue<T, Container, Compare>(Compare(), cont) {}
+
+public:
+    auto begin() -> decltype(this->c.begin()) { return this->c.begin(); }
+    auto end() -> decltype(this->c.end()) { return this->c.end(); }
     /**
      * \brief Get the begin and end iterator of the heap.
      */
@@ -65,51 +71,80 @@ public:
         }
 
         // If it is the first element, call pop() and return.
-        if(it == c.begin())
+        const size_t size = c.size();
+        const size_t index = it - c.begin();
+        if(index == 0)
         {
             this->pop();
             return;
         }
+
         // If it is the last element, erase it directly and return.
-        if (it == --c.end())
+        if (index == size - 1)
         {
             c.erase(it);
             return;
         }
 
         // Move the last element to the current position.
-        *it = std::move(c[c.size() - 1]);
+        *it = std::move(c[size - 1]);
         c.pop_back();
 
-        // Restore heap property by percolating down.
-        percolate_down(it - c.begin());
+        // Restore heap property by percolating down/percolating up.
+        if (/*index > 0 && */this->comp(c.data()[((index - 1) >> 1)], *it))
+            percolate_up(index);
+        else
+            percolate_down(index);
     }
 
 private:
+    /**
+     * Percolate up operation to restore heap property.
+     * @param[in] index - the index of the element to percolate up.
+     */
+    LLBC_FORCE_INLINE void percolate_up(size_t index)
+    {
+        auto c_data = this->c.data();
+        const auto &comp = this->comp;
+
+        size_t parent;
+        T elem = std::move(c_data[index]);
+        for (; index > 0; index = parent)
+        {
+            parent = (index - 1) >> 1;
+            if (comp(c_data[parent], elem))
+                c_data[index] = std::move(c_data[parent]);
+            else
+                break;
+        }
+
+        c_data[index] = std::move(elem);
+    }
+
     /**
      * Percolate down operation to restore heap property.
      * @param[in] index - the index of the element to percolate down.
      */
     LLBC_FORCE_INLINE void percolate_down(size_t index)
     {
-        auto &c = this->c;
+        auto c_data = this->c.data();
         const auto &comp = this->comp;
 
         size_t child;
-        T elem = std::move(c[index]);
-        const size_t size = c.size();
-        for (; (child = index * 2 + 1) < size; index = child)
+        T elem = std::move(c_data[index]);
+        const size_t size = this->c.size();
+        for (; (child = (index << 1) + 1) < size; index = child)
         {
-            if (child != (size - 1) && comp(c[child], c[child + 1]))
+            if (child != (size - 1) && comp(c_data[child], c_data[child + 1]))
                 ++child;
 
-            if (comp(elem, c[child]))
-                c[index] = std::move(c[child]);
+            if (comp(elem, c_data[child]))
+                c_data[index] = std::move(c_data[child]);
             else
                 break;
         }
 
-        c[index] = std::move(elem);
+        c_data[index] = std::move(elem);
     }
 };
 

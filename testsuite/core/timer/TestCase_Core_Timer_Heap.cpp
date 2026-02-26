@@ -26,8 +26,9 @@ int TestCase_Core_Timer_Heap::Run(int argc, char** argv)
 {
     LLBC_PrintLn("Timer heap test:");
 
-    BaseTest<LLBC_Heap<int, std::vector<int>, std::less<int>>>(true);
-    BaseTest<LLBC_Heap<int, std::vector<int>, std::greater<int>>>(false);
+    if (BaseTest<LLBC_Heap<int, std::vector<int>, std::less<int>>>(true) != LLBC_OK ||
+        BaseTest<LLBC_Heap<int, std::vector<int>, std::greater<int>>>(false) != LLBC_OK)
+        return LLBC_FAILED;
 
     PerfTest();
 
@@ -38,7 +39,7 @@ int TestCase_Core_Timer_Heap::Run(int argc, char** argv)
 }
 
 template <typename Heap>
-void TestCase_Core_Timer_Heap::BaseTest(bool isMaxHeap)
+int TestCase_Core_Timer_Heap::BaseTest(bool isMaxHeap)
 {
     // Log: begin test.
     LLBC_PrintLn("- Base test(%s):", isMaxHeap ? "Max heap" : "Min heap");
@@ -61,36 +62,74 @@ void TestCase_Core_Timer_Heap::BaseTest(bool isMaxHeap)
     };
 
     // Define lambda: dump heap.
-    auto dumpHeap = [&heap](const char *outputPrefix) mutable {
+    auto dumpHeap = [&heap, isMaxHeap](const char *outputPrefix) mutable -> int {
         LLBC_Print("  - %s(size: %lu):", outputPrefix, heap.size());
+
+        typename Heap::value_type prevElem = heap.top();
         while (!heap.empty())
         {
             LLBC_Print("%d ", heap.top());
+            if (isMaxHeap && prevElem < heap.top())
+            {
+                LLBC_PrintLn("%s", "");
+                LLBC_PrintLn("    - Heap order error: prev elem:%d, current elem:%d",
+                             prevElem, heap.top());
+                return LLBC_FAILED;
+            }
+            else if (!isMaxHeap && prevElem > heap.top())
+            {
+                LLBC_PrintLn("%s", "");
+                LLBC_PrintLn("    - Heap order error: prev elem:%d, current elem:%d",
+                             prevElem, heap.top());
+                return LLBC_FAILED;
+            }
+
+            prevElem = heap.top();
             heap.pop();
         }
 
         LLBC_PrintLn("%s", "");
+
+        return LLBC_OK;
     };
 
     // Build heap & dump heap.
-    buildHeap(5);
-    dumpHeap("After build heap");
+    buildHeap(100);
+    LLBC_ReturnIf(dumpHeap("After build heap") != LLBC_OK, LLBC_FAILED);
+
+    // Rebuild heap for test remove first element...
+    buildHeap(100);
+    LLBC_PrintLn("  - Remove first elem: %d ...", heap.top());
+    heap.erase(*heap.begin());
+    LLBC_ReturnIf(dumpHeap("After remove first elem") != LLBC_OK, LLBC_FAILED);
+
+    // Rebuild heap for test remove last element...
+    buildHeap(100);
+    LLBC_PrintLn("  - Remove last elem: %d ...", *--heap.end());
+    heap.erase(*--heap.end());
+    LLBC_ReturnIf(dumpHeap("After rmove last elem") != LLBC_OK, LLBC_FAILED);
 
     // Rebuild heap for test remove specific element..
-    buildHeap(5);
-    const auto removeIdx = LLBC_Rand(0, 5);
-    LLBC_PrintLn("  - Remove specific elem: %d ...", *(heap.begin() + removeIdx));
-    heap.erase(*(heap.begin() + removeIdx));
-    dumpHeap("After remove");
+    buildHeap(100);
+    for (size_t i = 0; i < 10; ++i)
+    {
+        const auto removeIdx = LLBC_Rand(0, heap.size());
+        LLBC_PrintLn("  - Remove specific elem: %d ...", *(heap.begin() + removeIdx));
+        heap.erase(*(heap.begin() + removeIdx));
+    }
+
+    LLBC_ReturnIf(dumpHeap("After remove") != LLBC_OK, LLBC_FAILED);
 
     // Build heap for test pop.
     buildHeap(100);
     heap.pop();
     heap.pop();
     heap.pop();
-    dumpHeap("After pop 3 times");
+    LLBC_ReturnIf(dumpHeap("After pop 3 times") != LLBC_OK, LLBC_FAILED);
 
     LLBC_PrintLn("  - Base test(%s) finished", (isMaxHeap ? "Max heap" : "Min heap"));
+
+    return LLBC_OK;
 }
 
 void TestCase_Core_Timer_Heap::PerfTest()
