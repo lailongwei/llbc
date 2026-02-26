@@ -34,14 +34,8 @@ template <typename T,
 class LLBC_Heap : public std::priority_queue<T, Container, Compare>
 {
 public:
-    LLBC_Heap(): std::priority_queue<T, Container, Compare>() {}
-    LLBC_Heap(const Container &cont): std::priority_queue<T, Container, Compare>(Compare(), cont) {}
-
-public:
-    auto begin() -> decltype(this->c.begin()) { return this->c.begin(); }
-    auto end() -> decltype(this->c.end()) { return this->c.end(); }
     /**
-     * \brief Get the begin and end iterator of the heap.
+     * Get the begin and end iterator of the heap.
      */
     auto begin() const -> decltype(this->c.begin()) { return this->c.begin(); }
     auto end() const -> decltype(this->c.end()) { return this->c.end(); }
