@@ -529,16 +529,19 @@ LLBC_TimeSpan LLBC_Time::GetCrossedCycles(const LLBC_Time &from,
     timeOfTimeCycle += LLBC_TimeSpan(LLBC_GetTimezone() * LLBC_TimeConst::numOfMicrosPerSecond);
     timeOfTimeCycle %= timeCycle;
 
+    constexpr LLBC_TimeSpan utcBeginWeekOffset = LLBC_TimeSpan::FromDays(4);
     if (timeCycle == LLBC_TimeSpan::oneWeek)
-        timeOfTimeCycle = (timeOfTimeCycle + (LLBC_TimeSpan::oneDay * 4)) % LLBC_TimeSpan::oneWeek;
+        timeOfTimeCycle = (timeOfTimeCycle - utcBeginWeekOffset + LLBC_TimeSpan::oneWeek) % LLBC_TimeSpan::oneWeek;
 
     auto normalizedFrom = from - timeOfTimeCycle;
     auto normalizedTo = to - timeOfTimeCycle;
 
     normalizedFrom = LLBC_Time(
-        normalizedFrom.GetTimestampInMicros() - (normalizedFrom.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
+        normalizedFrom.GetTimestampInMicros() -
+            ((normalizedFrom.GetTimestampInMicros() + timeCycle.GetTotalMicros()) % timeCycle.GetTotalMicros()));
     normalizedTo = LLBC_Time(
-        normalizedTo.GetTimestampInMicros() - (normalizedTo.GetTimestampInMicros() % timeCycle.GetTotalMicros()));
+        normalizedTo.GetTimestampInMicros() -
+            ((normalizedTo.GetTimestampInMicros() + timeCycle.GetTotalMicros()) % timeCycle.GetTotalMicros()));
 
     return normalizedTo - normalizedFrom;
 }
