@@ -672,15 +672,15 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
                         0);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-15 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-16 00:00:00"),
-                        LLBC_TimeSpan::negOneDay, // -1 days => 6 ays => Saturday
+                        LLBC_TimeSpan::negOneDay, // -1 days => 6 days => Saturday
                         0);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 23:59:59"),
                         LLBC_Time::FromTimeStr("2023-07-16 00:00:00"),
-                        LLBC_TimeSpan::negOneDay, // -1 days => 6 ays => Saturday
+                        LLBC_TimeSpan::negOneDay, // -1 days => 6 days => Saturday
                         1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-15 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-16 00:00:00"),
-                        LLBC_TimeSpan::negOneDay, // -1 days => 6 ays => Saturday
+                        LLBC_TimeSpan::negOneDay, // -1 days => 6 days => Saturday
                         0);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-13 00:00:00"),
