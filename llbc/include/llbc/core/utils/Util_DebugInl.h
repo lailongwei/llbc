@@ -23,19 +23,36 @@
 #pragma once
 
 #include "llbc/core/os/OS_Time.h"
+#include "llbc/core/os/OS_SysConf.h"
+#include "llbc/core/os/OS_Process.h"
+#include "llbc/core/file/Directory.h"
 
+#if LLBC_TARGET_PLATFORM_WIN32
+#pragma warning(disable:4996)
+#include <Psapi.h>
+#endif
 __LLBC_NS_BEGIN
 
-inline LLBC_Stopwatch::LLBC_Stopwatch(bool autoStart)
+inline LLBC_Stopwatch::LLBC_Stopwatch(bool autoStart, bool traceMem)
 : _beginTime(autoStart ? LLBC_RdTsc() : 0llu)
 , _elapsedTime(0llu)
+
+, _traceMemEnabled(traceMem)
+, _beginMemSnapshot{0LL, 0LL, 0LL}
 {
+    if (_traceMemEnabled)
+        GetMemSnapshot(_beginMemSnapshot);
 }
 
-inline LLBC_Stopwatch::LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring)
+inline LLBC_Stopwatch::LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring, bool traceMem)
 : _beginTime(continueMeasuring ? LLBC_RdTsc() : 0llu)
 , _elapsedTime(elapsedTicks)
+
+, _traceMemEnabled(traceMem)
+, _beginMemSnapshot{0LL, 0LL, 0LL}
 {
+    if (_traceMemEnabled)
+        GetMemSnapshot(_beginMemSnapshot);
 }
 
 inline void LLBC_Stopwatch::Resume()
@@ -57,12 +74,18 @@ inline void LLBC_Stopwatch::Reset()
 {
     _beginTime = 0;
     _elapsedTime = 0;
+
+    if (_traceMemEnabled)
+        GetMemSnapshot(_beginMemSnapshot);
 }
 
 inline void LLBC_Stopwatch::Restart()
 {
     _elapsedTime = 0;
     _beginTime = LLBC_RdTsc();
+
+    if (_traceMemEnabled)
+        GetMemSnapshot(_beginMemSnapshot);
 }
 
 inline LLBC_TimeSpan LLBC_Stopwatch::Elapsed() const
@@ -104,12 +127,39 @@ inline uint64 LLBC_Stopwatch::ElapsedTicks() const
         return _elapsedTime;
 }
 
+inline bool LLBC_Stopwatch::IsTraceMemEnabled() const
+{
+    return _traceMemEnabled;
+}
+
+inline LLBC_MemSnapshot LLBC_Stopwatch::GetMemSnapshotDiff() const
+{
+    if (!_traceMemEnabled)
+        return {};
+
+    LLBC_MemSnapshot endMemSnapshot{};
+    if (!GetMemSnapshot(endMemSnapshot))
+        return {};
+
+    return {endMemSnapshot._virt - _beginMemSnapshot._virt,
+            endMemSnapshot._res - _beginMemSnapshot._res,
+            endMemSnapshot._shr - _beginMemSnapshot._shr};
+}
+
 inline LLBC_String LLBC_Stopwatch::ToString() const
 {
     const uint64 nanos = ElapsedNanos();
+    const auto memDiff = GetMemSnapshotDiff();
 
     LLBC_String repr;
-    repr.format("%.03f ms", nanos / 1000000.0);
+    if (_traceMemEnabled)
+        repr.format("%.03f ms, memDiff(virt:%lld res:%lld shr:%lld)", 
+                    nanos / 1000000.0,
+                    memDiff._virt, 
+                    memDiff._res,
+                    memDiff._shr);
+    else
+        repr.format("%.03f ms", nanos / 1000000.0);
 
     return repr;
 }
@@ -121,6 +171,38 @@ inline void LLBC_Stopwatch::InitFrequency()
 #else
     _frequency = LLBC_TimeConst::numOfMicrosPerSecond;
 #endif
+}
+
+inline bool LLBC_Stopwatch::GetMemSnapshot(LLBC_MemSnapshot &snapshot)
+{
+#if LLBC_TARGET_PLATFORM_LINUX
+    FILE *statmFile = fopen("/proc/self/statm", "r");
+    if (LIKELY(statmFile)) 
+    {
+        sint64 memVirt{}, memRes{}, memShr{};
+        const auto readCount = fscanf(statmFile, "%lld %lld %lld", &memVirt, &memRes, &memShr);
+        fclose(statmFile);
+
+        if (readCount == 3) 
+        {
+            snapshot._virt = memVirt * LLBC_pageSize;
+            snapshot._res = memRes * LLBC_pageSize;
+            snapshot._shr = memShr * LLBC_pageSize;
+            return true;
+        }
+    }
+#elif LLBC_TARGET_PLATFORM_WIN32 
+    const HANDLE hProcess = GetCurrentProcess();
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    if (GetProcessMemoryInfo(hProcess, reinterpret_cast<PROCESS_MEMORY_COUNTERS *>(&pmc), sizeof(pmc))) 
+    {
+        snapshot._virt = static_cast<sint64>(pmc.PrivateUsage);
+        snapshot._res = static_cast<sint64>(pmc.WorkingSetSize);
+        snapshot._shr = static_cast<sint64>(pmc.WorkingSetSize - pmc.PrivateUsage);
+        return true;
+    }
+#endif
+    return false;
 }
 
 __LLBC_NS_END
