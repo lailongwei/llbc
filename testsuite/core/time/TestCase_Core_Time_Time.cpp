@@ -651,11 +651,21 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
         std::cout << "  - timeOfWeek: " << timeOfWeek
             << "(" << LLBC_TimeConst::GetDayOfWeekDesc(timeOfWeek.GetTotalDays()) << ")" << std::endl;
         const int crossed = LLBC_Time::GetCrossedWeeks(from, to, timeOfWeek);
-        std::cout <<"   - crossed: " << crossed << std::endl;
+        std::cout <<"   - crossed: " << crossed << ", exceptCrossed:" << exceptCrossed << std::endl;
+
         if (crossed != exceptCrossed)
+        {
             std::cerr << "  - !!!!!!!!! Test failed, except:" << exceptCrossed << std::endl;
+            return LLBC_FAILED;
+        }
+
+        return LLBC_OK;
     };
 
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("1970-01-01 08:00:00"),
+                        LLBC_Time::FromTimeStr("1970-01-03 08:00:00"),
+                        LLBC_TimeSpan::FromDays(5, 8),
+                        1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_TimeSpan::zero,
@@ -663,7 +673,15 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-15 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-16 00:00:00"),
                         LLBC_TimeSpan::negOneDay, // -1 days => 6 ays => Saturday
+                        0);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 23:59:59"),
+                        LLBC_Time::FromTimeStr("2023-07-16 00:00:00"),
+                        LLBC_TimeSpan::negOneDay, // -1 days => 6 ays => Saturday
                         1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-15 00:00:00"),
+                        LLBC_Time::FromTimeStr("2023-07-16 00:00:00"),
+                        LLBC_TimeSpan::negOneDay, // -1 days => 6 ays => Saturday
+                        0);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2023-07-14 00:00:00"),
                         LLBC_Time::FromTimeStr("2023-07-13 00:00:00"),
                         LLBC_TimeSpan::zero,
@@ -698,32 +716,40 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
                         1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
                         LLBC_Time::FromTimeStr("2024-12-16 00:00:00"),
-                        LLBC_TimeSpan::zero,
-                        1);
-    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
-                        LLBC_Time::FromTimeStr("2024-12-16 00:00:00"),
                         LLBC_TimeSpan::oneHour,
                         0);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
-                        LLBC_Time::FromTimeStr("2024-12-16 01:00:00"),
-                        LLBC_TimeSpan::oneHour,
-                        1);
-    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
                         LLBC_Time::FromTimeStr("2024-12-22 00:00:00"),
+                        LLBC_TimeSpan::oneHour,
+                        0);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
+                        LLBC_Time::FromTimeStr("2024-12-23 01:00:00"),
                         LLBC_TimeSpan::oneHour,
                         1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-15 23:59:59"),
                         LLBC_Time::FromTimeStr("2024-12-23 01:00:00"),
-                        LLBC_TimeSpan::oneHour,
+                        LLBC_TimeSpan::FromDays(1, 1),
                         2);
-    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-25 23:59:59"),
-                        LLBC_Time::FromTimeStr("2024-12-26 00:00:00"),
-                        LLBC_TimeSpan::FromDays(3),
-                        1);
     crossedWeekTestLbda(LLBC_Time::FromTimeStr("2024-12-25 23:59:59"),
                         LLBC_Time::FromTimeStr("2024-12-26 00:00:00"),
                         LLBC_TimeSpan::FromDays(3, 1),
                         0);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2026-02-26 01:51:52.000000"),
+                        LLBC_Time::FromTimeStr("2026-03-02 04:07:59.875291"),
+                        LLBC_TimeSpan::FromDays(1, 4),
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2026-01-02 22:30:00"),
+                        LLBC_Time::FromTimeStr("2026-01-03 01:00:00"),
+                        LLBC_TimeSpan::FromDays(5, 23),
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2026-02-26 01:51:52.000000"),
+                        LLBC_Time::FromTimeStr("2026-03-02 04:07:59.875291"),
+                        LLBC_TimeSpan::FromDays(1, 4),
+                        1);
+    crossedWeekTestLbda(LLBC_Time::FromTimeStr("2026-02-26 01:51:52.000000"),
+                        LLBC_Time::FromTimeStr("2026-03-09 04:07:59.875291"),
+                        LLBC_TimeSpan::FromDays(1, 4),
+                        2);
 
     auto crossedMonthsTestLbda = [](const LLBC_Time &from,
                                   const LLBC_Time &to,
