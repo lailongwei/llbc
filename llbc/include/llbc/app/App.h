@@ -387,8 +387,8 @@ private:
     void HandleEvent_Stop(const LLBC_AppEvent &ev);
     void HandleEvent_Reload(const LLBC_AppEvent &ev);
 
-    static void HandleSignal_Stop(int sig);
-    static void HandleSignal_Reload(int sig);
+    static void HandleSignal_Stop(int recvThreadId, int sig, int sigVal);
+    static void HandleSignal_Reload(int recvThreadId, int sig, int sigVal);
 
 private:
     void FireAppPhaseChangeEvToServices(bool willStart,

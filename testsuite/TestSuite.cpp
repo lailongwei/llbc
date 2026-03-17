@@ -121,8 +121,8 @@ int TestSuite_Main(int argc, char* argv[])
         if (testCaseRet != LLBC_OK)
         {
             __PrintLineC(LLBC_NS LLBC_ConsoleColor::Fg_Red,
-                         "%s run failed, retCode:%d, press any key to continue...",
-                         testcaseName, testCaseRet);
+                         "%s run failed, retCode:%d, last error:%s, press any key to continue...",
+                         testcaseName, testCaseRet, LLBC_FormatLastError());
             getchar();
         }
     }
