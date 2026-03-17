@@ -21,6 +21,8 @@
 
 #include <signal.h>
 
+#include "llbc/common/Export.h"
+
 #include "llbc/core/os/OS_Thread.h"
 #include "llbc/core/os/OS_Atomic.h"
 
@@ -155,6 +157,12 @@ static LLBC_FORCE_INLINE bool __LLBC_IsCrashSignal(int sig)
                      sig) != __crashSignals + arrSize;
 }
 
+#if LLBC_TARGET_PLATFORM_WIN32
+static constexpr bool __LLBC_IsNPTLReservedSignal(int sig)
+{
+    return false;
+}
+#else // Non-Win32
 // NPTL reserved signals.
 // - NPTL: Native POSIX Thread Library.
 static constexpr int __nptlReservedSignals[] LLBC_CFG_OS_NPTL_RESERVED_SIGNALS;
@@ -167,6 +175,10 @@ static LLBC_FORCE_INLINE bool __LLBC_IsNPTLReservedSignal(int sig)
                      __nptlReservedSignals + arrSize,
                      sig) != __nptlReservedSignals + arrSize;
 }
+#endif // Win32
+
+// Signal handlers.
+static volatile LLBC_NS sint64 __signalHandlers[NSIG] = {0};
 
 // Signal dispatcher.
 #if LLBC_TARGET_PLATFORM_WIN32
@@ -190,11 +202,15 @@ static void __LLBC_SignalDispatcher(int sig, siginfo_t *sigInfo, void *sigCtx)
         // ensuring an already-pending signal is never overwritten.
         auto recvedSig = __LLBC_BuildReceivedSignal(LLBC_NS LLBC_GetCurrentThreadId(), sigVal);
         LLBC_NS LLBC_AtomicCompareAndExchange(&__receivedSignals[sig], static_cast<LLBC_NS sint64>(recvedSig), 0);
+
+        // On Windows: signal() handlers are one-shot, must re-register after each signal.
+        // TODO: The current implementation is not rigorous and will be optimized later.
+        #if LLBC_TARGET_PLATFORM_WIN32
+        if (LLBC_NS LLBC_AtomicGet(&__signalHandlers[sig]) != 0)
+            ::signal(sig, __LLBC_SignalDispatcher);
+        #endif
     }
 }
-
-// Signal handlers.
-static volatile LLBC_NS sint64 __signalHandlers[NSIG] = {0};
 
 __LLBC_INTERNAL_NS_END
 
