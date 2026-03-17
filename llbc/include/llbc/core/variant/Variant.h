@@ -168,6 +168,9 @@ public:
                 Str str;
                 Dict dict;
                 Seq seq;
+
+                ObjType() {}
+                ~ObjType() {}
             } obj;
 
             DataType() {}
