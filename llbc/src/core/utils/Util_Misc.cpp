@@ -47,7 +47,7 @@ LLBC_StartArgs::~LLBC_StartArgs()
 
 int LLBC_StartArgs::Parse(int argc, char *argv[])
 {
-    if (argc < 1)
+    if (argc < 1 || !argv)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;

@@ -190,14 +190,13 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
 {
     // Multi application check.
     LLBC_SetErrAndReturnIf(_thisApp != this, LLBC_ERROR_REPEAT, LLBC_FAILED);
-
     // Reentry check.
     LLBC_SetErrAndReturnIf(!IsStopped(), LLBC_ERROR_REENTRY, LLBC_FAILED);
 
-    // Parse startup arguments.
-    LLBC_ReturnIf(_startArgs.Parse(argc, argv) != LLBC_OK, LLBC_FAILED);
-
-    // Startup llbc library.
+    // Startup llbc framework.
+    // Note: _llbcLibStartupInApp flag is used to determine whether to call LLBC_Cleanup() in LLBC_App::~LLBC_App().
+    //       This ensures that after LLBC_App::Start() is called(regardless of success or failure), developers can
+    //       safely use other llbc framework abilities, such as LLBC_GetLastError().
     if (LLBC_Startup() != LLBC_OK)
     {
         LLBC_ReturnIf(LLBC_GetLastError() != LLBC_ERROR_REENTRY, LLBC_FAILED);
@@ -210,28 +209,25 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         _llbcLibStartupInApp = true;
     }
 
+    // Parse startup arguments.
+    // Note: If App start failed, don't clear start argument member.
+    LLBC_ReturnIf(_startArgs.Parse(argc, argv) != LLBC_OK, LLBC_FAILED);
+
+    // Declare ret variable.
+    int ret = LLBC_OK;
+
     // Normalize application name.
     _name = name;
     if (_name.empty())
         _name = LLBC_Directory::SplitExt(LLBC_Directory::ModuleFileName())[0];
-
-    // Define app start failed defer.
-    int ret = LLBC_FAILED;
-    LLBC_Defer(if (ret != LLBC_OK) {
-        _cfg.BecomeNil();
-        _cfgPath.clear();
-        _cfgType = LLBC_AppConfigType::End;
-
-        _name.clear();
-
-        _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
-        _startPhase = LLBC_AppStartPhase::Stopped;
-    });
+    LLBC_Defer(LLBC_DoIf(ret != LLBC_OK, _name.clear()));
 
     // Set start phase to starting.
     _startPhase = LLBC_AppStartPhase::Starting;
+    LLBC_Defer(LLBC_DoIf(ret != LLBC_OK, _startPhase = LLBC_AppStartPhase::Stopped));
     // Set start threadId.
     _startThreadId = LLBC_GetCurrentThreadId();
+    LLBC_Defer(LLBC_DoIf(ret != LLBC_OK, _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID));
 
     // Locate config path & Load config.
     if (_cfgPath.empty())
@@ -240,34 +236,50 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         if (!(_cfgPath = LocateConfigPath(_name, cfgType)).empty())
             _cfgType = static_cast<LLBC_AppConfigType::ENUM>(cfgType);
     }
+    LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && (ret = ReloadImpl(false, false)) != LLBC_OK, ret);
+    LLBC_Defer(
+        LLBC_DoIf(
+            ret != LLBC_OK,
+            _cfg.BecomeNil()
+            // , _cfgPath.clear() // Don't clear config path if application start failed.
+            // , _cfgType = LLBC_AppConfigType::End // Don't reset config type if application start failed.
+        )
+    );
 
-    // Reload.
-    LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadImpl(false, false) != LLBC_OK, LLBC_FAILED);
-
-    // Handle progress crash.
-    LLBC_ReturnIf(LLBC_EnableCrashHandle() != LLBC_OK, LLBC_FAILED);
+    // Enable crash handle(Ignore Not-Impl error).
+    ret = LLBC_EnableCrashHandle();
+    if (ret != LLBC_OK)
+    {
+        if (LLBC_GetLastError() == LLBC_ERROR_NOT_IMPL)
+            ret = LLBC_OK;
+        else
+            return ret;
+    }
+    LLBC_Defer(LLBC_DoIf(ret != LLBC_OK, LLBC_DisableCrashHandle()));
 
     // Install required signal handlers.
     // - App stop signals.
-    const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
-#if LLBC_TARGET_PLATFORM_WIN32
-    for (auto &stopSig : stopSigs)
-        signal(stopSig, LLBC_App::HandleSignal_Stop);
-#else // Non-Win32
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = LLBC_App::HandleSignal_Stop;
-    for (auto &stopSig : stopSigs)
-        sigaction(stopSig, &sa, nullptr);
-#endif // Win32
+    static constexpr int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
+    for (int sigIdx = 0; sigIdx < static_cast<int>(std::size(stopSigs)); ++sigIdx)
+    {
+        LLBC_ContinueIf((ret = LLBC_SetSignalHandler(stopSigs[sigIdx], LLBC_App::HandleSignal_Stop)) == LLBC_OK);
 
+        for (int rollbackSigIdx = sigIdx - 1; rollbackSigIdx >= 0; --rollbackSigIdx)
+            LLBC_SetSignalHandler(stopSigs[rollbackSigIdx], nullptr);
+        return ret;
+    }
+    LLBC_Defer(LLBC_DoIf(ret != LLBC_OK, LLBC_Foreach(stopSigs, LLBC_SetSignalHandler(item, nullptr))));
     // - App reload signals.
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    const int cfgReloadSigs[]LLBC_CFG_APP_RELOAD_SIGNALS;
-    sa.sa_handler = LLBC_App::HandleSignal_Reload;
-    for (auto &cfgReloadSig : cfgReloadSigs)
-        sigaction(cfgReloadSig, &sa, nullptr);
-#endif // Non-Win32
+    static constexpr int cfgReloadSigs[]LLBC_CFG_APP_RELOAD_SIGNALS;
+    for (int sigIdx = 0; sigIdx < static_cast<int>(std::size(cfgReloadSigs)); ++sigIdx)
+    {
+        LLBC_ContinueIf((ret = LLBC_SetSignalHandler(cfgReloadSigs[sigIdx], LLBC_App::HandleSignal_Reload)) == LLBC_OK);
+
+        for (int rollbackSigIdx = sigIdx - 1; rollbackSigIdx >= 0; --rollbackSigIdx)
+            LLBC_SetSignalHandler(cfgReloadSigs[rollbackSigIdx], nullptr);
+        return ret;
+    }
+    LLBC_Defer(LLBC_DoIf(ret != LLBC_OK, LLBC_Foreach(cfgReloadSigs, LLBC_SetSignalHandler(item, nullptr))));
 
     // Call OnEarlyStart event method.
     LLBC_TimerScheduler *timerScheduler =
@@ -281,7 +293,8 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
             if (LLBC_GetLastError() == LLBC_ERROR_SUCCESS)
                 LLBC_SetLastError(LLBC_ERROR_APP_EARLY_START_FAILED);
 
-            return LLBC_FAILED;
+            ret = LLBC_FAILED;
+            return ret;
         }
 
         LLBC_BreakIf(earlyStartFinished);
@@ -289,6 +302,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         LLBC_Sleep(LLBC_CFG_APP_TRY_START_INTERVAL);
         timerScheduler->Update();
     }
+    LLBC_Defer(LLBC_DoIf(ret != LLBC_OK,  OnLateStop()));
 
     // Fire App-WillStart event to all service(s).
     FireAppPhaseChangeEvToServices(true, false, false, false);
@@ -306,7 +320,8 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
             // Fire App-StartFail event to all service(s).
             FireAppPhaseChangeEvToServices(false, true, false, false);
 
-            return LLBC_FAILED;
+            ret = LLBC_FAILED;
+            return ret;
         }
 
         LLBC_BreakIf(startFinished);
@@ -324,10 +339,16 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     // Fire App-StartFinish event to all service(s).
     FireAppPhaseChangeEvToServices(false, false, true, false);
 
+    // Set ret to OK.
+    ret = LLBC_OK;
+
     // Enter app loop.
     while (true)
     {
         sint64 begRunTime = LLBC_GetMilliseconds();
+
+        // Process received signals.
+        LLBC_ProcessReceivedSignals();
 
         // Call OnUpdate event method.
         OnUpdate();
@@ -340,7 +361,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         if (_requireStop)
         {
             Stop();
-            return ret = LLBC_OK;
+            return ret;
         }
 
         // Execute sleep, if need.
@@ -397,29 +418,18 @@ void LLBC_App::Stop()
         timerScheduler->Update();
     }
 
-    // Set phase to Stopped.
-    _startPhase = LLBC_AppStartPhase::Stopped;
-
     // Call OnLateStop event method.
     OnLateStop();
 
+    // Set phase to Stopped.
+    _startPhase = LLBC_AppStartPhase::Stopped;
+
     // Uninstall required signal handlers.
-    const int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
-#if LLBC_TARGET_PLATFORM_WIN32
-    for (auto &stopSig : stopSigs)
-        signal(stopSig, SIG_DFL);
-#else // Non-Win32
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = SIG_DFL;
-    for (auto &stopSig : stopSigs)
-        sigaction(stopSig, &sa, nullptr);
-#endif // Win32
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    const int cfgReloadSigs[]LLBC_CFG_APP_RELOAD_SIGNALS;
-    for (auto &cfgReloadSig : cfgReloadSigs)
-        sigaction(cfgReloadSig, &sa, nullptr);
-#endif // Non-Win32
+    constexpr int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
+    LLBC_Foreach(stopSigs, LLBC_SetSignalHandler(item, nullptr));
+
+    constexpr int cfgReloadSigs[]LLBC_CFG_APP_RELOAD_SIGNALS;
+    LLBC_Foreach(cfgReloadSigs, LLBC_SetSignalHandler(item, nullptr));
 
     // Disable handle crash.
     LLBC_DisableCrashHandle();
@@ -517,7 +527,7 @@ LLBC_String LLBC_App::LocateConfigPath(const LLBC_String &appName, int &cfgType)
     // -> <module file directory>
     LLBC_Strings cfgFileDirs{ LLBC_Directory::CurDir(),
                               LLBC_Directory::ModuleFileDir(false) };
-    if (LLBC_Directory::ModuleFileDir(true) != LLBC_Directory::ModuleFileDir(true))
+    if (LLBC_Directory::ModuleFileDir(true) != LLBC_Directory::ModuleFileDir(false))
         cfgFileDirs.push_back(LLBC_Directory::ModuleFileDir(true));
 
     // -> <cwd>/xxxxx
@@ -751,13 +761,19 @@ void LLBC_App::HandleEvent_Stop(const LLBC_AppEvent &ev)
     _requireStop = true;
 }
 
-void LLBC_App::HandleSignal_Stop(int sig)
+void LLBC_App::HandleSignal_Stop(int recvThreadId, int sig, int sigVal)
 {
+    LLBC_UNUSED_PARAM(recvThreadId);
+    LLBC_UNUSED_PARAM(sigVal);
+
     ThisApp()->PushEvent(LLBC_AppEventType::Stop);
 }
 
-void LLBC_App::HandleSignal_Reload(int sig)
+void LLBC_App::HandleSignal_Reload(int recvThreadId, int sig, int sigVal)
 {
+    LLBC_UNUSED_PARAM(recvThreadId);
+    LLBC_UNUSED_PARAM(sigVal);
+
     ThisApp()->PushEvent(LLBC_AppEventType::Reload);
 }
 
