@@ -293,13 +293,13 @@ int TestCase_Core_OS_Signal::SignalTriggerTest()
 
     // Install signal handler.
     #if LLBC_TARGET_PLATFORM_WIN32
-    const int testSignals[] = {SIGSEGV, SIGFPE};
+    static constexpr int testSignals[] = {SIGSEGV, SIGFPE};
     #elif LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
-    const auto testSignals = {SIGUSR1, SIGUSR2};
+    static constexpr int testSignals[] = {SIGUSR1, SIGUSR2};
     #else // Non-Win32 && Non-Mac && Non-iPhone
-    const int testSignals[] = {SIGUSR1, SIGUSR2, SIGRTMIN, SIGRTMIN + 1, SIGRTMIN + 2, SIGRTMAX - 1, SIGRTMAX};
+    static constexpr int testSignals[] = {SIGUSR1, SIGUSR2, SIGRTMIN, SIGRTMIN + 1, SIGRTMIN + 2, SIGRTMAX - 1, SIGRTMAX};
     #endif
-    LLBC_PrintLn("- Install test signal handlers, signals:%s", LLBC_Variant(testSignals).ToString().c_str());
+    LLBC_PrintLn("- Install test signal handlers");
     for (auto &sig : testSignals)
     {
         LLBC_Expect(LLBC_SetSignalHandler(sig, _TestSigHandler) == LLBC_OK);
