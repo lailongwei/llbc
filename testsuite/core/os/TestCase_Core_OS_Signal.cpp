@@ -297,7 +297,7 @@ int TestCase_Core_OS_Signal::SignalTriggerTest()
     #elif LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
     static constexpr int testSignals[] = {SIGUSR1, SIGUSR2};
     #else // Non-Win32 && Non-Mac && Non-iPhone
-    static constexpr int testSignals[] = {SIGUSR1, SIGUSR2, SIGRTMIN, SIGRTMIN + 1, SIGRTMIN + 2, SIGRTMAX - 1, SIGRTMAX};
+    static const int testSignals[] = {SIGUSR1, SIGUSR2, SIGRTMIN, SIGRTMIN + 1, SIGRTMIN + 2, SIGRTMAX - 1, SIGRTMAX};
     #endif
     LLBC_PrintLn("- Install test signal handlers");
     for (auto &sig : testSignals)
