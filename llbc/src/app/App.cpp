@@ -269,6 +269,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         return ret;
     }
     LLBC_Defer(LLBC_DoIf(ret != LLBC_OK, LLBC_Foreach(stopSigs, LLBC_SetSignalHandler(item, nullptr))));
+    #if LLBC_TARGET_PLATFORM_NON_WIN32
     // - App reload signals.
     static constexpr int cfgReloadSigs[]LLBC_CFG_APP_RELOAD_SIGNALS;
     for (int sigIdx = 0; sigIdx < static_cast<int>(std::size(cfgReloadSigs)); ++sigIdx)
@@ -280,6 +281,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
         return ret;
     }
     LLBC_Defer(LLBC_DoIf(ret != LLBC_OK, LLBC_Foreach(cfgReloadSigs, LLBC_SetSignalHandler(item, nullptr))));
+    #endif // Non-Win32
 
     // Call OnEarlyStart event method.
     LLBC_TimerScheduler *timerScheduler =
@@ -427,9 +429,10 @@ void LLBC_App::Stop()
     // Uninstall required signal handlers.
     constexpr int stopSigs[]LLBC_CFG_APP_STOP_SIGNALS;
     LLBC_Foreach(stopSigs, LLBC_SetSignalHandler(item, nullptr));
-
+    #if LLBC_TARGET_PLATFORM_NON_WIN32
     constexpr int cfgReloadSigs[]LLBC_CFG_APP_RELOAD_SIGNALS;
     LLBC_Foreach(cfgReloadSigs, LLBC_SetSignalHandler(item, nullptr));
+    #endif // Non-Win32
 
     // Disable handle crash.
     LLBC_DisableCrashHandle();

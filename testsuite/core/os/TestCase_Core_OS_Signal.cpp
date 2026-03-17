@@ -118,11 +118,11 @@ int TestCase_Core_OS_Signal::SetSignalHandlerTest()
 
     // Define test signals(standard signals + real-time signals).
     #if LLBC_TARGET_PLATFORM_WIN32
-    const auto testSignals = {SIGSEGV, SIGFPE};
+    static constexpr int testSignals[] = {SIGINT, SIGTERM};
     #elif LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
-    const auto testSignals = {SIGUSR1, SIGUSR2};
+    static constexpr int testSignals[] = {SIGUSR1, SIGUSR2};
     #else // Non-Win32 && Non-Mac && Non-iPhone
-    const auto testSignals = {SIGUSR1, SIGUSR2, SIGRTMIN, SIGRTMIN + 1, SIGRTMIN + 2, SIGRTMAX - 1, SIGRTMAX};
+    const int testSignals[] = {SIGUSR1, SIGUSR2, SIGRTMIN, SIGRTMIN + 1, SIGRTMIN + 2, SIGRTMAX - 1, SIGRTMAX};
     #endif
 
     // Test get signal handler.
@@ -293,7 +293,7 @@ int TestCase_Core_OS_Signal::SignalTriggerTest()
 
     // Install signal handler.
     #if LLBC_TARGET_PLATFORM_WIN32
-    static constexpr int testSignals[] = {SIGSEGV, SIGFPE};
+    static constexpr int testSignals[] = {SIGINT, SIGTERM};
     #elif LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
     static constexpr int testSignals[] = {SIGUSR1, SIGUSR2};
     #else // Non-Win32 && Non-Mac && Non-iPhone
