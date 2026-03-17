@@ -149,9 +149,10 @@ static constexpr int __crashSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 // Check given signal is crash signal or not.
 static LLBC_FORCE_INLINE bool __LLBC_IsCrashSignal(int sig)
 {
-    return std::find(std::begin(__crashSignals),
-                     std::end(__crashSignals),
-                     sig) != std::end(__crashSignals);
+    static constexpr size_t arrSize = sizeof(__crashSignals) / sizeof(__crashSignals[0]);
+    return std::find(__crashSignals,
+                     __crashSignals + arrSize,
+                     sig) != __crashSignals + arrSize;
 }
 
 // NPTL reserved signals.
@@ -161,9 +162,10 @@ static constexpr int __nptlReservedSignals[] LLBC_CFG_OS_NPTL_RESERVED_SIGNALS;
 // Check given signal is NPTL reserved signal or not.
 static LLBC_FORCE_INLINE bool __LLBC_IsNPTLReservedSignal(int sig)
 {
-    return std::find(std::begin(__nptlReservedSignals),
-                     std::end(__nptlReservedSignals),
-                     sig) != std::end(__nptlReservedSignals);
+    static constexpr size_t arrSize = sizeof(__nptlReservedSignals) / sizeof(__nptlReservedSignals[0]);
+    return std::find(__nptlReservedSignals,
+                     __nptlReservedSignals + arrSize,
+                     sig) != __nptlReservedSignals + arrSize;
 }
 
 // Signal dispatcher.
