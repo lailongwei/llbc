@@ -30,20 +30,24 @@ LLBC_EXPORT char *strsignal(int sig);
 __LLBC_NS_BEGIN
 
 /**
- * \brief The llbc framework signal handler.
- * @param[in] recvThreadId - the received thread id.
- * @param[in] sig          - the signal.
- * @param[in] sigValue     - the signal value.
+ * @brief The llbc framework signal handler type.
+ * @param[in] recvThreadId - the id of the thread that received the signal.
+ * @param[in] sig          - the signal number.
+ * @param[in] sigValue     - the signal value(always 0 on Windows platform).
  */
 typedef void (*LLBC_SignalHandler)(int recvThreadId, int sig, int sigValue);
 
 /**
  * Set signal handler.
- * Note: Could not setup <LLBC_CFG_OS_CRASH_SIGNALS> signals by this function,
- *       if you want to setup crash signals, please use LLBC_SetCrashHandler() function.
- * Note: On Windows platform, the sigValue argument in handler is always 0.
- * @param[in] sig     - the signal, must be a valid signal number.
- * @param[in] handler - the signal handler function, if nullptr, clear the signal handler and restore default behavior.
+ * Notes:
+ * 1. Cannot set <LLBC_CFG_OS_CRASH_SIGNALS> signals via this function;
+ *    to set crash signal handlers, use LLBC_SetCrashHandler() instead.
+ * 2. On Windows platform, the sigValue argument in handler is always 0.
+ * 3. If handler is nullptr, any pending signal for this sig will be silently
+ *    discarded on the next LLBC_ProcessReceivedSignals() call.
+ *
+ * @param[in] sig     - the signal number, must be valid.
+ * @param[in] handler - the signal handler; if nullptr, clears the handler and restores default behavior.
  * @return int - return 0 if success, otherwise return -1.
  */
 LLBC_EXPORT int LLBC_SetSignalHandler(int sig, LLBC_SignalHandler handler);
@@ -59,8 +63,9 @@ LLBC_EXPORT int LLBC_SetSignalHandler(int sig, LLBC_SignalHandler handler);
 LLBC_EXPORT LLBC_SignalHandler LLBC_GetSignalHandler(int sig);
 
 /**
- * Process received signals, this function should be called in llbc entry thread loop.
- * If you used LLBC_App, don't need to call this function manually, otherwise please call it periodically.
+ * @brief Process received signals. This function should be called in the llbc entry thread loop.
+ * If you are using LLBC_App, you don't need to call this function manually;
+ * otherwise, call it periodically.
  * @return int - return 0 if success, otherwise return -1.
  */
 LLBC_EXPORT int LLBC_ProcessReceivedSignals();
