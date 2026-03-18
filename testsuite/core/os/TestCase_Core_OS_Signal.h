@@ -19,41 +19,21 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "llbc/common/Export.h"
+#pragma once
 
-#include "llbc/core/os/OS_SysConf.h"
+#include "llbc.h"
+using namespace llbc;
 
-__LLBC_NS_BEGIN
-
-sint64 LLBC_pageSize = 0;
-
-int __LLBC_InitSysConf()
+class TestCase_Core_OS_Signal : public LLBC_BaseTestCase
 {
-    #if LLBC_TARGET_PLATFORM_LINUX
-    errno = 0;
-    int tmpValue = sysconf(_SC_PAGESIZE);
-    if (UNLIKELY(tmpValue == -1))
-    {
-        if (UNLIKELY(errno == 0))
-            errno = EINVAL;
+public:
+    TestCase_Core_OS_Signal() = default;
+    ~TestCase_Core_OS_Signal() override = default;
 
-        LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return LLBC_FAILED;
-    }
+public:
+    int Run(int argc, char *argv[]) override;
 
-    LLBC_pageSize = tmpValue;
-    #elif LLBC_TARGET_PLATFORM_WIN32
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-    LLBC_pageSize = si.dwPageSize;
-    #endif
-
-    return LLBC_OK;
-}
-
-void __LLBC_CleanUpSysConf()
-{
-    LLBC_pageSize = 0;
-}
-
-__LLBC_NS_END
+private:
+    int SetSignalHandlerTest();
+    int SignalTriggerTest();
+};

@@ -113,7 +113,7 @@ int TestCase_Core_Timer_Heap::BaseTest(bool isMaxHeap)
     buildHeap(100);
     for (size_t i = 0; i < 10; ++i)
     {
-        const auto removeIdx = LLBC_Rand(0, heap.size());
+        const auto removeIdx = LLBC_Rand(0, static_cast<int>(heap.size()));
         LLBC_PrintLn("  - Remove specific elem: %d ...", *(heap.begin() + removeIdx));
         heap.erase(*(heap.begin() + removeIdx));
     }
@@ -168,14 +168,14 @@ void TestCase_Core_Timer_Heap::PerfTest()
     size_t tailEraseElemChoseBegin = heap.size() - tailEraseSize * 4;
     std::set<size_t, std::greater<size_t>> eraseIndexes;
     while (eraseIndexes.size() != tailEraseSize)
-        eraseIndexes.emplace(LLBC_Rand(tailEraseElemChoseBegin, heap.size()));
+        eraseIndexes.emplace(LLBC_Rand(static_cast<int>(tailEraseElemChoseBegin), static_cast<int>(heap.size())));
 
     auto heap2 = heap;
     LLBC_PrintLn("- Front-find erase elems, tailEraseSize:%lu, heapSize:%lu",
                  tailEraseSize, heap.size());
     sw.Restart();
     for (auto eraseIdx : eraseIndexes)
-        heap.erase(*(heap.begin() + eraseIdx), false);
+        heap.erase(*(heap.begin() + static_cast<int>(eraseIdx)), false);
     LLBC_PrintLn("  - Done, after erase, heapSize:%lu, cost:%.3f ms",
                  heap.size(), sw.Elapsed().GetTotalMicros() / 1000.0);
 

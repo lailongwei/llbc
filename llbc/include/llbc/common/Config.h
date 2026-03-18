@@ -41,7 +41,15 @@
 // Determine max capture frames count when enabled OS/Symbol functions.
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 // Determine crash signal set.
-#define LLBC_CFG_OS_CRASH_SIGNALS                           {SIGSEGV, SIGABRT, SIGFPE}
+#define LLBC_CFG_OS_CRASH_SIGNALS                           {SIGSEGV, SIGABRT, SIGFPE, SIGILL}
+// Determine NPTL reserved signal set.
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
+// __SIGRTMIN is a kernel-internal symbol (value 32), not reliably available in user-space headers,
+// so the values are hardcoded here.
+#define LLBC_CFG_OS_NPTL_RESERVED_SIGNALS                   {32, 33} // __SIGRTMIN + 0, __SIGRTMIN + 1
+#else // Non Linux like platform.
+#define LLBC_CFG_OS_NPTL_RESERVED_SIGNALS                   {}
+#endif
 
 /**
  * \brief Common about config options define.
@@ -49,7 +57,7 @@
 // Enable/Disable llbc framework assert macro.
 #define LLBC_CFG_COM_ENABLE_LLBC_ASSERT                     1
 // The stream object auto resize increment limit, in bytes.
-#define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          512
+#define LLBC_CFG_COM_STREAM_AUTO_RESIZE_INCR_LIMIT          1024
 
 /**
  * \brief core/algo about config options define.
