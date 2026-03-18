@@ -31,9 +31,9 @@
 #if LLBC_TARGET_PLATFORM_WIN32
 char *strsignal(int sig)
 {
-    // On windows platform, only support SIGABRT, SIGFPE, SIGILL, SIGINT, SIGSEGV, SIGTERM signals.
+    // On Windows platform, only SIGABRT, SIGFPE, SIGILL, SIGINT, SIGSEGV, SIGTERM are supported.
     // Doc: https://learn.microsoft.com/en-us/previous-versions/xdkz3x12(v=vs.140)
-    // NSIG(defined in signal.h): 23
+    // NSIG (defined in signal.h): 23
 
     // Signal descs:
     static constexpr int linuxNSIG = 65;
@@ -57,7 +57,7 @@ char *strsignal(int sig)
         /* 16 */ "Stack fault (Not Supported on Windows)",              // SIGSTKFLT
         /* 17 */ "Child exited (Not Supported on Windows)",             // SIGCHLD
         /* 18 */ "Continued (Not Supported on Windows)",                // SIGCONT
-        /* 19 */ "Stopped (signal)(Not Supported on Windows)",          // SIGSTOP
+        /* 19 */ "Stopped (signal) (Not Supported on Windows)",         // SIGSTOP
         /* 20 */ "Stopped (Not Supported on Windows)",                  // SIGTSTP
         /* 21 */ "Stopped (tty input) (Not Supported on Windows)",      // SIGTTIN
         /* 22 */ "Stopped (tty output) (Not Supported on Windows)",     // SIGTTOU
@@ -117,7 +117,7 @@ char *strsignal(int sig)
     }
     else
     {
-        snprintf(sigDesc,sizeof(sigDesc), "Unknown signal %d", sig);
+        snprintf(sigDesc, sizeof(sigDesc), "Unknown signal %d", sig);
     }
 
     return sigDesc;
@@ -128,8 +128,11 @@ __LLBC_INTERNAL_NS_BEGIN
 
 // Received signals.
 // |<---   32 bit   --->|<--- 32 bit --->|
-// | receive thread id  |  signal value  |
+// | receiver thread id |  signal value  |
 static volatile LLBC_NS sint64 __receivedSignals[NSIG] = {0};
+
+// Received signals count.
+static volatile LLBC_NS sint64 __receivedSignalCount = 0;
 
 // Build received signal.
 static LLBC_FORCE_INLINE LLBC_NS uint64 __LLBC_BuildReceivedSignal(int recvThreadId, int sigValue)
@@ -149,33 +152,41 @@ static LLBC_FORCE_INLINE void __LLBC_ParseReceivedSignal(LLBC_NS uint64 received
 static constexpr int __crashSignals[] LLBC_CFG_OS_CRASH_SIGNALS;
 
 // Check given signal is crash signal or not.
-static LLBC_FORCE_INLINE bool __LLBC_IsCrashSignal(int sig)
+constexpr bool __LLBC_IsCrashSignal(int sig)
 {
-    static constexpr size_t arrSize = sizeof(__crashSignals) / sizeof(__crashSignals[0]);
-    return std::find(__crashSignals,
-                     __crashSignals + arrSize,
-                     sig) != __crashSignals + arrSize;
-}
+    constexpr size_t arrSize = sizeof(__crashSignals) / sizeof(__crashSignals[0]);
+    for (size_t idx = 0; idx < arrSize; ++idx)
+    {
+        if (__crashSignals[idx] == sig)
+            return true;
+    }
 
-#if LLBC_TARGET_PLATFORM_WIN32
-static constexpr bool __LLBC_IsNPTLReservedSignal(int sig)
-{
     return false;
 }
-#else // Non-Win32
+
 // NPTL reserved signals.
 // - NPTL: Native POSIX Thread Library.
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
 static constexpr int __nptlReservedSignals[] LLBC_CFG_OS_NPTL_RESERVED_SIGNALS;
 
 // Check given signal is NPTL reserved signal or not.
-static LLBC_FORCE_INLINE bool __LLBC_IsNPTLReservedSignal(int sig)
+constexpr bool __LLBC_IsNPTLReservedSignal(int sig)
 {
-    static constexpr size_t arrSize = sizeof(__nptlReservedSignals) / sizeof(__nptlReservedSignals[0]);
-    return std::find(__nptlReservedSignals,
-                     __nptlReservedSignals + arrSize,
-                     sig) != __nptlReservedSignals + arrSize;
+    constexpr size_t arrSize = sizeof(__nptlReservedSignals) / sizeof(__nptlReservedSignals[0]);
+    for (size_t idx = 0; idx < arrSize; ++idx)
+    {
+        if (__nptlReservedSignals[idx] == sig)
+            return true;
+    }
+
+    return false;
 }
-#endif // Win32
+#else // Non Linux&Android
+constexpr bool __LLBC_IsNPTLReservedSignal(int sig)
+{
+    return false;
+}
+#endif // Linux || Android
 
 // Signal handlers.
 static volatile LLBC_NS sint64 __signalHandlers[NSIG] = {0};
@@ -187,29 +198,35 @@ static void __LLBC_SignalDispatcher(int sig)
 static void __LLBC_SignalDispatcher(int sig, siginfo_t *sigInfo, void *sigCtx)
 #endif
 {
-    if (LIKELY(std::find(std::begin(__crashSignals),
-                         std::end(__crashSignals),
-                         sig) == std::end(__crashSignals)))
-    {
-        // Get signal value.
-        #if LLBC_TARGET_PLATFORM_WIN32
-        const int sigVal = 0;
-        #else
-        const int sigVal = sigInfo->si_code == SI_QUEUE ? sigInfo->si_value.sival_int : 0;
-        #endif
+    // Not allow to process "crash" / "NPTL reserved" signal.
+    if (UNLIKELY(__LLBC_IsCrashSignal(sig) ||
+                 __LLBC_IsNPTLReservedSignal(sig)))
+        return;
 
-        // Save the received signal via CAS: only writes if the slot is empty (0),
-        // ensuring an already-pending signal is never overwritten.
-        auto recvedSig = __LLBC_BuildReceivedSignal(LLBC_NS LLBC_GetCurrentThreadId(), sigVal);
+    // Get signal value(on Windows platform, the signal value is always 0).
+    #if LLBC_TARGET_PLATFORM_WIN32
+    const int sigVal = 0;
+    #else
+    const int sigVal = sigInfo->si_code == SI_QUEUE ? sigInfo->si_value.sival_int : 0;
+    #endif
+
+    // Save the received signal via CAS: only writes if the slot is empty (0),
+    // ensuring an already-pending signal is never overwritten.
+    const auto recvedSig = __LLBC_BuildReceivedSignal(LLBC_NS LLBC_GetCurrentThreadId(), sigVal);
+    LLBC_ReturnIf(UNLIKELY(recvedSig == 0), void());
+    const LLBC_NS sint64 prevRecvedSig =
         LLBC_NS LLBC_AtomicCompareAndExchange(&__receivedSignals[sig], static_cast<LLBC_NS sint64>(recvedSig), 0);
 
-        // On Windows: signal() handlers are one-shot, must re-register after each signal.
-        // TODO: The current implementation is not rigorous and will be optimized later.
-        #if LLBC_TARGET_PLATFORM_WIN32
-        if (LLBC_NS LLBC_AtomicGet(&__signalHandlers[sig]) != 0)
-            ::signal(sig, __LLBC_SignalDispatcher);
-        #endif
-    }
+    // On Windows: signal() handler is one-shot, must re-register after each signal.
+    // TODO: The current implementation is not rigorous and will be optimized later.
+    #if LLBC_TARGET_PLATFORM_WIN32
+    if (LLBC_NS LLBC_AtomicGet(&__signalHandlers[sig]) != 0)
+        ::signal(sig, __LLBC_SignalDispatcher);
+    #endif
+
+    // Increase received signal count.
+    if (prevRecvedSig == 0)
+        LLBC_NS LLBC_AtomicFetchAndAdd(&__receivedSignalCount, 1);
 }
 
 __LLBC_INTERNAL_NS_END
@@ -297,6 +314,11 @@ LLBC_SignalHandler LLBC_GetSignalHandler(int sig)
 
 int LLBC_ProcessReceivedSignals()
 {
+    // If no received signals, return directly.
+    sint64 recvedSigCount = LLBC_AtomicGet(&LLBC_INL_NS __receivedSignalCount);
+    if (LIKELY(recvedSigCount <= 0))
+        return LLBC_OK;
+
     // Get lib tls.
     auto libTls = __LLBC_GetLibTls();
     if (UNLIKELY(!libTls))
@@ -314,15 +336,28 @@ int LLBC_ProcessReceivedSignals()
 
     for (int sig = 1; sig < NSIG; ++sig)
     {
-        // Check if signal received.
-        const auto receivedSig = static_cast<uint64>(LLBC_AtomicSet(&LLBC_INL_NS __receivedSignals[sig], 0ll));
-        if (receivedSig == 0)
-            continue;
+        // If no received signals, break.
+        // CONSTRAINT: <recvedSigCount> must be greater than or equal to 0.
+        recvedSigCount = LLBC_AtomicGet(&LLBC_INL_NS __receivedSignalCount);
+        llbc_assert(LIKELY(recvedSigCount >= 0) &&
+                        "llbc framework internal error: received signal count must be greater than or equal to 0 [1]");
+        LLBC_BreakIf(recvedSigCount == 0);
+
+        // If no received this signal, continue.
+        const auto recvedSig = static_cast<uint64>(LLBC_AtomicSet(&LLBC_INL_NS __receivedSignals[sig], 0ll));
+        LLBC_ContinueIf(recvedSig == 0);
+
+        // Decrease received signal count.
+        // CONSTRAINT: Before decrement, <recvedSigCount> must be greater than 0.
+        // NOTE: <recvedSigCount> will be updated at the start of the next loop iteration.
+        const sint64 prevRecvedSigCount = LLBC_AtomicFetchAndSub(&LLBC_INL_NS __receivedSignalCount, 1);
+        llbc_assert(LIKELY(prevRecvedSigCount > 0) &&
+                        "llbc framework internal error: previous received signal count must be greater than 0 [2]");
 
         // Parse received signal.
         int sigValue = 0;
         int recvThreadId = 0;
-        LLBC_INL_NS __LLBC_ParseReceivedSignal(receivedSig, recvThreadId, sigValue);
+        LLBC_INL_NS __LLBC_ParseReceivedSignal(recvedSig, recvThreadId, sigValue);
 
         // Invoke handler.
         LLBC_SignalHandler handler = nullptr;
@@ -331,12 +366,12 @@ int LLBC_ProcessReceivedSignals()
         if (handler)
             (*handler)(recvThreadId, sig, sigValue);
 
-        // Reset sig to 1 after handling the current signal, so that the next
+        // Reset sig to 0 after handling the current signal, so that the next
         // signal to be processed is always the highest-priority one among all
         // pending signals (lower signal number means higher priority).
-        sig = 1;
+        sig = 0; // !!! sig will increment to 1 in the next loop.
     }
-    
+
     return LLBC_OK;
 }
 
