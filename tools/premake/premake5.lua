@@ -334,6 +334,9 @@ project "testsuite"
         "app/AppCfgTest.properties",
         "app/AppCfgTest.ini",
         "app/AppCfgTest.xml",
+        "app/AppCfgReloadFailedTest.cfg",
+        "app/AppCfgReloadFailedTest.ini",
+        "app/AppCfgReloadFailedTest.xml",
     }
     filter { "system:windows" }
         for _, test_cfg in pairs(test_cfgs) do

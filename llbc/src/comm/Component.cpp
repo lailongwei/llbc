@@ -332,6 +332,51 @@ LLBC_String LLBC_ProtoReport::ToString() const
     return repr;
 }
 
+LLBC_AppReloadFailedInfo::LLBC_AppReloadFailedInfo()
+: _errNo(0)
+, _subErrNo(0)
+{
+}
+
+LLBC_AppReloadFailedInfo::~LLBC_AppReloadFailedInfo()
+{
+}
+
+int LLBC_AppReloadFailedInfo::GetErrNo() const
+{
+    return _errNo;
+}
+
+void LLBC_AppReloadFailedInfo::SetErrNo(int errNo)
+{
+    _errNo = errNo;
+}
+
+int LLBC_AppReloadFailedInfo::GetSubErrNo() const
+{
+    return _subErrNo;
+}
+
+void LLBC_AppReloadFailedInfo::SetSubErrNo(int subErrNo)
+{
+    _subErrNo = subErrNo;
+}
+
+LLBC_String LLBC_AppReloadFailedInfo::GetErrDesc() const
+{
+    return LLBC_StrErrorEx(_errNo, _subErrNo);
+}
+
+LLBC_String LLBC_AppReloadFailedInfo::ToString() const
+{
+    LLBC_String repr;
+    repr.append_format("errNo:0x%x, ", _errNo)
+        .append_format("subErrNo:%d, ", _subErrNo)
+        .append_format("errDesc:%s", LLBC_StrErrorEx(_errNo, _subErrNo));
+
+    return repr;
+}
+
 LLBC_Component::LLBC_Component()
 : _runningPhase(_CompRunningPhase::NotInit)
 
