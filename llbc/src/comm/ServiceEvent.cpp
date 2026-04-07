@@ -193,6 +193,15 @@ LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppReloadedEv(int cfgType,
     return evBlock;
 }
 
+LLBC_MessageBlock *LLBC_SvcEvUtil::BuildAppReloadFailedEv(int errNo, int subErrNo)
+{
+    LLBC_SvcEv_AppReloadFailedEv *wrapEv;
+    auto evBlock = __CreateEvBlock(wrapEv);
+    wrapEv->errNo = errNo;
+    wrapEv->subErrNo = subErrNo;
+    return evBlock;
+}
+
 LLBC_MessageBlock *LLBC_SvcEvUtil::BuildComponentEventEv(int eventType,
                                                          const LLBC_Variant &eventParams)
 {

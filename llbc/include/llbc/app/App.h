@@ -177,6 +177,11 @@ public:
      */
     virtual void OnReload() {  }
 
+    /**
+     * Application reload failed event method, please override this method in your project.
+     */
+    virtual void OnReloadFailed() {  }
+
 public:
     /**
      * Get this application.

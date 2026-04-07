@@ -56,6 +56,7 @@ public:
 
         AppPhaseEv,
         AppReloaded,
+        AppReloadFailed,
 
         ComponentEvent,
 
@@ -211,6 +212,17 @@ struct LLBC_HIDDEN LLBC_SvcEv_AppReloadedEv : public LLBC_ServiceEvent
 };
 
 /**
+ * \brief The application reload failed event structure encapsulation.
+ */
+struct LLBC_HIDDEN LLBC_SvcEv_AppReloadFailedEv : public LLBC_ServiceEvent
+{
+    int errNo;
+    int subErrNo;
+
+    LLBC_SvcEv_AppReloadFailedEv();
+};
+
+/**
  * \brief The component event ev structure encapsulation.
  */
 struct LLBC_HIDDEN LLBC_SvcEv_ComponentEventEv : public LLBC_ServiceEvent
@@ -306,6 +318,11 @@ public:
      */
     static LLBC_MessageBlock *BuildAppReloadedEv(int cfgType,
                                                  const LLBC_Variant &cfg);
+
+    /**
+     * Build application reload failed event.
+     */
+    static LLBC_MessageBlock *BuildAppReloadFailedEv(int errNo, int subErrNo);
 
     /**
      * Build component event ev.

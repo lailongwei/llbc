@@ -540,6 +540,7 @@ private:
     void HandleEv_FireEv(LLBC_ServiceEvent &ev);
     void HandleEv_AppPhaseEv(LLBC_ServiceEvent &ev);
     void HandleEv_AppReloaded(LLBC_ServiceEvent &ev);
+    void HandleEv_AppReloadFailed(LLBC_ServiceEvent &ev);
     void HandleEv_ComponentEvent(LLBC_ServiceEvent &ev);
 
     /**
