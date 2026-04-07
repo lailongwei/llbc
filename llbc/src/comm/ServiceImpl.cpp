@@ -85,6 +85,7 @@ LLBC_ServiceImpl::_EvHandler LLBC_ServiceImpl::_evHandlers[LLBC_ServiceEventType
 
     &LLBC_ServiceImpl::HandleEv_AppPhaseEv,
     &LLBC_ServiceImpl::HandleEv_AppReloaded,
+    &LLBC_ServiceImpl::HandleEv_AppReloadFailed,
 
     &LLBC_ServiceImpl::HandleEv_ComponentEvent,
 };
@@ -1872,6 +1873,22 @@ void LLBC_ServiceImpl::HandleEv_AppReloaded(LLBC_ServiceEvent &_)
     {
         if (comp->_runningPhase == _CompRunningPhase::LateStarted)
             comp->OnReload();
+    }
+}
+
+void LLBC_ServiceImpl::HandleEv_AppReloadFailed(LLBC_ServiceEvent &_)
+{
+    auto &ev = static_cast<LLBC_SvcEv_AppReloadFailedEv &>(_);
+    LLBC_AppReloadFailedInfo failedInfo;
+    failedInfo.SetErrNo(ev.errNo);
+    failedInfo.SetSubErrNo(ev.subErrNo);
+    const LLBC_Variant eventParams(&failedInfo);
+
+    // Dispatch app-reload-failed event to all comps.
+    for (auto &comp : _compList)
+    {
+        if (comp->_runningPhase == _CompRunningPhase::LateStarted)
+            comp->OnEvent(LLBC_ComponentEventType::AppReloadFailed, eventParams);
     }
 }
 

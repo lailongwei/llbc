@@ -322,6 +322,48 @@ private:
     LLBC_String _report;
 };
 
+/**
+ * \brief The application reload failed info class encapsulation.
+ */
+class LLBC_EXPORT LLBC_AppReloadFailedInfo
+{
+public:
+    /**
+     * Constructor & Destructor.
+     */
+    LLBC_AppReloadFailedInfo();
+    ~LLBC_AppReloadFailedInfo();
+
+public:
+    /**
+     * Error No getter & setter.
+     */
+    int GetErrNo() const;
+    void SetErrNo(int errNo);
+
+    /**
+     * Sub error No getter & setter.
+     */
+    int GetSubErrNo() const;
+    void SetSubErrNo(int subErrNo);
+
+    /**
+     * Get error description(call LLBC_StrErrorEx internally).
+     */
+    LLBC_String GetErrDesc() const;
+
+public:
+    /**
+     * Get this class string representation.
+     * @return LLBC_String - the string representation.
+     */
+    LLBC_String ToString() const;
+
+private:
+    int _errNo;
+    int _subErrNo;
+};
+
 // Pre-declare LLBC_Component, use for define LLBC_ComponentMethod type.
 class LLBC_Component;
 
@@ -411,6 +453,7 @@ public:
         AppStartFailed,
         AppStartFinished,
         AppWillStop,
+        AppReloadFailed,
 
         LibEnd = 1000,
 

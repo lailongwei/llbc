@@ -624,7 +624,24 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
         // - Reload detail: Reload config.
         LLBC_AtomicFetchAndAdd(&_loading, 1);
         LLBC_Defer(LLBC_AtomicFetchAndSub(&_loading, 1));
-        LLBC_ReturnIf(_cfgType != LLBC_AppConfigType::End && ReloadConfig() != LLBC_OK, LLBC_FAILED);
+        if (_cfgType != LLBC_AppConfigType::End && ReloadConfig() != LLBC_OK)
+        {
+            OnReloadFailed();
+            if (callEvMeth)
+            {
+                const auto reloadErrNo = LLBC_GetLastError();
+                const auto reloadSubErrNo = LLBC_GetSubErrorNo();
+                for (auto &svcId : _services.GetAllServiceIds())
+                {
+                    auto svc = _services.GetService(svcId);
+                    LLBC_ContinueIf(!svc);
+
+                    svc->Push(LLBC_SvcEvUtil::BuildAppReloadFailedEv(reloadErrNo, reloadSubErrNo));
+                }
+            }
+            
+            return LLBC_FAILED;
+        }
 
         // - Reload application fps.
         for (auto cfgItem : _cfg.AsDict())
@@ -649,7 +666,7 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
 
             if (cfgItem.first.AsStr().tolower() == "fps")
             {
-                const auto& fps =
+                const auto &fps =
                     _cfgType == LLBC_AppConfigType::Xml ?
                         cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
                 SetFPS(fps);
