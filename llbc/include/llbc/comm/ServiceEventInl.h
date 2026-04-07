@@ -127,6 +127,12 @@ inline LLBC_SvcEv_AppReloadedEv::LLBC_SvcEv_AppReloadedEv()
 {
 }
 
+inline LLBC_SvcEv_AppReloadFailedEv::LLBC_SvcEv_AppReloadFailedEv()
+: LLBC_ServiceEvent(LLBC_ServiceEventType::AppReloadFailed)
+, errNo(0)
+, subErrNo(0)
+{
+}
 
 inline LLBC_SvcEv_ComponentEventEv::LLBC_SvcEv_ComponentEventEv()
 : LLBC_ServiceEvent(LLBC_ServiceEventType::ComponentEvent)

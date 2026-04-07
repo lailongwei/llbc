@@ -78,7 +78,8 @@ void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLElement &elem, LLBC
 
     // Elemment name/value.
     var[LLBC_XMLKeys::Name] = elem.Name();
-    var[LLBC_XMLKeys::Value] = elem.GetText();
+    const auto elemText = elem.GetText();
+    var[LLBC_XMLKeys::Value] = elemText ? elemText : "";
 
     // Element attrs.
     auto &attrsVar = var[LLBC_XMLKeys::Attrs];
