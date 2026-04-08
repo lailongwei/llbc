@@ -22,9 +22,29 @@
 #pragma once
 
 #include "llbc/core/time/TimeSpan.h"
+#include "llbc/core/variant/Variant.h"
 
 __LLBC_NS_BEGIN
+/**
+ * Pre-declare some classes.
+ */
+class LLBC_Logger;
 
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+/**
+ * \brief Provides a memory snapshot structure.
+ */
+struct LLBC_HIDDEN LLBC_MemSnapshot
+{
+    sint64 _virt;
+    sint64 _res;
+    sint64 _shr;
+};
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
 /**
  * Convert byte array to string format(hexadecimal format).
  * @param[in] bytes     - buffer pointer.
@@ -61,15 +81,17 @@ public:
     /**
      * Construct stopwatch object.
      * @param[in] autoStart - start measuring after constructed flag, default is true.
+     * @param[in] traceMem  - trace memory usage flag, default is false.
      */
-    explicit LLBC_Stopwatch(bool autoStart = true);
+    explicit LLBC_Stopwatch(bool autoStart = true, bool traceMem = false);
 
     /**
      * Construct stopwatch object by elapsed ticks.
-     * @param[in] elapsedTicks      - elapsed ticks.
-     * @param[in] continueMeasuring - continue measuring flag, default is false.
+     * @param[in] elapsedTicks          - elapsed ticks.
+     * @param[in] continueMeasuring     - continue measuring flag, default is false.
+     * @param[in] traceMem              - trace memory usage flag, default is false.
      */
-    explicit LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring = false);
+    explicit LLBC_Stopwatch(uint64 elapsedTicks, bool continueMeasuring = false, bool traceMem = false);
 
 public:
     /**
@@ -138,7 +160,20 @@ public:
 
 public:
     /**
-     * Get elapsed time string reprsentation.
+     * Get is trace memory.
+     * @return bool - true if trace memory enabled, otherwise return false.
+     */
+    bool IsTraceMemEnabled() const;
+
+    /**
+     * Get memory diff.
+     * @return LLBC_MemSnapshot - memory snapshot diff.
+     */
+    LLBC_MemSnapshot GetMemSnapshotDiff() const;
+
+public:
+    /**
+     * Get elapsed time string representation.
      * @return LLBC_String - the elapsed time string representation, in milli-seconds.
      */
     LLBC_String ToString() const;
@@ -150,10 +185,100 @@ public:
     static void InitFrequency();
 
 private:
+    /**
+     * Get memory snapshot.
+     * @param[out] snapshot - memory snapshot.
+     * @return bool - success return true, otherwise return false.
+     */
+    static bool GetMemSnapshot(LLBC_MemSnapshot &snapshot);
+    
+private:
     uint64 _beginTime;
     uint64 _elapsedTime;
     static uint64 _frequency;
+
+    bool _traceMemEnabled;
+    LLBC_MemSnapshot _beginMemSnapshot;
 };
+
+/**
+ * \brief Provides a class to trace function cost and memory change.
+ */
+class LLBC_EXPORT LLBC_FuncTracer final
+{
+public:
+    /**
+     * Construct func tracer obj with tag value.
+     * @param[in] fileName      - file name.
+     * @param[in] lineNo        - line number.
+     * @param[in] funcName      - function name.
+     * @param[in] traceMem      - trace memory or not.
+     * @param[in] tagValue      - tag value, support arithmetic type and string likely type.
+     * @param[in] loggerName    - logger name, if empty, use root logger.
+     */
+    template <typename _TagValueType,
+              std::enable_if_t<std::is_arithmetic_v<_TagValueType> ||
+              std::is_convertible_v<_TagValueType, LLBC_CString>, int> = 0>
+    LLBC_FuncTracer(const LLBC_CString &fileName,
+                    int lineNo,
+                    const LLBC_CString &funcName,
+                    bool traceMem,
+                    const _TagValueType &tagValue,
+                    const LLBC_CString &loggerName = "")
+    : _logger(nullptr)
+    , _stopWatch(true, traceMem)
+    {
+        LLBC_Variant tagValueVar(tagValue);
+        Init(fileName, lineNo, funcName, traceMem, tagValueVar.ValueToString(), loggerName);
+    }
+
+    /**
+     * Destructor. Log function cost and memory diff.
+     */
+    ~LLBC_FuncTracer();
+
+private:
+    /**
+     * Initialize func tracer.
+     * @param[in] fileName      - file name.
+     * @param[in] lineNo        - line number.
+     * @param[in] funcName      - function name.
+     * @param[in] traceMem      - trace memory or not.
+     * @param[in] uniqueStr     - unique string.
+     * @param[in] loggerName    - logger name.
+     */
+    void Init(const LLBC_CString &fileName, 
+              int lineNo,
+              const LLBC_CString &funcName,
+              bool traceMem,
+              const LLBC_CString &uniqueStr,
+              const LLBC_CString &loggerName);
+
+private:
+    // Disable assignment and move assignment.
+    LLBC_DISABLE_ASSIGNMENT(LLBC_FuncTracer);
+    LLBC_DISABLE_MOVE_ASSIGNMENT(LLBC_FuncTracer);
+
+private:
+    LLBC_String _tagInfo;
+    const LLBC_Logger *_logger;
+    LLBC_Stopwatch _stopWatch;
+};
+
+#if LLBC_CFG_CORE_UTILS_ENABLE_FUNC_TRACE
+    #define LLBC_FUNC_TRACE_EX(tagValue, traceMem)                                             \
+        LLBC_FuncTracer LLBC_Concat(__funcTracer_, __LINE__)(__FILE__,                         \
+                                                             __LINE__,                         \
+                                                             __FUNCTION__,                     \
+                                                             traceMem,                         \
+                                                             tagValue)
+    
+    #define LLBC_FUNC_TRACE(traceMem)                                                          \
+        LLBC_FUNC_TRACE_EX("", traceMem)
+#else
+    #define LLBC_FUNC_TRACE_EX(tagValue, traceMem) (static_cast<void>(0))
+    #define LLBC_FUNC_TRACE(traceMem) (static_cast<void>(0))
+#endif
 
 __LLBC_NS_END
 
