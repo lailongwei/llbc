@@ -141,9 +141,9 @@ inline LLBC_MemSnapshot LLBC_Stopwatch::GetMemSnapshotDiff() const
     if (!GetMemSnapshot(endMemSnapshot))
         return {};
 
-    return {endMemSnapshot._virt - _beginMemSnapshot._virt,
-            endMemSnapshot._res - _beginMemSnapshot._res,
-            endMemSnapshot._shr - _beginMemSnapshot._shr};
+    return {endMemSnapshot.virt - _beginMemSnapshot.virt,
+            endMemSnapshot.res - _beginMemSnapshot.res,
+            endMemSnapshot.shr - _beginMemSnapshot.shr};
 }
 
 inline LLBC_String LLBC_Stopwatch::ToString() const
@@ -155,9 +155,9 @@ inline LLBC_String LLBC_Stopwatch::ToString() const
     if (_traceMemEnabled)
         repr.format("%.03f ms, memDiff(virt:%lld res:%lld shr:%lld)", 
                     nanos / 1000000.0,
-                    memDiff._virt, 
-                    memDiff._res,
-                    memDiff._shr);
+                    memDiff.virt, 
+                    memDiff.res,
+                    memDiff.shr);
     else
         repr.format("%.03f ms", nanos / 1000000.0);
 
@@ -176,6 +176,8 @@ inline void LLBC_Stopwatch::InitFrequency()
 inline bool LLBC_Stopwatch::GetMemSnapshot(LLBC_MemSnapshot &snapshot)
 {
 #if LLBC_TARGET_PLATFORM_LINUX
+    malloc_trim(0);
+
     FILE *statmFile = fopen("/proc/self/statm", "r");
     if (LIKELY(statmFile)) 
     {
@@ -185,9 +187,9 @@ inline bool LLBC_Stopwatch::GetMemSnapshot(LLBC_MemSnapshot &snapshot)
 
         if (readCount == 3) 
         {
-            snapshot._virt = memVirt * LLBC_pageSize;
-            snapshot._res = memRes * LLBC_pageSize;
-            snapshot._shr = memShr * LLBC_pageSize;
+            snapshot.virt = memVirt * LLBC_pageSize;
+            snapshot.res = memRes * LLBC_pageSize;
+            snapshot.shr = memShr * LLBC_pageSize;
             return true;
         }
     }
@@ -196,9 +198,9 @@ inline bool LLBC_Stopwatch::GetMemSnapshot(LLBC_MemSnapshot &snapshot)
     PROCESS_MEMORY_COUNTERS_EX pmc;
     if (GetProcessMemoryInfo(hProcess, reinterpret_cast<PROCESS_MEMORY_COUNTERS *>(&pmc), sizeof(pmc))) 
     {
-        snapshot._virt = static_cast<sint64>(pmc.PrivateUsage);
-        snapshot._res = static_cast<sint64>(pmc.WorkingSetSize);
-        snapshot._shr = static_cast<sint64>(pmc.WorkingSetSize - pmc.PrivateUsage);
+        snapshot.virt = static_cast<sint64>(pmc.PrivateUsage);
+        snapshot.res = static_cast<sint64>(pmc.WorkingSetSize);
+        snapshot.shr = static_cast<sint64>(pmc.WorkingSetSize - pmc.PrivateUsage);
         return true;
     }
 #endif

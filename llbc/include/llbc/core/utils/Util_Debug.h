@@ -38,9 +38,9 @@ __LLBC_NS_BEGIN
  */
 struct LLBC_HIDDEN LLBC_MemSnapshot
 {
-    sint64 _virt;
-    sint64 _res;
-    sint64 _shr;
+    sint64 virt;
+    sint64 res;
+    sint64 shr;
 };
 __LLBC_NS_END
 
@@ -216,14 +216,14 @@ public:
      * @param[in] tagValue      - tag value, support arithmetic type and string likely type.
      * @param[in] loggerName    - logger name, if empty, use root logger.
      */
-    template <typename _TagValueType,
-              std::enable_if_t<std::is_arithmetic_v<_TagValueType> ||
-              std::is_convertible_v<_TagValueType, LLBC_CString>, int> = 0>
+    template <typename _TagType,
+              std::enable_if_t<std::is_arithmetic_v<_TagType> ||
+              std::is_convertible_v<_TagType, LLBC_CString>, int> = 0>
     LLBC_FuncTracer(const LLBC_CString &fileName,
                     int lineNo,
                     const LLBC_CString &funcName,
                     bool traceMem,
-                    const _TagValueType &tagValue,
+                    const _TagType &tagValue,
                     const LLBC_CString &loggerName = "")
     : _logger(nullptr)
     , _stopWatch(true, traceMem)
@@ -244,14 +244,14 @@ private:
      * @param[in] lineNo        - line number.
      * @param[in] funcName      - function name.
      * @param[in] traceMem      - trace memory or not.
-     * @param[in] uniqueStr     - unique string.
+     * @param[in] tagInfo       - tag info.
      * @param[in] loggerName    - logger name.
      */
     void Init(const LLBC_CString &fileName, 
               int lineNo,
               const LLBC_CString &funcName,
               bool traceMem,
-              const LLBC_CString &uniqueStr,
+              const LLBC_CString &tagInfo,
               const LLBC_CString &loggerName);
 
 private:

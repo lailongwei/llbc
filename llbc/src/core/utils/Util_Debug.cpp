@@ -111,27 +111,31 @@ void LLBC_FuncTracer::Init(const LLBC_CString &fileName,
                            int lineNo,
                            const LLBC_CString &funcName, 
                            bool traceMem,
-                           const LLBC_CString &tagInfoStr,
+                           const LLBC_CString &tagInfo,
                            const LLBC_CString &loggerName)
 {
     if (!loggerName.empty())
+    {
         _logger = LLBC_LoggerMgrSingleton->GetLogger(loggerName);
-
-    if (UNLIKELY(!_logger))
+        if (UNLIKELY(!_logger))
+            _logger = LLBC_LoggerMgrSingleton->GetRootLogger();
+    }
+    else
     {
         _logger = LLBC_LoggerMgrSingleton->GetRootLogger();
-        if (UNLIKELY(!_logger))
-            return;
     }
     
+    if (UNLIKELY(!_logger))
+        return;
+
     if (_logger->GetLogLevel() != LLBC_LogLevel::Trace)
         return;
 
     _tagInfo.format("%s:%d:%s:%s",
-                          LLBC_Directory::BaseName(fileName).c_str(),
-                          lineNo,
-                          funcName.c_str(),
-                          tagInfoStr.c_str());
+                    LLBC_Directory::BaseName(fileName).c_str(),
+                    lineNo,
+                    funcName.c_str(),
+                    tagInfo.c_str());
 
     LLOG_TRACE4(_logger->GetLoggerName().c_str(), 
                 "FuncTrace", 
@@ -153,9 +157,9 @@ LLBC_FuncTracer::~LLBC_FuncTracer()
                         _tagInfo.c_str(),
                         cost.GetTotalMillis(),
                         cost.GetTotalMicros() % 1000,
-                        memDiff._virt,
-                        memDiff._res,
-                        memDiff._shr);
+                        memDiff.virt,
+                        memDiff.res,
+                        memDiff.shr);
         else
             LLOG_TRACE4(_logger->GetLoggerName().c_str(),
                         "FuncTrace",
