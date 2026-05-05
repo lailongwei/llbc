@@ -43,7 +43,7 @@ LLBC_LogTrace::TraceData<_TraceStrLimit>::TraceData(const _TraceDataTy &traceDat
         str[0] = '\0';
     }
     else if constexpr (std::is_pointer_v<_TraceDataTy> &&
-                       std::is_same_v<std::remove_cv_t<std::remove_pointer_t<_TraceDataTy>>, char>)
+                       std::is_same_v<std::remove_cv_t<std::remove_extent_t<_TraceDataTy>>, char>)
     {
         if (UNLIKELY(traceData == nullptr))
         {
@@ -74,9 +74,9 @@ LLBC_LogTrace::TraceData<_TraceStrLimit>::TraceData(const _TraceDataTy &traceDat
             memcpy(str, traceData.c_str(), strLen);
         str[strLen] = '\0';
     }
-    else if constexpr(std::is_same_v<_TraceDataTy, LLBC_Variant>)
+    else if constexpr (std::is_same_v<_TraceDataTy, LLBC_Variant>)
     {
-        const LLBC_String &dataStr = traceData.AsStr();
+        const LLBC_String &dataStr = traceData.template As<LLBC_String>();
         strLen = std::min(dataStr.size(), sizeof(str) - 1);
         if (strLen > 0)
             memcpy(str, dataStr.c_str(), strLen);

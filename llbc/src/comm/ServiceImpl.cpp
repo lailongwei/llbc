@@ -1296,7 +1296,7 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
 {
     // Update config type.
     _cfgType = appCfgType;
-    _cfg.BecomeNil();
+    _cfg.Become<void>();
 
     if (_cfgType < LLBC_AppConfigType::Begin ||
         _cfgType >= LLBC_AppConfigType::End)
@@ -1319,16 +1319,16 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
         // Comp config section(s): [<svc_name>.<comp_name>]
         for (auto it = appCfg.DictBegin(); it != appCfg.DictEnd(); ++it)
         {
-            const auto iniSectionName = it->first.AsStr();
+            const auto iniSectionName = it->first.As<LLBC_String>();
             if (iniSectionName == GetName())
             {
-                for (auto &iniCfgItem : it->second.AsDict())
+                for (auto &iniCfgItem : it->second.As<LLBC_Variant::Dict>())
                     _cfg.DictInsert(iniCfgItem.first, iniCfgItem.second);
             }
             else if (iniSectionName.startswith(GetName() + ".") && iniSectionName.size() > GetName().size() + 1)
             {
                 auto &compCfg = _cfg[iniSectionName.substr(GetName().size() + 1)];
-                for (auto &compCfgItem : it->second.AsDict())
+                for (auto &compCfgItem : it->second.As<LLBC_Variant::Dict>())
                     compCfg.DictInsert(compCfgItem.first, compCfgItem.second);
             }
         }
@@ -1337,9 +1337,9 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
     {
         isXmlCfg = true;
         auto &svcCfgs = appCfg[LLBC_XMLKeys::Children];
-        for (auto &svcCfg : svcCfgs.AsSeq())
+        for (auto &svcCfg : svcCfgs.As<LLBC_Variant::Seq>())
         {
-            const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].AsStr();
+            const auto svcCfgName = svcCfg[LLBC_XMLKeys::Name].As<LLBC_Variant::Str>();
             if (svcCfgName != "Service" &&
                 svcCfgName != "service" &&
                 svcCfgName != "Svc" &&
@@ -1358,9 +1358,9 @@ void LLBC_ServiceImpl::UpdateServiceCfg(int appCfgType, const LLBC_Variant &appC
 
     // After config update, read recognizable service config.
     // - Update service fps:
-    for (auto cfgItem : _cfg.AsDict())
+    for (auto &cfgItem : _cfg.As<LLBC_Variant::Dict>())
     {
-        if (cfgItem.first.AsStr().tolower() == "fps")
+        if (cfgItem.first.As<LLBC_String>().tolower() == "fps")
         {
             const auto fps = isXmlCfg ? cfgItem.second[LLBC_XMLKeys::Value] : cfgItem.second;
             SetFPS(fps);
@@ -1517,7 +1517,7 @@ void LLBC_ServiceImpl::PostStop()
 
     // Cleanup service config.
     _cfgType = LLBC_AppConfigType::End;
-    _cfg.BecomeNil();
+    _cfg.Become<void>();
 
     // Reset _svcThreadId.
     _svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;

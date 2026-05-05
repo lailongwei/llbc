@@ -73,7 +73,7 @@ int LLBC_Properties::LoadFromString(const LLBC_String &str,
     LLBC_Strings keyItems;
 
     // Foreach parse property lines.
-    properties.BecomeDict();
+    properties.Become<LLBC_Variant::Dict>();
     const auto lines = str.split("\n", -1, true);
     for (size_t i = 0; i < lines.size(); ++i)
     {
@@ -92,7 +92,7 @@ int LLBC_Properties::LoadFromString(const LLBC_String &str,
         for (size_t i = 0; i < keyItems.size() - 1; ++i)
         {
             prevProperty = &(*prevProperty)[keyItems[i]];
-            prevProperty->BecomeDict();
+            prevProperty->Become<LLBC_Variant::Dict>();
         }
 
         (*prevProperty)[keyItems[keyItems.size() - 1]] = value;
@@ -136,7 +136,7 @@ int LLBC_Properties::SaveToString(const LLBC_Variant &properties,
                                   LLBC_String *errMsg)
 {
     // Check properties value.
-    if (!properties.IsDict())
+    if (!properties.Is<LLBC_Variant::Dict>())
     {
         LLBC_DoIf(errMsg,
                   errMsg->format("Properties must be a dictionary, property type:'%s'",
@@ -267,14 +267,14 @@ int LLBC_Properties::SaveLine(const LLBC_String key,
     };
 
     // If propValue is a dict, write dict items.
-    if (value.IsDict())
+    if (value.Is<LLBC_Variant::Dict>())
     {
         if (!value)
             return key.empty() ? LLBC_OK : writePropLine();
 
         for (auto it = value.DictBegin(); it != value.DictEnd(); ++it)
         {
-            const auto keyItem = it->first.AsStr();
+            const auto keyItem = it->first.As<LLBC_String>();
             const auto newPropKey =
                 key.empty() ? keyItem : key + __LLBC_PropertySeps::KeyItemSep + keyItem;
             if (!CheckKeyItem(keyItem))

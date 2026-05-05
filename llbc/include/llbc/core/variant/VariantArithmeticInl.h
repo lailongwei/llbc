@@ -81,7 +81,6 @@ inline void *LLBC_VariantArithmetic::Performs_raw_operation(void *left, void *ri
         break;
 
     default:
-        leftVal = 0;
         break;
     }
 
@@ -193,10 +192,8 @@ RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawType rig
         return left % right;
 
     default:
-        break;
+        return RawType();
     }
-
-    return RawType();
 }
 
 __LLBC_NS_END

@@ -27,11 +27,13 @@ __LLBC_NS_BEGIN
 
 /**
  * \brief Variant type enumeration.
- *      format(32bit): first_type[high 8 bit] second_type[low 8 bit]
+ *      format(16bit): first_type[high 8 bit] second_type[low 8 bit]
  *          first_type:
- *              raw type:    The row data type, like int32, uint32 ...eg.
- *              string type: The string data type, use LLBC_String.
- *              Others... :  Not define.
+ *              raw type:        The row data type, like int32, uint32 ...eg.
+ *              string type:     The string data type, use LLBC_String.
+ *              sequence type:   The sequence data type, use LLBC_Variant::Seq.
+ *              dictionary type: The dictionary data type, use LLBC_Variant::Dict.
+ *              Others... :      ....
  *          second type:
  *              ... ...
  */
@@ -51,22 +53,22 @@ public:
 
         // Row type enumeration.
         // Bit view(first type always equal RAW):
-        //          [first type] [raw type] [signed/unsigned]
-        //             8 bits      7 bits        1 bit     
-        RAW_BOOL             = 0x0103, // 0000 0011
-        RAW_SINT8            = 0x0105, // 0000 0101
-        RAW_UINT8            = 0x0106, // 0000 0110
-        RAW_SINT16           = 0x0109, // 0000 1001
-        RAW_UINT16           = 0x010a, // 0000 1010
-        RAW_SINT32           = 0x010d, // 0000 1101
-        RAW_UINT32           = 0x010e, // 0000 1110
-        RAW_LONG             = 0x0111, // 0001 0001
-        RAW_ULONG            = 0x0112, // 0001 0010
-        RAW_PTR              = 0x0114, // 0001 0100
-        RAW_SINT64           = 0x0117, // 0001 0111
-        RAW_UINT64           = 0x0118, // 0001 1000
-        RAW_FLOAT            = 0x011b, // 0001 1011
-        RAW_DOUBLE           = 0x011d, // 0001 1101
+        //                              [first type] [raw type] [signed/unsigned]
+        //                                  8 bits     7 bits        1 bit     
+        RAW_BOOL             = 0x0102, //    0x01      0000001         0
+        RAW_SINT8            = 0x0105, //    0x01      0000010         1
+        RAW_UINT8            = 0x0106, //    0x01      0000011         0
+        RAW_SINT16           = 0x0109, //    0x01      0000100         1
+        RAW_UINT16           = 0x010a, //    0x01      0000101         0
+        RAW_SINT32           = 0x010d, //    0x01      0000110         1
+        RAW_UINT32           = 0x010e, //    0x01      0000111         0
+        RAW_LONG             = 0x0111, //    0x01      0001000         1
+        RAW_ULONG            = 0x0112, //    0x01      0001001         0
+        RAW_PTR              = 0x0114, //    0x01      0001010         0
+        RAW_SINT64           = 0x0117, //    0x01      0001011         1
+        RAW_UINT64           = 0x0118, //    0x01      0001100         0
+        RAW_FLOAT            = 0x011b, //    0x01      0001101         1
+        RAW_DOUBLE           = 0x011d, //    0x01      0001110         1
 
         // Str type enumeration.
         // ! Now, string type's second type only support LLBC_String type.
@@ -95,12 +97,167 @@ public:
         MASK_RAW_SIGNED      = 0x0001
     };
 
+    // RAW types.
+    static constexpr std::array<ENUM, 14> RAW_TYPES {
+        RAW_BOOL,
+
+        RAW_SINT8,
+        RAW_UINT8,
+
+        RAW_SINT16,
+        RAW_UINT16,
+
+        RAW_SINT32,
+        RAW_UINT32,
+
+        RAW_LONG,
+        RAW_ULONG,
+
+        RAW_PTR,
+
+        RAW_SINT64,
+        RAW_UINT64,
+
+        RAW_FLOAT,
+        RAW_DOUBLE,
+    };
+
+    // STR types.
+    static constexpr std::array<ENUM, 1> STR_TYPES {
+        STR_DFT,
+    };
+
+    // SEQ types.
+    static constexpr std::array<ENUM, 1> SEQ_TYPES {
+        SEQ_DFT,
+    };
+
+    // DICT types.
+    static constexpr std::array<ENUM, 1> DICT_TYPES {
+        DICT_DFT,
+    };
+
+    // ALL types.
+    static constexpr std::array<ENUM, 18> ALL_TYPES {
+        // NIL(1):
+        NIL,
+
+        // RAW(14):
+        RAW_BOOL,
+        RAW_SINT8,
+        RAW_UINT8,
+        RAW_SINT16,
+        RAW_UINT16,
+        RAW_SINT32,
+        RAW_UINT32,
+        RAW_LONG,
+        RAW_ULONG,
+        RAW_PTR,
+        RAW_SINT64,
+        RAW_UINT64,
+        RAW_FLOAT,
+        RAW_DOUBLE,
+
+        // STR(1):
+        STR_DFT,
+
+        // SEQ(1):
+        SEQ_DFT,
+
+        // DICT(1):
+        DICT_DFT,
+    };
+
+public:
+    /**
+     * Type convertable check.
+     * @return bool - return true if convertable to Variant, otherwise return false.
+     */
+    template <typename _Ty>
+    static constexpr bool IsConvertable();
+
+public:
+    /**
+     * Deduce variant type.
+     */
+    template <typename _Ty>
+    static constexpr ENUM DeduceType();
+
+public:
+    /**
+     * Get first type.
+     * @param[in] type - the variant type.
+     * @return int - the variant first type.
+     */
+    static constexpr ENUM GetFirstType(int type) { return static_cast<ENUM>(type & MASK_FIRST_TYPE); }
+
+    /**
+     * Type enum validate check.
+     */
+    static constexpr bool IsValid(int type);
+
+    /**
+     * Nil-Type introspection support methods. 
+     */
+    static constexpr bool IsNil(int type) { return type == NIL; }
+    template <typename _Ty>
+    static constexpr bool IsNil();
+
+    /**
+     * Raw-Type introspection support methods.
+     */
+    static constexpr bool IsRaw(int type) { return GetFirstType(type) == RAW; }
+    template <typename _Ty>
+    static constexpr bool IsRaw();
+
+    static constexpr bool IsSigned(int type)
+    {
+        return IsRaw(type) && (type & MASK_RAW_SIGNED) == MASK_RAW_SIGNED;
+    }
+    template <typename _Ty>
+    static constexpr bool IsSigned();
+
+    static constexpr bool IsUnsigned(int type)
+    {
+        return IsRaw(type) && (type & MASK_RAW_SIGNED) != MASK_RAW_SIGNED;
+    }
+    template <typename _Ty>
+    static constexpr bool IsUnsigned();
+
+    /**
+     * Str-Type introspection support methods.
+     */
+    static constexpr bool IsStr(int type) { return GetFirstType(type) == STR; }
+    template <typename _Ty>
+    static constexpr bool IsStr();
+
+    /**
+     * Seq-Type introspection support methods.
+     */
+    static constexpr bool IsSeq(int type) { return GetFirstType(type) == SEQ; }
+    template <typename _Ty>
+    static constexpr bool IsSeq();
+
+    /**
+     * Dict-Type introspection support methods.
+     */
+    static constexpr bool IsDict(int type) { return GetFirstType(type) == DICT; }
+    template <typename _Ty>
+    static constexpr bool IsDict();
+
     /**
      * Get type string representation.
      * @param[in] type - the variant type enumeration.
      * @return const LLBC_String & - the type string representation.
      */
     static const LLBC_String &Type2Str(int type);
+
+    /**
+     * Get type string representation(template function).
+     * @return const LLBC_String & - the type string representation.
+     */
+    template <typename _Ty>
+    static const LLBC_String &Type2Str();
 };
 
 __LLBC_NS_END
@@ -150,85 +307,44 @@ public:
     typedef Dict::reverse_iterator DictReverseIter;
     typedef Dict::const_reverse_iterator DictConstReverseIter;
 
-    struct LLBC_EXPORT Holder
+private:
+    /**
+     * @The variant data union encapsulation.
+     */
+    union Data
     {
-        LLBC_VariantType::ENUM type;
-
-        union DataType
+        union RawType
         {
-            union RawType
-            {
-                sint64 int64Val;
-                uint64 uint64Val;
-                double doubleVal;
-            } raw;
+            sint64 i64;
+            uint64 ui64;
+            double dbl;
+        } raw;
 
-            union ObjType
-            {
-                Str str;
-                Dict dict;
-                Seq seq;
-            } obj;
+        union ObjType
+        {
+            Str str;
+            Seq seq;
+            Dict dict;
+        } obj;
 
-            DataType() {}
-            ~DataType() {};
-        } data;
+        Data() = default;
+        ~Data() = default;
 
-        Holder() : type(LLBC_VariantType::NIL) { data.raw.uint64Val = 0; }
-        ~Holder() { Reset(); }
+        sint64 &i64() { return raw.i64; }
+        const sint64 &i64() const { return raw.i64; }
+        uint64 &ui64() { return raw.ui64; }
+        const uint64 &ui64() const { return raw.ui64; }
+        double &dbl() { return raw.dbl; }
+        const double &dbl() const { return raw.dbl; }
 
-        explicit Holder(const bool &b);
-        explicit Holder(const sint8 &i8);
-        explicit Holder(const uint8 &ui8);
-        explicit Holder(const sint16 &i16);
-        explicit Holder(const uint16 &ui16);
-        explicit Holder(const sint32 &i32);
-        explicit Holder(const uint32 &ui32);
-        explicit Holder(const long &l);
-        explicit Holder(const ulong &ul);
-        template <typename _T>
-        explicit Holder(const _T * const &ptr);
-        explicit Holder(const sint64 &i64);
-        explicit Holder(const uint64 &ui64);
-        explicit Holder(const float &f);
-        explicit Holder(const double &d);
-        template <typename _T, std::enable_if_t<std::is_enum_v<_T>, int> = 0>
-        explicit Holder(const _T &en);
-        explicit Holder(const char *str);
-        explicit Holder(const std::string &str);
-        explicit Holder(const LLBC_String &str);
-        explicit Holder(const LLBC_CString &str);
-        template <typename _T1, typename _T2>
-        explicit Holder(const std::pair<_T1, _T2> &pa);
-        explicit Holder(const Seq &seq);
-        template <typename _T>
-        explicit Holder(const std::vector<_T> &vec);
-        template <typename _T>
-        explicit Holder(const std::list<_T> &lst);
-        template <typename _T>
-        explicit Holder(const std::deque<_T> &dqe);
-        template <typename _T>
-        explicit Holder(const std::queue<_T> &que);
-        template <typename _T>
-        explicit Holder(const std::set<_T> &s);
-        template <typename _T>
-        explicit Holder(const std::unordered_set<_T> &us);
-        explicit Holder(const Dict &dict);
-        template <typename _Key, typename _Val>
-        explicit Holder(const std::map<_Key, _Val> &m);
-        template <typename _Key, typename _Val>
-        explicit Holder(const std::unordered_map<_Key, _Val> &um);
-        Holder(const Holder &other);
-        Holder(Holder &&other) noexcept;
-        Holder &operator=(const Holder &other);
-        Holder &operator=(Holder &&other) noexcept;
+        Str &str() { return obj.str; }
+        const Str &str() const { return obj.str; }
 
-        LLBC_VariantType::ENUM GetFirstType() const;
+        Seq &seq() { return obj.seq; }
+        const Seq &seq() const { return obj.seq; }
 
-        void Reset();
-
-    private:
-        friend class LLBC_Variant;
+        Dict &dict() { return obj.dict; }
+        const Dict &dict() const { return obj.dict; }
     };
 
 public:
@@ -238,235 +354,251 @@ public:
     static void DestroyNumber2StrFastAccessTable();
 
 public:
-    LLBC_Variant() = default;
-
-    // Constructors(all parameter constructors is explicit, copy constructor is non-explicit).
-    explicit LLBC_Variant(const bool &b);
-    explicit LLBC_Variant(const sint8 &i8);
-    explicit LLBC_Variant(const uint8 &ui8);
-    explicit LLBC_Variant(const sint16 &i16);
-    explicit LLBC_Variant(const uint16 &ui16);
-    explicit LLBC_Variant(const sint32 &i32);
-    explicit LLBC_Variant(const uint32 &ui32);
-    explicit LLBC_Variant(const long &l);
-    explicit LLBC_Variant(const ulong &ul);
-    template <typename _T>
-    explicit LLBC_Variant(const _T * const &ptr);
-    explicit LLBC_Variant(const sint64 &i64);
-    explicit LLBC_Variant(const uint64 &ui64);
-    explicit LLBC_Variant(const float &f);
-    explicit LLBC_Variant(const double &d);
-    template <typename _T, std::enable_if_t<std::is_enum_v<_T>, int> = 0>
-    explicit LLBC_Variant(const _T &en);
-    explicit LLBC_Variant(const char *str);
-    explicit LLBC_Variant(const std::string &str);
-    explicit LLBC_Variant(const LLBC_String &str);
-    explicit LLBC_Variant(const LLBC_CString &str);
-    template <typename _T1, typename _T2>
-    explicit LLBC_Variant(const std::pair<_T1, _T2> &pa);
-    explicit LLBC_Variant(const Seq &seq);
-    template <typename _T>
-    explicit LLBC_Variant(const std::vector<_T> &vec);
-    template <typename _T>
-    explicit LLBC_Variant(const std::list<_T> &lst);
-    template <typename _T>
-    explicit LLBC_Variant(const std::deque<_T> &dqe);
-    template <typename _T>
-    explicit LLBC_Variant(const std::queue<_T> &que);
-    template <typename _T>
-    explicit LLBC_Variant(const std::set<_T> &s);
-    template <typename _T>
-    explicit LLBC_Variant(const std::unordered_set<_T> &us);
-    explicit LLBC_Variant(const Dict &dict);
-    template <typename _Key, typename _Val>
-    explicit LLBC_Variant(const std::map<_Key, _Val> &m);
-    template <typename _Key, typename _Val>
-    explicit LLBC_Variant(const std::unordered_map<_Key, _Val> &um);
+    // Constructors.
+    LLBC_Variant();
+    template <typename _Ty,
+              std::enable_if_t<LLBC_VariantType::IsRaw<_Ty>(), int> = 0>
+    explicit LLBC_Variant(const _Ty &raw);
+    template <typename _Ty,
+              std::enable_if_t<LLBC_VariantType::IsStr<_Ty>(), int> = 0>
+    explicit LLBC_Variant(_Ty &&str);
+    template <typename _Ty,
+              std::enable_if_t<LLBC_VariantType::IsSeq<_Ty>(), int> = 0>
+    explicit LLBC_Variant(_Ty &&seq);
+    template <typename _Ty,
+              std::enable_if_t<LLBC_VariantType::IsDict<_Ty>(), int> = 0>
+    explicit LLBC_Variant(_Ty &&dict);
     LLBC_Variant(const LLBC_Variant &var);
     LLBC_Variant(LLBC_Variant &&var) noexcept;
 
 public:
-    // Fetch variant data type and holder data.
-    LLBC_VariantType::ENUM GetType() const;
-    LLBC_VariantType::ENUM GetFirstType() const;
-    struct Holder *GetMutableHolder();
-    const struct Holder &GetHolder() const;
+    // Assignment operators.
+    template <typename _Ty,
+              std::enable_if_t<LLBC_VariantType::IsRaw<_Ty>(), int> = 0>
+    LLBC_Variant &operator=(const _Ty &raw);
+    template <typename _Ty,
+              std::enable_if_t<LLBC_VariantType::IsStr<_Ty>(), int> = 0>
+    LLBC_Variant &operator=(_Ty &&str);
+    template <typename _Ty,
+              std::enable_if_t<LLBC_VariantType::IsSeq<_Ty>(), int> = 0>
+    LLBC_Variant &operator=(_Ty &&seq);
+    template <typename _Ty,
+              std::enable_if_t<LLBC_VariantType::IsDict<_Ty>(), int> = 0>
+    LLBC_Variant &operator=(_Ty &&dict);
+    LLBC_Variant &operator=(const LLBC_Variant &var);
+    LLBC_Variant &operator=(LLBC_Variant &&var) noexcept;
 
-    // Type diagnose.
-    bool IsNil() const;
-    bool IsRaw() const;
-    bool IsSignedRaw() const;
-    bool IsUnsignedRaw() const;
-    bool IsBool() const;
-    bool IsInt8() const;
-    bool IsUInt8() const;
-    bool IsInt16() const;
-    bool IsUInt16() const;
-    bool IsInt32() const;
-    bool IsUInt32() const;
-    bool IsLong() const;
-    bool IsULong() const;
-    bool IsPtr() const;
-    bool IsInt64() const;
-    bool IsUInt64() const;
-    bool IsFloat() const;
-    bool IsDouble() const;
-    bool IsStr() const;
-    bool IsSeq() const;
-    bool IsDict() const;
+public:
+    // Type introspection support methods.
+    LLBC_VariantType::ENUM GetType() const { return _type; }
+    LLBC_VariantType::ENUM GetFirstType() const { return LLBC_VariantType::GetFirstType(_type); }
 
-    // Type convert.
-    LLBC_Variant &BecomeNil();
-    LLBC_Variant &BecomeBool();
-    LLBC_Variant &BecomeInt8();
-    LLBC_Variant &BecomeUInt8();
-    LLBC_Variant &BecomeInt16();
-    LLBC_Variant &BecomeUInt16();
-    LLBC_Variant &BecomeInt32();
-    LLBC_Variant &BecomeUInt32();
-    LLBC_Variant &BecomeLong();
-    LLBC_Variant &BecomeULong();
-    LLBC_Variant &BecomePtr();
-    LLBC_Variant &BecomeInt64();
-    LLBC_Variant &BecomeUInt64();
-    LLBC_Variant &BecomeFloat();
-    LLBC_Variant &BecomeDouble();
-    LLBC_Variant &BecomeStr();
-    LLBC_Variant &BecomeSeq();
-    LLBC_Variant &BecomeDict();
+    template <typename... _Tys>
+    bool Is() const;
+
+    LLBC_DEPRECATED_EX("Use Is<void>() instead")
+    bool IsNil() const { return LLBC_VariantType::IsNil(_type); }
+
+    bool IsRaw() const { return LLBC_VariantType::IsRaw(_type); }
+    bool IsSigned() const { return LLBC_VariantType::IsSigned(_type); }
+    bool IsUnsigned() const { return LLBC_VariantType::IsUnsigned(_type); }
+
+    LLBC_DEPRECATED_EX("Use Is<LLBC_Variant::Str>() instead")
+    bool IsStr() const { return LLBC_VariantType::IsStr(_type); }
+
+    LLBC_DEPRECATED_EX("Use Is<LLBC_Variant::Seq>() instead")
+    bool IsSeq() const { return LLBC_VariantType::IsSeq(_type); }
+
+    LLBC_DEPRECATED_EX("Use Is<LLBC_Variant::Dict>() instead")
+    bool IsDict() const { return LLBC_VariantType::IsDict(_type); }
+
+public:
+    // Variant mutable-data access(Dangerous).
+    Data &GetData() { return _data; }
+    // Variant imutable-data access(Dangerous).
+    const Data &GetData() const { return _data; }
+
+public:
+    // Change variant internal type.
+    template <typename _Ty>
+    LLBC_Variant &Become();
     LLBC_Variant &Become(LLBC_VariantType::ENUM ty);
+    LLBC_DEPRECATED_EX("Use Become<void>() or Become(LLBC_VariantType::NIL) instead")
+    LLBC_Variant &BecomeNil() { return Become(LLBC_VariantType::NIL); }
 
-    // Real data fetch.
-    bool AsBool() const;
+public:
+    // Explicit value fetch.
+    template <typename _Ty>
+    std::enable_if_t<LLBC_VariantType::IsNil<_Ty>(), const LLBC_Variant &>
+    As() const;
+
+    template <typename _Ty>
+    std::enable_if_t<!std::is_reference_v<_Ty> && LLBC_VariantType::IsRaw<_Ty>(), _Ty>
+    As() const;
+
+    template <typename _Ty>
+    std::enable_if_t<!std::is_reference_v<_Ty> &&
+                        (std::is_same_v<std::remove_cv_t<_Ty>, std::string> ||
+                         std::is_same_v<std::remove_cv_t<_Ty>, LLBC_String>),
+                     _Ty>
+    As() const;
+    template <typename _Ty>
+    std::enable_if_t<!std::is_reference_v<_Ty> &&
+                        (std::is_same_v<std::remove_cv_t<_Ty>, std::string_view> ||
+                         std::is_same_v<std::remove_cv_t<_Ty>, LLBC_CString>),
+                      _Ty>
+    As() const;
+    template <typename _Ty>
+    std::enable_if_t<!std::is_reference_v<_Ty> &&
+                        LLBC_VariantType::IsStr<_Ty>() &&
+                        (std::is_pointer_v<_Ty> &&
+                         std::is_same_v<std::remove_cv_t<std::remove_pointer_t<_Ty>>, char>),
+                     _Ty>
+    As(size_t *strLen = nullptr) const;
+
+    template <typename _Ty>
+    std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<_Ty>>, LLBC_Variant::Seq>,
+                     const LLBC_Variant::Seq &>
+    As() const { return Is<Seq>() ? _data.seq() : _emptySeq; }
+    template <typename _Ty>
+    std::enable_if_t<!std::is_reference_v<_Ty> &&
+                        !std::is_same_v<std::remove_cv_t<_Ty>, LLBC_Variant::Seq> &&
+                        LLBC_VariantType::IsSeq<_Ty>(),
+                      _Ty>
+    As() const;
+
+    template <typename _Ty>
+    std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<_Ty>>, LLBC_Variant::Dict>,
+                     const LLBC_Variant::Dict &>
+    As() const { return Is<Dict>() ? _data.dict() : _emptyDict; }
+    template <typename _Ty>
+    std::enable_if_t<!std::is_reference_v<_Ty> &&
+                        !std::is_same_v<std::remove_cv_t<_Ty>, LLBC_Variant::Dict> &&
+                        LLBC_VariantType::IsDict<_Ty>(),
+                     _Ty>
+    As() const;
+
     bool AsLooseBool() const;
-    sint8 AsInt8() const;
-    uint8 AsUInt8() const;
-    sint16 AsInt16() const;
-    uint16 AsUInt16() const;
-    sint32 AsInt32() const;
-    uint32 AsUInt32() const;
-    long AsLong() const;
-    unsigned long AsULong() const;
-    template <typename _Ty>
-    _Ty *AsPtr() const;
-    sint64 AsInt64() const;
-    uint64 AsUInt64() const;
-    float AsFloat() const;
-    double AsDouble() const;
-    template <typename _T>
-    typename std::enable_if<std::is_enum<_T>::value, _T>::type
-    AsEnum() const;
-    LLBC_String AsStr() const;
-    const Seq &AsSeq() const;
-    const Dict &AsDict() const;
 
-    operator bool () const;
-    operator sint8 () const;
-    operator uint8 () const;
-    operator sint16 () const;
-    operator uint16 () const;
-    operator sint32 () const;
-    operator uint32 () const;
-    operator long () const;
-    operator ulong () const;
+public:
+    // Implicit value fetch.
     template <typename _Ty>
-    operator _Ty * () const;
-    operator sint64 () const;
-    operator uint64 () const;
-    operator float () const;
-    operator double () const;
-    template <typename _T,
-              typename std::enable_if<std::is_enum<_T>::value, int>::type = 0>
-    operator _T () const;
-    operator LLBC_String () const;
-    template <typename _T1, typename _T2>
-    operator typename std::pair<_T1, _T2>() const;
-    operator const Seq &() const;
-    template <typename _Ty>
-    operator std::vector<_Ty>() const;
-    template <typename _Ty>
-    operator std::set<_Ty>() const;
-    template <typename _Ty>
-    operator std::unordered_set<_Ty>() const;
-    template <typename _Ty>
-    operator std::queue<_Ty>() const;
-    template <typename _Ty>
-    operator std::deque<_Ty>() const;
-    operator const Dict &() const;
-    template <typename _Key, typename _Val>
-    operator std::map<_Key, _Val>() const;
-    template <typename _Key, typename _Val>
-    operator std::unordered_map<_Key, _Val>() const;
+    operator _Ty() const { return As<_Ty>(); }
 
-    // Common operation methods.
+public:
+    // Common operation method: Clear().
+    // - For NIL: no effect.
+    // - For RAW: reset data to RawType().
+    // - For STR: clear string(Str::clear()).
+    // - For SEQ: clear sequence(Seq::clear()).
+    // - For DICT: clear dictionary(Dict::clear()).
     void Clear();
+
+    // Common operation method: IsEmpty().
+    // - For NIL: always return true.
+    // - For RAW: always reutrn true.
+    // - For STR: return true if string is empty, otherwise return false(not empty).
+    // - For SEQ: return true if sequence is empty, otherwise return false(not empty).
+    // - For DICT: return true if dictionary is empty, otherwise return false(not empty).
     bool IsEmpty() const;
+
+    // Common operation method: Size().
+    // - For NIL: always return 0.
+    // - For RAW: always reutrn 0.
+    // - For STR: return string size.
+    // - For SEQ: return sequence size.
+    // - For DICT: return dictionary size.
     size_t Size() const;
+
+    // Common operation method: Capacity().
+    // - For NIL: always return 0.
+    // - For RAW: always reutrn 0.
+    // - For STR: return string capacity.
+    // - For SEQ: return sequence capacity.
+    // - For DICT: return dictionary size(same with Size() method).
     size_t Capacity() const;
 
+    // Common operatin method: Count().
+    // For NIL: always return 0.
+    // For RAW: always return 0.
+    // For STR: return matched sub string count(key auto converted to STR type before search).
+    // For SEQ: return matched element count.
+    // For DICT: return 1 if found, otherwise reutrn 0.
+    template <typename _Key>
+    size_t Count(const _Key &key) const { return CountImpl(key, false); }
+
+    // Common operation method: Contains().
+    // For NIL: always return false.
+    // For RAW: always return false.
+    // For STR: return true if found in STR, otherwise return false.
+    // For SEQ: return true if found in SEQ, otherwise return false.
+    // For DIT: return true if found, otherwise return false.
+    template <typename _Key>
+    bool Contains(const _Key &key) const {return CountImpl(key, true) >= 1; }
+
+public:
+    // Str type variant object specify Operate methods.
+    void StrResize(Str::size_type newSize, Str::value_type ch = Str::value_type());
+    void StrReserve(Str::size_type newCap);
+
+public:
     // Sequence type variant object specify Operate methods.
-    SeqIter SeqBegin();
-    SeqIter SeqEnd();
-    SeqConstIter SeqBegin() const;
-    SeqConstIter SeqEnd() const;
-    SeqReverseIter SeqReverseBegin();
-    SeqReverseIter SeqReverseEnd();
-    SeqConstReverseIter SeqReverseBegin() const;
-    SeqConstReverseIter SeqReverseEnd() const;
+    SeqIter SeqBegin() { return Become<Seq>()._data.seq().begin(); }
+    SeqIter SeqEnd() { return Become<Seq>()._data.seq().end(); }
+    SeqConstIter SeqBegin() const { return As<Seq>().begin(); }
+    SeqConstIter SeqEnd() const { return As<Seq>().end(); }
+    SeqReverseIter SeqReverseBegin() { return Become<Seq>()._data.seq().rbegin(); }
+    SeqReverseIter SeqReverseEnd() { return Become<Seq>()._data.seq().rend(); }
+    SeqConstReverseIter SeqReverseBegin() const { return As<Seq>().rbegin(); }
+    SeqConstReverseIter SeqReverseEnd() const { return As<Seq>().rend(); }
 
-    Seq::reference SeqFront();
-    Seq::reference SeqBack();
-    Seq::const_reference SeqFront() const;
-    Seq::const_reference SeqBack() const;
-
-    SeqIter SeqInsert(SeqIter it, const Seq::value_type &val);
-    void SeqInsert(SeqIter it, Seq::size_type n, const Seq::value_type &val);
-    void SeqInsert(SeqIter it, SeqConstIter first, SeqConstIter last);
+    Seq::reference SeqFront() { return Become<Seq>()._data.seq().front(); }
+    Seq::reference SeqBack() { return Become<Seq>()._data.seq().back(); }
+    Seq::const_reference SeqFront() const { return As<Seq>().front(); }
+    Seq::const_reference SeqBack() const { return As<Seq>().back(); }
 
     template <typename _Ty>
-    SeqIter SeqInsert(SeqIter it, const _Ty &val);
+    SeqIter SeqInsert(SeqIter it, _Ty &&val);
     template <typename _Ty>
-    void SeqInsert(SeqIter it, Seq::size_type n, const _Ty &val);
+    SeqIter SeqInsert(SeqIter it, Seq::size_type n, const _Ty &val);
+    SeqIter SeqInsert(SeqIter it, SeqConstIter first, SeqConstIter last);
 
-    template <typename _Ty1, typename... _Tys>
-    typename ::std::enable_if<::std::is_same<_Ty1, LLBC_Variant>::value, void>::type
-    SeqPushBack(_Ty1 &&val1, _Tys &&... vals);
-    template <typename _Ty1, typename... _Tys>
-    typename ::std::enable_if<!::std::is_same<_Ty1, LLBC_Variant>::value, void>::type
-    SeqPushBack(_Ty1 &&val1, _Tys &&... vals);
+    template <typename... _Tys>
+    SeqIter SeqBatchInsert(SeqIter it, _Tys &&... vals);
 
+    template <typename _Ty>
+    void SeqPushBack(_Ty &&val) { Become<Seq>()._data.seq().emplace_back(std::forward<_Ty>(val)); }
     void SeqPopBack();
 
-    void SeqResize(Seq::size_type n, const Seq::value_type &val = Seq::value_type::nil);
-    template <typename _Ty>
-    void SeqResize(Seq::size_type n, const _Ty &val = _Ty());
+    template <typename... _Tys>
+    void SeqBatchPushBack(_Tys &&... vals);
 
-    void SeqReserve(Seq::size_type n);
+    template <typename _Ty>
+    void SeqResize(Seq::size_type newSize, const _Ty &val = _Ty());
+    void SeqReserve(Seq::size_type newCap) { Become<Seq>()._data.seq().reserve(newCap); }
 
     SeqIter SeqErase(SeqIter it);
+    SeqIter SeqErase(SeqConstIter it);
     SeqIter SeqErase(SeqIter first, SeqIter last);
-    void SeqErase(const Seq::value_type &val);
+    SeqIter SeqErase(SeqConstIter first, SeqConstIter last);
     template <typename _Ty>
-    void SeqErase(const _Ty &val);
+    size_t SeqErase(const _Ty &val, size_t eraseCount = LLBC_INFINITE, bool stableErase = true);
 
+public:
     // Dictionary type variant object specify Operate methods.
-    DictIter DictBegin();
-    DictIter DictEnd();
-    DictConstIter DictBegin() const;
-    DictConstIter DictEnd() const;
-    DictReverseIter DictReverseBegin();
-    DictReverseIter DictReverseEnd();
-    DictConstReverseIter DictReverseBegin() const;
-    DictConstReverseIter DictReverseEnd() const;
+    DictIter DictBegin() { return Become<Dict>()._data.dict().begin(); }
+    DictIter DictEnd() { return Become<Dict>()._data.dict().end(); }
+    DictConstIter DictBegin() const { return As<Dict>().begin(); }
+    DictConstIter DictEnd() const { return As<Dict>().end(); }
+    DictReverseIter DictReverseBegin() { return Become<Dict>()._data.dict().rbegin(); }
+    DictReverseIter DictReverseEnd() { return Become<Dict>()._data.dict().rend(); }
+    DictConstReverseIter DictReverseBegin() const { return As<Dict>().rbegin(); }
+    DictConstReverseIter DictReverseEnd() const { return As<Dict>().rend(); }
 
-    std::pair<DictIter, bool> DictInsert(const Dict::key_type &key, const Dict::mapped_type &val);
     std::pair<DictIter, bool> DictInsert(const Dict::value_type &val);
-
+    std::pair<DictIter, bool> DictInsert(Dict::value_type &&val);
     template <typename _Key, typename _Val>
-    std::pair<DictIter, bool> DictInsert(const _Key &key, const _Val &val);
-
-    DictIter DictFind(const Dict::key_type &key);
-    DictConstIter DictFind(const Dict::key_type &key) const;
+    std::pair<DictIter, bool> DictInsert(_Key &&key, _Val &&val);
 
     template <typename _Key>
     DictIter DictFind(const _Key &key);
@@ -474,72 +606,19 @@ public:
     DictConstIter DictFind(const _Key &key) const;
 
     DictIter DictErase(DictIter it);
+    DictIter DictErase(DictConstIter it);
     DictIter DictErase(DictIter first, DictIter last);
+    DictIter DictErase(DictConstIter first, DictConstIter last);
+    template <typename... _Keys>
+    size_t DictErase(const _Keys &... keys);
 
-    template <typename _Key1, typename... _Keys>
-    typename ::std::enable_if<::std::is_same<_Key1, LLBC_Variant>::value, typename LLBC_Variant::Dict::size_type>::type
-    DictErase(_Key1 &&key1, _Keys &&... keys);
-    template <typename _Key1, typename... _Keys>
-    typename ::std::enable_if<!::std::is_same<_Key1, LLBC_Variant>::value, typename LLBC_Variant::Dict::size_type>::type
-    DictErase(_Key1 &&key1, _Keys &&... keys);
-
-    LLBC_Variant &operator[](const LLBC_Variant &key);
-    const LLBC_Variant &operator[](const LLBC_Variant &key) const;
-
+public:
     template <typename _Key>
     LLBC_Variant &operator[](const _Key &key);
     template <typename _Key>
     const LLBC_Variant &operator[](const _Key &key) const;
 
-    // assignment operators.
-    LLBC_Variant &operator=(bool b);
-    LLBC_Variant &operator=(sint8 i8);
-    LLBC_Variant &operator=(uint8 ui8);
-    LLBC_Variant &operator=(sint16 i16);
-    LLBC_Variant &operator=(uint16 ui16);
-    LLBC_Variant &operator=(sint32 i32);
-    LLBC_Variant &operator=(uint32 ui32);
-    LLBC_Variant &operator=(long l);
-    LLBC_Variant &operator=(unsigned long ul);
-    LLBC_Variant &operator=(const char * const &str);
-    template <typename _T>
-    LLBC_Variant &operator=(const _T * const &ptr);
-    LLBC_Variant &operator=(const sint64 &i64);
-    LLBC_Variant &operator=(const uint64 &ui64);
-    LLBC_Variant &operator=(float f);
-    LLBC_Variant &operator=(const double &d);
-    template <typename _T,
-              typename std::enable_if<std::is_enum<_T>::value, int>::type = 0>
-    LLBC_Variant& operator=(const _T &en);
-    LLBC_Variant &operator=(const std::string &str);
-    LLBC_Variant &operator=(const LLBC_String &str);
-    LLBC_Variant &operator=(const LLBC_CString &str);
-    template <typename _T1, typename _T2>
-    LLBC_Variant &operator=(const std::pair<_T1, _T2> &pa);
-    LLBC_Variant &operator=(const Seq &seq);
-    template <typename _T>
-    LLBC_Variant &operator=(const std::vector<_T> &vec);
-    template <typename _T>
-    LLBC_Variant &operator=(const std::list<_T> &lst);
-    template <typename _T>
-    LLBC_Variant &operator=(const std::queue<_T> &que);
-    template <typename _T>
-    LLBC_Variant &operator=(const std::set<_T> &s);
-    LLBC_Variant &operator=(const Dict &dict);
-    template <typename _Key, typename _Val>
-    LLBC_Variant &operator=(const std::map<_Key, _Val> &m);
-    LLBC_Variant &operator=(const LLBC_Variant &var);
-    LLBC_Variant &operator=(LLBC_Variant &&var) noexcept;
-
-    // Relational operators.
-    bool operator==(const LLBC_Variant &another) const;
-    bool operator!=(const LLBC_Variant &another) const;
-
-    bool operator<(const LLBC_Variant &another) const;
-    bool operator>(const LLBC_Variant &another) const;
-    bool operator<=(const LLBC_Variant &another) const;
-    bool operator>=(const LLBC_Variant &another) const;
-
+public:
     // Relational operators.
     template <typename _T>
     bool operator==(const _T &another) const;
@@ -556,19 +635,6 @@ public:
     bool operator>=(const _T &another) const;
 
     // Arithmetic operators.
-    LLBC_Variant operator+(const LLBC_Variant &another) const;
-    LLBC_Variant operator-(const LLBC_Variant &another) const;
-    LLBC_Variant operator*(const LLBC_Variant &another) const;
-    LLBC_Variant operator/(const LLBC_Variant &another) const;
-    LLBC_Variant operator%(const LLBC_Variant &another) const;
-
-    LLBC_Variant &operator+=(const LLBC_Variant &another);
-    LLBC_Variant &operator-=(const LLBC_Variant &another);
-    LLBC_Variant &operator*=(const LLBC_Variant &another);
-    LLBC_Variant &operator/=(const LLBC_Variant &another);
-    LLBC_Variant &operator%=(const LLBC_Variant &another);
-
-    // Arithmetic operators(template base).
     template <typename _T>
     LLBC_Variant operator+(const _T &another) const;
     template <typename _T>
@@ -592,9 +658,9 @@ public:
     LLBC_Variant &operator%=(const _T &another);
 
     // Type to string.
-    const LLBC_String &TypeToString() const;
+    const LLBC_String &TypeToString() const { return LLBC_VariantType::Type2Str(_type); }
     // Value to string.
-    LLBC_String ValueToString() const;
+    LLBC_String ValueToString() const { return As<Str>(); }
     // To string.
     LLBC_String ToString() const;
 
@@ -607,30 +673,38 @@ public:
 
 private:
     friend class LLBC_VariantTraits;
+    friend class ::std::hash<LLBC_Variant>;
 
-    void SetType(int type);
+    template <typename _Key>
+    size_t CountImpl(const _Key &key, bool returnIfFound) const;
 
-    void CtFromRaw(uint64 raw, LLBC_VariantType::ENUM ty);
-    template <typename _T, typename _UnaryContainer>
-    void CtFromUnaryCont(const _UnaryContainer &unaryCont);
-    template <typename _Key, typename _Val, typename _BinaryContainer>
-    void CtFromBinaryCont(const _BinaryContainer &binaryCont);
-
-    template <typename _Key, typename _Val, typename _BinaryContainer>
-    void CpToBinaryCont(_BinaryContainer &binaryCont) const;
+    void Reset(LLBC_VariantType::ENUM newType);
 
     template <typename _64Ty>
     _64Ty AsSignedOrUnsigned64() const;
 
-    void SeqPushBack();
-    void SeqPushBackElem(const Seq::value_type &val);
-
-    Dict::size_type DictErase();
-    Dict::size_type DictEraseKey(const Dict::key_type &key);
+    template <typename _Key>
+    Dict::size_type DictEraseOne(const _Key &key);
 
 private:
-    Holder _holder;
+    LLBC_VariantType::ENUM _type;
+    Data _data;
+
     static Str **_num2StrFastAccessTbl;
+
+    static const Str _trueStr;
+    static const Str _falseStr;
+    static const Str _emptySeqStr;
+    static const Str _emptyDictStr;
+    static const std::string _trueSTLStr;
+    static const std::string _falseSTLStr;
+    static const std::string _emptySTLSeqStr;
+    static const std::string _emptySTLDictStr;
+
+    static const Str _emptyStr;
+    static const std::string _emptySTLStr;
+    static const Seq _emptySeq;
+    static const Dict _emptyDict;
 };
 
 __LLBC_NS_END

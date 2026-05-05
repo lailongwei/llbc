@@ -34,6 +34,12 @@ int TestCase_Com_Version::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("llbc library version test: ");
 
+    class MyClass {};
+    // std::unordered_set<int, MyClass *> *set = nullptr;
+    LLBC_PrintLn("%d", LLBC_ObjReflector::IsReusable<std::unordered_set<int, MyClass*>>());
+
+    return 0;
+
     LLBC_PrintLn("Major version: %d", LLBC_majorVersion);
     LLBC_PrintLn("Minor version: %d", LLBC_minorVersion);
     LLBC_PrintLn("Update No: %d", LLBC_updateNo);

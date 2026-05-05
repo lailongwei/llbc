@@ -67,13 +67,13 @@ public:
         {
             case LLBC_ComponentEventType::SessionCreate:
             {
-                OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
+                OnSessionCreate(*eventParams.As<LLBC_SessionInfo *>());
                 break;
             }
 
             case LLBC_ComponentEventType::SessionDestroy:
             {
-                OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
+                OnSessionDestroy(*eventParams.As<LLBC_SessionDestroyInfo *>());
                 break;
             }
 

@@ -365,7 +365,7 @@ void LLBC_Component::UpdateComponentCfg()
     // Get config type.
     _cfgType = _svc->GetConfigType();
     // Reset config.
-    _cfg.BecomeNil();
+    _cfg.Become<void>();
 
     if (_cfgType < LLBC_AppConfigType::Begin ||
         _cfgType >= LLBC_AppConfigType::End)
@@ -384,9 +384,9 @@ void LLBC_Component::UpdateComponentCfg()
         // Component config:
         // <Component/component/Comp/comp Name/name="xxx">
         auto &compCfgs = svcCfg[LLBC_XMLKeys::Children];
-        for (auto &compCfg : compCfgs.AsSeq())
+        for (auto &compCfg : compCfgs.As<LLBC_Variant::Seq>())
         {
-            const auto compCfgName = compCfg[LLBC_XMLKeys::Name].AsStr();
+            const auto compCfgName = compCfg[LLBC_XMLKeys::Name].As<LLBC_String>();
             if (compCfgName != "Component" &&
                 compCfgName != "component" &&
                 compCfgName != "Comp" &&

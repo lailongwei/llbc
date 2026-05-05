@@ -56,27 +56,27 @@ public:
         {
             case LLBC_ComponentEventType::SessionCreate:
             {
-                OnSessionCreate(*eventParams.AsPtr<LLBC_SessionInfo>());
+                OnSessionCreate(*eventParams.As<LLBC_SessionInfo *>());
                 break;
             }
             case LLBC_ComponentEventType::SessionDestroy:
             {
-                OnSessionDestroy(*eventParams.AsPtr<LLBC_SessionDestroyInfo>());
+                OnSessionDestroy(*eventParams.As<LLBC_SessionDestroyInfo *>());
                 break;
             }
             case LLBC_ComponentEventType::AsyncConnResult:
             {
-                OnAsyncConnResult(*eventParams.AsPtr<LLBC_AsyncConnResult>());
+                OnAsyncConnResult(*eventParams.As<LLBC_AsyncConnResult *>());
                 break;
             }
             case LLBC_ComponentEventType::UnHandledPacket:
             {
-                OnUnHandledPacket(*eventParams.AsPtr<LLBC_Packet>());
+                OnUnHandledPacket(*eventParams.As<LLBC_Packet *>());
                 break;
             }
             case LLBC_ComponentEventType::ProtoReport:
             {
-                OnProtoReport(*eventParams.AsPtr<LLBC_ProtoReport>());
+                OnProtoReport(*eventParams.As<LLBC_ProtoReport *>());
                 break;
             }
 

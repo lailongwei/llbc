@@ -60,9 +60,11 @@ public:
     // Constructors.
     explicit LLBC_BasicString(const _Ax &al = _Ax()):_Base(al) {  }
     LLBC_BasicString(const _This &rhs):_Base(rhs) {  }
-    LLBC_BasicString(_This &&rhs):_Base(std::move(rhs)) {  }
+    LLBC_BasicString(_This &&rhs) noexcept
+        :_Base(std::move(rhs)) {  }
     LLBC_BasicString(const _Base &rhs):_Base(rhs) {  }
-    LLBC_BasicString(_Base &&rhs):_Base(std::move(rhs)) {  }
+    LLBC_BasicString(_Base &&rhs) noexcept
+        :_Base(std::move(rhs)) {  }
     LLBC_BasicString(const LLBC_BasicCString<_Elem> &rhs):_Base(rhs.c_str(), rhs.size()) {  }
     LLBC_BasicString(const _This &rhs, size_type pos, size_type n):_Base(rhs, pos, n) {  }
     LLBC_BasicString(const _Elem *s, const _Ax &al = _Ax()):_Base(al) { if (s) _Base::append(s); }
@@ -480,13 +482,21 @@ public:
 
     _This &assign(const _Elem *s)
     {
-        _Base::assign(s);
+        if (LIKELY(s))
+            _Base::assign(s);
+        else
+            this->clear();
+
         return *this;
     }
 
     _This &assign(const _Elem *s, size_type n)
     {
-        _Base::assign(s, n);
+        if (LIKELY(s))
+            _Base::assign(s, n);
+        else
+            this->clear();
+
         return *this;
     }
 
@@ -1596,3 +1606,32 @@ public:
 };
 
 __LLBC_NS_END
+
+namespace std
+{
+
+template <>
+struct hash<LLBC_NS LLBC_BasicString<char>>
+{
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
+    __attribute__((pure))
+    #endif // Comp == gcc or Comp == clang
+    size_t operator()(const LLBC_NS LLBC_BasicString<char> &str) const noexcept
+    {
+        return ::std::hash<std::basic_string<char>>()(str);
+    }
+};
+
+template <>
+struct hash<LLBC_NS LLBC_BasicString<LLBC_NS wchar>>
+{
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_GLANG
+    __attribute__((pure))
+    #endif // Comp == gcc or Comp == clang
+    size_t operator()(const LLBC_NS LLBC_BasicString<LLBC_NS wchar> &str) const noexcept
+    {
+        return ::std::hash<std::basic_string<LLBC_NS wchar>>()(str);
+    }
+};
+
+}

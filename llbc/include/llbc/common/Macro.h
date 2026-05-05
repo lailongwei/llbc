@@ -232,13 +232,8 @@
     name &operator=(name &&) = delete      \
 
 // Deprecated attribute macro define.
-#if defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
-#define LLBC_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER) && _MSC_VER >= 1400 // VS 2005 or higher.
-#define LLBC_DEPRECATED __declspec(deprecated)
-#else
-#define LLBC_DEPRECATED
-#endif
+#define LLBC_DEPRECATED                 [[deprecated]]
+#define LLBC_DEPRECATED_EX(description) [[deprecated(description)]]
 
 // WARN_UNUSED_RESULT macro define.
 #if defined(__GNUC__) || defined(__clang__)
@@ -397,6 +392,9 @@
 #define LLBC_DoIf(cond, behav)                                      \
     { if ((cond)) { behav; } }                                      \
 
+#define LLBC_ConstExprDoIf(condd, behav)                            \
+    { if constexpr ((cond)) { behav; } }                            \
+
 #define LLBC_ContinueIf(cond)                                       \
     { if ((cond)) continue; }                                       \
 
@@ -445,8 +443,12 @@
                                                                                                           \
         LLBC_FlushFile(LLBC_Concat(outputFile, __LINE__));                                                \
                                                                                                           \
-        if (!LLBC_Concat(llbcExpectCond, __LINE__))                                                       \
+        if (!LLBC_Concat(llbcExpectCond, __LINE__)) {                                                     \
+            LLBC_FilePrintLn(stderr,                                                                      \
+                             "Stack Backtrace:\n%s\n",                                                    \
+                             LLBC_NS LLBC_CaptureStackBackTrace().c_str());                               \
             abort();                                                                                      \
+        }                                                                                                 \
     } while (false)
 
 #define LLBC_Expect_EQ(val1, val2, ...)  LLBC_Expect((val1) == (val2), ##__VA_ARGS__)

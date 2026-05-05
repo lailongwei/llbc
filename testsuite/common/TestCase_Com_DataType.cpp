@@ -300,12 +300,12 @@ void TestCase_Com_DataType::StringUTF8Test()
     utf8Str.append(1, (char)0xe4).append(1, (char)0xb8).append(1, (char)0x96);
     utf8Str.append(1, (char)0xe7).append(1, (char)0x95).append(1, (char)0x8c);
     utf8Str.append("Hello World");
-    LLBC_PrintLn("When add string, len: %ld, utf8 len: %ld", utf8Str.length(), utf8Str.length_with_utf8());
+    LLBC_PrintLn("When add string, len: %lu, utf8 len: %lu", utf8Str.length(), utf8Str.length_with_utf8());
 
     // split_utf8_string().
     std::vector<LLBC_String> utf8Vec;
     utf8Str.split_utf8_string(utf8Vec);
-    LLBC_Print("After split utf8 string, vector size: %ld", utf8Vec.size());
+    LLBC_Print("After split utf8 string, vector size: %lu", utf8Vec.size());
     for(const auto& utf8Char : utf8Vec)
         LLBC_Print("    \"%s\"", utf8Char.c_str());
     LLBC_Print("\n");
@@ -319,7 +319,7 @@ void TestCase_Com_DataType::StringUTF8Test()
     utf8Str.scatter_utf8_string(utf8Vec, 1);
     utf8Str.scatter_utf8_string(utf8Vec, 2);
     utf8Str.scatter_utf8_string(utf8Vec, 3);
-    LLBC_PrintLn("After scatter utf8 string, vector size: %ld", utf8Vec.size());
+    LLBC_PrintLn("After scatter utf8 string, vector size: %lu", utf8Vec.size());
 
     LLBC_PrintLn("\n");
 }
@@ -340,17 +340,17 @@ void TestCase_Com_DataType::StringStripTest()
 {
     LLBC_PrintLn("Strip test:");
     LLBC_String str = "\t \t Hello World! \t \t";
-    LLBC_PrintLn("Before strip, str: %s, len: %ld", str.c_str(), str.length());
+    LLBC_PrintLn("Before strip, str: %s, len: %lu", str.c_str(), str.length());
 
     str.strip();
-    LLBC_PrintLn("After strip, str: %s, len: %ld", str.c_str(), str.length());
+    LLBC_PrintLn("After strip, str: %s, len: %lu", str.c_str(), str.length());
 }
 
 void TestCase_Com_DataType::StringSplitTest(const LLBC_String &str, size_t maxSplit, const LLBC_String &sep)
 {
-    LLBC_PrintLn("Will split string(maxSplit: %ld, sep: %s): %s", maxSplit, sep.c_str(), str.c_str());
+    LLBC_PrintLn("Will split string(maxSplit: %lu, sep: %s): %s", maxSplit, sep.c_str(), str.c_str());
     std::vector<LLBC_String> splitted = str.split(sep, maxSplit);
-    LLBC_PrintLn("Split use separator:., size: %ld", splitted.size());
+    LLBC_PrintLn("Split use separator:., size: %lu", splitted.size());
     for (size_t i = 0; i < splitted.size(); ++i)
         LLBC_PrintLn("    \"%s\"", splitted[i].c_str());
 }

@@ -38,11 +38,6 @@ class LLBC_EXPORT LLBC_VariantTraits
 {
 public:
     /**
-     * Assign operator.
-     */
-    static void assign(LLBC_Variant &left, const LLBC_Variant &right);
-
-    /**
      * Relational operators.
      * ==, !=, <, >, <=, >=
      */

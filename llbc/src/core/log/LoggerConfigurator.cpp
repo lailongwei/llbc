@@ -76,10 +76,10 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath,
         // Convert to variant object(brief format).
         LLBC_Variant detailCfg;
         LLBC_VariantUtil::Xml2Variant(xmlDoc, detailCfg);
-        for (auto &loggerXmlCfg : detailCfg["Log"][LLBC_XMLKeys::Children].AsSeq())
+        for (auto &loggerXmlCfg : detailCfg["Log"][LLBC_XMLKeys::Children].As<LLBC_Variant::Seq>())
         {
-            LLBC_Variant &loggerCfg = cfg[loggerXmlCfg[LLBC_XMLKeys::Name].AsStr()];
-            for (auto &logCfgItem : loggerXmlCfg[LLBC_XMLKeys::Children].AsSeq())
+            LLBC_Variant &loggerCfg = cfg[loggerXmlCfg[LLBC_XMLKeys::Name].As<LLBC_String>()];
+            for (auto &logCfgItem : loggerXmlCfg[LLBC_XMLKeys::Children].As<LLBC_Variant::Seq>())
                 loggerCfg[logCfgItem[LLBC_XMLKeys::Name]] = logCfgItem[LLBC_XMLKeys::Value];
         }
     }
@@ -96,7 +96,7 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath,
 
     // Create root logger config info.
     const LLBC_Variant &rootCfg = cfg[LLBC_CFG_LOG_ROOT_LOGGER_NAME];
-    if (UNLIKELY(!rootCfg.IsDict()))
+    if (UNLIKELY(!rootCfg.Is<LLBC_Variant::Dict>()))
     {
         _cfgFilePath.clear();
         _logTimeAccessor = nullptr;
@@ -121,7 +121,7 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath,
     _configs.insert(std::make_pair(LLBC_CFG_LOG_ROOT_LOGGER_NAME, _rootConfig));
 
     // Create all non-root logger config infos.
-    for (auto &cfgItem : cfg.AsDict())
+    for (auto &cfgItem : cfg.As<LLBC_Variant::Dict>())
     {
         const LLBC_String loggerName = cfgItem.first;
         if (loggerName == LLBC_CFG_LOG_ROOT_LOGGER_NAME)

@@ -51,12 +51,12 @@ namespace
         int OnInit(bool &initFinished) override
         {
             AddMethod("Foo", [this](const LLBC_Variant &callArgs, LLBC_Variant &callRet) {
-                callRet = Foo(callArgs["x"], callArgs["y"].AsStr());
+                callRet = Foo(callArgs["x"], callArgs["y"].As<LLBC_String>());
                 return 0;
             });
 
             AddMethod("Goo", [this](const LLBC_Variant &callArgs, LLBC_Variant &callRet) {
-                callRet = Goo(callArgs["x"], callArgs["y"].AsStr());
+                callRet = Goo(callArgs["x"], callArgs["y"].As<LLBC_String>());
                 return 0;
             });
 

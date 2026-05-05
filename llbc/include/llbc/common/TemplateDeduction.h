@@ -35,6 +35,9 @@ struct LLBC_IsTemplSpec : public std::false_type {};
 template <template <typename...> class ClassTemplate, typename... Args>
 struct LLBC_IsTemplSpec<ClassTemplate<Args...>, ClassTemplate> : public std::true_type {};
 
+template <typename Class, template <typename...> class ClassTemplate>
+constexpr bool LLBC_IsTemplSpecV = LLBC_IsTemplSpec<Class, ClassTemplate>::value;
+
 /**
  * \brief Special Template specification judge function: std::array.
  */

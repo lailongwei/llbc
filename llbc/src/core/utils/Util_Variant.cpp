@@ -32,10 +32,10 @@ const LLBC_String LLBC_XMLKeys::Attrs("__attrs__");
 
 void LLBC_VariantUtil::Ini2Variant(const LLBC_Ini &ini, LLBC_Variant &var)
 {
-    if (var.IsDict())
+    if (var.Is<LLBC_Variant::Dict>())
         var.Clear();
     else
-        var.BecomeDict();
+        var.Become<LLBC_Variant::Dict>();
 
     auto &sections = ini.GetAllSections();
     for (auto &section : sections)
@@ -49,13 +49,13 @@ void LLBC_VariantUtil::Ini2Variant(const LLBC_Ini &ini, LLBC_Variant &var)
 
 void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLDocument &doc, LLBC_Variant &var)
 {
-    if (var.IsDict())
+    if (var.Is<LLBC_Variant::Dict>())
         var.Clear();
     else
-        var.BecomeDict();
+        var.Become<LLBC_Variant::Dict>();
 
     auto &childrenVar = var[LLBC_XMLKeys::Children];
-    childrenVar.BecomeSeq();
+    childrenVar.Become<LLBC_Variant::Seq>();
 
     auto child = doc.FirstChildElement();
     for (; child; child = child->NextSiblingElement())
@@ -71,10 +71,10 @@ void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLDocument &doc, LLBC
 
 void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLElement &elem, LLBC_Variant &var)
 {
-    if (var.IsDict())
+    if (var.Is<LLBC_Variant::Dict>())
         var.Clear();
     else
-        var.BecomeDict();
+        var.Become<LLBC_Variant::Dict>();
 
     // Elemment name/value.
     var[LLBC_XMLKeys::Name] = elem.Name();
@@ -82,7 +82,7 @@ void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLElement &elem, LLBC
 
     // Element attrs.
     auto &attrsVar = var[LLBC_XMLKeys::Attrs];
-    attrsVar.BecomeDict();
+    attrsVar.Become<LLBC_Variant::Dict>();
 
     auto attr = elem.FirstAttribute();
     for (; attr; attr = attr->Next())
@@ -90,7 +90,7 @@ void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLElement &elem, LLBC
 
     // Children elements.
     auto &childrenVar = var[LLBC_XMLKeys::Children];
-    childrenVar.BecomeSeq();
+    childrenVar.Become<LLBC_Variant::Dict>();
 
     auto child = elem.FirstChildElement();
     for (; child; child = child->NextSiblingElement())
