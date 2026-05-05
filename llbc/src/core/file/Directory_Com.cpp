@@ -656,6 +656,39 @@ LLBC_String LLBC_Directory::BaseName(const LLBC_String &path)
 #endif
 }
 
+const char *LLBC_Directory::BaseName2(const LLBC_String &path, size_t *pos)
+{
+    if (path.empty())
+    {
+        if (pos) *pos = LLBC_String::npos;
+        return ""; // 或者返回 path.c_str()
+    }
+
+    const char *data = path.data();
+    size_t len = path.length();
+    size_t i = len;
+
+    // 从后往前查找分隔符
+    while (i > 0)
+    {
+        char c = data[i - 1];
+#if LLBC_TARGET_PLATFORM_WIN32
+        if (c == '/' || c == '\\')
+#else
+        if (c == '/')
+#endif
+        {
+            break;
+        }
+        i--;
+    }
+
+    // i 现在是 BaseName 的起始索引
+    if (pos) *pos = i;
+    
+    return data + i;
+}
+
 LLBC_String LLBC_Directory::CurDir()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
