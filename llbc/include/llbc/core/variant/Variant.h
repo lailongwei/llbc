@@ -327,8 +327,8 @@ private:
             Dict dict;
         } obj;
 
-        Data() = default;
-        ~Data() = default;
+        Data() { }
+        ~Data() { }
 
         sint64 &i64() { return raw.i64; }
         const sint64 &i64() const { return raw.i64; }
@@ -573,7 +573,7 @@ public:
     template <typename... _Tys>
     void SeqBatchPushBack(_Tys &&... vals);
 
-    template <typename _Ty>
+    template <typename _Ty = LLBC_Variant>
     void SeqResize(Seq::size_type newSize, const _Ty &val = _Ty());
     void SeqReserve(Seq::size_type newCap) { Become<Seq>()._data.seq().reserve(newCap); }
 
@@ -582,7 +582,15 @@ public:
     SeqIter SeqErase(SeqIter first, SeqIter last);
     SeqIter SeqErase(SeqConstIter first, SeqConstIter last);
     template <typename _Ty>
-    size_t SeqErase(const _Ty &val, size_t eraseCount = LLBC_INFINITE, bool stableErase = true);
+    size_t SeqErase(const _Ty &val,
+                    size_t eraseCount = LLBC_INFINITE,
+                    bool fromBegin = true,
+                    bool stableErase = true);
+    template <typename _UnaryPred>
+    size_t SeqEraseIf(const _UnaryPred &pred,
+                      size_t eraseCount = LLBC_INFINITE,
+                      bool fromBegin = true,
+                      bool stableErase = true);
 
 public:
     // Dictionary type variant object specify Operate methods.
