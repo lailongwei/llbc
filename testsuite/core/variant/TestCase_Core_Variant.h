@@ -182,13 +182,13 @@ public:
 
 public:
     int ClearTest();
-
-public:
     int IsEmptyTest();
 
 public:
     int SizeAndCapacityTest();
+    int CountAndContainsTest();
 
 public:
-    int CountAndContainsTest();
+    int SeqSpecificTest();
+    int DictSpecificTest();
 };

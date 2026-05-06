@@ -1196,7 +1196,7 @@ LLBC_Variant::SeqIter LLBC_Variant::SeqBatchInsert(SeqIter it, _Tys &&... vals)
     else
     {
         const auto dist = std::distance(_data.seq().begin(), it);
-        (SeqInsert(it, std::forward<_Tys>(vals)), ...);
+        (SeqInsert(it++, std::forward<_Tys>(vals)), ...);
 
         return _data.seq().begin() + dist;
     }
@@ -1227,71 +1227,98 @@ void LLBC_Variant::SeqResize(Seq::size_type newSize, const _Ty &val)
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqIter it)
 {
-    if (UNLIKELY(!Is<Seq>()))
-        return Become<Seq>()._data.seq().end();
-
+    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
     return _data.seq().erase(it);
 }
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqConstIter it)
 {
-    if (UNLIKELY(!Is<Seq>()))
-        return Become<Seq>()._data.seq().end();
-
+    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
     return _data.seq().erase(it);
 }
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqIter first, SeqIter last)
 {
-    if (UNLIKELY(!Is<Seq>()))
-        return Become<Seq>()._data.seq().end();
-
+    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
     return _data.seq().erase(first, last);
 }
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqConstIter first, SeqConstIter last)
 {
-    if (UNLIKELY(!Is<Seq>()))
-        return Become<Seq>()._data.seq().end();
-
+    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
     return _data.seq().erase(first, last);
 }
 
 template <typename _Ty>
-size_t LLBC_Variant::SeqErase(const _Ty &val, size_t eraseCount, bool stableErase)
+size_t LLBC_Variant::SeqErase(const _Ty &val,
+                              size_t eraseCount,
+                              bool fromBegin,
+                              bool stableErase)
 {
-    if constexpr (!std::is_same_v<_Ty, LLBC_Variant>)
-        return SeqErase(LLBC_Variant(val), eraseCount, stableErase);
+    return SeqEraseIf([&val](const Seq::value_type &elem) { return elem == val; },
+                      eraseCount,
+                      fromBegin,
+                      stableErase);
+}
 
-    if (UNLIKELY(!Is<Seq>()))
+template <typename _UnaryPred>
+size_t LLBC_Variant::SeqEraseIf(const _UnaryPred &pred,
+                                size_t eraseCount,
+                                bool fromBegin,
+                                bool stableErase)
+{
+    if (!Is<Seq>())
     {
         Become<Seq>();
         return 0;
     }
 
-    if (_data.seq().empty())
+    if (_data.seq().empty() || eraseCount == 0)
         return 0;
 
-    size_t erasedCount;
+    size_t erasedCount = 0;
     Seq &seq = _data.seq();
-    sint64 pos = static_cast<sint64>(seq.size() - 1);
-    for (; pos >= 0 && (eraseCount == LLBC_INFINITE || erasedCount < eraseCount); --pos)
+    sint64 pos, endPos, step;
+    if (fromBegin)
     {
-        if (seq[pos] == val)
-        {
-            if (stableErase)
-            {
-                seq.erase(seq.begin() + pos);
-            }
-            else
-            {
-                if (pos != seq.size() - 1)
-                    seq[pos] = std::move(seq.size() - 1);
-                seq.erase(--seq.end());
-            }
+        pos = 0;
+        endPos = static_cast<sint64>(seq.size());
+        step = 1;
+    }
+    else
+    {
+        pos = static_cast<sint64>(seq.size()) - 1;
+        endPos = -1;
+        step = -1;
+    }
 
-            ++erasedCount;
+    constexpr size_t infEraseCount = static_cast<size_t>(LLBC_INFINITE);
+    for (;
+         pos != endPos && (eraseCount == infEraseCount || erasedCount < eraseCount);
+         )
+    {
+        if (!pred(seq[pos]))
+        {
+            pos += step;
+            continue;
         }
+
+        if (stableErase)
+        {
+            seq.erase(seq.begin() + pos);
+        }
+        else
+        {
+            if (static_cast<size_t>(pos) != seq.size() - 1)
+                seq[pos] = std::move(seq[seq.size() - 1]);
+            seq.erase(--seq.end());
+        }
+
+        ++erasedCount;
+        if (fromBegin)
+            --endPos;
+        else
+            --pos;
     }
 
     return erasedCount;

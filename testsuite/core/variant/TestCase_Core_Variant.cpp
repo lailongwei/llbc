@@ -56,6 +56,8 @@ int TestCase_Core_Variant::Run(int argc, char *argv[])
     LLBC_Expect(IsEmptyTest() == LLBC_OK);
     LLBC_Expect(SizeAndCapacityTest() == LLBC_OK);
     LLBC_Expect(CountAndContainsTest() == LLBC_OK);
+    LLBC_Expect(SeqSpecificTest() == LLBC_OK);
+    LLBC_Expect(DictSpecificTest() == LLBC_OK);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -3168,6 +3170,283 @@ int TestCase_Core_Variant::CountAndContainsTest()
                     !numStrVar.Contains(LLBC_Variant(intVal * 10)) &&
                 numStrVar.Count(LLBC_Variant::nil) == 0 &&
                     !numStrVar.Contains(LLBC_Variant::nil));
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::SeqSpecificTest()
+{
+    LLBC_PrintLn("Sequence specific test:");
+
+    // Non-Seq call NON-CONST sequence specific methods test(implicity convert to Seq).
+    LLBC_Variant testVar;
+    LLBC_Expect(testVar.SeqBegin() == testVar.SeqEnd() && testVar.Is<LLBC_Variant::Seq>());
+
+    testVar.Become<void>();
+    LLBC_Expect(testVar.SeqReverseBegin() == testVar.SeqReverseEnd() && testVar.Is<LLBC_Variant::Seq>());
+
+    testVar.Become<void>();
+    testVar.SeqPushBack(3);
+    LLBC_Expect(testVar.Is<LLBC_Variant::Seq>() && testVar.Size() == 1);
+
+    testVar.Become<void>();
+    testVar.SeqBatchPushBack(false, 3.1415, "Hello World", std::vector<int>{});
+    LLBC_Expect(testVar.Is<LLBC_Variant::Seq>() &&
+                testVar.Size() == 4 &&
+                testVar[0] == false &&
+                testVar[1] == 3.1415 &&
+                testVar[2] == "Hello World" &&
+                testVar[3] == std::vector<int>{});
+
+    testVar.Become<void>();
+    testVar.SeqResize(100);
+    LLBC_Expect(testVar.Is<LLBC_Variant::Seq>() &&
+                testVar.Size() == 100 &&
+                std::all_of(testVar.SeqBegin(),
+                            testVar.SeqEnd(),
+                            [](const auto &elem) { return elem.template Is<void>(); }));
+    
+    testVar.Become<void>();
+    testVar.SeqReserve(200);
+    LLBC_Expect(testVar.Is<LLBC_Variant::Seq>() &&
+                testVar.Size() == 0 &&
+                testVar.Capacity() == 200);
+
+    testVar.Become<void>();
+    LLBC_Expect(testVar.SeqErase(3) == 0 &&
+                testVar.Is<LLBC_Variant::Seq>());
+    LLBC_Expect(testVar.SeqEraseIf([](const auto &elem) { return elem == 3; }) == 0 &&
+                testVar.Is<LLBC_Variant::Seq>());
+
+    // Below test code will raise abort.
+    // testVar.Become<void>();
+    // testVar.SeqInsert(testVar.SeqBegin(), 1, 3);
+    // LLBC_Expect(testVar.Is<LLBC_Variant::Seq>());
+
+    // Non-Seq call CONST sequence specific methods test(will not be implicitly converted to Seq).
+    const LLBC_Variant constTestVar;
+    LLBC_Expect(constTestVar.SeqBegin() == constTestVar.SeqEnd() && constTestVar.Is<void>());
+    LLBC_Expect(constTestVar.SeqReverseBegin() == constTestVar.SeqReverseEnd() && constTestVar.Is<void>());
+    LLBC_Expect(constTestVar.Size() == 0 && constTestVar.Is<void>());
+    LLBC_Expect(constTestVar.Capacity() == 0 && constTestVar.Is<void>());
+    LLBC_Expect(constTestVar.Capacity() == 0 && constTestVar.Is<void>());
+    LLBC_Expect(!constTestVar.Contains(333) && constTestVar.Is<void>());
+    LLBC_Expect(constTestVar.Count(333) == 0 && constTestVar.Is<void>());
+
+    // Empty sequence test.
+    LLBC_Variant emptySeqVar;
+    const LLBC_Variant &constEmptySeqVar = emptySeqVar;
+    emptySeqVar.Become<LLBC_Variant::Seq>();
+    LLBC_Expect(emptySeqVar.Is<LLBC_Variant::Seq>() &&
+                emptySeqVar.IsEmpty() &&
+                emptySeqVar.Size() == 0);
+    LLBC_Expect(emptySeqVar.SeqBegin() == emptySeqVar.SeqEnd() &&
+                emptySeqVar.SeqEnd() - emptySeqVar.SeqBegin() == 0 &&
+                emptySeqVar.SeqReverseBegin() == emptySeqVar.SeqReverseEnd() &&
+                emptySeqVar.SeqReverseEnd() - emptySeqVar.SeqReverseBegin() == 0);
+    LLBC_Expect(constEmptySeqVar.SeqBegin() == constEmptySeqVar.SeqEnd() &&
+                constEmptySeqVar.SeqEnd() - constEmptySeqVar.SeqBegin() == 0 &&
+                constEmptySeqVar.SeqReverseBegin() == constEmptySeqVar.SeqReverseEnd() &&
+                constEmptySeqVar.SeqReverseEnd() - constEmptySeqVar.SeqReverseBegin() == 0);
+    LLBC_Expect(emptySeqVar.Count(333) == 0 && !emptySeqVar.Contains(333));
+
+    // SeqPushBack/SeqBatchPushBack test:
+    testVar.Become<LLBC_Variant::Seq>();
+    testVar.Clear();
+    testVar.SeqPushBack(1);
+    LLBC_Expect(testVar.Size() == 1 && testVar[0] == 1);
+    testVar.SeqBatchPushBack(false, 3.1415926, "Hello World");
+    LLBC_Expect(testVar.Size() == 4 &&
+                testVar[0] == 1 &&
+                testVar[1] == false &&
+                testVar[2] == 3.1415926 &&
+                testVar[3] == "Hello World");
+
+    testVar.Clear();
+    LLBC_String strElem("Hello World");
+    testVar.SeqPushBack(std::move(strElem));
+    LLBC_Expect(testVar[0] == "Hello World" && strElem.empty());
+
+    strElem = "Hello World";
+    std::vector<int> vecElem{1, 2, 3};
+    const auto copyVecElem = vecElem;
+
+    LLBC_String strElem2("Hey Judy");
+    testVar.Clear();
+    testVar.SeqBatchPushBack(std::move(strElem), std::move(vecElem), strElem2);
+    LLBC_Expect(testVar.Size() == 3 &&
+                testVar[0] == "Hello World" &&
+                testVar[1] == copyVecElem &&
+                testVar[2] == "Hey Judy" &&
+                strElem.empty() &&
+                vecElem.empty() &&
+                strElem2 == "Hey Judy",
+                "testVar:%s", testVar.ToString().c_str());
+
+    // SeqInsert(SeqIter it, _Ty &&val):
+    testVar.Clear();
+    strElem = "Hello World";
+    testVar.SeqInsert(testVar.SeqBegin(), true);
+    testVar.SeqInsert(testVar.SeqEnd(), strElem);
+    LLBC_Expect(testVar.Size() == 2 &&
+                testVar[0] == true &&
+                testVar[1] == "Hello World" &&
+                strElem == "Hello World",
+                "testVar:%s", testVar.ToString().c_str());
+
+    testVar.SeqInsert(testVar.SeqBegin() + 1, std::move(strElem));
+    LLBC_Expect(testVar[1] == testVar[2] &&
+                strElem.empty());
+
+    // SeqInsert(SeqIter it, size_t n, const _Ty &val):
+    testVar.Clear();
+    testVar.SeqInsert(testVar.SeqBegin(), 10, 1);
+    LLBC_Expect(testVar.Size() == 10 &&
+                std::all_of(testVar.SeqBegin(),
+                            testVar.SeqEnd(),
+                            [](const auto &elem) { return elem == 1; }));
+    testVar.SeqInsert(testVar.SeqBegin() + 5, 10, 2);
+    LLBC_Expect(testVar.Size() == 20 &&
+                std::all_of(testVar.SeqBegin() + 5,
+                            testVar.SeqBegin() + 15,
+                            [](const auto &elem) {return elem == 2; }));
+    testVar.SeqInsert(testVar.SeqEnd(), 10, 3);
+    LLBC_Expect(testVar.Size() == 30 &&
+                std::all_of(testVar.SeqBegin() + 20,
+                            testVar.SeqEnd(),
+                            [](const auto &elem) {return elem == 3; }));
+
+    // SeqInsert(SeqIter it, SeqConstIter begin, SeqConstIter end):
+    LLBC_Variant anotherSeq;
+    anotherSeq.SeqInsert(anotherSeq.SeqBegin(), 10, 1);
+    testVar.SeqInsert(testVar.SeqEnd(), anotherSeq.SeqBegin(), anotherSeq.SeqEnd());
+    LLBC_Expect(testVar.Size() == 40 &&
+                std::all_of(testVar.SeqBegin() + 30,
+                            testVar.SeqEnd(),
+                            [](const auto &elem) { return elem == 1; }));
+
+    // SeqBatchInsert(SeqIter it, ...):
+    testVar.Clear();
+    testVar.SeqBatchInsert(testVar.SeqBegin(), true, 3.1415926, "Hello World");
+    LLBC_Expect(testVar.Size() == 3 &&
+                testVar[0] == true &&
+                testVar[1] == 3.1415926 &&
+                testVar[2] == "Hello World",
+                "testVar:%s", testVar.ToString().c_str());
+
+    // SeqFront()/SeqBack():
+    LLBC_Expect(testVar.SeqFront() == true &&
+                testVar.SeqBack() == "Hello World",
+                "testVar:%s", testVar.ToString().c_str());
+
+    // SeqPopBack():
+    testVar.SeqPopBack();
+    LLBC_Expect(testVar.Size() == 2 && testVar.SeqBack() == 3.1415926);
+
+    // SeqErase(SeqIter):
+    testVar.Clear();
+    testVar.SeqBatchPushBack(1, 2, 3, true, false);
+    LLBC_Expect(testVar.SeqErase(testVar.SeqBegin()) == testVar.SeqBegin() &&
+                testVar.Size() == 4 &&
+                testVar[0] == 2);
+    testVar.SeqInsert(testVar.SeqBegin(), 1);
+    LLBC_Expect(testVar.SeqErase(static_cast<const LLBC_Variant &>(testVar).SeqBegin() + 1) ==
+                    static_cast<const LLBC_Variant &>(testVar).SeqBegin() + 1 &&
+                testVar.Size() == 4 &&
+                testVar[0] == 1 &&
+                testVar[1] == 3);
+    testVar.SeqInsert(testVar.SeqBegin() + 1, 2);
+    auto seqEraseRet = testVar.SeqErase(testVar.SeqEnd() - 1);
+    LLBC_Expect(seqEraseRet == testVar.SeqEnd() &&
+                testVar.Size() == 4 &&
+                testVar[0] == 1 &&
+                testVar[1] == 2 &&
+                testVar[2] == 3 &&
+                testVar[3] == true);
+
+    // SeqErase(SeqIter begin, SeqIter end):
+    testVar.Clear();
+    for (int i = 0; i < 10; ++i)
+        testVar.SeqPushBack(i);
+    seqEraseRet = testVar.SeqErase(testVar.SeqBegin(), testVar.SeqBegin() + 5);
+    LLBC_Expect(seqEraseRet == testVar.SeqBegin() &&
+                testVar.Size() == 5 &&
+                testVar[0] == 5,
+                "testVar:%s, testVar.Size():%lu, testVar[0]:%s, seqEraseRet == testVar.SeqBegin()?:%s",
+                testVar.ToString().c_str(),
+                testVar.Size(),
+                testVar[0].ToString().c_str(),
+                seqEraseRet == testVar.SeqBegin() ? "true" : "false");
+    seqEraseRet = testVar.SeqErase(static_cast<const LLBC_Variant &>(testVar).SeqBegin(),
+                                   static_cast<const LLBC_Variant &>(testVar).SeqBegin() + 5);
+    LLBC_Expect(seqEraseRet == static_cast<const LLBC_Variant &>(testVar).SeqBegin() &&
+                testVar.Size() == 0);
+
+    // SeqErase(val):
+    testVar.Clear();
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int i = 0; i < 10; ++i)
+            testVar.SeqPushBack(i);
+    }
+
+    // [0] 1 2 3 4 5 6 7 8 9 | [0] 1 2 3 4 5 6 7 8 9 | [0] 1 2 3 4 5 6 7 8 9
+    size_t valEraseRet = testVar.SeqErase(0);
+    LLBC_Expect(valEraseRet == 3 &&
+                testVar.Size() == 27 &&
+                testVar[0] == 1 &&
+                testVar.Count(0) == 0,
+                "testVar:%s",
+                testVar.ToString().c_str());
+
+    // [1] 2 3 4 5 6 7 8 9 | 1 2 3 4 5 6 7 8 9 | 1 2 3 4 5 6 7 8 9
+    valEraseRet = testVar.SeqErase(1, /*eraseCount = */1);
+    LLBC_Expect(valEraseRet == 1 &&
+                testVar.Size() == 26 &&
+                testVar[0] == 2 &&
+                testVar.Count(1) == 2,
+                "testVar:%s",
+                testVar.ToString().c_str());
+    
+    // 2 3 4 5 6 7 8 9 | 1 2 3 4 5 6 7 8 9 | 1 [2] 3 4 5 6 7 8 9
+    valEraseRet = testVar.SeqErase(2, /*eraseCount = */1, /*fromBegin = */false);
+    LLBC_Expect(valEraseRet == 1 &&
+                testVar.Size() == 25 &&
+                testVar[8] == 1 &&
+                testVar[16] == 9 &&
+                testVar[18] == 3 &&
+                testVar.Count(2) == 2,
+                "testVar:%s",
+                testVar.ToString().c_str());
+
+    // 2 [3] 4 5 6 7 8 9 | 1 2 [3] 4 5 6 7 8 9 | 1 [3] 4 5 6 7 8 9
+    valEraseRet = testVar.SeqErase(3, 100);
+    LLBC_Expect(valEraseRet == 3 &&
+                testVar.Size() == 22 &&
+                testVar[7] == 1 &&
+                testVar[14] == 9 &&
+                testVar[16] == 4 &&
+                testVar.Count(3) == 0,
+                "testVar:%s",
+                testVar.ToString().c_str());
+
+    // 2 [4] 5 6 7 8 9 | 1 2 [4] 5 6 7 8 9 | 1 [4] 5 6 7 8 9
+    valEraseRet = testVar.SeqEraseIf([](const auto &elem) { return elem == 4; });
+    LLBC_Expect(valEraseRet == 3 &&
+                testVar.Size() == 19 &&
+                testVar[6] == 1 &&
+                testVar[12] == 9 &&
+                testVar[14] == 5 &&
+                testVar.Count(4) == 0,
+                "testVar:%s",
+                testVar.ToString().c_str());
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::DictSpecificTest()
+{
+    LLBC_PrintLn("Dictionary specific test:");
 
     return LLBC_OK;
 }
