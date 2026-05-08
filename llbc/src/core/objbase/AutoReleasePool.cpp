@@ -93,13 +93,18 @@ int LLBC_AutoReleasePool::RemoveObject(LLBC_Object *o)
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
+    
     if (o->_autoRef == 0)
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return LLBC_FAILED;
     }
 
-    _arr->Erase(o, false);
+    // Use UnstableErase for O(1) removal (swap-and-pop strategy).
+    // Note: UnstableErase does not preserve element order, which is acceptable for AutoReleasePool.
+    if (!_arr->UnstableErase(o, false))
+        return LLBC_FAILED;
+
     o->_autoRef = 0;
 
     return LLBC_OK;
