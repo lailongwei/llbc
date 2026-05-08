@@ -179,8 +179,10 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::DeduceType<const uint64 &&>() == LLBC_VariantType::RAW_UINT64);
 
     // ENUM
-    LLBC_Expect(LLBC_VariantType::DeduceType<TestTraditionalEnum>() == LLBC_VariantType::RAW_SINT64);
-    LLBC_Expect(LLBC_VariantType::DeduceType<TestNewStyleEnum>() == LLBC_VariantType::RAW_SINT64);
+    LLBC_Expect(LLBC_VariantType::DeduceType<TestTraditionalEnum>() == LLBC_VariantType::RAW_UINT32,
+                "TestTraditonalEnum underlying type:%s",
+                LLBC_GetTypeName(std::underlying_type_t<TestTraditionalEnum>));
+    LLBC_Expect(LLBC_VariantType::DeduceType<TestNewStyleEnum>() == LLBC_VariantType::RAW_SINT32);
 
     // FLOAT
     LLBC_Expect(LLBC_VariantType::DeduceType<float>() == LLBC_VariantType::RAW_FLOAT);
@@ -754,15 +756,15 @@ int TestCase_Core_Variant::ConstructTest_RawType()
 
     // Construct from enum.
     LLBC_Variant traditionalEnumVar(TestTraditionalEnum::TestTraditionalEnum1);
-    LLBC_Expect(traditionalEnumVar.Is<sint64>() &&
+    LLBC_Expect(traditionalEnumVar.Is<uint32>() &&
                 !traditionalEnumVar.Is<void>() &&
                 traditionalEnumVar.IsRaw() &&
-                traditionalEnumVar.IsSigned() &&
-                !traditionalEnumVar.IsUnsigned() &&
+                !traditionalEnumVar.IsSigned() &&
+                traditionalEnumVar.IsUnsigned() &&
                 !traditionalEnumVar.Is<LLBC_Variant::Str>() &&
                 !traditionalEnumVar.Is<LLBC_Variant::Seq>() &&
                 !traditionalEnumVar.Is<LLBC_Variant::Dict>() &&
-                traditionalEnumVar.GetType() == LLBC_VariantType::RAW_SINT64 &&
+                traditionalEnumVar.GetType() == LLBC_VariantType::RAW_UINT32 &&
                 traditionalEnumVar == TestTraditionalEnum::TestTraditionalEnum1 &&
                 traditionalEnumVar.As<TestTraditionalEnum>() == TestTraditionalEnum::TestTraditionalEnum1,
                 "Construct from traditional enum");
@@ -773,7 +775,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
         TestNewStyleEnum2 = 2
     };
     LLBC_Variant newStyleEnumVar(TestNewStyleEnum::TestNewStyleEnum2);
-    LLBC_Expect(newStyleEnumVar.Is<sint64>() &&
+    LLBC_Expect(newStyleEnumVar.Is<sint32>() &&
                 !newStyleEnumVar.Is<void>() &&
                 newStyleEnumVar.IsRaw() &&
                 newStyleEnumVar.IsSigned() &&
@@ -781,7 +783,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                 !newStyleEnumVar.Is<LLBC_Variant::Str>() &&
                 !newStyleEnumVar.Is<LLBC_Variant::Seq>() &&
                 !newStyleEnumVar.Is<LLBC_Variant::Dict>() &&
-                newStyleEnumVar.GetType() == LLBC_VariantType::RAW_SINT64 &&
+                newStyleEnumVar.GetType() == LLBC_VariantType::RAW_SINT32 &&
                 newStyleEnumVar == TestNewStyleEnum::TestNewStyleEnum2 &&
                 newStyleEnumVar.As<TestNewStyleEnum>() == TestNewStyleEnum::TestNewStyleEnum2,
                 "Construct from new style enum");
@@ -1759,13 +1761,13 @@ int TestCase_Core_Variant::AssignmentTest_VariantType()
             {TestTraditionalEnum::TestTraditionalEnum1, TestTraditionalEnum::TestTraditionalEnum2})
     {
         LLBC_Variant traditionalEnumVar(traditionalEnumVal);
-        LLBC_Expect(AssignmentTest_OneVariantType<sint64>(traditionalEnumVar) == LLBC_OK);
+        LLBC_Expect(AssignmentTest_OneVariantType<uint32>(traditionalEnumVar) == LLBC_OK);
     }
     for (auto newStyleEnumVal :
             {TestNewStyleEnum::TestNewStyleEnum1, TestNewStyleEnum::TestNewStyleEnum2})
     {
         LLBC_Variant newStyleEnumVar(newStyleEnumVal);
-        LLBC_Expect(AssignmentTest_OneVariantType<sint64>(newStyleEnumVar) == LLBC_OK);
+        LLBC_Expect(AssignmentTest_OneVariantType<sint32>(newStyleEnumVar) == LLBC_OK);
     }
 
     // Str: char array:
@@ -3030,7 +3032,7 @@ int TestCase_Core_Variant::SizeAndCapacityTest()
     LLBC_Expect(strVar.Size() == 20 &&
                 strVar.Capacity() == 80 &&
                 strVar.As<LLBC_Variant::Str>()[0] == 'H' &&
-                strVar.As<LLBC_Variant::Str>()[79] == '\0',
+                strVar.As<LLBC_Variant::Str>()[19] == '\0',
                 "strVar.Size():%lu, strVar.Capacity():%lu",
                 strVar.Size(),
                 strVar.Capacity());

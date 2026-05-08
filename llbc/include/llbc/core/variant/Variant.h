@@ -97,8 +97,8 @@ public:
         MASK_RAW_SIGNED      = 0x0001
     };
 
-    // RAW types.
-    static constexpr std::array<ENUM, 14> RAW_TYPES {
+    // RAW types(14).
+    static constexpr std::array RAW_TYPES {
         RAW_BOOL,
 
         RAW_SINT8,
@@ -122,24 +122,24 @@ public:
         RAW_DOUBLE,
     };
 
-    // STR types.
-    static constexpr std::array<ENUM, 1> STR_TYPES {
+    // STR types(1).
+    static constexpr std::array STR_TYPES {
         STR_DFT,
     };
 
-    // SEQ types.
-    static constexpr std::array<ENUM, 1> SEQ_TYPES {
+    // SEQ types(1).
+    static constexpr std::array SEQ_TYPES {
         SEQ_DFT,
     };
 
-    // DICT types.
-    static constexpr std::array<ENUM, 1> DICT_TYPES {
+    // DICT types(1).
+    static constexpr std::array DICT_TYPES {
         DICT_DFT,
     };
 
-    // ALL types.
-    static constexpr std::array<ENUM, 18> ALL_TYPES {
-        // NIL(1):
+    // ALL types(NIL(1) + RAW(14) + STR(1) + SEQ(1) + DICT(1)).
+    static constexpr std::array ALL_TYPES {
+        // NIL()):
         NIL,
 
         // RAW(14):
@@ -167,6 +167,13 @@ public:
         // DICT(1):
         DICT_DFT,
     };
+    static_assert(/* NIL */1 +
+                    RAW_TYPES.size() +
+                    STR_TYPES.size() +
+                    SEQ_TYPES.size() +
+                    DICT_TYPES.size() == ALL_TYPES.size(),
+                  "llbc framework internal error: "
+                    "ALL_TYPES size not equal to NIL + RAW + STR + SEQ + DICT");
 
 public:
     /**
@@ -370,6 +377,7 @@ public:
     explicit LLBC_Variant(_Ty &&dict);
     LLBC_Variant(const LLBC_Variant &var);
     LLBC_Variant(LLBC_Variant &&var) noexcept;
+    ~LLBC_Variant();
 
 public:
     // Assignment operators.
@@ -459,7 +467,7 @@ public:
     template <typename _Ty>
     std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<_Ty>>, LLBC_Variant::Seq>,
                      const LLBC_Variant::Seq &>
-    As() const { return Is<Seq>() ? _data.seq() : _emptySeq; }
+    As() const { return Is<Seq>() ? _data.seq() : GetEmptySeq(); }
     template <typename _Ty>
     std::enable_if_t<!std::is_reference_v<_Ty> &&
                         !std::is_same_v<std::remove_cv_t<_Ty>, LLBC_Variant::Seq> &&
@@ -470,7 +478,7 @@ public:
     template <typename _Ty>
     std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<_Ty>>, LLBC_Variant::Dict>,
                      const LLBC_Variant::Dict &>
-    As() const { return Is<Dict>() ? _data.dict() : _emptyDict; }
+    As() const { return Is<Dict>() ? _data.dict() : GetEmptyDict(); }
     template <typename _Ty>
     std::enable_if_t<!std::is_reference_v<_Ty> &&
                         !std::is_same_v<std::remove_cv_t<_Ty>, LLBC_Variant::Dict> &&
@@ -687,6 +695,7 @@ private:
     size_t CountImpl(const _Key &key, bool returnIfFound) const;
 
     void Reset(LLBC_VariantType::ENUM newType);
+    void ResetData();
 
     template <typename _64Ty>
     _64Ty AsSignedOrUnsigned64() const;
@@ -694,25 +703,25 @@ private:
     template <typename _Key>
     Dict::size_type DictEraseOne(const _Key &key);
 
+    static const Str &GetEmptyStr();
+    static const Str &GetTrueStr();
+    static const Str &GetFalseStr();
+    static const Str &GetEmptySeqStr();
+    static const Str &GetEmptyDictStr();
+    static const std::string &GetEmptySTLStr();
+    static const std::string &GetTrueSTLStr();
+    static const std::string &GetFalseSTLStr();
+    static const std::string &GetEmptySTLSeqStr();
+    static const std::string &GetEmptySTLDictStr();
+
+    static const Seq &GetEmptySeq();
+    static const Dict &GetEmptyDict();
+
 private:
     LLBC_VariantType::ENUM _type;
     Data _data;
 
     static Str **_num2StrFastAccessTbl;
-
-    static const Str _trueStr;
-    static const Str _falseStr;
-    static const Str _emptySeqStr;
-    static const Str _emptyDictStr;
-    static const std::string _trueSTLStr;
-    static const std::string _falseSTLStr;
-    static const std::string _emptySTLSeqStr;
-    static const std::string _emptySTLDictStr;
-
-    static const Str _emptyStr;
-    static const std::string _emptySTLStr;
-    static const Seq _emptySeq;
-    static const Dict _emptyDict;
 };
 
 __LLBC_NS_END

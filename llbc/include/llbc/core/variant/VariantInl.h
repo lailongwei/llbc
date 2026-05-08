@@ -161,7 +161,7 @@ constexpr LLBC_VariantType::ENUM LLBC_VariantType::DeduceType()
     }
     else if constexpr (std::is_enum_v<_PureTy>) // enum
     {
-        return RAW_SINT64;
+        return DeduceType<std::underlying_type_t<_PureTy>>();
     }
     else if constexpr (std::is_same_v<_PureTy, float>) // float
     {
@@ -288,14 +288,14 @@ LLBC_Variant::LLBC_Variant(const _Ty &raw)
     }
     else if constexpr (std::is_pointer_v<_Ty>)
     {
-        if constexpr (sizeof(_Ty) < sizeof(uint64))
-            _data.ui64() = 0;
-
-        memcpy(&_data.ui64(), &raw, sizeof(_Ty));
+        _data.ui64() = reinterpret_cast<std::uintptr_t>(raw);
     }
     else if constexpr (std::is_enum_v<_Ty>)
     {
-        _data.i64() = static_cast<sint64>(raw);
+        if constexpr (std::is_signed_v<std::underlying_type_t<_Ty>>)
+            _data.i64() = static_cast<sint64>(raw);
+        else
+            _data.ui64() = static_cast<uint64>(raw);
     }
     else
     {
@@ -474,6 +474,13 @@ inline LLBC_Variant::LLBC_Variant(LLBC_Variant &&var) noexcept
         _data.ui64() = var._data.ui64();
 }
 
+inline LLBC_Variant::~LLBC_Variant()
+{
+    // To improve LLBC_Variant destructor performance, decide not to call Reset() function
+    // (this function would perform unnecessary cleanup operations).
+    ResetData();
+}
+
 template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsRaw<_Ty>(), int>>
 LLBC_Variant &LLBC_Variant::operator=(const _Ty &raw)
@@ -496,14 +503,14 @@ LLBC_Variant &LLBC_Variant::operator=(const _Ty &raw)
     }
     else if constexpr (std::is_pointer_v<_Ty>)
     {
-        if constexpr (sizeof(_Ty) < sizeof(uint64))
-            _data.ui64() = 0;
-        
-        memcpy(&_data.ui64(), &raw, sizeof(_Ty));
+        _data.ui64() = reinterpret_cast<std::uintptr_t>(raw);
     }
     else if constexpr (std::is_enum_v<_Ty>)
     {
-        _data.i64() = static_cast<sint64>(raw);
+        if (std::is_signed_v<std::underlying_type_t<_Ty>>)
+            _data.i64() = static_cast<sint64>(raw);
+        else
+            _data.ui64() = static_cast<uint64>(raw);
     }
     else
     {
@@ -851,7 +858,10 @@ LLBC_Variant::As() const
     // xxx -> enum:
     else if constexpr (std::is_enum_v<_PureTy>)
     {
-        return static_cast<_Ty>(As<sint64>());
+        if (std::is_signed_v<std::underlying_type_t<_PureTy>>)
+            return static_cast<_Ty>(As<sint64>());
+        else
+            return static_cast<_Ty>(As<uint64>());
     }
     else
     {
@@ -894,9 +904,9 @@ LLBC_Variant::As() const
         if (Is<bool>())
         {
             if constexpr (std::is_same_v<_PureTy, Str>)
-                return _data.ui64() != 0 ? _trueStr : _falseStr;
+                return _data.ui64() != 0 ? GetTrueStr() : GetFalseStr();
             else
-                return _data.ui64() != 0 ? _trueSTLStr: _falseSTLStr;
+                return _data.ui64() != 0 ? GetTrueSTLStr(): GetFalseSTLStr();
         }
 
         if (Is<float, double>())
@@ -940,9 +950,9 @@ LLBC_Variant::As() const
         if (_data.seq().empty())
         {
             if constexpr (std::is_same_v<_PureTy, Str>)
-                return _emptySeqStr;
+                return GetEmptySeqStr();
             else
-                return _emptySTLSeqStr;
+                return GetEmptySTLSeqStr();
         }
 
         _PureTy content;
@@ -968,9 +978,9 @@ LLBC_Variant::As() const
         if (_data.dict().empty())
         {
             if constexpr (std::is_same_v<_PureTy, Str>)
-                return _emptyDictStr;
+                return GetEmptyDictStr();
             else
-                return _emptySTLDictStr;
+                return GetEmptySTLDictStr();
         }
 
         _PureTy content;
@@ -999,9 +1009,9 @@ LLBC_Variant::As() const
     }
 
     if constexpr (std::is_same_v<_PureTy, Str>)
-        return _emptyStr;
+        return GetEmptyStr();
     else
-        return _emptySTLStr;
+        return GetEmptySTLStr();
 }
 
 // Undefine Num -> Str internal macro.
@@ -1742,14 +1752,18 @@ size_t LLBC_Variant::CountImpl(const _Key &key, bool returnIfFound) const
 
 LLBC_FORCE_INLINE void LLBC_Variant::Reset(LLBC_VariantType::ENUM newType)
 {
+    ResetData();
+    _type = newType;
+}
+
+LLBC_FORCE_INLINE void LLBC_Variant::ResetData()
+{
     if (_type == LLBC_VariantType::STR_DFT)
         _data.obj.str.~Str();
     else if (_type == LLBC_VariantType::SEQ_DFT)
         _data.obj.seq.~Seq();
     else if (_type == LLBC_VariantType::DICT_DFT)
         _data.obj.dict.~Dict();
-
-    _type = newType;
 }
 
 template <typename _64Ty>

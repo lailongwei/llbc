@@ -25,59 +25,83 @@
 #include "llbc/core/utils/Util_Text.h"
 #include "llbc/core/variant/Variant.h"
 
-__LLBC_INTERNAL_NS_BEGIN
-
-static std::unordered_map<LLBC_NS LLBC_VariantType::ENUM, LLBC_NS LLBC_String> __g_typeDescs {
-    {LLBC_NS LLBC_VariantType::NIL, "Nil"},
-
-    {LLBC_NS LLBC_VariantType::RAW_BOOL, "bool"},
-    {LLBC_NS LLBC_VariantType::RAW_SINT8, "int8"},
-    {LLBC_NS LLBC_VariantType::RAW_UINT8, "uint8"},
-    {LLBC_NS LLBC_VariantType::RAW_SINT16, "int16"},
-    {LLBC_NS LLBC_VariantType::RAW_UINT16, "uint16"},
-    {LLBC_NS LLBC_VariantType::RAW_SINT32, "int32"},
-    {LLBC_NS LLBC_VariantType::RAW_UINT32, "uint32"},
-    {LLBC_NS LLBC_VariantType::RAW_LONG, "long"},
-    {LLBC_NS LLBC_VariantType::RAW_ULONG, "ulong"},
-    {LLBC_NS LLBC_VariantType::RAW_PTR, "pointer"},
-    {LLBC_NS LLBC_VariantType::RAW_SINT64, "int64"},
-    {LLBC_NS LLBC_VariantType::RAW_UINT64, "uint64"},
-    {LLBC_NS LLBC_VariantType::RAW_FLOAT, "float"},
-    {LLBC_NS LLBC_VariantType::RAW_DOUBLE, "double"},
-
-    {LLBC_NS LLBC_VariantType::STR_DFT, "string"},
-
-    {LLBC_NS LLBC_VariantType::SEQ_DFT, "sequence"},
-
-    {LLBC_NS LLBC_VariantType::DICT_DFT, "dictionary"},
-};
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 const LLBC_Variant LLBC_Variant::nil;
 
-const LLBC_Variant::Str LLBC_Variant::_trueStr("true");
-const LLBC_Variant::Str LLBC_Variant::_falseStr("false");
-const LLBC_Variant::Str LLBC_Variant::_emptySeqStr("[]");
-const LLBC_Variant::Str LLBC_Variant::_emptyDictStr("{}");
-const std::string LLBC_Variant::_trueSTLStr("true");
-const std::string LLBC_Variant::_falseSTLStr("false");
-const std::string LLBC_Variant::_emptySTLSeqStr("[]");
-const std::string LLBC_Variant::_emptySTLDictStr("{}");
-
-const LLBC_Variant::Str LLBC_Variant::_emptyStr;
-const std::string LLBC_Variant::_emptySTLStr;
-const LLBC_Variant::Seq LLBC_Variant::_emptySeq;
-const LLBC_Variant::Dict LLBC_Variant::_emptyDict;
-
-
-
 const LLBC_String &LLBC_VariantType::Type2Str(int type)
 {
-    const auto it = LLBC_INL_NS __g_typeDescs.find(static_cast<ENUM>(type));
-    return (it != LLBC_INL_NS __g_typeDescs.end()) ? it->second : LLBC_INL_NS __g_typeDescs[NIL];
+    static const std::array<LLBC_String, ALL_TYPES.size()> typeStrs {
+        "Nil",
+
+        "bool",
+        "int8",
+        "uint8",
+        "int16",
+        "uint16",
+        "int32",
+        "uint32",
+        "long",
+        "ulong",
+        "pointer",
+        "int64",
+        "uint64",
+        "float",
+        "double",
+
+        "string",
+
+        "sequence",
+
+        "dictionary",
+    };
+
+    switch (type)
+    {
+    case NIL:
+        return typeStrs[0];
+    
+    case RAW_BOOL:
+        return typeStrs[1];
+    case RAW_SINT8:
+        return typeStrs[2];
+    case RAW_UINT8:
+        return typeStrs[3];
+    case RAW_SINT16:
+        return typeStrs[4];
+    case RAW_UINT16:
+        return typeStrs[5];
+    case RAW_SINT32:
+        return typeStrs[6];
+    case RAW_UINT32:
+        return typeStrs[7];
+    case RAW_LONG:
+        return typeStrs[8];
+    case RAW_ULONG:
+        return typeStrs[9];
+    case RAW_PTR:
+        return typeStrs[10];
+    case RAW_SINT64:
+        return typeStrs[11];
+    case RAW_UINT64:
+        return typeStrs[12];
+    case RAW_FLOAT:
+        return typeStrs[13];
+    case RAW_DOUBLE:
+        return typeStrs[14];
+
+    case STR_DFT:
+        return typeStrs[15];
+
+    case SEQ_DFT:
+        return typeStrs[16];
+
+    case DICT_DFT:
+        return typeStrs[17];
+
+    default:
+        return typeStrs[0];
+    }
 }
 
 __LLBC_NS_END
@@ -313,6 +337,77 @@ bool LLBC_Variant::Deserialize(LLBC_Stream &stream)
     }
     
     return false;
+}
+
+const LLBC_Variant::Str &LLBC_Variant::GetEmptyStr()
+{
+    static const Str emptyStr;
+    return emptyStr;
+}
+
+const LLBC_Variant::Str &LLBC_Variant::GetTrueStr()
+{
+    static const Str trueStr("true");
+    return trueStr;
+}
+
+const LLBC_Variant::Str &LLBC_Variant::GetFalseStr()
+{
+    static const Str falseStr("false");
+    return falseStr;
+}
+
+const LLBC_Variant::Str &LLBC_Variant::GetEmptySeqStr()
+{
+    static const Str emptySeqStr("[]");
+    return emptySeqStr;
+}
+
+const LLBC_Variant::Str &LLBC_Variant::GetEmptyDictStr()
+{
+    static const Str emptyDictStr("{}");
+    return emptyDictStr;
+}
+
+const std::string &LLBC_Variant::GetEmptySTLStr()
+{
+    static const std::string emptySTLStr;
+    return emptySTLStr;
+}
+
+const std::string &LLBC_Variant::GetTrueSTLStr()
+{
+    static const std::string trueSTLStr("true");
+    return trueSTLStr;
+}
+
+const std::string &LLBC_Variant::GetFalseSTLStr()
+{
+    static const std::string falseSTLStr("false");
+    return falseSTLStr;
+}
+
+const std::string &LLBC_Variant::GetEmptySTLSeqStr()
+{
+    static const std::string emptySTLSeqStr("[]");
+    return emptySTLSeqStr;
+}
+const std::string &LLBC_Variant::GetEmptySTLDictStr()
+{
+    static const std::string emptySTLDictStr("{}");
+    return emptySTLDictStr;
+}
+
+const LLBC_Variant::Seq &LLBC_Variant::GetEmptySeq()
+{
+    static const Seq emptySeq;
+    return emptySeq;
+}
+
+const LLBC_Variant::Dict &LLBC_Variant::GetEmptyDict()
+{
+    static const Dict emptyDict;
+    return emptyDict;
 }
 
 __LLBC_NS_END
