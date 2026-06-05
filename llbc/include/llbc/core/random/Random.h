@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/common/Common.h"
+#include <optional>
 
 __LLBC_NS_BEGIN
 
@@ -59,17 +60,6 @@ public:
     int Rand(int begin, int end);
 
     /**
-     * Generate a random index based on the weight values of the input weights.
-     * @return int - the random index of the weights[0, weights.size()).
-     */
-    template <typename _Weights>
-    typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
-                            LLBC_IsTemplSpec<_Weights, std::list>::value ||
-                            LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
-                            std::is_array<_Weights>::value, int>::type
-    Rand(const _Weights &weights);
-
-    /**
      * Generate a floating point number N such that: 0 <= N < 1.
      * @return int - the random floating point number N.
      */
@@ -82,11 +72,50 @@ public:
     bool BoolJudge();
 
     /**
-     * Random choose one element at given range.
-     * @return _RandomAccessIter - the choose element iterator.
+     * Pick one value from the container.
+     * @param[in] container - the container to pick from.
+     * @param[in] weights   - optional external weights container pointer. Pass a real
+     *                        pointer to enable weighted sampling, or OMIT this argument
+     *                        to use the default (uniform / .second).
+     * @return std::optional<std::reference_wrapper<const typename _Container::value_type>> - picked value reference.
      */
-    template <typename _RandomAccessIter>
-    _RandomAccessIter Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end);
+    template <typename _Container, typename _Weights = std::vector<uint32>>
+    std::enable_if_t<(LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::vector>::value ||
+                      LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::list>::value) &&
+                     (std::is_integral_v<typename std::remove_cv_t<_Weights>::value_type> ||
+                      std::is_floating_point_v<typename std::remove_cv_t<_Weights>::value_type>),
+                     std::optional<std::reference_wrapper<const typename _Container::value_type>>>
+    Choice(const _Container &container,
+           const _Weights *weights = nullptr);
+
+    /**
+     * The unified random choices interface (without-replacement sampling).
+     * Size & weight alignment rules (weighted path):
+     * - If weights.size() <  container.size(): missing entries are treated as weight 0
+     * - If weights.size() >  container.size(): excess weights are silently discarded.
+     * - A single weight that is non-positive / NaN / -0.0 is regularized to 0
+     * 
+     * k handling :
+     * - k == 0                         : returns empty vector, last error untouched.
+     * - container.empty()              : returns empty vector and sets LLBC_ERROR_INVALID.
+     * - uniform path & k > size        : k is silently clamped to size (full permutation).
+     * - weighted path                  : at most min(k, #positive-weight-elements) picks;
+     * - weighted path & sum(weights)<=0: returns empty vector and sets LLBC_ERROR_INVALID.
+     *
+     * @param[in] container - the container to pick from.
+     * @param[in] k         - number of values to pick (default 1).
+     * @param[in] weights   - optional external weights container pointer. 
+     * @return std::vector<std::reference_wrapper<const typename _Container::value_type>> - picked value references.
+     */
+    template <typename _Container, typename _Weights = std::vector<uint32>>
+    std::enable_if_t<(LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::vector>::value ||
+                      LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::list>::value) &&
+                     (std::is_integral_v<typename std::remove_cv_t<_Weights>::value_type> ||
+                      std::is_floating_point_v<typename std::remove_cv_t<_Weights>::value_type>),
+                     std::vector<std::reference_wrapper<const typename _Container::value_type>>>
+    Choices(const _Container &container,
+            size_t k = 1,
+            const _Weights *weights = nullptr);
 
     /**
      * Reorders the elements in the given range [begin, end) such that each possible permutation 
@@ -114,5 +143,3 @@ LLBC_EXPORT bool LLBC_BoolJudge();
 __LLBC_NS_END
 
 #include "llbc/core/random/RandomInl.h"
-
-

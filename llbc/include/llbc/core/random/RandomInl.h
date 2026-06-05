@@ -68,32 +68,6 @@ inline int LLBC_Random::Rand(int begin, int end)
     }
 }
 
-template <typename _Weights>
-typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
-                        LLBC_IsTemplSpec<_Weights, std::list>::value ||
-                        LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
-                        std::is_array<_Weights>::value, int>::type
-LLBC_Random::Rand(const _Weights &weights)
-{
-    int totalWeight = 0;
-    for (const auto &weight : weights)
-        totalWeight += static_cast<int>(weight);
-
-    int i = 0;
-    int currentWeight = 0;
-    const int randomWeight = Rand(0, totalWeight);
-    for (const auto &weight : weights)
-    {
-        currentWeight += static_cast<int>(weight);
-        if (randomWeight < currentWeight)
-            return i;
-        i++;
-    }
-
-    llbc_assert(false && "llbc framework internal error");
-    return 0;
-}
-
 inline double LLBC_Random::RandReal()
 {
     return static_cast<double>(_mtRand()) / 4294967296.;
@@ -104,14 +78,124 @@ inline bool LLBC_Random::BoolJudge()
     return _mtRand() % 2 == 1;
 }
 
-template <typename _RandomAccessIter>
-inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end)
+template <typename _Container, typename _Weights>
+std::enable_if_t<(LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::vector>::value ||
+                  LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::list>::value) &&
+                 (std::is_integral_v<typename std::remove_cv_t<_Weights>::value_type> ||
+                  std::is_floating_point_v<typename std::remove_cv_t<_Weights>::value_type>),
+                 std::optional<std::reference_wrapper<const typename _Container::value_type>>>
+LLBC_Random::Choice(const _Container &container,
+                    const _Weights *weights)
 {
-    sint64 diff = static_cast<sint64>(end - begin);
-    if (UNLIKELY(diff <= 0 || diff > UINT_MAX))
-        return end;
+    auto out = Choices(container, 1, weights);
+    return !out.empty() ? std::make_optional(out[0]) : std::nullopt;
+}
 
-    return begin + _mtRand() % static_cast<uint32>(diff);
+template <typename _Container, typename _Weights>
+std::enable_if_t<(LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::vector>::value ||
+                  LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::list>::value) &&
+                 (std::is_integral_v<typename std::remove_cv_t<_Weights>::value_type> ||
+                  std::is_floating_point_v<typename std::remove_cv_t<_Weights>::value_type>),
+                 std::vector<std::reference_wrapper<const typename _Container::value_type>>>
+LLBC_Random::Choices(const _Container &container,
+                     size_t k,
+                     const _Weights *weights)
+{
+    using RawContainer = std::remove_cv_t<_Container>;
+    std::vector<std::reference_wrapper<const typename _Container::value_type>> out;
+
+    if (k == 0)
+        return out;
+
+    const size_t n = container.size();
+    if (n == 0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return out;
+    }
+
+    std::vector<const typename _Container::value_type *> values;
+    values.reserve(n);
+    if constexpr (LLBC_IsTemplSpec<RawContainer, std::queue>::value)
+    {
+        class QueueContainerAccessor : private RawContainer
+        {
+        public:
+            static const typename RawContainer::container_type &Get(const RawContainer &queue)
+            {
+                typename RawContainer::container_type RawContainer::*containerPtr = &QueueContainerAccessor::c;
+                return queue.*containerPtr;
+            }
+        };
+
+        const auto &queueContainer = QueueContainerAccessor::Get(container);
+        for (const auto &value : queueContainer)
+            values.push_back(std::addressof(value));
+    }
+    else
+    {
+        for (const auto &value : container)
+            values.push_back(std::addressof(value));
+    }
+
+    out.reserve(k > n ? n : k);
+
+    // Unary uniform fast-path: partial Fisher-Yates on pointers, O(min(k,n)).
+    if constexpr (!(LLBC_IsTemplSpec<RawContainer, std::map>::value ||
+                    LLBC_IsTemplSpec<RawContainer, std::unordered_map>::value))
+    {
+        if (weights == nullptr)
+        {
+            for (size_t i = 0, take = k > n ? n : k; i < take; ++i)
+            {
+                std::swap(values[i], values[i + static_cast<size_t>(Rand(static_cast<int>(n - i)))]);
+                out.emplace_back(*values[i]);
+            }
+            return out;
+        }
+    }
+
+    std::vector<double> ws(n, 0.0);
+    double total = 0.0;
+    if (weights != nullptr)
+    {
+        size_t i = 0;
+        for (auto it = std::begin(*weights); i < n && it != std::end(*weights); ++it, ++i)
+        {
+            const double dw = static_cast<double>(*it);
+            if (dw > 0.0) { ws[i] = dw; total += dw; }
+        }
+    }
+    else if constexpr (LLBC_IsTemplSpec<RawContainer, std::map>::value ||
+                       LLBC_IsTemplSpec<RawContainer, std::unordered_map>::value)
+    {
+        static_assert(std::is_arithmetic<typename _Container::mapped_type>::value,
+            "LLBC_Random::Choices: pair-like .second must be arithmetic without external weights.");
+        for (size_t i = 0; i < n; ++i)
+        {
+            const double dw = static_cast<double>(values[i]->second);
+            if (dw > 0.0) { ws[i] = dw; total += dw; }
+        }
+    }
+
+    // Roulette-wheel without replacement: O(k*n). total<=0 -> loop skipped, returns empty.
+    double remain = total;
+    for (size_t i = 0; i < k && remain > 0.0; ++i)
+    {
+        const double r = RandReal() * remain;
+        double acc = 0.0;
+        for (size_t j = 0; j < n; ++j)
+        {
+            if (ws[j] > 0.0 && (acc += ws[j]) > r)
+            {
+                out.emplace_back(*values[j]);
+                remain -= ws[j];
+                ws[j] = 0.0;
+                break;
+            }
+        }
+    }
+    return out;
 }
 
 template <typename _RandomAccessIter>
