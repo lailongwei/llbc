@@ -29,6 +29,12 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
+LLBC_NS uint32 __LLBC_GetDefaultRandomSeed() 
+{
+    thread_local std::random_device randomDevice;
+    return static_cast<LLBC_NS uint32>(randomDevice());
+}
+
 static LLBC_NS LLBC_Random __g_random;
 static LLBC_NS LLBC_SpinLock __g_randomLock;
 

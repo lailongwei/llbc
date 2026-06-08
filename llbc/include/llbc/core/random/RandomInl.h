@@ -24,7 +24,7 @@
 __LLBC_NS_BEGIN
 
 inline LLBC_Random::LLBC_Random(uint32 seed)
-: _mtRand(seed != 0 ? seed : std::random_device()())
+: _mtRand(seed != 0 ? seed : LLBC_INL_NS __LLBC_GetDefaultRandomSeed())
 {
 }
 
