@@ -384,7 +384,6 @@ public:
      * Time span operations.
      */
     LLBC_TimeSpan operator-(const LLBC_Time &time) const;
-    LLBC_TimeSpan operator+(const LLBC_Time &time) const;
 
     LLBC_Time operator+(const LLBC_TimeSpan &span) const;
     LLBC_Time operator-(const LLBC_TimeSpan &span) const;
