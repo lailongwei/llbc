@@ -66,7 +66,10 @@ LLBC_SockAddr_IN::LLBC_SockAddr_IN(const char *ip, uint16 port)
 
 LLBC_SockAddr_IN::LLBC_SockAddr_IN(const LLBC_SockAddr_IN &right)
 {
-    memcpy(this, &right, sizeof(LLBC_SockAddr_IN));
+    _addrFamily = right._addrFamily;
+    _port = right._port;
+    _ip = right._ip;
+    memcpy(_zero, right._zero, sizeof(_zero));
 }
 
 LLBC_SockAddr_IN::~LLBC_SockAddr_IN()
@@ -262,7 +265,13 @@ LLBC_String LLBC_SockAddr_IN::ToString() const
 
 LLBC_SockAddr_IN &LLBC_SockAddr_IN::operator=(const LLBC_SockAddr_IN &right)
 {
-    memcpy(this, &right, sizeof(LLBC_SockAddr_IN));
+    if (this == &right)
+        return *this;
+
+    _addrFamily = right._addrFamily;
+    _port = right._port;
+    _ip = right._ip;
+    memcpy(_zero, right._zero, sizeof(_zero));
     return *this;
 }
 

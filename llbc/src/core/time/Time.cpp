@@ -267,11 +267,6 @@ LLBC_TimeSpan LLBC_Time::operator-(const LLBC_Time &time) const
     return LLBC_TimeSpan(_time - time._time);
 }
 
-LLBC_TimeSpan LLBC_Time::operator+(const LLBC_Time &time) const
-{
-    return LLBC_TimeSpan(_time - time._time);
-}
-
 LLBC_Time LLBC_Time::operator+(const LLBC_TimeSpan &span) const
 {
     return LLBC_Time(_time + span.GetTotalMicros());

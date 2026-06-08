@@ -296,7 +296,8 @@ public:
      */
     LLBC_BasicCString &operator=(const LLBC_BasicCString &other)
     {
-        memcpy(this, &other, sizeof(other));
+        _cstr = other._cstr;
+        _size = other._size;
         return *this;
     }
 
