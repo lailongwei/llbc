@@ -29,7 +29,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static LLBC_NS uint32 LLBC_GetDefaultRandomSeed()
+static LLBC_NS uint32 __LLBC_GetDefaultRandomSeed()
 {
     thread_local std::random_device randomDevice;
     return static_cast<LLBC_NS uint32>(randomDevice());
@@ -43,7 +43,7 @@ __LLBC_INTERNAL_NS_END
 __LLBC_NS_BEGIN
 
 LLBC_Random::LLBC_Random(uint32 seed)
-: _mtRand(seed != 0 ? seed : LLBC_INL_NS LLBC_GetDefaultRandomSeed())
+: _mtRand(seed != 0 ? seed : LLBC_INL_NS __LLBC_GetDefaultRandomSeed())
 {
 }
 
