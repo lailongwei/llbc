@@ -23,11 +23,6 @@
 
 __LLBC_NS_BEGIN
 
-inline LLBC_Random::LLBC_Random(uint32 seed)
-: _mtRand(seed != 0 ? seed : LLBC_INL_NS __LLBC_GetDefaultRandomSeed())
-{
-}
-
 inline void LLBC_Random::Seed(int seed)
 {
     _mtRand.seed(seed);
