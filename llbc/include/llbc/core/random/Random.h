@@ -23,12 +23,6 @@
 
 #include "llbc/common/Common.h"
 
-__LLBC_INTERNAL_NS_BEGIN
-
-LLBC_EXPORT LLBC_NS uint32 __LLBC_GetDefaultRandomSeed(); 
-
-__LLBC_INTERNAL_NS_END
-
 __LLBC_NS_BEGIN
 
 /**
