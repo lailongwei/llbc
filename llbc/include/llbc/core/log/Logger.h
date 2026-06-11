@@ -27,6 +27,7 @@
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogTrace.h"
+#include "llbc/core/log/LogMuteFilter.h"
 
 __LLBC_NS_BEGIN
 
@@ -187,6 +188,96 @@ public:
      * @param[in] requireColorLogTraces - conf log traces.
      */
     void UpdateColorLogTraces(const LLBC_LogTraces &requireColorLogTraces);
+
+public:
+    /**
+     * Add a file+line log mute rule.
+     * Matched log records are dropped before any appender, see LLBC_LogMuteFilter.
+     * @param[in] file - the file basename.
+     * @param[in] line - the file line number, 0 means wildcard(any line of the file).
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddLogMuteFileLine(const LLBC_String &file, int line);
+
+    /**
+     * Remove a file+line log mute rule.
+     * @param[in] file - the file basename.
+     * @param[in] line - the file line number, 0 only removes the wildcard entry.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveLogMuteFileLine(const LLBC_String &file, int line);
+
+    /**
+     * Remove all file+line log mute rules of the specific file(both wildcard and specific lines).
+     * @param[in] file - the file basename.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveLogMuteFile(const LLBC_String &file);
+
+    /**
+     * Add a function-name log mute rule.
+     * @param[in] func - the function name.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddLogMuteFunc(const LLBC_String &func);
+
+    /**
+     * Remove a function-name log mute rule.
+     * @param[in] func - the function name.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveLogMuteFunc(const LLBC_String &func);
+
+    /**
+     * Add a file+level log mute rule.
+     * Logs in the file with level less than minLevel are muted; if a rule of
+     * the same file already exists, it is overwritten.
+     * @param[in] file     - the file basename.
+     * @param[in] minLevel - the minimum kept log level.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int AddLogMuteFileLevel(const LLBC_String &file, int minLevel);
+
+    /**
+     * Remove the file+level log mute rule of the specific file.
+     * @param[in] file - the file basename.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int RemoveLogMuteFileLevel(const LLBC_String &file);
+
+    /**
+     * Clear all installed log mute rules.
+     */
+    void ClearLogMuteRules();
+
+    /**
+     * Snapshot all installed file+line log mute rules. The output is cleared first; order unspecified.
+     * @param[out] out - the rule snapshot, each entry is (file, line); line == 0 means wildcard.
+     */
+    void GetLogMuteFileLineRules(std::vector<std::pair<LLBC_String, int> > &out) const;
+
+    /**
+     * Snapshot all installed function-name log mute rules. The output is cleared first; order unspecified.
+     * @param[out] out - the rule snapshot.
+     */
+    void GetLogMuteFuncRules(std::vector<LLBC_String> &out) const;
+
+    /**
+     * Snapshot all installed file+level log mute rules. The output is cleared first; order unspecified.
+     * @param[out] out - the rule snapshot, each entry is (file, minLevel).
+     */
+    void GetLogMuteFileLevelRules(std::vector<std::pair<LLBC_String, int> > &out) const;
+
+    /**
+     * Get the count of muted log records since logger initialization or last ResetLogMutedCount().
+     * @return uint64 - the muted log record count, 0 if mute filter not initialized.
+     */
+    uint64 GetLogMutedCount() const;
+
+    /**
+     * Reset the muted log record count to zero, rules are not affected.
+     */
+    void ResetLogMutedCount();
 
 public:
     /**
@@ -500,6 +591,9 @@ private:
 
     // Log trace manager.
     LLBC_LogTraceMgr *_logTraceMgr;
+
+    // Log mute filter (drops logs by file/line or by function name).
+    LLBC_LogMuteFilter *_logMuteFilter;
 
     // Log runnable object.
     LLBC_LogRunnable *_logRunnable;

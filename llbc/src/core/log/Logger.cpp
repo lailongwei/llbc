@@ -31,6 +31,7 @@
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogTrace.h"
+#include "llbc/core/log/LogMuteFilter.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 #include "llbc/core/log/LogTimeAccessor.h"
 #include "llbc/core/log/BaseLogAppender.h"
@@ -52,6 +53,8 @@ LLBC_Logger::LLBC_Logger()
 , _logTraceMgr(new LLBC_LogTraceMgr(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0],
                                     LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1],
                						LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2]))
+
+, _logMuteFilter(new LLBC_LogMuteFilter)
 
 , _logRunnable(nullptr)
 
@@ -100,6 +103,17 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     _logLevel = config->GetLogLevel();
     _config = new LLBC_LoggerConfigInfo(*config);
     _logTraceMgr->UpdateColorLogTraces(_config->GetRequireColorLogTraces());
+
+    // Apply log-mute rules parsed from config.
+    for (auto &fileLineRule : _config->GetMuteFileLineRules())
+    {
+        for (int line : fileLineRule.second)
+            _logMuteFilter->AddFileLineRule(fileLineRule.first, line);
+    }
+    for (auto &func : _config->GetMuteFuncRules())
+        _logMuteFilter->AddFuncRule(func);
+    for (auto &fileLvlRule : _config->GetMuteFileLevelRules())
+        _logMuteFilter->AddFileLevelRule(fileLvlRule.first, fileLvlRule.second);
 
     _logTimeAccessor = &_config->GetLogTimeAccessor();
 
@@ -441,6 +455,136 @@ void LLBC_Logger::ClearAllLogTraces()
     _lock.Unlock();
 }
 
+int LLBC_Logger::AddLogMuteFileLine(const LLBC_String &file, int line)
+{
+    if (UNLIKELY(!_logMuteFilter))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    return _logMuteFilter->AddFileLineRule(file, line);
+}
+
+int LLBC_Logger::RemoveLogMuteFileLine(const LLBC_String &file, int line)
+{
+    if (UNLIKELY(!_logMuteFilter))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    return _logMuteFilter->RemoveFileLineRule(file, line);
+}
+
+int LLBC_Logger::RemoveLogMuteFile(const LLBC_String &file)
+{
+    if (UNLIKELY(!_logMuteFilter))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    return _logMuteFilter->RemoveFileRule(file);
+}
+
+int LLBC_Logger::AddLogMuteFunc(const LLBC_String &func)
+{
+    if (UNLIKELY(!_logMuteFilter))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    return _logMuteFilter->AddFuncRule(func);
+}
+
+int LLBC_Logger::RemoveLogMuteFunc(const LLBC_String &func)
+{
+    if (UNLIKELY(!_logMuteFilter))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    return _logMuteFilter->RemoveFuncRule(func);
+}
+
+int LLBC_Logger::AddLogMuteFileLevel(const LLBC_String &file, int minLevel)
+{
+    if (UNLIKELY(!_logMuteFilter))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    return _logMuteFilter->AddFileLevelRule(file, minLevel);
+}
+
+int LLBC_Logger::RemoveLogMuteFileLevel(const LLBC_String &file)
+{
+    if (UNLIKELY(!_logMuteFilter))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    return _logMuteFilter->RemoveFileLevelRule(file);
+}
+
+void LLBC_Logger::ClearLogMuteRules()
+{
+    if (UNLIKELY(!_logMuteFilter))
+        return;
+
+    _logMuteFilter->ClearRules();
+}
+
+void LLBC_Logger::GetLogMuteFileLineRules(
+    std::vector<std::pair<LLBC_String, int> > &out) const
+{
+    out.clear();
+    if (UNLIKELY(!_logMuteFilter))
+        return;
+
+    _logMuteFilter->GetFileLineRules(out);
+}
+
+void LLBC_Logger::GetLogMuteFuncRules(std::vector<LLBC_String> &out) const
+{
+    out.clear();
+    if (UNLIKELY(!_logMuteFilter))
+        return;
+
+    _logMuteFilter->GetFuncRules(out);
+}
+
+void LLBC_Logger::GetLogMuteFileLevelRules(
+    std::vector<std::pair<LLBC_String, int> > &out) const
+{
+    out.clear();
+    if (UNLIKELY(!_logMuteFilter))
+        return;
+
+    _logMuteFilter->GetFileLevelRules(out);
+}
+
+uint64 LLBC_Logger::GetLogMutedCount() const
+{
+    if (UNLIKELY(!_logMuteFilter))
+        return 0;
+
+    return _logMuteFilter->GetMutedCount();
+}
+
+void LLBC_Logger::ResetLogMutedCount()
+{
+    if (UNLIKELY(!_logMuteFilter))
+        return;
+
+    _logMuteFilter->ResetMutedCount();
+}
+
 int LLBC_Logger::VOutput(int level,
                          const char *tag,
                          const char *file,
@@ -729,6 +873,11 @@ void LLBC_Logger::AddAppender(LLBC_BaseLogAppender *appender)
 
 int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
 {
+    // Drop muted records here, before any appender sees them.
+    if (UNLIKELY(_logMuteFilter && !_logMuteFilter->IsEmpty() &&
+                 _logMuteFilter->ShouldMute(data.file, data.line, data.level, data.func)))
+        return LLBC_OK;
+
     LLBC_BaseLogAppender *appender = _appenders;
     if (!appender)
         return LLBC_OK;
@@ -806,6 +955,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
     _lastFlushTime = 0;
 
     LLBC_XDelete(_logTraceMgr);
+    LLBC_XDelete(_logMuteFilter);
 
     _logTimeAccessor = nullptr;
 

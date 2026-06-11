@@ -261,6 +261,35 @@ public:
      */
     bool IsLazyCreateLogFile() const;
 
+public:
+    /**
+     * Log mute rule containers.
+     * Parsed from cfg keys logMuteFileLines/logMuteFuncs/logMuteFileLevels,
+     * consumed by LLBC_LogMuteFilter on Logger::Initialize, format and separator
+     * details please refer to LoggerConfigInfo.cpp parsing block.
+     */
+    typedef std::vector<std::pair<LLBC_String, std::vector<int> > > MuteFileLineRules;
+    typedef std::vector<LLBC_String> MuteFuncRules;
+    typedef std::vector<std::pair<LLBC_String, int> > MuteFileLevelRules;
+
+    /**
+     * Get parsed log mute file+line rules.
+     * @return const MuteFileLineRules & - the file+line rules.
+     */
+    const MuteFileLineRules &GetMuteFileLineRules() const;
+
+    /**
+     * Get parsed log mute function-name rules.
+     * @return const MuteFuncRules & - the function-name rules.
+     */
+    const MuteFuncRules &GetMuteFuncRules() const;
+
+    /**
+     * Get parsed log mute file+level rules.
+     * @return const MuteFileLevelRules & - the file+level rules.
+     */
+    const MuteFileLevelRules &GetMuteFileLevelRules() const;
+
 private:
     /**
      * Normalize the log file name.
@@ -313,6 +342,10 @@ private:
     bool _lazyCreateLogFile;
     LLBC_LogTraces _requireColorLogTraces;
     bool _takeOver;
+
+    MuteFileLineRules _muteFileLineRules;
+    MuteFuncRules _muteFuncRules;
+    MuteFileLevelRules _muteFileLevelRules;
 };
 
 __LLBC_NS_END

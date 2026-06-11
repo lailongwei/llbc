@@ -42,6 +42,13 @@ private:
     int DoLoggerMgrReloadTest();
     void DoLogColorFilterTest();
     void DoLogTraceEnableLevelTest();
+    int DoLogMuteFilterTest();
+    bool EmitAndCheckMuted(LLBC_Logger *logger,
+                           int level,
+                           const char *file,
+                           int line,
+                           const char *func,
+                           const char *msg);
 
     void DoLogTraceTest();
     template <typename _KeyTy, typename _ContentTy>

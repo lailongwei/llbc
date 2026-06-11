@@ -128,6 +128,80 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
             _requireColorLogTraces.emplace(LLBC_LogTrace::TraceKey(key), contentVec); 
     }
 
+    // Log mute rules: file+line, func, file+level.
+    {
+        const char ruleSep = LLBC_CFG_CORE_LOG_MUTE_SEPARATORS[0];
+        const char kvSep = LLBC_CFG_CORE_LOG_MUTE_SEPARATORS[1];
+        const char valuesSep = LLBC_CFG_CORE_LOG_MUTE_SEPARATORS[2];
+
+        // logMuteFileLines = "file1:line1,line2;file2:0;..."  (line==0 wildcards the file)
+        LLBC_String fileLinesStr = cfg["logMuteFileLines"].AsStr().strip();
+        if (!fileLinesStr.empty())
+        {
+            auto groups = fileLinesStr.split(ruleSep, -1, true);
+            for (auto &group : groups)
+            {
+                auto parts = group.strip().split(kvSep, 1, true);
+                if (parts.size() != 2)
+                    continue;
+                LLBC_String file = parts[0].strip();
+                LLBC_String linesStr = parts[1].strip();
+                if (file.empty() || linesStr.empty())
+                    continue;
+
+                std::vector<int> lines;
+                auto lineStrs = linesStr.split(valuesSep, -1, true);
+                for (auto &lineStr : lineStrs)
+                {
+                    LLBC_String s = lineStr.strip();
+                    // Strict numeric check: only pure digits accepted
+                    // (no sign, no leading/trailing junk). Non-digit input
+                    // (e.g. "abc", "-1") is silently skipped.
+                    if (s.empty() || !s.isdigit())
+                        continue;
+                    lines.push_back(LLBC_Variant(s).AsInt32());
+                }
+                if (!lines.empty())
+                    _muteFileLineRules.emplace_back(file, std::move(lines));
+            }
+        }
+
+        // logMuteFuncs = "func1;func2;..."
+        LLBC_String funcsStr = cfg["logMuteFuncs"].AsStr().strip();
+        if (!funcsStr.empty())
+        {
+            auto funcs = funcsStr.split(ruleSep, -1, true);
+            for (auto &func : funcs)
+            {
+                LLBC_String f = func.strip();
+                if (!f.empty())
+                    _muteFuncRules.push_back(f);
+            }
+        }
+
+        // logMuteFileLevels = "file1:warn;file2:error;..."
+        LLBC_String fileLevelsStr = cfg["logMuteFileLevels"].AsStr().strip();
+        if (!fileLevelsStr.empty())
+        {
+            auto groups = fileLevelsStr.split(ruleSep, -1, true);
+            for (auto &group : groups)
+            {
+                auto parts = group.strip().split(kvSep, 1, true);
+                if (parts.size() != 2)
+                    continue;
+                LLBC_String file = parts[0].strip();
+                LLBC_String lvlStr = parts[1].strip();
+                if (file.empty() || lvlStr.empty())
+                    continue;
+
+                int lvl = LLBC_LogLevel::GetLevelEnum(lvlStr.c_str());
+                if (!LLBC_LogLevel::IsValid(lvl))
+                    continue;
+                _muteFileLevelRules.emplace_back(file, lvl);
+            }
+        }
+    }
+
     _asyncMode = __LLBC_GetLogCfg(
         "asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
     if (_asyncMode)

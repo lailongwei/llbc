@@ -178,4 +178,19 @@ inline bool LLBC_LoggerConfigInfo::IsLazyCreateLogFile() const
     return _lazyCreateLogFile;
 }
 
+inline const LLBC_LoggerConfigInfo::MuteFileLineRules &LLBC_LoggerConfigInfo::GetMuteFileLineRules() const
+{
+    return _muteFileLineRules;
+}
+
+inline const LLBC_LoggerConfigInfo::MuteFuncRules &LLBC_LoggerConfigInfo::GetMuteFuncRules() const
+{
+    return _muteFuncRules;
+}
+
+inline const LLBC_LoggerConfigInfo::MuteFileLevelRules &LLBC_LoggerConfigInfo::GetMuteFileLevelRules() const
+{
+    return _muteFileLevelRules;
+}
+
 __LLBC_NS_END
