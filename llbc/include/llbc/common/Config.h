@@ -218,12 +218,6 @@
 // - [1]: LogTrace key/content separator.
 // - [2]: logTrace contents separator.
 #define LLBC_CFG_CORE_LOG_TRACE_SEPARATORS                  "|:,"
-// Log mute rule separators (used to parse logMuteFileLines / logMuteFuncs /
-// logMuteFileLevels in logger config):
-// - [0]: rules separator (between rules of the same key).
-// - [1]: key/value separator (between file/func and its value).
-// - [2]: values separator (between multiple line numbers of one file).
-#define LLBC_CFG_CORE_LOG_MUTE_SEPARATORS                   ";:,"
 
 /**
  * \brief core/timer about configs.

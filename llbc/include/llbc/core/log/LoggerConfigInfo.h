@@ -23,6 +23,7 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/log/LogTrace.h"
+#include "llbc/core/log/LogControl.h"
 
 __LLBC_NS_BEGIN
 
@@ -263,32 +264,27 @@ public:
 
 public:
     /**
-     * Log mute rule containers.
-     * Parsed from cfg keys logMuteFileLines/logMuteFuncs/logMuteFileLevels,
-     * consumed by LLBC_LogMuteFilter on Logger::Initialize, format and separator
-     * details please refer to LoggerConfigInfo.cpp parsing block.
+     * Get parsed log control items.
+     * Parsed from cfg key `logControls` (a JSON array string), consumed by
+     * LLBC_LogControlFilter on Logger::Initialize. JSON schema:
+     *   [
+     *     {
+     *       "match": {
+     *         "file": {"name": "Foo.cpp", "line": 0},  // line optional, 0 == any
+     *         "func": "DoBar",
+     *         "threadId": 12345,
+     *         "level": "warn"                           // string or int
+     *       },
+     *       "appenders": ["console", "file"],          // optional, empty == all
+     *       "action": "mute",                            // or "setLevel"
+     *       "newLevel": "error"                          // required if action==setLevel
+     *     }
+     *   ]
+     * Each match-rule is OR-combined within one item; declaration order is
+     * preserved across items.
+     * @return const std::vector<LLBC_LogControlItem> & - the parsed items.
      */
-    typedef std::vector<std::pair<LLBC_String, std::vector<int> > > MuteFileLineRules;
-    typedef std::vector<LLBC_String> MuteFuncRules;
-    typedef std::vector<std::pair<LLBC_String, int> > MuteFileLevelRules;
-
-    /**
-     * Get parsed log mute file+line rules.
-     * @return const MuteFileLineRules & - the file+line rules.
-     */
-    const MuteFileLineRules &GetMuteFileLineRules() const;
-
-    /**
-     * Get parsed log mute function-name rules.
-     * @return const MuteFuncRules & - the function-name rules.
-     */
-    const MuteFuncRules &GetMuteFuncRules() const;
-
-    /**
-     * Get parsed log mute file+level rules.
-     * @return const MuteFileLevelRules & - the file+level rules.
-     */
-    const MuteFileLevelRules &GetMuteFileLevelRules() const;
+    const std::vector<LLBC_LogControlItem> &GetLogControls() const;
 
 private:
     /**
@@ -343,9 +339,7 @@ private:
     LLBC_LogTraces _requireColorLogTraces;
     bool _takeOver;
 
-    MuteFileLineRules _muteFileLineRules;
-    MuteFuncRules _muteFuncRules;
-    MuteFileLevelRules _muteFileLevelRules;
+    std::vector<LLBC_LogControlItem> _logControls;
 };
 
 __LLBC_NS_END

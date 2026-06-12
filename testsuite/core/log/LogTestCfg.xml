@@ -29,18 +29,17 @@
         <!-- 在以json格式输出Log时, 是否添加时间字戳到json log中, key:timestamp, 默认不添加 -->
         <addTimestampInJsonLog>true</addTimestampInJsonLog>
 
-        <!-- 日志静音(log mute filter)规则, 按"文件/行号/函数名"静音或提级.
-             分隔符见 LLBC_CFG_CORE_LOG_MUTE_SEPARATORS, 默认 ';' ':' ',', 单条规则解析失败静默跳过.
-             命中: file+line / func 命中即静音; file+level 命中等价"提级", 仅放行 >= 配置 level. -->
-        <!-- 按文件和行号静音: "file:line[,line...];..." (basename 匹配, 行号纯数字, 0 通配整文件)
-             示例: "fileA.cpp:100,200; fileB.cpp:0" -->
-        <logMuteFileLines></logMuteFileLines>
-        <!-- 按函数名静音: "func1;func2;..." (整体匹配 __FUNCTION__, 不支持通配)
-             示例: "MutedFuncOne; MutedFuncTwo" -->
-        <logMuteFuncs></logMuteFuncs>
-        <!-- 按文件和日志等级静音: "file:level;..." (level 走 LLBC_LogLevel::GetLevelEnum, 大小写不敏感)
-             合法 level: TRACE/DEBUG/INFO/WARN/ERROR/FATAL; 示例: "fileC.cpp:WARN; fileD.cpp:ERROR" -->
-        <logMuteFileLevels></logMuteFileLevels>
+        <!-- 日志输出控制项 (log control items), 配置为一个 JSON 数组字符串. 每个元素 schema:
+               { "match":     { "file": "Foo.cpp" | {"name":"Foo.cpp","line":0},
+                                "func": "DoBar",
+                                "threadId": 12345,
+                                "level": "warn" | 3 },
+                 "appenders": ["console","file","network"],   // 缺省 == 全部 appender
+                 "action":    "mute" | "setlevel",
+                 "newLevel":  "error" | 4 }                   // action=="setlevel" 时必填
+             match 内部各键之间为 OR (one-of); 多控制项按声明顺序应用; setLevel 改写对后续控制
+             项的 level 匹配可见; 解析失败的元素静默跳过, 不影响其它合法元素. -->
+        <logControls></logControls>
 
         <!-- 控制台输出器配置选项 -->
         <!-- 确定日志是否输出到控制台,可以的取值:true/false. -->
@@ -246,44 +245,41 @@
         <fadviseDiscardRetainPercent>50</fadviseDiscardRetainPercent>
     </fadvise>
 
-    <!-- log mute filter 测试相关 logger 配置 -->
-    <!-- 规则格式（详见 LoggerConfigInfo.cpp 解析逻辑）:
-           - logMuteFileLines  = "file1:line1,line2; file2:0; ..."   (line==0 通配该 file 全部行)
-           - logMuteFuncs      = "func1; func2; ..."
-           - logMuteFileLevels = "file1:warn; file2:error; ..."      (level 走 LLBC_LogLevel::GetLevelEnum)
-         多组用 ';' 分隔, 内部冒号/逗号见上, strip 空白; 单条规则解析失败静默跳过. -->
+    <!-- log output control 测试相关 logger 配置.
+         配置项 logControls 为 JSON 数组字符串, schema 见 root.logControls 注释. -->
 
-    <!-- 1) 全规则齐全 -->
+    <!-- 1) 全规则齐全 (含: 文件名+行号 / 文件名+行号范围 / 函数名 / 文件 setLevel / 单 appender 限定 / 多匹配维度 OR) -->
     <!-- 那些"应 pass"的样本会被 console 真打出来, 这是预期行为(同时充当反向断言). -->
-    <logmute_full>
+    <logcontrol_full>
         <asynchronous>false</asynchronous>
         <logToConsole>true</logToConsole>
         <logToFile>false</logToFile>
         <consoleLogLevel>TRACE</consoleLogLevel>
         <fileLogLevel>TRACE</fileLogLevel>
-        <!-- fileA 静音 100/200 两行, fileB 整文件静音 (line==0 通配) -->
-        <logMuteFileLines>mute_fileA.cpp:100,200; mute_fileB.cpp:0</logMuteFileLines>
-        <!-- 静音两个函数 -->
-        <logMuteFuncs>MutedFuncOne; MutedFuncTwo</logMuteFuncs>
-        <!-- fileC 提级到 WARN, fileD 提级到 ERROR -->
-        <logMuteFileLevels>mute_fileC.cpp:WARN; mute_fileD.cpp:ERROR</logMuteFileLevels>
-    </logmute_full>
+        <!-- file=mute_fileA.cpp 行 100/200 静音 (字符串 vs. 对象语法), file=mute_fileB.cpp 全文件静音 (line==0 通配),
+             静音函数 MutedFuncOne 与 MutedFuncTwo (后者仅作用于 console appender),
+             file=mute_fileC.cpp 提级到 warn, file=mute_fileD.cpp 提级到 error,
+             file=mute_fileE.cpp 行号范围 [300,305) 静音 (字符串语法 "name:NN-MM", 半开区间),
+             file=mute_fileF.cpp 行号范围 [400,410) 静音 (对象语法 line/lineEnd). -->
+        <logControls>[{"match":{"file":"mute_fileA.cpp:100"},"action":"mute"},{"match":{"file":{"name":"mute_fileA.cpp","line":200}},"action":"mute"},{"match":{"file":"mute_fileB.cpp"},"action":"mute"},{"match":{"func":"MutedFuncOne"},"action":"mute"},{"match":{"func":"MutedFuncTwo"},"appenders":["console"],"action":"mute"},{"match":{"file":"mute_fileC.cpp"},"action":"setlevel","newLevel":"warn"},{"match":{"file":"mute_fileD.cpp"},"action":"setlevel","newLevel":"error"},{"match":{"file":"mute_fileE.cpp:300-305"},"action":"mute"},{"match":{"file":{"name":"mute_fileF.cpp","line":400,"lineEnd":410}},"action":"mute"}]</logControls>
+    </logcontrol_full>
 
-    <!-- 2) 容错样本: 内部混入坏规则, 期望坏的被静默跳过, 好的依然生效.
-           每条 key 的 value 中混入若干故意写错的段:
-             - logMuteFileLines : 缺':' / 行号非数字 / 负数行号 / 一条好规则
-             - logMuteFuncs     : 空段(不止首尾, 段间也允许) / 一条好规则
-             - logMuteFileLevels: 缺':' / 非法 level 字符串 / 一条好规则 -->
-    <logmute_robust>
+    <!-- 2) 容错样本: 数组中混入坏元素, 期望坏的被静默跳过, 好的依然生效.
+            - 第 0 项: 没有任何 match 字段, 应被跳过 (HasAnyMatch() 失败).
+            - 第 1 项: file 既不是字符串也不是对象, 应被跳过.
+            - 第 2 项: action 非法字符串, 应被跳过.
+            - 第 3 项: action="setlevel" 但缺 newLevel, 应被跳过.
+            - 第 4 项: appenders 中含未知 appender 字符串, 期望"未知项被忽略", 控制项整体仍生效.
+            - 第 5 项: 合法控制项, 函数 ok_func 静音.
+            - 第 6 项: file 字符串带非法范围 (end <= begin), 应被跳过. -->
+    <logcontrol_robust>
         <asynchronous>false</asynchronous>
         <logToConsole>true</logToConsole>
         <logToFile>false</logToFile>
         <consoleLogLevel>TRACE</consoleLogLevel>
         <fileLogLevel>TRACE</fileLogLevel>
-        <logMuteFileLines>no_colon; bad_line.cpp:abc; neg_line.cpp:-1; ok_file.cpp:42</logMuteFileLines>
-        <logMuteFuncs>; ;ok_func;   </logMuteFuncs>
-        <logMuteFileLevels>no_colon_level; bad_level.cpp:notalevel; ok_level.cpp:WARN</logMuteFileLevels>
-    </logmute_robust>
+        <logControls>[{"match":{},"action":"mute"},{"match":{"file":12345},"action":"mute"},{"match":{"func":"X"},"action":"unknownaction"},{"match":{"func":"Y"},"action":"setlevel"},{"match":{"func":"keep_me"},"appenders":["console","totally_unknown_appender"],"action":"mute"},{"match":{"func":"ok_func"},"action":"mute"},{"match":{"file":"bad.cpp:10-10"},"action":"mute"}]</logControls>
+    </logcontrol_robust>
 
     <!-- 其它 logger(s) 配置 -->
 </Log>

@@ -21,42 +21,20 @@
 
 #pragma once
 
-#include "llbc.h"
-using namespace llbc;
+__LLBC_NS_BEGIN
 
-class TestCase_Core_Log final : public LLBC_BaseTestCase
+inline LLBC_LogControlItem::LLBC_LogControlItem()
+: haveFile(false)
+, matchLine(0)
+, matchLineEnd(0)
+, haveFunc(false)
+, haveThreadId(false)
+, matchThreadId(0)
+, haveLevel(false)
+, matchLevel(0)
+, action(LLBC_LogControlAction::Mute)
+, newLevel(0)
 {
-public:
-    TestCase_Core_Log();
-    ~TestCase_Core_Log() override;
+}
 
-public:
-    int Run(int argc, char *argv[]) override;
-
-private:
-    void DoLogLevelSetTest();
-    void DoJsonLogTest();
-    void DoUninitLogTest();
-    void SyncLoggerMultiThreadTest();
-    void DoConditionMacroLogTest();
-    int DoLoggerMgrReloadTest();
-    void DoLogColorFilterTest();
-    void DoLogTraceEnableLevelTest();
-    int DoLogMuteFilterTest();
-    bool EmitAndCheckSuppressed(LLBC_Logger *logger,
-                                int level,
-                                const char *file,
-                                int line,
-                                const char *func,
-                                const char *msg,
-                                size_t expectedHits);
-
-    void DoLogTraceTest();
-    template <typename _KeyTy, typename _ContentTy>
-    void AddLogTrace(const _KeyTy &key, const _ContentTy &content);
-
-    void OnLogHook(const LLBC_LogData *logData);
-
-private:
-    LLBC_String _logCfgFilePath;
-};
+__LLBC_NS_END

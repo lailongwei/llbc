@@ -27,7 +27,8 @@
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogTrace.h"
-#include "llbc/core/log/LogMuteFilter.h"
+#include "llbc/core/log/LogControl.h"
+#include "llbc/core/log/LogControlFilter.h"
 
 __LLBC_NS_BEGIN
 
@@ -191,93 +192,62 @@ public:
 
 public:
     /**
-     * Add a file+line log mute rule.
-     * Matched log records are dropped before any appender, see LLBC_LogMuteFilter.
-     * @param[in] file - the file basename.
-     * @param[in] line - the file line number, 0 means wildcard(any line of the file).
+     * Append a log output control item to the logger.
+     *
+     * Each control item describes:
+     *   a) match-rules (one-of, OR over: file+line / func / threadId / level);
+     *   b) appender scope (a set of LLBC_LogAppenderType::*; empty == all appenders);
+     *   c) action (Mute, or SetLevel + newLevel).
+     *
+     * Items are applied per appender in declaration order at OutputLogData(),
+     * see LLBC_LogControlFilter for full semantics.
+     *
+     * @param[in] item - the control item to add. It must satisfy:
+     *                   - HasAnyMatch() returns true,
+     *                   - per-rule fields are valid (non-empty file/func when enabled,
+     *                     valid log level when haveLevel, etc.),
+     *                   - action is valid; if SetLevel, newLevel must be a valid log level,
+     *                   - every entry of appenderTypes is a valid LLBC_LogAppenderType.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AddLogMuteFileLine(const LLBC_String &file, int line);
+    int AddLogControl(const LLBC_LogControlItem &item);
 
     /**
-     * Remove a file+line log mute rule.
-     * @param[in] file - the file basename.
-     * @param[in] line - the file line number, 0 only removes the wildcard entry.
+     * Remove the control item at the given index.
+     * @param[in] index - the item index, 0-based, in declaration order.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int RemoveLogMuteFileLine(const LLBC_String &file, int line);
+    int RemoveLogControl(size_t index);
 
     /**
-     * Remove all file+line log mute rules of the specific file(both wildcard and specific lines).
-     * @param[in] file - the file basename.
-     * @return int - return 0 if success, otherwise return -1.
+     * Clear all installed log control items.
      */
-    int RemoveLogMuteFile(const LLBC_String &file);
+    void ClearLogControls();
 
     /**
-     * Add a function-name log mute rule.
-     * @param[in] func - the function name.
-     * @return int - return 0 if success, otherwise return -1.
+     * Get installed log control item count.
+     * @return size_t - the count, 0 if not initialized.
      */
-    int AddLogMuteFunc(const LLBC_String &func);
+    size_t GetLogControlCount() const;
 
     /**
-     * Remove a function-name log mute rule.
-     * @param[in] func - the function name.
-     * @return int - return 0 if success, otherwise return -1.
+     * Snapshot all installed log control items in declaration order. The output is cleared first.
+     * @param[out] out - the items snapshot.
      */
-    int RemoveLogMuteFunc(const LLBC_String &func);
+    void GetLogControls(std::vector<LLBC_LogControlItem> &out) const;
 
     /**
-     * Add a file+level log mute rule.
-     * Logs in the file with level less than minLevel are muted; if a rule of
-     * the same file already exists, it is overwritten.
-     * @param[in] file     - the file basename.
-     * @param[in] minLevel - the minimum kept log level.
-     * @return int - return 0 if success, otherwise return -1.
+     * Get the count of log records suppressed by Mute actions since logger
+     * initialization or last ResetLogControlSuppressedCount(). Counted once per
+     * (record, appender) pair when a Mute action fires.
+     * @return uint64 - the suppressed record count, 0 if not initialized.
      */
-    int AddLogMuteFileLevel(const LLBC_String &file, int minLevel);
+    uint64 GetLogControlSuppressedCount() const;
 
     /**
-     * Remove the file+level log mute rule of the specific file.
-     * @param[in] file - the file basename.
-     * @return int - return 0 if success, otherwise return -1.
+     * Reset the suppressed record count to zero; control items are not affected.
      */
-    int RemoveLogMuteFileLevel(const LLBC_String &file);
-
-    /**
-     * Clear all installed log mute rules.
-     */
-    void ClearLogMuteRules();
-
-    /**
-     * Snapshot all installed file+line log mute rules. The output is cleared first; order unspecified.
-     * @param[out] out - the rule snapshot, each entry is (file, line); line == 0 means wildcard.
-     */
-    void GetLogMuteFileLineRules(std::vector<std::pair<LLBC_String, int> > &out) const;
-
-    /**
-     * Snapshot all installed function-name log mute rules. The output is cleared first; order unspecified.
-     * @param[out] out - the rule snapshot.
-     */
-    void GetLogMuteFuncRules(std::vector<LLBC_String> &out) const;
-
-    /**
-     * Snapshot all installed file+level log mute rules. The output is cleared first; order unspecified.
-     * @param[out] out - the rule snapshot, each entry is (file, minLevel).
-     */
-    void GetLogMuteFileLevelRules(std::vector<std::pair<LLBC_String, int> > &out) const;
-
-    /**
-     * Get the count of muted log records since logger initialization or last ResetLogMutedCount().
-     * @return uint64 - the muted log record count, 0 if mute filter not initialized.
-     */
-    uint64 GetLogMutedCount() const;
-
-    /**
-     * Reset the muted log record count to zero, rules are not affected.
-     */
-    void ResetLogMutedCount();
+    void ResetLogControlSuppressedCount();
 
 public:
     /**
@@ -592,8 +562,8 @@ private:
     // Log trace manager.
     LLBC_LogTraceMgr *_logTraceMgr;
 
-    // Log mute filter (drops logs by file/line or by function name).
-    LLBC_LogMuteFilter *_logMuteFilter;
+    // Log output control filter (Mute / SetLevel; per-appender, ordered).
+    LLBC_LogControlFilter *_logControlFilter;
 
     // Log runnable object.
     LLBC_LogRunnable *_logRunnable;
