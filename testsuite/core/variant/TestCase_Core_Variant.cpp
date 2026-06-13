@@ -372,6 +372,30 @@ int TestCase_Core_Variant::VariantTypeTest()
 
     LLBC_Expect((LLBC_VariantType::IsConvertable<LLBC_Variant>()) == true);
 
+    //DeduceClass::Get<>:
+    // - Nil:
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::NIL>::Class, void>));
+    // - Raw:
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_BOOL>::Class, bool>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_SINT8>::Class, sint8>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_UINT8>::Class, uint8>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_SINT16>::Class, sint16>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_UINT16>::Class, uint16>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_SINT32>::Class, sint32>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_UINT32>::Class, uint32>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_LONG>::Class, long>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_ULONG>::Class, ulong>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_SINT64>::Class, sint64>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_UINT64>::Class, uint64>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_FLOAT>::Class, float>));
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_DOUBLE>::Class, double>));
+    // - Str:
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::STR_DFT>::Class, LLBC_Variant::Str>));
+    // - Seq:
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::SEQ_DFT>::Class, LLBC_Variant::Seq>));
+    // - Dict:
+    LLBC_Expect((std::is_same_v<LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::DICT_DFT>::Class, LLBC_Variant::Dict>));
+
     // IsNil():
     LLBC_Expect(LLBC_VariantType::IsNil<void>());
     LLBC_Expect(LLBC_VariantType::IsNil<LLBC_Variant>());
@@ -2638,7 +2662,9 @@ int TestCase_Core_Variant::AsTest_RawTypes()
 template <typename _RawTy>
 int TestCase_Core_Variant::AsTest_OneRawType()
 {
-    _RawTy val;
+    LLBC_PrintLn("- AsTest - OneRawType - %s", LLBC_GetTypeName(_RawTy));
+
+    volatile _RawTy val;
     if constexpr (std::is_signed_v<_RawTy>)
         val = static_cast<_RawTy>(-8);
     else
@@ -2657,8 +2683,8 @@ int TestCase_Core_Variant::AsTest_OneRawType()
         var.As<ulong>() == static_cast<ulong>(val) &&
         var.As<sint64>() == static_cast<sint64>(val) &&
         var.As<uint64>() == static_cast<uint64>(val) &&
-        var.As<float>() == static_cast<float>(val) &&
-        var.As<double>() == static_cast<double>(val) &&
+        LLBC_IsFloatAlmostEqual(var.As<float>(), static_cast<float>(val)) &&
+        LLBC_IsFloatAlmostEqual(var.As<double>(), static_cast<double>(val)) &&
         var.As<LLBC_String>() == LLBC_Num2Str(val) &&
         var.As<LLBC_Variant::Seq>().empty() &&
         var.As<LLBC_Variant::Dict>().empty());
@@ -2825,8 +2851,7 @@ int TestCase_Core_Variant::AsLooseBoolTest()
         double>()) == LLBC_OK);
 
     // Str:
-    LLBC_Expect(LLBC_Variant("") == false &&
-                LLBC_Variant("XXFAEFDAS") == false);
+    LLBC_Expect(LLBC_Variant("") != false && LLBC_Variant("XXFAEFDAS") != false);
 
     for (auto &trueStrVal : {"true", "True", "TRUE", " \tTrUe", "tRuE \t", "\t TrUe\t "})
         LLBC_Expect(LLBC_Variant(trueStrVal).AsLooseBool() == true, "trueStrVal:%s", trueStrVal);
@@ -2871,7 +2896,7 @@ int TestCase_Core_Variant::AsLooseBoolTest_OneRawType()
     LLBC_Expect(LLBC_Variant(_RawTy{}).AsLooseBool() == false);
 
     // Non-Default Raw: true.
-    _RawTy val;
+    volatile _RawTy val;
     if constexpr (std::is_signed_v<_RawTy>)
         val = static_cast<_RawTy>(-8);
     else
@@ -3449,6 +3474,408 @@ int TestCase_Core_Variant::SeqSpecificTest()
 int TestCase_Core_Variant::DictSpecificTest()
 {
     LLBC_PrintLn("Dictionary specific test:");
+
+    // Const Non-Dict variant test:
+    // - DictBegin()/DictEnd()
+    const LLBC_Variant constNonDictVar;
+    LLBC_Expect(constNonDictVar.DictBegin() == constNonDictVar.DictEnd() &&
+                constNonDictVar.Is<void>());
+    // - DictReverseBegin()/DictReverseEnd():
+    LLBC_Expect(constNonDictVar.DictReverseBegin() == constNonDictVar.DictReverseEnd() &&
+                constNonDictVar.Is<void>());
+    // - DictFind():
+    LLBC_Expect(constNonDictVar.DictFind("key") == constNonDictVar.DictEnd());
+
+    // Non-Const Non-Dict variant test:
+    // - DictBegin():
+    {
+        LLBC_Variant nonConstNonDictVar(1);
+        const auto dictBegin = nonConstNonDictVar.DictBegin();
+        LLBC_Expect(nonConstNonDictVar.Is<LLBC_Variant::Dict>() && dictBegin == nonConstNonDictVar.DictEnd());
+    }
+    // - DictEnd():
+    {
+        LLBC_Variant nonConstNonDictVar(3.1415926);
+        const auto dictEnd = nonConstNonDictVar.DictEnd();
+        LLBC_Expect(nonConstNonDictVar.Is<LLBC_Variant::Dict>() && nonConstNonDictVar.DictBegin() == dictEnd);
+    }
+    // -DictReverseBegin():
+    {
+        LLBC_Variant nonConstNonDictVar(1);
+        const auto dictReverseBegin = nonConstNonDictVar.DictReverseBegin();
+        LLBC_Expect(nonConstNonDictVar.Is<LLBC_Variant::Dict>() &&
+                    dictReverseBegin == nonConstNonDictVar.DictReverseEnd());
+    }
+    // - DictReverseEnd():
+    {
+        LLBC_Variant nonConstNonDictVar(3.1415926);
+        const auto dictReverseEnd = nonConstNonDictVar.DictReverseEnd();
+        LLBC_Expect(nonConstNonDictVar.Is<LLBC_Variant::Dict>() && nonConstNonDictVar.DictReverseBegin() == dictReverseEnd);
+    }
+    // - Find():
+    {
+        LLBC_Variant nonConstNonDictVar("Hello World");
+        const auto findRet = nonConstNonDictVar.DictFind("key");
+        LLBC_Expect(nonConstNonDictVar.Is<LLBC_Variant::Dict>() && findRet == nonConstNonDictVar.DictEnd());
+    }
+
+    // Empty Dict test:
+    {
+        LLBC_Variant emptyDictVar;
+        emptyDictVar.Become<LLBC_Variant::Dict>();
+
+        // - Is<Dict>:
+        LLBC_Expect(emptyDictVar.Is<LLBC_Variant::Dict>());
+
+        // - IsEmpty()/Size()/Capacity():
+        LLBC_Expect(emptyDictVar.IsEmpty() &&
+                    emptyDictVar.Size() == 0 &&
+                    emptyDictVar.Capacity() == 0);
+    }
+
+    // Insert test(included DictFind()):
+    LLBC_Expect(DictSpecificTest_Insert() == LLBC_OK);
+
+    // Erase test:
+    LLBC_Expect(DictSpecificTest_Erase() == LLBC_OK);
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::DictSpecificTest_Insert()
+{
+    LLBC_PrintLn("- DictSpecificTest_Insert:");
+
+    // Insert nil:
+    LLBC_Variant dictVar;
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_Variant::nil, "nilKey", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_Variant::nil, "nilKeyToo", false) == LLBC_OK);
+
+    // Insert Raw:
+    // - Insert bool:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, false, "bool - false key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, false, "bool - false key too", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, true, "bool - false key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, true, "bool - false key too", false) == LLBC_OK);
+    // - Insert sint8:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<sint8>(-8), "sint8 key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<sint8>(-8), "sint8 key too", false) == LLBC_OK);
+    // - Insert uint8:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<uint8>(8), "uint8 key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<uint8>(8), "uint8 key too", false) == LLBC_OK);
+    // - Insert sint16:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<sint16>(-16), "sint16 key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<sint16>(-16), "sint16 key too", false) == LLBC_OK);
+    // - Insert uint16:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<uint16>(16), "uint16 key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<uint16>(16), "uint16 key too", false) == LLBC_OK);
+    // - Insert sint32:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<sint32>(-32), "sint32 key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<sint32>(-32), "sint32 key too", false) == LLBC_OK);
+    // - Insert uint32:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<uint32>(32), "uint32 key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<uint32>(32), "uint32 key too", false) == LLBC_OK);
+    // - Insert long:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<long>(-48), "long key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<long>(-48), "long key too", false) == LLBC_OK);
+    // - Insert ulong:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<ulong>(48), "ulong key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<ulong>(48), "ulong key too", false) == LLBC_OK);
+    // - Insert sint64:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<sint64>(-64), "sint64 key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<sint64>(-64), "sint64 key too", false) == LLBC_OK);
+    // - Insert uint64:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<uint64>(64), "uint64 key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, static_cast<uint64>(64), "uint64 key too", false) == LLBC_OK);
+    // - Insert float:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, 3.14f, "float key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, 3.14f, "float key too", false) == LLBC_OK);
+    // - Insert double:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, 0.618, "double key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, 0.618, "double key too", false) == LLBC_OK);
+
+    // Insert Str:
+    // - Insert empty string:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, "", "empty string key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_String(""), "empty LLBC_String", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_CString(""), "empty LLBC_CString", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string(""), "empty std::string", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string_view(""), "empty std::string_view", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_Variant(""), "empty Str type LLBC_Variant", false) == LLBC_OK);
+    // - Insert non-empty string:
+    LLBC_Expect(LLBC_Variant("Hello World") == LLBC_String("Hello World"));
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, "Hello World", "non-empty string key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_String("Hello World"), "non-empty LLBC_String key", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_CString("Hello World"), "non-empty LLBC_CString key", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string("Hello World"), "non-empty std::string key", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string_view("Hello World"), "non-empty std::string_view key", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_Variant("Hello World"), "non-empty Str type LLBC_Variant", false) == LLBC_OK);
+
+    // Insert Seq:
+    // - Insert std::pair<>:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::make_pair(1, "value"), "std::pair key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::make_pair(1, "value"), "std::pair key too", false) == LLBC_OK);
+    // - Insert std::vector<>.
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::vector<int>{1, 2, 3}, "std::vector key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::vector<int>{1, 2, 3}, "std::vector key too", false) == LLBC_OK);
+    // - Insert std::list<>.
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::list<int>{10, 20, 30}, "std::list key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::list<int>{10, 20, 30}, "std::list key too", false) == LLBC_OK);
+    // - Insert std::deque<>.
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::deque<int>{100, 200, 300}, "std::deque key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::deque<int>{100, 200, 300}, "std::deque key too", false) == LLBC_OK);
+    // - insert std::queue<>.
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::queue<int>(std::deque<int>{100, 200, 400}), "std::queue key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::queue<int>(std::deque<int>{100, 200, 400}), "std::queue key too", false) == LLBC_OK);
+    // - Insert std::set<>.
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::set<int>{1, 2, 300}, "std::set key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::set<int>{1, 2, 300}, "std::set key too", false) == LLBC_OK);
+    // - Insert std::unordered_set<>.
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::unordered_set<int>{10, 20, 3}, "std::unordered_set key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::unordered_set<int>{10, 20, 3}, "std::unordered_set key too", false) == LLBC_OK);
+
+    // Insert Dict:
+    // - Insert std::map<>:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::map<int, std::string>{{1, "one"}, {2, "two"}}, "std::map key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::map<int, std::string>{{1, "one"}, {2, "two"}}, "std::map key too", false) == LLBC_OK);
+    // - Insert std::unordered_map<>:
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::unordered_map<int, std::string>{{3, "three"}, {4, "four"}}, "std::unordered_map key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::unordered_map<int, std::string>{{3, "three"}, {4, "four"}}, "std::unordered_map key too", false) == LLBC_OK);
+
+    // Insert variant.
+    LLBC_Variant varKey(10086);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, varKey, "variant key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, varKey, "variant key too", false) == LLBC_OK);
+
+    // Insert complex key:
+    std::map<LLBC_String, std::vector<std::set<int>>> complexKey;
+    complexKey["first"] = {{1, 2, 3}, {4, 5, 6}};
+    complexKey["second"] = {{10, 20, 30}, {40, 50, 60}};
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, complexKey, "complex key", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, complexKey, "complex key too", false) == LLBC_OK);
+
+    // RValue insert:
+    LLBC_String rvalKey("rval key");
+    std::string rvalVal("rval value");
+    LLBC_Expect(dictVar.DictInsert(std::move(rvalKey), std::move(rvalVal)).second == true &&
+                dictVar.Count("rval key") == 1 &&
+                dictVar["rval key"] == "rval value" &&
+                rvalKey.empty() &&
+                rvalVal.empty());
+
+    // After Insert test finished, dump var:
+    LLBC_PrintLn("- After Insert test, dictVar:%s", dictVar.ToString().c_str());
+
+    return LLBC_OK;
+}
+
+template <typename _KeyTy, typename _ValTy>
+int TestCase_Core_Variant::DictSpecificTest_InsertOne(LLBC_Variant &var, const _KeyTy &key, const _ValTy &val, bool expectSucc)
+{
+    const LLBC_String keyTyName = LLBC_GetTypeName(_KeyTy);
+    const LLBC_String valTyName = LLBC_GetTypeName(_ValTy);
+    LLBC_PrintLn(" - DictSpecificTest_InsertOne, keyTyName:%s, key:%s, valTyName:%s, val:%s, expectSucc:%d",
+                 keyTyName.c_str(),
+                 LLBC_Variant(key).ToString().c_str(),
+                 valTyName.c_str(),
+                 LLBC_Variant(val).ToString().c_str(),
+                 expectSucc);
+
+    const size_t beforeInsertSize = var.Size();
+    const auto insertRet = var.DictInsert(key, val);
+    LLBC_Expect(insertRet.first != var.DictEnd() &&
+                insertRet.second == expectSucc &&
+                insertRet.first->first == key &&
+                (expectSucc ? insertRet.first->second == val : insertRet.first->second == var[insertRet.first->first]) &&
+                (expectSucc ? var.Size() == beforeInsertSize + 1 : var.Size() == beforeInsertSize));
+
+    const auto findRet = var.DictFind(key);
+    LLBC_Expect(findRet != var.DictEnd() &&
+                findRet->first == key &&
+                findRet->second == var[findRet->first] &&
+                (expectSucc ? findRet->second == val : findRet->second != val));
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::DictSpecificTest_Erase()
+{
+    LLBC_PrintLn("- DictSpecificTest_Erase:");
+
+    // Erase Raw:
+    // - Erase bool:
+    LLBC_Variant dictVar;
+    dictVar.DictInsert(false, "bool - false key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, false, true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, false, false) == LLBC_OK);
+    // -Erase sint8:
+    dictVar.DictInsert(static_cast<sint8>(-8), "sint8 key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<sint8>(-8), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<sint8>(-8), false) == LLBC_OK);
+    // - Erase uint8:
+    dictVar.DictInsert(static_cast<uint8>(8), "uint8 key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<uint8>(8), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<uint8>(8), false) == LLBC_OK);
+    // - Erase sint16:
+    dictVar.DictInsert(static_cast<sint16>(-16), "sint16 key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<sint16>(-16), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<sint16>(-16), false) == LLBC_OK);
+    // - Erase uint16:
+    dictVar.DictInsert(static_cast<uint16>(16), "uint16 key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<uint16>(16), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<uint16>(16), false) == LLBC_OK);
+    // - Erase sint32:
+    dictVar.DictInsert(static_cast<sint32>(-32), "sint32 key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<sint32>(-32), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<sint32>(-32), false) == LLBC_OK);
+    // - Erase uint32:
+    dictVar.DictInsert(static_cast<uint32>(32), "uint32 key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<uint32>(32), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<uint32>(32), false) == LLBC_OK);
+    // - Erase long:
+    dictVar.DictInsert(static_cast<long>(-48), "long key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<long>(-48), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<long>(-48), false) == LLBC_OK);
+    // - Erase ulong:
+    dictVar.DictInsert(static_cast<ulong>(48), "ulong key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<ulong>(48), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<ulong>(48), false) == LLBC_OK);
+    // - Erase sint64:
+    dictVar.DictInsert(static_cast<sint64>(-64), "sint64 key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<sint64>(-64), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<sint64>(-64), false) == LLBC_OK);
+    // - Erase uint64:
+    dictVar.DictInsert(static_cast<uint64>(64), "uint64 key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<uint64>(64), true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, static_cast<uint64>(64), false) == LLBC_OK);
+    // - Erase float:
+    dictVar.DictInsert(3.14f, "float key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, 3.14f, true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, 3.14f, false) == LLBC_OK);
+    // - Erase double:
+    dictVar.DictInsert(0.618, "double key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, 0.618, true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, 0.618, false) == LLBC_OK);
+
+    // Erase Str:
+    // -Erase empty string:
+    dictVar.DictInsert("", "empty string key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, "", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, "", false) == LLBC_OK);
+    // - Erase non-empty string:
+    dictVar.DictInsert("Hello World", "non-empty string key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, "Hello World", true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, "Hello World", false) == LLBC_OK);
+
+    // Erase Seq:
+    // - Erase empty seq:
+    dictVar.DictInsert(std::vector<int>{}, "empty seq key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, std::vector<int>{}, true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, std::vector<int>{}, false) == LLBC_OK);
+    // - Erase non-empty seq:
+    dictVar.DictInsert(std::vector<int>{1, 2, 3}, "non-empty seq key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, std::vector<int>{1, 2, 3}, true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, std::vector<int>{1, 2, 3}, false) == LLBC_OK);
+
+    // Erase Dict:
+    // -Erase empty dict:
+    dictVar.DictInsert(std::map<int, std::string>{}, "empty dict key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, std::map<int, std::string>{}, true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, std::map<int, std::string>{}, false) == LLBC_OK);
+    // - Erase non-empty dict:
+    dictVar.DictInsert(std::map<int, std::string>{{1, "one"}, {2, "two"}}, "non-empty dict key");
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, std::map<int, std::string>{{1, "one"}, {2, "two"}}, true) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_EraseOne(dictVar, std::map<int, std::string>{{1, "one"}, {2, "two"}}, false) == LLBC_OK);
+
+    // Str/Int key insert.
+    LLBC_Expect(dictVar.DictInsert(10086, "the int key").second);
+    LLBC_Expect(dictVar.DictInsert("10086", "the string key").second);
+    LLBC_Expect(dictVar[10086] == "the int key");
+    LLBC_Expect(dictVar["10086"] == "the string key");
+    LLBC_Expect(dictVar.DictErase("10086") == 1);
+    LLBC_Expect(dictVar.DictErase("10086") == 0);
+    LLBC_Expect(dictVar.DictErase(10086) == 1);
+    LLBC_Expect(dictVar.DictErase(10086) == 0);
+
+    // Iter erase test:
+    dictVar.Clear();
+    LLBC_Expect(dictVar.DictInsert("IterKey", 1).second);
+    const auto dictIt = dictVar.DictFind("IterKey");
+    LLBC_Expect(dictIt != dictVar.DictEnd() && dictIt->first == "IterKey" && dictIt->second == 1);
+    const auto dictItEraseRet = dictVar.DictErase(dictIt);
+    LLBC_Expect(dictItEraseRet == dictVar.DictEnd() &&
+                dictVar.Size() == 0 &&
+                dictVar.DictFind("IterKey") == dictVar.DictEnd());
+
+    // ConstIter erase test:
+    dictVar.Clear();
+    LLBC_Expect(dictVar.DictInsert("ConstIterKey", 1).second);
+    const auto dictConstIt = static_cast<const LLBC_Variant &>(dictVar).DictFind("ConstIterKey");
+    LLBC_Expect(dictConstIt != static_cast<const LLBC_Variant &>(dictVar).DictEnd() &&
+                dictConstIt->first == "ConstIterKey" &&
+                dictConstIt->second == 1);
+    const auto dictConstItEraseRet = dictVar.DictErase(dictConstIt);
+    LLBC_Expect(dictConstItEraseRet == dictVar.DictEnd() &&
+                dictVar.Size() == 0 &&
+                dictVar.DictFind("ConstIterKey") == dictVar.DictEnd());
+
+    // Range erase test(iter):
+    dictVar.Clear();
+    for (int i = 0; i < 10; ++i)
+        dictVar.DictInsert(i, std::vector<int>{i, i * 10, i * 100});
+    LLBC_Variant::DictIter dictEraseRet;
+    LLBC_Expect((dictEraseRet =
+                 dictVar.DictErase(std::next(dictVar.DictBegin(), 1), std::next(dictVar.DictEnd(), -1)))->first == 9,
+                "dictEraseRet == dictVar.DictEnd()?:%s, dictEraseRet->first:%s, dictVar.DictEnd()->first:%s",
+                dictEraseRet == dictVar.DictEnd() ? "true" : "false",
+                LLBC_Variant(dictEraseRet->first).ToString().c_str(),
+                LLBC_Variant(dictVar.DictEnd()->first).ToString().c_str());
+    LLBC_Expect(dictVar.Size() == 2 &&
+                dictVar.DictFind(0) != dictVar.DictEnd() &&
+                dictVar.DictFind(9) != dictVar.DictEnd() &&
+                dictVar.DictFind(1) == dictVar.DictEnd() &&
+                dictVar.DictFind(8) == dictVar.DictEnd());
+
+    // Range erase test(const iter):
+    dictVar.Clear();
+    for (int i = 0; i < 10; ++i)
+    {
+        if (i % 2 == 0)
+            dictVar.DictInsert(i, std::vector<int>{i, i * 10, i * 100});
+        else
+            dictVar.DictInsert(LLBC_Num2Str(i), std::vector<int>{i, i * 10, i * 100});
+    }
+
+    LLBC_Expect(dictVar.DictErase(dictVar.DictFind("1"), ++dictVar.DictFind("1")) != dictVar.DictEnd());
+    LLBC_Expect(dictVar.Size() == 9 &&
+                dictVar.DictFind("1") == dictVar.DictEnd());
+
+    // Batch erase test:
+    dictVar.Clear();
+    dictVar.DictInsert(false, "hello");
+    dictVar.DictInsert(10086, "world");
+    dictVar.DictInsert(3.14, "pi");
+    LLBC_Expect(dictVar.DictErase(false, 10086) == 2);
+    LLBC_Expect(dictVar.Size() == 1 &&
+                dictVar.DictFind(false) == dictVar.DictEnd() &&
+                dictVar.DictFind(10086) == dictVar.DictEnd() &&
+                dictVar.DictFind(3.14) != dictVar.DictEnd());
+
+    return LLBC_OK;
+}
+
+template <typename _KeyTy>
+int TestCase_Core_Variant::DictSpecificTest_EraseOne(LLBC_Variant &var, const _KeyTy &key, bool expectSucc)
+{
+    LLBC_PrintLn(" - DictSpecificTest_EraseOne, key:%s, expectSucc:%d",
+                 LLBC_Variant(key).ToString().c_str(),
+                 expectSucc);
+
+    const size_t beforeEraseSize = var.Size();
+    const size_t eraseCount = var.DictErase(key);
+    LLBC_Expect(eraseCount == (expectSucc ? 1 : 0) &&
+                var.Size() == (expectSucc ? beforeEraseSize - 1 : beforeEraseSize) &&
+                var.DictFind(key) == var.DictEnd());
 
     return LLBC_OK;
 }

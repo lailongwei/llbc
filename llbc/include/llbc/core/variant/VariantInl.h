@@ -137,8 +137,8 @@ constexpr LLBC_VariantType::ENUM LLBC_VariantType::DeduceType()
     }
     else if constexpr (std::is_array_v<_PureTy>) // string array/non-string array:
     {
-        typedef std::remove_cv_t<std::remove_extent_t<_PureTy>> _PtrElemTy;
-        if constexpr (std::is_same_v<_PtrElemTy, char>)
+        typedef std::remove_cv_t<std::remove_extent_t<_PureTy>> _ArrayElemTy;
+        if constexpr (std::is_same_v<_ArrayElemTy, char>)
             return STR_DFT;
         else
             return RAW_PTR;
@@ -200,6 +200,114 @@ constexpr LLBC_VariantType::ENUM LLBC_VariantType::DeduceType()
         return NIL;
     }
 }
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::NIL>
+{
+    typedef void Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_BOOL>
+{
+    typedef bool Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_SINT8>
+{
+    typedef sint8 Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_UINT8>
+{
+    typedef uint8 Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_SINT16>
+{
+    typedef sint16 Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_UINT16>
+{
+    typedef uint16 Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_SINT32>
+{
+    typedef sint32 Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_UINT32>
+{
+    typedef uint32 Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_LONG>
+{
+    typedef long Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_ULONG>
+{
+    typedef ulong Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_PTR>
+{
+    typedef void * Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_SINT64>
+{
+    typedef sint64 Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_UINT64>
+{
+    typedef uint64 Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_FLOAT>
+{
+    typedef float Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::RAW_DOUBLE>
+{
+    typedef double Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::STR_DFT>
+{
+    typedef typename LLBC_Variant::Str Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::SEQ_DFT>
+{
+    typedef typename LLBC_Variant::Seq Class;
+};
+
+template <>
+struct LLBC_VariantType::DeduceClass::Get<LLBC_VariantType::DICT_DFT>
+{
+    typedef typename LLBC_Variant::Dict Class;
+};
 
 inline constexpr bool LLBC_VariantType::IsValid(int type)
 {
@@ -269,183 +377,29 @@ inline LLBC_Variant::LLBC_Variant()
 template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsRaw<_Ty>(), int>>
 LLBC_Variant::LLBC_Variant(const _Ty &raw)
-: _type(LLBC_VariantType::DeduceType<_Ty>())
 {
-    if constexpr (std::is_integral_v<_Ty>)
-    {
-        if constexpr (std::is_signed_v<_Ty>)
-            _data.i64() = raw;
-        else
-            _data.ui64() = raw;
-    }
-    else if constexpr (std::is_floating_point_v<_Ty>)
-    {
-        _data.dbl() = raw;
-    }
-    else if constexpr (std::is_null_pointer_v<_Ty>)
-    {
-        _data.ui64() = 0;
-    }
-    else if constexpr (std::is_pointer_v<_Ty>)
-    {
-        _data.ui64() = reinterpret_cast<std::uintptr_t>(raw);
-    }
-    else if constexpr (std::is_enum_v<_Ty>)
-    {
-        if constexpr (std::is_signed_v<std::underlying_type_t<_Ty>>)
-            _data.i64() = static_cast<sint64>(raw);
-        else
-            _data.ui64() = static_cast<uint64>(raw);
-    }
-    else
-    {
-        llbc_assert(false && "Construction from this RAW type is not supported!");
-    }
+    ConstructOrAssignFromRaw<_Ty, true>(raw);
 }
 
 template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsStr<_Ty>(), int>>
 LLBC_Variant::LLBC_Variant(_Ty &&str)
-: _type(LLBC_VariantType::DeduceType<_Ty>())
 {
-    __LLBC_INL_Var_PureType(_Ty);
-
-    if constexpr (std::is_pointer_v<_PureTy>)
-        new (&_data.str()) Str(str);
-    else if constexpr (std::is_same_v<_PureTy, std::string_view> ||
-                       std::is_same_v<_PureTy, LLBC_CString>)
-        new (&_data.str()) Str(str.data(), str.size());
-    else
-        new (&_data.str()) Str(std::forward<_Ty>(str));
+    ConstructOrAssignFromStr<_Ty, true>(std::forward<_Ty>(str));
 }
 
 template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsSeq<_Ty>(), int> = 0>
 LLBC_Variant::LLBC_Variant(_Ty &&seq)
-: _type(LLBC_VariantType::DeduceType<_Ty>())
 {
-    __LLBC_INL_Var_PureType(_Ty);
-
-    if constexpr (std::is_same_v<_PureTy, Seq>)
-    {
-        new (&_data.seq()) Seq(std::forward<_Ty>(seq));
-    }
-    else if constexpr (LLBC_IsTemplSpec<_PureTy, std::pair>::value)
-    {
-        new (&_data.seq()) Seq();
-    
-        _data.seq().reserve(2);
-        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-        {
-            _data.seq().emplace_back(std::move(seq.first));
-            _data.seq().emplace_back(std::move(seq.second));
-        }
-        else
-        {
-            _data.seq().emplace_back(seq.first);
-            _data.seq().emplace_back(seq.second);
-        }
-    }
-    else
-    {
-        new (&_data.seq()) Seq();
-        if (seq.empty())
-            return;
-
-        _data.seq().reserve(seq.size());
-        if constexpr (LLBC_IsTemplSpec<_PureTy, std::queue>::value)
-        {
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-            {
-                class _MyMutableQueue : public _PureTy
-                {
-                public:
-                    auto begin() { return this->c.begin(); }
-                    auto end() { return this->c.end(); }
-
-                    void clear() { this->c.clear(); }
-                };
-
-                auto &myQueue = reinterpret_cast<_MyMutableQueue &>(seq);
-                for (auto it = myQueue.begin(); it != myQueue.end(); ++it)
-                    _data.seq().emplace_back(std::move(*it));
-                myQueue.clear();
-            }
-            else
-            {
-                class _MyImmutableQueue : public _PureTy
-                {
-                public:
-                    auto begin() const { return this->c.begin(); }
-                    auto end() const { return this->c.end(); }
-                };
-
-                const auto &myQueue = reinterpret_cast<const _MyImmutableQueue &>(seq);
-                for (auto it = myQueue.begin(); it != myQueue.end(); ++it)
-                    _data.seq().emplace_back(*it);
-            }
-        }
-        else if constexpr (LLBC_IsTemplSpec<_PureTy, std::set>::value ||
-                           LLBC_IsTemplSpec<_PureTy, std::unordered_set>::value)
-        {
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-            {
-                do
-                {
-                    _data.seq().emplace_back(std::move(seq.extract(seq.begin()).value()));
-                } while (!seq.empty());
-            }
-            else
-            {
-                for (const auto &elem : seq)
-                    _data.seq().emplace_back(elem);
-            }
-        }
-        else
-        {
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-            {
-                for (auto &&elem : seq)
-                    _data.seq().emplace_back(std::move(elem));
-                seq.clear();
-            }
-            else
-            {
-                for (const auto &elem : seq)
-                    _data.seq().emplace_back(elem);
-            }
-        }
-    }
+    ConstructOrAssignFromSeq<_Ty, true>(std::forward<_Ty>(seq));
 }
 
 template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsDict<_Ty>(), int> = 0>
 LLBC_Variant::LLBC_Variant(_Ty &&dict)
-: _type(LLBC_VariantType::DeduceType<_Ty>())
 {
-    __LLBC_INL_Var_PureType(_Ty);
-
-    if constexpr (std::is_same_v<_PureTy, Dict>)
-    {
-        new (&_data.dict()) Dict(std::forward<_Ty>(dict));
-    }
-    else
-    {
-        new (&_data.dict()) Dict();
-        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-        {
-            while (!dict.empty())
-            {
-                auto nh = dict.extract(dict.begin());
-                _data.dict().emplace(std::move(nh.key()), std::move(nh.mapped()));
-            }
-        }
-        else
-        {
-            for (auto &[key, value] : dict)
-                _data.dict().emplace(key, value);
-        }
-    }
+    ConstructOrAssignFromDict<_Ty, true>(std::forward<_Ty>(dict));
 }
 
 inline LLBC_Variant::LLBC_Variant(const LLBC_Variant &var)
@@ -485,38 +439,7 @@ template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsRaw<_Ty>(), int>>
 LLBC_Variant &LLBC_Variant::operator=(const _Ty &raw)
 {
-    Reset(LLBC_VariantType::DeduceType<_Ty>());
-    if constexpr (std::is_integral_v<_Ty>)
-    {
-        if constexpr (std::is_signed_v<_Ty>)
-            _data.i64() = raw;
-        else
-            _data.ui64() = raw;
-    }
-    else if constexpr (std::is_floating_point_v<_Ty>)
-    {
-        _data.dbl() = raw;
-    }
-    else if constexpr (std::is_null_pointer_v<_Ty>)
-    {
-        _data.ui64() = 0;
-    }
-    else if constexpr (std::is_pointer_v<_Ty>)
-    {
-        _data.ui64() = reinterpret_cast<std::uintptr_t>(raw);
-    }
-    else if constexpr (std::is_enum_v<_Ty>)
-    {
-        if (std::is_signed_v<std::underlying_type_t<_Ty>>)
-            _data.i64() = static_cast<sint64>(raw);
-        else
-            _data.ui64() = static_cast<uint64>(raw);
-    }
-    else
-    {
-        llbc_assert(false && "Assignment from this RAW type is not supported!");
-    }
-
+    ConstructOrAssignFromRaw<_Ty, false>(raw);
     return *this;
 }
 
@@ -524,26 +447,7 @@ template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsStr<_Ty>(), int>>
 LLBC_Variant &LLBC_Variant::operator=(_Ty &&str)
 {
-    __LLBC_INL_Var_PureType(_Ty);
-
-    Become<Str>();
-    if constexpr ((std::is_array_v<_PureTy> &&
-                   std::is_same_v<std::remove_cv_t<std::remove_extent_t<_PureTy>>, char>) ||
-                  (std::is_pointer_v<_PureTy> &&
-                    std::is_same_v<std::remove_cv_t<std::remove_pointer_t<_PureTy>>, char>))
-    {
-        _data.str().assign(str);
-    }
-    else if constexpr (std::is_same_v<_PureTy, std::string_view> ||
-                       std::is_same_v<_PureTy, LLBC_CString>)
-    {
-        _data.str().assign(str.data(), str.size());
-    }
-    else
-    {
-        _data.str() = std::forward<_Ty>(str);
-    }
-
+    ConstructOrAssignFromStr<_Ty, false>(std::forward<_Ty>(str));
     return *this;
 }
 
@@ -551,103 +455,7 @@ template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsSeq<_Ty>(), int>>
 LLBC_Variant &LLBC_Variant::operator=(_Ty &&seq)
 {
-    __LLBC_INL_Var_PureType(_Ty);
-
-    if constexpr (std::is_same_v<_PureTy, Seq>)
-    {
-        Become<Seq>()._data.seq() = std::forward<_Ty>(seq);
-    }
-    else if constexpr (LLBC_IsTemplSpec<_PureTy, std::pair>::value)
-    {
-        Become<Seq>();
-
-        _data.seq().clear();
-        _data.seq().reserve(2);
-        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-        {
-            _data.seq().emplace_back(std::move(seq.first));
-            _data.seq().emplace_back(std::move(seq.second));
-        }
-        else
-        {
-            _data.seq().emplace_back(seq.first);
-            _data.seq().emplace_back(seq.second);
-        }
-    }
-    else
-    {
-        Become<Seq>();
-        _data.seq().clear();
-
-        if (seq.empty())
-            return *this;
-
-        if (_data.seq().capacity() < seq.size())
-            _data.seq().reserve(seq.size());
-
-        if constexpr (LLBC_IsTemplSpec<_PureTy, std::queue>::value)
-        {
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-            {
-                class _MyMutableQueue : public _PureTy
-                {
-                public:
-                    auto begin() { return this->c.begin(); }
-                    auto end() { return this->c.end(); }
-
-                    void clear() { this->c.clear(); }
-                };
-
-                auto &myQueue = reinterpret_cast<_MyMutableQueue &>(seq);
-                for (auto &item : myQueue)
-                    _data.seq().emplace_back(std::move(item));
-                myQueue.clear();
-            }
-            else
-            {
-                class _MyImmutableQueue : public _PureTy
-                {
-                public:
-                    auto begin() const { return this->c.begin(); }
-                    auto end() const { return this->c.end(); }
-                };
-
-                const auto &myQueue = reinterpret_cast<const _MyImmutableQueue &>(seq);
-                for (auto &item : myQueue)
-                    _data.seq().emplace_back(item);
-            }
-        }
-        else if constexpr (LLBC_IsTemplSpec<_PureTy, std::set>::value ||
-                           LLBC_IsTemplSpec<_PureTy, std::unordered_set>::value)
-        {
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-            {
-                do
-                {
-                    _data.seq().emplace_back(std::move(seq.extract(seq.begin()).value()));
-                } while (!seq.empty());
-            }
-            else
-            {
-                for (auto &item : seq)
-                    _data.seq().emplace_back(item);
-            }
-        }
-        else
-        {
-            for (auto &item : seq)
-            {
-                if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-                    _data.seq().emplace_back(std::move(item));
-                else
-                    _data.seq().emplace_back(item);
-            }
-
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-                seq.clear();
-        }
-    }
-
+    ConstructOrAssignFromSeq<_Ty, false>(std::forward<_Ty>(seq));
     return *this;
 }
 
@@ -655,35 +463,7 @@ template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsDict<_Ty>(), int>>
 LLBC_Variant &LLBC_Variant::operator=(_Ty &&dict)
 {
-    __LLBC_INL_Var_PureType(_Ty);
-
-    if constexpr (std::is_same_v<_PureTy, Dict>)
-    {
-        Become<Dict>()._data.dict() = std::forward<_Ty>(dict);
-    }
-    else
-    {
-        Become<Dict>();
-        _data.dict().clear();
-
-        if (dict.empty())
-            return *this;
-
-        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-        {
-            do
-            {
-                auto nh = dict.extract(dict.begin());
-                _data.dict().emplace(std::move(nh.key()), std::move(nh.mapped()));
-            } while (!dict.empty());
-        }
-        else
-        {
-            for (auto &[key, value] : dict)
-                _data.dict().emplace(key, value);
-        }
-    }
-
+    ConstructOrAssignFromDict<_Ty, false>(std::forward<_Ty>(dict));
     return *this;
 }
 
@@ -754,7 +534,10 @@ inline LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var) noexcept
 template <typename... _Tys>
 bool LLBC_Variant::Is() const
 {
-    return (... || (_type == LLBC_VariantType::DeduceType<_Tys>()));
+    if constexpr (sizeof...(_Tys) == 0)
+        return false;
+    else
+        return (... || (_type == LLBC_VariantType::DeduceType<_Tys>()));
 }
 
 template <typename _Ty>
@@ -768,31 +551,17 @@ LLBC_Variant &LLBC_Variant::Become()
 }
 
 template <typename _Ty>
-std::enable_if_t<LLBC_VariantType::IsNil<_Ty>(), const LLBC_Variant &>
-LLBC_Variant::As() const
-{
-    __LLBC_INL_Var_PureType(_Ty);
-    if constexpr (std::is_same_v<_PureTy, LLBC_Variant>)
-    {
-        return *this;
-    }
-    else
-        return (GetType() == LLBC_VariantType::NIL) ? *this : nil;
-}
-
-template <typename _Ty>
 std::enable_if_t<!std::is_reference_v<_Ty> && LLBC_VariantType::IsRaw<_Ty>(), _Ty>
 LLBC_Variant::As() const
 {
     __LLBC_INL_Var_PureType(_Ty);
+
     // xxx -> nullptr_t:
     if constexpr (std::is_null_pointer_v<_PureTy>)
-    {
         return nullptr;
-    }
 
     // xxx -> integral:
-    else if constexpr (std::is_integral_v<_PureTy>)
+    if constexpr (std::is_integral_v<_PureTy>)
     {
         // - xxx -> bool:
         if constexpr (std::is_same_v<_PureTy, bool>)
@@ -817,7 +586,7 @@ LLBC_Variant::As() const
     }
 
     // xxx -> floating point:
-    else if constexpr (std::is_floating_point_v<_PureTy>)
+    if constexpr (std::is_floating_point_v<_PureTy>)
     {
         // - raw -> floating point:
         if (IsRaw())
@@ -836,8 +605,11 @@ LLBC_Variant::As() const
             if (_data.str().empty())
                 return .0;
             
-            if (_data.str().find('.') != LLBC_String::npos)
-                return LLBC_Str2Num<_Ty>(_data.str().c_str());
+            // TODO: Will optimize(erase str().strip() call) after LLBC_Num2Str<>() support "xxx  " format convert.
+            if (_data.str().find('.') != LLBC_String::npos ||
+                _data.str().find('e') != LLBC_String::npos ||
+                _data.str().find('E') != LLBC_String::npos)
+                return LLBC_Str2Num<_Ty>(_data.str().strip().c_str());
             
             if (_data.str().find('-') != LLBC_String::npos)
                 return static_cast<_Ty>(AsSignedOrUnsigned64<sint64>());
@@ -846,27 +618,25 @@ LLBC_Variant::As() const
         }
         
        // - nil/seq/dict -> floating point:
-        return .0;
+        return 0.0;
     }
 
     // xxx -> pointer:
-    else if constexpr (std::is_pointer_v<_PureTy>)
-    {
+    if constexpr (std::is_pointer_v<_PureTy>)
         return reinterpret_cast<_Ty>(As<uint64>());
-    }
 
     // xxx -> enum:
-    else if constexpr (std::is_enum_v<_PureTy>)
+    if constexpr (std::is_enum_v<_PureTy>)
     {
         if (std::is_signed_v<std::underlying_type_t<_PureTy>>)
             return static_cast<_Ty>(As<sint64>());
         else
             return static_cast<_Ty>(As<uint64>());
     }
-    else
-    {
-        llbc_assert(false && "Can not convert variant to this RAW type");
-    }
+
+    llbc_assert(false && "Can not convert variant to this RAW type");
+
+    return _Ty();
 }
 
 // Define internal macro: Num -> Str.
@@ -902,27 +672,31 @@ LLBC_Variant::As() const
     if (IsRaw())
     {
         if (Is<bool>())
-        {
-            if constexpr (std::is_same_v<_PureTy, Str>)
-                return _data.ui64() != 0 ? GetTrueStr() : GetFalseStr();
-            else
-                return _data.ui64() != 0 ? GetTrueSTLStr(): GetFalseSTLStr();
-        }
+            return _data.ui64() != 0 ? GetTrueStr<_PureTy>() : GetFalseStr<_PureTy>();
 
         if (Is<float, double>())
             __LLBC_Inl_Variant_AsStr_Num2Str(_data.dbl(), false);
 
-        int castedFastNum;
+        static_assert(LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN < 0 &&
+                          LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END > 0,
+                      "LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN and "
+                      "LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END must be negative and positive");
+
         if (LIKELY(_num2StrFastAccessTbl) &&
-            ((IsSigned() &&
-              (castedFastNum = static_cast<int>(_data.i64())) >= LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN &&
-               castedFastNum <= LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END) ||
-             (IsUnsigned() &&
-              !Is<void *>() &&
-              (castedFastNum = static_cast<int>(_data.ui64())) >= LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN &&
-               castedFastNum <= LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END)))
+                   ((IsSigned() &&
+                     (_data.i64() >= static_cast<sint64>(LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN) &&
+                      _data.i64() <= static_cast<sint64>(LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END))) ||
+                    (IsUnsigned() &&
+                     !Is<void *>() &&
+                     (_data.ui64() >= 0ull &&
+                      _data.ui64() <= static_cast<uint64>(LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END)))))
         {
-            return *_num2StrFastAccessTbl[castedFastNum - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN];
+            if (IsSigned())
+                return *_num2StrFastAccessTbl[
+                    static_cast<int>(_data.i64()) - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN];
+            else
+                return *_num2StrFastAccessTbl[
+                    static_cast<int>(_data.ui64()) - LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_BEGIN];
         }
 
         if (IsSigned())
@@ -948,12 +722,7 @@ LLBC_Variant::As() const
     if (Is<Seq>())
     {
         if (_data.seq().empty())
-        {
-            if constexpr (std::is_same_v<_PureTy, Str>)
-                return GetEmptySeqStr();
-            else
-                return GetEmptySTLSeqStr();
-        }
+            return GetEmptySeqStr<_PureTy>();
 
         _PureTy content;
         content.reserve(16);
@@ -976,12 +745,7 @@ LLBC_Variant::As() const
     if (Is<Dict>())
     {
         if (_data.dict().empty())
-        {
-            if constexpr (std::is_same_v<_PureTy, Str>)
-                return GetEmptyDictStr();
-            else
-                return GetEmptySTLDictStr();
-        }
+            return GetEmptyDictStr<_PureTy>();
 
         _PureTy content;
         content.reserve(32);
@@ -1008,10 +772,7 @@ LLBC_Variant::As() const
         return content;
     }
 
-    if constexpr (std::is_same_v<_PureTy, Str>)
-        return GetEmptyStr();
-    else
-        return GetEmptySTLStr();
+    return GetEmptyStr<_PureTy>();
 }
 
 // Undefine Num -> Str internal macro.
@@ -1111,9 +872,9 @@ LLBC_Variant::As() const
 
             return retSeq;
         }
-        else if constexpr (LLBC_IsTemplSpec<_Ty, std::queue>::value ||
-                           LLBC_IsTemplSpec<_Ty, std::set>::value ||
-                           LLBC_IsTemplSpec<_Ty, std::unordered_set>::value)
+        else if constexpr (LLBC_IsTemplSpec<_PureTy, std::queue>::value ||
+                           LLBC_IsTemplSpec<_PureTy, std::set>::value ||
+                           LLBC_IsTemplSpec<_PureTy, std::unordered_set>::value)
         {
             _PureTy retSeq;
             if (Is<Seq>())
@@ -1124,10 +885,9 @@ LLBC_Variant::As() const
 
             return retSeq;
         }
-        else
-        {
-            llbc_assert(false && "Unconvertable SEQ type");
-        }
+
+        llbc_assert(false && "Unconvertable SEQ type");
+        return _Ty();
     }
 }
 
@@ -1166,22 +926,20 @@ inline void LLBC_Variant::StrResize(Str::size_type newSize, Str::value_type ch)
         std::fill(str.begin() + oldSize, str.end(), ch);
 }
 
-inline void LLBC_Variant::StrReserve(Str::size_type newCap)
-{
-    Become<Str>()._data.str().reserve(newCap);
-}
-
 template <typename _Ty>
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqInsert(SeqIter it, _Ty &&val)
 {
-    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
+    if (UNLIKELY(!Is<Seq>()))
+        return Become<Seq>()._data.seq().end();
+
     return _data.seq().emplace(it, std::forward<_Ty>(val));
 }
 
 template <typename _Ty>
 LLBC_Variant::SeqIter LLBC_Variant::SeqInsert(SeqIter it, Seq::size_type n, const _Ty &val)
 {
-    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
+    if (UNLIKELY(!Is<Seq>()))
+        return Become<Seq>()._data.seq().end();
 
     if constexpr (std::is_same_v<_Ty, LLBC_Variant>)
         return _data.seq().insert(it, n, val);
@@ -1191,31 +949,36 @@ LLBC_Variant::SeqIter LLBC_Variant::SeqInsert(SeqIter it, Seq::size_type n, cons
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqInsert(SeqIter it, SeqConstIter first, SeqConstIter last)
 {
-    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
+    if (UNLIKELY(!Is<Seq>()))
+        return Become<Seq>()._data.seq().end();
+
     return _data.seq().insert(it, first, last);
 }
 
 template <typename... _Tys>
 LLBC_Variant::SeqIter LLBC_Variant::SeqBatchInsert(SeqIter it, _Tys &&... vals)
 {
-    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
+    if (UNLIKELY(!Is<Seq>()))
+        return Become<Seq>()._data.seq().end();
+
     if constexpr (sizeof...(vals) == 0)
     {
         return it;
     }
     else
     {
-        const auto dist = std::distance(_data.seq().begin(), it);
-        (SeqInsert(it++, std::forward<_Tys>(vals)), ...);
+        const auto beginInsertPos = std::distance(_data.seq().begin(), it);
+        auto curInsertPos = beginInsertPos;
+        (SeqInsert(_data.seq().begin() + curInsertPos++, std::forward<_Tys>(vals)), ...);
 
-        return _data.seq().begin() + dist;
+        return _data.seq().begin() + beginInsertPos;
     }
 }
 
 inline void LLBC_Variant::SeqPopBack()
 {
     Become<Seq>();
-    if (LIKELY(!_data.seq().empty()))
+    if (!_data.seq().empty())
         _data.seq().pop_back();
 }
 
@@ -1237,25 +1000,29 @@ void LLBC_Variant::SeqResize(Seq::size_type newSize, const _Ty &val)
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqIter it)
 {
-    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
+    if (!Is<Seq>())
+        return Become<Seq>()._data.seq().end();
     return _data.seq().erase(it);
 }
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqConstIter it)
 {
-    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
+    if (!Is<Seq>())
+        return Become<Seq>()._data.seq().end();
     return _data.seq().erase(it);
 }
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqIter first, SeqIter last)
 {
-    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
+    if (!Is<Seq>())
+        return Become<Seq>()._data.seq().end();
     return _data.seq().erase(first, last);
 }
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqConstIter first, SeqConstIter last)
 {
-    llbc_assert(LIKELY(Is<Seq>()) && "Variant is not sequence type");
+    if (!Is<Seq>())
+        return Become<Seq>()._data.seq().end();
     return _data.seq().erase(first, last);
 }
 
@@ -1283,7 +1050,7 @@ size_t LLBC_Variant::SeqEraseIf(const _UnaryPred &pred,
         return 0;
     }
 
-    if (_data.seq().empty() || eraseCount == 0)
+    if (_data.seq().empty() || UNLIKELY(eraseCount == 0))
         return 0;
 
     size_t erasedCount = 0;
@@ -1403,17 +1170,28 @@ inline LLBC_Variant::DictIter LLBC_Variant::DictErase(DictIter first, DictIter l
 template <typename... _Keys>
 size_t LLBC_Variant::DictErase(const _Keys &... keys)
 {
-    if (UNLIKELY(!Is<Dict>()))
+    if constexpr (sizeof...(_Keys) == 0)
     {
-        Become<Dict>();
         return 0;
     }
+    else
+    {
+        if (UNLIKELY(!Is<Dict>()))
+        {
+            Become<Dict>();
+            return 0;
+        }
 
-    Become<Dict>();
-    return (... +
-            (std::is_same_v<_Keys, Dict::key_type> ?
-                _data.dict().erase(keys) :
-                    _data.dict().erase(Dict::key_type(keys))));
+        auto eraseOne = [this](const auto &key) -> size_t {
+            typedef std::remove_cv_t<std::remove_reference_t<decltype(key)>> _KeyTy;
+            if constexpr (std::is_same_v<_KeyTy, Dict::key_type>)
+                return _data.dict().erase(key);
+            else
+                return _data.dict().erase(Dict::key_type(key));
+        };
+
+        return (... + eraseOne(keys));
+    }
 }
 
 template <typename _Key>
@@ -1647,6 +1425,334 @@ inline LLBC_String LLBC_Variant::ToString() const
     return strRepr;
 }
 
+LLBC_FORCE_INLINE void LLBC_Variant::Reset(LLBC_VariantType::ENUM newType)
+{
+    ResetData();
+    _type = newType;
+}
+
+LLBC_FORCE_INLINE void LLBC_Variant::ResetData()
+{
+    if (_type == LLBC_VariantType::STR_DFT)
+        _data.obj.str.~Str();
+    else if (_type == LLBC_VariantType::SEQ_DFT)
+        _data.obj.seq.~Seq();
+    else if (_type == LLBC_VariantType::DICT_DFT)
+        _data.obj.dict.~Dict();
+
+    // Reset() is a internal method.
+    // llbc framework guarantee all caller will set new value after Reset() called,
+    //  so we only reset _data memory on debug mode.
+    #ifdef LLBC_DEBUG
+    _data.ui64() = 0;
+    #endif
+}
+
+template <typename _64Ty>
+_64Ty LLBC_Variant::AsSignedOrUnsigned64() const
+{
+    // Nil/Seq/Dict: return 0.
+    if (Is<void, Seq, Dict>())
+        return 0;
+
+    // Str: Try convert to _64Ty.
+    if (Is<Str>())
+    {
+        const Str &str = _data.str();
+        if (str.empty())
+            return 0;
+
+        int base = 10;
+        if (str.size() > 2)
+        {
+            size_t hexadecimalBegPos = str.find("0x");
+            if (hexadecimalBegPos == LLBC_String::npos)
+                hexadecimalBegPos = str.find("0X");
+
+            if (hexadecimalBegPos != LLBC_String::npos)
+                base = 16;
+        }
+
+        // TODO: Will optimize(erase str().strip() call) after LLBC_Num2Str<>() support "xxx  " format convert.
+        return LLBC_Str2Num<_64Ty>(str.strip().c_str(), base);
+    }
+
+    // Raw: Execute static_cast.
+    if (IsRaw())
+    {
+        if (Is<float, double>())
+        {
+            if (LLBC_IsFloatZero(_data.dbl()))
+                return 0;
+
+            return static_cast<_64Ty>(_data.dbl());
+        }
+
+        if constexpr (std::is_unsigned_v<_64Ty>)
+            return _data.ui64();
+        else
+            return _data.i64();
+    }
+
+    llbc_assert(false && "Unknown vaariant type");
+    return 0; 
+}
+
+template <typename _Ty, bool IsConstruct>
+LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromRaw(const _Ty &raw)
+{
+    if constexpr (IsConstruct)
+        _type = LLBC_VariantType::DeduceType<_Ty>();
+    else
+        Reset(LLBC_VariantType::DeduceType<_Ty>());
+
+    if constexpr (std::is_integral_v<_Ty>)
+    {
+        if constexpr (std::is_signed_v<_Ty>)
+            _data.i64() = raw;
+        else
+            _data.ui64() = raw;
+    }
+    else if constexpr (std::is_floating_point_v<_Ty>)
+    {
+        _data.dbl() = raw;
+    }
+    else if constexpr (std::is_null_pointer_v<_Ty>)
+    {
+        _data.ui64() = 0;
+    }
+    else if constexpr (std::is_pointer_v<_Ty>)
+    {
+        _data.ui64() = reinterpret_cast<std::uintptr_t>(raw);
+    }
+    else if constexpr (std::is_enum_v<_Ty>)
+    {
+        if constexpr (std::is_signed_v<std::underlying_type_t<_Ty>>)
+            _data.i64() = static_cast<sint64>(raw);
+        else
+            _data.ui64() = static_cast<uint64>(raw);
+    }
+    else
+    {
+        llbc_assert(false && "Set value from this RAW type is not supported!");
+        _data.ui64() = 0;
+    }
+}
+
+template <typename _Ty, bool IsConstruct>
+void LLBC_Variant::ConstructOrAssignFromStr(_Ty &&str)
+{
+    __LLBC_INL_Var_PureType(_Ty);
+
+    if constexpr (IsConstruct)
+        _type = LLBC_VariantType::DeduceType<_Ty>();
+    else
+        Become<Str>();
+
+    if constexpr ((std::is_array_v<_PureTy> &&
+                   std::is_same_v<std::remove_cv_t<std::remove_extent_t<_PureTy>>, char>) ||
+                  (std::is_pointer_v<_PureTy> &&
+                   std::is_same_v<std::remove_cv_t<std::remove_pointer_t<_PureTy>>, char>))
+    {
+        if constexpr (IsConstruct)
+            new (&_data.str()) Str(str);
+        else
+            _data.str().assign(str);
+    }
+    else if constexpr (std::is_same_v<_PureTy, std::string_view> ||
+                       std::is_same_v<_PureTy, LLBC_CString>)
+    {
+        if constexpr (IsConstruct)
+            new (&_data.str()) Str(str.data(), str.size());
+        else
+            _data.str().assign(str.data(), str.size());
+    }
+    else
+    {
+        if constexpr (IsConstruct)
+            new (&_data.str()) Str(std::forward<_Ty>(str));
+        else
+            _data.str() = std::forward<_Ty>(str);
+    }
+}
+
+template <typename _Ty, bool IsConstruct>
+LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
+{
+    __LLBC_INL_Var_PureType(_Ty);
+
+    if constexpr (IsConstruct)
+        _type = LLBC_VariantType::DeduceType<_Ty>();
+
+    if constexpr (std::is_same_v<_PureTy, Seq>)
+    {
+        if constexpr (IsConstruct)
+            new (&_data.seq()) Seq(std::forward<_Ty>(seq));
+        else
+            Become<Seq>()._data.seq() = std::forward<_Ty>(seq);
+    }
+    else if constexpr (LLBC_IsTemplSpec<_PureTy, std::pair>::value)
+    {
+        if constexpr (IsConstruct)
+        {
+            new (&_data.seq()) Seq();
+            _data.seq().reserve(2);
+        }
+        else
+        {
+            Become<Seq>()._data.seq().resize(2);
+        }
+    
+        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+        {
+            if constexpr (IsConstruct)
+            {
+                _data.seq().emplace_back(std::move(seq.first));
+                _data.seq().emplace_back(std::move(seq.second));
+            }
+            else
+            {
+                _data.seq()[0] = std::move(seq.first);
+                _data.seq()[1] = std::move(seq.second);
+            }
+        }
+        else
+        {
+            if constexpr (IsConstruct)
+            {
+                _data.seq().emplace_back(seq.first);
+                _data.seq().emplace_back(seq.second);
+            }
+            else
+            {
+                _data.seq().at(0) = seq.first;
+                _data.seq().at(1) = seq.second;
+            }
+        }
+    }
+    else
+    {
+        if constexpr (IsConstruct)
+            new (&_data.seq()) Seq();
+        else
+            Become<Seq>()._data.seq().clear();
+
+        if (seq.empty())
+            return;
+
+        if constexpr (IsConstruct)
+        {
+            _data.seq().reserve(seq.size());
+        }
+        else
+        {
+            if (_data.seq().capacity() < seq.size())
+                _data.seq().reserve(seq.size());
+        }
+
+        if constexpr (LLBC_IsTemplSpec<_PureTy, std::queue>::value)
+        {
+            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            {
+                class _MyMutableQueue : public _PureTy
+                {
+                public:
+                    auto begin() { return this->c.begin(); }
+                    auto end() { return this->c.end(); }
+
+                    void clear() { this->c.clear(); }
+                };
+
+                auto &myQueue = static_cast<_MyMutableQueue &>(seq);
+                for (auto it = myQueue.begin(); it != myQueue.end(); ++it)
+                    _data.seq().emplace_back(std::move(*it));
+                myQueue.clear();
+            }
+            else
+            {
+                class _MyImmutableQueue : public _PureTy
+                {
+                public:
+                    auto begin() const { return this->c.begin(); }
+                    auto end() const { return this->c.end(); }
+                };
+
+                const auto &myQueue = static_cast<const _MyImmutableQueue &>(seq);
+                for (auto it = myQueue.begin(); it != myQueue.end(); ++it)
+                    _data.seq().emplace_back(*it);
+            }
+        }
+        else if constexpr (LLBC_IsTemplSpec<_PureTy, std::set>::value ||
+                           LLBC_IsTemplSpec<_PureTy, std::unordered_set>::value)
+        {
+            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            {
+                do
+                {
+                    _data.seq().emplace_back(std::move(seq.extract(seq.begin()).value()));
+                } while (!seq.empty());
+            }
+            else
+            {
+                for (const auto &elem : seq)
+                    _data.seq().emplace_back(elem);
+            }
+        }
+        else
+        {
+            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            {
+                for (auto &&elem : seq)
+                    _data.seq().emplace_back(std::move(elem));
+                seq.clear();
+            }
+            else
+            {
+                for (const auto &elem : seq)
+                    _data.seq().emplace_back(elem);
+            }
+        }
+    }
+}
+
+template <typename _Ty, bool IsConstruct>
+LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromDict(_Ty &&dict)
+{
+    __LLBC_INL_Var_PureType(_Ty);
+
+    if constexpr (IsConstruct)
+        _type = LLBC_VariantType::DeduceType<_Ty>();
+
+    if constexpr (std::is_same_v<_PureTy, Dict>)
+    {
+        if constexpr (IsConstruct)
+            new (&_data.dict()) Dict(std::forward<_Ty>(dict));
+        else
+            Become<Dict>()._data.dict() = std::forward<_Ty>(dict);
+    }
+    else
+    {
+        if constexpr (IsConstruct)
+            new (&_data.dict()) Dict();
+        else
+            Become<Dict>()._data.dict().clear();
+
+        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+        {
+            while (!dict.empty())
+            {
+                auto nh = dict.extract(dict.begin());
+                _data.dict().emplace(std::move(nh.key()), std::move(nh.mapped()));
+            }
+        }
+        else
+        {
+            for (auto &[key, value] : dict)
+                _data.dict().emplace(key, value);
+        }
+    }
+}
+
 template <typename _Key>
 size_t LLBC_Variant::CountImpl(const _Key &key, bool returnIfFound) const
 {
@@ -1701,7 +1807,7 @@ size_t LLBC_Variant::CountImpl(const _Key &key, bool returnIfFound) const
         {
             size_t pos = 0;
             auto const &str = _data.str();
-            while (true)
+            while (pos < str.size())
             {
                 pos = str.find(subStrPtr, pos, subStrSize);
                 if (pos == Str::npos)
@@ -1743,76 +1849,56 @@ size_t LLBC_Variant::CountImpl(const _Key &key, bool returnIfFound) const
     }
 
     // Dict:
+    if (Is<Dict>())
+    {
+        if constexpr (!std::is_same_v<_Key, Dict::key_type>)
+            return _data.dict().count(Dict::key_type(key));
+        else
+            return _data.dict().count(key);
+    }
+
     llbc_assert(Is<Dict>() && "LLBC_Variant::CountImpl() internal error");
-    if constexpr (!std::is_same_v<_Key, Dict::mapped_type>)
-        return _data.dict().count(Dict::mapped_type(key));
-    else
-        return _data.dict().count(key);
+    return 0;
 }
 
-LLBC_FORCE_INLINE void LLBC_Variant::Reset(LLBC_VariantType::ENUM newType)
+template <typename _StrTy>
+const _StrTy &LLBC_Variant::GetEmptyStr()
 {
-    ResetData();
-    _type = newType;
+    __LLBC_INL_Var_PureType(_StrTy);
+    static const _PureTy emptyStr;
+    return emptyStr;
 }
 
-LLBC_FORCE_INLINE void LLBC_Variant::ResetData()
+template <typename _StrTy>
+const _StrTy &LLBC_Variant::GetTrueStr()
 {
-    if (_type == LLBC_VariantType::STR_DFT)
-        _data.obj.str.~Str();
-    else if (_type == LLBC_VariantType::SEQ_DFT)
-        _data.obj.seq.~Seq();
-    else if (_type == LLBC_VariantType::DICT_DFT)
-        _data.obj.dict.~Dict();
+    __LLBC_INL_Var_PureType(_StrTy);
+    static const _PureTy trueStr("true");
+    return trueStr;
 }
 
-template <typename _64Ty>
-_64Ty LLBC_Variant::AsSignedOrUnsigned64() const
+template <typename _StrTy>
+const _StrTy &LLBC_Variant::GetFalseStr()
 {
-    if (Is<void, Seq, Dict>())
-        return 0;
-
-    if (Is<Str>())
-    {
-        const Str &str = _data.str();
-        if (str.empty())
-            return 0;
-
-        int base = 10;
-        if (str.size() > 2)
-        {
-            size_t hexadecimalBegPos = str.find("0x");
-            if (hexadecimalBegPos == LLBC_String::npos)
-                hexadecimalBegPos = str.find("0X");
-
-            if (hexadecimalBegPos != LLBC_String::npos)
-                base = 16;
-        }
-
-        return LLBC_Str2Num<_64Ty>(str.c_str(), base);
-    }
-
-    if (Is<float, double>())
-    {
-        if (LLBC_IsFloatZero(_data.raw.dbl))
-            return 0;
-
-        return static_cast<_64Ty>(_data.dbl());
-    }
-
-    if constexpr (std::is_unsigned_v<_64Ty>)
-        return _data.ui64();
-    else
-        return _data.i64();
+    __LLBC_INL_Var_PureType(_StrTy);
+    static const _PureTy falseStr("false");
+    return falseStr;
 }
 
-template <typename _Key>
-LLBC_Variant::Dict::size_type LLBC_Variant::DictEraseOne(const _Key &key)
+template <typename _StrTy>
+const _StrTy &LLBC_Variant::GetEmptySeqStr()
 {
-    if constexpr (std::is_same_v<_Key, LLBC_Variant>)
-        return Become<Dict>()._data.dict().erase(key);
-    else
-        return DictEraseOne(LLBC_Variant(key));
+    __LLBC_INL_Var_PureType(_StrTy);
+    static const _PureTy emptySeqStr("[]");
+    return emptySeqStr;
+}
+
+template <typename _StrTy>
+const _StrTy &LLBC_Variant::GetEmptyDictStr()
+{
+    __LLBC_INL_Var_PureType(_StrTy);
+    static const _PureTy emptyDictStr("{}");
+    return emptyDictStr;
 }
 
 __LLBC_NS_END

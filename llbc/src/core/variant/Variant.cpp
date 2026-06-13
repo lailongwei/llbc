@@ -154,6 +154,9 @@ void LLBC_Variant::DestroyNumber2StrFastAccessTable()
 
 LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM type)
 {
+    if (UNLIKELY(!LLBC_VariantType::IsValid(type)))
+        return *this;
+
     if (_type != type)
     {
         Reset(type);
@@ -170,7 +173,7 @@ LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM type)
     return *this;
 }
 
-void LLBC_Variant::Clear()
+void LLBC_Variant::Clear() noexcept
 {
     if (Is<Str>())
         _data.str().clear();
@@ -178,11 +181,11 @@ void LLBC_Variant::Clear()
         _data.seq().clear();
     else if (Is<Dict>())
         _data.dict().clear();
-    else
+    else if (!Is<void>())
         _data.i64() = 0;
 }
 
-bool LLBC_Variant::IsEmpty() const
+bool LLBC_Variant::IsEmpty() const noexcept
 {
     if (Is<Str>())
         return _data.str().empty();
@@ -194,7 +197,7 @@ bool LLBC_Variant::IsEmpty() const
     return true;
 }
 
-size_t LLBC_Variant::Size() const
+size_t LLBC_Variant::Size() const noexcept
 {
     if (Is<Str>())
         return _data.str().size();
@@ -206,7 +209,7 @@ size_t LLBC_Variant::Size() const
     return 0;
 }
 
-size_t LLBC_Variant::Capacity() const
+size_t LLBC_Variant::Capacity() const noexcept
 {
     if (Is<Str>())
         return _data.str().capacity();
@@ -337,65 +340,6 @@ bool LLBC_Variant::Deserialize(LLBC_Stream &stream)
     }
     
     return false;
-}
-
-const LLBC_Variant::Str &LLBC_Variant::GetEmptyStr()
-{
-    static const Str emptyStr;
-    return emptyStr;
-}
-
-const LLBC_Variant::Str &LLBC_Variant::GetTrueStr()
-{
-    static const Str trueStr("true");
-    return trueStr;
-}
-
-const LLBC_Variant::Str &LLBC_Variant::GetFalseStr()
-{
-    static const Str falseStr("false");
-    return falseStr;
-}
-
-const LLBC_Variant::Str &LLBC_Variant::GetEmptySeqStr()
-{
-    static const Str emptySeqStr("[]");
-    return emptySeqStr;
-}
-
-const LLBC_Variant::Str &LLBC_Variant::GetEmptyDictStr()
-{
-    static const Str emptyDictStr("{}");
-    return emptyDictStr;
-}
-
-const std::string &LLBC_Variant::GetEmptySTLStr()
-{
-    static const std::string emptySTLStr;
-    return emptySTLStr;
-}
-
-const std::string &LLBC_Variant::GetTrueSTLStr()
-{
-    static const std::string trueSTLStr("true");
-    return trueSTLStr;
-}
-
-const std::string &LLBC_Variant::GetFalseSTLStr()
-{
-    static const std::string falseSTLStr("false");
-    return falseSTLStr;
-}
-
-const std::string &LLBC_Variant::GetEmptySTLSeqStr()
-{
-    static const std::string emptySTLSeqStr("[]");
-    return emptySTLSeqStr;
-}
-const std::string &LLBC_Variant::GetEmptySTLDictStr()
-{
-    static const std::string emptySTLDictStr("{}");
-    return emptySTLDictStr;
 }
 
 const LLBC_Variant::Seq &LLBC_Variant::GetEmptySeq()

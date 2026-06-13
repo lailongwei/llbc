@@ -26,157 +26,16 @@
 #include "llbc/core/variant/VariantArithmetic.h"
 #include "llbc/core/variant/VariantTraits.h"
 
-// Some file level internal macros define
-// The object type Variant assignment macro define.
-
-// The object type Variant equal compare macro define.
-#define __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(ty, varName) \
-    if (!right.Is<ty>())                              \
-        return false;                                 \
-    return lData.varName() == rData.varName()         \
-
 __LLBC_NS_BEGIN
 
 bool LLBC_VariantTraits::eq(const LLBC_Variant &left, const LLBC_Variant &right)
 {
-    if (&left == &right)
-        return true;
-
-    const auto &lData = left._data;
-    const auto &rData = right._data;
-    if (left.Is<LLBC_Variant::Str>()) // Str == Any
-    {
-        // Str == Non-Raw
-        if (!right.IsRaw())
-        {
-            __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(LLBC_Variant::Str, str);
-        }
-        else // Str == Raw
-        {
-            if (right.Is<float, double>())
-                return LLBC_IsFloatAlmostEqual(left.As<double>(), right.As<double>());
-            else if (right.IsUnsigned())
-                return left.As<uint64>() == right.As<uint64>();
-            else
-                return left.As<sint64>() == right.As<sint64>();
-        }
-    }
-    else if (left.Is<LLBC_Variant::Seq>()) // Seq == Any
-    {
-        __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(LLBC_Variant::Seq, seq);
-    }
-    else if (left.Is<LLBC_Variant::Dict>()) // Dict == Any
-    {
-        __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP(LLBC_Variant::Dict, dict);
-    }
-    else if (left.IsRaw()) // Raw == Any
-    {
-        if (!right.IsRaw() && !right.Is<LLBC_Variant::Str>()) // Raw == Non-Raw&&Non-Str
-            return false;
-
-        // Raw == Raw/Str
-        if (left.Is<float, double>() || right.Is<float, double>())
-            return LLBC_IsFloatAlmostEqual(left.As<double>(), right.As<double>());
-        else if (left.IsUnsigned() || right.IsUnsigned())
-            return left.As<uint64>() == right.As<uint64>();
-        else
-            return left.As<sint64>() == right.As<sint64>();
-    }
-
-    return (left.Is<void>() && right.Is<void>());
-}
-
-bool LLBC_VariantTraits::ne(const LLBC_Variant &left, const LLBC_Variant &right)
-{
-    return !LLBC_VariantTraits::eq(left, right);
+    return compare_impl<true>(left, right);
 }
 
 bool LLBC_VariantTraits::lt(const LLBC_Variant &left, const LLBC_Variant &right)
 {
-    if (&left == &right)
-        return false;
-
-    const auto &lData = left._data;
-    const auto &rData = right._data;
-    if (left.Is<LLBC_Variant::Dict>())
-    {
-        if (right.Is<LLBC_Variant::Dict>()) // Dict: exec compare
-            return lData.dict() < rData.dict();
-        else // Seq/Str/Raw/Nil: false
-            return false;
-    }
-    else if (left.Is<LLBC_Variant::Seq>())
-    {
-        if (right.Is<LLBC_Variant::Dict>()) // Seq<Dict: true
-            return true;
-        if (right.Is<LLBC_Variant::Seq>()) // Seq: exec compare
-            return lData.seq() < rData.seq();
-        else // Str/Raw/Nil: false
-            return false;
-    }
-    else if (left.Is<LLBC_Variant::Str>())
-    {
-        if (right.Is<LLBC_Variant::Dict>() || right.Is<LLBC_Variant::Seq>()) // Dict/Seq: true
-        {
-            return true;
-        }
-        else if (right.Is<LLBC_Variant::Str>()) // Str: exec compare
-        {
-            return lData.str() < rData.str();
-        }
-        else if (right.IsRaw()) // Raw: exec compare(convert to raw)
-        {
-            if (right.Is<float, double>())
-                return left.As<double>() < right.As<double>();
-            else if (right.IsUnsigned())
-                return left.As<uint64>() < right.As<uint64>();
-            else
-                return left.As<sint64>() < right.As<sint64>();
-        }
-        else // Nil: false
-        {
-            return false;
-        }
-    }
-    else if (left.IsRaw())
-    {
-        if (right.Is<LLBC_Variant::Dict>() || right.Is<LLBC_Variant::Seq>()) // Dict/Seq: true
-        {
-            return true;
-        }
-        else if (right.Is<LLBC_Variant::Str>() || right.IsRaw()) // Str/Raw: exec compare
-        {
-            if (left.Is<float, double>() || right.Is<float, double>())
-                return left.As<double>() < right.As<double>();
-            else if (left.IsUnsigned() || right.IsUnsigned())
-                return left.As<uint64>() < right.As<uint64>();
-            else
-                return left.As<sint64>() < right.As<sint64>();
-        }
-        else // Nil: false
-        {
-            return false;
-        }
-    }
-    else
-    {
-        return !right.Is<void>();
-    }
-}
-
-bool LLBC_VariantTraits::gt(const LLBC_Variant &left, const LLBC_Variant &right)
-{
-    return right < left;
-}
-
-bool LLBC_VariantTraits::le(const LLBC_Variant &left, const LLBC_Variant &right)
-{
-    return !(right < left);
-}
-
-bool LLBC_VariantTraits::ge(const LLBC_Variant &left, const LLBC_Variant &right)
-{
-    return !(left < right);
+    return compare_impl<false>(left, right);
 }
 
 LLBC_Variant LLBC_VariantTraits::add(const LLBC_Variant &left, const LLBC_Variant &right)
@@ -226,12 +85,9 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
     }
 
     // Left is Nil rules:
-    // > Left[Nil] + Right[Any] = Right
+    // > Left[Nil] + Right[Any] = Left
     if (left.Is<void>())
-    {
-        left = right;
         return;
-    }
 
     // Left is Dict rules:
     // > Left[Dict] + Right[Dict] = Dict[Left join Right]
@@ -294,22 +150,10 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
     if (left.Is<LLBC_Variant::Str>())
     {
         auto &lStr = left._data.str();
-        if (right.Is<LLBC_Variant::Dict>() || right.Is<LLBC_Variant::Seq>())
-        {
-            return;
-        }
-        else if (right.Is<LLBC_Variant::Str>())
-        {
-            const auto &rStr = right._data.str();
-            if (rStr.empty())
-                return;
-
-            lStr.append(rStr);
-        }
-        else
-        {
+        if (right.Is<LLBC_Variant::Str>())
+            lStr.append(right._data.str());
+        else if (!right.Is<LLBC_Variant::Dict, LLBC_Variant::Seq>())
             lStr.append(right.As<LLBC_Variant::Str>());
-        }
 
         return;
     }
@@ -321,18 +165,14 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
     if (left.IsRaw())
     {
         if (right.Is<LLBC_Variant::Str>())
-        {
-            left = left.As<LLBC_Variant::Str>();
-            add_equal(left, right);
-            return;
-        }
+            add_equal(left = left.As<LLBC_Variant::Str>(), right);
         else if (right.IsRaw())
-        {
             LLBC_VariantArithmetic::Performs(left, right, LLBC_VariantArithmetic::VT_ARITHMETIC_ADD);
-        }
 
         return;
     }
+        
+    llbc_assert(false && "Left variant type is invalid");
 }
 
 void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right)
@@ -363,23 +203,19 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
         if (right.Is<LLBC_Variant::Dict>())
         {
             const auto &rDict = right._data.dict();
-            if (rDict.empty())
-                return;
-
-            const auto rEndIt = rDict.end();
-            for (auto rIt = rDict.begin(); rIt != rEndIt; ++rIt)
-                lDict.erase(rIt->first);
+            for (auto &[key, _] : rDict)
+            {
+                lDict.erase(key);
+                if (lDict.empty())
+                    return;
+            }
         }
         else if (right.Is<LLBC_Variant::Seq>())
         {
             const auto &rSeq = right._data.seq();
-            if (rSeq.empty())
-                return;
-
-            const auto rEndIt = rSeq.end();
-            for (auto rIt = rSeq.begin(); rIt != rEndIt; ++rIt)
+            for (auto &elem : rSeq)
             {
-                lDict.erase(*rIt);
+                lDict.erase(elem);
                 if (lDict.empty())
                     return;
             }
@@ -405,38 +241,38 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
         if (right.Is<LLBC_Variant::Dict>())
         {
             const auto &rDict = right._data.dict();
-            if (rDict.empty())
-                return;
-
-            const auto rEndIt = rDict.end();
-            for (auto rIt = rDict.begin(); rIt != rEndIt; ++rIt)
+            for (auto rIt = rDict.begin(); rIt != rDict.end(); ++rIt)
             {
-                lSeq.erase(std::remove_if(lSeq.begin(), lSeq.end(),
-                            [&rIt](const LLBC_Variant &elem) { return elem == rIt->first; }), lSeq.end());
+                lSeq.erase(
+                    std::remove_if(
+                        lSeq.begin(),
+                        lSeq.end(),
+                        [&rIt](const LLBC_Variant &elem) { return elem == rIt->first; }), lSeq.end());
                 if (lSeq.empty())
                     return;
             }
         }
         else if (right.Is<LLBC_Variant::Seq>())
         {
-
             const auto &rSeq = right._data.seq();
-            if (rSeq.empty())
-                return;
-
-            auto rItEnd = rSeq.end();
-            for (auto rIt = rSeq.begin(); rIt != rItEnd; ++rIt)
+            for (auto &rElem : rSeq)
             {
-                lSeq.erase(std::remove_if(lSeq.begin(), lSeq.end(),
-                            [&rIt](const LLBC_Variant &elem) { return elem == *rIt; }), lSeq.end());
+                lSeq.erase(
+                    std::remove_if(
+                        lSeq.begin(),
+                        lSeq.end(),
+                        [&rElem](const LLBC_Variant &lElem) { return lElem == rElem; }), lSeq.end());
                 if (lSeq.empty())
                     return;
             }
         }
         else
         {
-            lSeq.erase(std::remove_if(lSeq.begin(), lSeq.end(),
-                        [&right](const LLBC_Variant &elem) { return elem == right; }), lSeq.end());
+            lSeq.erase(
+                std::remove_if(
+                    lSeq.begin(),
+                    lSeq.end(),
+                    [&right](const LLBC_Variant &elem) { return elem == right; }), lSeq.end());
         }
 
         return;
@@ -462,7 +298,7 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
             while (pos != LLBC_Variant::Str::npos)
             {
                 lStr.erase(pos, rStr.size());
-                pos = lStr.find(rStr);
+                pos = lStr.find(rStr, pos);
             }
         }
         else if (right.IsRaw())
@@ -480,17 +316,14 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
     if (left.IsRaw())
     {
         if (right.Is<LLBC_Variant::Str>())
-        {
-            left = left.As<LLBC_Variant::Str>();
-            sub_equal(left, right);
-        }
+            sub_equal(left = left.As<LLBC_Variant::Str>(), right);
         else if (right.IsRaw())
-        {
             LLBC_VariantArithmetic::Performs(left, right, LLBC_VariantArithmetic::VT_ARITHMETIC_SUB);
-        }
 
         return;
     }
+
+    llbc_assert(false && "Left variant type is invalid");
 }
 
 void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right)
@@ -521,7 +354,7 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
         if (lDict.empty())
             return;
 
-        if (right.Is<LLBC_Variant::Seq>() || right.Is<LLBC_Variant::Dict>())
+        if (right.Is<LLBC_Variant::Dict, LLBC_Variant::Seq>())
         {
             if (right.IsEmpty())
             {
@@ -531,8 +364,10 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
 
             for (auto lIt = lDict.begin(); lIt != lDict.end(); )
             {
-                if ((right.Is<LLBC_Variant::Dict>() && right.DictFind(lIt->first) == right.DictEnd()) ||
-                    (right.Is<LLBC_Variant::Seq>() && std::find(right.SeqBegin(), right.SeqEnd(), lIt->first) == right.SeqEnd()))
+                if ((right.Is<LLBC_Variant::Dict>() &&
+                     right.DictFind(lIt->first) == right.DictEnd()) ||
+                    (right.Is<LLBC_Variant::Seq>() &&
+                     std::find(right.SeqBegin(), right.SeqEnd(), lIt->first) == right.SeqEnd()))
                     lDict.erase(lIt++);
                 else
                     ++lIt;
@@ -546,13 +381,13 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
     // > Left[Seq] * Right[Dict/Seq] = Intersection On Left and Right
     // > Left[Seq] * Right[Str] = Left
     // > Left[Seq] * Right[Raw] = Left[Seq] repeat right.As<sint32>() times
-    else if (left.Is<LLBC_Variant::Seq>())
+    if (left.Is<LLBC_Variant::Seq>())
     {
         auto &lSeq = left._data.seq();
         if (lSeq.empty())
             return;
 
-        if (right.Is<LLBC_Variant::Seq>() || right.Is<LLBC_Variant::Dict>())
+        if (right.Is<LLBC_Variant::Dict, LLBC_Variant::Seq>())
         {
             if (right.IsEmpty())
             {
@@ -570,7 +405,7 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
         }
         else if (right.IsRaw())
         {
-            sint32 rRaw = right.As<sint32>();
+            sint64 rRaw = right.As<sint64>();
             if (rRaw <= 0)
             {
                 lSeq.clear();
@@ -597,7 +432,8 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
     // > Left[Str] * Right[Dict/Seq] = Left[Str]
     // > Left[Str] * Right[Str] = Left[Str]
     // > Left[Str] * Right[Raw] = Left[Str] repeat Right.As<sint32>() times
-    else if (left.Is<LLBC_Variant::Str>())
+    // > Left[Str] * Right[Nil] = Left[Str]
+    if (left.Is<LLBC_Variant::Str>())
     {
         if (right.IsRaw())
         {
@@ -612,17 +448,17 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
     }
 
     // Left is Raw rules:
-    // > Left[Raw] * Right[Dict/Seq/Str] = Left[Raw]
+    // > Left[Raw] * Right[Dict/Seq/Str/Nil] = Left[Raw]
     // > Left[Raw] * Right[Raw] = Left[left raw * right raw]
-    else if (left.IsRaw())
+    if (left.IsRaw())
     {
         if (right.IsRaw())
-        {
             LLBC_VariantArithmetic::Performs(left, right, LLBC_VariantArithmetic::VT_ARITHMETIC_MUL);
-        }
 
         return;
     }
+
+    llbc_assert(false && "Left variant type is invalid");
 }
 
 void LLBC_VariantTraits::div_equal(LLBC_Variant &left, const LLBC_Variant &right)
@@ -677,6 +513,93 @@ void LLBC_VariantTraits::mod_equal(LLBC_Variant &left, const LLBC_Variant &right
     LLBC_VariantArithmetic::Performs(left, right, LLBC_VariantArithmetic::VT_ARITHMETIC_MOD);
 }
 
-__LLBC_NS_END
+template <bool _ExecEq>
+LLBC_FORCE_INLINE
+bool LLBC_VariantTraits::compare_impl(const LLBC_Variant &left, const LLBC_Variant &right)
+{
+    // left and right is same object.
+    if (&left == &right)
+        return _ExecEq ? true : false;
 
-#undef __LLBC_INL_OBJ_TYPE_VARS_EQ_COMP
+    // left first type and right first type is different.
+    const auto lFirstType = left.GetFirstType();
+    const auto rFirstType = right.GetFirstType();
+    if constexpr (_ExecEq)
+    {
+        if (lFirstType != rFirstType)
+            return false;
+    }
+    else
+    {
+        if (lFirstType < rFirstType)
+            return true;
+        else if (lFirstType > rFirstType)
+            return false;
+    }
+
+    // left first type and right first type is same.
+    if (lFirstType == LLBC_VariantType::NIL) // Nil ==/< Nil ?
+    {
+        return _ExecEq ? true : false;
+    }
+    else if (lFirstType == LLBC_VariantType::RAW) // Raw ==/< Raw ?
+    {
+        return raw_compare<_ExecEq>(left, right);
+    }
+    else if (lFirstType == LLBC_VariantType::STR) // Str ==/< Str ?
+    {
+        if constexpr (_ExecEq)
+            return left._data.str() == right._data.str();
+        else
+            return left._data.str() < right._data.str();
+    }
+    else if (lFirstType == LLBC_VariantType::SEQ) // Seq ==/< Seq ?
+    {
+        if constexpr (_ExecEq)
+            return left._data.seq() == right._data.seq();
+        else
+            return left._data.seq() < right._data.seq();
+    }
+    else if (lFirstType == LLBC_VariantType::DICT) // DICT ==/< DICT ?
+    {
+        if constexpr (_ExecEq)
+            return left._data.dict() == right._data.dict();
+        else
+            return left._data.dict() < right._data.dict();
+    }
+    else
+    {
+        llbc_assert(false && "Invalid variant type");
+        return false;
+    }
+}
+
+template <bool _ExecEq>
+LLBC_FORCE_INLINE
+bool LLBC_VariantTraits::raw_compare(const LLBC_Variant &left, const LLBC_Variant &right)
+{
+    if (left.Is<double, float>() || right.Is<double, float>())
+    {
+        if constexpr (_ExecEq)
+            return LLBC_IsFloatAlmostEqual(left.As<double>(), right.As<double>());
+        else
+            return left.As<double>() < right.As<double>();
+    }
+
+    if (left.IsUnsigned() || right.IsUnsigned())
+    {
+        if constexpr (_ExecEq)
+            return left.As<uint64>() == right.As<uint64>();
+        else
+            return left.As<uint64>() < right.As<uint64>();
+    }
+    else
+    {
+        if constexpr (_ExecEq)
+            return left.As<sint64>() == right.As<sint64>();
+        else
+            return left.As<sint64>() < right.As<sint64>();
+    }
+}
+
+__LLBC_NS_END

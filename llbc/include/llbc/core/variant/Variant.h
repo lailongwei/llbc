@@ -190,6 +190,18 @@ public:
     template <typename _Ty>
     static constexpr ENUM DeduceType();
 
+    /**
+     * Deduce variant class.
+     */
+    struct DeduceClass
+    {
+        template <ENUM _TypeEnum>
+        struct Get
+        {
+            typedef void Class;
+        };
+    };
+
 public:
     /**
      * Get first type.
@@ -252,6 +264,7 @@ public:
     template <typename _Ty>
     static constexpr bool IsDict();
 
+public:
     /**
      * Get type string representation.
      * @param[in] type - the variant type enumeration.
@@ -437,8 +450,15 @@ public:
 public:
     // Explicit value fetch.
     template <typename _Ty>
-    std::enable_if_t<LLBC_VariantType::IsNil<_Ty>(), const LLBC_Variant &>
-    As() const;
+    std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<_Ty>>, LLBC_Variant>,
+                     const LLBC_Variant &>
+    As() const { return *this; }
+
+    template <typename _Ty>
+    std::enable_if_t<LLBC_VariantType::IsNil<_Ty>() &&
+                        !std::is_same_v<std::remove_cv_t<std::remove_reference_t<_Ty>>, LLBC_Variant>,
+                     const LLBC_Variant &>
+    As() const {return nil; }
 
     template <typename _Ty>
     std::enable_if_t<!std::is_reference_v<_Ty> && LLBC_VariantType::IsRaw<_Ty>(), _Ty>
@@ -455,14 +475,14 @@ public:
                         (std::is_same_v<std::remove_cv_t<_Ty>, std::string_view> ||
                          std::is_same_v<std::remove_cv_t<_Ty>, LLBC_CString>),
                       _Ty>
-    As() const;
+    As() const; // Lifetime: The returned view is valid only while the source variant is not mutated.
     template <typename _Ty>
     std::enable_if_t<!std::is_reference_v<_Ty> &&
                         LLBC_VariantType::IsStr<_Ty>() &&
                         (std::is_pointer_v<_Ty> &&
                          std::is_same_v<std::remove_cv_t<std::remove_pointer_t<_Ty>>, char>),
                      _Ty>
-    As(size_t *strLen = nullptr) const;
+    As(size_t *strLen = nullptr) const; // Lifetime: The returned ptr is valid only while the source variant is not mutated.
 
     template <typename _Ty>
     std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<_Ty>>, LLBC_Variant::Seq>,
@@ -496,11 +516,11 @@ public:
 public:
     // Common operation method: Clear().
     // - For NIL: no effect.
-    // - For RAW: reset data to RawType().
+    // - For RAW: set data.raw.i64 to 0.
     // - For STR: clear string(Str::clear()).
     // - For SEQ: clear sequence(Seq::clear()).
     // - For DICT: clear dictionary(Dict::clear()).
-    void Clear();
+    void Clear() noexcept;
 
     // Common operation method: IsEmpty().
     // - For NIL: always return true.
@@ -508,7 +528,7 @@ public:
     // - For STR: return true if string is empty, otherwise return false(not empty).
     // - For SEQ: return true if sequence is empty, otherwise return false(not empty).
     // - For DICT: return true if dictionary is empty, otherwise return false(not empty).
-    bool IsEmpty() const;
+    bool IsEmpty() const noexcept;
 
     // Common operation method: Size().
     // - For NIL: always return 0.
@@ -516,15 +536,15 @@ public:
     // - For STR: return string size.
     // - For SEQ: return sequence size.
     // - For DICT: return dictionary size.
-    size_t Size() const;
+    size_t Size() const noexcept;
 
     // Common operation method: Capacity().
     // - For NIL: always return 0.
     // - For RAW: always reutrn 0.
     // - For STR: return string capacity.
     // - For SEQ: return sequence capacity.
-    // - For DICT: return dictionary size(same with Size() method).
-    size_t Capacity() const;
+    // - For DICT: return size() for compatibility.
+    size_t Capacity() const noexcept;
 
     // Common operatin method: Count().
     // For NIL: always return 0.
@@ -533,7 +553,7 @@ public:
     // For SEQ: return matched element count.
     // For DICT: return 1 if found, otherwise reutrn 0.
     template <typename _Key>
-    size_t Count(const _Key &key) const { return CountImpl(key, false); }
+    size_t Count(const _Key &key) const noexcept { return CountImpl(key, false); }
 
     // Common operation method: Contains().
     // For NIL: always return false.
@@ -542,12 +562,12 @@ public:
     // For SEQ: return true if found in SEQ, otherwise return false.
     // For DIT: return true if found, otherwise return false.
     template <typename _Key>
-    bool Contains(const _Key &key) const {return CountImpl(key, true) >= 1; }
+    bool Contains(const _Key &key) const noexcept {return CountImpl(key, true) > 0; }
 
 public:
     // Str type variant object specify Operate methods.
     void StrResize(Str::size_type newSize, Str::value_type ch = Str::value_type());
-    void StrReserve(Str::size_type newCap);
+    void StrReserve(Str::size_type newCap) { Become<Str>()._data.str().reserve(newCap); }
 
 public:
     // Sequence type variant object specify Operate methods.
@@ -691,28 +711,34 @@ private:
     friend class LLBC_VariantTraits;
     friend class ::std::hash<LLBC_Variant>;
 
-    template <typename _Key>
-    size_t CountImpl(const _Key &key, bool returnIfFound) const;
-
     void Reset(LLBC_VariantType::ENUM newType);
     void ResetData();
 
     template <typename _64Ty>
     _64Ty AsSignedOrUnsigned64() const;
 
-    template <typename _Key>
-    Dict::size_type DictEraseOne(const _Key &key);
+    template <typename _Ty, bool IsConstruct>
+    void ConstructOrAssignFromRaw(const _Ty &raw);
+    template <typename _Ty, bool IsConstruct>
+    void ConstructOrAssignFromStr(_Ty &&str);
+    template <typename _Ty, bool IsConstruct>
+    void ConstructOrAssignFromSeq(_Ty &&seq);
+    template <typename _Ty, bool IsConstruct>
+    void ConstructOrAssignFromDict(_Ty &&dict);
 
-    static const Str &GetEmptyStr();
-    static const Str &GetTrueStr();
-    static const Str &GetFalseStr();
-    static const Str &GetEmptySeqStr();
-    static const Str &GetEmptyDictStr();
-    static const std::string &GetEmptySTLStr();
-    static const std::string &GetTrueSTLStr();
-    static const std::string &GetFalseSTLStr();
-    static const std::string &GetEmptySTLSeqStr();
-    static const std::string &GetEmptySTLDictStr();
+    template <typename _Key>
+    size_t CountImpl(const _Key &key, bool returnIfFound) const;
+
+    template <typename _StrTy>
+    static const _StrTy &GetEmptyStr();
+    template <typename _StrTy>
+    static const _StrTy &GetTrueStr();
+    template <typename _StrTy>
+    static const _StrTy &GetFalseStr();
+    template <typename _StrTy>
+    static const _StrTy &GetEmptySeqStr();
+    template <typename _StrTy>
+    static const _StrTy &GetEmptyDictStr();
 
     static const Seq &GetEmptySeq();
     static const Dict &GetEmptyDict();

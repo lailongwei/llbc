@@ -190,5 +190,12 @@ public:
 
 public:
     int SeqSpecificTest();
+
     int DictSpecificTest();
+    int DictSpecificTest_Insert();
+    template <typename _KeyTy, typename _ValTy>
+    int DictSpecificTest_InsertOne(LLBC_Variant &var, const _KeyTy &key, const _ValTy &val, bool expectSucc);
+    int DictSpecificTest_Erase();
+    template <typename _KeyTy>
+    int DictSpecificTest_EraseOne(LLBC_Variant &var, const _KeyTy &key, bool expectSucc);
 };
