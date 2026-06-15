@@ -198,4 +198,28 @@ public:
     int DictSpecificTest_Erase();
     template <typename _KeyTy>
     int DictSpecificTest_EraseOne(LLBC_Variant &var, const _KeyTy &key, bool expectSucc);
+
+public:
+    int SubscriptOperatorTest();
+    int SubscriptOperatorTest_Seq();
+    int SubscriptOperatorTest_Dict();
+
+public:
+    int RelationalOperatorTest();
+
+    void RelationalOperatorTest_GenTestDatas_DiffType(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas);
+
+    void RelationalOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testData);
+    void RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testData);
+    void RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testData);
+    void RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testData);
+    void RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testData);
+
+    int RelationOperatorTest_ExceptCheck(LLBC_Variant &testData);
 };

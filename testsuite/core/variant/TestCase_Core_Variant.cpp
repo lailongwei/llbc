@@ -58,6 +58,8 @@ int TestCase_Core_Variant::Run(int argc, char *argv[])
     LLBC_Expect(CountAndContainsTest() == LLBC_OK);
     LLBC_Expect(SeqSpecificTest() == LLBC_OK);
     LLBC_Expect(DictSpecificTest() == LLBC_OK);
+    LLBC_Expect(SubscriptOperatorTest() == LLBC_OK);
+    LLBC_Expect(RelationalOperatorTest() == LLBC_OK);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -3876,6 +3878,440 @@ int TestCase_Core_Variant::DictSpecificTest_EraseOne(LLBC_Variant &var, const _K
     LLBC_Expect(eraseCount == (expectSucc ? 1 : 0) &&
                 var.Size() == (expectSucc ? beforeEraseSize - 1 : beforeEraseSize) &&
                 var.DictFind(key) == var.DictEnd());
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::SubscriptOperatorTest()
+{
+    LLBC_PrintLn("- SubscriptOperatorTest:");
+
+    LLBC_Expect(SubscriptOperatorTest_Seq() == LLBC_OK);
+    LLBC_Expect(SubscriptOperatorTest_Dict() == LLBC_OK);
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::SubscriptOperatorTest_Seq()
+{
+    LLBC_PrintLn(" - ubscriptOperatorTest_Seq:");
+
+    // Push test elements.
+    LLBC_Variant var;
+    var.SeqPushBack(LLBC_Variant::nil);
+    var.SeqPushBack(false);
+    var.SeqPushBack(true);
+    var.SeqPushBack(static_cast<sint8>(-8));
+    var.SeqPushBack(static_cast<uint8>(8));
+    var.SeqPushBack(static_cast<sint16>(-16));
+    var.SeqPushBack(static_cast<uint16>(16));
+    var.SeqPushBack(static_cast<sint32>(-32));
+    var.SeqPushBack(static_cast<uint32>(32));
+    var.SeqPushBack(static_cast<long>(-48));
+    var.SeqPushBack(static_cast<ulong>(48));
+    var.SeqBatchPushBack(static_cast<sint64>(-64),
+                         static_cast<uint64>(64),
+                         3.14f,
+                         0.618,
+                         "",
+                         "Hello World",
+                         std::vector<int>{1, 2, 3},
+                         std::map<int, std::string>{{1, "one"}, {2, "two"}});
+
+    // Check pushed elements.
+    LLBC_Expect(var.Size() == 19 &&
+                var[0] == LLBC_Variant::nil &&
+                var[1] == false &&
+                var[2] == true &&
+                var[3].Is<sint8>() && var[3] == -8 &&
+                var[4].Is<uint8>() && var[4] == 8 &&
+                var[5].Is<sint16>() && var[5] == -16 &&
+                var[6].Is<uint16>() && var[6] == 16 &&
+                var[7].Is<sint32>() && var[7] == -32 &&
+                var[8].Is<uint32>() && var[8] == 32 &&
+                var[9].Is<long>() && var[9] == -48 &&
+                var[10].Is<ulong>() && var[10] == 48 &&
+                var[11].Is<sint64>() && var[11] == -64 &&
+                var[12].Is<uint64>() && var[12] == 64 &&
+                var[13].Is<float>() && var[13] == 3.14f &&
+                var[14].Is<double>() && var[14] == 0.618 &&
+                var[15].Is<std::string>() && var[15] == "" &&
+                var[16].Is<LLBC_String>() && var[16] == "Hello World" &&
+                (var[17].Is<LLBC_Variant::Seq>() && var[17] == std::vector<int>{1, 2, 3}) &&
+                (var[18].Is<LLBC_Variant::Dict>() && var[18] == std::map<int, std::string>{{1, "one"}, {2, "two"}}));
+
+    // Update specific element value(test sequence auto resize ability).
+    var[100] = "Hello World";
+    LLBC_Expect(var.Size() == 101 && var[100] == "Hello World");
+
+    // Update specific element value.
+    var[2] = false;
+    LLBC_Expect(var.Size() == 101 && var[2] == false);
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::SubscriptOperatorTest_Dict()
+{
+    LLBC_PrintLn(" - SubscriptOperatorTest_Dict:");
+
+    // Insert test elements.
+    LLBC_Variant var;
+    var.DictInsert(LLBC_Variant::nil, "nil");
+    var.DictInsert(false, "false");
+    var.DictInsert(true, "true");
+    var.DictInsert(static_cast<sint8>(-8), "sint8");
+    var.DictInsert(static_cast<uint8>(8), "uint8");
+    var.DictInsert(static_cast<sint16>(-16), "sint16");
+    var.DictInsert(static_cast<uint16>(16), "uint16");
+    var.DictInsert(static_cast<sint32>(-32), "sint32");
+    var.DictInsert(static_cast<uint32>(32), "uint32");
+    var.DictInsert(static_cast<long>(-48), "long");
+    var.DictInsert(static_cast<ulong>(48), "ulong");
+    var.DictInsert(static_cast<sint64>(-64), "sint64");
+    var.DictInsert(static_cast<uint64>(64), "uint64");
+    var.DictInsert(3.14f, "float");
+    var.DictInsert(0.618, "double");
+    var.DictInsert("", "Empty String");
+    var.DictInsert("Hello World", "Non-Empty String");
+    var.DictInsert(std::vector<int>{1, 2, 3}, "Seq[1, 2, 3]");
+    var.DictInsert(std::map<int, LLBC_String>{{1, "1"}, {2, "2"}, {3, "3"}}, R"(Dict{{1, "1"}, {2, "2"}, {3, "3"}})");
+
+    // Check inserted elements.
+    LLBC_Expect(var.Size() == 19 &&
+                var[LLBC_Variant::nil] == "nil" &&
+                var[false] == "false" &&
+                var[true] == "true" &&
+                var[static_cast<sint8>(-8)] == "sint8" &&
+                var[static_cast<uint8>(8)] == "uint8" &&
+                var[static_cast<sint16>(-16)] == "sint16" &&
+                var[static_cast<uint16>(16)] == "uint16" &&
+                var[static_cast<sint32>(-32)] == "sint32" &&
+                var[static_cast<uint32>(32)] == "uint32" &&
+                var[static_cast<long>(-48)] == "long" &&
+                var[static_cast<ulong>(48)] == "ulong" &&
+                var[static_cast<sint64>(-64)] == "sint64" &&
+                var[static_cast<uint64>(64)] == "uint64" &&
+                var[3.14f] == "float" &&
+                var[0.618] == "double" &&
+                var[""] == "Empty String" &&
+                var["Hello World"] == "Non-Empty String" &&
+                (var[std::vector<int>{1, 2, 3}] == "Seq[1, 2, 3]") &&
+                (var[std::map<int, LLBC_String>{{1, "1"}, {2, "2"}, {3, "3"}}] == R"(Dict{{1, "1"}, {2, "2"}, {3, "3"}})"));
+
+    // Update specific element value.
+    var[false] = "false new value";
+    LLBC_Expect(var.Size() == 19 &&
+                var[false] == "false new value");
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::RelationalOperatorTest()
+{
+    LLBC_PrintLn("- RelationalOperatorTest:");
+
+    LLBC_Variant testDatas;
+    RelationalOperatorTest_GenTestDatas_SameType(testDatas);
+    RelationalOperatorTest_GenTestDatas_DiffType(testDatas);
+    
+    for (auto it = testDatas.SeqBegin(); it != testDatas.SeqEnd(); ++it)
+        LLBC_Expect(RelationOperatorTest_ExceptCheck(*it) == LLBC_OK);
+
+    return LLBC_OK;
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType(LLBC_Variant &testDatas)
+{
+    RelationalOperatorTest_GenTestDatas_DiffType_NilVsOthers(testDatas);
+    RelationalOperatorTest_GenTestDatas_DiffType_RawVsOthers(testDatas);
+    RelationalOperatorTest_GenTestDatas_DiffType_StrVsOthers(testDatas);
+    RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOthers(testDatas);
+    RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(testDatas);
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas)
+{
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // nil vs other types.
+    const size_t beginPos1 = testDatas.Size();
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
+                          LLBC_Variant(1),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
+                          LLBC_Variant(1.5),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
+                          LLBC_Variant(""),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
+                          LLBC_Variant("Non-Empty Str Data"),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
+                          LLBC_Variant(std::vector<int>{}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
+                          LLBC_Variant(std::vector<int>{1, 2, 3}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
+                          LLBC_Variant(std::map<int, std::string>{}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
+                          LLBC_Variant(std::map<int, std::string>{{1, "1"}, {2, "2"}, {3, "3"}}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+
+    // other types vs nil.
+    const size_t beginPos2 = testDatas.Size();
+    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
+    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
+    {
+        auto &testData = testDatas[i];
+        std::swap(testData[0], testData[1]);
+        testData[3] = !testData[3];
+    }
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas)
+{
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // raw vs other types.
+    const size_t beginPos1 = testDatas.Size();
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
+                          LLBC_Variant::nil,
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
+                          LLBC_Variant(""),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
+                          LLBC_Variant("Non-Empty Str Data"),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
+                          LLBC_Variant(std::list<int>{}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
+                          LLBC_Variant(std::list<int>{1, 2, 3}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
+                          LLBC_Variant(std::map<int, LLBC_String>{}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
+                          LLBC_Variant(std::map<int, LLBC_String>{{1, "1"}, {2, "2"}, {3, "3"}}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+
+    // other types vs raw.
+    const size_t beginPos2 = testDatas.Size();
+    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
+    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
+    {
+        auto &testData = testDatas[i];
+        std::swap(testData[0], testData[1]);
+        testData[3] = !testData[3];
+    }
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas)
+{
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // str vs other types.
+    const size_t beginPos1 = testDatas.Size();
+    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
+                               LLBC_Variant::nil,
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
+                               LLBC_Variant(1),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
+                               LLBC_Variant(std::vector<int>{}),
+                               LLBC_Variant(false),
+                               LLBC_Variant(true));
+    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
+                               LLBC_Variant(std::vector<int>{1, 2, 3}),
+                               LLBC_Variant(false),
+                               LLBC_Variant(true));
+    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
+                               LLBC_Variant(std::map<int, LLBC_String>{}),
+                               LLBC_Variant(false),
+                               LLBC_Variant(true));
+    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
+                               LLBC_Variant(std::map<int, LLBC_String>{{1, "1"}, {2, "2"}, {3, "3"}}),
+                               LLBC_Variant(false),
+                               LLBC_Variant(true));
+
+    // other types vs str.
+    const size_t beginPos2 = testDatas.Size();
+    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
+    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
+    {
+        auto &testData = testDatas[i];
+        std::swap(testData[0], testData[1]);
+        testData[3] = !testData[3];
+    }
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas)
+{
+
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // seq vs other types.
+    const size_t beginPos1 = testDatas.Size();
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
+                               LLBC_Variant::nil,
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
+                               LLBC_Variant(0),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
+                               LLBC_Variant(""),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
+                               LLBC_Variant("Non-Empty Str Data"),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
+                               LLBC_Variant(std::map<int, LLBC_String>{}),
+                               LLBC_Variant(false),
+                               LLBC_Variant(true));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
+                               LLBC_Variant(std::map<int, std::string_view>{{1, "1"}, {2, "2"}, {3, "3"}}),
+                               LLBC_Variant(false),
+                               LLBC_Variant(true));
+
+    // other types vs seq.
+    const size_t beginPos2 = testDatas.Size();
+    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
+    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
+    {
+        auto &testData = testDatas[i];
+        std::swap(testData[0], testData[1]);
+        testData[3] = !testData[3];
+    }
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas)
+{
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // dict vs other types.
+    const size_t beginPos1 = testDatas.Size();
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
+                               LLBC_Variant::nil,
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
+                               LLBC_Variant(0),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
+                               LLBC_Variant(""),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
+                               LLBC_Variant("Non-Empty Str Data"),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
+                               LLBC_Variant(std::queue<int>{}),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
+                               LLBC_Variant(std::deque<int>{1, 2, 3}),
+                               LLBC_Variant(false),
+                               LLBC_Variant(false));
+
+    // other types vs dict.
+    const size_t beginPos2 = testDatas.Size();
+    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
+    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
+    {
+        auto &testData = testDatas[i];
+        std::swap(testData[0], testData[1]);
+        testData[3] = !testData[3];
+    }
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas)
+{
+    RelationalOperatorTest_GenTestDatas_SameType_Nil(testDatas);
+    RelationalOperatorTest_GenTestDatas_SameType_Raw(testDatas);
+    RelationalOperatorTest_GenTestDatas_SameType_Str(testDatas);
+    RelationalOperatorTest_GenTestDatas_SameType_Seq(testDatas);
+    RelationalOperatorTest_GenTestDatas_SameType_Dict(testDatas);
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testData)
+{
+    // TODO: Will impl.
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testData)
+{
+    // TODO: Will impl.
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testData)
+{
+    // TODO: Will impl.
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testData)
+{
+    // TODO: Will impl.
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testData)
+{
+    // TODO: Will impl.
+}
+
+int TestCase_Core_Variant::RelationOperatorTest_ExceptCheck(LLBC_Variant &testData)
+{
+    LLBC_PrintLn(" - Relational operator test, except check: lhs:%s, rhs:%s, exceptEq:%s, exceptLt:%s",
+                 testData[0].ToString().c_str(),
+                 testData[1].ToString().c_str(),
+                 testData[2] ? "true" : "false",
+                 testData[3] ? "true" : "false");
+
+    // operator==
+    LLBC_Expect(((testData[0] == testData[1]) == testData[2].As<bool>()));
+
+    // operator!=
+    LLBC_Expect(((testData[0] != testData[1]) == !testData[2].As<bool>()));
+
+    // operator <
+    LLBC_Expect(((testData[0] < testData[1]) == testData[3].As<bool>()));
+
+    // operator<=
+    LLBC_Expect(((testData[0] <= testData[1] ) == (testData[2].As<bool>() || testData[3].As<bool>())));
+
+    // operator>
+    LLBC_Expect(((testData[0] > testData[1] ) == !(testData[2].As<bool>() || testData[3].As<bool>())));
+
+    // operator>=
+    LLBC_Expect(((testData[0] >= testData[1]) == !testData[3].As<bool>()));
 
     return LLBC_OK;
 }
