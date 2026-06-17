@@ -32,6 +32,7 @@ public:
 private:
     void RawTest();
     void StringBaseTest();
+    LLBC_String StringVFormatTestHelper(const char* fmt, ...);
     void StringCompareTest();
     void StringLogicOperationTest();
     void StringUTF8Test();

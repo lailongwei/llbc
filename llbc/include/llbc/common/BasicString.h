@@ -1178,6 +1178,17 @@ public:
     // format operation: format
     _This &format(const _Elem *fmt, ...)
     {
+        va_list ap;
+        va_start(ap, fmt);
+        _This &ret = this->vformat(fmt, ap);
+        va_end(ap);
+
+        return ret;
+    }
+
+    // format operation: va_list format
+    _This &vformat(const _Elem *fmt, va_list ap)
+    {
         if (UNLIKELY(sizeof(_Elem) != sizeof(char)))
             return *this;
 
@@ -1189,10 +1200,10 @@ public:
         }
 
         // calculate required length
-        va_list ap;
-        va_start(ap, fmt);
-        int len = vsnprintf(nullptr, 0, fmt, ap);
-        va_end(ap);
+        va_list vaCopy;
+        va_copy(vaCopy, ap);
+        int len = vsnprintf(nullptr, 0, fmt, vaCopy);
+        va_end(vaCopy);
 
         if (UNLIKELY(len <= 0))
         {
@@ -1204,12 +1215,12 @@ public:
         this->resize(len);
 
         // format once.
-        va_start(ap, fmt);
+        va_copy(vaCopy, ap);
         const int writtenLen = vsnprintf(const_cast<char *>(this->data()),
                                          this->size() + 1,
                                          fmt,
-                                         ap);
-        va_end(ap);
+                                         vaCopy);
+        va_end(vaCopy);
         if (UNLIKELY(writtenLen != static_cast<int>(this->size())))
             this->clear();
 
