@@ -31,7 +31,7 @@ namespace
             if (eventType != LLBC_ComponentEventType::AppReloadFailed)
                 return;
 
-            const auto failedInfo = eventParams.AsPtr<LLBC_AppReloadFailedInfo>();
+            const auto failedInfo = eventParams.As<LLBC_AppReloadFailedInfo *>();
             LLBC_PrintLn("AppReloadFailed! %s", failedInfo->ToString().c_str());
         }
     };
