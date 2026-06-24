@@ -154,7 +154,7 @@ int TestCase_Core_Event::BasicTest()
     auto* ev = new LLBC_Event(EventIds::Event1);
     ev->SetParam(std::string("copy string"), "copy string: hello world");
     (*ev)["empty"] = 111;
-    LLBC_PrintLn("Empty key params - param:%d", (*ev)["empty"].AsInt32());
+    LLBC_PrintLn("Empty key params - param:%d", (*ev)["empty"].As<sint32>());
 
     // Test finished, remove all listeners.
     evMgr.RemoveListener(ev1Stub1);

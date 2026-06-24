@@ -21,34 +21,34 @@
 
 #pragma once
 
+
 __LLBC_NS_BEGIN
 
 template <>
-inline bool LLBC_VariantArithmetic::Performs_raw_operation(bool left, bool right, int type)
+inline decltype(bool() + bool()) LLBC_VariantArithmetic::Performs_raw_operation(bool left, bool right, int type)
 {
+    typedef decltype(bool() + bool()) _RtnType;
     switch (type)
     {
     case VT_ARITHMETIC_ADD:
-        return left || right;
+        return left + right;
 
     case VT_ARITHMETIC_SUB:
-        if (left) // true - true = false, true - false = true.
-            return !right;
-        else // false - true = false, false - false = false.
-            return false;
+        return left - right;
 
     case VT_ARITHMETIC_MUL:
+        return left * right;
     case VT_ARITHMETIC_DIV:
-        return left && right; // left == true and right == true return true, otherwise return false.
+        return right ? left / right : _RtnType();
 
     case VT_ARITHMETIC_MOD:
-        return (left ? 1 : 0) % (right ? 1 : 0);
+        return right ? left % right : _RtnType();
 
     default:
         break;
     }
 
-    return bool();
+    return _RtnType();
 }
 
 template <>
@@ -81,7 +81,6 @@ inline void *LLBC_VariantArithmetic::Performs_raw_operation(void *left, void *ri
         break;
 
     default:
-        leftVal = 0;
         break;
     }
 
@@ -106,10 +105,20 @@ inline float LLBC_VariantArithmetic::Performs_raw_operation(float left, float ri
         return left * right;
 
     case VT_ARITHMETIC_DIV:
-        return left / right;
+        if (LIKELY(!LLBC_IsFloatZero(right)))
+            return left / right;
+        else
+            return 0.0f;
 
     case VT_ARITHMETIC_MOD:
-        return static_cast<float>(static_cast<sint64>(left) % static_cast<sint64>(right));
+    {
+        const auto castedLeft = static_cast<sint64>(left);
+        const auto castedRight = static_cast<sint64>(right);
+        if (LIKELY(castedRight != 0))
+            return static_cast<float>(castedLeft % castedRight);
+        else
+            return static_cast<float>(castedLeft);
+    }
 
     default:
         break;
@@ -133,10 +142,20 @@ inline double LLBC_VariantArithmetic::Performs_raw_operation(double left, double
         return left * right;
 
     case VT_ARITHMETIC_DIV:
-        return left / right;
+        if (LIKELY(!LLBC_IsFloatZero(right)))
+            return left / right;
+        else
+            return 0.0;
 
     case VT_ARITHMETIC_MOD:
-        return static_cast<double>(static_cast<sint64>(left) % static_cast<sint64>(right));
+    {
+        const auto castedLeft = static_cast<sint64>(left);
+        const auto castedRight = static_cast<sint64>(right);
+        if (LIKELY(castedRight != 0))
+            return static_cast<double>(castedLeft % castedRight);
+        else
+            return static_cast<double>(castedLeft);
+    }
 
     default:
         break;
@@ -160,10 +179,20 @@ inline ldouble LLBC_VariantArithmetic::Performs_raw_operation(ldouble left, ldou
         return left * right;
 
     case VT_ARITHMETIC_DIV:
-        return left / right;
+        if (LIKELY(!LLBC_IsFloatZero(right)))
+            return left / right;
+        else
+            return 0.0;
 
     case VT_ARITHMETIC_MOD:
-        return static_cast<ldouble>(static_cast<sint64>(left) % static_cast<sint64>(right));
+    {
+        const auto castedLeft = static_cast<sint64>(left);
+        const auto castedRight = static_cast<sint64>(right);
+        if (LIKELY(castedRight != 0))
+            return static_cast<ldouble>(castedLeft % castedRight);
+        else
+            return static_cast<ldouble>(castedLeft);
+    }
 
     default:
         break;
@@ -172,8 +201,8 @@ inline ldouble LLBC_VariantArithmetic::Performs_raw_operation(ldouble left, ldou
     return ldouble();
 }
 
-template <typename RawType>
-RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawType right, int type)
+template <typename RawType, typename RtnType>
+RtnType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawType right, int type)
 {
     switch (type)
     {
@@ -187,16 +216,20 @@ RawType LLBC_VariantArithmetic::Performs_raw_operation(RawType left, RawType rig
         return left * right;
 
     case VT_ARITHMETIC_DIV:
-        return left / right;
+        if (LIKELY(right != RawType()))
+            return left / right;
+        else
+            return RtnType();
 
     case VT_ARITHMETIC_MOD:
-        return left % right;
+        if (LIKELY(right != RawType()))
+            return left % right;
+        else
+            return RtnType();
 
     default:
-        break;
+        return RtnType();
     }
-
-    return RawType();
 }
 
 __LLBC_NS_END

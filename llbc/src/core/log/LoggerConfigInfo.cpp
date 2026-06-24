@@ -91,7 +91,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     // Not config use default/root option.
     LLBC_String notCfgUseOpt;
     if (cfg["notConfigUse"])
-        notCfgUseOpt = cfg["notConfigUse"].AsStr();
+        notCfgUseOpt = cfg["notConfigUse"].As<LLBC_String>();
     else if (rootCfg)
         notCfgUseOpt = rootCfg->IsNotConfigUseRoot() ? "root" : "default";
     else
@@ -103,7 +103,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
     // Require color log traces.
     auto keyContentsGroups =
-        cfg["requireColorLogTraces"].AsStr().strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0], -1, true);
+        cfg["requireColorLogTraces"].As<LLBC_String>().strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0], -1, true);
     for (auto &group : keyContentsGroups)
     {
         auto keyContentsPair = group.strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1], 1, true);
@@ -134,7 +134,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         _independentThread = __LLBC_GetLogCfg(
             "independentThread", INDEPENDENT_THREAD, IsIndependentThread, AsLooseBool);
      _flushInterval = __LLBC_GetLogCfg(
-         "flushInterval", LOG_FLUSH_INTERVAL, GetFlushInterval, AsInt32);
+         "flushInterval", LOG_FLUSH_INTERVAL, GetFlushInterval, As<int>);
 
     // Json styled log configs.
     _addTimestampInJsonLog = __LLBC_GetLogCfg(
@@ -145,12 +145,12 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     if (_logToConsole)
     {
         if (cfg["consoleLogLevel"])
-            _consoleLogLevel = LLBC_LogLevel::GetLevelEnum(cfg["consoleLogLevel"].AsStr().c_str());
+            _consoleLogLevel = LLBC_LogLevel::GetLevelEnum(cfg["consoleLogLevel"].As<LLBC_String>().c_str());
         else
             _consoleLogLevel = _notConfigUseRoot ? rootCfg->GetConsoleLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
         if (cfg["consolePattern"])
-            _consolePattern = cfg["consolePattern"].AsStr();
+            _consolePattern = cfg["consolePattern"].As<LLBC_String>();
         else
             _consolePattern = _notConfigUseRoot ? 
                 rootCfg->GetConsolePattern().c_str() : LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN;
@@ -164,12 +164,12 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
     {
         // File log level.
         if (cfg["fileLogLevel"])
-            _fileLogLevel = LLBC_LogLevel::GetLevelEnum(cfg["fileLogLevel"].AsStr().c_str());
+            _fileLogLevel = LLBC_LogLevel::GetLevelEnum(cfg["fileLogLevel"].As<LLBC_String>().c_str());
         else
             _fileLogLevel = _notConfigUseRoot ? rootCfg->GetFileLogLevel() : LLBC_CFG_LOG_DEFAULT_LEVEL;
 
         // Log file dir.
-        if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, AsStr).strip()).empty())
+        if (!(_logDir = __LLBC_GetLogCfg2("logDir", "", GetLogDir, As<LLBC_String>).strip()).empty())
         {
             #if LLBC_TARGET_PLATFORM_WIN32
             _logDir = _logDir.findreplace('/', '\\');
@@ -184,7 +184,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
         // Log file name.
         if (cfg["logFile"])
-            _logFile = cfg["logFile"].AsStr().strip();
+            _logFile = cfg["logFile"].As<LLBC_String>().strip();
 
         if (_logFile.empty())
         {
@@ -209,20 +209,20 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
         // Log file suffix.
         _logFileSuffix = __LLBC_GetLogCfg(
-            "logFileSuffix", LOG_FILE_SUFFIX, GetLogFileSuffix, AsStr);
+            "logFileSuffix", LOG_FILE_SUFFIX, GetLogFileSuffix, As<LLBC_String>);
         // Log code file path.
         _logCodeFilePath = __LLBC_GetLogCfg(
             "logCodeFilePath", LOG_CODE_FILE_PATH, IsLogCodeFilePath, AsLooseBool);
         // Log file pattern.
         if (cfg["filePattern"])
-            _filePattern = cfg["filePattern"].AsStr();
+            _filePattern = cfg["filePattern"].As<LLBC_String>();
         else
             _filePattern = _notConfigUseRoot ? 
                 rootCfg->GetFilePattern().c_str() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN;
 
         // File rolling mode.
         if (cfg["fileRollingMode"])
-            _fileRollingMode = LLBC_LogRollingMode::Str2Mode(cfg["fileRollingMode"].AsStr());
+            _fileRollingMode = LLBC_LogRollingMode::Str2Mode(cfg["fileRollingMode"].As<LLBC_String>());
         else
             _fileRollingMode = _notConfigUseRoot ?
                 rootCfg->GetFileRollingMode() : LLBC_CFG_LOG_DEFAULT_FILE_ROLLING_MODE;
@@ -241,7 +241,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
             _maxFileSize = LLBC_CFG_LOG_DEFAULT_MAX_FILE_SIZE;
         // Max backup index.
         _maxBackupIndex = __LLBC_GetLogCfg2(
-            "maxBackupIndex", LLBC_CFG_LOG_MAX_BACKUP_INDEX, GetMaxBackupIndex, AsInt32);
+            "maxBackupIndex", LLBC_CFG_LOG_MAX_BACKUP_INDEX, GetMaxBackupIndex, As<int>);
         // Lazy create log file.
         _lazyCreateLogFile = __LLBC_GetLogCfg2(
             "lazyCreateLogFile", LLBC_CFG_LOG_LAZY_CREATE_LOG_FILE, IsLazyCreateLogFile, AsLooseBool);
@@ -249,11 +249,11 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         // File buffer size.
         if (_asyncMode)
             _fileBufferSize = __LLBC_GetLogCfg(
-                "fileBufferSize", LOG_FILE_BUFFER_SIZE, GetFileBufferSize, AsInt32);
+                "fileBufferSize", LOG_FILE_BUFFER_SIZE, GetFileBufferSize, As<int>);
         
         // Advise discard file page cache.
         _fadviseDiscardEnabled = LLBC_CFG_LOG_DEFAULT_ENABLE_FADVISE_DISCARD;
-        if (!cfg["enableFadviseDiscard"].AsStr().strip().empty())
+        if (!cfg["enableFadviseDiscard"].As<LLBC_String>().strip().empty())
             _fadviseDiscardEnabled = cfg["enableFadviseDiscard"].AsLooseBool();
 
         if (_fadviseDiscardEnabled) 
@@ -268,8 +268,8 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
 
             // File page cache retain size.
             int fadviseDiscardRetainPercent = LLBC_CFG_LOG_DEFAULT_FADVISE_DISCARD_RETAIN_PERCENT;
-            if (!cfg["fadviseDiscardRetainPercent"].AsStr().strip().empty())
-                fadviseDiscardRetainPercent = std::clamp(cfg["fadviseDiscardRetainPercent"].AsInt32(),
+            if (!cfg["fadviseDiscardRetainPercent"].As<LLBC_String>().strip().empty())
+                fadviseDiscardRetainPercent = std::clamp(cfg["fadviseDiscardRetainPercent"].As<int>(),
                                                          LLBC_CFG_LOG_FADVISE_DISCARD_RETAIN_PERCENT_MIN,
                                                          LLBC_CFG_LOG_FADVISE_DISCARD_RETAIN_PERCENT_MAX);
             

@@ -179,50 +179,42 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
     }
     else if (var.IsRaw()) // Raw type(bool, integer, float)
     {
-        if (var.IsBool())
+        if (var.Is<bool>())
         {
-            if (var.AsBool())
+            if (var.As<bool>())
                 Py_RETURN_TRUE;
             else
                 Py_RETURN_FALSE;
         }
-        else if (var.IsInt8() ||
-                 var.IsUInt8() ||
-                 var.IsInt16() ||
-                 var.IsUInt16() ||
-                 var.IsInt32() ||
-                 var.IsLong())
+        else if (var.Is<sint8, uint8, sint16, uint16, sint32, long>())
         {
-            return PyInt_FromLong(var.AsLong());
+            return PyInt_FromLong(var.As<long>());
         }
-        else if (var.IsULong())
+        else if (var.Is<ulong>())
         {
-            return PyLong_FromUnsignedLong(var.AsULong());
+            return PyLong_FromUnsignedLong(var.As<ulong>());
         }
-        else if (var.IsUInt32() ||
-                 var.IsInt64())
+        else if (var.Is<uint32, sint64>())
         {
-            return PyLong_FromLongLong(var.AsInt64());
+            return PyLong_FromLongLong(var.As<sint64>());
         }
-        else if (var.IsPtr() ||
-                 var.IsUInt64())
+        else if (var.Is<void *, uint64>())
         {
-            return PyLong_FromUnsignedLongLong(var.AsUInt64());
+            return PyLong_FromUnsignedLongLong(var.As<uint64>());
         }
-        else if (var.IsFloat() ||
-                 var.IsDouble())
+        else if (var.Is<float, double>())
         {
-            return PyFloat_FromDouble(var.AsDouble());
+            return PyFloat_FromDouble(var.As<double>());
         }
     }
-    else if (var.IsStr()) // Str type
+    else if (var.Is<LLBC_Variant::Str>()) // Str type
     {
         if (!var.IsEmpty())
             return PyString_FromStringAndSize(var.GetHolder().data.obj.str.c_str(), var.GetHolder().data.obj.str.size());
         else
             return PyString_FromStringAndSize(nullptr, 0);
     }
-    else if (var.IsSeq()) // Seq type
+    else if (var.Is<LLBC_Variant::Seq>()) // Seq type
     {
         const size_t seqSize = var.Size();
         PyObject *pyList = PyList_New(seqSize);
@@ -241,7 +233,7 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
 
         return pyList;
     }
-    else if (var.IsDict()) // Dict type
+    else if (var.Is<LLBC_Variant::Dict>()) // Dict type
     {
         PyObject *pyDict = PyDict_New();
         for (LLBC_Variant::DictConstIter it = var.DictBegin();

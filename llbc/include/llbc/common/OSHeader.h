@@ -84,6 +84,7 @@
 
 // C++ standard header files.
 #include <string>
+#include <string_view>
 #include <iostream>
 #include <sstream>
 #include <memory>

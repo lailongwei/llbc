@@ -80,8 +80,8 @@ private:
     /**
      * Implementation function.
      */
-    template <typename RawType>
-    static RawType Performs_raw_operation(RawType left, RawType right, int type);
+    template <typename RawType, typename RtnType = RawType>
+    static RtnType Performs_raw_operation(RawType left, RawType right, int type);
 };
 
 __LLBC_NS_END

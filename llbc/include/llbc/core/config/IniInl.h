@@ -124,7 +124,7 @@ inline LLBC_String LLBC_IniSection::GetValue(const LLBC_String &key, const LLBC_
 template <>
 inline std::string LLBC_IniSection::GetValue(const LLBC_String &key, const std::string &defaultValue) const
 {
-    return this->GetValue(key, LLBC_Variant(LLBC_String(defaultValue))).AsStr();
+    return this->GetValue(key, LLBC_Variant(defaultValue));
 }
 
 template <typename _ValueType>

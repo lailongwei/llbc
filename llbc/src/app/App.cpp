@@ -240,7 +240,7 @@ int LLBC_App::Start(int argc, char *argv[], const LLBC_String &name)
     LLBC_Defer(
         LLBC_DoIf(
             ret != LLBC_OK,
-            _cfg.BecomeNil()
+            _cfg.Become<void>()
             // , _cfgPath.clear() // Don't clear config path if application start failed.
             // , _cfgType = LLBC_AppConfigType::End // Don't reset config type if application start failed.
         )
@@ -435,12 +435,12 @@ void LLBC_App::Stop()
     #endif // Non-Win32
 
     // Disable handle crash.
-    LLBC_DisableCrashHandle();
+    // LLBC_DisableCrashHandle();
 
     // Cleanup members.
     _cfgPath.clear();
     _cfgType = LLBC_AppConfigType::End;
-    _cfg.BecomeNil();
+    _cfg.Become<void>();
 
     _startThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
 
@@ -644,17 +644,17 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
         }
 
         // - Reload application fps.
-        for (auto cfgItem : _cfg.AsDict())
+        for (auto &cfgItem : _cfg.As<LLBC_Variant::Dict>())
         {
             if (_cfgType == LLBC_AppConfigType::Ini)
             {
-                auto sectionName = cfgItem.first.AsStr().tolower();
+                auto sectionName = cfgItem.first.As<LLBC_String>().tolower();
                 if (sectionName != "app" && sectionName != "application")
                     break;
 
-                for (auto cfgSecItem : cfgItem.second.AsDict())
+                for (auto &cfgSecItem : cfgItem.second.As<LLBC_Variant::Dict>())
                 {
-                    if (cfgSecItem.first.AsStr().tolower() == "fps")
+                    if (cfgSecItem.first.As<LLBC_String>().tolower() == "fps")
                     {
                         SetFPS(cfgSecItem.second);
                         break;
@@ -664,7 +664,7 @@ int LLBC_App::ReloadImpl(bool checkAppStarted, bool callEvMeth)
                 break;
             }
 
-            if (cfgItem.first.AsStr().tolower() == "fps")
+            if (cfgItem.first.As<LLBC_String>().tolower() == "fps")
             {
                 const auto &fps =
                     _cfgType == LLBC_AppConfigType::Xml ?
@@ -736,7 +736,7 @@ int LLBC_App::ReloadXmlConfig()
 
 int LLBC_App::ReloadPropertyConfig()
 {
-    _cfg.BecomeNil();
+    _cfg.Become<void>();
     return LLBC_Properties::LoadFromFile(_cfgPath, _cfg);
 }
 

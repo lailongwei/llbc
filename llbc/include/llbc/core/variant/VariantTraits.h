@@ -38,20 +38,15 @@ class LLBC_EXPORT LLBC_VariantTraits
 {
 public:
     /**
-     * Assign operator.
-     */
-    static void assign(LLBC_Variant &left, const LLBC_Variant &right);
-
-    /**
      * Relational operators.
      * ==, !=, <, >, <=, >=
      */
     static bool eq(const LLBC_Variant &left, const LLBC_Variant &right);
-    static bool ne(const LLBC_Variant &left, const LLBC_Variant &right);
+    static bool ne(const LLBC_Variant &left, const LLBC_Variant &right) { return !eq(left, right); }
     static bool lt(const LLBC_Variant &left, const LLBC_Variant &right);
-    static bool gt(const LLBC_Variant &left, const LLBC_Variant &right);
-    static bool le(const LLBC_Variant &left, const LLBC_Variant &right);
-    static bool ge(const LLBC_Variant &left, const LLBC_Variant &right);
+    static bool gt(const LLBC_Variant &left, const LLBC_Variant &right) { return lt(right, left); }
+    static bool le(const LLBC_Variant &left, const LLBC_Variant &right) { return !lt(right, left); }
+    static bool ge(const LLBC_Variant &left, const LLBC_Variant &right) { return !lt(left, right); }
 
     /**
      * Arithmetic operators.
@@ -72,6 +67,13 @@ public:
     static void mul_equal(LLBC_Variant &left, const LLBC_Variant &right);
     static void div_equal(LLBC_Variant &left, const LLBC_Variant &right);
     static void mod_equal(LLBC_Variant &left, const LLBC_Variant &right);
+
+private:
+    template <bool _ExecEq>
+    static bool compare_impl(const LLBC_Variant &left, const LLBC_Variant &right);
+
+    template <bool _ExecEq>
+    static bool raw_compare(const LLBC_Variant &left, const LLBC_Variant &right);
 };
 
 __LLBC_NS_END
