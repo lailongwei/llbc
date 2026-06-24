@@ -215,11 +215,59 @@ public:
     void RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas);
 
     void RelationalOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas);
-    void RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testData);
-    void RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testData);
-    void RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testData);
-    void RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testData);
-    void RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testData);
+    void RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas);
+    void RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas);
+
+    void RelationalOperatorTest_ReverseTestDatas(LLBC_Variant &testDatas, size_t beginPos);
 
     int RelationOperatorTest_ExceptCheck(LLBC_Variant &testData);
+
+private:
+    int ArithmeticOperatorTest();
+
+    void ArithmeticOperatorTest_GenTestDatas_DiffType(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas);
+
+    void ArithmeticOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas);
+    void ArithmeticOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas);
+
+    template <typename _LeftTy,
+              typename _RightTy,
+              typename _ExpectAddResultTy,
+              typename _ExpectSubResultTy,
+              typename _ExpectMulResultTy,
+              typename _ExpectDivResultTy,
+              typename _ExpectModResultTy>
+    LLBC_Variant ArithmeticOperatorTest_BuildOneTestData(const _LeftTy &left,
+                                                         const _RightTy &right,
+                                                         bool execXxxAndEqual,
+                                                         const _ExpectAddResultTy &expectAddResult,
+                                                         const _ExpectSubResultTy &expectSubResult,
+                                                         const _ExpectMulResultTy &expectMulResult,
+                                                         const _ExpectDivResultTy &expectDivResult,
+                                                         const _ExpectModResultTy &expectModResult);
+
+    void ArithmeticOperatorTest_BuildXxxAndEqualTestDatas(LLBC_Variant &testDatas);
+
+    int ArithmeticOperatorTest_ExceptCheck(LLBC_Variant &testData);
+
+public:
+    int SerDeserTest();
+
+    template <typename _Ty>
+    int SerDeserTestOne(const _Ty &val);
+
+public:
+    int OstreamOutputTest();
 };

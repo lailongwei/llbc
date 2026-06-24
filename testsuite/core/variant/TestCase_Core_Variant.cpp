@@ -60,6 +60,9 @@ int TestCase_Core_Variant::Run(int argc, char *argv[])
     LLBC_Expect(DictSpecificTest() == LLBC_OK);
     LLBC_Expect(SubscriptOperatorTest() == LLBC_OK);
     LLBC_Expect(RelationalOperatorTest() == LLBC_OK);
+    LLBC_Expect(ArithmeticOperatorTest() == LLBC_OK);
+    LLBC_Expect(SerDeserTest() == LLBC_OK);
+    LLBC_Expect(OstreamOutputTest() == LLBC_OK);
 
     LLBC_PrintLn("Press any key to continue ...");
     getchar();
@@ -4016,7 +4019,9 @@ int TestCase_Core_Variant::RelationalOperatorTest()
     RelationalOperatorTest_GenTestDatas_DiffType(testDatas);
     
     for (auto it = testDatas.SeqBegin(); it != testDatas.SeqEnd(); ++it)
+    {
         LLBC_Expect(RelationOperatorTest_ExceptCheck(*it) == LLBC_OK);
+    }
 
     return LLBC_OK;
 }
@@ -4035,7 +4040,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_NilVsOt
     // Test data format: lhs, rhs, expectEq, expectLt.
 
     // nil vs other types.
-    const size_t beginPos1 = testDatas.Size();
+    const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
                           LLBC_Variant(1),
                           LLBC_Variant(false),
@@ -4070,14 +4075,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_NilVsOt
                           LLBC_Variant(true)});
 
     // other types vs nil.
-    const size_t beginPos2 = testDatas.Size();
-    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
-    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
-    {
-        auto &testData = testDatas[i];
-        std::swap(testData[0], testData[1]);
-        testData[3] = !testData[3];
-    }
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas)
@@ -4085,45 +4083,38 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_RawVsOt
     // Test data format: lhs, rhs, expectEq, expectLt.
 
     // raw vs other types.
-    const size_t beginPos1 = testDatas.Size();
+    const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
                           LLBC_Variant::nil,
                           LLBC_Variant(false),
                           LLBC_Variant(false)});
-    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
-                          LLBC_Variant(""),
-                          LLBC_Variant(false),
-                          LLBC_Variant(true)});
-    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
-                          LLBC_Variant("Non-Empty Str Data"),
-                          LLBC_Variant(false),
-                          LLBC_Variant(true)});
-    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
-                          LLBC_Variant(std::list<int>{}),
-                          LLBC_Variant(false),
-                          LLBC_Variant(true)});
-    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
-                          LLBC_Variant(std::list<int>{1, 2, 3}),
-                          LLBC_Variant(false),
-                          LLBC_Variant(true)});
-    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
-                          LLBC_Variant(std::map<int, LLBC_String>{}),
-                          LLBC_Variant(false),
-                          LLBC_Variant(true)});
-    testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
-                          LLBC_Variant(std::map<int, LLBC_String>{{1, "1"}, {2, "2"}, {3, "3"}}),
-                          LLBC_Variant(false),
-                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(1),
+                                      LLBC_Variant(""),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(1),
+                                      LLBC_Variant("Non-Empty Str Data"),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(1),
+                                      LLBC_Variant(std::list<int>{}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(1),
+                                      LLBC_Variant(std::list<int>{1, 2, 3}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(1),
+                                      LLBC_Variant(std::map<int, LLBC_String>{}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(1),
+                                      LLBC_Variant(std::map<int, LLBC_String>{{1, "1"}, {2, "2"}, {3, "3"}}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
 
     // other types vs raw.
-    const size_t beginPos2 = testDatas.Size();
-    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
-    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
-    {
-        auto &testData = testDatas[i];
-        std::swap(testData[0], testData[1]);
-        testData[3] = !testData[3];
-    }
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas)
@@ -4131,41 +4122,34 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_StrVsOt
     // Test data format: lhs, rhs, expectEq, expectLt.
 
     // str vs other types.
-    const size_t beginPos1 = testDatas.Size();
-    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
-                               LLBC_Variant::nil,
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
-                               LLBC_Variant(1),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
-                               LLBC_Variant(std::vector<int>{}),
-                               LLBC_Variant(false),
-                               LLBC_Variant(true));
-    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
-                               LLBC_Variant(std::vector<int>{1, 2, 3}),
-                               LLBC_Variant(false),
-                               LLBC_Variant(true));
-    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
-                               LLBC_Variant(std::map<int, LLBC_String>{}),
-                               LLBC_Variant(false),
-                               LLBC_Variant(true));
-    testDatas.SeqBatchPushBack(LLBC_Variant("Str Data"),
-                               LLBC_Variant(std::map<int, LLBC_String>{{1, "1"}, {2, "2"}, {3, "3"}}),
-                               LLBC_Variant(false),
-                               LLBC_Variant(true));
+    const size_t beginPos = testDatas.Size();
+    testDatas.SeqPushBack(std::vector{LLBC_Variant("Str Data"),
+                                      LLBC_Variant::nil,
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant("Str Data"),
+                                      LLBC_Variant(1),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant("Str Data"),
+                                      LLBC_Variant(std::vector<int>{}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant("Str Data"),
+                                      LLBC_Variant(std::vector<int>{1, 2, 3}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant("Str Data"),
+                                      LLBC_Variant(std::map<int, LLBC_String>{}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant("Str Data"),
+                                      LLBC_Variant(std::map<int, LLBC_String>{{1, "1"}, {2, "2"}, {3, "3"}}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
 
-    // other types vs str.
-    const size_t beginPos2 = testDatas.Size();
-    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
-    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
-    {
-        auto &testData = testDatas[i];
-        std::swap(testData[0], testData[1]);
-        testData[3] = !testData[3];
-    }
+    // other types vs raw.
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas)
@@ -4174,41 +4158,34 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOt
     // Test data format: lhs, rhs, expectEq, expectLt.
 
     // seq vs other types.
-    const size_t beginPos1 = testDatas.Size();
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
-                               LLBC_Variant::nil,
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
-                               LLBC_Variant(0),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
-                               LLBC_Variant(""),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
-                               LLBC_Variant("Non-Empty Str Data"),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
-                               LLBC_Variant(std::map<int, LLBC_String>{}),
-                               LLBC_Variant(false),
-                               LLBC_Variant(true));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::set<int>{}),
-                               LLBC_Variant(std::map<int, std::string_view>{{1, "1"}, {2, "2"}, {3, "3"}}),
-                               LLBC_Variant(false),
-                               LLBC_Variant(true));
+    const size_t beginPos = testDatas.Size();
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::set<int>{}),
+                          LLBC_Variant::nil,
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::set<int>{}),
+                          LLBC_Variant(0),
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::set<int>{}),
+                          LLBC_Variant(""),
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::set<int>{}),
+                          LLBC_Variant("Non-Empty Str Data"),
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::set<int>{}),
+                          LLBC_Variant(std::map<int, LLBC_String>{}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::set<int>{}),
+                          LLBC_Variant(std::map<int, std::string_view>{{1, "1"}, {2, "2"}, {3, "3"}}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(true)});
 
     // other types vs seq.
-    const size_t beginPos2 = testDatas.Size();
-    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
-    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
-    {
-        auto &testData = testDatas[i];
-        std::swap(testData[0], testData[1]);
-        testData[3] = !testData[3];
-    }
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas)
@@ -4217,40 +4194,33 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_DictVsO
 
     // dict vs other types.
     const size_t beginPos1 = testDatas.Size();
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
-                               LLBC_Variant::nil,
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
-                               LLBC_Variant(0),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
-                               LLBC_Variant(""),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
-                               LLBC_Variant("Non-Empty Str Data"),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
-                               LLBC_Variant(std::queue<int>{}),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
-    testDatas.SeqBatchPushBack(LLBC_Variant(std::map<int, LLBC_String>{}),
-                               LLBC_Variant(std::deque<int>{1, 2, 3}),
-                               LLBC_Variant(false),
-                               LLBC_Variant(false));
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, LLBC_String>{}),
+                          LLBC_Variant::nil,
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, LLBC_String>{}),
+                          LLBC_Variant(0),
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, LLBC_String>{}),
+                          LLBC_Variant(""),
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, LLBC_String>{}),
+                          LLBC_Variant("Non-Empty Str Data"),
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, LLBC_String>{}),
+                          LLBC_Variant(std::queue<int>{}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, LLBC_String>{}),
+                          LLBC_Variant(std::deque<int>{1, 2, 3}),
+                          LLBC_Variant(false),
+                          LLBC_Variant(false)});
 
     // other types vs dict.
-    const size_t beginPos2 = testDatas.Size();
-    testDatas.SeqInsert(testDatas.SeqEnd(), testDatas.SeqBegin() + static_cast<long>(beginPos1), testDatas.SeqEnd());
-    for (size_t i = beginPos2; i < testDatas.Size(); ++i)
-    {
-        auto &testData = testDatas[i];
-        std::swap(testData[0], testData[1]);
-        testData[3] = !testData[3];
-    }
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos1);
 }
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas)
@@ -4262,29 +4232,218 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType(LLBC_Va
     RelationalOperatorTest_GenTestDatas_SameType_Dict(testDatas);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testData)
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas)
 {
-    // TODO: Will impl.
+    // Test data format: lhs, rhs, expectEq, expectLt.
+    testDatas.SeqPushBack(std::vector{LLBC_Variant::nil,
+                                      LLBC_Variant::nil,
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testData)
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas)
 {
-    // TODO: Will impl.
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // - bool:
+    const size_t beginPos = testDatas.Size();
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(false),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(true),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(false),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+
+    // sint64/uint64:
+    for (int i = 0; i < 100; ++i)
+    {
+        const auto rand1 = LLBC_Rand();
+        const auto rand2 = LLBC_Rand();
+        const auto rand1IsUnsigned = LLBC_BoolJudge();
+        const bool rand2IsUnsigned = LLBC_BoolJudge();
+
+        LLBC_Variant rand1Var;
+        if (rand1IsUnsigned)
+            rand1Var = static_cast<uint64>(rand1);
+        else
+            rand1Var = static_cast<sint64>(rand1);
+
+        LLBC_Variant rand2Var;
+        if (rand2IsUnsigned)
+            rand2Var = static_cast<uint64>(rand2);
+        else
+            rand2Var = static_cast<sint64>(rand2);
+
+        bool expectEq = false;
+        bool expectLt = false;
+        if (rand1IsUnsigned || rand2IsUnsigned)
+        {
+            expectEq = static_cast<uint64>(rand1) == static_cast<uint64>(rand2);
+            expectLt = static_cast<uint64>(rand1) < static_cast<uint64>(rand2);
+        }
+        else
+        {
+            expectEq = static_cast<sint64>(rand1) == static_cast<sint64>(rand2);
+            expectLt = static_cast<sint64>(rand1) < static_cast<sint64>(rand2);
+        }
+
+        testDatas.SeqPushBack(std::vector{rand1Var,
+                                          rand2Var,
+                                          LLBC_Variant(expectEq),
+                                          LLBC_Variant(expectLt)});
+    }
+
+    // float/double:
+    for (int i = 0; i < 100; ++i)
+    {
+        const auto rand1 = LLBC_RandReal() * LLBC_Rand();
+        const auto rand2 = LLBC_RandReal() * LLBC_Rand();
+        const auto rand1IsDouble = LLBC_BoolJudge();
+        const auto rand2IsDouble = LLBC_BoolJudge();
+
+        LLBC_Variant rand1Var;
+        if (rand1IsDouble)
+            rand1Var = static_cast<double>(rand1);
+        else
+            rand1Var = static_cast<float>(rand1);
+
+        LLBC_Variant rand2Var;
+        if (rand2IsDouble)
+            rand2Var = static_cast<double>(rand2);
+        else
+            rand2Var = static_cast<float>(rand2);
+
+        bool expectEq = false;
+        bool expectLt = false;
+        if (rand1IsDouble || rand2IsDouble)
+        {
+            expectEq = LLBC_IsFloatAlmostEqual(static_cast<double>(rand1), static_cast<double>(rand2));
+            expectLt = static_cast<double>(rand1) < static_cast<double>(rand2);
+        }
+        else
+        {
+            expectEq = LLBC_IsFloatAlmostEqual(static_cast<float>(rand1), static_cast<float>(rand2));
+            expectLt = static_cast<float>(rand1) < static_cast<float>(rand2);
+        }
+
+        testDatas.SeqPushBack(std::vector{rand1Var,
+                                          rand2Var,
+                                          LLBC_Variant(expectEq),
+                                          LLBC_Variant(expectLt)});
+    }
+
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testData)
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas)
 {
-    // TODO: Will impl.
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // Empty Str vs Empty Str:
+    const size_t beginPos = testDatas.Size();
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(""),
+                                      LLBC_Variant(""),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
+
+    // Empty Str vs Non-Empty Str:
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(""),
+                                      LLBC_Variant("Non-Empty Str Data"),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+
+    // Non-Empty Str vs Non-Empty Str:
+    testDatas.SeqPushBack(std::vector{LLBC_Variant("Non-Empty Str Data"),
+                                      LLBC_Variant("Non-Empty Str Data"),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant("Non-Empty Str Data"),
+                                      LLBC_Variant("Non-Empty Str Data2"),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testData)
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas)
 {
-    // TODO: Will impl.
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // Empty Seq vs Empty Seq:
+    const size_t beginPos = testDatas.Size();
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::vector<int>{}),
+                                      LLBC_Variant(std::vector<int>{}),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
+
+    // Empty Seq vs Non-Empty Seq:
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::vector<int>{}),
+                                      LLBC_Variant(std::vector<int>{1, 2, 3}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+
+    // Non-Empty Seq vs Non-Empty Seq:
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::vector<int>{1, 2, 3}),
+                                      LLBC_Variant(std::vector<int>{1, 2, 3}),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::vector<int>{1, 2, 3}),
+                                      LLBC_Variant(std::vector<int>{1, 2, 4}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testData)
+void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas)
 {
-    // TODO: Will impl.
+    // Test data format: lhs, rhs, expectEq, expectLt.
+
+    // Empty Dict vs Empty Dict:
+    const size_t beginPos = testDatas.Size();
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, int>{}),
+                                      LLBC_Variant(std::map<int, int>{}),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
+
+    // Empty Dict vs Non-Empty Dict:
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, int>{}),
+                                      LLBC_Variant(std::map<int, int>{{1, 2}}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+
+    // Non-Empty Dict vs Non-Empty Dict:
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, int>{{1, 2}}),
+                                      LLBC_Variant(std::map<int, int>{{1, 2}}),
+                                      LLBC_Variant(true),
+                                      LLBC_Variant(false)});
+    testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, int>{{1, 2}}),
+                                      LLBC_Variant(std::map<int, int>{{1, 3}}),
+                                      LLBC_Variant(false),
+                                      LLBC_Variant(true)});
+
+    RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
+}
+
+void TestCase_Core_Variant::RelationalOperatorTest_ReverseTestDatas(LLBC_Variant &testDatas, size_t beginPos)
+{
+    const size_t endPos = testDatas.Size();
+    for (size_t pos = beginPos; pos != endPos; ++pos)
+        testDatas.SeqPushBack(testDatas[pos]);
+
+    for (size_t pos = endPos; pos < testDatas.Size(); ++pos)
+    {
+        auto &testData = testDatas[pos];
+        std::swap(testData[0], testData[1]);
+        if (!testData[2])
+            testData[3] = !testData[3];
+    }
 }
 
 int TestCase_Core_Variant::RelationOperatorTest_ExceptCheck(LLBC_Variant &testData)
@@ -4312,6 +4471,761 @@ int TestCase_Core_Variant::RelationOperatorTest_ExceptCheck(LLBC_Variant &testDa
 
     // operator>=
     LLBC_Expect(((testData[0] >= testData[1]) == !testData[3].As<bool>()));
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::ArithmeticOperatorTest()
+{
+    LLBC_PrintLn("Arithmetic operator test:");
+
+    // Generate test datas.
+    // Test data format:
+    // [left, right, execXxxEqual, expectAdd, expectSub, expectMul, expectDiv, expectMod]
+    LLBC_Variant testDatas;
+    ArithmeticOperatorTest_GenTestDatas_DiffType(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_SameType(testDatas);
+    ArithmeticOperatorTest_BuildXxxAndEqualTestDatas(testDatas);
+
+    // Execute except check.
+    for (auto seqIt = testDatas.SeqBegin(); seqIt != testDatas.SeqEnd(); ++seqIt)
+        LLBC_Expect(ArithmeticOperatorTest_ExceptCheck(*seqIt) == LLBC_OK);
+
+    return LLBC_OK;
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType(LLBC_Variant &testDatas)
+{
+    ArithmeticOperatorTest_GenTestDatas_DiffType_NilVsOthers(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_DiffType_RawVsOthers(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_DiffType_StrVsOthers(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_DiffType_SeqVsOthers(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_DiffType_DictVsOthers(testDatas);
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas)
+{
+    // Nil vs Raw:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
+                                                                  1,
+                                                                  false,
+                                                                  1,
+                                                                  1,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+
+    // Nil vs Str:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
+                                                                  "",
+                                                                  false,
+                                                                  "",
+                                                                  "",
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
+                                                                  "Str Data",
+                                                                  false,
+                                                                  "Str Data",
+                                                                  "Str Data",
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+
+    // Nil vs Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
+                                                                  std::vector<int>{},
+                                                                  false,
+                                                                  std::vector<int>{},
+                                                                  std::vector<int>{},
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
+                                                                  std::vector<int>{1, 2, 3},
+                                                                  false,
+                                                                  std::vector<int>{1, 2, 3},
+                                                                  std::vector<int>{1, 2, 3},
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+
+    // Nil vs Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
+                                                                  std::map<int, int>{},
+                                                                  false,
+                                                                  std::map<int, int>{},
+                                                                  std::map<int, int>{},
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
+                                                                  std::map<int, int>{{1, 2}, {3, 4}, {5, 6}},
+                                                                  false,
+                                                                  std::map<int, int>{{1, 2}, {3, 4}, {5, 6}},
+                                                                  std::map<int, int>{{1, 2}, {3, 4}, {5, 6}},
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas)
+{
+    // Raw vs Nil:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(1,
+                                                                  LLBC_Variant::nil,
+                                                                  false,
+                                                                  1,
+                                                                  1,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+
+    // Raw vs Str:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(123,
+                                                                  "1",
+                                                                  false,
+                                                                  "1231",
+                                                                  "23",
+                                                                  123,
+                                                                  123,
+                                                                  123));
+
+
+    // Raw vs Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(123,
+                                                                  std::vector<int>{1, 2},
+                                                                  false,
+                                                                  123,
+                                                                  123,
+                                                                  123,
+                                                                  123,
+                                                                  123));
+
+    // Raw vs Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(123,
+                                                                  std::map<int, int>{{1, 2}, {3, 4}},
+                                                                  false,
+                                                                  123,
+                                                                  123,
+                                                                  123,
+                                                                  123,
+                                                                  123));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas)
+{
+    // Str vs Nil:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("123",
+                                                                  LLBC_Variant::nil,
+                                                                  false,
+                                                                  "123",
+                                                                  "123",
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+
+    // Str vs Raw:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("123",
+                                                                  3,
+                                                                  false,
+                                                                  "1233",
+                                                                  "12",
+                                                                  "123123123",
+                                                                  "123",
+                                                                  "123"));
+
+    // Str vs Str:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("123",
+                                                                  "2",
+                                                                  false,
+                                                                  "1232",
+                                                                  "13",
+                                                                  "123",
+                                                                  "123",
+                                                                  "123"));
+
+
+    // Str vs Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("123",
+                                                                  std::vector<int>{1, 2},
+                                                                  false,
+                                                                  "123",
+                                                                  "123",
+                                                                  "123",
+                                                                  "123",
+                                                                  "123"));
+
+    // Str vs Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("123",
+                                                                  std::map<int, int>{{1, 2}, {3, 4}},
+                                                                  false,
+                                                                  "123",
+                                                                  "123",
+                                                                  "123",
+                                                                  "123",
+                                                                  "123"));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas)
+{
+    // Seq vs Nil:
+    LLBC_Variant expectAddResult;
+    expectAddResult.SeqBatchPushBack(1, 2, 3, LLBC_Variant::nil);
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::vector<int>{1, 2, 3},
+                                                                  LLBC_Variant::nil,
+                                                                  false,
+                                                                  expectAddResult,
+                                                                  std::vector<int>{1, 2, 3},
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+
+    // Seq vs Raw:
+    expectAddResult.Clear();
+    expectAddResult.SeqBatchPushBack(1, 2, 3, 3);
+    LLBC_Variant expectSubResult;
+    expectSubResult.SeqBatchPushBack(1, 2);
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::vector<int>{1, 2, 3},
+                                                                  3,
+                                                                  false,
+                                                                  expectAddResult,
+                                                                  expectSubResult,
+                                                                  std::vector<int>{1, 2, 3, 1, 2, 3, 1, 2, 3},
+                                                                  std::vector<int>{1, 2, 3},
+                                                                  std::vector<int>{1, 2, 3}));
+
+    // Seq vs Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::vector<int>{1, 2, 3},
+                                                                  std::vector<int>{1, 4, 5, 3},
+                                                                  false,
+                                                                  std::vector<int>{1, 2, 3, 1, 4, 5, 3},
+                                                                  std::vector<int>{2},
+                                                                  std::vector<int>{1, 3},
+                                                                  std::vector<int>{1, 2, 3},
+                                                                  std::vector<int>{1, 2, 3}));
+
+    // Seq vs Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::vector<int>{1, 2, 3},
+                                                                  std::map<int, int>{{1, 10}, {4, 40}, {5, 50}, {3, 30}},
+                                                                  false,
+                                                                  std::vector<int>{1, 2, 3, 1, 3, 4, 5},
+                                                                  std::vector<int>{2},
+                                                                  std::vector<int>{1, 3},
+                                                                  std::vector<int>{1, 2, 3},
+                                                                  std::vector<int>{1, 2, 3}));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas)
+{
+    // Dict vs Nil:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  LLBC_Variant::nil,
+                                                                  false,
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+
+    // Dict vs Raw:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  1,
+                                                                  false,
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}));
+
+    // Dict vs Str:
+    testDatas.SeqPushBack(
+        ArithmeticOperatorTest_BuildOneTestData(std::map<
+            LLBC_String, int>{{"Str Data", 10}, {"Str Data2", 20}, {"Str Data3", 30}},
+            "Str Data",
+            false,
+            std::map<LLBC_String, int>{{"Str Data", 10}, {"Str Data2", 20}, {"Str Data3", 30}},
+            std::map<LLBC_String, int>{{"Str Data2", 20}, {"Str Data3", 30}},
+            std::map<LLBC_String, int>{{"Str Data", 10}, {"Str Data2", 20}, {"Str Data3", 30}},
+            std::map<LLBC_String, int>{{"Str Data", 10}, {"Str Data2", 20}, {"Str Data3", 30}},
+            std::map<LLBC_String, int>{{"Str Data", 10}, {"Str Data2", 20}, {"Str Data3", 30}}));
+
+    // Dict vs Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::vector{1, 3},
+                                                                  false,
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{2, 20}},
+                                                                  std::map<int, int>{{1, 10}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}));
+
+    // Dict vs Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{2, 200}, {4, 40}},
+                                                                  false,
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}, {4, 40}},
+                                                                  std::map<int, int>{{1, 10}, {3, 30}},
+                                                                  std::map<int, int>{{2, 20}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas)
+{
+    ArithmeticOperatorTest_GenTestDatas_SameType_Nil(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_SameType_Raw(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_SameType_Str(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_SameType_Seq(testDatas);
+    ArithmeticOperatorTest_GenTestDatas_SameType_Dict(testDatas);
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas)
+{
+    // Nil vs Nil:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  false,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil,
+                                                                  LLBC_Variant::nil));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas)
+{
+    // Bool vs Bool:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(false,
+                                                                  false,
+                                                                  false,
+                                                                  0,
+                                                                  0,
+                                                                  0,
+                                                                  0,
+                                                                  0));
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(false,
+                                                                  true,
+                                                                  false,
+                                                                  1,
+                                                                  -1,
+                                                                  0,
+                                                                  0,
+                                                                  0));
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(true,
+                                                                  false,
+                                                                  false,
+                                                                  1,
+                                                                  1,
+                                                                  0,
+                                                                  0,
+                                                                  0));
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(true,
+                                                                  true,
+                                                                  false,
+                                                                  2,
+                                                                  0,
+                                                                  1,
+                                                                  1,
+                                                                  0));
+
+    // sint64/uint64 vs sint64/uint64:
+    for (int i = 0; i < 10; ++i)                                                               
+    {
+        int left = LLBC_Rand();
+        int right = LLBC_Rand();
+        bool leftIsUnsigned = LLBC_BoolJudge();
+        bool rightIsUnsigned = LLBC_BoolJudge();
+
+        LLBC_Variant leftVar;
+        if (leftIsUnsigned)
+            leftVar = static_cast<uint64>(left);
+        else
+            leftVar = static_cast<sint64>(left);
+
+        LLBC_Variant rightVar;
+        if (rightIsUnsigned)
+            rightVar = static_cast<uint64>(right);
+        else
+            rightVar = static_cast<sint64>(right);
+
+        LLBC_Variant expectAddResult;
+        LLBC_Variant expectSubResult;
+        LLBC_Variant expectMulResult;
+        LLBC_Variant expectDivResult;
+        LLBC_Variant expectModResult;
+        if (leftIsUnsigned || rightIsUnsigned)
+        {
+            uint64 u64Left = 0;
+            if (leftIsUnsigned)
+                u64Left = static_cast<uint64>(left);
+            else
+                u64Left = static_cast<uint64>(static_cast<sint64>(left));
+
+            uint64 u64Right = 0;
+            if (rightIsUnsigned)
+                u64Right = static_cast<uint64>(right);
+            else
+                u64Right = static_cast<uint64>(static_cast<sint64>(right));
+
+            expectAddResult = u64Left + u64Right;
+            expectSubResult = u64Left - u64Right;
+            expectMulResult = u64Left * u64Right;
+            expectDivResult = u64Right != 0 ? u64Left / u64Right : 0ull;
+            expectModResult = u64Right != 0 ? u64Left % u64Right : 0ull;
+        }
+        else
+        {
+            const auto s64Left = static_cast<sint64>(left);
+            const auto s64Right = static_cast<sint64>(right);
+            expectAddResult = s64Left + s64Right;
+            expectSubResult = s64Left - s64Right;
+            expectMulResult = s64Left * s64Right;
+            expectDivResult = s64Right != 0 ? s64Left / s64Right : 0ull;
+            expectModResult = s64Right != 0 ? s64Left % s64Right : 0ull;
+        }
+
+        testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(leftVar,
+                                                                      rightVar,
+                                                                      false,
+                                                                      expectAddResult,
+                                                                      expectSubResult,
+                                                                      expectMulResult,
+                                                                      expectDivResult,
+                                                                      expectModResult));
+    }
+
+    // double vs double:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(3.1,
+                                                                  1.3,
+                                                                  false,
+                                                                  4.4,
+                                                                  1.8,
+                                                                  3.1 * 1.3,
+                                                                  3.1 / 1.3,
+                                                                  static_cast<sint64>(3.1) % static_cast<sint64>(1.3)));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas)
+{
+    // Empty Str vs Empty Str:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("",
+                                                                  "",
+                                                                  false,
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  ""));
+
+    // Empty Str vs Non-Empty Str:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("",
+                                                                  "Hello World",
+                                                                  false,
+                                                                  "Hello World",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  ""));
+
+    // Non-Empty Str vs Empty Str:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("Hello World",
+                                                                  "",
+                                                                  false,
+                                                                  "Hello World",
+                                                                  "Hello World",
+                                                                  "Hello World",
+                                                                  "Hello World",
+                                                                  "Hello World"));
+
+    // Non-Empty Str vs Non-Empty Str:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("Hello World Hello World",
+                                                                  "World",
+                                                                  false,
+                                                                  "Hello World Hello WorldWorld",
+                                                                  "Hello  Hello ",
+                                                                  "Hello World Hello World",
+                                                                  "Hello World Hello World",
+                                                                  "Hello World Hello World"));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas)
+{
+    // Empty Seq vs Empty Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::Seq(),
+                                                                  LLBC_Variant::Seq(),
+                                                                  false,
+                                                                  LLBC_Variant::Seq(),
+                                                                  LLBC_Variant::Seq(),
+                                                                  LLBC_Variant::Seq(),
+                                                                  LLBC_Variant::Seq(),
+                                                                  LLBC_Variant::Seq()));
+
+    // Empty Seq vs Non-Empty Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::Seq(),
+                                                                  std::vector{1, 2, 3},
+                                                                  false,
+                                                                  std::vector{1, 2, 3},
+                                                                  LLBC_Variant::Seq(),
+                                                                  LLBC_Variant::Seq(),
+                                                                  LLBC_Variant::Seq(),
+                                                                  LLBC_Variant::Seq()));
+
+    // Non-Empty Seq vs Empty Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::vector{1, 2, 3},
+                                                                  LLBC_Variant::Seq(),
+                                                                  false,
+                                                                  std::vector{1, 2, 3},
+                                                                  std::vector{1, 2, 3},
+                                                                  LLBC_Variant::Seq(),
+                                                                  std::vector{1, 2, 3},
+                                                                  std::vector{1, 2, 3}));
+
+    // Non-Empty Seq vs Non-Empty Seq:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::vector{1, 2, 3},
+                                                                  std::vector{1, 2, 2, 4, 4},
+                                                                  false,
+                                                                  std::vector{1, 2, 3, 1, 2, 2, 4, 4},
+                                                                  std::vector{3},
+                                                                  std::vector{1, 2},
+                                                                  std::vector{1, 2, 3},
+                                                                  std::vector{1, 2, 3}));
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas)
+{
+    // Empty Dict vs Empty Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::Dict(),
+                                                                  LLBC_Variant::Dict(),
+                                                                  false,
+                                                                  LLBC_Variant::Dict(),
+                                                                  LLBC_Variant::Dict(),
+                                                                  LLBC_Variant::Dict(),
+                                                                  LLBC_Variant::Dict(),
+                                                                  LLBC_Variant::Dict()));
+
+    // Empty Dict vs Non-Empty Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::Dict(),
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  false,
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  LLBC_Variant::Dict(),
+                                                                  LLBC_Variant::Dict(),
+                                                                  LLBC_Variant::Dict(),
+                                                                  LLBC_Variant::Dict()));
+
+    // Non-Empty Dict vs Empty Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  LLBC_Variant::Dict(),
+                                                                  false,
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}));
+
+    // Non-Empty Dict vs Non-Empty Dict:
+    testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 200}, {4, 40}},
+                                                                  false,
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}, {4, 40}},
+                                                                  std::map<int, int>{{3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
+                                                                  std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}));
+}
+
+template <typename _LeftTy,
+          typename _RightTy,
+          typename _ExpectAddResultTy,
+          typename _ExpectSubResultTy,
+          typename _ExpectMulResultTy,
+          typename _ExpectDivResultTy,
+          typename _ExpectModResultTy>
+LLBC_Variant TestCase_Core_Variant::ArithmeticOperatorTest_BuildOneTestData(const _LeftTy &left,
+                                                                            const _RightTy &right,
+                                                                            bool execXxxAndEqual,
+                                                                            const _ExpectAddResultTy &expectAddResult,
+                                                                            const _ExpectSubResultTy &expectSubResult,
+                                                                            const _ExpectMulResultTy &expectMulResult,
+                                                                            const _ExpectDivResultTy &expectDivResult,
+                                                                            const _ExpectModResultTy &expectModResult)
+{
+    LLBC_Variant testData;
+    testData.SeqBatchPushBack(left,
+                              right,
+                              execXxxAndEqual,
+                              expectAddResult,
+                              expectSubResult,
+                              expectMulResult,
+                              expectDivResult,
+                              expectModResult);
+
+    return testData;
+}
+
+void TestCase_Core_Variant::ArithmeticOperatorTest_BuildXxxAndEqualTestDatas(LLBC_Variant &testDatas)
+{
+    const auto size = testDatas.Size();
+    for (size_t i = 0; i < size; ++i)
+    {
+        auto testData = testDatas[i];
+        testData[2] = true;
+        testDatas.SeqPushBack(testData);
+    }
+}
+
+int TestCase_Core_Variant::ArithmeticOperatorTest_ExceptCheck(LLBC_Variant &testData)
+{
+    const auto &left = testData[0];
+    const auto &right = testData[1];
+    const auto &execXxxAndEqual = testData[2];
+    LLBC_PrintLn(" - left:%s, right:%s, execXxxAndEqual:%s",
+                 left.ToString().c_str(),
+                 right.ToString().c_str(),
+                 execXxxAndEqual ? "true" : "false");
+
+    if (execXxxAndEqual)
+    {
+        auto copyLeft = left;
+        LLBC_Expect((copyLeft += right) == testData[3] && copyLeft == testData[3],
+                    "%s += %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[3].ToString().c_str());
+
+        copyLeft = left;
+        LLBC_Expect((copyLeft -= right) == testData[4] && copyLeft == testData[4],
+                    "%s -= %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[4].ToString().c_str());
+
+        copyLeft = left;
+        LLBC_Expect((copyLeft *= right) == testData[5] && copyLeft == testData[5],
+                    "%s *= %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[5].ToString().c_str());
+
+        copyLeft = left;
+        LLBC_Expect((copyLeft /= right) == testData[6] && copyLeft == testData[6],
+                    "%s /= %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[6].ToString().c_str());
+
+        copyLeft = left;
+        LLBC_Expect((copyLeft %= right) == testData[7] && copyLeft == testData[7],
+                    "%s %%= %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[7].ToString().c_str());
+    }
+    else
+    {
+        LLBC_Expect((left + right) == testData[3],
+                    "%s + %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[3].ToString().c_str());
+        LLBC_Expect((left - right) == testData[4],
+                    "%s - %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[4].ToString().c_str());
+        LLBC_Expect((left * right) == testData[5],
+                    "%s * %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[5].ToString().c_str());
+        LLBC_Expect((left / right) == testData[6],
+                    "%s / %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[6].ToString().c_str());
+        LLBC_Expect((left % right) == testData[7],
+                    "%s %% %s = %s",
+                    left.ToString().c_str(),
+                    right.ToString().c_str(),
+                    testData[7].ToString().c_str());
+    }
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::SerDeserTest()
+{
+    LLBC_PrintLn("SerDeserTest:");
+
+    LLBC_Expect(SerDeserTestOne(LLBC_Variant::nil) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(true) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(1) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(1u) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(1ll) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(1ull) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(1.0) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne("Hello World") == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(std::vector{1, 2, 3}) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}) == LLBC_OK);
+    LLBC_Expect(SerDeserTestOne(std::map<int, std::vector<std::pair<LLBC_String, int>>>{
+        {1, {{"Hello World", 10}, {"Hey Judy", 20}}},
+        {2, {{"hello world", 100}, {"hey judy", 200}}}}) == LLBC_OK);
+
+    return LLBC_OK;
+}
+
+template <typename _Ty>
+int TestCase_Core_Variant::SerDeserTestOne(const _Ty &val)
+{
+    LLBC_Variant var1(val);
+
+    // Use LLBC_Stream::Read/LLBC_Stream::Write to ser/deser.
+    LLBC_Stream stream;
+    stream.Write(var1);
+    LLBC_Variant var2;
+    stream.Read(var2);
+    LLBC_Expect(var1 == var2 && stream.GetReadPos() == stream.GetWritePos(),
+                "Stream::Read/Stream::Write: var1:%s, var2:%s, readPos:%zu, writePos:%zu",
+                var1.ToString().c_str(),
+                var2.ToString().c_str(),
+                stream.GetReadPos(),
+                stream.GetWritePos());
+
+    // Use LLBC_Stream streaming operator to ser/deser.
+    LLBC_Stream stream2;
+    stream2 << var1;
+    LLBC_Variant var3;
+    stream2 >> var3;
+    LLBC_Expect(var1 == var3 && stream2.GetReadPos() == stream2.GetWritePos(),
+                "Stream streaming operator: var1:%s, var3:%s, readPos:%zu, writePos:%zu",
+                var1.ToString().c_str(),
+                var3.ToString().c_str(),
+                stream2.GetReadPos(),
+                stream2.GetWritePos());
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::OstreamOutputTest()
+{
+    LLBC_PrintLn("OstreamOutputTest:");
+
+    LLBC_Variant nilVar;
+    std::cout <<nilVar <<std::endl;
+
+    LLBC_Variant intVar(1);
+    std::cout <<intVar <<std::endl;
+
+    LLBC_Variant strVar("Hello World");
+    std::cout <<strVar <<std::endl;
+
+    LLBC_Variant seqVar(std::vector<int>{1, 2, 3});
+    std::cout <<seqVar <<std::endl;
+
+    LLBC_Variant dictVar(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}});
+    std::cout <<dictVar <<std::endl;
 
     return LLBC_OK;
 }

@@ -85,9 +85,12 @@ void LLBC_VariantTraits::add_equal(LLBC_Variant &left, const LLBC_Variant &right
     }
 
     // Left is Nil rules:
-    // > Left[Nil] + Right[Any] = Left
+    // > Left[Nil] + Right[Any] = Right
     if (left.Is<void>())
+    {
+        left = right;
         return;
+    }
 
     // Left is Dict rules:
     // > Left[Dict] + Right[Dict] = Dict[Left join Right]
@@ -187,9 +190,12 @@ void LLBC_VariantTraits::sub_equal(LLBC_Variant &left, const LLBC_Variant &right
     }
 
     // Left is Nil rules:
-    // > Left[Nil] - Right[Any] = Left
+    // > Left[Nil] - Right[Any] = Right
     if (left.Is<void>())
+    {
+        left = right;
         return;
+    }
 
     // Left is Dict rules:
     // > Left[Dict] - Right[Dict/Seq] = Dict[Left - Right]
@@ -338,7 +344,8 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
     }
 
     // Left or Right is Nil rules:
-    // > Left[Nil] or Right[Nil] mul = Nil
+    // > Left[Nil] * Right[Any] = Nil
+    // > Left[Any] * Right[Nil] = Nil
     if (left.Is<void>() || right.Is<void>())
     {
         left.Become<void>();
@@ -432,7 +439,6 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
     // > Left[Str] * Right[Dict/Seq] = Left[Str]
     // > Left[Str] * Right[Str] = Left[Str]
     // > Left[Str] * Right[Raw] = Left[Str] repeat Right.As<sint32>() times
-    // > Left[Str] * Right[Nil] = Left[Str]
     if (left.Is<LLBC_Variant::Str>())
     {
         if (right.IsRaw())
@@ -448,7 +454,7 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
     }
 
     // Left is Raw rules:
-    // > Left[Raw] * Right[Dict/Seq/Str/Nil] = Left[Raw]
+    // > Left[Raw] * Right[Dict/Seq/Str] = Left[Raw]
     // > Left[Raw] * Right[Raw] = Left[left raw * right raw]
     if (left.IsRaw())
     {
@@ -472,7 +478,9 @@ void LLBC_VariantTraits::div_equal(LLBC_Variant &left, const LLBC_Variant &right
         return;
     }
 
-    // Left[Nil] or Right[Nil] = Nil
+    // Left or Right is Nil rules:
+    // > Left[Nil] / Right[Any] = Nil
+    // > Left[Any] / Right[Nil] = Nil
     if (left.Is<void>() || right.Is<void>())
     {
         left.Become<void>();
@@ -498,7 +506,9 @@ void LLBC_VariantTraits::mod_equal(LLBC_Variant &left, const LLBC_Variant &right
         return;
     }
 
-    // Left[Nil] or Right[Nil] = Nil
+    // Left or Right is Nil rules:
+    // > Left[Nil] % Right[Any] = Nil
+    // > Left[Any] % Right[Nil] = Nil
     if (left.Is<void>() || right.Is<void>())
     {
         left.Become<void>();

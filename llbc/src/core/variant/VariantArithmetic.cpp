@@ -97,7 +97,7 @@ void LLBC_VariantArithmetic::Performs_bool_any(LLBC_Variant &left, const LLBC_Va
     switch (right.GetType())
     {
     case LLBC_VariantType::RAW_BOOL:
-        left = Performs_raw_operation(left.As<bool>(), right.As<bool>(), type);
+        left = Performs_raw_operation<bool, int>(left.As<bool>(), right.As<bool>(), type);
         break;
 
     case LLBC_VariantType::RAW_SINT8:
