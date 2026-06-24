@@ -445,7 +445,8 @@
                                                                                                           \
         if (!LLBC_Concat(llbcExpectCond, __LINE__)) {                                                     \
             LLBC_FilePrintLn(stderr,                                                                      \
-                             "Stack Backtrace:\n%s\n",                                                    \
+                             "%s:%d\nStack Backtrace:\n%s\n",                                             \
+                             __FILE__, __LINE__,                                                          \
                              LLBC_NS LLBC_CaptureStackBackTrace().c_str());                               \
             abort();                                                                                      \
         }                                                                                                 \
