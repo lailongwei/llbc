@@ -26,7 +26,7 @@
 // Handle crash support macro define.
 #if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
  #define LLBC_SUPPORT_HANDLE_CRASH 1
-#else // Non Win32 and Linux
+#else // Non Win32/Linux/Mac.
  #define LLBC_SUPPORT_HANDLE_CRASH 0
 #endif
 

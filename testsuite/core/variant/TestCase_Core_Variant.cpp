@@ -945,7 +945,9 @@ int TestCase_Core_Variant::ConstructTest_StrType()
     LLBC_Expect(llbcStrVarFromMove.Is<LLBC_String>() &&
                     llbcStrVarFromMove.GetData().str() == "hello world(for move)" &&
                     llbcStrForMove.empty(),
-                "Move Construct from LLBC_String");
+                "Move Construct from LLBC_String, llbcStrVarFromMove:%s, llbcStrForMove:%s",
+                llbcStrVarFromMove.ToString().c_str(),
+                llbcStrForMove.c_str());
 
     // Construct from LLBC_CString/const LLBC_CString.
     LLBC_CString llbcCStr("hello world");
@@ -1074,6 +1076,17 @@ int TestCase_Core_Variant::ConstructTest_OneSeqType(_SeqTy &&seq)
                         "Construct from pair, ty:%s: seqVar:%s",
                         LLBC_GetTypeName(seq), seqVar.ToString().c_str());
         }
+    }
+    else if constexpr (LLBC_IsTemplSpec<_PureSeqTy, std::unordered_set>::value)
+    {
+        std::vector<typename _PureSeqTy::value_type> vecSeq;
+        for (auto &elem : seq)
+            vecSeq.push_back(elem);
+
+        if constexpr (std::is_rvalue_reference_v<_SeqTy &&>)
+            return ConstructTest_OneSeqType(std::move(vecSeq));
+        else
+            return ConstructTest_OneSeqType(vecSeq);
     }
     else
     {
@@ -1651,6 +1664,17 @@ int TestCase_Core_Variant::AssignmentTest_OneSeqType(_SeqTy &&seq)
                         "Copy Assignment from pair, ty:%s, seqVar:%s",
                         LLBC_GetTypeName(seq), seqVar.ToString().c_str());
         }
+    }
+    else if constexpr (LLBC_IsTemplSpec<_PureSeqTy, std::unordered_set>::value)
+    {
+        std::vector<typename _PureSeqTy::value_type> vecSeq;
+        for (auto &elem : seq)
+            vecSeq.push_back(elem);
+
+        if constexpr (std::is_rvalue_reference_v<_SeqTy &&>)
+            return AssignmentTest_OneSeqType(std::move(vecSeq));
+        else
+            return AssignmentTest_OneSeqType(vecSeq);
     }
     else
     {
@@ -3053,14 +3077,23 @@ int TestCase_Core_Variant::SizeAndCapacityTest()
                 LLBC_Variant(-8).Capacity() == 0);
 
     // Str:
+    // - SSO diff impl:
     LLBC_Variant strVar("");
-    LLBC_Expect(strVar.Size() == 0 &&
-                strVar.Capacity() == 0);
+    #if LLBC_CUR_COMP == LLBC_COMP_CLANG
+    constexpr size_t expectCap = 22;
+    #elif LLBC_CUR_COMP == LLBC_COMP_MSVC
+    constexpr size_t expectCap = 15;
+    #else // Gcc and other compilers: 0
+    constexpr size_t expectCap = 0;
+    #endif
+    LLBC_Expect(strVar.Size() == 0 && strVar.Capacity() == expectCap,
+                "StrVar.size:%lu, strVar.capacity:%lu",
+                strVar.Size(), strVar.Capacity());
     strVar = "Hello World";
     strVar.StrResize(20);
     strVar.StrReserve(80);
     LLBC_Expect(strVar.Size() == 20 &&
-                strVar.Capacity() == 80 &&
+                strVar.Capacity() >= 80 &&
                 strVar.As<LLBC_Variant::Str>()[0] == 'H' &&
                 strVar.As<LLBC_Variant::Str>()[19] == '\0',
                 "strVar.Size():%lu, strVar.Capacity():%lu",

@@ -24,10 +24,18 @@
 
 #include "llbc/core/time/Time.h"
 #include "llbc/core/os/OS_Process.h"
+
 #if LLBC_SUPPORT_HANDLE_CRASH
+
+// iPhone/Macosx implementation:
+#if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+ #include <mach-o/dyld.h>
+#endif // iPhone/Macosx.
+
 #include "llbc/core/file/Directory.h"
 #include "llbc/common/RTTI.h"
-#endif
+#endif // Suport handle crash.
+
 #include "llbc/core/log/LoggerMgr.h"
 
 #if LLBC_CUR_COMP == LLBC_COMP_GCC
@@ -283,10 +291,16 @@ static void __NonWin32CrashHandler(int sig)
     }
 
     // Get executable file path.
+    #if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+    LLBC_NS uint32 exeFilePathSize = sizeof(__exeFilePath);
+    if (_NSGetExecutablePath(__exeFilePath, &exeFilePathSize) != 0)
+        raise(sig);
+    #else // Linux/Android.
     ssize_t readLinkRet = readlink("/proc/self/exe", __exeFilePath, sizeof(__exeFilePath) - 1);
     LLBC_DoIf(readLinkRet == -1, raise(sig));
-
     __exeFilePath[readLinkRet] = '\0';
+    #endif // Macosx/iPhone.
+
     const char *exeFileName = basename(__exeFilePath);
     LLBC_DoIf(!exeFileName, raise(sig));
 

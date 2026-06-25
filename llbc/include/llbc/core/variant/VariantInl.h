@@ -389,14 +389,14 @@ LLBC_Variant::LLBC_Variant(_Ty &&str)
 }
 
 template <typename _Ty,
-          std::enable_if_t<LLBC_VariantType::IsSeq<_Ty>(), int> = 0>
+          std::enable_if_t<LLBC_VariantType::IsSeq<_Ty>(), int>>
 LLBC_Variant::LLBC_Variant(_Ty &&seq)
 {
     ConstructOrAssignFromSeq<_Ty, true>(std::forward<_Ty>(seq));
 }
 
 template <typename _Ty,
-          std::enable_if_t<LLBC_VariantType::IsDict<_Ty>(), int> = 0>
+          std::enable_if_t<LLBC_VariantType::IsDict<_Ty>(), int>>
 LLBC_Variant::LLBC_Variant(_Ty &&dict)
 {
     ConstructOrAssignFromDict<_Ty, true>(std::forward<_Ty>(dict));
@@ -843,7 +843,6 @@ LLBC_Variant::As() const
     {
         if (Is<Seq>() && !_data.seq().empty())
         {
-            const size_t seqSize = _data.seq().size();
             if (_data.seq().size() >= 2)
                 return {_data.seq()[0], _data.seq()[1]};
             else
