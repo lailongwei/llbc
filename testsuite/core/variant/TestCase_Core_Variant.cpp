@@ -4014,6 +4014,8 @@ int TestCase_Core_Variant::RelationalOperatorTest()
 {
     LLBC_PrintLn("- RelationalOperatorTest:");
 
+    // Build test datas:
+    // Test data format: lhs, rhs, expectEq, expectLt.
     LLBC_Variant testDatas;
     RelationalOperatorTest_GenTestDatas_SameType(testDatas);
     RelationalOperatorTest_GenTestDatas_DiffType(testDatas);
@@ -4037,8 +4039,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType(LLBC_Va
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // nil vs other types.
     const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant::nil,
@@ -4080,8 +4080,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_NilVsOt
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // raw vs other types.
     const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector<LLBC_Variant>{LLBC_Variant(1),
@@ -4119,8 +4117,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_RawVsOt
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // str vs other types.
     const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector{LLBC_Variant("Str Data"),
@@ -4154,9 +4150,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_StrVsOt
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas)
 {
-
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // seq vs other types.
     const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector{LLBC_Variant(std::set<int>{}),
@@ -4190,8 +4183,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOt
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // dict vs other types.
     const size_t beginPos1 = testDatas.Size();
     testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, LLBC_String>{}),
@@ -4234,7 +4225,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType(LLBC_Va
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
     testDatas.SeqPushBack(std::vector{LLBC_Variant::nil,
                                       LLBC_Variant::nil,
                                       LLBC_Variant(true),
@@ -4243,8 +4233,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Nil(LLB
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // - bool:
     const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector{LLBC_Variant(false),
@@ -4343,8 +4331,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Raw(LLB
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // Empty Str vs Empty Str:
     const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector{LLBC_Variant(""),
@@ -4373,8 +4359,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Str(LLB
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // Empty Seq vs Empty Seq:
     const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector{LLBC_Variant(std::vector<int>{}),
@@ -4403,8 +4387,6 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Seq(LLB
 
 void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas)
 {
-    // Test data format: lhs, rhs, expectEq, expectLt.
-
     // Empty Dict vs Empty Dict:
     const size_t beginPos = testDatas.Size();
     testDatas.SeqPushBack(std::vector{LLBC_Variant(std::map<int, int>{}),
