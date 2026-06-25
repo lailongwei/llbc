@@ -60,7 +60,7 @@ public:
     // Constructors.
     explicit LLBC_BasicString(const _Ax &al = _Ax()):_Base(al) {  }
     LLBC_BasicString(const _This &rhs):_Base(rhs) {  }
-    LLBC_BasicString(_This &&rhs) noexcept :_Base(std::move(rhs)) {  }
+    LLBC_BasicString(_This &&rhs) noexcept :_Base(static_cast<_Base &&>(rhs)) {  }
     LLBC_BasicString(const _Base &rhs):_Base(rhs) {  }
     LLBC_BasicString(_Base &&rhs) noexcept
         :_Base(std::move(rhs)) {  }
@@ -79,7 +79,7 @@ public:
 
     _This &operator=(_This &&rhs) noexcept
     {
-        _Base::operator=(std::move(rhs));
+        _Base::operator=(static_cast<_Base &&>(rhs));
         return *this;
     }
 
