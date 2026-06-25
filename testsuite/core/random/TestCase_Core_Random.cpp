@@ -82,7 +82,7 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
         LLBC_Print("%.6f ", LLBC_RandReal());
     }
 
-    // Test Choice / Choices.
+    // Test Choice / WeightedChoice / Sample / WeightedSample.
     Exec_Choice_Test();
     Exec_Choices_Test();
 
@@ -154,142 +154,217 @@ void TestCase_Core_Random::Exec_RandInt_begin_end_Test(int begin, int end, int t
 void TestCase_Core_Random::Exec_Choice_Test()
 {
     LLBC_Print("\n");
-    LLBC_PrintLn("LLBC_Random::Choice() test(vector range:[1, 100]):");
+    LLBC_PrintLn("LLBC_Random::Choice() / WeightedChoice() test(vector range:[1, 100]):");
 
     LLBC_Random rand;
 
-    // std::vector container.
+    // std::vector container - uniform Choice.
     std::vector<int> v;
     for (int i = 0; i < 100; ++i)
         v.push_back(i + 1);
 
     for (int i = 0; i < 10; ++i)
     {
-        auto picked = rand.Choice(v);
-        LLBC_PrintLn("  Choice(vector) result: %d", picked.has_value() ? picked->get() : -1);
+        auto it = rand.Choice(v.begin(), v.end());
+        LLBC_PrintLn("  Choice(vector) result: %d", it != v.end() ? *it : -1);
     }
 
-    // std::list container.
+    // std::list container - uniform Choice.
     std::list<int> lst{11, 22, 33, 44, 55};
     {
-        auto picked = rand.Choice(lst);
-        LLBC_PrintLn("  Choice(list) result: %d", picked.has_value() ? picked->get() : -1);
+        auto it = rand.Choice(lst.begin(), lst.end());
+        LLBC_PrintLn("  Choice(list) result: %d", it != lst.end() ? *it : -1);
     }
 
-    // std::array container.
+    // std::array container - uniform Choice.
     std::array<int, 5> arr{100, 200, 300, 400, 500};
     {
-        auto picked = rand.Choice(arr);
-        LLBC_PrintLn("  Choice(array) result: %d", picked.has_value() ? picked->get() : -1);
+        auto it = rand.Choice(arr.begin(), arr.end());
+        LLBC_PrintLn("  Choice(array) result: %d", it != arr.end() ? *it : -1);
     }
 
-    // Test Choice with vector weights (only the third element has positive weight).
+    // WeightedChoice with vector weights (only the third element has positive weight).
     {
         std::vector<int> elements{10, 20, 30};
         std::vector<int> weights{0, 0, 1};
-        auto picked = rand.Choice(elements, &weights);
-        LLBC_PrintLn("  Choice(vector, vec weights{0,0,1}) result: %d (expect 30)",
-                     picked.has_value() ? picked->get() : -1);
+        auto it = rand.WeightedChoice(elements.begin(), elements.end(),
+                                      weights.begin(), weights.end());
+        LLBC_PrintLn("  WeightedChoice(vector, weights{0,0,1}) result: %d (expect 30)",
+                     it != elements.end() ? *it : -1);
     }
 
-    // Test Choice with list weights (only the second element has positive weight).
+    // WeightedChoice with list weights (only the second element has positive weight).
     {
         std::list<int> elements{7, 8, 9};
         std::list<int> weights{0, 1, 0};
-        auto picked = rand.Choice(elements, &weights);
-        LLBC_PrintLn("  Choice(list, list weights{0,1,0}) result: %d (expect 8)",
-                     picked.has_value() ? picked->get() : -1);
+        auto it = rand.WeightedChoice(elements.begin(), elements.end(),
+                                      weights.begin(), weights.end());
+        LLBC_PrintLn("  WeightedChoice(list, weights{0,1,0}) result: %d (expect 8)",
+                     it != elements.end() ? *it : -1);
     }
 
-    // Test Choice with std::map (use pair.second as implicit weights).
-    // Only key=300 has positive weight, expect picked.first == 300.
+    // WeightedChoice on std::map by projecting .second to a weight vector.
+    // Only key=300 has positive weight, expect it->first == 300.
     {
         std::map<int, int> m{{100, 0}, {200, 0}, {300, 1}};
-        auto picked = rand.Choice(m);
-        LLBC_PrintLn("  Choice(map, .second as weights{0,0,1}) result: %d (expect 300)",
-                     picked.has_value() ? picked->get().first : -1);
+        std::vector<int> ws;
+        ws.reserve(m.size());
+        for (auto &kv : m) ws.push_back(kv.second);
+
+        auto it = rand.WeightedChoice(m.begin(), m.end(),
+                                      ws.begin(),  ws.end());
+        LLBC_PrintLn("  WeightedChoice(map, projected weights{0,0,1}) result: %d (expect 300)",
+                     it != m.end() ? it->first : -1);
+    }
+
+    // Choice on empty container: expect end iterator.
+    {
+        std::vector<int> empty;
+        auto it = rand.Choice(empty.begin(), empty.end());
+        LLBC_PrintLn("  Choice(empty vector) result: %s (expect end)",
+                     it != empty.end() ? "non-end" : "end");
+    }
+
+    // WeightedChoice with all-zero weights: expect end iterator.
+    {
+        std::vector<int> elements{1, 2, 3};
+        std::vector<int> weights{0, 0, 0};
+        auto it = rand.WeightedChoice(elements.begin(), elements.end(),
+                                      weights.begin(), weights.end());
+        LLBC_PrintLn("  WeightedChoice(vector, weights{0,0,0}) result: %s (expect end)",
+                     it != elements.end() ? "non-end" : "end");
     }
 }
 
 void TestCase_Core_Random::Exec_Choices_Test()
 {
     LLBC_Print("\n");
-    LLBC_PrintLn("LLBC_Random::Choices() test(vector range:[1, 100]):");
+    LLBC_PrintLn("LLBC_Random::Sample() / WeightedSample() test(vector range:[1, 100]):");
 
     LLBC_Random rand;
 
-    // std::vector container.
+    // std::vector container - uniform Sample (random-access path).
     std::vector<int> v;
     for (int i = 0; i < 100; ++i)
         v.push_back(i + 1);
 
     {
-        auto picked = rand.Choices(v, 5);
-        LLBC_Print("  Choices(vector, k=5) result: ");
-        for (const auto &value : picked)
-            LLBC_Print("%d ", value.get());
+        std::vector<int> picked;
+        rand.Sample(v.begin(), v.end(), std::back_inserter(picked), 5);
+        LLBC_Print("  Sample(vector, n=5) result: ");
+        for (auto x : picked)
+            LLBC_Print("%d ", x);
         LLBC_Print("\n");
     }
 
-    // std::list container.
+    // std::list container - uniform Sample (forward path / reservoir).
     {
         std::list<int> lst{11, 22, 33, 44, 55, 66, 77};
-        auto picked = rand.Choices(lst, 3);
-        LLBC_Print("  Choices(list, k=3) result: ");
-        for (const auto &value : picked)
-            LLBC_Print("%d ", value.get());
+        std::vector<int> picked;
+        rand.Sample(lst.begin(), lst.end(), std::back_inserter(picked), 3);
+        LLBC_Print("  Sample(list, n=3) result: ");
+        for (auto x : picked)
+            LLBC_Print("%d ", x);
         LLBC_Print("\n");
     }
 
-    // std::array container.
+    // std::array container - uniform Sample.
     {
         std::array<int, 6> arr{100, 200, 300, 400, 500, 600};
-        auto picked = rand.Choices(arr, 3);
-        LLBC_Print("  Choices(array, k=3) result: ");
-        for (const auto &value : picked)
-            LLBC_Print("%d ", value.get());
+        std::vector<int> picked;
+        rand.Sample(arr.begin(), arr.end(), std::back_inserter(picked), 3);
+        LLBC_Print("  Sample(array, n=3) result: ");
+        for (auto x : picked)
+            LLBC_Print("%d ", x);
         LLBC_Print("\n");
     }
 
-    // Test Choices with vector weights.
+    // WeightedSample with vector weights.
     {
         std::vector<int> elements{1, 2, 3};
         std::vector<int> weights{30, 50, 20};
-        auto picked = rand.Choices(elements, 2, &weights);
-        LLBC_Print("  Choices(vector, k=2, vec weights{30,50,20}) result: ");
-        for (const auto &value : picked)
-            LLBC_Print("%d ", value.get());
+        std::vector<int> picked;
+        rand.WeightedSample(elements.begin(), elements.end(),
+                            weights.begin(),  weights.end(),
+                            std::back_inserter(picked), 2);
+        LLBC_Print("  WeightedSample(vector, n=2, weights{30,50,20}) result: ");
+        for (auto x : picked)
+            LLBC_Print("%d ", x);
         LLBC_Print("\n");
     }
 
-    // Test Choices with list weights.
+    // WeightedSample with list weights.
     {
         std::list<int> elements{10, 20, 30, 40};
         std::list<int> weights{1, 2, 3, 4};
-        auto picked = rand.Choices(elements, 2, &weights);
-        LLBC_Print("  Choices(list, k=2, list weights{1,2,3,4}) result: ");
-        for (const auto &value : picked)
-            LLBC_Print("%d ", value.get());
+        std::vector<int> picked;
+        rand.WeightedSample(elements.begin(), elements.end(),
+                            weights.begin(),  weights.end(),
+                            std::back_inserter(picked), 2);
+        LLBC_Print("  WeightedSample(list, n=2, weights{1,2,3,4}) result: ");
+        for (auto x : picked)
+            LLBC_Print("%d ", x);
         LLBC_Print("\n");
     }
 
-    // Test Choices with std::map (use pair.second as implicit weights).
+    // WeightedSample on std::map by projecting .second to a weight vector.
     {
         std::map<int, int> m{{1, 10}, {2, 20}, {3, 30}, {4, 40}};
-        auto picked = rand.Choices(m, 2);
-        LLBC_Print("  Choices(map, k=2, .second as weights{10,20,30,40}) result: ");
-        for (const auto &value : picked)
-            LLBC_Print("(%d,%d) ", value.get().first, value.get().second);
+        std::vector<int> ws;
+        ws.reserve(m.size());
+        for (auto &kv : m) ws.push_back(kv.second);
+
+        std::vector<std::pair<int, int>> picked;
+        rand.WeightedSample(m.begin(), m.end(),
+                            ws.begin(), ws.end(),
+                            std::back_inserter(picked), 2);
+        LLBC_Print("  WeightedSample(map, n=2, projected weights{10,20,30,40}) result: ");
+        for (auto &kv : picked)
+            LLBC_Print("(%d,%d) ", kv.first, kv.second);
         LLBC_Print("\n");
     }
 
-    // Test Choices with std::unordered_map (use pair.second as implicit weights).
+    // WeightedSample on std::unordered_map by projecting .second to a weight vector.
     {
         std::unordered_map<int, int> um{{11, 1}, {22, 2}, {33, 3}};
-        auto picked = rand.Choices(um, 2);
-        LLBC_Print("  Choices(unordered_map, k=2, .second as weights{1,2,3}) result: ");
-        for (const auto &value : picked)
-            LLBC_Print("(%d,%d) ", value.get().first, value.get().second);
+        std::vector<int> ws;
+        ws.reserve(um.size());
+        for (auto &kv : um) ws.push_back(kv.second);
+
+        std::vector<std::pair<int, int>> picked;
+        rand.WeightedSample(um.begin(), um.end(),
+                            ws.begin(), ws.end(),
+                            std::back_inserter(picked), 2);
+        LLBC_Print("  WeightedSample(unordered_map, n=2, projected weights{1,2,3}) result: ");
+        for (auto &kv : picked)
+            LLBC_Print("(%d,%d) ", kv.first, kv.second);
+        LLBC_Print("\n");
+    }
+
+    // Sample on empty container: expect 0 elements written.
+    {
+        std::vector<int> empty;
+        std::vector<int> picked;
+        rand.Sample(empty.begin(), empty.end(), std::back_inserter(picked), 3);
+        LLBC_PrintLn("  Sample(empty vector, n=3) size: %zu (expect 0)", picked.size());
+    }
+
+    // Sample with n == 0: expect 0 elements written.
+    {
+        std::vector<int> picked;
+        rand.Sample(v.begin(), v.end(), std::back_inserter(picked), 0);
+        LLBC_PrintLn("  Sample(vector, n=0) size: %zu (expect 0)", picked.size());
+    }
+
+    // Sample with n > size: expect size clamped to container size.
+    {
+        std::vector<int> small{1, 2, 3};
+        std::vector<int> picked;
+        rand.Sample(small.begin(), small.end(), std::back_inserter(picked), 10);
+        LLBC_Print("  Sample(vector{1,2,3}, n=10) size: %zu (expect 3), result.: ",
+                   picked.size());
+        for (auto x : picked)
+            LLBC_Print("%d ", x);
         LLBC_Print("\n");
     }
 }

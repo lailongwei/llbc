@@ -73,117 +73,153 @@ inline bool LLBC_Random::BoolJudge()
     return _mtRand() % 2 == 1;
 }
 
-template <typename _Container, typename _Weights>
-std::enable_if_t<(LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::vector>::value ||
-                  LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::list>::value) &&
-                 (std::is_integral_v<typename std::remove_cv_t<_Weights>::value_type> ||
-                  std::is_floating_point_v<typename std::remove_cv_t<_Weights>::value_type>),
-                 std::optional<std::reference_wrapper<const typename _Container::value_type>>>
-LLBC_Random::Choice(const _Container &container,
-                    const _Weights *weights)
+template <typename _InputIt>
+_InputIt LLBC_Random::Choice(_InputIt first, _InputIt last)
 {
-    auto out = Choices(container, 1, weights);
-    return !out.empty() ? std::make_optional(out[0]) : std::nullopt;
+    const auto n = std::distance(first, last);
+    if (n <= 0)
+        return last;
+
+    std::advance(first, Rand(static_cast<int>(n)));
+    return first;
 }
 
-template <typename _Container, typename _Weights>
-std::enable_if_t<(LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::vector>::value ||
-                  LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::list>::value) &&
-                 (std::is_integral_v<typename std::remove_cv_t<_Weights>::value_type> ||
-                  std::is_floating_point_v<typename std::remove_cv_t<_Weights>::value_type>),
-                 std::vector<std::reference_wrapper<const typename _Container::value_type>>>
-LLBC_Random::Choices(const _Container &container,
-                     size_t k,
-                     const _Weights *weights)
+template <typename _InputIt, typename _WeightIt>
+_InputIt LLBC_Random::WeightedChoice(_InputIt first, _InputIt last,
+                                     _WeightIt wfirst, _WeightIt wlast)
 {
-    using RawContainer = std::remove_cv_t<_Container>;
-    std::vector<std::reference_wrapper<const typename _Container::value_type>> out;
+    // Sum positive weights (missing -> 0; excess -> ignored).
+    double total = 0.0;
+    auto it = first;
+    auto wit = wfirst;
+    for (; it != last && wit != wlast; ++it, ++wit)
+    {
+        const double dw = static_cast<double>(*wit);
+        if (dw > 0.0) total += dw;
+    }
 
-    if (k == 0)
+    if (total <= 0.0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return last;
+    }
+
+    // Roulette-wheel selection.
+    const double r = RandReal() * total;
+    double acc = 0.0;
+    for (it = first, wit = wfirst; it != last && wit != wlast; ++it, ++wit)
+    {
+        const double dw = static_cast<double>(*wit);
+        if (dw > 0.0 && (acc += dw) > r)
+            return it;
+    }
+
+    return last;
+}
+
+template <typename _PopIt, typename _OutIt, typename _Distance>
+_OutIt LLBC_Random::Sample(_PopIt first, _PopIt last,
+                           _OutIt out, _Distance n)
+{
+    if (n <= 0)
         return out;
-
-    const size_t n = container.size();
-    if (n == 0)
+    if (first == last)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return out;
     }
 
-    std::vector<const typename _Container::value_type *> values;
-    values.reserve(n);
-    if constexpr (LLBC_IsTemplSpec<RawContainer, std::queue>::value)
+    using IterCat = typename std::iterator_traits<_PopIt>::iterator_category;
+    if constexpr (std::is_base_of_v<std::random_access_iterator_tag, IterCat>)
     {
-        class QueueContainerAccessor : private RawContainer
-        {
-        public:
-            static const typename RawContainer::container_type &Get(const RawContainer &queue)
-            {
-                typename RawContainer::container_type RawContainer::*containerPtr = &QueueContainerAccessor::c;
-                return queue.*containerPtr;
-            }
-        };
+        // Partial Fisher-Yates on iterator buffer, O(min(n, distance)).
+        const size_t total = static_cast<size_t>(last - first);
+        std::vector<_PopIt> buf;
+        buf.reserve(total);
+        for (auto it = first; it != last; ++it)
+            buf.push_back(it);
 
-        const auto &queueContainer = QueueContainerAccessor::Get(container);
-        for (const auto &value : queueContainer)
-            values.push_back(std::addressof(value));
+        const size_t take = static_cast<size_t>(n) > total ? total : static_cast<size_t>(n);
+        for (size_t i = 0; i < take; ++i)
+        {
+            std::swap(buf[i], buf[i + static_cast<size_t>(Rand(static_cast<int>(total - i)))]);
+            *out++ = *buf[i];
+        }
     }
     else
     {
-        for (const auto &value : container)
-            values.push_back(std::addressof(value));
-    }
+        // Reservoir sampling (Algorithm R), O(distance).
+        const size_t k = static_cast<size_t>(n);
+        std::vector<_PopIt> reservoir;
+        reservoir.reserve(k);
 
-    out.reserve(k > n ? n : k);
-
-    // Unary uniform fast-path: partial Fisher-Yates on pointers, O(min(k,n)).
-    if constexpr (!(LLBC_IsTemplSpec<RawContainer, std::map>::value ||
-                    LLBC_IsTemplSpec<RawContainer, std::unordered_map>::value))
-    {
-        if (weights == nullptr)
-        {
-            for (size_t i = 0, take = k > n ? n : k; i < take; ++i)
-            {
-                std::swap(values[i], values[i + static_cast<size_t>(Rand(static_cast<int>(n - i)))]);
-                out.emplace_back(*values[i]);
-            }
-            return out;
-        }
-    }
-
-    std::vector<double> ws(n, 0.0);
-    double total = 0.0;
-    if (weights != nullptr)
-    {
         size_t i = 0;
-        for (auto it = std::begin(*weights); i < n && it != std::end(*weights); ++it, ++i)
+        for (auto it = first; it != last; ++it, ++i)
         {
-            const double dw = static_cast<double>(*it);
-            if (dw > 0.0) { ws[i] = dw; total += dw; }
+            if (i < k)
+            {
+                reservoir.push_back(it);
+            }
+            else
+            {
+                const size_t j = static_cast<size_t>(Rand(static_cast<int>(i + 1)));
+                if (j < k) reservoir[j] = it;
+            }
         }
+
+        for (auto &it : reservoir)
+            *out++ = *it;
     }
-    else if constexpr (LLBC_IsTemplSpec<RawContainer, std::map>::value ||
-                       LLBC_IsTemplSpec<RawContainer, std::unordered_map>::value)
+    return out;
+}
+
+template <typename _PopIt, typename _WeightIt,
+          typename _OutIt, typename _Distance>
+_OutIt LLBC_Random::WeightedSample(_PopIt first, _PopIt last,
+                                   _WeightIt wfirst, _WeightIt wlast,
+                                   _OutIt out, _Distance n)
+{
+    if (n <= 0)
+        return out;
+
+    // Buffer iterators and aligned weights (NaN / <=0 -> 0).
+    // Empty range or all-zero weights -> total == 0.0 -> handled below.
+    std::vector<_PopIt> pop;
+    std::vector<double> ws;
+    double total = 0.0;
+    auto wit = wfirst;
+    for (auto it = first; it != last; ++it)
     {
-        static_assert(std::is_arithmetic<typename _Container::mapped_type>::value,
-            "LLBC_Random::Choices: pair-like .second must be arithmetic without external weights.");
-        for (size_t i = 0; i < n; ++i)
+        double dw = 0.0;
+        if (wit != wlast)
         {
-            const double dw = static_cast<double>(values[i]->second);
-            if (dw > 0.0) { ws[i] = dw; total += dw; }
+            dw = static_cast<double>(*wit++);
+            if (!(dw > 0.0)) dw = 0.0;
         }
+        pop.push_back(it);
+        ws.push_back(dw);
+        total += dw;
     }
 
-    // Roulette-wheel without replacement: O(k*n). total<=0 -> loop skipped, returns empty.
+    if (total <= 0.0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return out;
+    }
+
+    // Roulette-wheel without replacement: O(n * popLen).
+    const size_t popLen = pop.size();
+    const size_t want = static_cast<size_t>(n);
     double remain = total;
-    for (size_t i = 0; i < k && remain > 0.0; ++i)
+    for (size_t picks = 0; picks < want && remain > 0.0; ++picks)
     {
         const double r = RandReal() * remain;
         double acc = 0.0;
-        for (size_t j = 0; j < n; ++j)
+        for (size_t j = 0; j < popLen; ++j)
         {
             if (ws[j] > 0.0 && (acc += ws[j]) > r)
             {
-                out.emplace_back(*values[j]);
+                *out++ = *pop[j];
                 remain -= ws[j];
                 ws[j] = 0.0;
                 break;

@@ -22,7 +22,6 @@
 #pragma once
 
 #include "llbc/common/Common.h"
-#include <optional>
 
 __LLBC_NS_BEGIN
 
@@ -72,50 +71,54 @@ public:
     bool BoolJudge();
 
     /**
-     * Pick one value from the container.
-     * @param[in] container - the container to pick from.
-     * @param[in] weights   - optional external weights container pointer. Pass a real
-     *                        pointer to enable weighted sampling, or OMIT this argument
-     *                        to use the default (uniform / .second).
-     * @return std::optional<std::reference_wrapper<const typename _Container::value_type>> - picked value reference.
+     * Pick one element uniformly at random from the range [first, last).
+     * @param[in] first - begin iterator of the population.
+     * @param[in] last  - end iterator of the population.
+     * @return _InputIt - iterator to the picked element, or `last` if the range is empty.
      */
-    template <typename _Container, typename _Weights = std::vector<uint32>>
-    std::enable_if_t<(LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::vector>::value ||
-                      LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::list>::value) &&
-                     (std::is_integral_v<typename std::remove_cv_t<_Weights>::value_type> ||
-                      std::is_floating_point_v<typename std::remove_cv_t<_Weights>::value_type>),
-                     std::optional<std::reference_wrapper<const typename _Container::value_type>>>
-    Choice(const _Container &container,
-           const _Weights *weights = nullptr);
+    template <typename _InputIt>
+    _InputIt Choice(_InputIt first, _InputIt last);
 
     /**
-     * The unified random choices interface (without-replacement sampling).
-     * Size & weight alignment rules (weighted path):
-     * - If weights.size() <  container.size(): missing entries are treated as weight 0
-     * - If weights.size() >  container.size(): excess weights are silently discarded.
-     * - A single weight that is non-positive / NaN / -0.0 is regularized to 0
-     * 
-     * k handling :
-     * - k == 0                         : returns empty vector, last error untouched.
-     * - container.empty()              : returns empty vector and sets LLBC_ERROR_INVALID.
-     * - uniform path & k > size        : k is silently clamped to size (full permutation).
-     * - weighted path                  : at most min(k, #positive-weight-elements) picks;
-     * - weighted path & sum(weights)<=0: returns empty vector and sets LLBC_ERROR_INVALID.
-     *
-     * @param[in] container - the container to pick from.
-     * @param[in] k         - number of values to pick (default 1).
-     * @param[in] weights   - optional external weights container pointer. 
-     * @return std::vector<std::reference_wrapper<const typename _Container::value_type>> - picked value references.
+     * Pick one element with weights from the range [first, last).
+     * Weights range [wfirst, wlast) is aligned by position to [first, last):
+     * @param[in] first  - begin iterator of the population.
+     * @param[in] last   - end iterator of the population.
+     * @param[in] wfirst - begin iterator of the weights.
+     * @param[in] wlast  - end iterator of the weights.
+     * @return _InputIt - iterator to the picked element; `last` if range is empty or sum(weights) <= 0
      */
-    template <typename _Container, typename _Weights = std::vector<uint32>>
-    std::enable_if_t<(LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::vector>::value ||
-                      LLBC_IsTemplSpec<std::remove_cv_t<_Weights>, std::list>::value) &&
-                     (std::is_integral_v<typename std::remove_cv_t<_Weights>::value_type> ||
-                      std::is_floating_point_v<typename std::remove_cv_t<_Weights>::value_type>),
-                     std::vector<std::reference_wrapper<const typename _Container::value_type>>>
-    Choices(const _Container &container,
-            size_t k = 1,
-            const _Weights *weights = nullptr);
+    template <typename _InputIt, typename _WeightIt>
+    _InputIt WeightedChoice(_InputIt first, _InputIt last,
+                            _WeightIt wfirst, _WeightIt wlast);
+
+    /**
+     * Sample n elements WITHOUT replacement, uniformly, from [first, last) into out. Output order is unspecified.
+     * @param[in]  first - begin iterator of the population.
+     * @param[in]  last  - end iterator of the population.
+     * @param[out] out   - output iterator to write the selected elements.
+     * @param[in]  n     - number of elements to sample.
+     * @return _OutIt - the iterator one past the last written element.
+     */
+    template <typename _PopIt, typename _OutIt, typename _Distance>
+    _OutIt Sample(_PopIt first, _PopIt last,
+                  _OutIt out, _Distance n);
+
+    /**
+     * Sample n elements WITHOUT replacement, with weights, from [first, last) into out. Output order is unspecified.
+     * @param[in]  first  - begin iterator of the population.
+     * @param[in]  last   - end iterator of the population.
+     * @param[in]  wfirst - begin iterator of the weights.
+     * @param[in]  wlast  - end iterator of the weights.
+     * @param[out] out    - output iterator to write the selected elements.
+     * @param[in]  n      - number of elements to sample.
+     * @return _OutIt - the iterator one past the last written element.
+     */
+    template <typename _PopIt, typename _WeightIt,
+              typename _OutIt, typename _Distance>
+    _OutIt WeightedSample(_PopIt first, _PopIt last,
+                          _WeightIt wfirst, _WeightIt wlast,
+                          _OutIt out, _Distance n);
 
     /**
      * Reorders the elements in the given range [begin, end) such that each possible permutation 
