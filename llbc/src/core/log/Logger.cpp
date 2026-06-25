@@ -32,7 +32,7 @@
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogTrace.h"
 #include "llbc/core/log/LogControl.h"
-#include "llbc/core/log/LogControlFilter.h"
+#include "llbc/core/log/LogControlMgr.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 #include "llbc/core/log/LogTimeAccessor.h"
 #include "llbc/core/log/BaseLogAppender.h"
@@ -55,7 +55,7 @@ LLBC_Logger::LLBC_Logger()
                                     LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1],
                						LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2]))
 
-, _logControlFilter(new LLBC_LogControlFilter)
+, _logControlMgr(new LLBC_LogControlMgr)
 
 , _logRunnable(nullptr)
 
@@ -106,8 +106,8 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     _logTraceMgr->UpdateColorLogTraces(_config->GetRequireColorLogTraces());
 
     // Apply log output control items parsed from config.
-    for (const auto &item : _config->GetLogControls())
-        _logControlFilter->AddControl(item);
+    if (_logControlMgr->SetControls(_config->GetLogControls()) != LLBC_OK)
+        return LLBC_FAILED;
 
     _logTimeAccessor = &_config->GetLogTimeAccessor();
 
@@ -449,67 +449,48 @@ void LLBC_Logger::ClearAllLogTraces()
     _lock.Unlock();
 }
 
-int LLBC_Logger::AddLogControl(const LLBC_LogControlItem &item)
+int LLBC_Logger::SetLogControls(const std::vector<LLBC_LogControlItem> &items)
 {
-    if (UNLIKELY(!_logControlFilter))
+    if (UNLIKELY(!_logControlMgr))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
         return LLBC_FAILED;
     }
 
-    return _logControlFilter->AddControl(item);
-}
-
-int LLBC_Logger::RemoveLogControl(size_t index)
-{
-    if (UNLIKELY(!_logControlFilter))
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
-        return LLBC_FAILED;
-    }
-
-    return _logControlFilter->RemoveControl(index);
-}
-
-void LLBC_Logger::ClearLogControls()
-{
-    if (UNLIKELY(!_logControlFilter))
-        return;
-
-    _logControlFilter->ClearControls();
+    return _logControlMgr->SetControls(items);
 }
 
 size_t LLBC_Logger::GetLogControlCount() const
 {
-    if (UNLIKELY(!_logControlFilter))
+    if (UNLIKELY(!_logControlMgr))
         return 0;
 
-    return _logControlFilter->GetControlCount();
+    return _logControlMgr->GetControlCount();
 }
 
 void LLBC_Logger::GetLogControls(std::vector<LLBC_LogControlItem> &out) const
 {
     out.clear();
-    if (UNLIKELY(!_logControlFilter))
+    if (UNLIKELY(!_logControlMgr))
         return;
 
-    _logControlFilter->GetControls(out);
+    _logControlMgr->GetControls(out);
 }
 
 uint64 LLBC_Logger::GetLogControlSuppressedCount() const
 {
-    if (UNLIKELY(!_logControlFilter))
+    if (UNLIKELY(!_logControlMgr))
         return 0;
 
-    return _logControlFilter->GetSuppressedCount();
+    return _logControlMgr->GetSuppressedCount();
 }
 
 void LLBC_Logger::ResetLogControlSuppressedCount()
 {
-    if (UNLIKELY(!_logControlFilter))
+    if (UNLIKELY(!_logControlMgr))
         return;
 
-    _logControlFilter->ResetSuppressedCount();
+    _logControlMgr->ResetSuppressedCount();
 }
 
 int LLBC_Logger::VOutput(int level,
@@ -798,18 +779,29 @@ void LLBC_Logger::AddAppender(LLBC_BaseLogAppender *appender)
     tmpAppender->SetAppenderNext(appender);
 }
 
-int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
+int LLBC_Logger::OutputLogData(LLBC_LogData &data)
 {
     LLBC_BaseLogAppender *appender = _appenders;
     if (!appender)
         return LLBC_OK;
 
     // Lock-free fast-path: skip the entire control logic when no item installed.
-    const bool hasControl = _logControlFilter && !_logControlFilter->IsEmpty();
+    const bool hasControl = _logControlMgr && !_logControlMgr->IsEmpty();
 
-    // Save original level once; each appender starts from this value so that
-    // SetLevel rewrites do NOT leak across appenders.
+    // Save the original level once. We may temporarily rewrite `data.level`
+    // per appender (LLBC_LogControlMgr::SetLevel); LLBC_Defer guarantees
+    // restoration on every return path, so callers (and remaining appenders)
+    // observe the original value. Each appender starts from this saved value,
+    // so per-appender SetLevel rewrites do NOT leak across appenders.
+    //
+    // Thread-safety: this read-modify-restore window is closed within a
+    // single thread:
+    //   - sync mode  : the caller holds `_lock` for the whole call.
+    //   - async mode : `data` is owned exclusively by the LogRunnable thread.
+    // All shipped appenders consume `data` synchronously inside Output(),
+    // so no other thread can observe the transient rewritten level.
     const int originalLevel = data.level;
+    LLBC_Defer(data.level = originalLevel);
 
     while (appender)
     {
@@ -817,12 +809,9 @@ int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
 
         if (hasControl)
         {
-            const auto r = _logControlFilter->Apply(appender->GetType(),
-                                                    data.file,
-                                                    data.line,
-                                                    data.func,
-                                                    data.threadId,
-                                                    originalLevel);
+            const auto r = _logControlMgr->Apply(appender->GetType(),
+                                                 data,
+                                                 originalLevel);
             if (r.muted)
             {
                 appender = appender->GetAppenderNext();
@@ -833,27 +822,9 @@ int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
         }
 
         // Drive the appender with the (possibly rewritten) level.
-        if (outputLevel == originalLevel)
-        {
-            if (appender->Output(data) != LLBC_OK)
-                return LLBC_FAILED;
-        }
-        else
-        {
-            // Apply rewritten level on a shallow copy: appenders only consume the
-            // level field and the message buffer; we do not transfer ownership of
-            // the heap-allocated msg. The original `data` is preserved for the
-            // remaining appenders.
-            LLBC_LogData tmp = data;
-            tmp.level = outputLevel;
-            const int ret = appender->Output(tmp);
-            // Avoid double-free: tmp shares msg buffer with data.
-            tmp.msg = nullptr;
-            tmp.msgCap = 0;
-            tmp.msgLen = 0;
-            if (ret != LLBC_OK)
-                return LLBC_FAILED;
-        }
+        data.level = outputLevel;
+        if (appender->Output(data) != LLBC_OK)
+            return LLBC_FAILED;
 
         appender = appender->GetAppenderNext();
     }
@@ -923,7 +894,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
     _lastFlushTime = 0;
 
     LLBC_XDelete(_logTraceMgr);
-    LLBC_XDelete(_logControlFilter);
+    LLBC_XDelete(_logControlMgr);
 
     _logTimeAccessor = nullptr;
 

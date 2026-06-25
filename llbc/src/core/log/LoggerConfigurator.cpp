@@ -228,7 +228,16 @@ int LLBC_LoggerConfigurator::ReConfig(LLBC_Logger *logger) const
         // - Re-Config other appender attributes.
         // ... ...
     }
-    
+
+    // Re-Config log output controls (logger-wide, not per-appender).
+    // The logger config parsing layer (LoggerConfigInfo) has already filtered
+    // out malformed entries; we still propagate any failure faithfully so the
+    // caller sees it. SetLogControls is atomic: on failure the previous
+    // snapshot stays effective, on success the new snapshot is published in
+    // one step (no transient empty state observable to log emitters).
+    if (logger->SetLogControls(info->GetLogControls()) != LLBC_OK)
+        return LLBC_FAILED;
+
     return LLBC_OK;
 }
 

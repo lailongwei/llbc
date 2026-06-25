@@ -28,7 +28,7 @@
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogTrace.h"
 #include "llbc/core/log/LogControl.h"
-#include "llbc/core/log/LogControlFilter.h"
+#include "llbc/core/log/LogControlMgr.h"
 
 __LLBC_NS_BEGIN
 
@@ -192,37 +192,45 @@ public:
 
 public:
     /**
-     * Append a log output control item to the logger.
+     * Atomically replace the entire installed log control list with `items`.
+     *
+     * This is the **only** writer entry point for log controls; the control
+     * list is populated from configuration at Initialize() and re-populated
+     * from a freshly parsed config at LoggerMgr::Reload(). There is
+     * intentionally no incremental Add/Remove API — log controls are
+     * configuration-only.
      *
      * Each control item describes:
-     *   a) match-rules (one-of, OR over: file+line / func / threadId / level);
+     *   a) match-rules: enabled rules among {file+line / func / threadId / level}
+     *      are AND-combined (all-of); each rule's own value-set (matchLineRanges
+     *      / matchFuncs / matchThreadIds / matchLevels) is OR-combined (one-of).
      *   b) appender scope (a set of LLBC_LogAppenderType::*; empty == all appenders);
      *   c) action (Mute, or SetLevel + newLevel).
      *
      * Items are applied per appender in declaration order at OutputLogData(),
-     * see LLBC_LogControlFilter for full semantics.
+     * see LLBC_LogControlMgr for full semantics.
      *
-     * @param[in] item - the control item to add. It must satisfy:
-     *                   - HasAnyMatch() returns true,
-     *                   - per-rule fields are valid (non-empty file/func when enabled,
-     *                     valid log level when haveLevel, etc.),
-     *                   - action is valid; if SetLevel, newLevel must be a valid log level,
-     *                   - every entry of appenderTypes is a valid LLBC_LogAppenderType.
+     * Semantics:
+     *  - All items are validated first; on any invalid item nothing is
+     *    changed and LLBC_FAILED is returned (LLBC_ERROR_INVALID). Each item
+     *    must satisfy:
+     *      - HasAnyMatch() returns true,
+     *      - per-rule fields are valid (non-empty file/func when enabled,
+     *        non-empty matchLevels with valid levels when haveLevel, etc.),
+     *      - action is valid; if SetLevel, newLevel must be a valid log level,
+     *      - every entry of appenderTypes is a valid LLBC_LogAppenderType.
+     *  - On success a single new snapshot is atomically published, so any
+     *    in-flight log emit either sees the old list in full or the new list
+     *    in full — never a transient empty/half-built state.
+     *  - Passing an empty vector publishes an empty snapshot (the hot-path
+     *    fast-skips the control chain entirely afterwards).
+     *  - The suppressed record count is intentionally preserved across calls;
+     *    call ResetLogControlSuppressedCount() explicitly for a clean baseline.
+     *
+     * @param[in] items - the new full list of control items.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AddLogControl(const LLBC_LogControlItem &item);
-
-    /**
-     * Remove the control item at the given index.
-     * @param[in] index - the item index, 0-based, in declaration order.
-     * @return int - return 0 if success, otherwise return -1.
-     */
-    int RemoveLogControl(size_t index);
-
-    /**
-     * Clear all installed log control items.
-     */
-    void ClearLogControls();
+    int SetLogControls(const std::vector<LLBC_LogControlItem> &items);
 
     /**
      * Get installed log control item count.
@@ -510,7 +518,7 @@ private:
     /**
      * Friend classs: LLBC_LogRunnable.
      * Asset method/data-members:
-     * - OutputLogData(const LLBC_LogData &data):int
+     * - OutputLogData(LLBC_LogData &data):int
      * - Flush(bool force, sint64 now):void
      */
     friend class LLBC_LogRunnable;
@@ -523,9 +531,16 @@ private:
 
     /**
      * Output log data.
-     * @param[in] data - log data.
+     * @param[in,out] data - log data. May be temporarily mutated (e.g. `level`
+     *                       rewritten by LLBC_LogControlMgr::SetLevel) per
+     *                       appender, but is always restored to the original
+     *                       state before this function returns. The caller
+     *                       (sole owner of `data` at this point: holding
+     *                       `_lock` in sync mode, or running on the unique
+     *                       LogRunnable thread in async mode) observes no
+     *                       net change.
      */
-    int OutputLogData(const LLBC_LogData &data);
+    int OutputLogData(LLBC_LogData &data);
 
     /**
     * Flush logger(for now, just only need flush all appenders).
@@ -562,8 +577,8 @@ private:
     // Log trace manager.
     LLBC_LogTraceMgr *_logTraceMgr;
 
-    // Log output control filter (Mute / SetLevel; per-appender, ordered).
-    LLBC_LogControlFilter *_logControlFilter;
+    // Log output control manager (Mute / SetLevel; per-appender, ordered).
+    LLBC_LogControlMgr *_logControlMgr;
 
     // Log runnable object.
     LLBC_LogRunnable *_logRunnable;

@@ -47,7 +47,12 @@ struct LLBC_EXPORT LLBC_LogData
     int msgLen;             // message length.
     int msgCap;             // message capacity.
 
-    int level;              // Log level.
+    int level;              // Log level. Set to the user-specified level when
+                            //   the log entry is created; may be temporarily
+                            //   rewritten per appender by LLBC_Logger::
+                            //   OutputLogData() (LLBC_LogControlMgr::
+                            //   SetLevel) and is always restored before that
+                            //   function returns.
     sint64 logTime;         // Log time.
 
     char file[128];         // File.

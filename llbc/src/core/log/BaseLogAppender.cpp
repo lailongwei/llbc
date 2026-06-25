@@ -26,7 +26,44 @@
 #include "llbc/core/log/LogTokenChain.h"
 #include "llbc/core/log/BaseLogAppender.h"
 
+__LLBC_INTERNAL_NS_BEGIN
+
+// Lower-case type names; index aligned with LLBC_LogAppenderType enum.
+// Last slot is the "unknown" sentinel returned by GetTypeStr() on invalid input.
+static const LLBC_NS LLBC_CString __type2StrRepr[LLBC_NS LLBC_LogAppenderType::End + 1] =
+{
+    "console",
+    "file",
+    "network",
+
+    "unknown"
+};
+
+__LLBC_INTERNAL_NS_END
+
 __LLBC_NS_BEGIN
+
+const LLBC_CString &LLBC_LogAppenderType::GetTypeStr(int appenderType)
+{
+    auto &strReprs = LLBC_INTERNAL_NS __type2StrRepr;
+    return IsValid(appenderType) ? strReprs[appenderType] : strReprs[LLBC_LogAppenderType::End];
+}
+
+int LLBC_LogAppenderType::GetTypeEnum(const LLBC_CString &typeStr)
+{
+    if (UNLIKELY(typeStr.empty()))
+        return LLBC_LogAppenderType::End;
+
+    const LLBC_String lowerStr = LLBC_String(typeStr).tolower();
+    if (LLBC_INTERNAL_NS __type2StrRepr[LLBC_LogAppenderType::Console] == lowerStr)
+        return LLBC_LogAppenderType::Console;
+    else if (LLBC_INTERNAL_NS __type2StrRepr[LLBC_LogAppenderType::File] == lowerStr)
+        return LLBC_LogAppenderType::File;
+    else if (LLBC_INTERNAL_NS __type2StrRepr[LLBC_LogAppenderType::Network] == lowerStr)
+        return LLBC_LogAppenderType::Network;
+
+    return LLBC_LogAppenderType::End;
+}
 
 LLBC_BaseLogAppender::LLBC_BaseLogAppender()
 : _logLevel(LLBC_LogLevel::End)

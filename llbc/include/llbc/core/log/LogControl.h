@@ -28,8 +28,16 @@ __LLBC_NS_BEGIN
 /**
  * \brief Log control item match-rule kinds.
  *
- * Within one control item the configured match-rules are combined with OR
- * (one-of): the item matches a log record if ANY of its enabled rules matches.
+ * Within one control item the configured match-rules are combined with AND
+ * (all-of): the item matches a log record only if ALL of its enabled rules
+ * match. Each rule's own value-set (e.g. matchFuncs, matchThreadIds,
+ * matchLevels, matchLineRanges) is OR-combined (one-of) internally.
+ *
+ * Rationale: AND-between-rules matches the engineering intuition of a filter
+ * (intersection of constraints) and is consistent with how iptables / log4j
+ * filter / SQL WHERE / Prometheus matchers compose multi-field predicates.
+ * To express OR between top-level dimensions, install multiple control items.
+ *
  * Different control items are independent, applied by declaration order.
  */
 class LLBC_LogControlMatchType
@@ -39,14 +47,17 @@ public:
     {
         Begin,
 
-        File = Begin,   // match by file (basename) + optional line / line range.
-                        // - line == 0 (and lineEnd == 0) : any line of the file.
-                        // - lineEnd == 0 : single line, match line == matchLine.
-                        // - lineEnd  > 0 : half-open range [matchLine, matchLineEnd),
-                        //                  match matchLine <= line < matchLineEnd.
-        Func,           // match by function name (exact match).
-        ThreadId,       // match by native thread id.
-        Level,          // match by log level (==).
+        File = Begin,   // match by file (basename) + optional line(s).
+                        // matchLineRanges holds zero-or-more half-open ranges
+                        // [begin, end); a single line N is stored as [N, N+1).
+                        // Empty matchLineRanges means "any line of the file"
+                        // (whole-file wildcard).
+        Func,           // match by function name; matches if record's function
+                        // equals ANY of matchFuncs (exact, no wildcard).
+        ThreadId,       // match by native thread id; matches if record's tid
+                        // equals ANY of matchThreadIds.
+        Level,          // match by log level; matches if record's level equals
+                        // ANY of matchLevels.
 
         End
     };
@@ -74,6 +85,12 @@ class LLBC_LogControlAction
 public:
     enum
     {
+        Unset = 0,      // sentinel: action not explicitly set.
+                        // LLBC_LogControlItem default-constructs `action` to
+                        // Unset; SetControls() rejects it via IsValid(). This
+                        // forces callers to set action explicitly instead of
+                        // silently muting (Mute is destructive — losing logs
+                        // on a typo / missed assignment is a silent failure).
         Begin,
 
         Mute = Begin,   // drop the matched record (on the configured appenders).
@@ -92,7 +109,10 @@ public:
  * \brief A single log output control item.
  *
  * Three parts:
- *   a) Match rules: zero-or-more of {File, Func, ThreadId, Level}, combined by OR.
+ *   a) Match rules: zero-or-more of {File, Func, ThreadId, Level}.
+ *      The enabled rules are combined with **AND** (intersection); each rule's
+ *      own value-set (matchLineRanges / matchFuncs / matchThreadIds /
+ *      matchLevels) is OR-combined (one-of) internally.
  *      An empty rule set means "match everything" and is rejected on validation.
  *   b) Appender scope: a set of appender types (LLBC_LogAppenderType::*); empty means all.
  *   c) Action: Mute or SetLevel(+newLevel).
@@ -100,28 +120,41 @@ public:
 struct LLBC_LogControlItem
 {
 public:
-    // a) match rules (one-of). Each "haveXxx" flag enables the corresponding rule.
+    // a) match rules. The enabled rules are AND-combined (all-of); each rule's
+    //    value-set below is OR-combined (one-of).
+    //    Each "haveXxx" flag enables the corresponding rule.
     bool haveFile;
     LLBC_String matchFile;     // file basename, valid when haveFile.
-    int matchLine;             // line number (or range begin); 0 means wildcard. Valid when haveFile.
-    int matchLineEnd;          // optional half-open range end, exclusive (i.e. line < matchLineEnd).
-                               //   0 == disabled (single-line / wildcard mode, see matchLine).
-                               //   > 0 with matchLine >= 0: range mode, match matchLine <= line < matchLineEnd.
+    std::vector<std::pair<int, int> > matchLineRanges; // half-open [begin, end) segments.
+                               // A single line N is stored as [N, N+1). Empty
+                               // means wildcard (any line of matchFile). Each
+                               // segment must satisfy 0 <= begin && end > begin.
+                               // The record's line matches if it lies in ANY
+                               // segment (segments are OR-combined).
 
     bool haveFunc;
-    LLBC_String matchFunc;     // valid when haveFunc.
+    std::vector<LLBC_String> matchFuncs; // valid when haveFunc; non-empty.
+                                         // Matches if the record's function name
+                                         // equals ANY entry (exact, OR-combined).
 
     bool haveThreadId;
-    LLBC_ThreadId matchThreadId; // valid when haveThreadId.
+    std::vector<LLBC_ThreadId> matchThreadIds; // valid when haveThreadId; non-empty.
+                                               // Matches if the record's tid
+                                               // equals ANY entry (OR-combined).
 
     bool haveLevel;
-    int matchLevel;            // valid when haveLevel; LLBC_LogLevel::Begin..<End.
+    std::vector<int> matchLevels; // valid when haveLevel; non-empty; each entry
+                                  // in LLBC_LogLevel::Begin..<End. Matches if
+                                  // the record's level equals ANY entry
+                                  // (OR-combined).
 
     // b) appender scope; empty == all appenders.
     std::vector<int> appenderTypes;
 
     // c) action.
     int action;                // LLBC_LogControlAction::Mute / SetLevel.
+                               // Default-constructed to Unset; SetControls()
+                               // rejects an item whose action wasn't set.
     int newLevel;              // valid when action == SetLevel.
 
 public:

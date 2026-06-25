@@ -901,13 +901,17 @@ void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 //        - unknown appender strings are silently dropped from the appender
 //          scope but the surrounding control item still survives;
 //        - good items still take effect.
-//   3) Runtime API (logcontrol_full as host)
-//        - AddLogControl / RemoveLogControl / ClearLogControls
-//          / GetLogControls / GetLogControlCount
+//   3) SetLogControls (logcontrol_full as host)
+//        - SetLogControls / GetLogControls / GetLogControlCount
 //          / GetLogControlSuppressedCount / ResetLogControlSuppressedCount
-//          behave as documented; IsEmpty fast-path takes effect after Clear.
+//          behave as documented; IsEmpty fast-path takes effect after an
+//          empty SetLogControls.
+//        - SetLogControls is atomic & all-or-nothing: an invalid item in the
+//          new list rejects the whole call and the previous snapshot stays
+//          effective.
 //        - SetLevel rewrite is observable to subsequent items in the chain
 //          (a later level-match item can fire because of an earlier SetLevel).
+//        - LoggerMgr::Reload re-installs the config-driven control list.
 // ----------------------------------------------------------------------------
 
 bool TestCase_Core_Log::EmitAndCheckSuppressed(LLBC_Logger *logger,
@@ -943,6 +947,10 @@ int TestCase_Core_Log::DoLogMuteFilterTest()
     //      [6] file=mute_fileD.cpp                  -> setlevel error
     //      [7] file=mute_fileE.cpp [300,305)        -> mute  (string syntax "name:NN-MM")
     //      [8] file=mute_fileF.cpp [400,410)        -> mute  (object syntax line/lineEnd)
+    //      [9] file=mute_fileG.cpp 50, 60-65, 70    -> mute  (string multi-segment)
+    //     [10] file=mute_fileH.cpp 100-103, 200     -> mute  (object multi-segment "lines")
+    //     [11] func=[MutedFuncMA, MutedFuncMB]      -> mute  (func array multi-value)
+    //     [12] threadId=[1, 2147483640]             -> mute  (threadId array multi-value)
     //    Only `console` appender is enabled, so each muted record contributes
     //    +1 to GetLogControlSuppressedCount().
     // ------------------------------------------------------------------
@@ -955,29 +963,60 @@ int TestCase_Core_Log::DoLogMuteFilterTest()
         std::vector<LLBC_LogControlItem> items;
         fullLogger->GetLogControls(items);
         LLBC_PrintLn("[full] parsed control item count: %zu", items.size());
-        LLBC_ErrorAndReturnIf(items.size() != 9,
-                              LLBC_FAILED, "[full] expect 9 control items");
+        LLBC_ErrorAndReturnIf(items.size() != 13,
+                              LLBC_FAILED, "[full] expect 13 control items");
         // Spot-check declaration order.
         LLBC_ErrorAndReturnIf(!items[0].haveFile || items[0].matchFile != "mute_fileA.cpp" ||
-                              items[0].matchLine != 100 || items[0].matchLineEnd != 0 ||
+                              items[0].matchLineRanges.size() != 1 ||
+                              items[0].matchLineRanges[0].first != 100 ||
+                              items[0].matchLineRanges[0].second != 101 ||
                               items[0].action != LLBC_LogControlAction::Mute,
                               LLBC_FAILED, "[full] item[0] mismatch");
-        LLBC_ErrorAndReturnIf(!items[4].haveFunc || items[4].matchFunc != "MutedFuncTwo" ||
+        LLBC_ErrorAndReturnIf(!items[4].haveFunc || items[4].matchFuncs.size() != 1 ||
+                              items[4].matchFuncs[0] != "MutedFuncTwo" ||
                               items[4].appenderTypes.size() != 1 ||
                               items[4].appenderTypes[0] != LLBC_LogAppenderType::Console,
                               LLBC_FAILED, "[full] item[4] mismatch");
         LLBC_ErrorAndReturnIf(items[5].action != LLBC_LogControlAction::SetLevel ||
                               items[5].newLevel != LLBC_LogLevel::Warn,
                               LLBC_FAILED, "[full] item[5] mismatch");
-        // Range items: half-open [matchLine, matchLineEnd).
+        // Range items: half-open [begin, end), single-segment.
         LLBC_ErrorAndReturnIf(!items[7].haveFile || items[7].matchFile != "mute_fileE.cpp" ||
-                              items[7].matchLine != 300 || items[7].matchLineEnd != 305 ||
+                              items[7].matchLineRanges.size() != 1 ||
+                              items[7].matchLineRanges[0].first != 300 ||
+                              items[7].matchLineRanges[0].second != 305 ||
                               items[7].action != LLBC_LogControlAction::Mute,
                               LLBC_FAILED, "[full] item[7] (string range) mismatch");
         LLBC_ErrorAndReturnIf(!items[8].haveFile || items[8].matchFile != "mute_fileF.cpp" ||
-                              items[8].matchLine != 400 || items[8].matchLineEnd != 410 ||
+                              items[8].matchLineRanges.size() != 1 ||
+                              items[8].matchLineRanges[0].first != 400 ||
+                              items[8].matchLineRanges[0].second != 410 ||
                               items[8].action != LLBC_LogControlAction::Mute,
                               LLBC_FAILED, "[full] item[8] (object range) mismatch");
+        // Multi-segment items: G (string) "50, 60-65, 70" -> [50,51),[60,65),[70,71);
+        //                      H (object lines) "100-103, 200" -> [100,103),[200,201).
+        LLBC_ErrorAndReturnIf(!items[9].haveFile || items[9].matchFile != "mute_fileG.cpp" ||
+                              items[9].matchLineRanges.size() != 3 ||
+                              items[9].matchLineRanges[0] != std::make_pair(50, 51) ||
+                              items[9].matchLineRanges[1] != std::make_pair(60, 65) ||
+                              items[9].matchLineRanges[2] != std::make_pair(70, 71),
+                              LLBC_FAILED, "[full] item[9] (string multi-seg) mismatch");
+        LLBC_ErrorAndReturnIf(!items[10].haveFile || items[10].matchFile != "mute_fileH.cpp" ||
+                              items[10].matchLineRanges.size() != 2 ||
+                              items[10].matchLineRanges[0] != std::make_pair(100, 103) ||
+                              items[10].matchLineRanges[1] != std::make_pair(200, 201),
+                              LLBC_FAILED, "[full] item[10] (object multi-seg) mismatch");
+        // Multi-value func / threadId: arrays in JSON.
+        LLBC_ErrorAndReturnIf(!items[11].haveFunc ||
+                              items[11].matchFuncs.size() != 2 ||
+                              items[11].matchFuncs[0] != "MutedFuncMA" ||
+                              items[11].matchFuncs[1] != "MutedFuncMB",
+                              LLBC_FAILED, "[full] item[11] (func array) mismatch");
+        LLBC_ErrorAndReturnIf(!items[12].haveThreadId ||
+                              items[12].matchThreadIds.size() != 2 ||
+                              items[12].matchThreadIds[0] != static_cast<LLBC_ThreadId>(1) ||
+                              items[12].matchThreadIds[1] != static_cast<LLBC_ThreadId>(2147483640),
+                              LLBC_FAILED, "[full] item[12] (threadId array) mismatch");
     }
 
     // 1.a) file+line exact: A:100 muted, A:101 pass, A:200 muted.
@@ -1065,6 +1104,75 @@ int TestCase_Core_Log::DoLogMuteFilterTest()
                                 "mute_fileF.cpp", 410, "AnyFunc", "F:410 pass (object range end excluded)", 0),
         LLBC_FAILED, "[full.range] F:410 wrongly muted (end should be excluded)");
 
+    // 1.g) file+line MULTI-SEGMENT.
+    //   G "50, 60-65, 70" -> hits 50 / 60..64 / 70; misses 49,51..59,65,69,71
+    //   H "100-103, 200"  -> hits 100..102 / 200;  misses 99,103,199,201
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileG.cpp", 49, "AnyFunc", "G:49 pass", 0),
+        LLBC_FAILED, "[full.multiseg] G:49 wrongly muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileG.cpp", 50, "AnyFunc", "G:50 muted (single)", 1),
+        LLBC_FAILED, "[full.multiseg] G:50 not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileG.cpp", 51, "AnyFunc", "G:51 pass (gap)", 0),
+        LLBC_FAILED, "[full.multiseg] G:51 wrongly muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileG.cpp", 60, "AnyFunc", "G:60 muted (range begin)", 1),
+        LLBC_FAILED, "[full.multiseg] G:60 not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileG.cpp", 64, "AnyFunc", "G:64 muted (range end-1)", 1),
+        LLBC_FAILED, "[full.multiseg] G:64 not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileG.cpp", 65, "AnyFunc", "G:65 pass (range end excluded)", 0),
+        LLBC_FAILED, "[full.multiseg] G:65 wrongly muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileG.cpp", 70, "AnyFunc", "G:70 muted (last single)", 1),
+        LLBC_FAILED, "[full.multiseg] G:70 not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileG.cpp", 71, "AnyFunc", "G:71 pass (after last)", 0),
+        LLBC_FAILED, "[full.multiseg] G:71 wrongly muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileH.cpp", 102, "AnyFunc", "H:102 muted (object range mid)", 1),
+        LLBC_FAILED, "[full.multiseg] H:102 not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileH.cpp", 103, "AnyFunc", "H:103 pass (range end excluded)", 0),
+        LLBC_FAILED, "[full.multiseg] H:103 wrongly muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileH.cpp", 200, "AnyFunc", "H:200 muted (single in lines)", 1),
+        LLBC_FAILED, "[full.multiseg] H:200 not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "mute_fileH.cpp", 201, "AnyFunc", "H:201 pass", 0),
+        LLBC_FAILED, "[full.multiseg] H:201 wrongly muted");
+
+    // 1.h) func MULTI-VALUE (config-driven, JSON array): MutedFuncMA / MutedFuncMB
+    //      both muted, MutedFuncMC pass. Threadid multi-value (item[12]) is not
+    //      exercised here since neither tid in the array equals the current
+    //      thread's id (synthetic values), so it has no effect on these emits.
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "any.cpp", 1, "MutedFuncMA", "func MA muted", 1),
+        LLBC_FAILED, "[full.multifunc] MutedFuncMA not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "any.cpp", 1, "MutedFuncMB", "func MB muted", 1),
+        LLBC_FAILED, "[full.multifunc] MutedFuncMB not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "any.cpp", 1, "MutedFuncMC", "func MC pass", 0),
+        LLBC_FAILED, "[full.multifunc] MutedFuncMC wrongly muted");
+
     // 1.e) un-registered file should always pass.
     LLBC_ErrorAndReturnIf(
         !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
@@ -1098,11 +1206,13 @@ int TestCase_Core_Log::DoLogMuteFilterTest()
                               LLBC_FAILED,
                               "[robust] expect 2 control items, got %zu", items.size());
         // The kept "keep_me" item should have a non-empty scope of [console].
-        LLBC_ErrorAndReturnIf(items[0].matchFunc != "keep_me" ||
+        LLBC_ErrorAndReturnIf(items[0].matchFuncs.size() != 1 ||
+                              items[0].matchFuncs[0] != "keep_me" ||
                               items[0].appenderTypes.size() != 1 ||
                               items[0].appenderTypes[0] != LLBC_LogAppenderType::Console,
                               LLBC_FAILED, "[robust] keep_me item scope mismatch");
-        LLBC_ErrorAndReturnIf(items[1].matchFunc != "ok_func",
+        LLBC_ErrorAndReturnIf(items[1].matchFuncs.size() != 1 ||
+                              items[1].matchFuncs[0] != "ok_func",
                               LLBC_FAILED, "[robust] ok_func item missing");
     }
     LLBC_ErrorAndReturnIf(
@@ -1119,150 +1229,256 @@ int TestCase_Core_Log::DoLogMuteFilterTest()
         LLBC_FAILED, "[robust] unrelated wrongly muted");
 
     // ------------------------------------------------------------------
-    // 3) Runtime API on logcontrol_full: Add / Remove / Clear / counters.
+    // 3) SetLogControls on logcontrol_full: atomic full-list replacement is
+    //    the only writer entry point (config-driven, plus LoggerMgr::Reload).
+    //    Each sub-test below installs a *complete* control list that exercises
+    //    one specific rule-semantics aspect, then verifies behavior.
     // ------------------------------------------------------------------
     fullLogger->ResetLogControlSuppressedCount();
     LLBC_ErrorAndReturnIf(fullLogger->GetLogControlSuppressedCount() != 0,
-                          LLBC_FAILED, "[runtime] reset failed");
+                          LLBC_FAILED, "[setctrl] reset failed");
 
-    const size_t cfgItemCount = fullLogger->GetLogControlCount();
-
-    // Build a runtime-only mute item: file=runtime.cpp, line==7, mute.
+    // Convenience: build a file+line==N mute item.
     auto buildFileLineMute = [](const char *file, int line) {
         LLBC_LogControlItem it;
         it.haveFile = true;
         it.matchFile = file;
-        it.matchLine = line;
-        it.action = LLBC_LogControlAction::Mute;
-        return it;
-    };
-    auto buildFuncMute = [](const char *func) {
-        LLBC_LogControlItem it;
-        it.haveFunc = true;
-        it.matchFunc = func;
+        it.matchLineRanges.emplace_back(line, line + 1);
         it.action = LLBC_LogControlAction::Mute;
         return it;
     };
 
-    LLBC_ErrorAndReturnIf(
-        fullLogger->AddLogControl(buildFileLineMute("runtime.cpp", 7)) != LLBC_OK,
-        LLBC_FAILED, "[runtime] AddLogControl failed");
-    LLBC_ErrorAndReturnIf(
-        fullLogger->GetLogControlCount() != cfgItemCount + 1,
-        LLBC_FAILED, "[runtime] count after add mismatch");
-    LLBC_ErrorAndReturnIf(
-        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
-                                "runtime.cpp", 7, "any", "runtime added rule", 1),
-        LLBC_FAILED, "[runtime] runtime rule not muted");
-
-    // AddLogControl validation: empty match -> INVALID.
+    // 3.a) Install a single file+line mute rule and verify it fires.
     {
-        LLBC_LogControlItem badEmpty;
-        badEmpty.action = LLBC_LogControlAction::Mute;
+        std::vector<LLBC_LogControlItem> items;
+        items.push_back(buildFileLineMute("runtime.cpp", 7));
         LLBC_ErrorAndReturnIf(
-            fullLogger->AddLogControl(badEmpty) == LLBC_OK,
-            LLBC_FAILED, "[runtime] empty-match should fail");
+            fullLogger->SetLogControls(items) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.basic] SetLogControls failed");
+        LLBC_ErrorAndReturnIf(
+            fullLogger->GetLogControlCount() != 1,
+            LLBC_FAILED, "[setctrl.basic] count mismatch");
+        LLBC_ErrorAndReturnIf(
+            !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                    "runtime.cpp", 7, "any", "basic rule", 1),
+            LLBC_FAILED, "[setctrl.basic] rule not muted");
     }
-    // Negative line + valid file rule -> INVALID.
-    {
-        LLBC_LogControlItem badLine;
-        badLine.haveFile = true;
-        badLine.matchFile = "x.cpp";
-        badLine.matchLine = -1;
-        badLine.action = LLBC_LogControlAction::Mute;
+
+    // 3.b) Per-item validation: each of the following bad lists must be
+    //      rejected by SetLogControls; the previous snapshot (3.a's one-item
+    //      list) must remain effective afterwards (strong exception-safety).
+    auto expectRejectedAndPrevAlive = [&](const std::vector<LLBC_LogControlItem> &bad,
+                                          const char *tag) -> int {
         LLBC_ErrorAndReturnIf(
-            fullLogger->AddLogControl(badLine) == LLBC_OK,
-            LLBC_FAILED, "[runtime] negative line should fail");
+            fullLogger->SetLogControls(bad) == LLBC_OK,
+            LLBC_FAILED, "[setctrl.validate] %s should fail", tag);
+        // Previous (3.a) snapshot stays alive: runtime.cpp:7 still muted.
+        LLBC_ErrorAndReturnIf(
+            !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                    "runtime.cpp", 7, "any", "prev still alive", 1),
+            LLBC_FAILED, "[setctrl.validate] %s corrupted prev snapshot", tag);
+        return LLBC_OK;
+    };
+
+    // Empty match -> INVALID.
+    {
+        LLBC_LogControlItem bad;
+        bad.action = LLBC_LogControlAction::Mute;
+        if (expectRejectedAndPrevAlive({bad}, "empty-match") != LLBC_OK) return LLBC_FAILED;
+    }
+    // Negative line in matchLineRanges -> INVALID.
+    {
+        LLBC_LogControlItem bad;
+        bad.haveFile = true;
+        bad.matchFile = "x.cpp";
+        bad.matchLineRanges.emplace_back(-1, 0);
+        bad.action = LLBC_LogControlAction::Mute;
+        if (expectRejectedAndPrevAlive({bad}, "negative-line") != LLBC_OK) return LLBC_FAILED;
     }
     // Range with end <= begin -> INVALID.
     {
-        LLBC_LogControlItem badRange;
-        badRange.haveFile = true;
-        badRange.matchFile = "r.cpp";
-        badRange.matchLine = 10;
-        badRange.matchLineEnd = 10; // empty / inverted range
-        badRange.action = LLBC_LogControlAction::Mute;
-        LLBC_ErrorAndReturnIf(
-            fullLogger->AddLogControl(badRange) == LLBC_OK,
-            LLBC_FAILED, "[runtime] range end<=begin should fail");
+        LLBC_LogControlItem bad;
+        bad.haveFile = true;
+        bad.matchFile = "r.cpp";
+        bad.matchLineRanges.emplace_back(10, 10);
+        bad.action = LLBC_LogControlAction::Mute;
+        if (expectRejectedAndPrevAlive({bad}, "range-empty") != LLBC_OK) return LLBC_FAILED;
+    }
+    // haveFunc but matchFuncs empty -> INVALID.
+    {
+        LLBC_LogControlItem bad;
+        bad.haveFunc = true;
+        bad.action = LLBC_LogControlAction::Mute;
+        if (expectRejectedAndPrevAlive({bad}, "empty-matchFuncs") != LLBC_OK) return LLBC_FAILED;
+    }
+    // haveThreadId but matchThreadIds empty -> INVALID.
+    {
+        LLBC_LogControlItem bad;
+        bad.haveThreadId = true;
+        bad.action = LLBC_LogControlAction::Mute;
+        if (expectRejectedAndPrevAlive({bad}, "empty-matchThreadIds") != LLBC_OK) return LLBC_FAILED;
     }
     // SetLevel without valid newLevel -> INVALID.
     {
-        LLBC_LogControlItem badSet;
-        badSet.haveFunc = true;
-        badSet.matchFunc = "Y";
-        badSet.action = LLBC_LogControlAction::SetLevel;
-        badSet.newLevel = -123; // invalid
-        LLBC_ErrorAndReturnIf(
-            fullLogger->AddLogControl(badSet) == LLBC_OK,
-            LLBC_FAILED, "[runtime] setlevel w/ invalid newLevel should fail");
+        LLBC_LogControlItem bad;
+        bad.haveFunc = true;
+        bad.matchFuncs.emplace_back("Y");
+        bad.action = LLBC_LogControlAction::SetLevel;
+        bad.newLevel = -123;
+        if (expectRejectedAndPrevAlive({bad}, "setlevel-bad-newLevel") != LLBC_OK) return LLBC_FAILED;
     }
-
-    // Remove the runtime-added (last) item; subsequent emit on the same source
-    // location should pass.
+    // Match valid but action left at default (Unset) -> INVALID. Guards
+    // against silently-mute-everything on a typo / missed assignment.
     {
-        const size_t lastIdx = fullLogger->GetLogControlCount() - 1;
-        LLBC_ErrorAndReturnIf(
-            fullLogger->RemoveLogControl(lastIdx) != LLBC_OK,
-            LLBC_FAILED, "[runtime] RemoveLogControl failed");
+        LLBC_LogControlItem bad;
+        bad.haveFile = true;
+        bad.matchFile = "noaction.cpp";
+        if (expectRejectedAndPrevAlive({bad}, "unset-action") != LLBC_OK) return LLBC_FAILED;
     }
-    LLBC_ErrorAndReturnIf(
-        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
-                                "runtime.cpp", 7, "any", "after remove", 0),
-        LLBC_FAILED, "[runtime] removed rule still muting");
-    // Out-of-range remove -> NOT_FOUND.
-    LLBC_ErrorAndReturnIf(
-        fullLogger->RemoveLogControl(static_cast<size_t>(-1)) == LLBC_OK,
-        LLBC_FAILED, "[runtime] OOB Remove should fail");
+    // matchLevels: haveLevel + empty matchLevels -> INVALID.
+    {
+        LLBC_LogControlItem bad;
+        bad.haveLevel = true;
+        bad.action = LLBC_LogControlAction::Mute;
+        if (expectRejectedAndPrevAlive({bad}, "empty-matchLevels") != LLBC_OK) return LLBC_FAILED;
+    }
+    // matchLevels contains an invalid level -> INVALID.
+    {
+        LLBC_LogControlItem bad;
+        bad.haveLevel = true;
+        bad.matchLevels.push_back(LLBC_LogLevel::Warn);
+        bad.matchLevels.push_back(-123);
+        bad.action = LLBC_LogControlAction::Mute;
+        if (expectRejectedAndPrevAlive({bad}, "matchLevels-invalid") != LLBC_OK) return LLBC_FAILED;
+    }
+    // All-or-nothing: a list mixing one good item with one bad item must
+    // be rejected as a whole (the good item must NOT be installed).
+    {
+        LLBC_LogControlItem good;
+        good.haveFile = true;
+        good.matchFile = "should_not_install.cpp";
+        good.action = LLBC_LogControlAction::Mute;
+        LLBC_LogControlItem bad;
+        bad.haveLevel = true;
+        bad.matchLevels.push_back(-9999);
+        bad.action = LLBC_LogControlAction::Mute;
+        if (expectRejectedAndPrevAlive({good, bad}, "good+bad-mix") != LLBC_OK)
+            return LLBC_FAILED;
+        // The "good" item must NOT have leaked in.
+        LLBC_ErrorAndReturnIf(
+            !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                    "should_not_install.cpp", 1, "any",
+                                    "good item leaked", 0),
+            LLBC_FAILED, "[setctrl.validate] good+bad: good item leaked through");
+    }
 
-    // Range mute via runtime API: [50,55) on "rt_range.cpp".
+    // 3.c) Snapshot read-back: SetLogControls + GetLogControls roundtrip,
+    //      and an empty SetLogControls publishes an empty snapshot
+    //      (IsEmpty fast-path).
+    {
+        std::vector<LLBC_LogControlItem> emptyItems;
+        LLBC_ErrorAndReturnIf(
+            fullLogger->SetLogControls(emptyItems) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.empty] empty SetLogControls failed");
+        LLBC_ErrorAndReturnIf(
+            fullLogger->GetLogControlCount() != 0,
+            LLBC_FAILED, "[setctrl.empty] not cleared");
+        LLBC_ErrorAndReturnIf(
+            !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                    "runtime.cpp", 7, "any",
+                                    "no rule after empty", 0),
+            LLBC_FAILED, "[setctrl.empty] prev rule still muting");
+    }
+
+    // 3.d) Range mute via SetLogControls: [50,55) on "rt_range.cpp".
     {
         LLBC_LogControlItem rng;
         rng.haveFile = true;
         rng.matchFile = "rt_range.cpp";
-        rng.matchLine = 50;
-        rng.matchLineEnd = 55;
+        rng.matchLineRanges.emplace_back(50, 55);
         rng.action = LLBC_LogControlAction::Mute;
         LLBC_ErrorAndReturnIf(
-            fullLogger->AddLogControl(rng) != LLBC_OK,
-            LLBC_FAILED, "[runtime.range] add failed");
+            fullLogger->SetLogControls({rng}) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.range] SetLogControls failed");
     }
     LLBC_ErrorAndReturnIf(
         !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
                                 "rt_range.cpp", 49, "any", "rt_range:49 pass", 0),
-        LLBC_FAILED, "[runtime.range] 49 wrongly muted");
+        LLBC_FAILED, "[setctrl.range] 49 wrongly muted");
     LLBC_ErrorAndReturnIf(
         !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
                                 "rt_range.cpp", 50, "any", "rt_range:50 muted", 1),
-        LLBC_FAILED, "[runtime.range] 50 not muted");
+        LLBC_FAILED, "[setctrl.range] 50 not muted");
     LLBC_ErrorAndReturnIf(
         !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
                                 "rt_range.cpp", 54, "any", "rt_range:54 muted", 1),
-        LLBC_FAILED, "[runtime.range] 54 not muted");
+        LLBC_FAILED, "[setctrl.range] 54 not muted");
     LLBC_ErrorAndReturnIf(
         !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
                                 "rt_range.cpp", 55, "any", "rt_range:55 pass", 0),
-        LLBC_FAILED, "[runtime.range] 55 wrongly muted (end should be excluded)");
+        LLBC_FAILED, "[setctrl.range] 55 wrongly muted (end should be excluded)");
 
-    // Chain: SetLevel + Mute (level-match) verifies that the rewritten level
-    // is observable to subsequent control items in the chain.
+    // 3.e) Multi-value func mute: matches ANY of the configured names.
     {
-        LLBC_LogControlItem set;
-        set.haveFile = true;
-        set.matchFile = "link.cpp";
-        set.action = LLBC_LogControlAction::SetLevel;
-        set.newLevel = LLBC_LogLevel::Warn;
+        LLBC_LogControlItem mf;
+        mf.haveFunc = true;
+        mf.matchFuncs.emplace_back("rtFuncA");
+        mf.matchFuncs.emplace_back("rtFuncB");
+        mf.action = LLBC_LogControlAction::Mute;
         LLBC_ErrorAndReturnIf(
-            fullLogger->AddLogControl(set) != LLBC_OK,
-            LLBC_FAILED, "[runtime] add chain[setlevel] failed");
+            fullLogger->SetLogControls({mf}) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.multifunc] SetLogControls failed");
+    }
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "any.cpp", 1, "rtFuncA", "rtFuncA muted", 1),
+        LLBC_FAILED, "[setctrl.multifunc] rtFuncA not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "any.cpp", 1, "rtFuncB", "rtFuncB muted", 1),
+        LLBC_FAILED, "[setctrl.multifunc] rtFuncB not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "any.cpp", 1, "rtFuncC", "rtFuncC pass", 0),
+        LLBC_FAILED, "[setctrl.multifunc] rtFuncC wrongly muted");
+
+    // 3.f) Multi-value threadId mute: matches ANY of the listed tids.
+    //      Use the current thread's tid + a synthetic one; only the current
+    //      thread's emits should be muted.
+    {
+        LLBC_LogControlItem mt;
+        mt.haveThreadId = true;
+        mt.matchThreadIds.push_back(LLBC_GetCurrentThreadId());
+        mt.matchThreadIds.push_back(static_cast<LLBC_ThreadId>(0xDEADBEEF));
+        mt.action = LLBC_LogControlAction::Mute;
+        LLBC_ErrorAndReturnIf(
+            fullLogger->SetLogControls({mt}) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.multitid] SetLogControls failed");
+    }
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "any.cpp", 1, "tidProbe", "tid match muted", 1),
+        LLBC_FAILED, "[setctrl.multitid] current-thread record not muted");
+
+    // 3.g) Chain: SetLevel + Mute (level-match) verifies that the rewritten
+    //      level is observable to subsequent control items in the same chain.
+    //      The two items must be installed *together* in declaration order,
+    //      because SetLogControls replaces the whole list atomically.
+    {
+        LLBC_LogControlItem setlvl;
+        setlvl.haveFile = true;
+        setlvl.matchFile = "link.cpp";
+        setlvl.action = LLBC_LogControlAction::SetLevel;
+        setlvl.newLevel = LLBC_LogLevel::Warn;
 
         LLBC_LogControlItem muteWarn;
         muteWarn.haveLevel = true;
-        muteWarn.matchLevel = LLBC_LogLevel::Warn;
+        muteWarn.matchLevels.push_back(LLBC_LogLevel::Warn);
         muteWarn.action = LLBC_LogControlAction::Mute;
+
         LLBC_ErrorAndReturnIf(
-            fullLogger->AddLogControl(muteWarn) != LLBC_OK,
-            LLBC_FAILED, "[runtime] add chain[mute warn] failed");
+            fullLogger->SetLogControls({setlvl, muteWarn}) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.chain] SetLogControls failed");
 
         // Original level INFO + file=link.cpp:
         //   [setlevel] -> level becomes WARN
@@ -1271,26 +1487,150 @@ int TestCase_Core_Log::DoLogMuteFilterTest()
             !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
                                     "link.cpp", 1, "any",
                                     "info -> setlevel warn -> mute", 1),
-            LLBC_FAILED, "[runtime] setlevel chain to mute failed");
+            LLBC_FAILED, "[setctrl.chain] setlevel chain to mute failed");
 
-        // Sanity: a record on link.cpp with original WARN should also be muted
+        // Sanity: a record on any.cpp with original WARN should be muted
         // (directly by the level-match item, regardless of setlevel).
         LLBC_ErrorAndReturnIf(
             !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Warn,
                                     "any.cpp", 1, "any2", "raw warn match", 1),
-            LLBC_FAILED, "[runtime] direct level-match mute failed");
+            LLBC_FAILED, "[setctrl.chain] direct level-match mute failed");
     }
 
-    // Clear everything -> IsEmpty fast-path; nothing should be muted afterwards.
-    fullLogger->ClearLogControls();
+    // 3.h) AND-between-rules semantics: enabled rules within ONE item must
+    //      all match.
+    fullLogger->ResetLogControlSuppressedCount();
+    {
+        LLBC_LogControlItem andItem;
+        andItem.haveFile = true;
+        andItem.matchFile = "and.cpp";
+        andItem.haveLevel = true;
+        andItem.matchLevels.push_back(LLBC_LogLevel::Warn);
+        andItem.action = LLBC_LogControlAction::Mute;
+        LLBC_ErrorAndReturnIf(
+            fullLogger->SetLogControls({andItem}) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.and] SetLogControls failed");
+    }
+    // Both rules satisfied -> muted.
     LLBC_ErrorAndReturnIf(
-        fullLogger->GetLogControlCount() != 0,
-        LLBC_FAILED, "[runtime] Clear left items behind");
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Warn,
+                                "and.cpp", 1, "any",
+                                "and.cpp + warn -> muted", 1),
+        LLBC_FAILED, "[setctrl.and] both rules match: not muted");
+    // file matches but level mismatches -> NOT muted (proves it is not OR).
     LLBC_ErrorAndReturnIf(
         !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
-                                "mute_fileA.cpp", 100, "MutedFuncOne",
-                                "after clear", 0),
-        LLBC_FAILED, "[runtime] post-clear log was suppressed");
+                                "and.cpp", 1, "any",
+                                "and.cpp + info -> pass", 0),
+        LLBC_FAILED, "[setctrl.and] file-only should not match (would-be OR)");
+    // level matches but file mismatches -> NOT muted (proves it is not OR).
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Warn,
+                                "other.cpp", 1, "any",
+                                "other.cpp + warn -> pass", 0),
+        LLBC_FAILED, "[setctrl.and] level-only should not match (would-be OR)");
+
+    // 3.i) matchLevels OR semantics: a record level matches if it equals ANY
+    //      entry in matchLevels.
+    fullLogger->ResetLogControlSuppressedCount();
+    {
+        LLBC_LogControlItem multiLevel;
+        multiLevel.haveLevel = true;
+        multiLevel.matchLevels.push_back(LLBC_LogLevel::Warn);
+        multiLevel.matchLevels.push_back(LLBC_LogLevel::Error);
+        multiLevel.action = LLBC_LogControlAction::Mute;
+        LLBC_ErrorAndReturnIf(
+            fullLogger->SetLogControls({multiLevel}) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.multilevel] SetLogControls failed");
+    }
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Warn,
+                                "any.cpp", 1, "any",
+                                "level=warn muted", 1),
+        LLBC_FAILED, "[setctrl.multilevel] warn not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Error,
+                                "any.cpp", 1, "any",
+                                "level=error muted", 1),
+        LLBC_FAILED, "[setctrl.multilevel] error not muted");
+    LLBC_ErrorAndReturnIf(
+        !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                "any.cpp", 1, "any",
+                                "level=info pass", 0),
+        LLBC_FAILED, "[setctrl.multilevel] info wrongly muted");
+
+    // 3.j) Replace (not merge) semantics: a fresh SetLogControls fully
+    //      replaces the previous list — the old rule must no longer fire.
+    {
+        LLBC_LogControlItem ia;
+        ia.haveFile = true;
+        ia.matchFile = "replace_a.cpp";
+        ia.action = LLBC_LogControlAction::Mute;
+        LLBC_ErrorAndReturnIf(
+            fullLogger->SetLogControls({ia}) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.replace] install v1 failed");
+        LLBC_ErrorAndReturnIf(
+            !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                    "replace_a.cpp", 1, "AnyFunc",
+                                    "v1 muted", 1),
+            LLBC_FAILED, "[setctrl.replace] v1 not effective");
+
+        LLBC_LogControlItem ib;
+        ib.haveFile = true;
+        ib.matchFile = "replace_b.cpp";
+        ib.action = LLBC_LogControlAction::Mute;
+        LLBC_ErrorAndReturnIf(
+            fullLogger->SetLogControls({ib}) != LLBC_OK,
+            LLBC_FAILED, "[setctrl.replace] install v2 failed");
+        LLBC_ErrorAndReturnIf(
+            !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                    "replace_b.cpp", 1, "AnyFunc",
+                                    "v2 muted", 1),
+            LLBC_FAILED, "[setctrl.replace] v2 not effective");
+        LLBC_ErrorAndReturnIf(
+            !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                    "replace_a.cpp", 1, "AnyFunc",
+                                    "v1 must be gone", 0),
+            LLBC_FAILED, "[setctrl.replace] v1 leaked into v2 (merged, not replaced)");
+    }
+
+    // Final cleanup before reload sub-test: publish an empty list.
+    LLBC_ErrorAndReturnIf(
+        fullLogger->SetLogControls({}) != LLBC_OK,
+        LLBC_FAILED, "[setctrl] final cleanup failed");
+
+    // ------------------------------------------------------------------
+    // LoggerMgr::Reload propagates logControls into the live logger.
+    // We simply reload the same config file and verify that:
+    //   - the logger's logControls list is repopulated to a non-zero size,
+    //   - and the canonical config-driven rule (file=mute_fileA.cpp:100)
+    //     becomes effective again.
+    // ------------------------------------------------------------------
+    {
+        const size_t before = fullLogger->GetLogControlCount();
+        LLBC_ErrorAndReturnIf(before != 0,
+                              LLBC_FAILED,
+                              "[setctrl.reload] precondition: log controls not cleared");
+
+        LLBC_ErrorAndReturnIf(
+            LLBC_LoggerMgrSingleton->Reload() != LLBC_OK,
+            LLBC_FAILED,
+            "[setctrl.reload] LoggerMgr::Reload failed: %s",
+            LLBC_FormatLastError());
+
+        LLBC_ErrorAndReturnIf(
+            fullLogger->GetLogControlCount() == 0,
+            LLBC_FAILED,
+            "[setctrl.reload] logControls not repopulated after reload");
+
+        // Config-driven canonical rule re-armed.
+        LLBC_ErrorAndReturnIf(
+            !EmitAndCheckSuppressed(fullLogger, LLBC_LogLevel::Info,
+                                    "mute_fileA.cpp", 100, "AnyFunc",
+                                    "post-reload A:100 muted", 1),
+            LLBC_FAILED,
+            "[setctrl.reload] canonical rule not effective after reload");
+    }
 
     LLBC_PrintLn("DoLogMuteFilterTest done. final suppressed count of full logger: %llu",
                  (unsigned long long)fullLogger->GetLogControlSuppressedCount());

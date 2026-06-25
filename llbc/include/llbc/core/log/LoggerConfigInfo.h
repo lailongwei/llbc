@@ -266,7 +266,7 @@ public:
     /**
      * Get parsed log control items.
      * Parsed from cfg key `logControls` (a JSON array string), consumed by
-     * LLBC_LogControlFilter on Logger::Initialize. JSON schema:
+     * LLBC_LogControlMgr on Logger::Initialize. JSON schema:
      *   [
      *     {
      *       "match": {
@@ -301,6 +301,19 @@ private:
      * @return sint64 - the normalized size str.
      */
     sint64 NormalizeSizeStr(const LLBC_String &sizeStr, sint64 defaultSize, sint64 low, sint64 high);
+
+    /**
+     * Parse the value of cfg key `logControls` (a JSON array string) into
+     * LLBC_LogControlItem list. Malformed JSON / non-array input is ignored
+     * silently (consistent with other log cfg keys -- keep bootstrap robust).
+     * Per-item failures are also skipped silently; only well-formed items
+     * with at least one match rule, a known action and (when action==SetLevel)
+     * a valid newLevel are appended to `out`. Declaration order is preserved.
+     * @param[in]  logControlsStr - the raw JSON array string.
+     * @param[out] out            - the parsed control items, appended.
+     */
+    static void ParseLogControls(const LLBC_String &logControlsStr,
+                                 std::vector<LLBC_LogControlItem> &out);
 
 private:
     LLBC_String _loggerName;

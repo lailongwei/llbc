@@ -31,14 +31,16 @@
 
         <!-- 日志输出控制项 (log control items), 配置为一个 JSON 数组字符串. 每个元素 schema:
                { "match":     { "file": "Foo.cpp" | {"name":"Foo.cpp","line":0},
-                                "func": "DoBar",
-                                "threadId": 12345,
-                                "level": "warn" | 3 },
+                                "func": "DoBar" | ["DoBar","DoBaz"],
+                                "threadId": 12345 | [12345,23456],
+                                "level": "warn" | 3 | ["warn","error"] | [3,4] },
                  "appenders": ["console","file","network"],   // 缺省 == 全部 appender
                  "action":    "mute" | "setlevel",
                  "newLevel":  "error" | 4 }                   // action=="setlevel" 时必填
-             match 内部各键之间为 OR (one-of); 多控制项按声明顺序应用; setLevel 改写对后续控制
-             项的 level 匹配可见; 解析失败的元素静默跳过, 不影响其它合法元素. -->
+             match 内部各启用维度之间为 AND (all-of, 必须同时命中); 每条规则自身的取值集合
+             (matchLineRanges / matchFuncs / matchThreadIds / matchLevels) 之内为 OR (one-of).
+             多控制项按声明顺序应用; setLevel 改写对后续控制项的 level 匹配可见;
+             解析失败的元素静默跳过, 不影响其它合法元素. -->
         <logControls></logControls>
 
         <!-- 控制台输出器配置选项 -->
@@ -248,7 +250,7 @@
     <!-- log output control 测试相关 logger 配置.
          配置项 logControls 为 JSON 数组字符串, schema 见 root.logControls 注释. -->
 
-    <!-- 1) 全规则齐全 (含: 文件名+行号 / 文件名+行号范围 / 函数名 / 文件 setLevel / 单 appender 限定 / 多匹配维度 OR) -->
+    <!-- 1) 全规则齐全 (含: 文件名+行号 / 文件名+行号范围 / 函数名 / 文件 setLevel / 单 appender 限定 / 多取值数组 OR) -->
     <!-- 那些"应 pass"的样本会被 console 真打出来, 这是预期行为(同时充当反向断言). -->
     <logcontrol_full>
         <asynchronous>false</asynchronous>
@@ -260,8 +262,28 @@
              静音函数 MutedFuncOne 与 MutedFuncTwo (后者仅作用于 console appender),
              file=mute_fileC.cpp 提级到 warn, file=mute_fileD.cpp 提级到 error,
              file=mute_fileE.cpp 行号范围 [300,305) 静音 (字符串语法 "name:NN-MM", 半开区间),
-             file=mute_fileF.cpp 行号范围 [400,410) 静音 (对象语法 line/lineEnd). -->
-        <logControls>[{"match":{"file":"mute_fileA.cpp:100"},"action":"mute"},{"match":{"file":{"name":"mute_fileA.cpp","line":200}},"action":"mute"},{"match":{"file":"mute_fileB.cpp"},"action":"mute"},{"match":{"func":"MutedFuncOne"},"action":"mute"},{"match":{"func":"MutedFuncTwo"},"appenders":["console"],"action":"mute"},{"match":{"file":"mute_fileC.cpp"},"action":"setlevel","newLevel":"warn"},{"match":{"file":"mute_fileD.cpp"},"action":"setlevel","newLevel":"error"},{"match":{"file":"mute_fileE.cpp:300-305"},"action":"mute"},{"match":{"file":{"name":"mute_fileF.cpp","line":400,"lineEnd":410}},"action":"mute"}]</logControls>
+             file=mute_fileF.cpp 行号范围 [400,410) 静音 (对象语法 line/lineEnd),
+             file=mute_fileG.cpp 多段行号 "50, 60-65, 70" 静音 (字符串语法多段),
+             file=mute_fileH.cpp 多段行号 "100-103, 200" 静音 (对象语法 lines 字段),
+             func 多值 ["MutedFuncMA","MutedFuncMB"] (任一命中即静音),
+             threadId 多值 [1, 2147483640] (任一命中即静音). -->
+        <logControls>
+            [
+              { "match": { "file": "mute_fileA.cpp:100" },                                    "action": "mute" },
+              { "match": { "file": { "name": "mute_fileA.cpp", "line": 200 } },               "action": "mute" },
+              { "match": { "file": "mute_fileB.cpp" },                                        "action": "mute" },
+              { "match": { "func": "MutedFuncOne" },                                          "action": "mute" },
+              { "match": { "func": "MutedFuncTwo" }, "appenders": ["console"],                "action": "mute" },
+              { "match": { "file": "mute_fileC.cpp" },                                        "action": "setlevel", "newLevel": "warn"  },
+              { "match": { "file": "mute_fileD.cpp" },                                        "action": "setlevel", "newLevel": "error" },
+              { "match": { "file": "mute_fileE.cpp:300-305" },                                "action": "mute" },
+              { "match": { "file": { "name": "mute_fileF.cpp", "line": 400, "lineEnd": 410 } }, "action": "mute" },
+              { "match": { "file": "mute_fileG.cpp:50, 60-65, 70" },                          "action": "mute" },
+              { "match": { "file": { "name": "mute_fileH.cpp", "lines": "100-103, 200" } },   "action": "mute" },
+              { "match": { "func": ["MutedFuncMA", "MutedFuncMB"] },                          "action": "mute" },
+              { "match": { "threadId": [1, 2147483640] },                                     "action": "mute" }
+            ]
+        </logControls>
     </logcontrol_full>
 
     <!-- 2) 容错样本: 数组中混入坏元素, 期望坏的被静默跳过, 好的依然生效.
@@ -278,7 +300,20 @@
         <logToFile>false</logToFile>
         <consoleLogLevel>TRACE</consoleLogLevel>
         <fileLogLevel>TRACE</fileLogLevel>
-        <logControls>[{"match":{},"action":"mute"},{"match":{"file":12345},"action":"mute"},{"match":{"func":"X"},"action":"unknownaction"},{"match":{"func":"Y"},"action":"setlevel"},{"match":{"func":"keep_me"},"appenders":["console","totally_unknown_appender"],"action":"mute"},{"match":{"func":"ok_func"},"action":"mute"},{"match":{"file":"bad.cpp:10-10"},"action":"mute"}]</logControls>
+        <!-- 注意: tinyxml2 的 GetText() 只返回第一个子文本节点, 因此 <logControls> 元素文本
+             内部不能夹任何 XML 注释 (<!- - ... - ->), 否则注释之后的 JSON 内容会被丢弃
+             导致整段配置静默失效. 各元素的解释见上方 <logcontrol_robust> 块外的注释. -->
+        <logControls>
+            [
+              { "match": {},                          "action": "mute"          },
+              { "match": { "file": 12345 },           "action": "mute"          },
+              { "match": { "func": "X" },             "action": "unknownaction" },
+              { "match": { "func": "Y" },             "action": "setlevel"      },
+              { "match": { "func": "keep_me" },       "appenders": ["console", "totally_unknown_appender"], "action": "mute" },
+              { "match": { "func": "ok_func" },       "action": "mute"          },
+              { "match": { "file": "bad.cpp:10-10" }, "action": "mute"          }
+            ]
+        </logControls>
     </logcontrol_robust>
 
     <!-- 其它 logger(s) 配置 -->

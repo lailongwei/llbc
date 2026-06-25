@@ -1,22 +1,22 @@
-    // The MIT License (MIT)
+// The MIT License (MIT)
 
 // Copyright (c) 2013 lailongwei<lailongwei@126.com>
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of 
-// this software and associated documentation files (the "Software"), to deal in 
-// the Software without restriction, including without limitation the rights to 
-// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of 
-// the Software, and to permit persons to whom the Software is furnished to do so, 
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the "Software"), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
 // subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in all 
+//
+// The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS 
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
@@ -25,7 +25,7 @@
 #include "llbc/core/os/OS_SysConf.h"
 #include "llbc/core/os/OS_Process.h"
 #include "llbc/core/utils/Util_Text.h"
-#include  "llbc/core/file/Directory.h"
+#include "llbc/core/file/Directory.h"
 #include "llbc/core/variant/Variant.h"
 
 #include "llbc/core/log/LogLevel.h"
@@ -45,6 +45,275 @@
                                                                (_notConfigUseRoot ? rootCfg->rootMeth() : (dft))) \
 
 __LLBC_NS_BEGIN
+
+// =============================================================================
+// LogControls JSON parsing helpers (file-scope static).
+//
+// These helpers are dedicated to LLBC_LoggerConfigInfo::ParseLogControls and
+// MUST NOT be reused elsewhere (they are file-scope on purpose).
+//
+// All helpers are total functions on bad input: they either return false or
+// produce an empty result; callers silently skip the offending control item.
+//
+// For lenient JSON value access (HasMember + Is<T>() + Get<T>() folded into
+// one call), see LLBC_JsonGetMember / LLBC_JsonGetStr / LLBC_JsonGetInt in
+// "llbc/core/rapidjson/json.h".
+// =============================================================================
+
+// Parse a level value from JSON. Accepts string ("Debug"/"Info"/...) or int.
+// Returns false if value is invalid.
+//
+// Note: GetLevelEnum() does strict (uppercased) equality only, so we strip
+// surrounding whitespace here for friendlier user input (e.g. " Warn ", "INFO\n").
+static bool ParseLevel(const LLBC_Json::Value &v, int &outLevel)
+{
+    if (v.IsString())
+    {
+        const LLBC_String s = LLBC_String(v.GetString()).strip();
+        if (s.empty())
+            return false;
+        const int lvl = LLBC_LogLevel::GetLevelEnum(s);
+        if (!LLBC_LogLevel::IsValid(lvl))
+            return false;
+        outLevel = lvl;
+        return true;
+    }
+    if (v.IsInt())
+    {
+        const int lvl = v.GetInt();
+        if (!LLBC_LogLevel::IsValid(lvl))
+            return false;
+        outLevel = lvl;
+        return true;
+    }
+    return false;
+}
+
+// Parse an appender type name ("console"/"file"/"network", case-insensitive).
+// Returns false on unknown name or non-string value.
+static bool ParseAppenderType(const LLBC_Json::Value &v, int &outType)
+{
+    if (!v.IsString())
+        return false;
+    const LLBC_String s = LLBC_String(v.GetString()).strip();
+    const int t = LLBC_LogAppenderType::GetTypeEnum(s.c_str());
+    if (!LLBC_LogAppenderType::IsValid(t))
+        return false;
+    outType = t;
+    return true;
+}
+
+// Read an optional int field from a JSON object.
+// - field absent (or explicit JSON null) -> outVal unchanged, return true
+// - field present and is int / int64     -> outVal = <the int>, return true
+// - field present but not an int
+//   (string / float / bool / array / object / etc.) -> return false
+//
+// "Present but explicitly 0" is indistinguishable from "absent" by design --
+// both are treated as "not specified" (whole-file wildcard at the call site).
+// Callers should pre-initialize outVal to the "absent" default (typically 0).
+static bool ParseOptionalInt(const LLBC_Json::Value &parent,
+                             const char *key,
+                             int &outVal)
+{
+    const auto &v = LLBC_JsonGetMember(parent, key);
+    if (v.IsNull())
+        return true;
+    if (!v.IsInt() && !v.IsInt64())
+        return false;
+    outVal = v.IsInt() ? v.GetInt() : static_cast<int>(v.GetInt64());
+    return true;
+}
+
+// Parse a "line spec" string (the right-hand side of "name:..."
+// or the value of object-form "lines"). Multi-segment, comma-
+// separated; each segment is either a single line "N" or a
+// half-open range "N-M" ([N, M), with M > N).
+// Examples:
+//   "42"               -> [(42, 43)]
+//   "10-12"            -> [(10, 12)]
+//   "100, 102-112"     -> [(100, 101), (102, 112)]
+// Whitespace around tokens is stripped. Returns false on any
+// malformed segment (caller should silently skip the offending
+// control item).
+static bool ParseLineSpec(const LLBC_String &spec,
+                          std::vector<std::pair<int, int> > &outRanges)
+{
+    outRanges.clear();
+    LLBC_String s = LLBC_String(spec).strip();
+    if (s.empty())
+        return false;
+
+    auto segs = s.split(',', -1, true);
+    if (segs.empty())
+        return false;
+    for (auto &raw : segs)
+    {
+        LLBC_String seg = raw.strip();
+        if (seg.empty())
+            return false;
+
+        const auto dashPos = seg.find('-');
+        if (dashPos == LLBC_String::npos)
+        {
+            // Single line "N" -> [N, N+1).
+            if (!seg.isdigit())
+                return false;
+            const long ln = std::strtol(seg.c_str(), nullptr, 10);
+            if (ln < 0 || ln >= INT_MAX)
+                return false;
+            outRanges.emplace_back(static_cast<int>(ln), static_cast<int>(ln) + 1);
+        }
+        else
+        {
+            // Range "N-M" -> [N, M).
+            LLBC_String beg = seg.substr(0, dashPos).strip();
+            LLBC_String end = seg.substr(dashPos + 1).strip();
+            if (!beg.isdigit() || !end.isdigit())
+                return false;
+            const long lb = std::strtol(beg.c_str(), nullptr, 10);
+            const long le = std::strtol(end.c_str(), nullptr, 10);
+            if (lb < 0 || le <= lb || le > INT_MAX)
+                return false;
+            outRanges.emplace_back(static_cast<int>(lb), static_cast<int>(le));
+        }
+    }
+    return !outRanges.empty();
+}
+
+// Parse a string-form "file" value with optional multi-segment line spec.
+// Accepted forms (whitespace around tokens is stripped):
+//   "Foo.cpp"              -> name="Foo.cpp", ranges=[]   (whole-file wildcard)
+//   "Foo.cpp:42"           -> name="Foo.cpp", ranges=[(42,43)]
+//   "Foo.cpp:10-12"        -> name="Foo.cpp", ranges=[(10,12)]
+//   "Foo.cpp:100, 102-112" -> name="Foo.cpp", ranges=[(100,101),(102,112)]
+// Returns false if the string is malformed.
+static bool ParseFileStr(const char *raw,
+                         LLBC_String &name,
+                         std::vector<std::pair<int, int> > &ranges)
+{
+    LLBC_String s = LLBC_String(raw).strip();
+    if (s.empty())
+        return false;
+
+    ranges.clear();
+
+    // Split file name from line spec at ':'.
+    // The line spec part (e.g. "42", "10-12", "100, 102-112") never
+    // contains ':', and we only accept basenames here (no Windows drive
+    // letters like "C:\Foo.cpp"), so any well-formed input contains at
+    // most one ':'. We pick find() (the first ':') for clarity; rfind()
+    // would yield the same result on every well-formed input.
+    const auto colonPos = s.find(':');
+    if (colonPos == LLBC_String::npos)
+    {
+        name = s;
+        return !name.empty();
+    }
+
+    LLBC_String left  = s.substr(0, colonPos).strip();
+    LLBC_String right = s.substr(colonPos + 1).strip();
+    if (left.empty() || right.empty())
+        return false;
+
+    if (!ParseLineSpec(right, ranges))
+        return false;
+    name = left;
+    return true;
+}
+
+// Parse a "match.file" JSON value (string-form or object-form) into a name +
+// optional line ranges. Returns false on any malformed input; caller skips.
+static bool ParseFileMatch(const LLBC_Json::Value &fv,
+                           LLBC_String &outName,
+                           std::vector<std::pair<int, int> > &outRanges)
+{
+    outRanges.clear();
+
+    // 1. String form  : "Foo.cpp" / "Foo.cpp:42" / "Foo.cpp:10-12" / "Foo.cpp:100, 102-112".
+    if (fv.IsString())
+        return ParseFileStr(fv.GetString(), outName, outRanges);
+
+    // 2. Object form  : { "name":"Foo.cpp",
+    //                  "line":N,                // optional single line
+    //                  "lineEnd":M,             // optional, with "line", range [N,M)
+    //                  "lines":"100, 102-112" } // optional multi-segment;
+    if (!fv.IsObject())
+        return false;
+
+    const char *rawName = LLBC_JsonGetStr(LLBC_JsonGetMember(fv, "name"));
+    if (!rawName)
+        return false;
+    LLBC_String name = LLBC_String(rawName).strip();
+    if (name.empty())
+        return false;
+
+    // "lines" (string, multi-segment) wins if present.
+    const auto &linesVal = LLBC_JsonGetMember(fv, "lines");
+    if (!linesVal.IsNull())
+    {
+        const char *linesStr = LLBC_JsonGetStr(linesVal);
+        if (!linesStr)
+            return false;
+        const LLBC_String linesSpec = LLBC_String(linesStr).strip();
+        if (linesSpec.empty())
+            return false;
+        if (!ParseLineSpec(linesSpec, outRanges))
+            return false;
+        outName = std::move(name);
+        return true;
+    }
+
+    // "line" / "lineEnd" are optional ints; if either is present with a
+    // non-int type the whole control item is rejected (caller skips).
+    // Both absent (or both explicit 0) means "not specified" -> whole-file
+    // wildcard via the empty-ranges branch below.
+    int line = 0;
+    int lineEnd = 0;
+    if (!ParseOptionalInt(fv, "line", line) ||
+        !ParseOptionalInt(fv, "lineEnd", lineEnd))
+        return false;
+    if (line < 0 || lineEnd < 0 || (lineEnd != 0 && lineEnd <= line))
+        return false;
+
+    if (lineEnd > 0)
+        outRanges.emplace_back(line, lineEnd);
+    else if (line > 0)
+        outRanges.emplace_back(line, line + 1);
+    // line==0 && lineEnd==0 -> whole-file wildcard (empty ranges).
+
+    outName = std::move(name);
+    return true;
+}
+
+// Collect a JSON value into `out`. The value may be either a single scalar
+// (treated as a 1-element input) or an array of scalars. `extract(v, t)`
+// returns true and fills `t` if `v` is a valid scalar; otherwise the entry
+// is silently dropped (so the resulting vector may be shorter than the input
+// array, or even empty).
+//
+// Used by "match.func" (string / array-of-strings), "match.threadId"
+// (int / array-of-ints) and "match.level" (level-string-or-int / array of same).
+template <typename T, typename Fn>
+static void CollectAsVector(const LLBC_Json::Value &v,
+                            std::vector<T> &out,
+                            Fn extract)
+{
+    T tmp;
+    if (v.IsArray())
+    {
+        for (auto it = v.Begin(); it != v.End(); ++it)
+        {
+            if (extract(*it, tmp))
+                out.push_back(std::move(tmp));
+        }
+    }
+    else
+    {
+        if (extract(v, tmp))
+            out.push_back(std::move(tmp));
+    }
+}
 
 LLBC_LoggerConfigInfo::LLBC_LoggerConfigInfo()
 : _notConfigUseRoot(false)
@@ -111,7 +380,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         auto keyContentsPair = group.strip().split(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1], 1, true);
         if (keyContentsPair.size() != 2)
             continue;
-        
+
         LLBC_String key = keyContentsPair[0].strip();
         LLBC_String contentListStr = keyContentsPair[1].strip();
         if (key.empty() || contentListStr.empty())
@@ -122,283 +391,33 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         for (auto &content : contents)
         {
             auto normalizedContent = content.strip();
-            if (!normalizedContent.empty()) 
-                contentVec.emplace_back(normalizedContent); 
+            if (!normalizedContent.empty())
+                contentVec.emplace_back(normalizedContent);
         }
 
         if (!contentVec.empty())
-            _requireColorLogTraces.emplace(LLBC_LogTrace::TraceKey(key), contentVec); 
+            _requireColorLogTraces.emplace(LLBC_LogTrace::TraceKey(key), contentVec);
     }
 
     // Log mute rules: file+line, func, file+level.
-    {
-        // logControls: a JSON array string. Each element describes a single
-        // log output control item; details see LoggerConfigInfo.h.
-        const LLBC_String logControlsStr = cfg["logControls"].AsStr().strip();
-        if (!logControlsStr.empty())
-        {
-            LLBC_Json::Document doc;
-            if (doc.Parse(logControlsStr.c_str()).HasParseError() || !doc.IsArray())
-            {
-                // Malformed JSON / not an array: skip silently to keep
-                // bootstrap robust (consistent with other log cfg keys).
-            }
-            else
-            {
-                auto parseLevel = [](const LLBC_Json::Value &v, int &outLevel) -> bool {
-                    if (v.IsString())
-                    {
-                        const int lvl = LLBC_LogLevel::GetLevelEnum(v.GetString());
-                        if (!LLBC_LogLevel::IsValid(lvl))
-                            return false;
-                        outLevel = lvl;
-                        return true;
-                    }
-                    if (v.IsInt())
-                    {
-                        const int lvl = v.GetInt();
-                        if (!LLBC_LogLevel::IsValid(lvl))
-                            return false;
-                        outLevel = lvl;
-                        return true;
-                    }
-                    return false;
-                };
-
-                auto parseAppenderType = [](const LLBC_Json::Value &v, int &outType) -> bool {
-                    if (!v.IsString())
-                        return false;
-                    LLBC_String s = LLBC_String(v.GetString()).strip().tolower();
-                    if (s == "console")
-                        outType = LLBC_LogAppenderType::Console;
-                    else if (s == "file")
-                        outType = LLBC_LogAppenderType::File;
-                    else if (s == "network")
-                        outType = LLBC_LogAppenderType::Network;
-                    else
-                        return false;
-                    return true;
-                };
-
-                // Parse a "file" string with optional line / range suffix.
-                // Accepted forms (whitespace around tokens is stripped):
-                //   "Foo.cpp"          -> name="Foo.cpp", line=0,  lineEnd=0      (whole-file wildcard)
-                //   "Foo.cpp:42"       -> name="Foo.cpp", line=42, lineEnd=0      (single line)
-                //   "Foo.cpp:10-12"    -> name="Foo.cpp", line=10, lineEnd=12     (half-open range [10,12),
-                //                                                                   following llbc's [n0,n1)
-                //                                                                   range convention)
-                // Returns false if the string is malformed (caller should silently
-                // skip the offending control item).
-                auto parseFileStr = [](const char *raw,
-                                       LLBC_String &name,
-                                       int &line,
-                                       int &lineEnd) -> bool {
-                    LLBC_String s = LLBC_String(raw).strip();
-                    if (s.empty())
-                        return false;
-
-                    line = 0;
-                    lineEnd = 0;
-
-                    const auto colonPos = s.rfind(':');
-                    if (colonPos == LLBC_String::npos)
-                    {
-                        name = s;
-                        return !name.empty();
-                    }
-
-                    LLBC_String left  = s.substr(0, colonPos).strip();
-                    LLBC_String right = s.substr(colonPos + 1).strip();
-                    if (left.empty() || right.empty())
-                        return false;
-
-                    auto allDigits = [](const LLBC_String &str) -> bool {
-                        if (str.empty())
-                            return false;
-                        for (char c : str)
-                        {
-                            if (c < '0' || c > '9')
-                                return false;
-                        }
-                        return true;
-                    };
-
-                    const auto dashPos = right.find('-');
-                    if (dashPos == LLBC_String::npos)
-                    {
-                        // "name:NN" form.
-                        if (!allDigits(right))
-                            return false;
-                        const long ln = std::strtol(right.c_str(), nullptr, 10);
-                        if (ln < 0 || ln > INT_MAX)
-                            return false;
-                        name = left;
-                        line = static_cast<int>(ln);
-                        return true;
-                    }
-
-                    // "name:NN-MM" range form.
-                    LLBC_String beg = right.substr(0, dashPos).strip();
-                    LLBC_String end = right.substr(dashPos + 1).strip();
-                    if (!allDigits(beg) || !allDigits(end))
-                        return false;
-                    const long lb = std::strtol(beg.c_str(), nullptr, 10);
-                    const long le = std::strtol(end.c_str(), nullptr, 10);
-                    if (lb < 0 || le <= lb || le > INT_MAX)
-                        return false;
-                    name    = left;
-                    line    = static_cast<int>(lb);
-                    lineEnd = static_cast<int>(le);
-                    return true;
-                };
-
-                for (auto it = doc.Begin(); it != doc.End(); ++it)
-                {
-                    if (!it->IsObject())
-                        continue;
-                    LLBC_LogControlItem item;
-
-                    // a) match rules (one-of, OR-combined within this item).
-                    if (it->HasMember("match") && (*it)["match"].IsObject())
-                    {
-                        const auto &m = (*it)["match"];
-                        // file:
-                        //   - string form: "Foo.cpp" / "Foo.cpp:42" / "Foo.cpp:10-12".
-                        //   - object form: {"name":"Foo.cpp","line":N,"lineEnd":M}
-                        //                  (line / lineEnd both optional).
-                        if (m.HasMember("file"))
-                        {
-                            const auto &fv = m["file"];
-                            if (fv.IsString())
-                            {
-                                LLBC_String name;
-                                int line = 0;
-                                int lineEnd = 0;
-                                if (parseFileStr(fv.GetString(), name, line, lineEnd))
-                                {
-                                    item.haveFile = true;
-                                    item.matchFile = name;
-                                    item.matchLine = line;
-                                    item.matchLineEnd = lineEnd;
-                                }
-                            }
-                            else if (fv.IsObject() && fv.HasMember("name") && fv["name"].IsString())
-                            {
-                                const LLBC_String name = LLBC_String(fv["name"].GetString()).strip();
-                                int line = 0;
-                                int lineEnd = 0;
-                                if (fv.HasMember("line") && fv["line"].IsInt())
-                                    line = fv["line"].GetInt();
-                                if (fv.HasMember("lineEnd") && fv["lineEnd"].IsInt())
-                                    lineEnd = fv["lineEnd"].GetInt();
-                                // Validate: line/lineEnd >= 0; if range mode, lineEnd > line.
-                                const bool ok = !name.empty() &&
-                                                line >= 0 &&
-                                                lineEnd >= 0 &&
-                                                (lineEnd == 0 || lineEnd > line);
-                                if (ok)
-                                {
-                                    item.haveFile = true;
-                                    item.matchFile = name;
-                                    item.matchLine = line;
-                                    item.matchLineEnd = lineEnd;
-                                }
-                            }
-                        }
-                        // func: string.
-                        if (m.HasMember("func") && m["func"].IsString())
-                        {
-                            const LLBC_String fn = LLBC_String(m["func"].GetString()).strip();
-                            if (!fn.empty())
-                            {
-                                item.haveFunc = true;
-                                item.matchFunc = fn;
-                            }
-                        }
-                        // threadId: integer.
-                        if (m.HasMember("threadId") && m["threadId"].IsInt64())
-                        {
-                            item.haveThreadId = true;
-                            item.matchThreadId = static_cast<LLBC_ThreadId>(m["threadId"].GetInt64());
-                        }
-                        else if (m.HasMember("threadId") && m["threadId"].IsInt())
-                        {
-                            item.haveThreadId = true;
-                            item.matchThreadId = static_cast<LLBC_ThreadId>(m["threadId"].GetInt());
-                        }
-                        // level: string or int.
-                        if (m.HasMember("level"))
-                        {
-                            int lvl = 0;
-                            if (parseLevel(m["level"], lvl))
-                            {
-                                item.haveLevel = true;
-                                item.matchLevel = lvl;
-                            }
-                        }
-                    }
-
-                    // No match rule enabled? skip silently.
-                    if (!item.HasAnyMatch())
-                        continue;
-
-                    // b) appender scope (optional). Empty / absent == all appenders.
-                    if (it->HasMember("appenders") && (*it)["appenders"].IsArray())
-                    {
-                        const auto &arr = (*it)["appenders"];
-                        for (auto ait = arr.Begin(); ait != arr.End(); ++ait)
-                        {
-                            int t = 0;
-                            if (parseAppenderType(*ait, t))
-                                item.appenderTypes.push_back(t);
-                            // Unknown appender names are silently skipped.
-                        }
-                    }
-
-                    // c) action.
-                    LLBC_String actionStr;
-                    if (it->HasMember("action") && (*it)["action"].IsString())
-                        actionStr = LLBC_String((*it)["action"].GetString()).strip().tolower();
-                    if (actionStr == "mute")
-                    {
-                        item.action = LLBC_LogControlAction::Mute;
-                    }
-                    else if (actionStr == "setlevel")
-                    {
-                        item.action = LLBC_LogControlAction::SetLevel;
-                        if (!it->HasMember("newLevel"))
-                            continue;
-                        int nlvl = 0;
-                        if (!parseLevel((*it)["newLevel"], nlvl))
-                            continue;
-                        item.newLevel = nlvl;
-                    }
-                    else
-                    {
-                        // Unknown action -> skip.
-                        continue;
-                    }
-
-                    _logControls.push_back(std::move(item));
-                }
-            }
-        }
-    }
+    // logControls: a JSON array string. Each element describes a single
+    // log output control item; details see LoggerConfigInfo.h.
+    ParseLogControls(cfg["logControls"].AsStr().strip(), _logControls);
 
     _asyncMode = __LLBC_GetLogCfg(
         "asynchronous", ASYNC_MODE, IsAsyncMode, AsLooseBool);
     if (_asyncMode)
         _independentThread = __LLBC_GetLogCfg(
             "independentThread", INDEPENDENT_THREAD, IsIndependentThread, AsLooseBool);
-     _flushInterval = __LLBC_GetLogCfg(
-         "flushInterval", LOG_FLUSH_INTERVAL, GetFlushInterval, AsInt32);
+    _flushInterval = __LLBC_GetLogCfg(
+        "flushInterval", LOG_FLUSH_INTERVAL, GetFlushInterval, AsInt32);
 
     // Json styled log configs.
     _addTimestampInJsonLog = __LLBC_GetLogCfg(
         "addTimestampInJsonLog", ADD_TIMESTAMP_IN_JSON_LOG, IsAddTimestampInJsonLog, AsLooseBool);
 
     // Console log configs.
-     _logToConsole = __LLBC_GetLogCfg("logToConsole", LOG_TO_CONSOLE, IsLogToConsole, AsLooseBool);
+    _logToConsole = __LLBC_GetLogCfg("logToConsole", LOG_TO_CONSOLE, IsLogToConsole, AsLooseBool);
     if (_logToConsole)
     {
         if (cfg["consoleLogLevel"])
@@ -409,7 +428,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         if (cfg["consolePattern"])
             _consolePattern = cfg["consolePattern"].AsStr();
         else
-            _consolePattern = _notConfigUseRoot ? 
+            _consolePattern = _notConfigUseRoot ?
                 rootCfg->GetConsolePattern().c_str() : LLBC_CFG_LOG_DEFAULT_CONSOLE_LOG_PATTERN;
         _colourfulOutput = __LLBC_GetLogCfg(
             "colourfulOutput", COLOURFUL_OUTPUT, IsColourfulOutput, AsLooseBool);
@@ -474,7 +493,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         if (cfg["filePattern"])
             _filePattern = cfg["filePattern"].AsStr();
         else
-            _filePattern = _notConfigUseRoot ? 
+            _filePattern = _notConfigUseRoot ?
                 rootCfg->GetFilePattern().c_str() : LLBC_CFG_LOG_DEFAULT_FILE_LOG_PATTERN;
 
         // File rolling mode.
@@ -507,13 +526,13 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
         if (_asyncMode)
             _fileBufferSize = __LLBC_GetLogCfg(
                 "fileBufferSize", LOG_FILE_BUFFER_SIZE, GetFileBufferSize, AsInt32);
-        
+
         // Advise discard file page cache.
         _fadviseDiscardEnabled = LLBC_CFG_LOG_DEFAULT_ENABLE_FADVISE_DISCARD;
         if (!cfg["enableFadviseDiscard"].AsStr().strip().empty())
             _fadviseDiscardEnabled = cfg["enableFadviseDiscard"].AsLooseBool();
 
-        if (_fadviseDiscardEnabled) 
+        if (_fadviseDiscardEnabled)
         {
             // Fadvise discard size.
             _fadviseDiscardSize = NormalizeSizeStr(cfg["fadviseDiscardSize"],
@@ -529,7 +548,7 @@ int LLBC_LoggerConfigInfo::Initialize(const LLBC_String &loggerName,
                 fadviseDiscardRetainPercent = std::clamp(cfg["fadviseDiscardRetainPercent"].AsInt32(),
                                                          LLBC_CFG_LOG_FADVISE_DISCARD_RETAIN_PERCENT_MIN,
                                                          LLBC_CFG_LOG_FADVISE_DISCARD_RETAIN_PERCENT_MAX);
-            
+
             // Align page cache retain size.
             _fadviseDiscardRetainSize = (_fadviseDiscardSize * fadviseDiscardRetainPercent / 100) & ~(LLBC_pageSize - 1);
         }
@@ -575,9 +594,9 @@ int LLBC_LoggerConfigInfo::GetAppenderLogLevel(int appenderType) const
 void LLBC_LoggerConfigInfo::NormalizeLogFileName()
 {
     // Replace process id: %p.
-    const LLBC_String curProcId = 
+    const LLBC_String curProcId =
         LLBC_Num2Str(LLBC_GetCurrentProcessId());
-    _logFile.findreplace("%p", curProcId); 
+    _logFile.findreplace("%p", curProcId);
 
     // Replace exec name: %e/%m.
     // Note: %m pattern is deprecated.
@@ -693,6 +712,151 @@ sint64 LLBC_LoggerConfigInfo::NormalizeSizeStr(const LLBC_String &sizeStr, sint6
 
     // Clamp.
     return std::clamp(static_cast<sint64>(nmlLogFileSize), low, high);
+}
+
+void LLBC_LoggerConfigInfo::ParseLogControls(const LLBC_String &logControlsStr,
+                                             std::vector<LLBC_LogControlItem> &out)
+{
+    if (logControlsStr.empty())
+        return;
+
+    LLBC_Json::Document doc;
+    if (doc.Parse(logControlsStr.c_str()).HasParseError() || !doc.IsArray())
+        return;
+
+    for (auto it = doc.Begin(); it != doc.End(); ++it)
+    {
+        if (!it->IsObject())
+            continue;
+        LLBC_LogControlItem item;
+
+        // 1) match rules. Within one item, enabled rules are AND-combined
+        //    (all-of); each rule's own value-set (matchLineRanges /
+        //    matchFuncs / matchThreadIds / matchLevels) is OR-combined.
+        const auto &m = LLBC_JsonGetMember(*it, "match");
+        if (m.IsObject())
+        {
+            // 1.1) file + line: string-form or object-form. See ParseFileMatch().
+            const auto &fileVal = LLBC_JsonGetMember(m, "file");
+            if (!fileVal.IsNull())
+            {
+                LLBC_String name;
+                std::vector<std::pair<int, int> > ranges;
+                if (ParseFileMatch(fileVal, name, ranges))
+                {
+                    item.haveFile = true;
+                    item.matchFile = std::move(name);
+                    item.matchLineRanges = std::move(ranges);
+                }
+            }
+
+            // 1.2) func: string (single) OR array of strings (multi).
+            // Empty / non-string entries silently dropped; the rule
+            // is enabled only if at least one valid name remains.
+            const auto &funcVal = LLBC_JsonGetMember(m, "func");
+            if (!funcVal.IsNull())
+            {
+                std::vector<LLBC_String> funcs;
+                CollectAsVector<LLBC_String>(
+                    funcVal,
+                    funcs,
+                    [](const LLBC_Json::Value &v, LLBC_String &out) {
+                        const char *s = LLBC_JsonGetStr(v);
+                        if (!s)
+                            return false;
+                        out = LLBC_String(s).strip();
+                        return !out.empty();
+                    });
+                if (!funcs.empty())
+                {
+                    item.haveFunc = true;
+                    item.matchFuncs = std::move(funcs);
+                }
+            }
+
+            // 1.3) threadId: integer (single) OR array of integers (multi).
+            const auto &tidVal = LLBC_JsonGetMember(m, "threadId");
+            if (!tidVal.IsNull())
+            {
+                std::vector<LLBC_ThreadId> tids;
+                CollectAsVector<LLBC_ThreadId>(
+                    tidVal,
+                    tids,
+                    [](const LLBC_Json::Value &v, LLBC_ThreadId &out) {
+                        if (v.IsInt64())
+                            out = static_cast<LLBC_ThreadId>(v.GetInt64());
+                        else if (v.IsInt())
+                            out = static_cast<LLBC_ThreadId>(v.GetInt());
+                        else
+                            return false;
+                        return true;
+                    });
+                if (!tids.empty())
+                {
+                    item.haveThreadId = true;
+                    item.matchThreadIds = std::move(tids);
+                }
+            }
+
+            // 1.4) level: string / int (single) OR array of strings/ints (multi).
+            // Empty / non-level entries silently dropped; the rule
+            // is enabled only if at least one valid level remains.
+            const auto &levelVal = LLBC_JsonGetMember(m, "level");
+            if (!levelVal.IsNull())
+            {
+                std::vector<int> lvls;
+                CollectAsVector<int>(
+                    levelVal,
+                    lvls,
+                    [](const LLBC_Json::Value &v, int &out) {
+                        return ParseLevel(v, out);
+                    });
+                if (!lvls.empty())
+                {
+                    item.haveLevel = true;
+                    item.matchLevels = std::move(lvls);
+                }
+            }
+        }
+
+        if (!item.HasAnyMatch())
+            continue;
+
+        // 2) appender scope (optional). Empty / absent == all appenders.
+        const auto &appendersVal = LLBC_JsonGetMember(*it, "appenders");
+        if (appendersVal.IsArray())
+        {
+            for (auto ait = appendersVal.Begin(); ait != appendersVal.End(); ++ait)
+            {
+                int t = 0;
+                if (ParseAppenderType(*ait, t))
+                    item.appenderTypes.push_back(t);
+            }
+        }
+
+        // 3) action.
+        LLBC_String actionStr;
+        if (const char *s = LLBC_JsonGetStr(LLBC_JsonGetMember(*it, "action")))
+            actionStr = LLBC_String(s).strip().tolower();
+        if (actionStr == "mute")
+        {
+            item.action = LLBC_LogControlAction::Mute;
+        }
+        else if (actionStr == "setlevel")
+        {
+            item.action = LLBC_LogControlAction::SetLevel;
+            int nlvl = 0;
+            if (!ParseLevel(LLBC_JsonGetMember(*it, "newLevel"), nlvl))
+                continue;
+            item.newLevel = nlvl;
+        }
+        else
+        {
+            continue;
+        }
+
+        out.push_back(std::move(item));
+    }
 }
 
 __LLBC_NS_END

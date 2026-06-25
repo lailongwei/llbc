@@ -25,14 +25,10 @@ __LLBC_NS_BEGIN
 
 inline LLBC_LogControlItem::LLBC_LogControlItem()
 : haveFile(false)
-, matchLine(0)
-, matchLineEnd(0)
 , haveFunc(false)
 , haveThreadId(false)
-, matchThreadId(0)
 , haveLevel(false)
-, matchLevel(0)
-, action(LLBC_LogControlAction::Mute)
+, action(LLBC_LogControlAction::Unset)
 , newLevel(0)
 {
 }
