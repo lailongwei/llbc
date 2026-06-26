@@ -222,14 +222,14 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::DeduceType<std::string_view>() == LLBC_VariantType::STR_DFT);
     LLBC_Expect(LLBC_VariantType::DeduceType<std::string_view &>() == LLBC_VariantType::STR_DFT);
     LLBC_Expect(LLBC_VariantType::DeduceType<const std::string_view>() == LLBC_VariantType::STR_DFT);
-    LLBC_Expect(LLBC_VariantType::DeduceType<const std::string_view &>() == LLBC_VariantType::STR_DFT);
-    // Str - LLBC_CString:
-    LLBC_Expect(LLBC_VariantType::DeduceType<LLBC_CString>() == LLBC_VariantType::STR_DFT);
-    LLBC_Expect(LLBC_VariantType::DeduceType<LLBC_CString &>() == LLBC_VariantType::STR_DFT);
-    LLBC_Expect(LLBC_VariantType::DeduceType<LLBC_CString &&>() == LLBC_VariantType::STR_DFT);
-    LLBC_Expect(LLBC_VariantType::DeduceType<const LLBC_CString>() == LLBC_VariantType::STR_DFT);
-    LLBC_Expect(LLBC_VariantType::DeduceType<const LLBC_CString &>() == LLBC_VariantType::STR_DFT);
-    LLBC_Expect(LLBC_VariantType::DeduceType<const LLBC_CString &&>() == LLBC_VariantType::STR_DFT);
+    LLBC_Expect(LLBC_VariantType::DeduceType<std::string_view>() == LLBC_VariantType::STR_DFT);
+    // Str - std::string_view:
+    LLBC_Expect(LLBC_VariantType::DeduceType<std::string_view>() == LLBC_VariantType::STR_DFT);
+    LLBC_Expect(LLBC_VariantType::DeduceType<std::string_view &>() == LLBC_VariantType::STR_DFT);
+    LLBC_Expect(LLBC_VariantType::DeduceType<std::string_view &&>() == LLBC_VariantType::STR_DFT);
+    LLBC_Expect(LLBC_VariantType::DeduceType<const std::string_view>() == LLBC_VariantType::STR_DFT);
+    LLBC_Expect(LLBC_VariantType::DeduceType<std::string_view>() == LLBC_VariantType::STR_DFT);
+    LLBC_Expect(LLBC_VariantType::DeduceType<std::string_view&>() == LLBC_VariantType::STR_DFT);
     // Str - string pointer:
     LLBC_Expect(LLBC_VariantType::DeduceType<char *>() == LLBC_VariantType::STR_DFT);
     LLBC_Expect(LLBC_VariantType::DeduceType<char *&>() == LLBC_VariantType::STR_DFT);
@@ -828,7 +828,7 @@ int TestCase_Core_Variant::ConstructTest_StrType()
     char charArr[] = "hello";
     LLBC_Variant charArrVar(charArr);
     LLBC_Expect(charArrVar.Is<LLBC_String>() &&
-                charArrVar.Is<LLBC_CString>() &&
+                charArrVar.Is<std::string_view>() &&
                 charArrVar.Is<std::string>() &&
                 charArrVar.Is<std::string_view>() &&
                 charArrVar.Is<char *>() &&
@@ -848,7 +848,7 @@ int TestCase_Core_Variant::ConstructTest_StrType()
     char *nullCharPtr = nullptr;
     LLBC_Variant nullCharPtrVar(nullCharPtr);
     LLBC_Expect(nullCharPtrVar.Is<LLBC_String>() &&
-                nullCharPtrVar.Is<LLBC_CString>() &&
+                nullCharPtrVar.Is<std::string_view>() &&
                 nullCharPtrVar.Is<std::string>() &&
                 nullCharPtrVar.Is<std::string_view>() &&
                 nullCharPtrVar.Is<char *>() &&
@@ -868,7 +868,7 @@ int TestCase_Core_Variant::ConstructTest_StrType()
     LLBC_Defer(free(strPtr));
     LLBC_Variant strPtrVar(strPtr);
     LLBC_Expect(strPtrVar.Is<LLBC_String>() &&
-                strPtrVar.Is<LLBC_CString>() &&
+                strPtrVar.Is<std::string_view>() &&
                 strPtrVar.Is<std::string>() &&
                 strPtrVar.Is<std::string_view>() &&
                 strPtrVar.Is<char *>() &&
@@ -949,15 +949,15 @@ int TestCase_Core_Variant::ConstructTest_StrType()
                 llbcStrVarFromMove.ToString().c_str(),
                 llbcStrForMove.c_str());
 
-    // Construct from LLBC_CString/const LLBC_CString.
-    LLBC_CString llbcCStr("hello world");
+    // Construct from std::string_view/const std::string_view.
+    std::string_view llbcCStr("hello world");
     LLBC_Variant llbcCStrVar(llbcCStr);
-    LLBC_Expect(llbcCStrVar.Is<LLBC_CString>() && llbcCStrVar == llbcCStr,
-                "Construct from LLBC_CString");
-    LLBC_CString cllbcCStr("hello world");
+    LLBC_Expect(llbcCStrVar.Is<std::string_view>() && llbcCStrVar == llbcCStr,
+                "Construct from std::string_view");
+    std::string_view cllbcCStr("hello world");
     LLBC_Variant cllbcCStrVar(cllbcCStr);
-    LLBC_Expect(cllbcCStrVar.Is<const LLBC_CString>() && cllbcCStrVar == cllbcCStr,
-                "Construct from const LLBC_CString");
+    LLBC_Expect(cllbcCStrVar.Is<const std::string_view>() && cllbcCStrVar == cllbcCStr,
+                "Construct from const std::string_view");
 
     return LLBC_OK;
 }
@@ -1513,20 +1513,20 @@ int TestCase_Core_Variant::AssignmentTest_StrType()
                 constSTLStrVar == constSTLString,
                 "Assignment from const std::string");
 
-    // Assignment from LLBC_CString.
-    LLBC_CString llbcCStr("hello world");
+    // Assignment from std::string_view.
+    std::string_view llbcCStr("hello world");
     LLBC_Variant llbcCStrVar;
     llbcCStrVar = llbcCStr;
     LLBC_Expect(llbcCStrVar.Is<LLBC_String>() &&
                 llbcCStrVar == llbcCStr,
-                "Assignment from LLBC_CString");
-    // Assignment from const LLBC_CString.
-    LLBC_CString constLLBCCString("hello world");
+                "Assignment from std::string_view");
+    // Assignment from const std::string_view.
+    std::string_view constLLBCCString("hello world");
     LLBC_Variant constLLBCCStrVar;
     constLLBCCStrVar = constLLBCCString;
     LLBC_Expect(constLLBCCStrVar.Is<LLBC_String>() &&
                 constLLBCCStrVar == constLLBCCString,
-                "Assignment from const LLBC_CString");
+                "Assignment from const std::string_view");
 
     // Assignment from std::string_view.
     std::string_view stlStrView("hello world");
@@ -1827,9 +1827,9 @@ int TestCase_Core_Variant::AssignmentTest_VariantType()
     auto charArr = "hello world";
     LLBC_Variant charArrVar(charArr);
     LLBC_Expect(AssignmentTest_OneVariantType<decltype(charArr)>(charArrVar) == LLBC_OK);
-    // Str: const char */LLBC_String/std::string/std::string_view/LLBC_CString:
+    // Str: const char */LLBC_String/std::string/std::string_view/std::string_view:
     LLBC_Expect((AssignmentTest_StrVariantTypes<
-        const char *, LLBC_String, std::string, std::string_view, LLBC_CString>()) == LLBC_OK);
+        const char *, LLBC_String, std::string, std::string_view, std::string_view>()) == LLBC_OK);
 
     // Seq: std::pair/std::vector/std::list/std::queue/std::deque/std::set/std::unordered_set/LLBC_Variant::Seq:
     LLBC_Expect((AssignmentTest_SeqVariantTypes<
@@ -2122,11 +2122,11 @@ int TestCase_Core_Variant::GetTypeTest()
 
     // char */const char *.
     LLBC_Expect((GetTypeTest_StrTypes<char *, const char *>()) == LLBC_OK);
-    // LLBC_String/std::string/LLBC_CString/std::string_view.
+    // LLBC_String/std::string/std::string_view/std::string_view.
     LLBC_Expect((GetTypeTest_StrTypes<
         LLBC_String,
         std::string,
-        LLBC_CString,
+        std::string_view,
         std::string_view>()) == LLBC_OK);
 
     // std::pair/std::vector/std::list/std::queue/std::deque/std::set/std::unordered_set.
@@ -2267,7 +2267,7 @@ int TestCase_Core_Variant::IsXxxTest()
         const char *,
         LLBC_String,
         std::string,
-        LLBC_CString,
+        std::string_view,
         std::string_view>()) == LLBC_OK);
 
     // Seq.
@@ -2409,7 +2409,7 @@ int TestCase_Core_Variant::BecomeTest()
         std::string,
         LLBC_String,
         std::string_view,
-        LLBC_CString,
+        std::string_view,
         const char *>()) == LLBC_OK);
 
     //Seq Type.
@@ -2960,7 +2960,7 @@ int TestCase_Core_Variant::ImplicitValueFetchTest()
     LLBC_Variant strVar("Hello World");
     LLBC_Expect(strVar == LLBC_String("Hello World") &&
                 strVar == std::string("Hello World") &&
-                strVar == LLBC_CString("Hello World") &&
+                strVar == std::string_view("Hello World") &&
                 strVar == std::string_view("Hello World") &&
                 strVar == "Hello World");
 
@@ -3204,8 +3204,8 @@ int TestCase_Core_Variant::CountAndContainsTest()
                     strVar.Contains("Hello world")&&
                 strVar.Count(LLBC_String("Hello world")) == 2 &&
                     strVar.Contains(LLBC_String("Hello world")) &&
-                strVar.Count(LLBC_CString("Hello world")) == 2 &&
-                    strVar.Contains(LLBC_CString("Hello world")) &&
+                strVar.Count(std::string_view("Hello world")) == 2 &&
+                    strVar.Contains(std::string_view("Hello world")) &&
                 strVar.Count(std::string("Hello world")) == 2 &&
                     strVar.Contains(std::string("Hello world")) &&
                 strVar.Count(std::string_view("Hello world")) == 2 &&
@@ -3636,7 +3636,7 @@ int TestCase_Core_Variant::DictSpecificTest_Insert()
     // - Insert empty string:
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, "", "empty string key", true) == LLBC_OK);
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_String(""), "empty LLBC_String", false) == LLBC_OK);
-    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_CString(""), "empty LLBC_CString", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string_view(""), "empty std::string_view", false) == LLBC_OK);
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string(""), "empty std::string", false) == LLBC_OK);
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string_view(""), "empty std::string_view", false) == LLBC_OK);
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_Variant(""), "empty Str type LLBC_Variant", false) == LLBC_OK);
@@ -3644,7 +3644,7 @@ int TestCase_Core_Variant::DictSpecificTest_Insert()
     LLBC_Expect(LLBC_Variant("Hello World") == LLBC_String("Hello World"));
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, "Hello World", "non-empty string key", true) == LLBC_OK);
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_String("Hello World"), "non-empty LLBC_String key", false) == LLBC_OK);
-    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_CString("Hello World"), "non-empty LLBC_CString key", false) == LLBC_OK);
+    LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string_view("Hello World"), "non-empty std::string_view key", false) == LLBC_OK);
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string("Hello World"), "non-empty std::string key", false) == LLBC_OK);
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, std::string_view("Hello World"), "non-empty std::string_view key", false) == LLBC_OK);
     LLBC_Expect(DictSpecificTest_InsertOne(dictVar, LLBC_Variant("Hello World"), "non-empty Str type LLBC_Variant", false) == LLBC_OK);

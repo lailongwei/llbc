@@ -472,8 +472,7 @@ public:
     As() const;
     template <typename _Ty>
     std::enable_if_t<!std::is_reference_v<_Ty> &&
-                        (std::is_same_v<std::remove_cv_t<_Ty>, std::string_view> ||
-                         std::is_same_v<std::remove_cv_t<_Ty>, LLBC_CString>),
+                        (std::is_same_v<std::remove_cv_t<_Ty>, std::string_view>),
                       _Ty>
     As() const; // Lifetime: The returned view is valid only while the source variant is not mutated.
     template <typename _Ty>

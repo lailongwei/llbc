@@ -67,7 +67,7 @@ public:
 #define __LLBC_Inl_EventKeyMatch \
         (std::is_same_v<std::remove_extent_t<KeyType>, char> || \
          (std::is_pointer_v<KeyType> && std::is_same_v<std::remove_cv_t<std::remove_pointer_t<KeyType>>, char>) || \
-         std::is_same_v<KeyType, LLBC_CString> || \
+         std::is_same_v<KeyType, std::string_view> || \
          LLBC_IsTemplSpec<KeyType, std::basic_string>::value \
         )
 
@@ -81,7 +81,7 @@ public:
     GetParam(const KeyType &key);
 
     /**
-    * Get LLBC_CString key indexed event param.
+    * Get string key indexed event param.
     * @param[in] key   - the key.
     * @param[in] param - the param.
     * @return LLBC_Event & - this reference.
@@ -92,15 +92,15 @@ public:
 
     /**
      * Get all key indexed params.
-     * @return const std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params const reference.
+     * @return const std::map<std::string_view, LLBC_Variant> & - the string key indexed params const reference.
      */
-    const std::map<LLBC_CString, LLBC_Variant> &GetParams() const;
+    const std::map<std::string_view, LLBC_Variant> &GetParams() const;
 
     /**
      * Get all key indexed params(mutable).
-     * @return std::map<LLBC_CString, LLBC_Variant> & - the LLBC_CString key indexed params mutable reference.
+     * @return std::map<std::string_view, LLBC_Variant> & - the string key indexed params mutable reference.
      */
-    std::map<LLBC_CString, LLBC_Variant> &GetMutableParams();
+    std::map<std::string_view, LLBC_Variant> &GetMutableParams();
 
     /**
      * Get extend data.
@@ -145,8 +145,8 @@ public:
 protected:
     int _id;
     bool _dontDelAfterFire;
-    std::map<LLBC_CString, LLBC_Variant> _params;
-    std::map<LLBC_CString, std::string *> _heavyKeys;
+    std::map<std::string_view, LLBC_Variant> _params;
+    std::map<std::string_view, std::string *> _heavyKeys;
 
     void *_extData;
     LLBC_Delegate<void(void *)> *_extDataClearDeleg;

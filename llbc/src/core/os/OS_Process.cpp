@@ -485,7 +485,7 @@ int __LLBC_CleanUpCrashHandleEnv()
     return LLBC_OK;
 }
 
-int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
+int LLBC_SetCrashDumpFilePath(std::string_view dumpFilePath)
 {
     LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
     
@@ -502,7 +502,7 @@ int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
         return LLBC_FAILED;
     }
 
-    memcpy(LLBC_INL_NS __dumpFilePath, dumpFilePath.c_str(), dumpFilePath.size());
+    memcpy(LLBC_INL_NS __dumpFilePath, dumpFilePath.data(), dumpFilePath.size());
     LLBC_INL_NS __dumpFilePath[dumpFilePath.size()] = '\0';
 
     return LLBC_OK;
@@ -533,7 +533,7 @@ int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
 #endif // Win32
 }
 
-int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
+int LLBC_SetCrashHandler(std::string_view crashHandlerName,
                          const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &crashHandler)
 {
 

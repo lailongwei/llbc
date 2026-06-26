@@ -199,14 +199,14 @@ void TestCase_Core_Log::DoLogLevelSetTest()
     auto testLogger = LLBC_LoggerMgrSingleton->GetLogger("log_level_set_test");
     LLBC_PrintLn("Log level set test, test logger name:%s, default level:%s",
                  testLogger->GetLoggerName().c_str(),
-                 LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).c_str());
+                 LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).data());
 
     auto testOutput = [testLogger](int appenderType, int logLevel) {
         const auto ret = testLogger->SetAppenderLogLevel(appenderType, logLevel);
         LLBC_PrintLn(">>>>>>>> logger: %s, appender:%d, level: %s, ret:%d, error:%s <<<<<<<<<",
                      testLogger->GetLoggerName().c_str(),
                      appenderType,
-                     LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).c_str(),
+                     LLBC_LogLevel::GetLevelStr(testLogger->GetLogLevel()).data(),
                      ret,
                      ret == LLBC_OK ? "Success" : LLBC_FormatLastError());
         LLOG_TRACE2("log_level_set_test", "This is a TRACE log");
@@ -481,7 +481,7 @@ int TestCase_Core_Log::DoLoggerMgrReloadTest()
         {
             LLOG(loggerName, nullptr, logLevel,
                  "This is a <%s> level log for %s logger",
-                 LLBC_LogLevel::GetLevelStr(logLevel).c_str(), loggerName);
+                 LLBC_LogLevel::GetLevelStr(logLevel).data(), loggerName);
         }
         LLBC_PrintLn("All levels log has been output, please check console/file output");
     }
@@ -547,8 +547,8 @@ void TestCase_Core_Log::DoLogTraceTest()
         AddLogTrace(3.1415926, LLBC_LogLevel::Error);
         AddLogTrace("hello", "world");
         AddLogTrace(std::string("std::string key"), std::string("std::string content"));
-        AddLogTrace(LLBC_String("LLBC_String key"), LLBC_CString("LLBC_String content"));
-        AddLogTrace(LLBC_String(""), LLBC_CString("empty key content"));
+        AddLogTrace(LLBC_String("LLBC_String key"), std::string_view("LLBC_String content"));
+        AddLogTrace(LLBC_String(""), std::string_view("empty key content"));
     }
 
     LLBC_PrintLn("- Do too long key&content test:");
@@ -676,7 +676,7 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLBC_PrintLn("DoLogColorFilterTest begin");
     auto rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
     // 10086 in log color filter list, log_level: WARN
-    LLBC_PrintLn("fileLogLevel: %s", LLBC_LogLevel::GetLevelStr(rootLogger->GetLogLevel()).c_str());
+    LLBC_PrintLn("fileLogLevel: %s", LLBC_LogLevel::GetLevelStr(rootLogger->GetLogLevel()).data());
 
     LLOG_WARN("10086 in log color filter list, log_level: WARN, will output 4~6");
     LLOG_TRACE("This is a uninited trace log message 1");
@@ -846,9 +846,9 @@ void TestCase_Core_Log::DoLogTraceEnableLevelTest()
     auto logTraceEnablerLogger = LLBC_LoggerMgrSingleton->GetLogger(testLoggerName);
     LLBC_PrintLn("Log trace enable level test, test logger name:%s, default level:%s",
                  logTraceEnablerLogger->GetLoggerName().c_str(),
-                 LLBC_LogLevel::GetLevelStr(logTraceEnablerLogger->GetLogLevel()).c_str());
+                 LLBC_LogLevel::GetLevelStr(logTraceEnablerLogger->GetLogLevel()).data());
 
-    LLBC_PrintLn("fileLogLevel: %s", LLBC_LogLevel::GetLevelStr(logTraceEnablerLogger->GetLogLevel()).c_str());
+    LLBC_PrintLn("fileLogLevel: %s", LLBC_LogLevel::GetLevelStr(logTraceEnablerLogger->GetLogLevel()).data());
 
     auto ret = logTraceEnablerLogger->AddLogTrace("LOG_TRACE_ENABLE_LEVEL_TEST", 12345678);
     LLBC_PrintLn("  - Add test log trace content, return:%d, err:%s",
@@ -879,6 +879,6 @@ void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
     LLBC_PrintLn("Log hook, loggerName: %s, level: %s, message: %s",
                    logData->logger->GetLoggerName().c_str(),
-                   LLBC_LogLevel::GetLevelStr(logData->level).c_str(),
+                   LLBC_LogLevel::GetLevelStr(logData->level).data(),
                    logData->msg);
 }
