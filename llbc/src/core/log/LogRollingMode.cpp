@@ -27,7 +27,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const LLBC_NS LLBC_CString __rollMode2StrRepr[LLBC_NS LLBC_LogRollingMode::End + 1] =
+static const std::string_view __rollMode2StrRepr[LLBC_NS LLBC_LogRollingMode::End + 1] =
 {
     "NOROLLING", // NoRolling
     "HOURLYROLLING", // Hourly Rolling
@@ -36,7 +36,7 @@ static const LLBC_NS LLBC_CString __rollMode2StrRepr[LLBC_NS LLBC_LogRollingMode
     "UKNLOGROLLING" // Unknown Log Rolling
 };
 
-static const LLBC_NS LLBC_CString __rollMode2StrAliasRepr[LLBC_NS LLBC_LogRollingMode::End + 1] =
+static const std::string_view __rollMode2StrAliasRepr[LLBC_NS LLBC_LogRollingMode::End + 1] =
 {
     "NO", // NoRolling
     "HOURLY", // Hourly Rolling
@@ -49,14 +49,14 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-const LLBC_CString &LLBC_LogRollingMode::GetModeStr(int mode)
+std::string_view LLBC_LogRollingMode::GetModeStr(int mode)
 {
     return IsValid(mode) ?
         LLBC_INTERNAL_NS __rollMode2StrRepr[mode] :
             LLBC_INTERNAL_NS __rollMode2StrRepr[End];
 }
 
-int LLBC_LogRollingMode::Str2Mode(const LLBC_CString &modeStr)
+int LLBC_LogRollingMode::Str2Mode(std::string_view modeStr)
 {
     const LLBC_String upperModeStr = LLBC_String(modeStr).toupper();
     if (LLBC_INTERNAL_NS __rollMode2StrRepr[HourlyRolling] == upperModeStr ||

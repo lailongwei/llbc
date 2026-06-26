@@ -76,6 +76,7 @@ inline LLBC_Event::LLBC_Event(LLBC_Event &&other) noexcept
 inline LLBC_Event::~LLBC_Event()
 {
     ClearExtData(true);
+    LLBC_STLHelper::DeleteContainer(_heavyKeys);
 }
 
 inline int LLBC_Event::GetId() const
@@ -122,8 +123,9 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
         auto heavyIt = _heavyKeys.find(key);
         if (heavyIt == _heavyKeys.end())
         {
-            auto heavyKey = new std::string(key);
-            heavyIt = _heavyKeys.emplace(heavyKey->c_str(), heavyKey).first;
+            auto heavyKey = new std::string(key.data(), key.size());
+            const std::string_view heavyKeyView(heavyKey->data(), heavyKey->size());
+            heavyIt = _heavyKeys.emplace(heavyKeyView, heavyKey).first;
         }
 
         _params.emplace(heavyIt->first, param);
@@ -134,12 +136,12 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
     }
 }
 
-inline const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetParams() const
+inline const std::map<std::string_view, LLBC_Variant> &LLBC_Event::GetParams() const
 {
     return _params;
 }
 
-inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableParams()
+inline std::map<std::string_view, LLBC_Variant> &LLBC_Event::GetMutableParams()
 {
     return _params;
 }

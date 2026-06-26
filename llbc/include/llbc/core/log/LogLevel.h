@@ -55,7 +55,7 @@ public:
      * @param[in] shortLevelStr - return short level string, default is false.
      * @return const LLBC_String & - level representation.
      */
-    static const LLBC_CString &GetLevelStr(int level, bool shortLevelStr = false);
+    static std::string_view GetLevelStr(int level, bool shortLevelStr = false);
 
 public:
     /**
@@ -63,7 +63,7 @@ public:
      * @param[in] levelStr - log level representation.
      * @return int - log level enum.
      */
-    static int GetLevelEnum(const LLBC_CString &levelStr);
+    static int GetLevelEnum(std::string_view levelStr);
 
     /**
      * Check giving log level is validate or not.
