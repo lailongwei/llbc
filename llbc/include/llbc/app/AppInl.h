@@ -64,7 +64,7 @@ inline LLBC_Service *LLBC_App::GetService(int id) const
     return _services.GetService(id);
 }
 
-inline LLBC_Service *LLBC_App::GetService(const LLBC_CString &name) const
+inline LLBC_Service *LLBC_App::GetService(std::string_view name) const
 {
     return _services.GetService(name);
 }
@@ -74,7 +74,7 @@ inline int LLBC_App::StopService(int id, bool del, bool destroyComp)
     return _services.Stop(id, del, destroyComp);
 }
 
-inline int LLBC_App::StopService(const LLBC_CString &name, bool del, bool destroyComp)
+inline int LLBC_App::StopService(std::string_view name, bool del, bool destroyComp)
 {
     return _services.Stop(name, del, destroyComp);
 }

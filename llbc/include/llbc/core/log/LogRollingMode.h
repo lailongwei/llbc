@@ -45,16 +45,16 @@ public:
     /**
      * Get rolling mode string representation.
      * @param[in] mode - the rolling mode.
-     * @return const LLBC_CString & - the rolling mode string representation.
+     * @return std::string_view - the rolling mode string representation.
      */
-    static const LLBC_CString &GetModeStr(int mode);
+    static std::string_view GetModeStr(int mode);
 
     /**
      * Get rolling mode by rolling mode string.
      * @param[in] modeStr - the rolling mode string.
      * @return int - the rolling mode.
      */
-    static int Str2Mode(const LLBC_CString &modeStr);
+    static int Str2Mode(std::string_view modeStr);
 
     /**
      * Check given rolling mode is validate or not.

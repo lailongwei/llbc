@@ -165,7 +165,7 @@ LLBC_Service::GetComponent() const
     return const_cast<LLBC_Service *>(this)->GetComponent<Comp>();
 }
 
-inline const LLBC_Component *LLBC_Service::GetComponent(const LLBC_CString &compName) const
+inline const LLBC_Component *LLBC_Service::GetComponent(std::string_view compName) const
 {
     return const_cast<LLBC_Service *>(this)->GetComponent(compName);
 }

@@ -680,7 +680,7 @@ template <typename Obj>
 LLBC_FORCE_INLINE LLBC_TypedObjPool<Obj> *LLBC_ObjPool::GetTypedObjPool()
 {
     typedef LLBC_TypedObjPool<Obj> _TypedObjPool;
-    static const LLBC_CString rttiName(typeid(Obj).name());
+    static const std::string_view rttiName(typeid(Obj).name());
 
     // Lock.
     __LLBC_INL_LockObjPool();
@@ -719,8 +719,8 @@ template <typename ObjA, typename ObjB>
 int LLBC_ObjPool::EnsureDeletionBefore()
 {
     // Same object type check.
-    const LLBC_CString frontName(typeid(ObjA).name());
-    const LLBC_CString backName(typeid(ObjB).name());
+    const std::string_view frontName(typeid(ObjA).name());
+    const std::string_view backName(typeid(ObjB).name());
     LLBC_SetErrAndReturnIf(frontName == backName, LLBC_ERROR_NOT_ALLOW, LLBC_FAILED);
 
     // Lock & defer unlock.
@@ -839,7 +839,7 @@ inline LLBC_String LLBC_ObjPool::GetOrderedDeleteTree(bool pretty) const
              it != _orderedDeleteNodeTree->end();
              ++it)
             jsonDoc.PushBack(
-                             it->second->GetOrderedDeleteTree( jsonDoc),
+                             it->second->GetOrderedDeleteTree(jsonDoc),
                              jsonAlloc);
     }
     __LLBC_INL_UnlockObjPool();
@@ -859,7 +859,7 @@ inline LLBC_String LLBC_ObjPool::GetOrderedDeleteTree(bool pretty) const
     return LLBC_String(jsonSB.GetString(), jsonSB.GetLength());
 }
 
-inline LLBC_ObjPool::_OrderedDeleteNode::_OrderedDeleteNode(const LLBC_CString &name)
+inline LLBC_ObjPool::_OrderedDeleteNode::_OrderedDeleteNode(std::string_view name)
 : _name(name)
 , _front(nullptr)
 , _backs(nullptr)
@@ -889,10 +889,10 @@ inline void LLBC_ObjPool::DelTypedObjPool(_WrappedTypedObjPool *wrappedTypedObjP
     free(wrappedTypedObjPool);
 }
 
-inline const std::map<LLBC_CString, LLBC_ObjPool::_OrderedDeleteNode *> &
+inline const std::map<std::string_view, LLBC_ObjPool::_OrderedDeleteNode *> &
 LLBC_ObjPool::_OrderedDeleteNode::GetBacks() const
 {
-    static const std::map<LLBC_CString, _OrderedDeleteNode *> emptyNodes;
+    static const std::map<std::string_view, _OrderedDeleteNode *> emptyNodes;
     return _backs ? *_backs : emptyNodes;
 }
 
@@ -907,7 +907,7 @@ inline int LLBC_ObjPool::_OrderedDeleteNode::AddBack(_OrderedDeleteNode *backNod
     return LLBC_OK;
 }
 
-inline int LLBC_ObjPool::_OrderedDeleteNode::RemoveBack(const LLBC_CString &name)
+inline int LLBC_ObjPool::_OrderedDeleteNode::RemoveBack(std::string_view name)
 {
     LLBC_SetErrAndReturnIf(!_backs, LLBC_ERROR_NOT_FOUND, LLBC_FAILED);
     for (auto backNodeIt = _backs->begin(); backNodeIt != _backs->end(); ++backNodeIt)
@@ -940,13 +940,13 @@ inline int LLBC_ObjPool::_OrderedDeleteNode::RemoveBack(const LLBC_CString &name
     return LLBC_FAILED;
 }
 
-inline bool LLBC_ObjPool::_OrderedDeleteNode::IsFront(const LLBC_CString &name) const
+inline bool LLBC_ObjPool::_OrderedDeleteNode::IsFront(std::string_view name) const
 {
     LLBC_ReturnIf(!_front, false);
     return _front->_name == name ? true : _front->IsFront(name);
 }
 
-inline bool LLBC_ObjPool::_OrderedDeleteNode::IsBack(const LLBC_String &name) const
+inline bool LLBC_ObjPool::_OrderedDeleteNode::IsBack(std::string_view name) const
 {
     LLBC_ReturnIf(!_backs || _backs->empty(), false);
     LLBC_Foreach(*_backs,
@@ -958,8 +958,8 @@ inline LLBC_Json::Value LLBC_ObjPool::_OrderedDeleteNode::GetOrderedDeleteTree(L
 {
     LLBC_Json::Value nodeJson(LLBC_Json::kObjectType);
     nodeJson.AddMember("type",
-                       LLBC_Json::Value().SetString(_name.c_str(),
-                                                    _name.size(), 
+                       LLBC_Json::Value().SetString(_name.data(),
+                                                    static_cast<SizeType>(_name.size()), 
                                                     jsonDoc.GetAllocator()),
                        jsonDoc.GetAllocator());
 
@@ -1006,7 +1006,7 @@ inline void LLBC_ObjPool::OperateOneOrderedDeleteNode(_OrderedDeleteNode *ordere
 }
 
 
-inline void LLBC_ObjPool::SetName(const LLBC_CString &poolName)
+inline void LLBC_ObjPool::SetName(std::string_view poolName)
 {
     __LLBC_INL_LockObjPool();
     _name = poolName;

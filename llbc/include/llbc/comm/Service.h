@@ -511,14 +511,14 @@ public:
                             !std::is_same<LLBC_Component, Comp>::value,
                             Comp *>::type
     GetComponent();
-    virtual LLBC_Component *GetComponent(const LLBC_CString &compName) = 0;
+    virtual LLBC_Component *GetComponent(std::string_view compName) = 0;
 
     template <typename Comp>
     typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value &&
                             !std::is_same<LLBC_Component, Comp>::value,
                             const Comp *>::type
     GetComponent() const;
-    const LLBC_Component *GetComponent(const LLBC_CString &compName) const;
+    const LLBC_Component *GetComponent(std::string_view compName) const;
 
 public:
     /**

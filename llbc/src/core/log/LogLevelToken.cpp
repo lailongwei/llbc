@@ -53,8 +53,8 @@ void LLBC_LogLevelToken::Format(const LLBC_LogData &data, LLBC_String &formatted
 {
     const int index = static_cast<int>(formattedData.size());
 
-    const LLBC_CString &lvStr = LLBC_LogLevel::GetLevelStr(data.level, _shortLevelStr);
-    formattedData.append(lvStr.c_str(), lvStr.size());
+    const std::string_view lvStr = LLBC_LogLevel::GetLevelStr(data.level, _shortLevelStr);
+    formattedData.append(lvStr.data(), lvStr.size());
 
     GetFormatter().Format(formattedData, index);
 }

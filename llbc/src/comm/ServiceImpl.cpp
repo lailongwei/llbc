@@ -695,7 +695,7 @@ int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath,
     }
 
     // Validate comp class name and giving compName is same or not.
-    const LLBC_CString realCompName = LLBC_GetCompName(*comp);
+    const std::string_view realCompName = LLBC_GetCompName(*comp);
     if (UNLIKELY(realCompName != compName))
     {
         LLBC_XDelete(comp);
@@ -719,7 +719,7 @@ int LLBC_ServiceImpl::AddComponent(const LLBC_String &compSharedLibPath,
     return ret;
 }
 
-LLBC_Component *LLBC_ServiceImpl::GetComponent(const LLBC_CString &compName)
+LLBC_Component *LLBC_ServiceImpl::GetComponent(std::string_view compName)
 {
     if (UNLIKELY(compName.empty()))
     {
@@ -737,7 +737,7 @@ LLBC_Component *LLBC_ServiceImpl::GetComponent(const LLBC_CString &compName)
     // Match IXxxYyy.
     if (compName.size() > 1 && compName[0] == 'I')
     {
-        if ((it = _name2Comps.find(compName + 1)) != compsEnd)
+        if ((it = _name2Comps.find(std::string_view(compName.data() + 1, compName.size() - 1))) != compsEnd)
             return it->second;
     }
 
@@ -748,7 +748,7 @@ LLBC_Component *LLBC_ServiceImpl::GetComponent(const LLBC_CString &compName)
         compName[2] == 's' &&
         compName[3] == 'e')
     {
-        if ((it = _name2Comps.find(compName + 4)) != compsEnd)
+        if ((it = _name2Comps.find(std::string_view(compName.data() + 4, compName.size() - 4))) != compsEnd)
             return it->second;
     }
 
@@ -2044,7 +2044,7 @@ void LLBC_ServiceImpl::DestroyComps(bool onlyCallEvMeth)
         auto compName = it->first;
         _name2Comps.erase(it);
 
-        free(const_cast<char *>(compName.c_str()));
+        free(const_cast<char *>(compName.data()));
     }
 
     // Delete all will-register components.
@@ -2167,11 +2167,12 @@ void LLBC_ServiceImpl::AddComp(LLBC_Component *comp)
 {
     _compList.push_back(comp);
 
-    const LLBC_CString compName = LLBC_GetCompName(*comp);
+    const std::string_view compName = LLBC_GetCompName(*comp);
     auto allocCompName = LLBC_Malloc(char, compName.size() + 1);
-    memcpy(allocCompName, compName.c_str(), compName.size() + 1);
+    memcpy(allocCompName, compName.data(), compName.size());
+    allocCompName[compName.size()] = '\0';
 
-    _name2Comps.emplace(LLBC_CString(allocCompName, compName.size()), comp);
+    _name2Comps.emplace(std::string_view(allocCompName, compName.size()), comp);
 }
 
 LLBC_Library *LLBC_ServiceImpl::OpenCompLibrary(const LLBC_String &libPath, bool &existingLib)

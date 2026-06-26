@@ -83,7 +83,7 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath,
 
     // Config root logger.
     _rootLogger = new LLBC_Logger;
-    const LLBC_CString rootLoggerName(LLBC_CFG_LOG_ROOT_LOGGER_NAME);
+    const std::string_view rootLoggerName(LLBC_CFG_LOG_ROOT_LOGGER_NAME);
     if (logConfigurator->Config(rootLoggerName, _sharedLogRunnable, _rootLogger) != LLBC_OK)
     {
         LLBC_XDelete(_rootLogger);
@@ -118,9 +118,9 @@ int LLBC_LoggerMgr::Initialize(const LLBC_String &cfgFilePath,
 
         const LLBC_String &cfgLoggerName = cfgIter->first;
         const size_t loggerNameLen = cfgLoggerName.size();
-        LLBC_CString loggerName(LLBC_Malloc(char, loggerNameLen + 1), loggerNameLen);
-        memcpy(const_cast<char *>(loggerName.c_str()), cfgLoggerName.c_str(), cfgLoggerName.size());
-        const_cast<char *>(loggerName.c_str())[loggerNameLen] = '\0';
+        std::string_view loggerName(LLBC_Malloc(char, loggerNameLen + 1), loggerNameLen);
+        memcpy(const_cast<char *>(loggerName.data()), cfgLoggerName.data(), cfgLoggerName.size());
+        const_cast<char *>(loggerName.data())[loggerNameLen] = '\0';
 
         _loggerList.emplace_back(loggerName, logger);
         _cstr2Loggers.insert(std::make_pair(loggerName, logger));
@@ -186,7 +186,7 @@ void LLBC_LoggerMgr::Finalize()
     for (auto rit = _loggerList.rbegin(); rit != _loggerList.rend(); ++rit)
     {
         if (rit->first != LLBC_CFG_LOG_ROOT_LOGGER_NAME)
-            free(const_cast<char *>(rit->first.c_str()));
+            free(const_cast<char *>(rit->first.data()));
         delete rit->second;
     }
     _loggerList.clear();
@@ -210,7 +210,7 @@ LLBC_Logger *LLBC_LoggerMgr::GetRootLogger() const
     return _rootLogger;
 }
 
-LLBC_Logger *LLBC_LoggerMgr::GetLogger(const LLBC_CString &name) const
+LLBC_Logger *LLBC_LoggerMgr::GetLogger(std::string_view name) const
 {
     _lock.Lock();
     if (UNLIKELY(_rootLogger == nullptr))
@@ -272,7 +272,7 @@ void LLBC_LoggerMgr::UnInitOutput(int logLv,
                                   ...)
 {
     FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
-    const LLBC_CString &lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
+    const std::string_view lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
 
     // Parse to get file basename.
     if (file)
@@ -313,7 +313,7 @@ void LLBC_LoggerMgr::UnInitOutput(int logLv,
     LLBC_FilePrint(to,
                    "[Log]%s [%-5s][%s:%d %s]<%s> - ",
                    now.ToString().c_str(),
-                   lvDesc.c_str(),
+                   lvDesc.data(),
                    file ? file : "",
                    line,
                    func ? func : "",
@@ -362,7 +362,7 @@ void LLBC_LoggerMgr::UnInitNonFormatOutput(int logLv,
                                            size_t msgLen)
 {
     FILE *to = logLv >= LLBC_LogLevel::Warn ? stderr : stdout;
-    const LLBC_CString &lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
+    const std::string_view lvDesc = LLBC_LogLevel::GetLevelStr(logLv);
 
     if (file)
     {
@@ -381,7 +381,7 @@ void LLBC_LoggerMgr::UnInitNonFormatOutput(int logLv,
     LLBC_FilePrint(to,
                    "[Log]%s [%-5s][%s:%d %s]<%s> - ",
                    now.ToString().c_str(),
-                   lvDesc.c_str(),
+                   lvDesc.data(),
                    file ? file : "",
                    line,
                    func ? func : "",

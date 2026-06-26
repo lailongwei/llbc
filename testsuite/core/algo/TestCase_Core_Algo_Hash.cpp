@@ -66,7 +66,7 @@ int TestCase_Core_Algo_Hash::SimpleTest()
             hashAlgo != LLBC_HashAlgo::End;
             ++hashAlgo)
             LLBC_PrintLn("    - %s: %u",
-                         LLBC_HashAlgo::GetEnumStr(hashAlgo).c_str(),
+                         LLBC_HashAlgo::GetEnumStr(hashAlgo).data(),
                          LLBC_Hasher::Hash(static_cast<LLBC_HashAlgo::ENUM>(hashAlgo),
                                            key.c_str(),
                                            key.size()));

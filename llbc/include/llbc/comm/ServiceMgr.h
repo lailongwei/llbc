@@ -65,7 +65,7 @@ public:
      * @param[in] name - the service name.
      * @return LLBC_Service * - the service, if not found, return nullptr.
      */
-    LLBC_Service *GetService(const LLBC_CString &name);
+    LLBC_Service *GetService(std::string_view name);
 
 public:
     /**
@@ -90,7 +90,7 @@ public:
      * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Stop(const LLBC_CString &name, bool del = true, bool destroyComp = false);
+    int Stop(std::string_view name, bool del = true, bool destroyComp = false);
 
     /**
      * Stop all services.
@@ -141,7 +141,7 @@ private:
     int Stop(LLBC_Service *svc, bool del, bool destroyComp);
 
     LLBC_Service *GetServiceNonLock(int id);
-    LLBC_Service *GetServiceNonLock(const LLBC_CString &name);
+    LLBC_Service *GetServiceNonLock(std::string_view name);
 
     static bool InTls(const LLBC_Service *svc);
     static bool InTls(const Id2Services &svcs);
