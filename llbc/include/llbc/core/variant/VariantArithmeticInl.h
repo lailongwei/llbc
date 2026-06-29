@@ -39,10 +39,34 @@ inline decltype(bool() + bool()) LLBC_VariantArithmetic::Performs_raw_operation(
     case VT_ARITHMETIC_MUL:
         return left * right;
     case VT_ARITHMETIC_DIV:
+        // Disable C4804 compiler warning if using MSVC compiler.
+        // Compiler Warning (level 1) C4804:
+        // - https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4804?view=msvc-170
+        #if LLBC_CUR_COMP == LLBC_COMP_MSVC
+        #pragma warning(push)
+        #pragma warning(disable: 4804)
+        #endif // MSVC compiler.
+
         return right ? left / right : _RtnType();
 
+        #if LLBC_CUR_COMP == LLBC_COMP_MSVC
+        #pragma warning(pop)
+        #endif // MSVC compiler.
+
     case VT_ARITHMETIC_MOD:
+        // Disable C4804 compiler warning if using MSVC compiler.
+        // Compiler Warning (level 1) C4804:
+        // - https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4804?view=msvc-170
+        #if LLBC_CUR_COMP == LLBC_COMP_MSVC
+        #pragma warning(push)
+        #pragma warning(disable: 4804)
+        #endif // MSVC compiler.
+
         return right ? left % right : _RtnType();
+
+        #if LLBC_CUR_COMP == LLBC_COMP_MSVC
+        #pragma warning(pop)
+        #endif // MSVC compiler.
 
     default:
         break;
