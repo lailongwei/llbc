@@ -866,7 +866,7 @@ LLBC_Variant::As() const
                     retSeq.reserve(_data.seq().size());
 
                 for (auto &item : _data.seq())
-                    retSeq.emplace_back(item);
+                    retSeq.emplace_back(item.As<typename _PureTy::value_type>());
             }
 
             return retSeq;
@@ -879,7 +879,7 @@ LLBC_Variant::As() const
             if (Is<Seq>())
             {
                 for (auto &item : _data.seq())
-                    retSeq.emplace(item);
+                    retSeq.emplace(item.As<typename _PureTy::value_type>());
             }
 
             return retSeq;
@@ -903,7 +903,7 @@ LLBC_Variant::As() const
     if (Is<Dict>())
     {
         for (auto &[key, value] : _data.dict())
-            retDict.emplace(key, value);
+            retDict.emplace(key.As<typename _PureTy::key_type>(), value.As<typename _PureTy::mapped_type>());
     }
 
     return retDict;
