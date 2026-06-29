@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "llbc/common/Compiler.h"
 #include "llbc/common/Errno.h"
 #include "llbc/common/BasicCString.h"
 
@@ -1607,7 +1608,7 @@ struct hash<LLBC_NS LLBC_BasicString<char>>
 template <>
 struct hash<LLBC_NS LLBC_BasicString<LLBC_NS wchar>>
 {
-    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_GLANG
+    #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
     __attribute__((pure))
     #endif // Comp == gcc or Comp == clang
     size_t operator()(const LLBC_NS LLBC_BasicString<LLBC_NS wchar> &str) const noexcept
