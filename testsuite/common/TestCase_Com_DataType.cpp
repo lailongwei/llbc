@@ -32,6 +32,9 @@ int TestCase_Com_DataType::Run(int argc, char *argv[])
     // string base test.
     StringBaseTest();
 
+    // string convert test.
+    StringConvertTest();
+
     // string compare test.
     StringCompareTest();
 
@@ -141,6 +144,73 @@ void TestCase_Com_DataType::StringBaseTest()
     LLBC_PrintLn("%s starts with 'world!!'?: %s", str.c_str(), str.endswith("world!!") ? "true" : "false");
 
     LLBC_PrintLn("\n");
+}
+
+void TestCase_Com_DataType::StringConvertTest()
+{
+    LLBC_PrintLn("String convert test:");
+
+    // ================== Construct ==================
+    // LLBC_String: Copy construct from another llbc string:
+    LLBC_String llbcStr("Hello World(llbc)");
+    LLBC_String llbcStr_CopyCtFromLLBCStr(llbcStr);
+    LLBC_Expect(llbcStr_CopyCtFromLLBCStr == llbcStr);
+    // LLBC_String: Move construct from another llbc string:
+    LLBC_String llbcStr_MoveCtFromLLBCStr(std::move(llbcStr));
+    LLBC_Expect(llbcStr_MoveCtFromLLBCStr == llbcStr_CopyCtFromLLBCStr &&
+                llbcStr.empty());
+
+    // LLBC_String: Copy construct from another std::string:
+    std::string stlStr("Hello World(stl)");
+    LLBC_String llbcStr_CopyCtFromSTLStr(stlStr);
+    LLBC_Expect(llbcStr_CopyCtFromSTLStr == stlStr);
+    // LLBC_String: Move construct from another std::string:
+    std::string llbcStr_MoveCtFromSTLStr(std::move(stlStr));
+    LLBC_Expect(llbcStr_MoveCtFromSTLStr == llbcStr_CopyCtFromSTLStr &&
+                stlStr.empty());
+
+    // std::string: Copy construct from another llbc string:
+    llbcStr = "Hello World(llbc)";
+    std::string stlStr_CopyCtFromLLBCStr(llbcStr);
+    LLBC_Expect(stlStr_CopyCtFromLLBCStr == llbcStr);
+    // std::string: Move construct from another llbc string:
+    std::string stlStr_MoveCtFromLLBCStr(std::move(llbcStr));
+    LLBC_Expect(stlStr_MoveCtFromLLBCStr == stlStr_CopyCtFromLLBCStr &&
+        !llbcStr.empty());
+
+    // ================== Assignment ==================
+    // LLBC_String: Copy assignment from another llbc string:
+    llbcStr = "Hello World(llbc)";
+    LLBC_String llbcStr_CopyAssignFromLLBCStr;
+    llbcStr_CopyAssignFromLLBCStr = llbcStr;
+    LLBC_Expect(llbcStr_CopyAssignFromLLBCStr == llbcStr);
+    // LLBC_String: Move assignment from another llbc string:
+    LLBC_String llbcStr_MoveAssignFromLLBCStr;
+    llbcStr_MoveAssignFromLLBCStr = std::move(llbcStr);
+    LLBC_Expect(llbcStr_MoveAssignFromLLBCStr == llbcStr_CopyAssignFromLLBCStr &&
+                llbcStr.empty());
+
+    // LLBC_String: Copy assignment from another std::string:
+    stlStr = "Hello World(stl)";
+    LLBC_String llbcStr_CopyAssignFromSTLStr;
+    llbcStr_CopyAssignFromSTLStr = stlStr;
+    LLBC_Expect(llbcStr_CopyAssignFromSTLStr == stlStr);
+    // LLBC_String: Move assignment from another std::string:
+    LLBC_String llbcStr_MoveAssignFromSTLStr;
+    llbcStr_MoveAssignFromSTLStr = std::move(stlStr);
+    LLBC_Expect(llbcStr_MoveAssignFromSTLStr == llbcStr_CopyAssignFromSTLStr &&
+                stlStr.empty());
+
+    // std::string: Copy assignment from another llbc string:
+    llbcStr = "Hello World(llbc)";
+    std::string stlStr_CopyAssignFromLLBCStr;
+    stlStr_CopyAssignFromLLBCStr = llbcStr;
+    LLBC_Expect(stlStr_CopyAssignFromLLBCStr == llbcStr);
+    // std::string: Move assignment from another llbc string:
+    std::string stlStr_MoveAssignFromLLBCStr;
+    stlStr_MoveAssignFromLLBCStr = std::move(llbcStr);
+    LLBC_Expect(stlStr_MoveAssignFromLLBCStr == stlStr_CopyAssignFromLLBCStr &&
+                !llbcStr.empty());
 }
 
 void TestCase_Com_DataType::StringCompareTest()
