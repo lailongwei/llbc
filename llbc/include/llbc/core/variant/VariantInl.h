@@ -903,7 +903,8 @@ LLBC_Variant::As() const
     if (Is<Dict>())
     {
         for (auto &[key, value] : _data.dict())
-            retDict.emplace(key.As<typename _PureTy::key_type>(), value.As<typename _PureTy::mapped_type>());
+            retDict.emplace(key.template As<typename _PureTy::key_type>(),
+                            value.template As<typename _PureTy::mapped_type>());
     }
 
     return retDict;
