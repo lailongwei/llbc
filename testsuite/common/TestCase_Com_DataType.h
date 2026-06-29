@@ -32,6 +32,7 @@ public:
 private:
     void RawTest();
     void StringBaseTest();
+    void StringConvertTest();
     void StringCompareTest();
     void StringLogicOperationTest();
     void StringUTF8Test();
