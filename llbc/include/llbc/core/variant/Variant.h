@@ -345,6 +345,8 @@ private:
             Str str;
             Seq seq;
             Dict dict;
+
+            ~ObjType() { }
         } obj;
 
         Data() { }
@@ -709,7 +711,7 @@ public:
 
 private:
     friend class LLBC_VariantTraits;
-    friend class ::std::hash<LLBC_Variant>;
+    friend struct ::std::hash<LLBC_Variant>;
 
     void Reset(LLBC_VariantType::ENUM newType);
     void ResetData();
