@@ -173,10 +173,12 @@ void TestCase_Com_DataType::StringConvertTest()
     llbcStr = "Hello World(llbc)";
     std::string stlStr_CopyCtFromLLBCStr(llbcStr);
     LLBC_Expect(stlStr_CopyCtFromLLBCStr == llbcStr);
+    #if LLBC_CUR_COMP == LLBC_COMP_NSVC
     // std::string: Move construct from another llbc string:
     std::string stlStr_MoveCtFromLLBCStr(std::move(llbcStr));
     LLBC_Expect(stlStr_MoveCtFromLLBCStr == stlStr_CopyCtFromLLBCStr &&
         !llbcStr.empty());
+    #endif // MSVC compiler.
 
     // ================== Assignment ==================
     // LLBC_String: Copy assignment from another llbc string:
@@ -206,11 +208,13 @@ void TestCase_Com_DataType::StringConvertTest()
     std::string stlStr_CopyAssignFromLLBCStr;
     stlStr_CopyAssignFromLLBCStr = llbcStr;
     LLBC_Expect(stlStr_CopyAssignFromLLBCStr == llbcStr);
+    #if LLBC_CUR_COMP == LLBC_COMP_NSVC
     // std::string: Move assignment from another llbc string:
     std::string stlStr_MoveAssignFromLLBCStr;
     stlStr_MoveAssignFromLLBCStr = std::move(llbcStr);
     LLBC_Expect(stlStr_MoveAssignFromLLBCStr == stlStr_CopyAssignFromLLBCStr &&
                 !llbcStr.empty());
+    #endif // MSVC compiler.
 }
 
 void TestCase_Com_DataType::StringCompareTest()
