@@ -184,9 +184,15 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::DeduceType<const uint64 &&>() == LLBC_VariantType::RAW_UINT64);
 
     // ENUM
+    #if LLBC_CUR_COMP == LLBC_COMP_MSVC
+    LLBC_Expect(LLBC_VariantType::DeduceType<TestTraditionalEnum>() == LLBC_VariantType::RAW_SINT32,
+                "TestTraditonalEnum underlying type:%s",
+                LLBC_GetTypeName(std::underlying_type_t<TestTraditionalEnum>));
+    #else // Non-MSVC compiler.
     LLBC_Expect(LLBC_VariantType::DeduceType<TestTraditionalEnum>() == LLBC_VariantType::RAW_UINT32,
                 "TestTraditonalEnum underlying type:%s",
                 LLBC_GetTypeName(std::underlying_type_t<TestTraditionalEnum>));
+#endif // MSVC compiler.
     LLBC_Expect(LLBC_VariantType::DeduceType<TestNewStyleEnum>() == LLBC_VariantType::RAW_SINT32);
 
     // FLOAT
@@ -785,6 +791,20 @@ int TestCase_Core_Variant::ConstructTest_RawType()
 
     // Construct from enum.
     LLBC_Variant traditionalEnumVar(TestTraditionalEnum::TestTraditionalEnum1);
+    #if LLBC_CUR_COMP == LLBC_COMP_MSVC
+    LLBC_Expect(traditionalEnumVar.Is<sint32>() &&
+                !traditionalEnumVar.Is<void>() &&
+                traditionalEnumVar.IsRaw() &&
+                traditionalEnumVar.IsSigned() &&
+                !traditionalEnumVar.IsUnsigned() &&
+                !traditionalEnumVar.Is<LLBC_Variant::Str>() &&
+                !traditionalEnumVar.Is<LLBC_Variant::Seq>() &&
+                !traditionalEnumVar.Is<LLBC_Variant::Dict>() &&
+                traditionalEnumVar.GetType() == LLBC_VariantType::RAW_SINT32 &&
+                traditionalEnumVar == TestTraditionalEnum::TestTraditionalEnum1 &&
+                traditionalEnumVar.As<TestTraditionalEnum>() == TestTraditionalEnum::TestTraditionalEnum1,
+                "Construct from traditional enum");
+    #else // Non-MSVC compiler.
     LLBC_Expect(traditionalEnumVar.Is<uint32>() &&
                 !traditionalEnumVar.Is<void>() &&
                 traditionalEnumVar.IsRaw() &&
@@ -797,6 +817,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                 traditionalEnumVar == TestTraditionalEnum::TestTraditionalEnum1 &&
                 traditionalEnumVar.As<TestTraditionalEnum>() == TestTraditionalEnum::TestTraditionalEnum1,
                 "Construct from traditional enum");
+    #endif // MSVC compiler.
 
     enum class TestNewStyleEnum
     {
@@ -1814,7 +1835,11 @@ int TestCase_Core_Variant::AssignmentTest_VariantType()
             {TestTraditionalEnum::TestTraditionalEnum1, TestTraditionalEnum::TestTraditionalEnum2})
     {
         LLBC_Variant traditionalEnumVar(traditionalEnumVal);
+        #if LLBC_CUR_COMP == LLBC_COMP_MSVC
+        LLBC_Expect(AssignmentTest_OneVariantType<sint32>(traditionalEnumVar) == LLBC_OK);
+        #else // Non-MSVC compiler.
         LLBC_Expect(AssignmentTest_OneVariantType<uint32>(traditionalEnumVar) == LLBC_OK);
+        #endif // MSVC compiler.
     }
     for (auto newStyleEnumVal :
             {TestNewStyleEnum::TestNewStyleEnum1, TestNewStyleEnum::TestNewStyleEnum2})
@@ -2791,6 +2816,16 @@ int TestCase_Core_Variant::AsTest_SeqType()
                 seqVar.As<LLBC_Variant::Seq>().size() == 2 &&
                 seqVar.As<LLBC_Variant::Dict>().empty());
 
+    auto strList = seqVar.As<std::list<LLBC_String>>();
+    LLBC_Expect(strList.size() == 2 &&
+                *strList.begin() == "1" &&
+                *(++strList.begin()) == seqVar[1].As<LLBC_String>());
+
+    auto strSet = seqVar.As<std::set<LLBC_String>>();
+    LLBC_Expect(strSet.size() == 2 &&
+                (*strSet.begin() == "1" || *(++strSet.begin()) == "1") &&
+                (*strSet.begin() == "Hello World" || *(++strSet.begin()) == "Hello World"));
+
     return LLBC_OK;
 }
 
@@ -2845,6 +2880,11 @@ int TestCase_Core_Variant::AsTest_DictType()
                      LLBC_Num2Str(dictFirstPair.first.As<sint32>())) == 1 &&
                  dictVar.As<std::map<LLBC_String, LLBC_String>>().count("Hello World") == 1 &&
                  dictVar.As<std::map<LLBC_String, LLBC_String>>().count("Not Exist Key") == 0));
+
+    auto strMap = dictVar.As<std::map<LLBC_String, LLBC_String>>();
+    LLBC_Expect(strMap.size() == dictVar.Size());
+    auto strUnorderedMap = dictVar.As<std::unordered_map<LLBC_String, LLBC_String>>();
+    LLBC_Expect(strUnorderedMap.size() == dictVar.Size());
 
     return LLBC_OK;
 }
