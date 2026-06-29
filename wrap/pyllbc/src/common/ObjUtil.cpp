@@ -61,7 +61,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
     switch (ty)
     {
     case PYLLBC_NONE_OBJ:
-        var.BecomeNil();
+        var.Become<void>();
         return LLBC_OK;
 
     case PYLLBC_BOOL_OBJ:
@@ -86,10 +86,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
         Py_ssize_t strLen;
         PyString_AsStringAndSize(obj, &str, &strLen);
 
-        var.BecomeStr();
-        LLBC_String &holdedStr = var.GetMutableHolder()->data.obj.str;
-        holdedStr.assign(str, static_cast<size_t>(strLen));
-
+        var = std::string_view(str, strLen);
         return LLBC_OK;
     }
 
@@ -106,8 +103,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
         Py_ssize_t strLen;
         PyString_AsStringAndSize(utf8Obj, &str, &strLen);
 
-        var.BecomeStr();
-        var.GetMutableHolder()->data.obj.str.assign(str, static_cast<size_t>(strLen));
+        var = std::string_view(str, strLen);
 
         Py_DECREF(utf8Obj);
 
@@ -117,7 +113,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
     case PYLLBC_LIST_OBJ:
     case PYLLBC_TUPLE_OBJ:
     {
-        var.BecomeSeq();
+        var.Become<LLBC_Variant::Seq>();
 
         PyObject *seq = PySequence_Fast(obj, nullptr); // New reference
         Py_ssize_t seqSize = PySequence_Fast_GET_SIZE(obj);
@@ -143,7 +139,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
 
     case PYLLBC_DICT_OBJ:
     {
-        var.BecomeDict();
+        var.Become<LLBC_Variant::Dict>();
 
         Py_ssize_t pos = 0;
         PyObject *key, *value;
@@ -173,7 +169,7 @@ int pyllbc_ObjUtil::Obj2Variant(PyObject *obj, LLBC_Variant &var)
 
 PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
 {
-    if (var.IsNil()) // Nil type
+    if (var.Is<void>()) // Nil type
     {
         Py_RETURN_NONE;
     }
@@ -210,7 +206,11 @@ PyObject *pyllbc_ObjUtil::Variant2Obj(const LLBC_Variant &var)
     else if (var.Is<LLBC_Variant::Str>()) // Str type
     {
         if (!var.IsEmpty())
-            return PyString_FromStringAndSize(var.GetHolder().data.obj.str.c_str(), var.GetHolder().data.obj.str.size());
+        {
+            size_t strLen = 0;
+            const char *str = var.As<const char *>(&strLen);
+            return PyString_FromStringAndSize(str, strLen);
+        }
         else
             return PyString_FromStringAndSize(nullptr, 0);
     }
