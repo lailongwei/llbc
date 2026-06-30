@@ -25,42 +25,42 @@ jobs:
         uses: microsoft/setup-msbuild@main
         
       - name: PreBuild
-        run: echo vs2019 | ./WinPreBuild.bat 0
+        run: echo vs2022 | ./WinPreBuild.bat 0
         
       - name: Compile core lib code
         run: |
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:llbc
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:llbc
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:llbc
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:llbc
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:llbc
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:llbc
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
         
       - name: Compile testsuite
         run: |
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests\testsuite
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:tests\testsuite
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests\testsuite
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\testsuite
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests\testsuite
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:tests\testsuite
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests\testsuite
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\testsuite
 
       - name: Compile quick_start
         run: |
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests\quick_start
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:tests\quick_start
-          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests\quick_start
-          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\quick_start
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests\quick_start
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:tests\quick_start
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests\quick_start
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\quick_start
 
 #      - name: Compile pyllbc lib code
 #        run: |
-#          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:pyllbc
-#          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:pyllbc
-#          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:pyllbc
-#          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:pyllbc
+#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:pyllbc
+#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:pyllbc
+#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:pyllbc
+#          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:pyllbc
 #
 #      - name: Compile lullbc lib code
 #        run: |
-#          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug32 -p:Platform=x86 -t:lullbc
-#          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release32 -p:Platform=x86 -t:lullbc
-#          # msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=debug64 -p:Platform=x64 -t:lullbc
-#          msbuild.exe build/vs2019/llbc_vs2019.sln -p:Configuration=release64 -p:Platform=x64 -t:lullbc
+#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:lullbc
+#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:lullbc
+#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:lullbc
+#          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:lullbc
 
       - name: Build all target by cmake
         run: |
