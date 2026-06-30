@@ -74,6 +74,53 @@ int TestCase_Core_Variant::VariantTypeTest()
 {
     LLBC_PrintLn("Variant type test:");
 
+    /// XXX_TYPES array:
+    // - RAW_TYPES:
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES.size() == 14);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[0] == LLBC_VariantType::RAW_BOOL);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[1] == LLBC_VariantType::RAW_SINT8);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[2] == LLBC_VariantType::RAW_UINT8);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[3] == LLBC_VariantType::RAW_SINT16);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[4] == LLBC_VariantType::RAW_UINT16);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[5] == LLBC_VariantType::RAW_SINT32);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[6] == LLBC_VariantType::RAW_UINT32);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[7] == LLBC_VariantType::RAW_LONG);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[8] == LLBC_VariantType::RAW_ULONG);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[9] == LLBC_VariantType::RAW_PTR);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[10] == LLBC_VariantType::RAW_SINT64);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[11] == LLBC_VariantType::RAW_UINT64);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[12] == LLBC_VariantType::RAW_FLOAT);
+    LLBC_Expect(LLBC_VariantType::RAW_TYPES[13] == LLBC_VariantType::RAW_DOUBLE);
+    // - STR_TYPES:
+    LLBC_Expect(LLBC_VariantType::STR_TYPES.size() == 1);
+    LLBC_Expect(LLBC_VariantType::STR_TYPES[0] == LLBC_VariantType::STR_DFT);
+    // - SEQ_TYPES:
+    LLBC_Expect(LLBC_VariantType::SEQ_TYPES.size() == 1);
+    LLBC_Expect(LLBC_VariantType::SEQ_TYPES[0] == LLBC_VariantType::SEQ_DFT);
+    // - DICT_TYPES:
+    LLBC_Expect(LLBC_VariantType::DICT_TYPES.size() == 1);
+    LLBC_Expect(LLBC_VariantType::DICT_TYPES[0] == LLBC_VariantType::DICT_DFT);
+    // - ALL_TYPES:
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES.size() == 18);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[0] == LLBC_VariantType::NIL);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[1] == LLBC_VariantType::RAW_BOOL);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[2] == LLBC_VariantType::RAW_SINT8);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[3] == LLBC_VariantType::RAW_UINT8);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[4] == LLBC_VariantType::RAW_SINT16);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[5] == LLBC_VariantType::RAW_UINT16);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[6] == LLBC_VariantType::RAW_SINT32);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[7] == LLBC_VariantType::RAW_UINT32);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[8] == LLBC_VariantType::RAW_LONG);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[9] == LLBC_VariantType::RAW_ULONG);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[10] == LLBC_VariantType::RAW_PTR);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[11] == LLBC_VariantType::RAW_SINT64);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[12] == LLBC_VariantType::RAW_UINT64);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[13] == LLBC_VariantType::RAW_FLOAT);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[14] == LLBC_VariantType::RAW_DOUBLE);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[15] == LLBC_VariantType::STR_DFT);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[16] == LLBC_VariantType::SEQ_DFT);
+    LLBC_Expect(LLBC_VariantType::ALL_TYPES[17] == LLBC_VariantType::DICT_DFT);
+
     // NIL
     LLBC_Expect(LLBC_VariantType::DeduceType<void>() == LLBC_VariantType::NIL);
     LLBC_Expect(LLBC_VariantType::DeduceType<LLBC_Variant>() == LLBC_VariantType::NIL);
