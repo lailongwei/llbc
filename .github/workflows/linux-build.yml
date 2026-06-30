@@ -5,6 +5,10 @@ on:
     paths-ignore:
       - ".github/workflows/macos-build.yml"
       - ".github/workflows/windows-build.yml"
+      - "static/**"
+      - "README.md"
+      - "LICENSE"
+      - "CHANGELOG"
   pull_request: {}
 
 env:
