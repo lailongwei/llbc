@@ -140,7 +140,7 @@ size_t LLBC_LogTraceMgr::GetLogTraceTimes(const LLBC_LogTrace &logTrace) const
         return item.first == logTrace.traceContent;
     });
 
-    return contentIt != traceContents.end() ? contentIt->second : 0;
+    return contentIt != traceContents.end() ? static_cast<size_t>(contentIt->second) : 0;
 }
 
 void LLBC_LogTraceMgr::ClearAllLogTraces()

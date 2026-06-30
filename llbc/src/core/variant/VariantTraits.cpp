@@ -402,17 +402,18 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
                 return;
             }
 
-            const auto lSeqSize = static_cast<sint64>(lSeq.size());
-            for (sint64 lIdx = lSeqSize - 1; lIdx >= 0; --lIdx)
+            size_t lIdx = lSeq.size();
+            do
             {
+                --lIdx;
                 if ((right.Is<LLBC_Variant::Dict>() && right.DictFind(lSeq.at(lIdx)) == right.DictEnd()) ||
                     (right.Is<LLBC_Variant::Seq>() && std::find(right.SeqBegin(), right.SeqEnd(), lSeq.at(lIdx)) == right.SeqEnd()))
                     lSeq.erase(lSeq.begin() + lIdx);
-            }
+            } while (lIdx > 0);
         }
         else if (right.IsRaw())
         {
-            sint64 rRaw = right.As<sint64>();
+            const sint64 rRaw = right.As<sint64>();
             if (rRaw <= 0)
             {
                 lSeq.clear();
@@ -423,7 +424,7 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
                 return;
             }
 
-            size_t lSeqReserve = lSeq.size() * rRaw;
+            size_t lSeqReserve = lSeq.size() * static_cast<size_t>(rRaw);
             if (lSeq.capacity() < lSeqReserve)
                 lSeq.reserve(lSeqReserve);
 
