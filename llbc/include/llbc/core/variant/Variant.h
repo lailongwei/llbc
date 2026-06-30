@@ -138,6 +138,7 @@ public:
     };
 
     // ALL types(NIL(1) + RAW(14) + STR(1) + SEQ(1) + DICT(1)).
+    // Note: long double is not supported for now.
     static constexpr std::array ALL_TYPES {
         // NIL()):
         NIL,

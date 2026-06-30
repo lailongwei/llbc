@@ -209,6 +209,8 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::DeduceType<const double>() == LLBC_VariantType::RAW_DOUBLE);
     LLBC_Expect(LLBC_VariantType::DeduceType<const double &>() == LLBC_VariantType::RAW_DOUBLE);
     LLBC_Expect(LLBC_VariantType::DeduceType<const double &&>() == LLBC_VariantType::RAW_DOUBLE);
+    // Unsupported - long double:
+    LLBC_Expect(LLBC_VariantType::DeduceType<long double>() == LLBC_VariantType::NIL);
 
     // Str - std::string:
     LLBC_Expect(LLBC_VariantType::DeduceType<std::string>() == LLBC_VariantType::STR_DFT);
@@ -310,6 +312,7 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<long, ulong>>() == LLBC_VariantType::DICT_DFT));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<sint64, uint64>>() == LLBC_VariantType::DICT_DFT));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<float, double>>() == LLBC_VariantType::DICT_DFT));
+    LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<double, long double>>() == LLBC_VariantType::NIL));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<std::string, int>>() == LLBC_VariantType::DICT_DFT));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<LLBC_String, float>>() == LLBC_VariantType::DICT_DFT));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<const char *, double>>() == LLBC_VariantType::DICT_DFT));
@@ -345,6 +348,7 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::IsConvertable<uint64>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<float>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<double>() == true);
+    LLBC_Expect(LLBC_VariantType::IsConvertable<long double>() == false);
     LLBC_Expect(LLBC_VariantType::IsConvertable<void *>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<LLBC_Packet *>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<LLBC_Packet *>() == true);
