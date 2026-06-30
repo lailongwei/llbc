@@ -1,7 +1,10 @@
 name: Windows build
 
 on:
-  push: {}
+  push:
+    paths-ignore:
+      - ".github/workflows/linux-build.yml"
+      - ".github/workflows/macos-build.yml"
   pull_request: {}
 
 jobs:
