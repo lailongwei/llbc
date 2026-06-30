@@ -23,6 +23,15 @@ jobs:
       
       - name: Install MSBuild
         uses: microsoft/setup-msbuild@main
+
+      - name: Setup MSVC Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Check cl.exe version
+        shell: cmd
+        run: cl.exe
         
       - name: PreBuild
         run: echo vs2019 | ./WinPreBuild.bat 0
