@@ -1,7 +1,10 @@
 name: Linux build
 
 on:
-  push: {}
+  push:
+    paths-ignore:
+      - ".github/workflows/macos-build.yml"
+      - ".github/workflows/windows-build.yml"
   pull_request: {}
 
 env:
