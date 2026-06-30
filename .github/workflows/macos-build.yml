@@ -1,7 +1,10 @@
 name: MacOS build
 
 on:
-  push: {}
+  push:
+    paths-ignore:
+      - ".github/workflows/linux-build.yml"
+      - ".github/workflows/windows-build.yml"
   pull_request: {}
 
 jobs:
