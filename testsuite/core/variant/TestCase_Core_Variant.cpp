@@ -133,6 +133,8 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::DeduceType<const bool>() == LLBC_VariantType::RAW_BOOL);
     LLBC_Expect(LLBC_VariantType::DeduceType<const bool &&>() == LLBC_VariantType::RAW_BOOL);
 
+    // Unsupported - signed char:
+    LLBC_Expect(LLBC_VariantType::DeduceType<signed char>() == LLBC_VariantType::NIL);
     // SINT8
     LLBC_Expect(LLBC_VariantType::DeduceType<char>() == LLBC_VariantType::RAW_SINT8);
     LLBC_Expect(LLBC_VariantType::DeduceType<char &>() == LLBC_VariantType::RAW_SINT8);
@@ -148,6 +150,8 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::DeduceType<const uint8 &>() == LLBC_VariantType::RAW_UINT8);
     LLBC_Expect(LLBC_VariantType::DeduceType<const uint8 &&>() == LLBC_VariantType::RAW_UINT8);
 
+    // Unsupported - wchar_t:
+    LLBC_Expect(LLBC_VariantType::DeduceType<wchar_t>() == LLBC_VariantType::NIL);
     // SINT16
     LLBC_Expect(LLBC_VariantType::DeduceType<sint16>() == LLBC_VariantType::RAW_SINT16);
     LLBC_Expect(LLBC_VariantType::DeduceType<sint16 &&>() == LLBC_VariantType::RAW_SINT16);
@@ -383,8 +387,10 @@ int TestCase_Core_Variant::VariantTypeTest()
     // IsConvertable():
     LLBC_Expect(LLBC_VariantType::IsConvertable<void>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<bool>() == true);
+    LLBC_Expect(LLBC_VariantType::IsConvertable<signed char>() == false);
     LLBC_Expect(LLBC_VariantType::IsConvertable<sint8>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<uint8>() == true);
+    LLBC_Expect(LLBC_VariantType::IsConvertable<wchar_t>() == false);
     LLBC_Expect(LLBC_VariantType::IsConvertable<sint16>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<uint16>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<sint32>() == true);

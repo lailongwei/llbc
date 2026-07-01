@@ -265,6 +265,24 @@ public:
     template <typename _Ty>
     static constexpr bool IsDict();
 
+    /**
+     * Check given integral type is supported by LLBC_Variant.
+     */
+    template<typename _Ty>
+    static constexpr bool IsSupportedIntegralType();
+
+    /**
+     * Check given enum type is supported by LLBC_Variant.
+     */
+    template <typename _Ty>
+    static constexpr bool IsSupportedEnumType();
+
+    /**
+     * Check given floating point type is supported by LLBC_Variant.
+     */
+    template <typename _Ty>
+    static constexpr bool IsSupportedFloatingPointType();
+
 public:
     /**
      * Get type string representation.

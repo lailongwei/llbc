@@ -40,9 +40,9 @@ constexpr bool LLBC_VariantType::IsConvertable()
     typedef std::remove_cv_t<std::remove_reference_t<_Ty>> _PureTy;
 
     if constexpr (std::is_same_v<_PureTy, void> ||
-                  std::is_integral_v<_PureTy> ||
-                  std::is_enum_v<_PureTy> ||
-                  (std::is_floating_point_v<_PureTy> && !std::is_same_v<_PureTy, ldouble>) ||
+                  IsSupportedIntegralType<_PureTy>() ||
+                  IsSupportedEnumType<_PureTy>() ||
+                  IsSupportedFloatingPointType<_PureTy>() ||
                   std::is_null_pointer_v<_PureTy> ||
                   std::is_pointer_v<_PureTy> ||
                   std::is_array_v<_PureTy>)
@@ -362,6 +362,61 @@ constexpr bool LLBC_VariantType::IsDict()
     return IsDict(DeduceType<_Ty>());
 }
 
+template<typename _Ty>
+constexpr bool LLBC_VariantType::IsSupportedIntegralType()
+{
+    // Unsupported integral types:
+    // - signed char
+    // - wchar_t
+    // - char16_t
+    // - char32_t
+
+    typedef std::remove_cv_t<std::remove_reference_t<_Ty>> _PureTy;
+    if constexpr (!std::is_integral_v<_PureTy>)
+        return false;
+
+    return std::is_same_v<_PureTy, bool> ||
+        std::is_same_v<_PureTy, sint8> ||
+        std::is_same_v<_PureTy, uint8> ||
+        std::is_same_v<_PureTy, sint16> ||
+        std::is_same_v<_PureTy, uint16> ||
+        std::is_same_v<_PureTy, sint32> ||
+        std::is_same_v<_PureTy, uint32> ||
+        std::is_same_v<_PureTy, long> ||
+        std::is_same_v<_PureTy, ulong> ||
+        std::is_same_v<_PureTy, sint64> ||
+        std::is_same_v<_PureTy, uint64>;
+}
+
+template<typename _Ty>
+constexpr bool LLBC_VariantType::IsSupportedEnumType()
+{
+    typedef std::remove_cv_t<std::remove_reference_t<_Ty>> _PureTy;
+    if constexpr (!std::is_enum_v<_PureTy>)
+    {
+        return false;
+    }
+    else
+    {
+        typedef std::underlying_type_t<_PureTy> _UnderlyingTy;
+        return IsSupportedIntegralType<_UnderlyingTy>();
+    }
+}
+
+template <typename _Ty>
+constexpr bool LLBC_VariantType::IsSupportedFloatingPointType()
+{
+    // Unsupported floating point types:
+    // - long double 
+
+    typedef std::remove_cv_t<std::remove_reference_t<_Ty>> _PureTy;
+    if constexpr (!std::is_floating_point_v<_PureTy>)
+        return false;
+
+    return std::is_same_v<_PureTy, float> ||
+        std::is_same_v<_PureTy, double>;
+}
+
 template <typename _Ty>
 const LLBC_String &LLBC_VariantType::Type2Str()
 {
@@ -561,7 +616,7 @@ LLBC_Variant::As() const
         return nullptr;
 
     // xxx -> integral:
-    if constexpr (std::is_integral_v<_PureTy>)
+    if constexpr (LLBC_VariantType::IsSupportedIntegralType<_PureTy>())
     {
         // - xxx -> bool:
         if constexpr (std::is_same_v<_PureTy, bool>)
@@ -586,7 +641,7 @@ LLBC_Variant::As() const
     }
 
     // xxx -> floating point:
-    if constexpr (std::is_floating_point_v<_PureTy>)
+    if constexpr (LLBC_VariantType::IsSupportedFloatingPointType<_PureTy>())
     {
         // - raw -> floating point:
         if (IsRaw())
@@ -626,7 +681,7 @@ LLBC_Variant::As() const
         return reinterpret_cast<_Ty>(As<uint64>());
 
     // xxx -> enum:
-    if constexpr (std::is_enum_v<_PureTy>)
+    if constexpr (LLBC_VariantType::IsSupportedEnumType<_PureTy>())
     {
         if (std::is_signed_v<std::underlying_type_t<_PureTy>>)
             return static_cast<_Ty>(As<sint64>());
@@ -1506,14 +1561,14 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromRaw(const _Ty &raw)
     else
         Reset(LLBC_VariantType::DeduceType<_Ty>());
 
-    if constexpr (std::is_integral_v<_Ty>)
+    if constexpr (LLBC_VariantType::IsSupportedIntegralType<_Ty>())
     {
         if constexpr (std::is_signed_v<_Ty>)
             _data.i64() = raw;
         else
             _data.ui64() = raw;
     }
-    else if constexpr (std::is_floating_point_v<_Ty>)
+    else if constexpr (LLBC_VariantType::IsSupportedFloatingPointType<_Ty>())
     {
         _data.dbl() = raw;
     }
@@ -1525,7 +1580,7 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromRaw(const _Ty &raw)
     {
         _data.ui64() = reinterpret_cast<std::uintptr_t>(raw);
     }
-    else if constexpr (std::is_enum_v<_Ty>)
+    else if constexpr (LLBC_VariantType::IsSupportedEnumType<_Ty>())
     {
         if constexpr (std::is_signed_v<std::underlying_type_t<_Ty>>)
             _data.i64() = static_cast<sint64>(raw);
