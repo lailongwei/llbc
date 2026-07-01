@@ -1621,6 +1621,17 @@ int TestCase_Core_Variant::AssignmentTest_StrType()
                 constSTLStrViewVar == constSTLStringView,
                 "Assignment from const std::string_view");
 
+    // Self assignment test.
+    LLBC_Variant selfAssignVar("Hello World");
+    selfAssignVar = selfAssignVar.GetData().str();
+    LLBC_Expect(selfAssignVar.Is<LLBC_String>() &&
+                selfAssignVar == "Hello World",
+                "After Str type variant copy assignment");
+    selfAssignVar = std::move(selfAssignVar.GetData().str());
+    LLBC_Expect(selfAssignVar.Is<LLBC_String>() &&
+                selfAssignVar == "Hello World",
+                "After Str type variant move assignment");
+
     return LLBC_OK;
 }
 
@@ -1707,6 +1718,17 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
     LLBC_Expect(AssignmentTest_OneSeqType(seq) == LLBC_OK);
     LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const LLBC_Variant::Seq &>(seq)) == LLBC_OK);
     LLBC_Expect(AssignmentTest_OneSeqType(std::move(seq)) == LLBC_OK);
+
+    // Self assignment test:
+    LLBC_Variant selfAssignVar(std::vector<int>{1, 2, 3});
+    selfAssignVar = selfAssignVar.GetData().seq();
+    LLBC_Expect((selfAssignVar.Is<LLBC_Variant::Seq>() &&
+                 selfAssignVar == std::vector<int>{1, 2, 3}),
+                "After Seq type variant copy assignment");
+    selfAssignVar = std::move(selfAssignVar.GetData().seq());
+    LLBC_Expect((selfAssignVar.Is<LLBC_Variant::Seq>() &&
+                 selfAssignVar == std::vector<int>{1, 2, 3}),
+                "After Seq type variant move assignment");
 
     return LLBC_OK;
 }
@@ -1819,6 +1841,17 @@ int TestCase_Core_Variant::AssignmentTest_DictType()
     LLBC_Expect(AssignmentTest_OneDictType(dict) == LLBC_OK);
     LLBC_Expect(AssignmentTest_OneDictType(static_cast<const LLBC_Variant::Dict &>(dict)) == LLBC_OK);
     LLBC_Expect(AssignmentTest_OneDictType(std::move(dict)) == LLBC_OK);
+
+    // Self assignment test:
+    LLBC_Variant selfAssignVar(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}});
+    selfAssignVar = selfAssignVar.GetData().dict();
+    LLBC_Expect((selfAssignVar.Is<LLBC_Variant::Dict>() &&
+                 selfAssignVar == std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}),
+                 "After Dict type variant copy assignment");
+    selfAssignVar = std::move(selfAssignVar.GetData().dict());
+    LLBC_Expect((selfAssignVar.Is<LLBC_Variant::Dict>() &&
+                 selfAssignVar == std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}),
+                 "After Dict type variant move assignment");
 
     return LLBC_OK;
 }

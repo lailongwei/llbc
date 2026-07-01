@@ -28,7 +28,7 @@
 // Define: Variant pure type macro.
 // Note: std::remove_cvref supported since C++20, llbc compatible C++17.
 #if __cplusplus >= 202002L
-#define __LLBC_INL_Var_PureType(_Type) typedef std::remove_cvref_t<_Type> _PureType
+#define __LLBC_INL_Var_PureType(_Type) typedef std::remove_cvref_t<_Type> _PureTy
 #else
 #define __LLBC_INL_Var_PureType(_Type) typedef std::remove_cv_t<std::remove_reference_t<_Type>> _PureTy
 #endif
@@ -1625,9 +1625,19 @@ void LLBC_Variant::ConstructOrAssignFromStr(_Ty &&str)
     else
     {
         if constexpr (IsConstruct)
+        {
             new (&_data.str()) Str(std::forward<_Ty>(str));
+        }
         else
+        {
+            if constexpr (std::is_same_v<_PureTy, Str>)
+            {
+                if (UNLIKELY(&str == &_data.str()))
+                    return;
+            }
+
             _data.str() = std::forward<_Ty>(str);
+        }
     }
 }
 
@@ -1642,9 +1652,17 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
     if constexpr (std::is_same_v<_PureTy, Seq>)
     {
         if constexpr (IsConstruct)
+        {
             new (&_data.seq()) Seq(std::forward<_Ty>(seq));
+        }
         else
-            Become<Seq>()._data.seq() = std::forward<_Ty>(seq);
+        {
+            Become<Seq>();
+            if (UNLIKELY(&seq == &_data.seq()))
+                return;
+
+            _data.seq() = std::forward<_Ty>(seq);
+        }
     }
     else if constexpr (LLBC_IsTemplSpec<_PureTy, std::pair>::value)
     {
@@ -1781,9 +1799,17 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromDict(_Ty &&dict)
     if constexpr (std::is_same_v<_PureTy, Dict>)
     {
         if constexpr (IsConstruct)
+        {
             new (&_data.dict()) Dict(std::forward<_Ty>(dict));
+        }
         else
-            Become<Dict>()._data.dict() = std::forward<_Ty>(dict);
+        {
+            Become<Dict>();
+            if (UNLIKELY(&dict == &_data.dict()))
+                return;
+
+            _data.dict() = std::forward<_Ty>(dict);
+        }
     }
     else
     {
