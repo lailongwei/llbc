@@ -30,16 +30,12 @@ public:
     TestCase_Core_Random();
     ~TestCase_Core_Random() override;
 
-public:
     int Run(int argc, char *argv[]) override;
 
 private:
     void Exec_RandInt_end_Test(int end, int times);
     void Exec_RandInt_begin_end_Test(int begin, int end, int times);
-    template <typename _Weights>
-    typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
-                            LLBC_IsTemplSpec<_Weights, std::list>::value ||
-                            LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
-                            std::is_array<_Weights>::value, void>::type
-    Exec_RandInt_array_Test(const _Weights &weights, int times);
+
+    void Exec_Choice_Test();
+    void Exec_Choices_Test();
 };
