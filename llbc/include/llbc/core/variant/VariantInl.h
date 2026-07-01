@@ -596,7 +596,8 @@ bool LLBC_Variant::Is() const
 }
 
 template <typename _Ty>
-LLBC_Variant &LLBC_Variant::Become()
+std::enable_if_t<LLBC_VariantType::IsConvertable<_Ty>(), LLBC_Variant &>
+LLBC_Variant::Become()
 {
     __LLBC_INL_Var_PureType(_Ty);
     if constexpr (std::is_same_v<_PureTy, LLBC_Variant>)
@@ -970,6 +971,41 @@ inline bool LLBC_Variant::AsLooseBool() const
     return (Is<Str>() && !_data.str().empty()) ? LLBC_Str2LooseBool(_data.str().c_str(), 10, true) : As<bool>();
 }
 
+inline void LLBC_Variant::StrReserve(Str::size_type newCap)
+{
+    Become<Str>()._data.str().reserve(newCap);
+}
+
+inline LLBC_Variant::SeqIter LLBC_Variant::SeqBegin()
+{
+    return Become<Seq>()._data.seq().begin();
+}
+
+inline LLBC_Variant::SeqIter LLBC_Variant::SeqEnd()
+{
+    return Become<Seq>()._data.seq().end();
+}
+
+inline LLBC_Variant::SeqReverseIter LLBC_Variant::SeqReverseBegin()
+{
+    return Become<Seq>()._data.seq().rbegin();
+}
+
+inline LLBC_Variant::SeqReverseIter LLBC_Variant::SeqReverseEnd()
+{
+    return Become<Seq>()._data.seq().rend();
+}
+
+inline LLBC_Variant::Seq::reference LLBC_Variant::SeqFront()
+{
+    return Become<Seq>()._data.seq().front();
+}
+
+inline LLBC_Variant::Seq::reference LLBC_Variant::SeqBack()
+{
+    return Become<Seq>()._data.seq().back();
+}
+
 inline void LLBC_Variant::StrResize(Str::size_type newSize, Str::value_type ch)
 {
     Str &str = Become<Str>()._data.str();
@@ -1030,6 +1066,12 @@ LLBC_Variant::SeqIter LLBC_Variant::SeqBatchInsert(SeqIter it, _Tys &&... vals)
     }
 }
 
+template <typename _Ty>
+void LLBC_Variant::SeqPushBack(_Ty &&val)
+{
+    Become<Seq>()._data.seq().emplace_back(std::forward<_Ty>(val));
+}
+
 inline void LLBC_Variant::SeqPopBack()
 {
     Become<Seq>();
@@ -1051,6 +1093,11 @@ void LLBC_Variant::SeqResize(Seq::size_type newSize, const _Ty &val)
         Become<Seq>()._data.seq().resize(newSize, val);
     else
         SeqResize(newSize, LLBC_Variant(val));
+}
+
+inline void LLBC_Variant::SeqReserve(Seq::size_type newCap)
+{
+    Become<Seq>()._data.seq().reserve(newCap);
 }
 
 inline LLBC_Variant::SeqIter LLBC_Variant::SeqErase(SeqIter it)
@@ -1154,6 +1201,26 @@ size_t LLBC_Variant::SeqEraseIf(const _UnaryPred &pred,
     }
 
     return erasedCount;
+}
+
+inline LLBC_Variant::DictIter LLBC_Variant::DictBegin()
+{
+    return Become<Dict>()._data.dict().begin();
+}
+
+inline LLBC_Variant::DictIter LLBC_Variant::DictEnd()
+{
+    return Become<Dict>()._data.dict().end();
+}
+
+inline LLBC_Variant::DictReverseIter LLBC_Variant::DictReverseBegin()
+{
+    return Become<Dict>()._data.dict().rbegin();
+}
+
+inline LLBC_Variant::DictReverseIter LLBC_Variant::DictReverseEnd()
+{
+    return Become<Dict>()._data.dict().rend();
 }
 
 inline std::pair<LLBC_Variant::DictIter, bool> LLBC_Variant::DictInsert(const Dict::value_type &val)

@@ -2533,6 +2533,9 @@ int TestCase_Core_Variant::BecomeTest()
     // Dict Type.
     LLBC_Expect(BecomeTest_DictType() == LLBC_OK);
 
+    // Unsupported Type.
+    LLBC_Expect(BecomeTest_UnsupportedType() == LLBC_OK);
+
     return LLBC_OK;
 }
 
@@ -2670,6 +2673,21 @@ int TestCase_Core_Variant::BecomeTest_DictType()
                  dictVar == std::vector<int>() &&
                  dictVar.IsEmpty() &&
                  dictVar != copyDictVar));
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::BecomeTest_UnsupportedType()
+{
+    // Note: If uncomment below code, will cause compile error.
+    // - Error content: "error: no matching function for call to ‘llbc::LLBC_Variant::Become<xxx>()’"
+
+    // Unsupported type: long double.
+    // LLBC_Variant var;
+    // var.Become<ldouble>();
+    // var.Become<signed char>();
+    // var.Become<wchar_t>();
+    // var.Become<LLBC_Packet>();
 
     return LLBC_OK;
 }

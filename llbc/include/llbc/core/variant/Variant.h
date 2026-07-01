@@ -463,7 +463,8 @@ public:
 public:
     // Change variant internal type.
     template <typename _Ty>
-    LLBC_Variant &Become();
+    std::enable_if_t<LLBC_VariantType::IsConvertable<_Ty>(), LLBC_Variant &>
+    Become();
     LLBC_Variant &Become(LLBC_VariantType::ENUM ty);
     LLBC_DEPRECATED_EX("Use Become<void>() or Become(LLBC_VariantType::NIL) instead")
     LLBC_Variant &BecomeNil() { return Become(LLBC_VariantType::NIL); }
@@ -588,21 +589,21 @@ public:
 public:
     // Str type variant object specify Operate methods.
     void StrResize(Str::size_type newSize, Str::value_type ch = Str::value_type());
-    void StrReserve(Str::size_type newCap) { Become<Str>()._data.str().reserve(newCap); }
+    void StrReserve(Str::size_type newCap);
 
 public:
     // Sequence type variant object specify Operate methods.
-    SeqIter SeqBegin() { return Become<Seq>()._data.seq().begin(); }
-    SeqIter SeqEnd() { return Become<Seq>()._data.seq().end(); }
+    SeqIter SeqBegin();
+    SeqIter SeqEnd();
     SeqConstIter SeqBegin() const { return As<Seq>().begin(); }
     SeqConstIter SeqEnd() const { return As<Seq>().end(); }
-    SeqReverseIter SeqReverseBegin() { return Become<Seq>()._data.seq().rbegin(); }
-    SeqReverseIter SeqReverseEnd() { return Become<Seq>()._data.seq().rend(); }
+    SeqReverseIter SeqReverseBegin();
+    SeqReverseIter SeqReverseEnd();
     SeqConstReverseIter SeqReverseBegin() const { return As<Seq>().rbegin(); }
     SeqConstReverseIter SeqReverseEnd() const { return As<Seq>().rend(); }
 
-    Seq::reference SeqFront() { return Become<Seq>()._data.seq().front(); }
-    Seq::reference SeqBack() { return Become<Seq>()._data.seq().back(); }
+    Seq::reference SeqFront();
+    Seq::reference SeqBack();
     Seq::const_reference SeqFront() const { return As<Seq>().front(); }
     Seq::const_reference SeqBack() const { return As<Seq>().back(); }
 
@@ -616,7 +617,7 @@ public:
     SeqIter SeqBatchInsert(SeqIter it, _Tys &&... vals);
 
     template <typename _Ty>
-    void SeqPushBack(_Ty &&val) { Become<Seq>()._data.seq().emplace_back(std::forward<_Ty>(val)); }
+    void SeqPushBack(_Ty &&val);
     void SeqPopBack();
 
     template <typename... _Tys>
@@ -624,7 +625,7 @@ public:
 
     template <typename _Ty = LLBC_Variant>
     void SeqResize(Seq::size_type newSize, const _Ty &val = _Ty());
-    void SeqReserve(Seq::size_type newCap) { Become<Seq>()._data.seq().reserve(newCap); }
+    void SeqReserve(Seq::size_type newCap);
 
     SeqIter SeqErase(SeqIter it);
     SeqIter SeqErase(SeqConstIter it);
@@ -643,12 +644,12 @@ public:
 
 public:
     // Dictionary type variant object specify Operate methods.
-    DictIter DictBegin() { return Become<Dict>()._data.dict().begin(); }
-    DictIter DictEnd() { return Become<Dict>()._data.dict().end(); }
+    DictIter DictBegin();
+    DictIter DictEnd();
     DictConstIter DictBegin() const { return As<Dict>().begin(); }
     DictConstIter DictEnd() const { return As<Dict>().end(); }
-    DictReverseIter DictReverseBegin() { return Become<Dict>()._data.dict().rbegin(); }
-    DictReverseIter DictReverseEnd() { return Become<Dict>()._data.dict().rend(); }
+    DictReverseIter DictReverseBegin();
+    DictReverseIter DictReverseEnd();
     DictConstReverseIter DictReverseBegin() const { return As<Dict>().rbegin(); }
     DictConstReverseIter DictReverseEnd() const { return As<Dict>().rend(); }
 

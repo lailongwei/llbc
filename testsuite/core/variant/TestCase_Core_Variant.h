@@ -150,6 +150,8 @@ public:
 
     int BecomeTest_DictType();
 
+    int BecomeTest_UnsupportedType();
+
 public:
     int AsTest();
 
