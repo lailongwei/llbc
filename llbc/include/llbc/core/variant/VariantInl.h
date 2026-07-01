@@ -42,7 +42,7 @@ constexpr bool LLBC_VariantType::IsConvertable()
     if constexpr (std::is_same_v<_PureTy, void> ||
                   std::is_integral_v<_PureTy> ||
                   std::is_enum_v<_PureTy> ||
-                  (std::is_floating_point_v<_PureTy> && !std::is_same_v<_PureTy, long double>) ||
+                  (std::is_floating_point_v<_PureTy> && !std::is_same_v<_PureTy, ldouble>) ||
                   std::is_null_pointer_v<_PureTy> ||
                   std::is_pointer_v<_PureTy> ||
                   std::is_array_v<_PureTy>)

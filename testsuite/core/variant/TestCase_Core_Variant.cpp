@@ -256,8 +256,8 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::DeduceType<const double>() == LLBC_VariantType::RAW_DOUBLE);
     LLBC_Expect(LLBC_VariantType::DeduceType<const double &>() == LLBC_VariantType::RAW_DOUBLE);
     LLBC_Expect(LLBC_VariantType::DeduceType<const double &&>() == LLBC_VariantType::RAW_DOUBLE);
-    // Unsupported - long double:
-    LLBC_Expect(LLBC_VariantType::DeduceType<long double>() == LLBC_VariantType::NIL);
+    // Unsupported - ldouble:
+    LLBC_Expect(LLBC_VariantType::DeduceType<ldouble>() == LLBC_VariantType::NIL);
 
     // Str - std::string:
     LLBC_Expect(LLBC_VariantType::DeduceType<std::string>() == LLBC_VariantType::STR_DFT);
@@ -359,7 +359,7 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<long, ulong>>() == LLBC_VariantType::DICT_DFT));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<sint64, uint64>>() == LLBC_VariantType::DICT_DFT));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<float, double>>() == LLBC_VariantType::DICT_DFT));
-    LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<double, long double>>() == LLBC_VariantType::NIL));
+    LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<double, ldouble>>() == LLBC_VariantType::NIL));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<std::string, int>>() == LLBC_VariantType::DICT_DFT));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<LLBC_String, float>>() == LLBC_VariantType::DICT_DFT));
     LLBC_Expect((LLBC_VariantType::DeduceType<std::unordered_map<const char *, double>>() == LLBC_VariantType::DICT_DFT));
@@ -395,7 +395,7 @@ int TestCase_Core_Variant::VariantTypeTest()
     LLBC_Expect(LLBC_VariantType::IsConvertable<uint64>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<float>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<double>() == true);
-    LLBC_Expect(LLBC_VariantType::IsConvertable<long double>() == false);
+    LLBC_Expect(LLBC_VariantType::IsConvertable<ldouble>() == false);
     LLBC_Expect(LLBC_VariantType::IsConvertable<void *>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<LLBC_Packet *>() == true);
     LLBC_Expect(LLBC_VariantType::IsConvertable<LLBC_Packet *>() == true);
@@ -3952,13 +3952,16 @@ int TestCase_Core_Variant::DictSpecificTest_Erase()
     dictVar.Clear();
     for (int i = 0; i < 10; ++i)
         dictVar.DictInsert(i, std::vector<int>{i, i * 10, i * 100});
-    LLBC_Variant::DictIter dictEraseRet;
-    LLBC_Expect((dictEraseRet =
-                 dictVar.DictErase(std::next(dictVar.DictBegin(), 1), std::next(dictVar.DictEnd(), -1)))->first == 9,
-                "dictEraseRet == dictVar.DictEnd()?:%s, dictEraseRet->first:%s, dictVar.DictEnd()->first:%s",
+    const auto dictEraseRet =
+        dictVar.DictErase(std::next(dictVar.DictBegin(), 1), std::next(dictVar.DictEnd(), -1));
+    LLBC_Expect(dictEraseRet != dictVar.DictEnd() &&
+                dictVar.Size() == 2 &&
+                dictVar.DictBegin()->first == 0 &&
+                (--dictVar.DictEnd())->first == 9,
+                "dictEraseRet == dictVar.DictEnd()?:%s, dictEraseRet->first:%s, (--dictVar.DictEnd())->first:%s",
                 dictEraseRet == dictVar.DictEnd() ? "true" : "false",
                 LLBC_Variant(dictEraseRet->first).ToString().c_str(),
-                LLBC_Variant(dictVar.DictEnd()->first).ToString().c_str());
+                LLBC_Variant((--dictVar.DictEnd())->first).ToString().c_str());
     LLBC_Expect(dictVar.Size() == 2 &&
                 dictVar.DictFind(0) != dictVar.DictEnd() &&
                 dictVar.DictFind(9) != dictVar.DictEnd() &&
