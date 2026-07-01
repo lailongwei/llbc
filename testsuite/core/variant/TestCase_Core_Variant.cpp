@@ -635,7 +635,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                  falseVar.GetData().ui64() == 0),
                 "Construct from bool(true/false)");
 
-    // Consrtuct from sint8/uint8:
+    // Construct from sint8/uint8:
     LLBC_Variant sint8Var(sint8(-8));
     LLBC_Variant uint8Var(uint8(8));
     LLBC_Expect((sint8Var.Is<sint8>() &&
@@ -660,7 +660,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                  uint8Var.GetData().ui64() == 8),
                 "Construct from sint8/uint8");
 
-    // Consrtuct from sint16/uint16:
+    // Construct from sint16/uint16:
     LLBC_Variant sint16Var(sint16(-16));
     LLBC_Variant uint16Var(uint16(16));
     LLBC_Expect((sint16Var.Is<sint16>() &&
@@ -685,7 +685,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                  uint16Var.GetData().ui64() == 16),
                 "Construct from sint16/uint16");
 
-    // Consrtuct from sint32/uint32:
+    // Construct from sint32/uint32:
     LLBC_Variant sint32Var(sint32(-32));
     LLBC_Variant uint32Var(uint32(32));
     LLBC_Expect((sint32Var.Is<sint32>() &&
@@ -710,7 +710,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                  uint32Var.GetData().ui64() == 32),
                 "Construct from sint32/uint32");
 
-    // Consrtuct from long/ulong:
+    // Construct from long/ulong:
     LLBC_Variant longVar(long(-48));
     LLBC_Variant ulongVar(ulong(48));
     LLBC_Expect((longVar.Is<long>() &&
@@ -735,7 +735,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                  ulongVar.GetData().ui64() == 48),
                 "Construct from long/ulong");
 
-    // Consrtuct from sint64/uint64:
+    // Construct from sint64/uint64:
     LLBC_Variant sint64Var(sint64(-64));
     LLBC_Variant uint64Var(uint64(64));
     LLBC_Expect((sint64Var.Is<sint64>() &&
@@ -760,7 +760,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                  uint64Var.GetData().ui64() == 64),
                 "Construct from sint64/uint64");
 
-    // Consrtuct from float/double:
+    // Construct from float/double:
     LLBC_Variant floatVar(.5f);
     LLBC_Variant doubleVar(.8);
     LLBC_Expect((floatVar.Is<float>() &&
@@ -934,7 +934,7 @@ int TestCase_Core_Variant::ConstructTest_StrType()
                 nullCharPtrVar.GetType() == LLBC_VariantType::STR_DFT,
                 "Construct from null char pointer");
 
-    // Consrtuct from char pointer(non-const char, non-const pointer).
+    // Construct from char pointer(non-const char, non-const pointer).
     char *strPtr = LLBC_Malloc(char, 12);
     memcpy(strPtr, "hello world", 12);
     LLBC_Defer(free(strPtr));
@@ -955,19 +955,19 @@ int TestCase_Core_Variant::ConstructTest_StrType()
                 strPtrVar == strPtr &&
                 strPtrVar.As<LLBC_String>() == strPtr,
                 "Construct from char pointer(non-const char, non-const pointer)");
-    // Consrtuct from char pointer(non-const char, const pointer).
+    // Construct from char pointer(non-const char, const pointer).
     char * const strPtr2 = LLBC_Malloc(char, 6);
     memcpy(strPtr2, "hello", 6);
     LLBC_Defer(free(strPtr2));
     LLBC_Variant strPtrVar2(strPtr2);
     LLBC_Expect(strPtrVar2.Is<char * const>() && strPtrVar2 == strPtr2,
                 "Construct from char pointer(non-const char, const pointer)");
-    // Consrtuct from char pointer(const char, non-const pointer).
+    // Construct from char pointer(const char, non-const pointer).
     const char *cstrPtr = "hello world(const)";
     LLBC_Variant cstrPtrVar(cstrPtr);
     LLBC_Expect(cstrPtrVar.Is<const char *>() && cstrPtrVar == cstrPtr,
                 "Construct from char pointer(const char, non-const pointer)");
-    // Consrtuct from char pointer(const char, const pointer).
+    // Construct from char pointer(const char, const pointer).
     const char * const cstrPtr2 = "hello world(const char && const pointer)";
     LLBC_Variant cstrPtrVar2(cstrPtr2);
     LLBC_Expect(cstrPtrVar2.Is<const char * const>() && cstrPtrVar2 == cstrPtr2,
