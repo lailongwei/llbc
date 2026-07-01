@@ -424,13 +424,14 @@ void LLBC_VariantTraits::mul_equal(LLBC_Variant &left, const LLBC_Variant &right
                 return;
             }
 
-            size_t lSeqReserve = lSeq.size() * static_cast<size_t>(rRaw);
+            const size_t lSeqOldSize = lSeq.size();
+            const size_t lSeqReserve = lSeqOldSize * static_cast<size_t>(rRaw);
             if (lSeq.capacity() < lSeqReserve)
                 lSeq.reserve(lSeqReserve);
 
             const auto lSeqEnd = lSeq.end();
             for (sint32 rptIdx = 1; rptIdx < rRaw; ++rptIdx)
-                lSeq.insert(lSeq.end(), lSeq.begin(), lSeqEnd);
+                lSeq.insert(lSeq.end(), lSeq.begin(), lSeq.begin() + lSeqOldSize);
         }
 
         return;
