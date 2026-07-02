@@ -482,7 +482,10 @@ public:
     As() const {return nil; }
 
     template <typename _Ty>
-    std::enable_if_t<!std::is_reference_v<_Ty> && LLBC_VariantType::IsRaw<_Ty>(), _Ty>
+    std::enable_if_t<!std::is_reference_v<_Ty> &&
+                        LLBC_VariantType::IsRaw<_Ty>() &&
+                        !std::is_array_v<_Ty>,
+                     _Ty>
     As() const;
 
     template <typename _Ty>

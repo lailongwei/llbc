@@ -607,7 +607,10 @@ LLBC_Variant::Become()
 }
 
 template <typename _Ty>
-std::enable_if_t<!std::is_reference_v<_Ty> && LLBC_VariantType::IsRaw<_Ty>(), _Ty>
+std::enable_if_t<!std::is_reference_v<_Ty> &&
+                    LLBC_VariantType::IsRaw<_Ty>() &&
+                    !std::is_array_v<_Ty>,
+                 _Ty>
 LLBC_Variant::As() const
 {
     __LLBC_INL_Var_PureType(_Ty);
@@ -1643,7 +1646,7 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromRaw(const _Ty &raw)
     {
         _data.ui64() = 0;
     }
-    else if constexpr (std::is_pointer_v<_Ty>)
+    else if constexpr (std::is_pointer_v<_Ty> || std::is_array_v<_Ty>)
     {
         _data.ui64() = reinterpret_cast<std::uintptr_t>(raw);
     }
