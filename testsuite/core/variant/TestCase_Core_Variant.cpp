@@ -1626,8 +1626,6 @@ int TestCase_Core_Variant::AssignmentTest_RawType()
                 constIntArrVar.As<const int *>()[2] == 6,
                 "Assignment from const array");
 
-    getchar();
-
     // Assignment from sint64.
     LLBC_Variant sint64Var;
     sint64Var = -64ll;
