@@ -791,40 +791,113 @@ int TestCase_Core_Variant::ConstructTest_RawType()
                  doubleVar.GetData().dbl() == .8),
                 "Construct from float/double");
 
+    // Construct from array.
+    int intArr[3] {1, 2, 3};
+    LLBC_Variant intArrVar(intArr);
+    LLBC_Expect(intArrVar.Is<int *>() &&
+                !intArrVar.Is<void>() &&
+                intArrVar.IsRaw() &&
+                !intArrVar.IsSigned() &&
+                intArrVar.IsUnsigned() &&
+                !intArrVar.Is<LLBC_Variant::Str>() &&
+                !intArrVar.Is<LLBC_Variant::Seq>() &&
+                !intArrVar.Is<LLBC_Variant::Dict>() &&
+                intArrVar.GetType() == LLBC_VariantType::RAW_PTR &&
+                intArrVar.GetData().ui64() != 0 &&
+                intArrVar.As<int *>() == intArr &&
+                intArrVar.As<int *>()[0] == intArr[0] &&
+                intArrVar.As<int *>()[1] == intArr[1] &&
+                intArrVar.As<int *>()[2] == intArr[2],
+                "Construct from array(int[3])");
+    // Construct from const array.
+    const int constIntArr[3] {4, 5, 6};
+    LLBC_Variant constIntArrVar(constIntArr);
+    LLBC_Expect(constIntArrVar.Is<const int *>() &&
+                !constIntArrVar.Is<void>() &&
+                constIntArrVar.IsRaw() &&
+                !constIntArrVar.IsSigned() &&
+                constIntArrVar.IsUnsigned() &&
+                !constIntArrVar.Is<LLBC_Variant::Str>() &&
+                !constIntArrVar.Is<LLBC_Variant::Seq>() &&
+                !constIntArrVar.Is<LLBC_Variant::Dict>() &&
+                constIntArrVar.GetType() == LLBC_VariantType::RAW_PTR &&
+                constIntArrVar.GetData().ui64() != 0 &&
+                constIntArrVar.As<const int *>() == constIntArr &&
+                constIntArrVar.As<const int *>()[0] == constIntArr[0] &&
+                constIntArrVar.As<const int *>()[1] == constIntArr[1] &&
+                constIntArrVar.As<const int *>()[2] == constIntArr[2],
+                "Construct from array(const int[3])");
+
+    // Cnstrut from null pointer.
+    LLBC_Packet *nullPacketPtr = nullptr;
+    LLBC_Variant nullPacketPtrVar(nullPacketPtr);
+    LLBC_Expect(nullPacketPtrVar.Is<void *>() &&
+                !nullPacketPtrVar.Is<void>() &&
+                nullPacketPtrVar.IsRaw() &&
+                !nullPacketPtrVar.IsSigned() &&
+                nullPacketPtrVar.IsUnsigned() &&
+                !nullPacketPtrVar.Is<LLBC_Variant::Str>() &&
+                !nullPacketPtrVar.Is<LLBC_Variant::Seq>() &&
+                !nullPacketPtrVar.Is<LLBC_Variant::Dict>() &&
+                nullPacketPtrVar.GetType() == LLBC_VariantType::RAW_PTR &&
+                nullPacketPtrVar == nullptr &&
+                nullPacketPtrVar == nullPacketPtr &&
+                nullPacketPtrVar.As<LLBC_Packet *>() == nullptr &&
+                nullPacketPtrVar.As<const LLBC_Packet *>() == nullptr &&
+                nullPacketPtrVar.GetData().ui64() == 0,
+                "Construct from null pointer(LLBC_Packet *)");
+    // Cnstrut from const null pointer.
+    const LLBC_Packet *constNullPacketPtr = nullptr;
+    LLBC_Variant constNullPacketPtrVar(constNullPacketPtr);
+    LLBC_Expect(constNullPacketPtrVar.Is<const void *>() &&
+                !constNullPacketPtrVar.Is<void>() &&
+                constNullPacketPtrVar.IsRaw() &&
+                !constNullPacketPtrVar.Is<LLBC_Variant::Str>() &&
+                !constNullPacketPtrVar.Is<LLBC_Variant::Seq>() &&
+                !constNullPacketPtrVar.Is<LLBC_Variant::Dict>() &&
+                constNullPacketPtrVar.GetType() == LLBC_VariantType::RAW_PTR &&
+                constNullPacketPtrVar == nullptr &&
+                constNullPacketPtrVar == constNullPacketPtr &&
+                constNullPacketPtrVar.As<LLBC_Packet *>() == nullptr &&
+                constNullPacketPtrVar.As<const LLBC_Packet *>() == nullptr &&
+                constNullPacketPtrVar.GetData().ui64() == 0,
+                "Construct from const null pointer(LLBC_Packet *)");
+
     // Construct from pointer.
     LLBC_Packet packet;
-    LLBC_Variant ptrVar(&packet);
-    LLBC_Expect(ptrVar.Is<void *>() &&
-                !ptrVar.Is<void>() &&
-                ptrVar.IsRaw() &&
-                !ptrVar.IsSigned() &&
-                ptrVar.IsUnsigned() &&
-                !ptrVar.Is<LLBC_Variant::Str>() &&
-                !ptrVar.Is<LLBC_Variant::Seq>() &&
-                !ptrVar.Is<LLBC_Variant::Dict>() &&
-                ptrVar.GetType() == LLBC_VariantType::RAW_PTR &&
-                ptrVar.As<LLBC_Packet *>() == &packet &&
-                ptrVar.As<const LLBC_Packet *>() == &packet &&
-                ptrVar == &packet &&
-                ptrVar.GetData().ui64() == reinterpret_cast<uint64>(&packet),
+    LLBC_Variant packetPtr(&packet);
+    LLBC_Expect(packetPtr.Is<void *>() &&
+                !packetPtr.Is<void>() &&
+                packetPtr.IsRaw() &&
+                !packetPtr.IsSigned() &&
+                packetPtr.IsUnsigned() &&
+                !packetPtr.Is<LLBC_Variant::Str>() &&
+                !packetPtr.Is<LLBC_Variant::Seq>() &&
+                !packetPtr.Is<LLBC_Variant::Dict>() &&
+                packetPtr.GetType() == LLBC_VariantType::RAW_PTR &&
+                packetPtr.As<LLBC_Packet *>() == &packet &&
+                packetPtr.As<const LLBC_Packet *>() == &packet &&
+                packetPtr == &packet &&
+                packetPtr.GetData().ui64() == reinterpret_cast<uint64>(&packet),
                 "Construct from pointer(LLBC_Packet *)");
+    // Construct from const pointer.
     const LLBC_Packet constPacket;
-    LLBC_Variant constPtrVar(&constPacket);
-    LLBC_Expect(constPtrVar.Is<const void *>() &&
-                !constPtrVar.Is<void>() &&
-                constPtrVar.IsRaw() &&
-                !constPtrVar.IsSigned() &&
-                constPtrVar.IsUnsigned() &&
-                !constPtrVar.Is<LLBC_Variant::Str>() &&
-                !constPtrVar.Is<LLBC_Variant::Seq>() &&
-                !constPtrVar.Is<LLBC_Variant::Dict>() &&
-                constPtrVar.GetType() == LLBC_VariantType::RAW_PTR &&
-                constPtrVar.As<LLBC_Packet *>() == &constPacket &&
-                constPtrVar.As<const LLBC_Packet *>() == &constPacket &&
-                constPtrVar.As<LLBC_Packet * const>() == &constPacket &&
-                constPtrVar.As<const LLBC_Packet * const>() == &constPacket &&
-                constPtrVar == &constPacket &&
-                constPtrVar.GetData().ui64() == reinterpret_cast<uint64>(&constPacket),
+    LLBC_Variant constPacketPtrVar(&constPacket);
+    LLBC_Expect(constPacketPtrVar.Is<const void *>() &&
+                !constPacketPtrVar.Is<void>() &&
+                constPacketPtrVar.IsRaw() &&
+                !constPacketPtrVar.IsSigned() &&
+                constPacketPtrVar.IsUnsigned() &&
+                !constPacketPtrVar.Is<LLBC_Variant::Str>() &&
+                !constPacketPtrVar.Is<LLBC_Variant::Seq>() &&
+                !constPacketPtrVar.Is<LLBC_Variant::Dict>() &&
+                constPacketPtrVar.GetType() == LLBC_VariantType::RAW_PTR &&
+                constPacketPtrVar.As<LLBC_Packet *>() == &constPacket &&
+                constPacketPtrVar.As<const LLBC_Packet *>() == &constPacket &&
+                constPacketPtrVar.As<LLBC_Packet * const>() == &constPacket &&
+                constPacketPtrVar.As<const LLBC_Packet * const>() == &constPacket &&
+                constPacketPtrVar == &constPacket &&
+                constPacketPtrVar.GetData().ui64() == reinterpret_cast<uint64>(&constPacket),
                 "Construct from pointer(const LLBC_Packet *)");
 
     // Construct from nullptr.
@@ -1490,6 +1563,70 @@ int TestCase_Core_Variant::AssignmentTest_RawType()
     LLBC_Expect(ulongVar.Is<ulong>() &&
                 ulongVar == 48ul,
                 "Assignment from ulong variant");
+
+    // Assignment from nullptr.
+    LLBC_Variant nullptrVar;
+    nullptrVar = nullptr;
+    LLBC_Expect(nullptrVar.Is<void *>() &&
+                nullptrVar == nullptr,
+                "Assignment from nullptr");
+
+    // Assignment from null pointer.
+    LLBC_Packet *nullPacketPtr = nullptr;
+    LLBC_Variant nullPacketPtrVar;
+    nullPacketPtrVar = nullPacketPtr;
+    LLBC_Expect(nullPacketPtrVar.Is<LLBC_Packet *>() &&
+                nullPacketPtrVar == nullptr &&
+                nullPacketPtrVar == nullPacketPtr,
+                "Assignment from null pointer");
+    // Assignment from const null pointer.
+    const LLBC_Packet *constNullPacketPtr = nullptr;
+    LLBC_Variant constNullPacketPtrVar;
+    constNullPacketPtrVar = constNullPacketPtr;
+    LLBC_Expect(constNullPacketPtrVar.Is<const LLBC_Packet *>() &&
+                constNullPacketPtrVar == nullptr &&
+                constNullPacketPtrVar == constNullPacketPtr,
+                "Assignment from const null pointer");
+
+    // Assignment from not-null pointer.
+    LLBC_Packet packet;
+    LLBC_Variant packetPtrVar;
+    packetPtrVar = &packet;
+    LLBC_Expect(packetPtrVar.Is<LLBC_Packet *>() &&
+                packetPtrVar == &packet,
+                "Assignment from not-null pointer");
+    // Assignment from const not-null pointer.
+    const LLBC_Packet constPacket;
+    LLBC_Variant constPacketPtrVar;
+    constPacketPtrVar = &constPacket;
+    LLBC_Expect(constPacketPtrVar.Is<const LLBC_Packet *>() &&
+                constPacketPtrVar == &constPacket,
+                "Assignment from const not-null pointer");
+
+    // Assignment from array.
+    int intArr[3] = {1, 2, 3};
+    LLBC_Variant intArrVar;
+    intArrVar = intArr;
+    LLBC_Expect(intArrVar.Is<int *>() &&
+                intArrVar == intArr &&
+                intArrVar.As<int *>() == intArr &&
+                intArrVar.As<int *>()[0] == 1 &&
+                intArrVar.As<int *>()[1] == 2 &&
+                intArrVar.As<int *>()[2] == 3,
+                "Assignment from array");
+    // Assignment from const array.
+    const int constIntArr[3] = {4, 5, 6};
+    LLBC_Variant constIntArrVar;
+    constIntArrVar = constIntArr;
+    LLBC_Expect(constIntArrVar.Is<const int *>() &&
+                constIntArrVar == constIntArr &&
+                constIntArrVar.As<const int *>() == constIntArr &&
+                constIntArrVar.As<const int *>()[0] == 4 &&
+                constIntArrVar.As<const int *>()[1] == 5 &&
+                constIntArrVar.As<const int *>()[2] == 6,
+                "Assignment from const array");
+
+    getchar();
 
     // Assignment from sint64.
     LLBC_Variant sint64Var;
