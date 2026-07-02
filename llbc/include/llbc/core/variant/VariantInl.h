@@ -1768,8 +1768,8 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
             }
             else
             {
-                _data.seq().at(0) = seq.first;
-                _data.seq().at(1) = seq.second;
+                _data.seq()[0] = seq.first;
+                _data.seq()[1] = seq.second;
             }
         }
     }
