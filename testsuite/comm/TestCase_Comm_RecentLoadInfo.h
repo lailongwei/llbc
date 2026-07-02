@@ -19,26 +19,27 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
 
-#include "llbc/common/Export.h"
+#include "llbc.h"
+using namespace llbc;
 
-#include "llbc/comm/ServiceImpl.h"
-
-__LLBC_NS_BEGIN
-
-LLBC_RecentLoadInfo::LLBC_RecentLoadInfo()
-: recentTime(LLBC_TimeSpan::zero)
-, workingTime(LLBC_TimeSpan::zero)
-, updateTimes(0)
-, overloadTimes(0)
+class TestCase_Comm_RecentLoadInfo final : public LLBC_BaseTestCase
 {
-}
+public:
+    TestCase_Comm_RecentLoadInfo();
+    ~TestCase_Comm_RecentLoadInfo() override;
 
-LLBC_Service *LLBC_Service::Create(const LLBC_String &name,
-                                   LLBC_IProtocolFactory *dftProtocolFactory,
-                                   bool fullStack)
-{
-    return new LLBC_ServiceImpl(name, dftProtocolFactory, fullStack);
-}
+public:
+    int Run(int argc, char *argv[]) override;
 
-__LLBC_NS_END
+private:
+    int Test_Disabled();
+    int Test_InvalidArgs();
+    int Test_BasicStats();
+    int Test_OverloadDetect();
+    int Test_SlidingWindow();
+    int Test_ConcurrentQuery();
+    int Test_LargeSampleCount();
+    int Test_ExceedMaxSampleCount();
+};

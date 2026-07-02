@@ -136,6 +136,20 @@ public:
 };
 
 /**
+ * \brief The service recent load info structure.
+ */
+struct LLBC_EXPORT LLBC_RecentLoadInfo
+{
+    LLBC_TimeSpan recentTime;
+    LLBC_TimeSpan workingTime;
+
+    size_t updateTimes;
+    size_t overloadTimes;
+
+    LLBC_RecentLoadInfo();
+};
+
+/**
  * \brief The service interface class define.
  */
 class LLBC_EXPORT LLBC_Service : protected LLBC_Task
@@ -214,10 +228,11 @@ public:
 public:
     /**
      * Startup service, default will startup one poller to work.
-     * @param[in] pollerCount - the poller count.
+     * @param[in] pollerCount     - the poller count.
+     * @param[in] loadSampleCount - the recent load sample count(0 means disabled).
      * @return int - return 0 if startup successful, otherwise return -1.
      */
-    virtual int Start(int pollerCount = 1) = 0;
+    virtual int Start(int pollerCount = 1, int loadSampleCount = -1) = 0;
 
     /**
      * Check service is started or not.
@@ -256,6 +271,16 @@ public:
     * @return LLBC_ThreadId - the service thread id.
     */
     virtual LLBC_ThreadId GetServiceThreadId() const = 0;
+
+public:
+    /**
+     * Get recent load info.
+     * @param[in] recentTime - the user expect recent time, must be greater than zero.
+     * @param[out] loadInfo  - the output recent load info.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int GetRecentLoadInfo(const LLBC_TimeSpan &recentTime,
+                                  LLBC_RecentLoadInfo &loadInfo) const = 0;
 
 public:
     /**
