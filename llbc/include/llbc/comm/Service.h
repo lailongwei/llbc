@@ -615,11 +615,11 @@ public:
 public:
     /**
      * Add component event into service. Operated in the next service drive loop.
-     * @param[in] eventType   - the event type, see LLBC_ComponentEventType enum.
+     * @param[in] compEventType - the component event type, see LLBC_ComponentEventType enum.
      * @param[in] eventParams - the event params.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int AddComponentEvent(int eventType, const LLBC_Variant &eventParams) = 0;
+    virtual int AddComponentEvent(int compEventType, const LLBC_Variant &eventParams) = 0;
 
 public:
     /**

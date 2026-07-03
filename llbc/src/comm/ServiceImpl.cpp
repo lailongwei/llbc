@@ -945,16 +945,16 @@ LLBC_ServiceEventFirer LLBC_ServiceImpl::BeginFireEvent(int eventId)
     return LLBC_ServiceEventFirer(this, ev);
 }
 
-int LLBC_ServiceImpl::AddComponentEvent(int eventType, const LLBC_Variant &eventParams)
+int LLBC_ServiceImpl::AddComponentEvent(int compEventType, const LLBC_Variant &eventParams)
 {
-    if (eventType < LLBC_ComponentEventType::LogicBegin ||
-        eventType >= LLBC_ComponentEventType::LogicEnd)
+    if (compEventType < LLBC_ComponentEventType::LogicBegin ||
+        compEventType >= LLBC_ComponentEventType::LogicEnd)
     {
         LLBC_SetLastError(LLBC_ERROR_INVALID);
         return LLBC_FAILED;
     }
 
-    return Push(LLBC_SvcEvUtil::BuildComponentEventEv(eventType, eventParams));
+    return Push(LLBC_SvcEvUtil::BuildComponentEventEv(compEventType, eventParams));
 }
 
 int LLBC_ServiceImpl::Post(const LLBC_Delegate<void(LLBC_Service *)> &runnable)
