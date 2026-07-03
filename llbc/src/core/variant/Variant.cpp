@@ -159,7 +159,7 @@ LLBC_Variant &LLBC_Variant::Become(LLBC_VariantType::ENUM type)
 
     if (_type != type)
     {
-        Reset(type);
+        ReleaseDataAndOnlySetType<false>(type);
         if (type == LLBC_VariantType::STR_DFT)
             new (&_data.str()) Str;
         else if (type == LLBC_VariantType::SEQ_DFT)

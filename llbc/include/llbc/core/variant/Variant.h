@@ -410,7 +410,7 @@ public:
     explicit LLBC_Variant(_Ty &&dict);
     LLBC_Variant(const LLBC_Variant &var);
     LLBC_Variant(LLBC_Variant &&var) noexcept;
-    ~LLBC_Variant();
+    ~LLBC_Variant() { ReleaseDataAndOnlySetType<true>(LLBC_VariantType::NIL); }
 
 public:
     // Assignment operators.
@@ -735,8 +735,8 @@ private:
     friend class LLBC_VariantTraits;
     friend struct ::std::hash<LLBC_Variant>;
 
-    void Reset(LLBC_VariantType::ENUM newType);
-    void ResetData();
+    template <bool _ZeroDataAfterRelease>
+    void ReleaseDataAndOnlySetType(LLBC_VariantType::ENUM newType);
 
     template <typename _64Ty>
     _64Ty AsSignedOrUnsigned64() const;

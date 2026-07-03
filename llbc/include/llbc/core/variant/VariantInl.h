@@ -483,13 +483,6 @@ inline LLBC_Variant::LLBC_Variant(LLBC_Variant &&var) noexcept
         _data.ui64() = var._data.ui64();
 }
 
-inline LLBC_Variant::~LLBC_Variant()
-{
-    // To improve LLBC_Variant destructor performance, decide not to call Reset() function
-    // (this function would perform unnecessary cleanup operations).
-    ResetData();
-}
-
 template <typename _Ty,
           std::enable_if_t<LLBC_VariantType::IsRaw<_Ty>(), int>>
 LLBC_Variant &LLBC_Variant::operator=(const _Ty &raw)
@@ -540,7 +533,7 @@ inline LLBC_Variant &LLBC_Variant::operator=(const LLBC_Variant &var)
     }
     else
     {
-        Reset(var._type);
+        ReleaseDataAndOnlySetType<false>(var._type);
         if (Is<Str>())
             new (&_data.str()) Str(var._data.str());
         else if (Is<Seq>())
@@ -572,7 +565,7 @@ inline LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var) noexcept
     }
     else
     {
-        Reset(var._type);
+        ReleaseDataAndOnlySetType<false>(var._type);
         if (Is<Str>())
             new (&_data.str()) Str(std::move(var._data.str()));
         else if (Is<Seq>())
@@ -1550,27 +1543,24 @@ inline LLBC_String LLBC_Variant::ToString() const
     return strRepr;
 }
 
-LLBC_FORCE_INLINE void LLBC_Variant::Reset(LLBC_VariantType::ENUM newType)
+template <bool _ZeroDataAfterRelease>
+LLBC_FORCE_INLINE
+void LLBC_Variant::ReleaseDataAndOnlySetType(LLBC_VariantType::ENUM newType)
 {
-    ResetData();
-    _type = newType;
-}
-
-LLBC_FORCE_INLINE void LLBC_Variant::ResetData()
-{
+    // Release data.
     if (_type == LLBC_VariantType::STR_DFT)
-        _data.obj.str.~Str();
+        _data.str().~Str();
     else if (_type == LLBC_VariantType::SEQ_DFT)
-        _data.obj.seq.~Seq();
+        _data.seq().~Seq();
     else if (_type == LLBC_VariantType::DICT_DFT)
-        _data.obj.dict.~Dict();
+        _data.dict().~Dict();
 
-    // Reset() is a internal method.
-    // llbc framework guarantee all caller will set new value after Reset() called,
-    //  so we only reset _data memory on debug mode.
-    #ifdef LLBC_DEBUG
-    _data.ui64() = 0;
-    #endif
+    // Zero data, if specified.
+    if constexpr (_ZeroDataAfterRelease)
+        _data.ui64() = 0;
+
+    // (Only) Set type.
+    _type = newType;
 }
 
 template <typename _64Ty>
@@ -1629,7 +1619,7 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromRaw(const _Ty &raw)
     if constexpr (IsConstruct)
         _type = LLBC_VariantType::DeduceType<_Ty>();
     else
-        Reset(LLBC_VariantType::DeduceType<_Ty>());
+        ReleaseDataAndOnlySetType<false>(LLBC_VariantType::DeduceType<_Ty>());
 
     if constexpr (LLBC_VariantType::IsSupportedIntegralType<_Ty>())
     {
@@ -1659,8 +1649,8 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromRaw(const _Ty &raw)
     }
     else
     {
-        llbc_assert(false && "Set value from this RAW type is not supported!");
         _data.ui64() = 0;
+        llbc_assert(false && "Set value from this RAW type is not supported!");
     }
 }
 
