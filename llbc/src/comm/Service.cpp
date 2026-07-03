@@ -26,14 +26,6 @@
 
 __LLBC_NS_BEGIN
 
-LLBC_RecentLoadInfo::LLBC_RecentLoadInfo()
-: recentTime(LLBC_TimeSpan::zero)
-, workingTime(LLBC_TimeSpan::zero)
-, updateTimes(0)
-, overloadTimes(0)
-{
-}
-
 LLBC_Service *LLBC_Service::Create(const LLBC_String &name,
                                    LLBC_IProtocolFactory *dftProtocolFactory,
                                    bool fullStack)

@@ -110,11 +110,10 @@ public:
 public:
     /**
      * Startup service, default will startup one poller to work.
-     * @param[in] pollerCount     - the poller count.
-     * @param[in] loadSampleCount - the recent load sample count(0 means disabled).
+     * @param[in] startArgs - the service start arguments, see LLBC_ServiceStartArgs.
      * @return int - return 0 if startup successful, otherwise return -1.
      */
-    int Start(int pollerCount = 1, int loadSampleCount = -1) override;
+    int Start(const LLBC_ServiceStartArgs &startArgs = LLBC_ServiceStartArgs::dft) override;
 
     /**
      * Check service is started or not.
@@ -154,16 +153,15 @@ public:
      */
     LLBC_ThreadId GetServiceThreadId() const override;
 
-public:
     /**
      * Get recent load info.
-     * @param[in] recentTime - the user expect recent time, must be greater than zero.
-     * @param[out] loadInfo  - the output recent load info.
+     * @param[in]  recentTime - the user expect recent time, must be greater than zero.
+     * @param[out] loadInfo   - the output recent load info.
      * @return int - return 0 if success, otherwise return -1.
      */
     int GetRecentLoadInfo(const LLBC_TimeSpan &recentTime,
-                          LLBC_RecentLoadInfo &loadInfo) const override;
-    
+                          LLBC_ServiceRecentLoadInfo &loadInfo) const override;
+
 public:
     /**
      * Create a session and listening.
@@ -660,44 +658,6 @@ private:
     sint64 _begSvcTime; // Begin heartbeat time, update on every heartbeat begin.
 
 private:
-    // Recent load info about members.
-    /**
-     * \brief Service load sample(per-interval) data structure.
-     */
-    struct _ServiceLoadSample
-    {
-        sint64 beginStatTimeInMillis; // Sample begin stat time, in millis.
-        sint64 lastStatTimeInMillis;  // Sample last stat time(last update time), in millis.
-
-        sint64 workingTime;           // Total OnSvc() working time in this sample, in millis.
-
-        size_t updateTimes;           // Total OnSvc() call count in this sample.
-        size_t overloadTimes;         // Total overload(working time >= frameInterval) count in this sample.
-    };
-    static_assert(std::is_trivially_copyable<_ServiceLoadSample>::value,
-                  "_ServiceLoadSample must be trivially copyable!");
-
-    int _loadSampleCount; // Total load sample count(0 means disabled).
-    sint64 _loadSampleIntervalMillis; // Per-sample interval, in millis.
-    _ServiceLoadSample _curLoadSample; // Currently filling sample(service-thread only).
-    mutable LLBC_RingBuffer<_ServiceLoadSample> *_loadSampleRing; // Ring buffer of completed samples.
-    mutable LLBC_SpinLock _loadSampleLock; // Protects _loadSampleRing.
-
-    /**
-     * Init/Clear recent load sample collect.
-     */
-    void InitLoadSample(int loadSampleCount);
-    void ClearLoadSample();
-
-    /**
-     * Collect one OnSvc() loop load sample.
-     * @param[in] begMillis     - the OnSvc() begin millis(time before heart-beat work).
-     * @param[in] endMillis     - the OnSvc() end millis(time after heart-beat work, before sleep).
-     * @param[in] frameInterval - the service frame interval, in millis.
-     */
-    void CollectLoadSample(sint64 begMillis, sint64 endMillis, sint64 frameInterval);
-
-private:
     // Components about members.
     using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
     std::list<LLBC_Component *> _willRegComps; // Will register component list.
@@ -735,6 +695,9 @@ private:
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
     std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
+
+    // - Load sample support members.
+    __LLBC_ServiceLoadSampler _loadSampler; // Service load sampler.
 };
 
 __LLBC_NS_END

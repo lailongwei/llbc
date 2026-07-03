@@ -304,7 +304,7 @@ int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, 
     }
 
     LLBC_PrintLn("Start service...");
-    if (svc->Start(10) != LLBC_OK)
+    if (svc->Start({10}) != LLBC_OK)
     {
         LLBC_PrintLn("Failed to start service, error: %s", LLBC_FormatLastError());
         getchar();
@@ -342,7 +342,7 @@ int TestCase_Comm_CompBase::TestInInternalDriveService(const LLBC_String &host, 
     LLBC_PrintLn("Press any key to restart service(stop->start)...");
     getchar();
     svc->Stop();
-    if (svc->Start(5) != LLBC_OK)
+    if (svc->Start({5}) != LLBC_OK)
     {
         LLBC_PrintLn("Failed to restart service, error: %s", LLBC_FormatLastError());
         getchar();
@@ -374,7 +374,7 @@ int TestCase_Comm_CompBase::TestInExternalDriveService(const LLBC_String &host, 
     svc->SetDriveMode(LLBC_ServiceDriveMode::ExternalDrive);
 
     LLBC_PrintLn("Start service...");
-    if (svc->Start(2) != LLBC_OK)
+    if (svc->Start({2}) != LLBC_OK)
     {
         LLBC_PrintLn("Failed to start service, error: %s", LLBC_FormatLastError());
         getchar();
@@ -394,7 +394,7 @@ int TestCase_Comm_CompBase::TestInExternalDriveService(const LLBC_String &host, 
 
     LLBC_PrintLn("Restart service...");
     svc->Stop();
-    if (svc->Start(2) != LLBC_OK)
+    if (svc->Start({2}) != LLBC_OK)
     {
         LLBC_PrintLn("Calling Service.OnSvc, %d seconds later will restart service...", waitSecs);
         getchar();

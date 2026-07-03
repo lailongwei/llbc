@@ -82,7 +82,7 @@ int csllbc_Service::Start(int pollerCount)
         return LLBC_FAILED;
     }
 
-    return _llbcSvc->Start(pollerCount);
+    return _llbcSvc->Start({pollerCount});
 }
 
 void csllbc_Service::Stop()

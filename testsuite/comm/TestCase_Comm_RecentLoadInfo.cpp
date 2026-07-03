@@ -61,7 +61,7 @@ namespace
             const sint64 endAt = LLBC_GetMilliseconds() + _duration;
             while (LLBC_GetMilliseconds() < endAt)
             {
-                LLBC_RecentLoadInfo info;
+                LLBC_ServiceRecentLoadInfo info;
                 const int ret = _svc->GetRecentLoadInfo(LLBC_TimeSpan::FromSeconds(60), info);
                 ++_queryTimes;
                 if (ret != LLBC_OK)
@@ -83,7 +83,7 @@ namespace
         int _failedTimes;
     };
 
-    void DumpLoadInfo(const char *tag, const LLBC_RecentLoadInfo &info)
+    void DumpLoadInfo(const char *tag, const LLBC_ServiceRecentLoadInfo &info)
     {
         const sint64 recentMs = info.recentTime.GetTotalMillis();
         const sint64 workMs = info.workingTime.GetTotalMillis();
@@ -155,14 +155,14 @@ int TestCase_Comm_RecentLoadInfo::Test_Disabled()
     LLBC_Service *svc = LLBC_Service::Create("RLI_Disabled");
     svc->AddComponent(new IdleComp);
     svc->SetFPS(50);
-    if (svc->Start(1, 0) != LLBC_OK)
+    if (svc->Start({1, 0}) != LLBC_OK)
     {
         delete svc;
         return LLBC_FAILED;
     }
     LLBC_Defer(delete svc);
 
-    LLBC_RecentLoadInfo info;
+    LLBC_ServiceRecentLoadInfo info;
     const int ret = svc->GetRecentLoadInfo(LLBC_TimeSpan::FromSeconds(10), info);
     const int err = LLBC_GetLastError();
 
@@ -195,7 +195,7 @@ int TestCase_Comm_RecentLoadInfo::Test_InvalidArgs()
     LLBC_Service *svc = LLBC_Service::Create("RLI_InvalidArgs");
     svc->AddComponent(new IdleComp);
     svc->SetFPS(50);
-    if (svc->Start(1, 4) != LLBC_OK)
+    if (svc->Start({1, 4}) != LLBC_OK)
     {
         delete svc;
         return LLBC_FAILED;
@@ -203,7 +203,7 @@ int TestCase_Comm_RecentLoadInfo::Test_InvalidArgs()
     LLBC_Defer(delete svc);
 
     // Both zero and negative recentTime must be rejected with ARG.
-    LLBC_RecentLoadInfo info;
+    LLBC_ServiceRecentLoadInfo info;
     if (svc->GetRecentLoadInfo(LLBC_TimeSpan::zero, info) == LLBC_OK ||
         LLBC_GetLastError() != LLBC_ERROR_ARG)
     {
@@ -228,7 +228,7 @@ int TestCase_Comm_RecentLoadInfo::Test_BasicStats()
     LLBC_Service *svc = LLBC_Service::Create("RLI_BasicStats");
     svc->AddComponent(new IdleComp);
     svc->SetFPS(targetFps);
-    if (svc->Start(1, 8) != LLBC_OK)
+    if (svc->Start({1, 8}) != LLBC_OK)
     {
         delete svc;
         return LLBC_FAILED;
@@ -239,7 +239,7 @@ int TestCase_Comm_RecentLoadInfo::Test_BasicStats()
     LLBC_PrintLn("Wait %ds for sampling...", waitSec);
     LLBC_Sleep(waitSec * 1000);
 
-    LLBC_RecentLoadInfo info;
+    LLBC_ServiceRecentLoadInfo info;
     if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromSeconds(kSampleIntervalSec * 3), info) != LLBC_OK)
     {
         LLBC_PrintLn("GetRecentLoadInfo failed: %s", LLBC_FormatLastError());
@@ -289,7 +289,7 @@ int TestCase_Comm_RecentLoadInfo::Test_OverloadDetect()
     LLBC_Service *svc = LLBC_Service::Create("RLI_Overload");
     svc->AddComponent(new OverloadComp(sleepPerFrame));
     svc->SetFPS(targetFps);
-    if (svc->Start(1, 8) != LLBC_OK)
+    if (svc->Start({1, 8}) != LLBC_OK)
     {
         delete svc;
         return LLBC_FAILED;
@@ -300,7 +300,7 @@ int TestCase_Comm_RecentLoadInfo::Test_OverloadDetect()
     LLBC_PrintLn("Wait %ds for overload sampling...", waitSec);
     LLBC_Sleep(waitSec * 1000);
 
-    LLBC_RecentLoadInfo info;
+    LLBC_ServiceRecentLoadInfo info;
     if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromSeconds(kSampleIntervalSec * 3), info) != LLBC_OK)
     {
         LLBC_PrintLn("GetRecentLoadInfo failed: %s", LLBC_FormatLastError());
@@ -331,7 +331,7 @@ int TestCase_Comm_RecentLoadInfo::Test_SlidingWindow()
     LLBC_Service *svc = LLBC_Service::Create("RLI_SlidingWindow");
     svc->AddComponent(new IdleComp);
     svc->SetFPS(50);
-    if (svc->Start(1, sampleCount) != LLBC_OK)
+    if (svc->Start({1, sampleCount}) != LLBC_OK)
     {
         delete svc;
         return LLBC_FAILED;
@@ -343,7 +343,7 @@ int TestCase_Comm_RecentLoadInfo::Test_SlidingWindow()
     LLBC_Sleep(waitSec * 1000);
 
     // Query 1: minimal recentTime, expect only the newest sample.
-    LLBC_RecentLoadInfo small;
+    LLBC_ServiceRecentLoadInfo small;
     if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromMillis(1), small) != LLBC_OK)
     {
         LLBC_PrintLn("Small query failed: %s", LLBC_FormatLastError());
@@ -354,7 +354,7 @@ int TestCase_Comm_RecentLoadInfo::Test_SlidingWindow()
     // Query 2: recentTime > ring capacity, expect scanning the whole ring.
     const sint64 ringCapMs =
         static_cast<sint64>(sampleCount) * kSampleIntervalMillis;
-    LLBC_RecentLoadInfo big;
+    LLBC_ServiceRecentLoadInfo big;
     if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromMillis(ringCapMs * 2), big) != LLBC_OK)
     {
         LLBC_PrintLn("Big query failed: %s", LLBC_FormatLastError());
@@ -381,7 +381,7 @@ int TestCase_Comm_RecentLoadInfo::Test_ConcurrentQuery()
     LLBC_Service *svc = LLBC_Service::Create("RLI_Concurrent");
     svc->AddComponent(new IdleComp);
     svc->SetFPS(100);
-    if (svc->Start(1, 8) != LLBC_OK)
+    if (svc->Start({1, 8}) != LLBC_OK)
     {
         delete svc;
         return LLBC_FAILED;
@@ -438,7 +438,7 @@ int TestCase_Comm_RecentLoadInfo::Test_LargeSampleCount()
     LLBC_Service *svc = LLBC_Service::Create("RLI_LargeSampleCount");
     svc->AddComponent(new IdleComp);
     svc->SetFPS(50);
-    if (svc->Start(1, kSampleCount) != LLBC_OK)
+    if (svc->Start({1, kSampleCount}) != LLBC_OK)
     {
         delete svc;
         return LLBC_FAILED;
@@ -451,7 +451,7 @@ int TestCase_Comm_RecentLoadInfo::Test_LargeSampleCount()
     LLBC_Sleep(waitSec * 1000);
 
     const int queryWindowSec = kSampleCount * kSampleIntervalSec;
-    LLBC_RecentLoadInfo info;
+    LLBC_ServiceRecentLoadInfo info;
     if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromSeconds(queryWindowSec), info) != LLBC_OK)
     {
         LLBC_PrintLn("GetRecentLoadInfo failed: %s", LLBC_FormatLastError());
@@ -484,7 +484,7 @@ int TestCase_Comm_RecentLoadInfo::Test_ExceedMaxSampleCount()
     LLBC_Service *svc = LLBC_Service::Create("RLI_ExceedMaxSampleCount");
     svc->AddComponent(new IdleComp);
     svc->SetFPS(50);
-    if (svc->Start(1, kSampleCount) != LLBC_OK)
+    if (svc->Start({1, kSampleCount}) != LLBC_OK)
     {
         LLBC_PrintLn("Start with sampleCount=%d failed: %s",
                      kSampleCount, LLBC_FormatLastError());
@@ -500,7 +500,7 @@ int TestCase_Comm_RecentLoadInfo::Test_ExceedMaxSampleCount()
 
     const int queryWindowSec =
         LLBC_CFG_COMM_MAX_SERVICE_LOAD_SAMPLE_COUNT * kSampleIntervalSec;
-    LLBC_RecentLoadInfo info;
+    LLBC_ServiceRecentLoadInfo info;
     if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromSeconds(queryWindowSec), info) != LLBC_OK)
     {
         LLBC_PrintLn("GetRecentLoadInfo failed: %s", LLBC_FormatLastError());

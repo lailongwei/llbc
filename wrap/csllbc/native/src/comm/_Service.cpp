@@ -78,7 +78,7 @@ int csllbc_Service_SetDriveMode(csllbc_Service *svc, int driveMode)
 
 int csllbc_Service_Start(csllbc_Service *svc, int pollerCount)
 {
-    return svc->Start(pollerCount);
+    return svc->Start({pollerCount});
 }
 
 void csllbc_Service_Stop(csllbc_Service *svc)

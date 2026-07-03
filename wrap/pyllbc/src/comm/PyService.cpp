@@ -179,7 +179,7 @@ int pyllbc_Service::Start(int pollerCount)
     _errHooker->Install();
 
     _started = true;
-    if (_llbcSvc->Start(pollerCount) != LLBC_OK)
+    if (_llbcSvc->Start({pollerCount}) != LLBC_OK)
     {
         _started = false;
 
