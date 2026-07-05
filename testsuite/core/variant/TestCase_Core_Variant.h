@@ -87,6 +87,14 @@ private:
     template <typename _RealTy, typename _VarTy>
     int AssignmentTest_OneVariantTypeOneRefType(_VarTy &&var);
 
+    int AssignmentTest_EfficientSeqAssignment();
+    void AssignmentTest_EfficientSeqAssignment_ConstructTestVariant(size_t testSeqVarSize,
+                                                                    LLBC_Variant &testSeqVar);
+    template <typename _PairTy>
+    int AssignmentTest_EfficientSeqAssignmentOnePairType(_PairTy &&pairVal);
+    template <typename _NonPairTy>
+    int AssignmentTest_EfficientSeqAssignmentOneNonPairType(_NonPairTy &&nonPairVal);
+
 public:
     int GetTypeTest();
 

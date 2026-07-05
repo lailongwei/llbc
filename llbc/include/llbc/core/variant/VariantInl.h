@@ -1706,9 +1706,17 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
 {
     __LLBC_INL_Var_PureType(_Ty);
 
+    // Step 1: Pre-Construct or Pre-Assignment:
+    // - Construct: Set type only.
+    // - Assignment: Become type to Seq.
     if constexpr (IsConstruct)
         _type = LLBC_VariantType::DeduceType<_Ty>();
+    else
+        Become<Seq>();
 
+    // Step 2: Parameter is Seq:
+    // - Construct: Forward param to Seq constructor.
+    // - Assignment: Forward param to Seq assignment operator.
     if constexpr (std::is_same_v<_PureTy, Seq>)
     {
         if constexpr (IsConstruct)
@@ -1717,133 +1725,229 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
         }
         else
         {
-            Become<Seq>();
             if (UNLIKELY(&seq == &_data.seq()))
                 return;
 
             _data.seq() = std::forward<_Ty>(seq);
         }
     }
+    // Step 3: Param is std::pair<> template instance:
+    // - Resize _data.seq() size to 2.
+    // - Execute copy/move construct/assignment.
     else if constexpr (LLBC_IsTemplSpec<_PureTy, std::pair>::value)
     {
         if constexpr (IsConstruct)
         {
             new (&_data.seq()) Seq();
             _data.seq().reserve(2);
-        }
-        else
-        {
-            Become<Seq>()._data.seq().resize(2);
-        }
-    
-        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-        {
-            if constexpr (IsConstruct)
+
+            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
             {
                 _data.seq().emplace_back(std::move(seq.first));
                 _data.seq().emplace_back(std::move(seq.second));
             }
             else
             {
-                _data.seq()[0] = std::move(seq.first);
-                _data.seq()[1] = std::move(seq.second);
-            }
-        }
-        else
-        {
-            if constexpr (IsConstruct)
-            {
                 _data.seq().emplace_back(seq.first);
                 _data.seq().emplace_back(seq.second);
             }
+        }
+        else
+        {
+            if (_data.seq().size() > 2)
+                _data.seq().resize(2);
+            if (_data.seq().capacity() < 2)
+                _data.seq().reserve(2);
+
+            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            {
+                if (_data.seq().size() > 0)
+                    _data.seq()[0] = std::move(seq.first);
+                else
+                    _data.seq().emplace_back(std::move(seq.first));
+
+                if (_data.seq().size() > 1)
+                    _data.seq()[1] = std::move(seq.second);
+                else
+                    _data.seq().emplace_back(std::move(seq.second));
+            }
             else
             {
-                _data.seq()[0] = seq.first;
-                _data.seq()[1] = seq.second;
+                if (_data.seq().size() > 0)
+                    _data.seq()[0] = seq.first;
+                else
+                    _data.seq().emplace_back(seq.first);
+
+                if (_data.seq().size() > 1)
+                    _data.seq()[1] = seq.second;
+                else
+                    _data.seq().emplace_back(seq.second);
             }
         }
     }
+    // Step 4: Param is normalize uniay stl container:
+    // - Execute high-performance move/copy construct/assignment.
     else
     {
-        if constexpr (IsConstruct)
-            new (&_data.seq()) Seq();
-        else
-            Become<Seq>()._data.seq().clear();
-
-        if (seq.empty())
-            return;
-
+        // - Step 4.1: Futher initialization:
+        //   - Construct: Create Seq instance, and reserve space.
+        //   - Assignment: Resize _data.seq() size to seq.size(), and reserve space if needed.
         if constexpr (IsConstruct)
         {
+            new (&_data.seq()) Seq();
             _data.seq().reserve(seq.size());
         }
         else
         {
+            if (_data.seq().size() > seq.size())
+                _data.seq().resize(seq.size());
+
             if (_data.seq().capacity() < seq.size())
                 _data.seq().reserve(seq.size());
         }
 
+        // - Step 4.2: If seq param is empty, just return.
+        //   Note: Used llbc_assert to check _data.seq() is empty.
+        if (seq.empty())
+        {
+            llbc_assert(_data.seq().empty() &&
+                "LLBC_Variant internal error: seq is empty, but _data.seq() is not empty!");
+            return;
+        }
+
+        // - Step 4.3: Param is std::queue<> template instance:
         if constexpr (LLBC_IsTemplSpec<_PureTy, std::queue>::value)
         {
+            // Define a iteratable queue class for iterating seq.
+            class _MyIteratableQueue : public _PureTy
+            {
+            public:
+                auto begin() { return this->c.begin(); }
+                auto begin() const { return this->c.begin(); }
+                auto end() { return this->c.end(); }
+                auto end() const { return this->c.end(); }
+
+                void clear() { this->c.clear(); }
+            };
+
+            // Iterate seq and move/copy elements to _data.seq().
+            // Note: In order to simplify code, discard seq param 'const' qualifier(if exists).
+            size_t myQueueIdx = 0;
+            auto &myQueue = const_cast<_MyIteratableQueue &>(static_cast<const _MyIteratableQueue &>(seq));
+            for (auto it = myQueue.begin(); it != myQueue.end(); ++it)
+            {
+                if constexpr (IsConstruct)
+                {
+                    if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        _data.seq().emplace_back(std::move(*it));
+                    else
+                        _data.seq().emplace_back(*it);
+                }
+                else
+                {
+                    if (myQueueIdx < _data.seq().size())
+                    {
+                        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                            _data.seq()[myQueueIdx] = std::move(*it);
+                        else
+                            _data.seq()[myQueueIdx] = *it;
+                    }
+                    else
+                    {
+                        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                            _data.seq().emplace_back(std::move(*it));
+                        else
+                            _data.seq().emplace_back(*it);
+                    }
+
+                    ++myQueueIdx;
+                }
+            }
+
             if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-            {
-                class _MyMutableQueue : public _PureTy
-                {
-                public:
-                    auto begin() { return this->c.begin(); }
-                    auto end() { return this->c.end(); }
-
-                    void clear() { this->c.clear(); }
-                };
-
-                auto &myQueue = static_cast<_MyMutableQueue &>(seq);
-                for (auto it = myQueue.begin(); it != myQueue.end(); ++it)
-                    _data.seq().emplace_back(std::move(*it));
                 myQueue.clear();
-            }
-            else
-            {
-                class _MyImmutableQueue : public _PureTy
-                {
-                public:
-                    auto begin() const { return this->c.begin(); }
-                    auto end() const { return this->c.end(); }
-                };
-
-                const auto &myQueue = static_cast<const _MyImmutableQueue &>(seq);
-                for (auto it = myQueue.begin(); it != myQueue.end(); ++it)
-                    _data.seq().emplace_back(*it);
-            }
         }
+        // Step 4.3: Param is std::set<> or std::unordered_set<> template instance:
         else if constexpr (LLBC_IsTemplSpec<_PureTy, std::set>::value ||
                            LLBC_IsTemplSpec<_PureTy, std::unordered_set>::value)
         {
             if constexpr (std::is_rvalue_reference_v<_Ty &&>)
             {
+                size_t extractedCount = 0;
                 do
                 {
-                    _data.seq().emplace_back(std::move(seq.extract(seq.begin()).value()));
+                    if constexpr (IsConstruct)
+                    {
+                        _data.seq().emplace_back(std::move(seq.extract(seq.begin()).value()));
+                    }
+                    else
+                    {
+                        if (extractedCount < _data.seq().size())
+                            _data.seq()[extractedCount] = std::move(seq.extract(seq.begin()).value());
+                        else
+                            _data.seq().emplace_back(std::move(seq.extract(seq.begin()).value()));
+
+                        ++extractedCount;
+                    }
                 } while (!seq.empty());
             }
             else
             {
+                size_t copiedCount = 0;
                 for (const auto &elem : seq)
-                    _data.seq().emplace_back(elem);
+                {
+                    if constexpr (IsConstruct)
+                    {
+                        _data.seq().emplace_back(elem);
+                    }
+                    else
+                    {
+                        if (copiedCount < _data.seq().size())
+                            _data.seq()[copiedCount] = elem;
+                        else
+                            _data.seq().emplace_back(elem);
+
+                        ++copiedCount;
+                    }
+                }
             }
         }
+        // Step 4.4: Param is other stl unary container:
         else
         {
+            size_t movedOrCopiedCount = 0;
+            for (auto &elem : seq)
+            {
+                if constexpr (IsConstruct)
+                {
+                    if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        _data.seq().emplace_back(std::move(elem));
+                    else
+                        _data.seq().emplace_back(elem);
+                }
+                else
+                {
+                    if (movedOrCopiedCount < _data.seq().size())
+                    {
+                        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                            _data.seq()[movedOrCopiedCount] = std::move(elem);
+                        else
+                            _data.seq()[movedOrCopiedCount] = elem;
+                    }
+                    else
+                    {
+                        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                            _data.seq().emplace_back(std::move(elem));
+                        else
+                            _data.seq().emplace_back(elem);
+                    }
+
+                    ++movedOrCopiedCount;
+                }
+            }
+
             if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-            {
-                for (auto &&elem : seq)
-                    _data.seq().emplace_back(std::move(elem));
                 seq.clear();
-            }
-            else
-            {
-                for (const auto &elem : seq)
-                    _data.seq().emplace_back(elem);
-            }
         }
     }
 }

@@ -1485,6 +1485,7 @@ int TestCase_Core_Variant::AssignmentTest()
     LLBC_Expect(AssignmentTest_SeqType() == LLBC_OK);
     LLBC_Expect(AssignmentTest_DictType() == LLBC_OK);
     LLBC_Expect(AssignmentTest_VariantType() == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignment() == LLBC_OK);
 
     return LLBC_OK;
 }
@@ -2329,6 +2330,160 @@ int TestCase_Core_Variant::AssignmentTest_OneVariantTypeOneRefType(_VarTy &&var)
                     var.template Is<_RealTy>(),
                     copyAssignmentFromVar == var,
                     varIsEmptyBeforeCopy, varIsEmptyAfterCopy, copyVarIsEmpty);
+    }
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignment()
+{
+    LLBC_PrintLn("Assignment test(Efficient Seq assignment):");
+
+    // Assignment from std::pair<LBC_String, LLBC_String>:
+    LLBC_PrintLn("- Efficient assignment from std::pair<int, int>:");
+    std::pair<LLBC_String, LLBC_String> pairVal{"Hello", "World"};
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOnePairType(pairVal) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOnePairType(static_cast<const decltype(pairVal) &>(pairVal)) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOnePairType(std::move(pairVal)) == LLBC_OK);
+
+    // Assignment from std::vector<int>:
+    LLBC_PrintLn("- Efficient assignment from std::vector<int>:");
+    std::vector<int> vecVal{100, 200, 300, 400, 500};
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(vecVal) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(static_cast<const decltype(vecVal) &>(vecVal)) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(std::move(vecVal)) == LLBC_OK);
+
+    // Assignment from std::list<int>:
+    LLBC_PrintLn("- Efficient assignment from std::list<int>:");
+    std::list<int> listVal{100, 200, 300, 400, 500};
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(listVal) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(static_cast<const decltype(listVal) &>(listVal)) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(std::move(listVal)) == LLBC_OK);
+
+    // Assignment from std::queue<int>:
+    LLBC_PrintLn("- Efficient assignment from std::queue<int>:");
+    std::queue<int> queueVal;
+    for (int i = 0; i < 5; ++i)
+        queueVal.push((i + 1) * 100);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(queueVal) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(static_cast<const decltype(queueVal) &>(queueVal)) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(std::move(queueVal)) == LLBC_OK);
+
+    // Assignment from std::deque<int>:
+    LLBC_PrintLn("- Efficient assignment from std::deque<int>:");
+    std::deque<int> dequeVal;
+    for (int i = 0; i < 5; ++i)
+        dequeVal.push_back((i + 1) * 100);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(dequeVal) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(static_cast<const decltype(dequeVal) &>(dequeVal)) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(std::move(dequeVal)) == LLBC_OK);
+
+    // Assignment from std::set<int>:
+    LLBC_PrintLn("- Efficient assignment from std::set<int>:");
+    std::set<int> setVal{100, 200, 300, 400, 500};
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(setVal) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(static_cast<const decltype(setVal) &>(setVal)) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(std::move(setVal)) == LLBC_OK);
+
+    // Assignment from std::unordered_set<int>:
+    LLBC_PrintLn("- Efficient assignment from std::unordered_set<int>:");
+    std::unordered_set<int> unorderedSetVal{100, 200, 300, 400, 500};
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(unorderedSetVal) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(static_cast<const decltype(unorderedSetVal) &>(unorderedSetVal)) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_EfficientSeqAssignmentOneNonPairType(std::move(unorderedSetVal)) == LLBC_OK);
+
+    return LLBC_OK;
+}
+
+void TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignment_ConstructTestVariant(
+    size_t testSeqVarSize,
+    LLBC_Variant &testSeqVar)
+{
+    testSeqVar.Clear();
+    for (size_t i = 0; i < testSeqVarSize; ++i)
+        testSeqVar.SeqPushBack(LLBC_Num2Str(i));
+}
+
+template <typename _PairTy>
+int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignmentOnePairType(_PairTy &&pairVal)
+{
+    typedef std::remove_cv_t<std::remove_reference_t<_PairTy>> _PurePairTy;
+
+    // Check rvalue_ref/const qualifier.
+    constexpr bool isRValueRef = std::is_rvalue_reference_v<_PairTy &&>;
+    constexpr bool isConst = std::is_const_v<std::remove_reference_t<_PairTy>>;
+
+    // Execute test:
+    for (size_t i = 0; i < 10; ++i)
+    {
+        _PurePairTy pairValInLoop(pairVal);
+        LLBC_PrintLn("- Efficient assignment from %s, isRValueRef:%d, isConst:%d, testVar.Size():%lu",
+                     LLBC_GetTypeName(_PairTy), isRValueRef, isConst, i);
+
+        LLBC_Variant testSeqVar;
+        AssignmentTest_EfficientSeqAssignment_ConstructTestVariant(i, testSeqVar);
+
+        _PurePairTy copyPairVal(pairValInLoop);
+        LLBC_Variant copyTestSeqVar(testSeqVar);
+        testSeqVar = std::forward<_PairTy>(pairValInLoop);
+        LLBC_Expect(testSeqVar.Is<LLBC_Variant::Seq>() &&
+                    testSeqVar.Size() == 2 &&
+                    testSeqVar[0].Is<typename _PurePairTy::first_type>() &&
+                    testSeqVar[0] == copyPairVal.first &&
+                    testSeqVar[1].Is<typename _PurePairTy::second_type>() &&
+                    testSeqVar[1] == copyPairVal.second);
+
+        if (!isRValueRef)
+        {
+            LLBC_Expect(pairValInLoop == copyPairVal &&
+                        testSeqVar[0] == pairValInLoop.first &&
+                        testSeqVar[1] == pairValInLoop.second);
+        }
+        else
+        {
+            LLBC_Expect((pairValInLoop.first.empty() ||
+                         (copyTestSeqVar[0] == pairValInLoop.first)) &&
+                        (pairValInLoop.second.empty() ||
+                         (copyTestSeqVar[1] == pairValInLoop.second)));
+        }
+    }
+
+    return LLBC_OK;
+}
+
+template <typename _NonPairTy>
+int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignmentOneNonPairType(_NonPairTy &&nonPairVal)
+{
+    typedef std::remove_cv_t<std::remove_reference_t<_NonPairTy>> _PureNonPairTy;
+
+    // Check rvalue_ref/const qualifier.
+    constexpr bool isRValueRef = std::is_rvalue_reference_v<_NonPairTy &&>;
+    constexpr bool isConst = std::is_const_v<std::remove_reference_t<_NonPairTy>>;
+
+    // Execute test.
+    for (size_t i = 0; i < 10; ++i)
+    {
+        _PureNonPairTy nonPairValInLoop(nonPairVal);
+        LLBC_PrintLn("- Efficient assignment from %s, isRValueRef:%d, isConst:%d, testVar.Size():%lu",
+                     LLBC_GetTypeName(_NonPairTy), isRValueRef, isConst, i);
+
+        LLBC_Variant testSeqVar;
+        AssignmentTest_EfficientSeqAssignment_ConstructTestVariant(i, testSeqVar);
+
+        _PureNonPairTy copyNonPairVal(nonPairValInLoop);
+        testSeqVar = std::forward<_NonPairTy>(nonPairValInLoop);
+        LLBC_Expect(testSeqVar.Is<LLBC_Variant::Seq>() &&
+                    testSeqVar.Size() == copyNonPairVal.size() &&
+                    testSeqVar == copyNonPairVal);
+
+        if (!isRValueRef)
+        {
+            LLBC_Expect(nonPairValInLoop == copyNonPairVal);
+        }
+        else
+        {
+            LLBC_Expect(nonPairValInLoop.empty());
+        }
     }
 
     return LLBC_OK;
