@@ -22,8 +22,6 @@
 
 #include "llbc/common/Export.h"
 
-#include "llbc/core/thread/Guard.h"
-
 #include "llbc/comm/ServiceLoadSampler.h"
 
 __LLBC_NS_BEGIN
@@ -34,10 +32,20 @@ LLBC_ServiceRecentLoadInfo::LLBC_ServiceRecentLoadInfo()
 {
 }
 
+LLBC_String LLBC_ServiceRecentLoadInfo::ToString() const
+{
+    LLBC_String repr;
+    repr.append_format("recentTime:%s, ", recentTime.ToString().c_str())
+        .append_format("workingTime:%s, ", workingTime.ToString().c_str())
+        .append_format("updateTimes:%zu, ", updateTimes)
+        .append_format("overloadTimes:%zu", overloadTimes);
+
+    return repr;
+}
+
 __LLBC_ServiceLoadSampler::__LLBC_ServiceLoadSampler()
 : _loadSampleRing(0)
 {
-    memset(&_curLoadSample, 0, sizeof(_curLoadSample));
 }
 
 __LLBC_ServiceLoadSampler::~__LLBC_ServiceLoadSampler()
@@ -45,19 +53,19 @@ __LLBC_ServiceLoadSampler::~__LLBC_ServiceLoadSampler()
     Clear();
 }
 
-void __LLBC_ServiceLoadSampler::Init(int loadSampleCount)
+void __LLBC_ServiceLoadSampler::Init(const LLBC_TimeSpan &loadSampleTime)
 {
-    Clear();
-
-    if (loadSampleCount <= 0)
+    if (loadSampleTime.GetTotalSeconds() <= 0)
         return;
 
-    if (loadSampleCount > LLBC_CFG_COMM_MAX_SERVICE_LOAD_SAMPLE_COUNT)
-        loadSampleCount = LLBC_CFG_COMM_MAX_SERVICE_LOAD_SAMPLE_COUNT;
+    const int sampleSeconds = std::min(loadSampleTime.GetTotalSeconds(),
+                                       LLBC_CFG_COMM_MAX_SERVICE_LOAD_SAMPLE_TIME);
+    const size_t sampleCount = static_cast<size_t>(
+        (sampleSeconds + LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL - 1) /
+        LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL);
 
-    _loadSampleRing.ReCapacity(static_cast<size_t>(loadSampleCount));
-
-    memset(&_curLoadSample, 0, sizeof(_curLoadSample));
+    LLBC_LockGuard guard(_loadSampleLock);
+    _loadSampleRing.ReCapacity(sampleCount);
 }
 
 void __LLBC_ServiceLoadSampler::Clear()
@@ -67,95 +75,88 @@ void __LLBC_ServiceLoadSampler::Clear()
         LLBC_LockGuard guard(_loadSampleLock);
         _loadSampleRing.Clear();
     }
-
-    memset(&_curLoadSample, 0, sizeof(_curLoadSample));
 }
 
 void __LLBC_ServiceLoadSampler::Collect(sint64 begMillis,
                                         sint64 endMillis,
                                         sint64 frameInterval)
 {
+    if (UNLIKELY(!IsEnabled()))
+        return;
+
     sint64 workingTime = endMillis - begMillis;
     if (UNLIKELY(workingTime < 0))
         workingTime = 0;
 
     const bool overloaded = (frameInterval > 0 && workingTime >= frameInterval);
+    const sint64 sampleIntervalMillis = LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL * 1000;
+
+    LLBC_LockGuard guard(_loadSampleLock);
 
     // Lazy-init current sample on first call after start.
-    if (UNLIKELY(_curLoadSample.beginStatTimeInMillis == 0))
+    if (UNLIKELY(_loadSampleRing.IsEmpty()))
     {
-        _curLoadSample.beginStatTimeInMillis = begMillis;
-        _curLoadSample.lastStatTimeInMillis = endMillis;
-        _curLoadSample.workingTime = workingTime;
-        _curLoadSample.updateTimes = 1;
-        _curLoadSample.overloadTimes = overloaded ? 1 : 0;
+        _ServiceLoadSample newSample;
+        newSample.beginStatTimeInMillis = begMillis;
+        newSample.lastStatTimeInMillis = endMillis;
+        newSample.workingTime = workingTime;
+        newSample.updateTimes = 1;
+        newSample.overloadTimes = overloaded ? 1 : 0;
+        _loadSampleRing.Push(newSample);
         return;
     }
 
-    const sint64 sampleElapsed = endMillis - _curLoadSample.beginStatTimeInMillis;
+    _ServiceLoadSample &cur = _loadSampleRing.Tail();
+    const sint64 sampleElapsed = endMillis - cur.beginStatTimeInMillis;
 
-    // Still in current sample window, just accumulate.
-    if (LIKELY(sampleElapsed < LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL * 1000))
-    {
-        _curLoadSample.lastStatTimeInMillis = endMillis;
-        _curLoadSample.workingTime += workingTime;
-        _curLoadSample.updateTimes += 1;
-        if (overloaded)
-            _curLoadSample.overloadTimes += 1;
-        return;
-    }
-
-    // Current sample window finished, accumulate this frame and push into ring buffer.
-    _curLoadSample.lastStatTimeInMillis = endMillis;
-    _curLoadSample.workingTime += workingTime;
-    _curLoadSample.updateTimes += 1;
+    // Accumulate this frame into current sample window.
+    cur.lastStatTimeInMillis = endMillis;
+    cur.workingTime += workingTime;
+    cur.updateTimes += 1;
     if (overloaded)
-        _curLoadSample.overloadTimes += 1;
+        cur.overloadTimes += 1;
 
-    // Push completed sample(s) into ring buffer.
-    LLBC_LockGuard guard(_loadSampleLock);
-    if (LIKELY(IsEnabled()))
+    // Still in current sample window.
+    if (LIKELY(sampleElapsed < sampleIntervalMillis))
+        return;
+
+    // Current sample window finished, fill empty samples for skipped intervals.
+    const sint64 curBegin = cur.beginStatTimeInMillis;
+    sint64 skippedIntervals = (sampleElapsed / sampleIntervalMillis) - 1;
+    if (skippedIntervals > 0)
     {
-        // Push the just-completed sample.
-        if (UNLIKELY(_loadSampleRing.IsFull()))
-            _loadSampleRing.Pop();
-        _loadSampleRing.Push(_curLoadSample);
+        const sint64 maxSkip = static_cast<sint64>(_loadSampleRing.GetCapacity());
+        if (skippedIntervals > maxSkip)
+            skippedIntervals = maxSkip;
 
-        // Fill empty samples for skipped intervals
-        sint64 skippedIntervals =
-            (sampleElapsed / (LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL * 1000)) - 1;
-        if (skippedIntervals > 0)
+        sint64 skipBeginTime = curBegin + sampleIntervalMillis;
+        for (sint64 i = 0; i < skippedIntervals; ++i)
         {
-            const sint64 maxSkip = static_cast<sint64>(_loadSampleRing.GetCapacity());
-            if (skippedIntervals > maxSkip)
-                skippedIntervals = maxSkip;
+            _ServiceLoadSample emptySample;
+            emptySample.beginStatTimeInMillis = skipBeginTime;
+            emptySample.lastStatTimeInMillis = skipBeginTime + sampleIntervalMillis;
+            emptySample.workingTime = 0;
+            emptySample.updateTimes = 0;
+            emptySample.overloadTimes = 0;
 
-            sint64 skipBeginTime = _curLoadSample.beginStatTimeInMillis +
-                                   LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL * 1000;
-            for (sint64 i = 0; i < skippedIntervals; ++i)
-            {
-                _ServiceLoadSample emptySample;
-                emptySample.beginStatTimeInMillis = skipBeginTime;
-                emptySample.lastStatTimeInMillis = skipBeginTime + LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL * 1000;
-                emptySample.workingTime = 0;
-                emptySample.updateTimes = 0;
-                emptySample.overloadTimes = 0;
+            if (UNLIKELY(_loadSampleRing.IsFull()))
+                _loadSampleRing.Pop();
+            _loadSampleRing.Push(emptySample);
 
-                if (UNLIKELY(_loadSampleRing.IsFull()))
-                    _loadSampleRing.Pop();
-                _loadSampleRing.Push(emptySample);
-
-                skipBeginTime += LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL * 1000;
-            }
+            skipBeginTime += sampleIntervalMillis;
         }
     }
 
     // Start a new sample window from <endMillis>.
-    _curLoadSample.beginStatTimeInMillis = endMillis;
-    _curLoadSample.lastStatTimeInMillis = endMillis;
-    _curLoadSample.workingTime = 0;
-    _curLoadSample.updateTimes = 0;
-    _curLoadSample.overloadTimes = 0;
+    _ServiceLoadSample newSample;
+    newSample.beginStatTimeInMillis = endMillis;
+    newSample.lastStatTimeInMillis = endMillis;
+    newSample.workingTime = 0;
+    newSample.updateTimes = 0;
+    newSample.overloadTimes = 0;
+    if (UNLIKELY(_loadSampleRing.IsFull()))
+        _loadSampleRing.Pop();
+    _loadSampleRing.Push(newSample);
 }
 
 int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime,
@@ -167,15 +168,15 @@ int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime
     loadInfo.updateTimes = 0;
     loadInfo.overloadTimes = 0;
 
-    if (UNLIKELY(recentTime <= LLBC_TimeSpan::zero))
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
-    }
-
     if (UNLIKELY(!IsEnabled()))
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    if (UNLIKELY(recentTime <= LLBC_TimeSpan::zero))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
@@ -234,3 +235,8 @@ int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime
 }
 
 __LLBC_NS_END
+
+std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ServiceRecentLoadInfo &loadInfo)
+{
+    return o <<loadInfo.ToString();
+}

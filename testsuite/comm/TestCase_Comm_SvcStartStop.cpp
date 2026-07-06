@@ -100,7 +100,9 @@ int TestCase_Comm_SvcStartStop::Run(int argc, char *argv[])
 
     LLBC_PrintLn("ReStart service...");
     svc->Stop();
-    svc->Start({2});
+    LLBC_ServiceStartArgs startArgs;
+    startArgs.pollerCount = 2;
+    svc->Start(startArgs);
 
     LLBC_PrintLn("Service restarted, sleep 5 seconds...");
     LLBC_Sleep(5000);

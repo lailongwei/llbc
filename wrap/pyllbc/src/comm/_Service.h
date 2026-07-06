@@ -97,7 +97,9 @@ LLBC_EXTERN_C PyObject *_pyllbc_StartService(PyObject *self, PyObject *args)
     int pollerCount = 0;
     PYLLBC_ParseCObjBeginArgs(svc, "|i", &pollerCount);
 
-    if (svc->Start({pollerCount}) != LLBC_OK)
+    LLBC_ServiceStartArgs startArgs;
+    startArgs.pollerCount = pollerCount;
+    if (svc->Start(startArgs) != LLBC_OK)
         return nullptr;
 
     if (PyErr_Occurred())

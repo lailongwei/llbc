@@ -142,16 +142,17 @@ public:
 struct LLBC_ServiceStartArgs
 {
     // Poller count.
-    int pollerCount = 1;
+    int pollerCount;
 
-    // Recent load sample count.
-    int loadSampleCount = LLBC_CFG_COMM_DFT_SERVICE_LOAD_SAMPLE_COUNT;
+    // Recent load sample time.
+    LLBC_TimeSpan loadSampleTime;
+
+    // Default constructor.
+    constexpr LLBC_ServiceStartArgs();
 
     // Default start arguments.
     static const LLBC_ServiceStartArgs dft;
 };
-
-inline constexpr LLBC_ServiceStartArgs LLBC_ServiceStartArgs::dft{};
 
 /**
  * \brief The service interface class define.

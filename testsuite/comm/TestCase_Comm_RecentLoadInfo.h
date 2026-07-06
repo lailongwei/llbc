@@ -42,4 +42,6 @@ private:
     int Test_ConcurrentQuery();
     int Test_LargeSampleCount();
     int Test_ExceedMaxSampleCount();
+    int Test_PartialSampleAtBoundary();
+    int Test_ToString();
 };

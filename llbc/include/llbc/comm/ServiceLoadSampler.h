@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include "llbc/core/time/TimeSpan.h"
-#include "llbc/core/thread/SpinLock.h"
-#include "llbc/core/algo/RingBuffer.h"
+#include "llbc/core/Core.h"
 
 __LLBC_NS_BEGIN
 
@@ -39,8 +37,17 @@ struct LLBC_EXPORT LLBC_ServiceRecentLoadInfo
     size_t overloadTimes;
 
     LLBC_ServiceRecentLoadInfo();
+
+    /**
+     * Get this class object string representation.
+     * @return LLBC_String - the string representation.
+     */
+    LLBC_String ToString() const;
 };
 
+/**
+ * \brief The service load sampler class encapsulation.
+ */
 class LLBC_HIDDEN __LLBC_ServiceLoadSampler
 {
 public:
@@ -49,11 +56,20 @@ public:
 
 public:
     /**
-     * Init/Clear recent load sample collect.
+     * Init recent load sample collect.
+     * @param[in] loadSampleTime - the load sample time span.
      */
-    void Init(int loadSampleCount);
+    void Init(const LLBC_TimeSpan &loadSampleTime);
+
+    /**
+     * Clear recent load sample collect.
+     */
     void Clear();
 
+    /**
+     * Check whether recent load sample collect is enabled or not.
+     * @return bool - return true if enabled, otherwise return false.
+     */
     bool IsEnabled() const { return _loadSampleRing.GetCapacity() > 0; }
 
     /**
@@ -91,9 +107,13 @@ private:
                   "_ServiceLoadSample must be trivially copyable!");
 
 private:
-    _ServiceLoadSample _curLoadSample; // Currently filling sample(service-thread only).
-    mutable LLBC_RingBuffer<_ServiceLoadSample> _loadSampleRing; // Ring buffer of completed samples.
+    mutable LLBC_RingBuffer<_ServiceLoadSample> _loadSampleRing; // Ring buffer of load samples.
     mutable LLBC_SpinLock _loadSampleLock; // Protects _loadSampleRing.
 };
 
 __LLBC_NS_END
+
+/**
+ * Service recent load info stream output operator previous declare.
+ */
+LLBC_EXTERN LLBC_EXPORT std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_ServiceRecentLoadInfo &loadInfo);

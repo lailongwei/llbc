@@ -230,7 +230,7 @@ int LLBC_ServiceImpl::Start(const LLBC_ServiceStartArgs &startArgs)
     }
 
     // Init load sample collect.
-    _loadSampler.Init(startArgs.loadSampleCount);
+    _loadSampler.Init(startArgs.loadSampleTime);
 
     // Defer reset _startErrNo/_startSubErrNo.
     LLBC_Defer(
