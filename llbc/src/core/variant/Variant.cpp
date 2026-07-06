@@ -296,6 +296,7 @@ bool LLBC_Variant::Deserialize(LLBC_Stream &stream)
         if (count == 0)
             return true;
 
+        _data.seq().reserve(count);
         for (uint32 i = 0; i < count; ++i)
         {
             LLBC_Variant val;
