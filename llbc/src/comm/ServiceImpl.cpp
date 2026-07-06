@@ -725,8 +725,8 @@ LLBC_Component *LLBC_ServiceImpl::GetComponent(const LLBC_CString &compName)
     }
 
     // Strict match.
-    const auto compsEnd = _name2Comps.end();
     LLBC_LockGuard guard(_lock);
+    const auto compsEnd = _name2Comps.end();
     auto it = _name2Comps.find(compName);
     if (it != compsEnd)
         return it->second;
