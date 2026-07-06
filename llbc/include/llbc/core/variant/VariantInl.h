@@ -32,6 +32,10 @@
 #else
 #define __LLBC_INL_Var_PureType(_Type) typedef std::remove_cv_t<std::remove_reference_t<_Type>> _PureTy
 #endif
+
+// Define: Type can move judge macro.
+#define __LLBC_INL_Var_TypeCanMove(_Type) (std::is_rvalue_reference_v<_Type &&> && !std::is_const_v<std::remove_reference_t<_Type>>)
+
 __LLBC_NS_BEGIN
 
 template <typename _Ty>
@@ -582,10 +586,8 @@ inline LLBC_Variant &LLBC_Variant::operator=(LLBC_Variant &&var) noexcept
 template <typename... _Tys>
 bool LLBC_Variant::Is() const
 {
-    if constexpr (sizeof...(_Tys) == 0)
-        return false;
-    else
-        return (... || (_type == LLBC_VariantType::DeduceType<_Tys>()));
+    static_assert(sizeof...(_Tys) > 0, "Is<>() requires at least one type");
+    return (... || (_type == LLBC_VariantType::DeduceType<_Tys>()));
 }
 
 template <typename _Ty>
@@ -1741,7 +1743,8 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
             new (&_data.seq()) Seq();
             _data.seq().reserve(2);
 
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
             {
                 _data.seq().emplace_back(std::move(seq.first));
                 _data.seq().emplace_back(std::move(seq.second));
@@ -1759,7 +1762,8 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
             if (_data.seq().capacity() < 2)
                 _data.seq().reserve(2);
 
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
             {
                 if (_data.seq().size() > 0)
                     _data.seq()[0] = std::move(seq.first);
@@ -1785,7 +1789,7 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
             }
         }
     }
-    // Step 4: Param is normalize uniay stl container:
+    // Step 4: Param is normalize unary stl container:
     // - Execute high-performance move/copy construct/assignment.
     else
     {
@@ -1807,38 +1811,29 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
         }
 
         // - Step 4.2: If seq param is empty, just return.
-        //   Note: Used llbc_assert to check _data.seq() is empty.
         if (seq.empty())
-        {
-            llbc_assert(_data.seq().empty() &&
-                "LLBC_Variant internal error: seq is empty, but _data.seq() is not empty!");
             return;
-        }
 
         // - Step 4.3: Param is std::queue<> template instance:
         if constexpr (LLBC_IsTemplSpec<_PureTy, std::queue>::value)
         {
-            // Define a iteratable queue class for iterating seq.
-            class _MyIteratableQueue : public _PureTy
+            // Define queue container accessor.
+            struct _QueueAccessor : public _PureTy
             {
-            public:
-                auto begin() { return this->c.begin(); }
-                auto begin() const { return this->c.begin(); }
-                auto end() { return this->c.end(); }
-                auto end() const { return this->c.end(); }
-
-                void clear() { this->c.clear(); }
+                static auto &Get(_PureTy &q) noexcept { return q.*(&_QueueAccessor::c); }
+                static const auto &Get(const _PureTy &q) noexcept {return q.*(&_QueueAccessor::c); }
             };
 
             // Iterate seq and move/copy elements to _data.seq().
             // Note: In order to simplify code, discard seq param 'const' qualifier(if exists).
             size_t myQueueIdx = 0;
-            auto &myQueue = const_cast<_MyIteratableQueue &>(static_cast<const _MyIteratableQueue &>(seq));
-            for (auto it = myQueue.begin(); it != myQueue.end(); ++it)
+            auto &queueContainer = _QueueAccessor::Get(seq);
+            for (auto it = queueContainer.begin(); it != queueContainer.end(); ++it)
             {
                 if constexpr (IsConstruct)
                 {
-                    if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                    // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                    if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
                         _data.seq().emplace_back(std::move(*it));
                     else
                         _data.seq().emplace_back(*it);
@@ -1847,14 +1842,16 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
                 {
                     if (myQueueIdx < _data.seq().size())
                     {
-                        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
                             _data.seq()[myQueueIdx] = std::move(*it);
                         else
                             _data.seq()[myQueueIdx] = *it;
                     }
                     else
                     {
-                        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
                             _data.seq().emplace_back(std::move(*it));
                         else
                             _data.seq().emplace_back(*it);
@@ -1864,14 +1861,16 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
                 }
             }
 
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
-                myQueue.clear();
+            // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
+                queueContainer.clear();
         }
-        // Step 4.3: Param is std::set<> or std::unordered_set<> template instance:
+        // Step 4.4: Param is std::set<> or std::unordered_set<> template instance:
         else if constexpr (LLBC_IsTemplSpec<_PureTy, std::set>::value ||
                            LLBC_IsTemplSpec<_PureTy, std::unordered_set>::value)
         {
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
             {
                 size_t extractedCount = 0;
                 do
@@ -1912,7 +1911,7 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
                 }
             }
         }
-        // Step 4.4: Param is other stl unary container:
+        // Step 4.5: Param is other stl unary container:
         else
         {
             size_t movedOrCopiedCount = 0;
@@ -1920,7 +1919,8 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
             {
                 if constexpr (IsConstruct)
                 {
-                    if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                    // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                    if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
                         _data.seq().emplace_back(std::move(elem));
                     else
                         _data.seq().emplace_back(elem);
@@ -1929,14 +1929,16 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
                 {
                     if (movedOrCopiedCount < _data.seq().size())
                     {
-                        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
                             _data.seq()[movedOrCopiedCount] = std::move(elem);
                         else
                             _data.seq()[movedOrCopiedCount] = elem;
                     }
                     else
                     {
-                        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+                        if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
                             _data.seq().emplace_back(std::move(elem));
                         else
                             _data.seq().emplace_back(elem);
@@ -1946,7 +1948,8 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromSeq(_Ty &&seq)
                 }
             }
 
-            if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+            if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
                 seq.clear();
         }
     }
@@ -1982,7 +1985,8 @@ LLBC_FORCE_INLINE void LLBC_Variant::ConstructOrAssignFromDict(_Ty &&dict)
         else
             Become<Dict>()._data.dict().clear();
 
-        if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+        // if constexpr (std::is_rvalue_reference_v<_Ty &&>)
+        if constexpr (__LLBC_INL_Var_TypeCanMove(_Ty))
         {
             while (!dict.empty())
             {
@@ -2209,7 +2213,10 @@ struct hash<LLBC_NS LLBC_Variant>
             for (LLBC_NS LLBC_Variant::DictConstIter it = dict.begin();
                  it != endIt;
                  ++it)
+            {
                 hashVal += (*this)(it->first);
+                hashVal += (*this)(it->second);
+            }
 
             return hashVal;
         }
@@ -2221,5 +2228,6 @@ struct hash<LLBC_NS LLBC_Variant>
 };
 
 }
-// Undef: Variant pure type define macro.
+// Undef: Variant internal macros.
 #undef __LLBC_INL_Var_PureType
+#undef __LLBC_INL_Var_TypeCanMove

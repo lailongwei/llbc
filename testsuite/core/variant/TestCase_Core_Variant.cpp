@@ -46,6 +46,7 @@ int TestCase_Core_Variant::Run(int argc, char *argv[])
     LLBC_Expect(VariantTypeTest() == LLBC_OK);
     LLBC_Expect(ConstructTest() == LLBC_OK);
     LLBC_Expect(AssignmentTest() == LLBC_OK);
+    LLBC_Expect(BoolOperatorTest() == LLBC_OK);
     LLBC_Expect(GetTypeTest() == LLBC_OK);
     LLBC_Expect(IsXxxTest() == LLBC_OK);
     LLBC_Expect(BecomeTest() == LLBC_OK);
@@ -1061,6 +1062,9 @@ int TestCase_Core_Variant::ConstructTest_StrType()
     LLBC_Variant cstlStrVar(cstlStr);
     LLBC_Expect(cstlStrVar.Is<const std::string>() && cstlStrVar == cstlStr,
                 "Construct from const std::string");
+    LLBC_Variant cstlStrVar2(static_cast<const std::string &&>(cstlStr));
+    LLBC_Expect(cstlStrVar2.Is<const std::string>() && cstlStrVar2 == cstlStr,
+                "Construct from const std::string &&");
 
     // Move Construct from std::string.
     std::string stlStrForMove("hello world(for move)");
@@ -1089,6 +1093,9 @@ int TestCase_Core_Variant::ConstructTest_StrType()
     LLBC_Variant cllbcStrVar(cllbcStr);
     LLBC_Expect(cllbcStrVar.Is<const LLBC_String>() && cllbcStrVar == cllbcStr,
                 "Construct from const LLBC_String");
+    LLBC_Variant cllbcStrVar2(static_cast<const LLBC_String &&>(cllbcStr));
+    LLBC_Expect(cllbcStrVar2.Is<const LLBC_String>() && cllbcStrVar2 == cllbcStr,
+                "Construct from const LLBC_String &&");
 
     // Move construct from LLBC_String.
     LLBC_String llbcStrForMove("hello world(for move)");
@@ -1129,6 +1136,7 @@ int TestCase_Core_Variant::ConstructTest_SeqType()
     {
         LLBC_Expect(ConstructTest_OneSeqType(intVec) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::vector<int> &>(intVec)) == LLBC_OK);
+        LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::vector<int> &&>(intVec)) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(std::move(intVec)) == LLBC_OK);
     }
 
@@ -1138,6 +1146,7 @@ int TestCase_Core_Variant::ConstructTest_SeqType()
     {
         LLBC_Expect(ConstructTest_OneSeqType(intList) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::list<int> &>(intList)) == LLBC_OK);
+        LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::list<int> &&>(intList)) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(std::move(intList)) == LLBC_OK);
     }
 
@@ -1150,6 +1159,7 @@ int TestCase_Core_Variant::ConstructTest_SeqType()
     {
         LLBC_Expect(ConstructTest_OneSeqType(que) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::queue<int> &>(que)) == LLBC_OK);
+        LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::queue<int> &&>(que)) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(std::move(que)) == LLBC_OK);
     }
 
@@ -1162,6 +1172,7 @@ int TestCase_Core_Variant::ConstructTest_SeqType()
     {
         LLBC_Expect(ConstructTest_OneSeqType(deq) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::deque<LLBC_String> &>(deq)) == LLBC_OK);
+        LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::deque<LLBC_String> &&>(deq)) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(std::move(deq)) == LLBC_OK);
     }
 
@@ -1174,6 +1185,7 @@ int TestCase_Core_Variant::ConstructTest_SeqType()
     {
         LLBC_Expect(ConstructTest_OneSeqType(int64Set) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::set<sint64> &>(int64Set)) == LLBC_OK);
+        LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::set<sint64> &&>(int64Set)) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(std::move(int64Set)) == LLBC_OK);
     }
 
@@ -1186,6 +1198,7 @@ int TestCase_Core_Variant::ConstructTest_SeqType()
     {
         LLBC_Expect(ConstructTest_OneSeqType(uint64UnorderedSet) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::unordered_set<uint64> &>(uint64UnorderedSet)) == LLBC_OK);
+        LLBC_Expect(ConstructTest_OneSeqType(static_cast<const std::unordered_set<uint64> &&>(uint64UnorderedSet)) == LLBC_OK);
         LLBC_Expect(ConstructTest_OneSeqType(std::move(uint64UnorderedSet)) == LLBC_OK);
     }
 
@@ -1195,6 +1208,7 @@ int TestCase_Core_Variant::ConstructTest_SeqType()
         seq.emplace_back(i);
     LLBC_Expect(ConstructTest_OneSeqType(seq) == LLBC_OK);
     LLBC_Expect(ConstructTest_OneSeqType(static_cast<const LLBC_Variant::Seq &>(seq)) == LLBC_OK);
+    LLBC_Expect(ConstructTest_OneSeqType(static_cast<const LLBC_Variant::Seq &&>(seq)) == LLBC_OK);
     LLBC_Expect(ConstructTest_OneSeqType(std::move(seq)) == LLBC_OK);
 
     return LLBC_OK;
@@ -1205,12 +1219,17 @@ int TestCase_Core_Variant::ConstructTest_OneSeqType(_SeqTy &&seq)
 {
     typedef std::remove_cv_t<std::remove_reference_t<_SeqTy>> _PureSeqTy;
 
-    LLBC_PrintLn("Seq construct test(Seq type: %s, rvalue_ref?:%s):",
-                 LLBC_GetTypeName(seq), std::is_rvalue_reference_v<_SeqTy &&> ? "true" : "false");
+    constexpr bool isConst = std::is_const_v<std::remove_reference_t<_SeqTy>>;
+    constexpr bool isCanMove = std::is_rvalue_reference_v<_SeqTy &&> && !isConst;
+    LLBC_PrintLn("Seq construct test(Seq type:%s, rvalue_ref:%s, const:%s, canMove:%s):",
+                 LLBC_GetTypeName(seq),
+                 std::is_rvalue_reference_v<_SeqTy &&> ? "true" : "false",
+                 isConst ? "true" : "false",
+                 isCanMove ? "true" : "false");
 
     if constexpr (LLBC_IsTemplSpec<_PureSeqTy, std::pair>::value)
     {
-        if constexpr (std::is_rvalue_reference_v<_SeqTy &&>)
+        if constexpr (isCanMove)
         {
             const _PureSeqTy copySeq(seq);
             LLBC_Variant seqVar(std::forward<_SeqTy>(seq));
@@ -1234,14 +1253,14 @@ int TestCase_Core_Variant::ConstructTest_OneSeqType(_SeqTy &&seq)
         for (auto &elem : seq)
             vecSeq.push_back(elem);
 
-        if constexpr (std::is_rvalue_reference_v<_SeqTy &&>)
+        if constexpr (isCanMove)
             return ConstructTest_OneSeqType(std::move(vecSeq));
         else
             return ConstructTest_OneSeqType(vecSeq);
     }
     else
     {
-        if constexpr (std::is_rvalue_reference_v<_SeqTy &&>)
+        if constexpr (isCanMove)
         {
             const _PureSeqTy copySeq(seq);
             LLBC_Variant seqVar(std::forward<_SeqTy>(seq));
@@ -1282,6 +1301,8 @@ int TestCase_Core_Variant::ConstructTest_DictType()
         LLBC_Expect(ConstructTest_OneDictType(m) == LLBC_OK);
         // const ref:
         LLBC_Expect(ConstructTest_OneDictType(static_cast<const std::map<LLBC_String, LLBC_String> &>(m)) == LLBC_OK);
+        // const rvalue ref:
+        LLBC_Expect(ConstructTest_OneDictType(static_cast<const std::map<LLBC_String, LLBC_String> &&>(m)) == LLBC_OK);
         // rvalue ref:
         LLBC_Expect(ConstructTest_OneDictType(std::move(m)) == LLBC_OK);
     }
@@ -1297,6 +1318,8 @@ int TestCase_Core_Variant::ConstructTest_DictType()
         LLBC_Expect(ConstructTest_OneDictType(unorderedMap) == LLBC_OK);
         // const ref:
         LLBC_Expect(ConstructTest_OneDictType(static_cast<const std::unordered_map<int, LLBC_String> &>(unorderedMap)) == LLBC_OK);
+        // const rvalue ref:
+        LLBC_Expect(ConstructTest_OneDictType(static_cast<const std::unordered_map<int, LLBC_String> &&>(unorderedMap)) == LLBC_OK);
         // rvalue ref:
         LLBC_Expect(ConstructTest_OneDictType(std::move(unorderedMap)) == LLBC_OK);
     }
@@ -1305,8 +1328,13 @@ int TestCase_Core_Variant::ConstructTest_DictType()
     LLBC_Variant::Dict dict;
     for (int i = 0; i < 10; ++i)
         dict.emplace(i, i + 10);
+    // non-const ref:
     LLBC_Expect(ConstructTest_OneDictType(dict) == LLBC_OK);
+    // const ref:
     LLBC_Expect(ConstructTest_OneDictType(static_cast<const LLBC_Variant::Dict &>(dict)) == LLBC_OK);
+    // const rvalue ref:
+    LLBC_Expect(ConstructTest_OneDictType(static_cast<const LLBC_Variant::Dict &&>(dict)) == LLBC_OK);
+    // rvalue ref:
     LLBC_Expect(ConstructTest_OneDictType(std::move(dict)) == LLBC_OK);
 
     return LLBC_OK;
@@ -1315,12 +1343,17 @@ int TestCase_Core_Variant::ConstructTest_DictType()
 template <typename _DictTy>
 int TestCase_Core_Variant::ConstructTest_OneDictType(_DictTy &&dict)
 {
-    LLBC_PrintLn("Dict construct test(dict type:%s, rvalue_ref:%s)",
-                 LLBC_GetTypeName(dict), std::is_rvalue_reference_v<_DictTy &&> ? "true" : "false");
+    constexpr bool isConst = std::is_const_v<std::remove_reference_t<_DictTy>>;
+    constexpr bool isCanMove = std::is_rvalue_reference_v<_DictTy &&> && !isConst;
+    LLBC_PrintLn("Dict construct test(dict type:%s, rvalue_ref:%s, const:%s, canMove:%s)",
+                 LLBC_GetTypeName(dict),
+                 std::is_rvalue_reference_v<_DictTy &&> ? "true" : "false",
+                 isConst ? "true" : "false",
+                 isCanMove ? "true" : "false");
 
     typedef std::remove_cv_t<std::remove_reference_t<_DictTy>> _PureDictTy;
 
-    if constexpr (std::is_rvalue_reference_v<_DictTy &&>)
+    if constexpr (isCanMove)
     {
         const _PureDictTy copyDict(dict);
         LLBC_Variant dictVar(std::forward<_DictTy>(dict));
@@ -1705,12 +1738,26 @@ int TestCase_Core_Variant::AssignmentTest_StrType()
                 llbcStrVar == llbcStr,
                 "Assignment from LLBC_String");
     // Assignment from const LLBC_String.
-    LLBC_String constLLBCString("hello world");
+    const LLBC_String constLLBCString("hello world");
     LLBC_Variant constLLBCStrVar;
     constLLBCStrVar = constLLBCString;
     LLBC_Expect(constLLBCStrVar.Is<LLBC_String>() &&
                 constLLBCStrVar == constLLBCString,
                 "Assignment from const LLBC_String");
+    // Assignment from const LLBC_String &&.
+    LLBC_Variant constLLBCStrVar2;
+    constLLBCStrVar2 = std::move(constLLBCString);
+    LLBC_Expect(constLLBCStrVar2.Is<LLBC_String>() &&
+                constLLBCStrVar2 == constLLBCString,
+                "Assignment from const LLBC_String &&");
+    // Move-Assignment from LLBC_String.
+    LLBC_Variant moveLLBCStrVar;
+    const LLBC_String copyLLBCStr = llbcStr;
+    moveLLBCStrVar = std::move(llbcStr);
+    LLBC_Expect(moveLLBCStrVar.Is<LLBC_String>() &&
+                moveLLBCStrVar == copyLLBCStr &&
+                llbcStr.empty(),
+                "Move-Assignment from LLBC_String");
 
     // Assignment from std::string.
     std::string stlStr("hello world");
@@ -1720,12 +1767,26 @@ int TestCase_Core_Variant::AssignmentTest_StrType()
                 stlStrVar == stlStr,
                 "Assignment from std::string");
     // Assignment from const std::string.
-    std::string constSTLString("hello world");
+    const std::string constSTLString("hello world");
     LLBC_Variant constSTLStrVar;
     constSTLStrVar = constSTLString;
     LLBC_Expect(constSTLStrVar.Is<LLBC_String>() &&
                 constSTLStrVar == constSTLString,
                 "Assignment from const std::string");
+    // Assignment from const std::string &&.
+    LLBC_Variant constSTLStrVar2;
+    constSTLStrVar2 = std::move(constSTLString);
+    LLBC_Expect(constSTLStrVar2.Is<LLBC_String>() &&
+                constSTLStrVar2 == constSTLString,
+                "Assignment from const std::string &&");
+    // Move-Assignment from std::string.
+    LLBC_Variant moveSTLStrVar;
+    const std::string copySTLStr = stlStr;
+    moveSTLStrVar = std::move(stlStr);
+    LLBC_Expect(moveSTLStrVar.Is<LLBC_String>() &&
+                moveSTLStrVar == copySTLStr &&
+                stlStr.empty(),
+                "Move-Assignment from std::string");
 
     // Assignment from LLBC_CString.
     LLBC_CString llbcCStr("hello world");
@@ -1787,6 +1848,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
     {
         LLBC_Expect(AssignmentTest_OneSeqType(intVec) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::vector<int> &>(intVec)) == LLBC_OK);
+        LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::vector<int> &&>(intVec)) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(std::move(intVec)) == LLBC_OK);
     }
 
@@ -1796,6 +1858,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
     {
         LLBC_Expect(AssignmentTest_OneSeqType(strList) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::list<LLBC_String> &>(strList)) == LLBC_OK);
+        LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::list<LLBC_String> &&>(strList)) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(std::move(strList)) == LLBC_OK);
     }
 
@@ -1808,6 +1871,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
     {
         LLBC_Expect(AssignmentTest_OneSeqType(intQueue) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::queue<int> &>(intQueue)) == LLBC_OK);
+        LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::queue<int> &&>(intQueue)) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(std::move(intQueue)) == LLBC_OK);
     }
 
@@ -1820,6 +1884,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
     {
         LLBC_Expect(AssignmentTest_OneSeqType(strDeque) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::deque<LLBC_String> &>(strDeque)) == LLBC_OK);
+        LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::deque<LLBC_String> &&>(strDeque)) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(std::move(strDeque)) == LLBC_OK);
     }
 
@@ -1832,6 +1897,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
     {
         LLBC_Expect(AssignmentTest_OneSeqType(int64Set) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::set<sint64> &>(int64Set)) == LLBC_OK);
+        LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::set<sint64> &&>(int64Set)) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(std::move(int64Set)) == LLBC_OK);
     }
 
@@ -1844,6 +1910,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
     {
         LLBC_Expect(AssignmentTest_OneSeqType(uint64UnorderedSet) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::unordered_set<uint64> &>(uint64UnorderedSet)) == LLBC_OK);
+        LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const std::unordered_set<uint64> &&>(uint64UnorderedSet)) == LLBC_OK);
         LLBC_Expect(AssignmentTest_OneSeqType(std::move(uint64UnorderedSet)) == LLBC_OK);
     }
 
@@ -1853,6 +1920,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
         seq.emplace_back(i);
     LLBC_Expect(AssignmentTest_OneSeqType(seq) == LLBC_OK);
     LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const LLBC_Variant::Seq &>(seq)) == LLBC_OK);
+    LLBC_Expect(AssignmentTest_OneSeqType(static_cast<const LLBC_Variant::Seq &&>(seq)) == LLBC_OK);
     LLBC_Expect(AssignmentTest_OneSeqType(std::move(seq)) == LLBC_OK);
 
     // Self assignment test:
@@ -1874,12 +1942,17 @@ int TestCase_Core_Variant::AssignmentTest_OneSeqType(_SeqTy &&seq)
 {
     typedef std::remove_cv_t<std::remove_reference_t<_SeqTy>> _PureSeqTy;
 
-    LLBC_PrintLn("Seq assignment test(seq type:%s, rvalue_ref:%s)",
-                 LLBC_GetTypeName(seq), std::is_rvalue_reference_v<_SeqTy &&> ? "true" : "false");
+    constexpr bool isConst = std::is_const_v<std::remove_reference_t<_SeqTy>>;
+    constexpr bool isCanMove = std::is_rvalue_reference_v<_SeqTy &&> && !isConst;
+    LLBC_PrintLn("Seq assignment test(seq type:%s, rvalue_ref:%s, const:%s, canMove:%s)",
+                 LLBC_GetTypeName(seq),
+                 std::is_rvalue_reference_v<_SeqTy &&> ? "true" : "false",
+                 isConst ? "true" : "false",
+                 isCanMove ? "true" : "false");
 
     if constexpr (LLBC_IsTemplSpec<_PureSeqTy, std::pair>::value)
     {
-        if constexpr (std::is_rvalue_reference_v<_SeqTy &&>)
+        if constexpr (isCanMove)
         {
             const _PureSeqTy copySeq(seq);
             LLBC_Variant seqVar;
@@ -1907,14 +1980,14 @@ int TestCase_Core_Variant::AssignmentTest_OneSeqType(_SeqTy &&seq)
         for (auto &elem : seq)
             vecSeq.push_back(elem);
 
-        if constexpr (std::is_rvalue_reference_v<_SeqTy &&>)
+        if constexpr (isCanMove)
             return AssignmentTest_OneSeqType(std::move(vecSeq));
         else
             return AssignmentTest_OneSeqType(vecSeq);
     }
     else
     {
-        if constexpr (std::is_rvalue_reference_v<_SeqTy &&>)
+        if constexpr (isCanMove)
         {
             const _PureSeqTy copySeq(seq);
             LLBC_Variant seqVar;
@@ -1995,11 +2068,16 @@ int TestCase_Core_Variant::AssignmentTest_DictType()
 template <typename _DictTy>
 int TestCase_Core_Variant::AssignmentTest_OneDictType(_DictTy &&dict)
 {
-    LLBC_PrintLn("Dict assignment test(dict type:%s, rvalue_ref:%s)",
-                 LLBC_GetTypeName(dict), std::is_rvalue_reference_v<_DictTy &&> ? "true" : "false");
+    constexpr bool isConst = std::is_const_v<std::remove_reference_t<_DictTy>>;
+    constexpr bool isCanMove = std::is_rvalue_reference_v<_DictTy &&> && !isConst;
+    LLBC_PrintLn("Dict assignment test(dict type:%s, rvalue_ref:%s, const:%s, canMove:%s)",
+                 LLBC_GetTypeName(dict),
+                 std::is_rvalue_reference_v<_DictTy &&> ? "true" : "false",
+                isConst ? "true" : "false",
+                isCanMove ? "true" : "false");
 
     typedef std::remove_cv_t<std::remove_reference_t<_DictTy>> _PureDictTy;
-    if constexpr (std::is_rvalue_reference_v<_DictTy &&>)
+    if constexpr (isCanMove)
     {
         const _PureDictTy copyDict(dict);
         LLBC_Variant dictVar;
@@ -2282,13 +2360,18 @@ int TestCase_Core_Variant::AssignmentTest_OneVariantTypeOneRefType(_VarTy &&var)
 {
     // Print assignment test info.
     constexpr bool isRValueRef = std::is_rvalue_reference_v<_VarTy &&>;
+    constexpr bool isConst = std::is_const_v<std::remove_reference_t<_VarTy>>;
+    constexpr bool isCanMove = isRValueRef && !isConst;
     const LLBC_String realTyStr = LLBC_GetTypeName(_RealTy);
-    LLBC_PrintLn("%s-Assignment from variant type, realTy:%s, var:%s",
-                 isRValueRef ? "Move" : "Copy",
+    LLBC_PrintLn("%s-Assignment from variant type, realTy:%s, var:%s, rvalue_ref:%s, const:%s, canMove:%s",
+                 isCanMove ? "Move" : "Copy",
                  realTyStr.c_str(),
-                 var.ToString().c_str());
+                 var.ToString().c_str(),
+                 isRValueRef ? "true" : "false",
+                 isConst ? "true" : "false",
+                 isCanMove ? "true" : "false");
 
-    if constexpr (isRValueRef)
+    if constexpr (isCanMove)
     {
         const LLBC_Variant copyVar(var);
         LLBC_Variant moveAssignmentFromVar = std::forward<_VarTy>(var);
@@ -2489,6 +2572,65 @@ int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignmentOneNonPairType(_
     return LLBC_OK;
 }
 
+int TestCase_Core_Variant::BoolOperatorTest()
+{
+    LLBC_PrintLn("Bool operator test:");
+
+    // Nil:
+    LLBC_Variant var;
+    LLBC_Expect(!var);
+
+    // bool - true:
+    var = true;
+    LLBC_Expect(var);
+    // bool - false:
+    var = false;
+    LLBC_Expect(!var);
+
+    // SINT32:
+    var = 0;
+    LLBC_Expect(!var);
+    var = 1;
+    LLBC_Expect(var);
+
+    // UINT32:
+    var = 0u;
+    LLBC_Expect(!var);
+    var = 1u;
+    LLBC_Expect(var);
+
+    // float/double:
+    var = 0.0f;
+    LLBC_Expect(!var);
+    var = 1.0f;
+    LLBC_Expect(var);
+
+    var = 0.0;
+    LLBC_Expect(!var);
+    var = 1.0;
+    LLBC_Expect(var);
+
+    // str:
+    var = "";
+    LLBC_Expect(!var);
+    var = "Hello world";
+    LLBC_Expect(var);
+
+    // seq:
+    var = LLBC_Variant::Seq{};
+    LLBC_Expect(!var);
+    var = std::vector<int>{1, 2, 3};
+    LLBC_Expect(var);
+
+    // dict:
+    var = LLBC_Variant::Dict{};
+    LLBC_Expect(!var);
+    var = std::map<LLBC_String, LLBC_String>{{"key1", "value1"}, {"key2", "value2"}};
+    LLBC_Expect(var);
+
+    return LLBC_OK;
+}
+
 int TestCase_Core_Variant::GetTypeTest()
 {
     LLBC_Print("GetType/GetFirstType test:");
@@ -2642,8 +2784,12 @@ int TestCase_Core_Variant::IsXxxTest()
 {
     LLBC_PrintLn("IsXxx() test:");
 
-    // Nil.
+    // Is<>():
     LLBC_Variant nilVar;
+    // - Uncomment below line to test compile error.
+    // LLBC_Expect(nilVar.Is<>() && false, "Is<>() must report compile error");
+
+    // Nil.
     LLBC_Expect(nilVar.Is<void>());
 
     // Raw.
@@ -4014,6 +4160,38 @@ int TestCase_Core_Variant::DictSpecificTest()
 
     // Erase test:
     LLBC_Expect(DictSpecificTest_Erase() == LLBC_OK);
+
+    // std::unordered_map<LLBC_Variant, LLBC_Variant>:
+    std::unordered_map<LLBC_Variant, LLBC_Variant> varUnorderedMap;
+    varUnorderedMap[LLBC_Variant::nil] = "nil variant";
+    varUnorderedMap[LLBC_Variant(1)] = "int variant(1)";
+    varUnorderedMap[LLBC_Variant(2)] = "int variant(2)";
+    varUnorderedMap[LLBC_Variant(3.1415926)] = "double variant(3.1415926)";
+    varUnorderedMap[LLBC_Variant(0.618)] = "double variant(0.618)";
+    varUnorderedMap[LLBC_Variant("")] = "string variant()";
+    varUnorderedMap[LLBC_Variant("Hello World")] = "string variant(Hello World)";
+    varUnorderedMap[LLBC_Variant("hello world")] = "string variant(hello world)";
+    varUnorderedMap[LLBC_Variant(std::vector<int>{})] = "vector variant{}";
+    varUnorderedMap[LLBC_Variant(std::vector<int>{1, 2, 3})] = "vector variant{1, 2, 3}";
+    varUnorderedMap[LLBC_Variant(std::vector<int>{3, 2, 1})] = "vector variant{3, 2, 1}";
+    varUnorderedMap[LLBC_Variant(std::map<std::string, int>{})] = "map variant{}";
+    varUnorderedMap[LLBC_Variant(std::map<std::string, int>{{"key", 1}})] = "map variant{'key': 1}";
+    varUnorderedMap[LLBC_Variant(std::map<int, std::string>{{1, "key"}})] = "map variant{1: 'key'}";
+    LLBC_Expect(varUnorderedMap.size() == 14 &&
+                varUnorderedMap[LLBC_Variant::nil] == "nil variant" &&
+                varUnorderedMap[LLBC_Variant(1)] == "int variant(1)" &&
+                varUnorderedMap[LLBC_Variant(2)] == "int variant(2)" &&
+                varUnorderedMap[LLBC_Variant(3.1415926)] == "double variant(3.1415926)" &&
+                varUnorderedMap[LLBC_Variant(0.618)] == "double variant(0.618)" &&
+                varUnorderedMap[LLBC_Variant("")] == "string variant()" &&
+                varUnorderedMap[LLBC_Variant("Hello World")] == "string variant(Hello World)" &&
+                varUnorderedMap[LLBC_Variant("hello world")] == "string variant(hello world)" &&
+                varUnorderedMap[LLBC_Variant(std::vector<int>{})] == "vector variant{}" &&
+                varUnorderedMap[LLBC_Variant(std::vector<int>{1, 2, 3})] == "vector variant{1, 2, 3}" &&
+                varUnorderedMap[LLBC_Variant(std::vector<int>{3, 2, 1})] == "vector variant{3, 2, 1}" &&
+                varUnorderedMap[LLBC_Variant(std::map<std::string, int>{})] == "map variant{}" &&
+                varUnorderedMap[LLBC_Variant(std::map<std::string, int>{{"key", 1}})] == "map variant{'key': 1}" &&
+                varUnorderedMap[LLBC_Variant(std::map<int, std::string>{{1, "key"}})] == "map variant{1: 'key'}");
 
     return LLBC_OK;
 }

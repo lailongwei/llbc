@@ -96,6 +96,9 @@ private:
     int AssignmentTest_EfficientSeqAssignmentOneNonPairType(_NonPairTy &&nonPairVal);
 
 public:
+    int BoolOperatorTest();
+
+public:
     int GetTypeTest();
 
     template <typename... _RawTys>
