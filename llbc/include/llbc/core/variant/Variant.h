@@ -506,7 +506,9 @@ public:
                         (std::is_pointer_v<_Ty> &&
                          std::is_same_v<std::remove_cv_t<std::remove_pointer_t<_Ty>>, char>),
                      _Ty>
-    As(size_t *strLen = nullptr) const; // Lifetime: The returned ptr is valid only while the source variant is not mutated.
+    As(size_t *strLen = nullptr) const; // Lifetime:
+                                        // - The returned ptr is valid only while the source variant 
+                                        //   is not mutated and any other LLBC_Variant called this method.
 
     template <typename _Ty>
     std::enable_if_t<std::is_same_v<std::remove_cv_t<std::remove_reference_t<_Ty>>, LLBC_Variant::Seq>,
