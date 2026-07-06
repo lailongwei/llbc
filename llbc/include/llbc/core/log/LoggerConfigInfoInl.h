@@ -178,4 +178,9 @@ inline bool LLBC_LoggerConfigInfo::IsLazyCreateLogFile() const
     return _lazyCreateLogFile;
 }
 
+inline const std::vector<LLBC_LogControlItem> &LLBC_LoggerConfigInfo::GetLogControls() const
+{
+    return _logControls;
+}
+
 __LLBC_NS_END
