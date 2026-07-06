@@ -39,7 +39,7 @@ __LLBC_NS_BEGIN
 /**
  * The log appender type class encapsulation.
  */
-class LLBC_LogAppenderType
+class LLBC_EXPORT LLBC_LogAppenderType
 {
 public:
     /**
@@ -61,6 +61,25 @@ public:
      * @return bool - reutrn true if valid, otherwise return false.
      */
     static constexpr bool IsValid(int appenderType) { return appenderType >= Begin && appenderType < End; }
+
+    /**
+     * Get specific appender type string representation.
+     * @param[in] appenderType - the appender type.
+     * @return const LLBC_CString & - the type string representation, lower-case
+     *                                ("console"/"file"/"network"); returns
+     *                                "unknown" when appenderType is invalid.
+     */
+    static const LLBC_CString &GetTypeStr(int appenderType);
+
+    /**
+     * Get specific appender type enum by type string representation.
+     * Comparison is case-insensitive; surrounding whitespace is NOT stripped
+     * (callers should pre-trim if needed).
+     * @param[in] typeStr - the type string representation.
+     * @return int - the appender type enum, returns LLBC_LogAppenderType::End
+     *               when typeStr is empty or unknown.
+     */
+    static int GetTypeEnum(const LLBC_CString &typeStr);
 };
 
 /**

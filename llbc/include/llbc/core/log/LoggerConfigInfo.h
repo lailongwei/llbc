@@ -23,6 +23,7 @@
 
 #include "llbc/common/Common.h"
 #include "llbc/core/log/LogTrace.h"
+#include "llbc/core/log/LogControl.h"
 
 __LLBC_NS_BEGIN
 
@@ -261,6 +262,47 @@ public:
      */
     bool IsLazyCreateLogFile() const;
 
+public:
+    /**
+     * Get parsed log control items.
+     * Parsed from cfg key `logControls`, which the LoggerConfigurator layer
+     * hands over in a domain-neutral CIR (Config Intermediate Representation)
+     * shape regardless of the source format (XML today; YAML/JSON later).
+     *
+     * CIR schema for `logControls` (plain map/seq/scalar Variant tree; no
+     * XML metadata such as [Name]/[Attrs]/[Children] is involved):
+     *
+     *   logControls: Dict { "item": Dict | Seq<Dict> }   // XML container
+     *              | Seq<Dict>                           // loader-native
+     *              | Dict { ... }                        // single-item shortcut
+     *
+     * Each item is a Dict:
+     *   Dict {
+     *     "match": Dict {                          // optional; empty == no rule
+     *       "file": Dict { "name": Str,
+     *                      "lines"?: Str },        // "N" | "N-M" | "N,M-K,..."
+     *       "func":     Str | Seq<Str>,            // OR-combined
+     *       "threadId": Str | Seq<Str>,            // OR-combined
+     *       "level":    Str | Seq<Str>             // OR; name or decimal
+     *     },
+     *     "appenders": Dict { "appender": Str | Seq<Str> }
+     *                  | Str | Seq<Str>,           // optional; empty == all
+     *     "action":    Dict {
+     *       "type":     Str,                       // "mute" | "setLevel"
+     *       "newLevel"?: Str                       // required iff type=setLevel
+     *     }
+     *   }
+     *
+     * Within one item, enabled rules are AND-combined; each rule's value-set
+     * (file.lineRanges / func.values / threadId.values / level.values) is
+     * OR-combined. Declaration order is preserved across items.
+     *
+     * XML source binding is documented separately (see doc/log_control.md);
+     * this module is not aware of any XML tag/attribute name.
+     * @return const std::vector<LLBC_LogControlItem> & - the parsed items.
+     */
+    const std::vector<LLBC_LogControlItem> &GetLogControls() const;
+
 private:
     /**
      * Normalize the log file name.
@@ -276,6 +318,23 @@ private:
      * @return sint64 - the normalized size str.
      */
     sint64 NormalizeSizeStr(const LLBC_String &sizeStr, sint64 defaultSize, sint64 low, sint64 high);
+
+    /**
+     * Parse the CIR node for `logControls` (see schema in GetLogControls()
+     * doc above) into LLBC_LogControlItem list. Malformed input is ignored
+     * silently (consistent with other log cfg keys -- keep bootstrap robust).
+     * Per-item failures are also skipped silently; only well-formed items
+     * with at least one match rule, a known action and (when action==SetLevel)
+     * a valid newLevel are appended to `out`. Declaration order is preserved.
+     *
+     * `cfg` is a Seq<Dict> per the CIR schema. If `cfg` is not a Seq (i.e.
+     * the key was absent or the loader emitted a non-list shape), this is a
+     * silent no-op.
+     * @param[in]  cfg - the CIR node of `logControls`.
+     * @param[out] out - the parsed control items, appended.
+     */
+    static void ParseLogControls(const LLBC_Variant &cfg,
+                                 std::vector<LLBC_LogControlItem> &out);
 
 private:
     LLBC_String _loggerName;
@@ -313,6 +372,8 @@ private:
     bool _lazyCreateLogFile;
     LLBC_LogTraces _requireColorLogTraces;
     bool _takeOver;
+
+    std::vector<LLBC_LogControlItem> _logControls;
 };
 
 __LLBC_NS_END

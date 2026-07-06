@@ -31,6 +31,8 @@
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogData.h"
 #include "llbc/core/log/LogTrace.h"
+#include "llbc/core/log/LogControl.h"
+#include "llbc/core/log/LogControlMgr.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 #include "llbc/core/log/LogTimeAccessor.h"
 #include "llbc/core/log/BaseLogAppender.h"
@@ -52,6 +54,8 @@ LLBC_Logger::LLBC_Logger()
 , _logTraceMgr(new LLBC_LogTraceMgr(LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[0],
                                     LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[1],
                						LLBC_CFG_CORE_LOG_TRACE_SEPARATORS[2]))
+
+, _logControlMgr(new LLBC_LogControlMgr)
 
 , _logRunnable(nullptr)
 
@@ -100,6 +104,10 @@ int LLBC_Logger::Initialize(const LLBC_LoggerConfigInfo *config, LLBC_LogRunnabl
     _logLevel = config->GetLogLevel();
     _config = new LLBC_LoggerConfigInfo(*config);
     _logTraceMgr->UpdateColorLogTraces(_config->GetRequireColorLogTraces());
+
+    // Apply log output control items parsed from config.
+    if (_logControlMgr->SetControls(_config->GetLogControls()) != LLBC_OK)
+        return LLBC_FAILED;
 
     _logTimeAccessor = &_config->GetLogTimeAccessor();
 
@@ -441,6 +449,50 @@ void LLBC_Logger::ClearAllLogTraces()
     _lock.Unlock();
 }
 
+int LLBC_Logger::SetLogControls(const std::vector<LLBC_LogControlItem> &items)
+{
+    if (UNLIKELY(!_logControlMgr))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_INIT);
+        return LLBC_FAILED;
+    }
+
+    return _logControlMgr->SetControls(items);
+}
+
+size_t LLBC_Logger::GetLogControlCount() const
+{
+    if (UNLIKELY(!_logControlMgr))
+        return 0;
+
+    return _logControlMgr->GetControlCount();
+}
+
+void LLBC_Logger::GetLogControls(std::vector<LLBC_LogControlItem> &out) const
+{
+    out.clear();
+    if (UNLIKELY(!_logControlMgr))
+        return;
+
+    _logControlMgr->GetControls(out);
+}
+
+uint64 LLBC_Logger::GetLogControlSuppressedCount() const
+{
+    if (UNLIKELY(!_logControlMgr))
+        return 0;
+
+    return _logControlMgr->GetSuppressedCount();
+}
+
+void LLBC_Logger::ResetLogControlSuppressedCount()
+{
+    if (UNLIKELY(!_logControlMgr))
+        return;
+
+    _logControlMgr->ResetSuppressedCount();
+}
+
 int LLBC_Logger::VOutput(int level,
                          const char *tag,
                          const char *file,
@@ -727,14 +779,43 @@ void LLBC_Logger::AddAppender(LLBC_BaseLogAppender *appender)
     tmpAppender->SetAppenderNext(appender);
 }
 
-int LLBC_Logger::OutputLogData(const LLBC_LogData &data)
+int LLBC_Logger::OutputLogData(LLBC_LogData &data)
 {
     LLBC_BaseLogAppender *appender = _appenders;
     if (!appender)
         return LLBC_OK;
 
+    // Fast-path: skip Apply() entirely when no control item is installed
+    // (common in production, keeps the hot path branch-light).
+    const bool hasControl = _logControlMgr && !_logControlMgr->IsEmpty();
+
+    // Apply() may temporarily rewrite `data.level` per appender (SetLevel);
+    // Defer restores it on every return path so the caller observes no net
+    // change. The read-modify-restore window is closed within a single thread
+    // (sync mode holds `_lock`; async mode runs on the LogRunnable thread),
+    // so the transient value is not observable elsewhere.
+    const int originalLevel = data.level;
+    LLBC_Defer(data.level = originalLevel);
+
     while (appender)
     {
+        int outputLevel = originalLevel;
+
+        if (hasControl)
+        {
+            const auto r = _logControlMgr->Apply(appender->GetType(),
+                                                 data,
+                                                 originalLevel);
+            if (r.muted)
+            {
+                appender = appender->GetAppenderNext();
+                continue;
+            }
+
+            outputLevel = r.effectiveLevel;
+        }
+
+        data.level = outputLevel;
         if (appender->Output(data) != LLBC_OK)
             return LLBC_FAILED;
 
@@ -806,6 +887,7 @@ void LLBC_Logger::ClearNonRunnableMembers(bool keepErrNo)
     _lastFlushTime = 0;
 
     LLBC_XDelete(_logTraceMgr);
+    LLBC_XDelete(_logControlMgr);
 
     _logTimeAccessor = nullptr;
 
