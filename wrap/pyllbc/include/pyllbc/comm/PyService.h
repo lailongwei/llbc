@@ -95,10 +95,10 @@ public:
 public:
     /**
      * Startup the service as client.
-     * @param[in] pollerCount - the poller count.
+     * @param[in] startArgs - the service start arguments.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int Start(int pollerCount = 1);
+    int Start(const LLBC_ServiceStartArgs &startArgs = LLBC_ServiceStartArgs::dft);
 
     /**
      * Check service start or not.

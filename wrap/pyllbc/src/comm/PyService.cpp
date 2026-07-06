@@ -166,7 +166,7 @@ int pyllbc_Service::SuppressCoderNotFoundWarning()
     return LLBC_OK;
 }
 
-int pyllbc_Service::Start(int pollerCount)
+int pyllbc_Service::Start(const LLBC_ServiceStartArgs &startArgs)
 {
     if (_started)
     {
@@ -179,8 +179,6 @@ int pyllbc_Service::Start(int pollerCount)
     _errHooker->Install();
 
     _started = true;
-    LLBC_ServiceStartArgs startArgs;
-    startArgs.pollerCount = pollerCount;
     if (_llbcSvc->Start(startArgs) != LLBC_OK)
     {
         _started = false;

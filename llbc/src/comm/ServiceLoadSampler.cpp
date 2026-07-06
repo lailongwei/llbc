@@ -32,15 +32,21 @@ LLBC_ServiceRecentLoadInfo::LLBC_ServiceRecentLoadInfo()
 {
 }
 
+void LLBC_ServiceRecentLoadInfo::Reset()
+{
+    recentTime = LLBC_TimeSpan::zero;
+    workingTime = LLBC_TimeSpan::zero;
+    updateTimes = 0;
+    overloadTimes = 0;
+}
+
 LLBC_String LLBC_ServiceRecentLoadInfo::ToString() const
 {
-    LLBC_String repr;
-    repr.append_format("recentTime:%s, ", recentTime.ToString().c_str())
-        .append_format("workingTime:%s, ", workingTime.ToString().c_str())
-        .append_format("updateTimes:%zu, ", updateTimes)
-        .append_format("overloadTimes:%zu", overloadTimes);
-
-    return repr;
+    return LLBC_String().format(
+        "ServiceRecentLoadInfo[recentTime:%s, workingTime:%s, "
+        "updateTimes:%zu, overloadTimes:%zu]",
+        recentTime.ToString().c_str(), workingTime.ToString().c_str(),
+        updateTimes, overloadTimes);
 }
 
 __LLBC_ServiceLoadSampler::__LLBC_ServiceLoadSampler()
@@ -70,17 +76,17 @@ void __LLBC_ServiceLoadSampler::Init(const LLBC_TimeSpan &loadSampleTime)
 
 void __LLBC_ServiceLoadSampler::Clear()
 {
+    LLBC_LockGuard guard(_loadSampleLock);
     if (IsEnabled())
-    {
-        LLBC_LockGuard guard(_loadSampleLock);
         _loadSampleRing.Clear();
-    }
 }
 
 void __LLBC_ServiceLoadSampler::Collect(sint64 begMillis,
                                         sint64 endMillis,
                                         sint64 frameInterval)
 {
+    LLBC_LockGuard guard(_loadSampleLock);
+    
     if (UNLIKELY(!IsEnabled()))
         return;
 
@@ -89,9 +95,7 @@ void __LLBC_ServiceLoadSampler::Collect(sint64 begMillis,
         workingTime = 0;
 
     const bool overloaded = (frameInterval > 0 && workingTime >= frameInterval);
-    const sint64 sampleIntervalMillis = LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL * 1000;
-
-    LLBC_LockGuard guard(_loadSampleLock);
+    constexpr sint64 sampleIntervalMillis = LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL * 1000;
 
     // Lazy-init current sample on first call after start.
     if (UNLIKELY(_loadSampleRing.IsEmpty()))
@@ -162,11 +166,10 @@ void __LLBC_ServiceLoadSampler::Collect(sint64 begMillis,
 int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime,
                                                  LLBC_ServiceRecentLoadInfo &loadInfo) const
 {
+    LLBC_LockGuard guard(_loadSampleLock);
+
     // Reset output.
-    loadInfo.recentTime = LLBC_TimeSpan::zero;
-    loadInfo.workingTime = LLBC_TimeSpan::zero;
-    loadInfo.updateTimes = 0;
-    loadInfo.overloadTimes = 0;
+    loadInfo.Reset();
 
     if (UNLIKELY(!IsEnabled()))
     {
@@ -182,40 +185,15 @@ int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime
 
     const sint64 wantedMillis = recentTime.GetTotalMillis();
 
-    // Prepare snapshot buffer: use stack buffer if small enough, otherwise heap buffer.
-    const size_t maxSamples = _loadSampleRing.GetCapacity();
-    _ServiceLoadSample stackBuf[64];
-    _ServiceLoadSample *snapshot = stackBuf;
-    if (maxSamples > sizeof(stackBuf) / sizeof(stackBuf[0]))
-        snapshot = static_cast<_ServiceLoadSample *>(malloc(sizeof(_ServiceLoadSample) * maxSamples));
-    LLBC_Defer(LLBC_DoIf(snapshot != stackBuf, free(snapshot)));
-
-    // Snapshot ring buffer under lock.
-    size_t snapshotCnt = 0;
-    {
-        LLBC_LockGuard guard(_loadSampleLock);
-
-        // Drain into snapshot then push back.
-        const size_t cnt = _loadSampleRing.GetSize();
-        for (size_t i = 0; i < cnt; ++i)
-            snapshot[i] = _loadSampleRing.Pop();
-        for (size_t i = 0; i < cnt; ++i)
-            _loadSampleRing.Push(snapshot[i]);
-
-        snapshotCnt = cnt;
-    }
-
-    if (snapshotCnt == 0)
-        return LLBC_OK;
-
     // Walk from newest to oldest, accumulate until covered time >= wantedMillis.
     sint64 accMillis = 0;
     sint64 accWorking = 0;
     size_t accUpdateTimes = 0;
     size_t accOverloadTimes = 0;
-    for (size_t i = snapshotCnt; i > 0; --i)
+    const size_t sampleCnt = _loadSampleRing.GetSize();
+    for (size_t i = sampleCnt; i > 0; --i)
     {
-        const _ServiceLoadSample &s = snapshot[i - 1];
+        const _ServiceLoadSample &s = _loadSampleRing.GetElem(i - 1);
         const sint64 sampleSpan = s.lastStatTimeInMillis - s.beginStatTimeInMillis;
         accMillis += sampleSpan > 0 ? sampleSpan : 0;
         accWorking += s.workingTime;

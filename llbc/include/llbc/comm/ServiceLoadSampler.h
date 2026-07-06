@@ -39,6 +39,11 @@ struct LLBC_EXPORT LLBC_ServiceRecentLoadInfo
     LLBC_ServiceRecentLoadInfo();
 
     /**
+     * Reset all fields to default state.
+     */
+    void Reset();
+
+    /**
      * Get this class object string representation.
      * @return LLBC_String - the string representation.
      */

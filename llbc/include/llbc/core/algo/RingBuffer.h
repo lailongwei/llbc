@@ -84,6 +84,32 @@ public:
     const T &Tail() const;
 
     /**
+     * Get element by index.
+     * @param[in] index - the element index.
+     * @return T & - the element reference.
+     */
+    T &GetElem(size_t index);
+    /**
+     * Get element by index.
+     * @param[in] index - the element index.
+     * @return const T & - the element const reference.
+     */
+    const T &GetElem(size_t index) const;
+
+    /**
+     * Get element by index.
+     * @param[in] index - the element index.
+     * @return T & - the element reference.
+     */
+    T &operator[](size_t index);
+    /**
+     * Get element by index.
+     * @param[in] index - the element index.
+     * @return const T & - the element const reference.
+     */
+    const T &operator[](size_t index) const;
+
+    /**
      * Get ring buffer size(used capacity).
      * @return size_t - the buffer size.
      */

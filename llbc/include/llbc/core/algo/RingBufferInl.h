@@ -110,6 +110,37 @@ LLBC_FORCE_INLINE const T &LLBC_RingBuffer<T>::Tail() const
 }
 
 template <typename T>
+LLBC_FORCE_INLINE T &LLBC_RingBuffer<T>::GetElem(size_t index)
+{
+#if LLBC_DEBUG
+    llbc_assert(index < GetSize() && "LLBC_RingBuffer::GetElem() index out of range!");
+#endif
+
+    size_t pos = _front + index;
+    if (pos >= _capacity)
+        pos -= _capacity;
+    return _elems[pos];
+}
+
+template <typename T>
+LLBC_FORCE_INLINE const T &LLBC_RingBuffer<T>::GetElem(size_t index) const
+{
+    return const_cast<LLBC_RingBuffer *>(this)->GetElem(index);
+}
+
+template <typename T>
+LLBC_FORCE_INLINE T &LLBC_RingBuffer<T>::operator[](size_t index)
+{
+    return GetElem(index);
+}
+
+template <typename T>
+LLBC_FORCE_INLINE const T &LLBC_RingBuffer<T>::operator[](size_t index) const
+{
+    return const_cast<LLBC_RingBuffer *>(this)->GetElem(index);
+}
+
+template <typename T>
 LLBC_FORCE_INLINE size_t LLBC_RingBuffer<T>::GetSize() const
 {
     if (_tail > _front)
