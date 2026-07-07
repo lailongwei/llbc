@@ -367,31 +367,31 @@ int TestCase_Comm_RecentLoadInfo::Test_SlidingWindow()
     LLBC_Sleep(waitSec * 1000);
 
     // Query 1: minimal recentTime, expect only the newest sample.
-    LLBC_ServiceRecentLoadInfo small;
-    if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromMillis(1), small) != LLBC_OK)
+    LLBC_ServiceRecentLoadInfo smallWnd;
+    if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromMillis(1), smallWnd) != LLBC_OK)
     {
         LLBC_PrintLn("Small query failed: %s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
-    DumpLoadInfo("SmallWindow", small);
+    DumpLoadInfo("SmallWindow", smallWnd);
 
     // Query 2: recentTime > ring capacity, expect scanning the whole ring.
     const sint64 ringCapMs =
         static_cast<sint64>(sampleCount) * kSampleIntervalMillis;
-    LLBC_ServiceRecentLoadInfo big;
-    if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromMillis(ringCapMs * 2), big) != LLBC_OK)
+    LLBC_ServiceRecentLoadInfo bigWnd;
+    if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromMillis(ringCapMs * 2), bigWnd) != LLBC_OK)
     {
         LLBC_PrintLn("Big query failed: %s", LLBC_FormatLastError());
         return LLBC_FAILED;
     }
-    DumpLoadInfo("BigWindow", big);
+    DumpLoadInfo("BigWindow", bigWnd);
 
-    if (big.recentTime <= small.recentTime)
+    if (bigWnd.recentTime <= smallWnd.recentTime)
     {
         LLBC_PrintLn("Expect big.recentTime > small.recentTime.");
         return LLBC_FAILED;
     }
-    if (big.updateTimes <= small.updateTimes)
+    if (bigWnd.updateTimes <= smallWnd.updateTimes)
     {
         LLBC_PrintLn("Expect big.updateTimes > small.updateTimes.");
         return LLBC_FAILED;
