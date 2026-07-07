@@ -205,10 +205,10 @@ int LLBC_ServiceImpl::SuppressCoderNotFoundWarning()
     return LLBC_OK;
 }
 
-int LLBC_ServiceImpl::Start(int pollerCount)
+int LLBC_ServiceImpl::Start(const LLBC_ServiceStartArgs &startArgs)
 {
     // Normalize pollerCount.
-    _pollerCount = MAX(1, pollerCount);
+    _pollerCount = MAX(1, startArgs.pollerCount);
 
     // Reentry check.
     _lock.Lock();
@@ -228,6 +228,9 @@ int LLBC_ServiceImpl::Start(int pollerCount)
         LLBC_SetLastError(LLBC_ERROR_REPEAT);
         return LLBC_FAILED;
     }
+
+    // Init load sample collect.
+    _loadSampler.Init(startArgs.loadSampleTime);
 
     // Defer reset _startErrNo/_startSubErrNo.
     LLBC_Defer(
@@ -1038,6 +1041,13 @@ void LLBC_ServiceImpl::OnSvc(bool fullFrame)
     if (fullFrame)
         ProcessIdle();
 
+    // Collect load sample
+    if (fullFrame && _loadSampler.IsEnabled())
+    {
+        const sint64 svcEndTime = LLBC_GetMilliseconds();
+        _loadSampler.Collect(_begSvcTime, svcEndTime, frameInterval);
+    }
+
     // Sleep FrameInterval - ElapsedTime milli-seconds, if need.
     if (fullFrame)
     {
@@ -1524,6 +1534,9 @@ void LLBC_ServiceImpl::PostStop()
     _svcThreadId = LLBC_INVALID_NATIVE_THREAD_ID;
     // Reset _pollerCount.
     _pollerCount = 0;
+
+    // Clear load sample collect.
+    _loadSampler.Clear();
 }
 
 LLBC_FORCE_INLINE void LLBC_ServiceImpl::HandlePosts()
@@ -2252,6 +2265,12 @@ void LLBC_ServiceImpl::ProcessIdle()
         if (comp->_runningPhase == _CompRunningPhase::LateStarted)
             comp->OnIdle(LLBC_TimeSpan::FromMillis(frameInterval - elapsed));
     }
+}
+
+int LLBC_ServiceImpl::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime,
+                                        LLBC_ServiceRecentLoadInfo &loadInfo) const
+{
+    return _loadSampler.GetRecentLoadInfo(recentTime, loadInfo);
 }
 
 LLBC_FORCE_INLINE int LLBC_ServiceImpl::LockableSend(LLBC_Packet *packet,

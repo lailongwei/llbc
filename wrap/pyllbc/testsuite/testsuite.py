@@ -32,6 +32,7 @@ def main():
     # MultiSvcTest()()
     # MulticastTest()()
     # EventTest()()
+    # SvcLoadSampleTest()()
 
 
 if __name__ == '__main__':

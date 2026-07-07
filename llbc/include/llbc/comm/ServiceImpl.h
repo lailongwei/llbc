@@ -110,10 +110,10 @@ public:
 public:
     /**
      * Startup service, default will startup one poller to work.
-     * @param[in] pollerCount - the poller count.
+     * @param[in] startArgs - the service start arguments, see LLBC_ServiceStartArgs.
      * @return int - return 0 if startup successful, otherwise return -1.
      */
-    int Start(int pollerCount = 1) override;
+    int Start(const LLBC_ServiceStartArgs &startArgs = LLBC_ServiceStartArgs::dft) override;
 
     /**
      * Check service is started or not.
@@ -153,6 +153,15 @@ public:
      */
     LLBC_ThreadId GetServiceThreadId() const override;
     
+    /**
+     * Get recent load info.
+     * @param[in]  recentTime - the user expect recent time, must be greater than zero.
+     * @param[out] loadInfo   - the output recent load info.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int GetRecentLoadInfo(const LLBC_TimeSpan &recentTime,
+                          LLBC_ServiceRecentLoadInfo &loadInfo) const override;
+
 public:
     /**
      * Create a session and listening.
@@ -686,6 +695,9 @@ private:
     LLBC_EventMgr _evManager; // EventManager.
     static LLBC_ListenerStub _evManagerMaxListenerStub; // Max event listener stub.
     std::queue<std::pair<int, const LLBC_Variant &> > _compEvents; // Component events.
+
+    // - Load sample support members.
+    __LLBC_ServiceLoadSampler _loadSampler; // Service load sampler.
 };
 
 __LLBC_NS_END

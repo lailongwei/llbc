@@ -166,7 +166,7 @@ int pyllbc_Service::SuppressCoderNotFoundWarning()
     return LLBC_OK;
 }
 
-int pyllbc_Service::Start(int pollerCount)
+int pyllbc_Service::Start(const LLBC_ServiceStartArgs &startArgs)
 {
     if (_started)
     {
@@ -179,7 +179,7 @@ int pyllbc_Service::Start(int pollerCount)
     _errHooker->Install();
 
     _started = true;
-    if (_llbcSvc->Start(pollerCount) != LLBC_OK)
+    if (_llbcSvc->Start(startArgs) != LLBC_OK)
     {
         _started = false;
 
@@ -203,6 +203,11 @@ int pyllbc_Service::Start(int pollerCount)
 bool pyllbc_Service::IsStarted() const
 {
     return _started;
+}
+
+int pyllbc_Service::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime, LLBC_ServiceRecentLoadInfo &loadInfo) const
+{
+    return _llbcSvc->GetRecentLoadInfo(recentTime, loadInfo);
 }
 
 void pyllbc_Service::Stop()

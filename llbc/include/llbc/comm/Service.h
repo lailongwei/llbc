@@ -24,6 +24,7 @@
 #include "llbc/comm/SessionOpts.h"
 #include "llbc/comm/Coder.h"
 #include "llbc/comm/Component.h"
+#include "llbc/comm/ServiceLoadSampler.h"
 
 __LLBC_NS_BEGIN
  /**
@@ -136,6 +137,24 @@ public:
 };
 
 /**
+ * \brief The service start arguments structure.
+ */
+struct LLBC_ServiceStartArgs
+{
+    // Poller count.
+    int pollerCount;
+
+    // Recent load sample time.
+    LLBC_TimeSpan loadSampleTime;
+
+    // Default constructor.
+    constexpr LLBC_ServiceStartArgs();
+
+    // Default start arguments.
+    static const LLBC_ServiceStartArgs dft;
+};
+
+/**
  * \brief The service interface class define.
  */
 class LLBC_EXPORT LLBC_Service : protected LLBC_Task
@@ -214,10 +233,10 @@ public:
 public:
     /**
      * Startup service, default will startup one poller to work.
-     * @param[in] pollerCount - the poller count.
+     * @param[in] startArgs - the service start arguments, see LLBC_ServiceStartArgs.
      * @return int - return 0 if startup successful, otherwise return -1.
      */
-    virtual int Start(int pollerCount = 1) = 0;
+    virtual int Start(const LLBC_ServiceStartArgs &startArgs = LLBC_ServiceStartArgs::dft) = 0;
 
     /**
      * Check service is started or not.
@@ -256,6 +275,15 @@ public:
     * @return LLBC_ThreadId - the service thread id.
     */
     virtual LLBC_ThreadId GetServiceThreadId() const = 0;
+
+    /**
+     * Get recent load info.
+     * @param[in]  recentTime - the user expect recent time, must be greater than zero.
+     * @param[out] loadInfo   - the output recent load info.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    virtual int GetRecentLoadInfo(const LLBC_TimeSpan &recentTime,
+                                  LLBC_ServiceRecentLoadInfo &loadInfo) const = 0;
 
 public:
     /**

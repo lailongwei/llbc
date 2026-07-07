@@ -59,6 +59,14 @@ constexpr bool LLBC_ServiceDriveMode::IsValid(int driveMode)
     return driveMode >= Begin && driveMode < End;
 }
 
+constexpr LLBC_ServiceStartArgs::LLBC_ServiceStartArgs()
+: pollerCount(1)
+, loadSampleTime(LLBC_TimeSpan::FromSeconds(LLBC_CFG_COMM_DFT_SERVICE_LOAD_SAMPLE_TIME))
+{
+}
+
+inline constexpr LLBC_ServiceStartArgs LLBC_ServiceStartArgs::dft{};
+
 template <typename Comp>
 typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, int>::type
 LLBC_Service::AddComponent()
