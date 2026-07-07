@@ -292,6 +292,12 @@
 #define LLBC_CFG_COMM_MIN_SERVICE_FPS                       1
 // Max service FPS value.
 #define LLBC_CFG_COMM_MAX_SERVICE_FPS                       1000
+// Service load sample interval, in seconds.
+#define LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL          6
+// Default service load sample time, in seconds.
+#define LLBC_CFG_COMM_DFT_SERVICE_LOAD_SAMPLE_TIME          0
+// Max service load sample time, in seconds.
+#define LLBC_CFG_COMM_MAX_SERVICE_LOAD_SAMPLE_TIME          3600
 // Per thread drive max services count.
 #define LLBC_CFG_COMM_PER_THREAD_DRIVE_MAX_SVC_COUNT        16
 // Determine enable the service has status handler support or not.

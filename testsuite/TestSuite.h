@@ -93,6 +93,7 @@
 #include "comm/TestCase_Comm_MessageBuffer.h"
 #include "comm/TestCase_Comm_DynLoadComp.h"
 #include "comm/TestCase_Comm_Echo.h"
+#include "comm/TestCase_Comm_RecentLoadInfo.h"
 
 #include "app/TestCase_App_AppTest.h"
 #include "app/TestCase_App_AppCfgTest.h"

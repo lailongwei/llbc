@@ -95,9 +95,13 @@ LLBC_EXTERN_C PyObject *_pyllbc_StartService(PyObject *self, PyObject *args)
 {
     pyllbc_Service *svc;
     int pollerCount = 0;
-    PYLLBC_ParseCObjBeginArgs(svc, "|i", &pollerCount);
+    int loadSampleTimeSec = 0;
+    PYLLBC_ParseCObjBeginArgs(svc, "|ii", &pollerCount, &loadSampleTimeSec);
 
-    if (svc->Start(pollerCount) != LLBC_OK)
+    LLBC_ServiceStartArgs startArgs;
+    startArgs.pollerCount = pollerCount;
+    startArgs.loadSampleTime = LLBC_TimeSpan::FromSeconds(loadSampleTimeSec);
+    if (svc->Start(startArgs) != LLBC_OK)
         return nullptr;
 
     if (PyErr_Occurred())
@@ -107,6 +111,39 @@ LLBC_EXTERN_C PyObject *_pyllbc_StartService(PyObject *self, PyObject *args)
     }
 
     Py_RETURN_NONE;
+}
+
+LLBC_EXTERN_C PyObject *_pyllbc_GetRecentLoadInfo(PyObject *self, PyObject *args)
+{
+    pyllbc_Service *svc;
+    int recentTimeSec;
+    PYLLBC_ParseCObjBeginArgs(svc, "i", &recentTimeSec);
+
+    LLBC_ServiceRecentLoadInfo loadInfo;
+    if (svc->GetRecentLoadInfo(LLBC_TimeSpan::FromSeconds(recentTimeSec), loadInfo) != LLBC_OK)
+        Py_RETURN_NONE;
+
+    PyObject *dict = PyDict_New();
+    if (!dict)
+        return nullptr;
+
+    PyObject *recentTime = PyLong_FromLongLong(loadInfo.recentTime.GetTotalMillis());
+    PyDict_SetItemString(dict, "recent_time", recentTime);
+    Py_DECREF(recentTime);
+
+    PyObject *workingTime = PyLong_FromLongLong(loadInfo.workingTime.GetTotalMillis());
+    PyDict_SetItemString(dict, "working_time", workingTime);
+    Py_DECREF(workingTime);
+
+    PyObject *updateTimes = PyLong_FromUnsignedLongLong(static_cast<unsigned PY_LONG_LONG>(loadInfo.updateTimes));
+    PyDict_SetItemString(dict, "update_times", updateTimes);
+    Py_DECREF(updateTimes);
+
+    PyObject *overloadTimes = PyLong_FromUnsignedLongLong(static_cast<unsigned PY_LONG_LONG>(loadInfo.overloadTimes));
+    PyDict_SetItemString(dict, "overload_times", overloadTimes);
+    Py_DECREF(overloadTimes);
+
+    return dict;
 }
 
 LLBC_EXTERN_C PyObject *_pyllbc_StopService(PyObject *self, PyObject *args)

@@ -180,7 +180,9 @@ int TestCase_Comm_Svc::Run(int argc, char *argv[])
     svc->AddComponent(comp);
     svc->Subscribe(OPCODE, comp, &TestComp::OnDataArrival);
     svc->SuppressCoderNotFoundWarning();
-    svc->Start(8);
+    LLBC_ServiceStartArgs startArgs;
+    startArgs.pollerCount = 8;
+    svc->Start(startArgs);
 
     // Connect to server / Create listen session to wait client connect.
     LLBC_SessionOpts sessionOpts;
