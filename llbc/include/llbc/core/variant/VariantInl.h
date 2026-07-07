@@ -742,7 +742,7 @@ LLBC_Variant::As() const
                       _data.i64() <= static_cast<sint64>(LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END))) ||
                     (IsUnsigned() &&
                      !Is<void *>() &&
-                     (_data.ui64() >= 0ull &&
+                     (// _data.ui64() >= 0ull &&
                       _data.ui64() <= static_cast<uint64>(LLBC_CFG_CORE_VARIANT_FAST_NUM_AS_STR_END)))))
         {
             if (IsSigned())
@@ -755,7 +755,7 @@ LLBC_Variant::As() const
 
         if (IsSigned())
         {
-            __LLBC_Inl_Variant_AsStr_Num2Str(_data.i64(), false);
+            __LLBC_Inl_Variant_AsStr_Num2Str(_data.i64(), false)
         }
         else
         {
@@ -1012,7 +1012,7 @@ inline void LLBC_Variant::StrResize(Str::size_type newSize, Str::value_type ch)
     str.resize(newSize);
 
     if (newSize > oldSize && ch != Str::value_type())
-        std::fill(str.begin() + oldSize, str.end(), ch);
+        std::fill(str.begin() + static_cast<Str::iterator::difference_type>(oldSize), str.end(), ch);
 }
 
 template <typename _Ty>
