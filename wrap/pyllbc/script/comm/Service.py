@@ -288,10 +288,11 @@ class pyllbcService(object):
         """
         llbc.inl.SuppressServiceCoderNotFoundWarning(self._c_obj)
 
-    def start(self, pollercount=1):
+    def start(self, pollercount=1, load_sample_time=0):
         """
         Start service.
         :param pollercount: the poller count, default is 1.
+        :param load_sample_time: the recent load sample time, in seconds, default is 0.
         """
         self._startcheck()
 
@@ -299,7 +300,7 @@ class pyllbcService(object):
         if self not in self.__class__._svcs_list:
             self._addsvc(self)
 
-        llbc.inl.StartService(self._c_obj, pollercount)
+        llbc.inl.StartService(self._c_obj, pollercount, load_sample_time)
         self._started = True
 
     @classmethod
@@ -319,6 +320,18 @@ class pyllbcService(object):
             raise llbc.error('{} not callable'.format(exc_handler))
         else:
             cls._frame_exc_handler = exc_handler
+
+    def get_recent_load_info(self, recent_time):
+        """
+        Get service recent load info.
+        :param recent_time: the recent time range to query, in seconds.
+        :return: a dict contains the following keys, or None if sampling not enabled or recent_time invalid.
+                 - recent_time: the actual recent time range, in milliseconds.
+                 - working_time: the working time within the recent time range, in milliseconds.
+                 - update_times: the update times within the recent time range.
+                 - overload_times: the overload times within the recent time range.
+        """
+        return llbc.inl.GetRecentLoadInfo(self._c_obj, recent_time)
 
     def stop(self):
         """

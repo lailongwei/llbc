@@ -205,6 +205,11 @@ bool pyllbc_Service::IsStarted() const
     return _started;
 }
 
+int pyllbc_Service::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime, LLBC_ServiceRecentLoadInfo &loadInfo) const
+{
+    return _llbcSvc->GetRecentLoadInfo(recentTime, loadInfo);
+}
+
 void pyllbc_Service::Stop()
 {
     if (!IsStarted())

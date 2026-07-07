@@ -195,7 +195,7 @@ int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime
     {
         const _ServiceLoadSample &s = _loadSampleRing.GetElem(i - 1);
         const sint64 sampleSpan = s.lastStatTimeInMillis - s.beginStatTimeInMillis;
-        accMillis += sampleSpan > 0 ? sampleSpan : 0;
+        accMillis += (sampleSpan > 0 ? sampleSpan : 0);
         accWorking += s.workingTime;
         accUpdateTimes += s.updateTimes;
         accOverloadTimes += s.overloadTimes;

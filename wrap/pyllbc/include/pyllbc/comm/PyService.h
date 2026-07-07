@@ -107,6 +107,14 @@ public:
     bool IsStarted() const;
 
     /**
+     * Get recent load info.
+     * @param[in]  recentTime - the user expect recent time, must be greater than zero.
+     * @param[out] loadInfo   - the output recent load info.
+     * @return int - return 0 if success, otherwise return -1.
+     */
+    int GetRecentLoadInfo(const LLBC_TimeSpan &recentTime, LLBC_ServiceRecentLoadInfo &loadInfo) const;
+
+    /**
      * Stop service.
      */
     void Stop();
