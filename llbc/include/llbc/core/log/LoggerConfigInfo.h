@@ -272,9 +272,9 @@ public:
      * CIR schema for `logControls` (plain map/seq/scalar Variant tree; no
      * XML metadata such as [Name]/[Attrs]/[Children] is involved):
      *
-     *   logControls: Dict { "item": Dict | Seq<Dict> }   // XML container
-     *              | Seq<Dict>                           // loader-native
-     *              | Dict { ... }                        // single-item shortcut
+     *   logControls: Dict { "logControl": Dict | Seq<Dict> }   // XML container
+     *              | Seq<Dict>                                  // loader-native
+     *              | Dict { ... }                               // single-item shortcut
      *
      * Each item is a Dict:
      *   Dict {

@@ -207,8 +207,9 @@ static bool ParseFileNode(const LLBC_Variant &fileNode,
 //   - Seq<T>                     -> copy of the input Seq
 //   - Dict with `wrapperKey`     -> unwrap once, then re-normalize
 //                                   (handles XML container element wrapping
-//                                   repeated children, e.g. <items><item>...
-//                                   </item><item>...</item></items>)
+//                                   repeated children, e.g.
+//                                   <logControls><logControl>...</logControl>
+//                                   <logControl>...</logControl></logControls>)
 //   - Dict (no wrapper) / Str /
 //     other scalar               -> 1-element Seq holding the node as-is
 //
@@ -655,17 +656,18 @@ void LLBC_LoggerConfigInfo::ParseLogControls(const LLBC_Variant &cfg,
                                              std::vector<LLBC_LogControlItem> &out)
 {
     // `cfg` == CIR node for the `logControls` key. Expected shapes:
-    //   - Dict{"item": Str|Dict|Seq<Dict>} : XML-style container element
-    //     wrapping repeated <item> children (a single <item> collapses to a
-    //     scalar/Dict in CIR; multiple <item>s produce a Seq of Dicts).
-    //   - Seq<Dict>                        : loader-native list (yaml/json).
-    //   - Str|Dict{...}                    : single item, no wrapper.
+    //   - Dict{"logControl": Str|Dict|Seq<Dict>} : XML-style container element
+    //     wrapping repeated <logControl> children (a single <logControl>
+    //     collapses to a scalar/Dict in CIR; multiple <logControl>s produce
+    //     a Seq of Dicts).
+    //   - Seq<Dict>                              : loader-native list (yaml/json).
+    //   - Str|Dict{...}                          : single item, no wrapper.
     // Absent (Nil) or malformed shapes are silent no-ops -- keep bootstrap
     // robust; consistent with per-item skip-on-error policy below.
-    // NormalizeToSeq handles all shapes uniformly: it unwraps the "item"
+    // NormalizeToSeq handles all shapes uniformly: it unwraps the "logControl"
     // container when present, and lifts a lone scalar/Dict into a
     // 1-element Seq -- so downstream just iterates.
-    const LLBC_Variant items = NormalizeToSeq(cfg, "item");
+    const LLBC_Variant items = NormalizeToSeq(cfg, "logControl");
     for (auto &itemNode : items.As<LLBC_Variant::Seq>())
     {
         if (!itemNode.Is<LLBC_Variant::Dict>())

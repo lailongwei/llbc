@@ -266,99 +266,99 @@
         <fileLogLevel>TRACE</fileLogLevel>
         <logControls>
             <!-- file=mute_fileA.cpp 行 100 静音 (attr lines) -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileA.cpp" lines="100"/>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- file=mute_fileA.cpp 行 200 静音 (attr lines) -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileA.cpp" lines="200"/>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- file=mute_fileB.cpp 全文件静音 (省略 lines 即通配) -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileB.cpp"/>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- 函数 MutedFuncOne 静音 -->
-            <item>
+            <logControl>
                 <match>
                     <func>MutedFuncOne</func>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- 函数 MutedFuncTwo 静音, 仅作用于 console appender -->
-            <item>
+            <logControl>
                 <match>
                     <func>MutedFuncTwo</func>
                 </match>
                 <appenders><appender>console</appender></appenders>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- file=mute_fileC.cpp 提级到 warn -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileC.cpp"/>
                 </match>
                 <action type="setLevel"><newLevel>warn</newLevel></action>
-            </item>
+            </logControl>
             <!-- file=mute_fileD.cpp 提级到 error -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileD.cpp"/>
                 </match>
                 <action type="setLevel"><newLevel>error</newLevel></action>
-            </item>
+            </logControl>
             <!-- file=mute_fileE.cpp 行号半开区间 [300,305) 静音 (attr lines) -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileE.cpp" lines="300-305"/>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- file=mute_fileF.cpp 行号半开区间 [400,410) 静音 (attr lines) -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileF.cpp" lines="400-410"/>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- file=mute_fileG.cpp 多段行号 "50, 60-65, 70" 静音 (attr lines) -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileG.cpp" lines="50, 60-65, 70"/>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- file=mute_fileH.cpp 多段行号 "100-103, 200" 静音 (attr lines) -->
-            <item>
+            <logControl>
                 <match>
                     <file name="mute_fileH.cpp" lines="100-103, 200"/>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- func 多值 ["MutedFuncMA","MutedFuncMB"] (任一命中即静音) -->
-            <item>
+            <logControl>
                 <match>
                     <func>MutedFuncMA</func>
                     <func>MutedFuncMB</func>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
             <!-- threadId 多值 [1, 2147483640] (任一命中即静音) -->
-            <item>
+            <logControl>
                 <match>
                     <threadId>1</threadId>
                     <threadId>2147483640</threadId>
                 </match>
                 <action type="mute"/>
-            </item>
+            </logControl>
         </logControls>
     </logcontrol_full>
 
