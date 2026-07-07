@@ -2553,19 +2553,39 @@ int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignmentOneNonPairType(_
         LLBC_Variant testSeqVar;
         AssignmentTest_EfficientSeqAssignment_ConstructTestVariant(i, testSeqVar);
 
-        _PureNonPairTy copyNonPairVal(nonPairValInLoop);
-        testSeqVar = std::forward<_NonPairTy>(nonPairValInLoop);
-        LLBC_Expect(testSeqVar.Is<LLBC_Variant::Seq>() &&
-                    testSeqVar.Size() == copyNonPairVal.size() &&
-                    testSeqVar == copyNonPairVal);
-
-        if (!isRValueRef)
+        if constexpr (LLBC_IsTemplSpec<_PureNonPairTy, std::unordered_set>::value)
         {
-            LLBC_Expect(nonPairValInLoop == copyNonPairVal);
+            std::vector<typename _PureNonPairTy::value_type> copyNonPairVal;
+            for (auto &elem : nonPairValInLoop)
+                copyNonPairVal.emplace_back(elem);
+
+            testSeqVar = std::forward<_NonPairTy>(nonPairValInLoop);
+            LLBC_Expect(testSeqVar.Is<LLBC_Variant::Seq>() &&
+                testSeqVar.Size() == copyNonPairVal.size() &&
+                testSeqVar == copyNonPairVal);
+
+            if (!isRValueRef)
+            {
+                for (auto &elem : copyNonPairVal)
+                    LLBC_Expect(nonPairValInLoop.find(elem) != nonPairValInLoop.end());
+            }
+            else
+            {
+                LLBC_Expect(nonPairValInLoop.empty());
+            }
         }
         else
         {
-            LLBC_Expect(nonPairValInLoop.empty());
+            _PureNonPairTy copyNonPairVal(nonPairValInLoop);
+            testSeqVar = std::forward<_NonPairTy>(nonPairValInLoop);
+            LLBC_Expect(testSeqVar.Is<LLBC_Variant::Seq>() &&
+                testSeqVar.Size() == copyNonPairVal.size() &&
+                testSeqVar == copyNonPairVal);
+
+            if (!isRValueRef)
+                LLBC_Expect(nonPairValInLoop == copyNonPairVal);
+            else
+                LLBC_Expect(nonPairValInLoop.empty());
         }
     }
 
