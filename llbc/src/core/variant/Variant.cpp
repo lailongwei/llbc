@@ -339,7 +339,7 @@ bool LLBC_Variant::Deserialize(LLBC_Stream &stream)
 
         return true;
     }
-    
+
     return false;
 }
 
