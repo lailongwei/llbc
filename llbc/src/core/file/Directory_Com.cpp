@@ -607,53 +607,31 @@ LLBC_String LLBC_Directory::ModuleFileName(bool readLink)
 
 LLBC_String LLBC_Directory::DirName(const LLBC_String &path)
 {
-#if LLBC_TARGET_PLATFORM_WIN32
-    size_t found = path.rfind('\\');
-    if (found == LLBC_String::npos)
-    {
-        found = path.rfind('/');
-        if (found == LLBC_String::npos)
-            return LLBC_String();
-    }
+    const size_t dirEndPos = FindDirEndPos(path);
+    if (dirEndPos == LLBC_String::npos)
+        return LLBC_String();
 
+#if LLBC_TARGET_PLATFORM_WIN32
     if (path.length() == 3 &&
         (LLBC_String::isalpha(path[0]) &&
          path[1] == ':' &&
          (path[2] == '\\' || path[2] == '/')))
         return path;
-
-    return path.substr(0, found);
 #else
-    const size_t found = path.rfind('/');
-    if (found == LLBC_String::npos)
-        return LLBC_String();
-
     if (path.length() == 1)
         return path;
-    else 
-        return path.substr(0, found);
 #endif
+
+    return path.substr(0, dirEndPos);
 }
 
 LLBC_String LLBC_Directory::BaseName(const LLBC_String &path)
 {
-#if LLBC_TARGET_PLATFORM_WIN32
-    size_t found = path.rfind('\\');
-    if (found == LLBC_String::npos)
-    {
-        found = path.rfind('/');
-        if (found == LLBC_String::npos)
-            return path;
-    }
-
-    return path.substr(found + 1);
-#else
-    const size_t found = path.rfind('/');
-    if (found == LLBC_String::npos)
+    const size_t dirEndPos = FindDirEndPos(path);
+    if (dirEndPos == LLBC_String::npos)
         return path;
     else
-        return path.substr(found + 1);
-#endif
+        return path.substr(dirEndPos + 1);
 }
 
 LLBC_String LLBC_Directory::CurDir()
@@ -709,6 +687,20 @@ int LLBC_Directory::SetCurDir(const LLBC_String &path)
 
     return LLBC_OK;
 #endif // Non-Win32
+}
+
+size_t LLBC_Directory::FindDirEndPos(const LLBC_String &path)
+{
+#if LLBC_TARGET_PLATFORM_WIN32
+    size_t slashPos = path.rfind('/');
+    size_t backSlashPos = path.rfind('\\');
+    if (slashPos != LLBC_String::npos && backSlashPos != LLBC_String::npos)
+        return std::max(slashPos, backSlashPos);
+    else
+        return std::min(slashPos, backSlashPos);
+#else
+    return path.rfind('/');
+#endif
 }
 
 __LLBC_NS_END

@@ -334,6 +334,15 @@ int TestCase_Core_File_Directory::DirNameBaseNameTest()
     LLBC_PrintLn("path %s dirName: %s, baseName: %s", 
         path.c_str(), LLBC_Directory::DirName(path).c_str(), LLBC_Directory::BaseName(path).c_str());
 
+#if LLBC_TARGET_PLATFORM_WIN32
+    path = "a/b\\c.exe";
+    LLBC_PrintLn("path %s dirName: %s, baseName: %s",
+        path.c_str(), LLBC_Directory::DirName(path).c_str(), LLBC_Directory::BaseName(path).c_str());
+
+    path = "a\\b/c.exe";
+    LLBC_PrintLn("path %s dirName: %s, baseName: %s",
+        path.c_str(), LLBC_Directory::DirName(path).c_str(), LLBC_Directory::BaseName(path).c_str());
+#endif
     LLBC_Print("\n");
 
     return LLBC_OK;
