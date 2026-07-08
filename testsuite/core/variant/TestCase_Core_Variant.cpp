@@ -591,6 +591,7 @@ int TestCase_Core_Variant::ConstructTest()
     LLBC_Expect(ConstructTest_SeqType() == LLBC_OK);
     LLBC_Expect(ConstructTest_DictType() == LLBC_OK);
     LLBC_Expect(ConstructTest_VariantType() == LLBC_OK);
+    LLBC_Expect(ConstructTest_AssignConstruct() == LLBC_OK);
 
     return LLBC_OK;
 }
@@ -1505,6 +1506,155 @@ int TestCase_Core_Variant::ConstructTest_VariantType()
     LLBC_Expect(ctFromDictVar == dictVar &&
                 ctFromDictVar.Is<LLBC_Variant::Dict>(),
                 "Construct from Dict variant");
+
+    return LLBC_OK;
+}
+
+int TestCase_Core_Variant::ConstructTest_AssignConstruct()
+{
+    // bool:
+    LLBC_Variant boolVar = true;
+    LLBC_Expect(boolVar.Is<bool>() &&
+                boolVar == true,
+                "Assignment from bool");
+
+    // sint8:
+    LLBC_Variant s8Var = static_cast<sint8>(-8);
+    LLBC_Expect(s8Var.Is<sint8>() &&
+                s8Var == static_cast<sint8>(-8),
+                "Assignment from sint8");
+    // uint8:
+    LLBC_Variant u8Var = static_cast<uint8>(8);
+    LLBC_Expect(u8Var.Is<uint8>() &&
+                u8Var == static_cast<uint8>(8),
+                "Assignment from uint8");
+
+    // sint16:
+    LLBC_Variant s16Var = static_cast<sint16>(-16);
+    LLBC_Expect(s16Var.Is<sint16>() &&
+                s16Var == static_cast<sint16>(-16),
+                "Assignment from sint16");
+    // uint16:
+    LLBC_Variant u16Var = static_cast<uint16>(16);
+    LLBC_Expect(u16Var.Is<uint16>() &&
+                u16Var == static_cast<uint16>(16),
+                "Assignment from uint16");
+
+    // sint32:
+    LLBC_Variant s32Var = static_cast<sint32>(-32);
+    LLBC_Expect(s32Var.Is<sint32>() &&
+                s32Var == static_cast<sint32>(-32),
+                "Assignment from sint32");
+    // uint32:
+    LLBC_Variant u32Var = static_cast<uint32>(32);
+    LLBC_Expect(u32Var.Is<uint32>() &&
+                u32Var == static_cast<uint32>(32),
+                "Assignment from uint32");
+
+    // long:
+    LLBC_Variant lVar = static_cast<long>(48);
+    LLBC_Expect(lVar.Is<long>() &&
+                lVar == static_cast<long>(48),
+                "Assignment from long");
+    // ulong:
+    LLBC_Variant ulVar = static_cast<ulong>(48);
+    LLBC_Expect(ulVar.Is<ulong>() &&
+                ulVar == static_cast<ulong>(48),
+                "Assignment from ulong");
+    
+    // float:
+    LLBC_Variant fVar = 1.0f;
+    LLBC_Expect(fVar.Is<float>() &&
+                fVar == 1.0f,
+                "Assignment from float");
+    // double:
+    LLBC_Variant dblVar = 2.0;
+    LLBC_Expect(dblVar.Is<double>() &&
+                dblVar == 2.0,
+                "Assignment from double");
+
+    // ptr:
+    LLBC_Variant ptrVar = &dblVar;
+    LLBC_Expect(ptrVar.Is<void *>() &&
+                ptrVar == &dblVar,
+                "Assignment from ptr");
+    // nullptr:
+    LLBC_Variant nullPtrVar = nullptr;
+    LLBC_Expect(nullPtrVar.Is<void *>() &&
+                nullPtrVar == nullptr,
+                "Assignment from nullptr");
+
+    // std::string:
+    LLBC_Variant stlStrVar = std::string("Hello World(stl string)");
+    LLBC_Expect(stlStrVar.Is<LLBC_String>() &&
+                stlStrVar == "Hello World(stl string)",
+                "Assignment from std::string");
+    // LLBC_String:
+    LLBC_Variant llbcStrVar = LLBC_String("Hello World(llbc string)");
+    LLBC_Expect(llbcStrVar.Is<LLBC_String>() &&
+                llbcStrVar == "Hello World(llbc string)",
+                "Assignment from LLBC_String");
+    // const char *:
+    LLBC_Variant cstrVar = "Hello World(c literal string)";
+    LLBC_Expect(cstrVar.Is<LLBC_String>() &&
+                cstrVar == "Hello World(c literal string)",
+                "Assignment from const char *");
+    // std::string_view:
+    LLBC_Variant stlStrViewVar = std::string_view("Hello World(stl string view)");
+    LLBC_Expect(stlStrViewVar.Is<LLBC_String>() &&
+                stlStrViewVar == "Hello World(stl string view)",
+                "Assignment from std::string_view");
+
+    // std::vector<int>:
+    LLBC_Variant vecVar = std::vector<int>{1, 2, 3};
+    LLBC_Expect((vecVar.Is<LLBC_Variant::Seq>() &&
+                 vecVar == std::vector<int>{1, 2, 3}),
+                "Assignment from std::vector<int>");
+    // std::list<int>:
+    LLBC_Variant listVar = std::list<int>{1, 2, 3};
+    LLBC_Expect((listVar.Is<LLBC_Variant::Seq>() &&
+                 listVar == std::list<int>{1, 2, 3}),
+                "Assignment from std::list<int>");
+    // std::queue<int>:
+    std::queue<int> intQueue;
+    for (int i = 1; i <= 3; ++i)
+        intQueue.push(i);
+    LLBC_Variant queueVar = intQueue;
+    LLBC_Expect((queueVar.Is<LLBC_Variant::Seq>() &&
+                 queueVar == intQueue),
+                "Assignment from std::queue<int>");
+    // std::deque<int>:
+    LLBC_Variant dequeVar = std::deque<int>{1, 2, 3};
+    LLBC_Expect((dequeVar.Is<LLBC_Variant::Seq>() &&
+                 dequeVar == std::deque<int>{1, 2, 3}),
+                "Assignment from std::deque<int>");
+    // std::set<int>:
+    LLBC_Variant setVar = std::set<int>{1, 2, 3};
+    LLBC_Expect((setVar.Is<LLBC_Variant::Seq>() &&
+                 setVar == std::set<int>{1, 2, 3}),
+                "Assignment from std::set<int>");
+    // std::unordered_set<int>:
+    LLBC_Variant unorderedSetVar = std::unordered_set<int>{1, 2, 3};
+    LLBC_Expect((unorderedSetVar.Is<LLBC_Variant::Seq>() &&
+                 unorderedSetVar.Size() == 3),
+                "Assignment from std::unordered_set<int>");
+
+    // std::map<int, LLBC_String>:
+    LLBC_Variant mapVar = std::map<int, LLBC_String>{{1, "Hello"}, {2, "World"}};
+    LLBC_Expect((mapVar.Is<LLBC_Variant::Dict>() &&
+                 mapVar == std::map<int, LLBC_String>{{1, "Hello"}, {2, "World"}}),
+                "Assignment from std::map<int, LLBC_String>");
+    // std::unordered_map<int, LLBC_String>:
+    LLBC_Variant unorderedMapVar = std::unordered_map<int, LLBC_String>{{1, "Hello"}, {2, "World"}};
+    LLBC_Expect((unorderedMapVar.Is<LLBC_Variant::Dict>() &&
+                 unorderedMapVar.Size() == 2) &&
+                "Assignment from std::unordered_map<int, LLBC_String>");
+
+    // LLBC_Variant:
+    LLBC_Variant varVar = LLBC_Variant(3);
+    LLBC_Expect(varVar.Is<int>() &&
+                varVar == 3,
+                "Assignment from LLBC_Variant");
 
     return LLBC_OK;
 }

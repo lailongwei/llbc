@@ -398,16 +398,16 @@ public:
     LLBC_Variant();
     template <typename _Ty,
               std::enable_if_t<LLBC_VariantType::IsRaw<_Ty>(), int> = 0>
-    explicit LLBC_Variant(const _Ty &raw);
+    LLBC_Variant(const _Ty &raw);
     template <typename _Ty,
               std::enable_if_t<LLBC_VariantType::IsStr<_Ty>(), int> = 0>
-    explicit LLBC_Variant(_Ty &&str);
+    LLBC_Variant(_Ty &&str);
     template <typename _Ty,
               std::enable_if_t<LLBC_VariantType::IsSeq<_Ty>(), int> = 0>
-    explicit LLBC_Variant(_Ty &&seq);
+    LLBC_Variant(_Ty &&seq);
     template <typename _Ty,
               std::enable_if_t<LLBC_VariantType::IsDict<_Ty>(), int> = 0>
-    explicit LLBC_Variant(_Ty &&dict);
+    LLBC_Variant(_Ty &&dict);
     LLBC_Variant(const LLBC_Variant &var);
     LLBC_Variant(LLBC_Variant &&var) noexcept;
     ~LLBC_Variant() { ReleaseDataAndOnlySetType<true>(LLBC_VariantType::NIL); }

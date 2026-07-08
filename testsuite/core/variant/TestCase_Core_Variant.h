@@ -45,6 +45,7 @@ private:
     template <typename _DictTy>
     int ConstructTest_OneDictType(_DictTy &&dict);
     int ConstructTest_VariantType();
+    int ConstructTest_AssignConstruct();
 
 private:
     int AssignmentTest();
