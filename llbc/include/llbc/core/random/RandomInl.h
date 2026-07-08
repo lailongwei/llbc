@@ -63,32 +63,6 @@ inline int LLBC_Random::Rand(int begin, int end)
     }
 }
 
-template <typename _Weights>
-typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
-                        LLBC_IsTemplSpec<_Weights, std::list>::value ||
-                        LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
-                        std::is_array<_Weights>::value, int>::type
-LLBC_Random::Rand(const _Weights &weights)
-{
-    int totalWeight = 0;
-    for (const auto &weight : weights)
-        totalWeight += static_cast<int>(weight);
-
-    int i = 0;
-    int currentWeight = 0;
-    const int randomWeight = Rand(0, totalWeight);
-    for (const auto &weight : weights)
-    {
-        currentWeight += static_cast<int>(weight);
-        if (randomWeight < currentWeight)
-            return i;
-        i++;
-    }
-
-    llbc_assert(false && "llbc framework internal error");
-    return 0;
-}
-
 inline double LLBC_Random::RandReal()
 {
     return static_cast<double>(_mtRand()) / 4294967296.;
@@ -99,14 +73,160 @@ inline bool LLBC_Random::BoolJudge()
     return _mtRand() % 2 == 1;
 }
 
-template <typename _RandomAccessIter>
-inline _RandomAccessIter LLBC_Random::Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end)
+template <typename _InputIt>
+_InputIt LLBC_Random::Choice(_InputIt first, _InputIt last)
 {
-    sint64 diff = static_cast<sint64>(end - begin);
-    if (UNLIKELY(diff <= 0 || diff > UINT_MAX))
-        return end;
+    const auto n = std::distance(first, last);
+    if (n <= 0)
+        return last;
 
-    return begin + _mtRand() % static_cast<uint32>(diff);
+    std::advance(first, Rand(static_cast<int>(n)));
+    return first;
+}
+
+template <typename _InputIt, typename _WeightIt>
+_InputIt LLBC_Random::WeightedChoice(_InputIt first, _InputIt last,
+                                     _WeightIt wfirst, _WeightIt wlast)
+{
+    // Sum positive weights (missing -> 0; excess -> ignored).
+    double total = 0.0;
+    auto it = first;
+    auto wit = wfirst;
+    for (; it != last && wit != wlast; ++it, ++wit)
+    {
+        const double dw = static_cast<double>(*wit);
+        if (dw > 0.0) total += dw;
+    }
+
+    if (total <= 0.0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return last;
+    }
+
+    // Roulette-wheel selection.
+    const double r = RandReal() * total;
+    double acc = 0.0;
+    for (it = first, wit = wfirst; it != last && wit != wlast; ++it, ++wit)
+    {
+        const double dw = static_cast<double>(*wit);
+        if (dw > 0.0 && (acc += dw) > r)
+            return it;
+    }
+
+    return last;
+}
+
+template <typename _PopIt, typename _OutIt, typename _Distance>
+_OutIt LLBC_Random::Sample(_PopIt first, _PopIt last,
+                           _OutIt out, _Distance n)
+{
+    if (n <= 0)
+        return out;
+    if (first == last)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return out;
+    }
+
+    using IterCat = typename std::iterator_traits<_PopIt>::iterator_category;
+    if constexpr (std::is_base_of_v<std::random_access_iterator_tag, IterCat>)
+    {
+        // Partial Fisher-Yates on iterator buffer, O(min(n, distance)).
+        const size_t total = static_cast<size_t>(last - first);
+        std::vector<_PopIt> buf;
+        buf.reserve(total);
+        for (auto it = first; it != last; ++it)
+            buf.push_back(it);
+
+        const size_t take = static_cast<size_t>(n) > total ? total : static_cast<size_t>(n);
+        for (size_t i = 0; i < take; ++i)
+        {
+            std::swap(buf[i], buf[i + static_cast<size_t>(Rand(static_cast<int>(total - i)))]);
+            *out++ = *buf[i];
+        }
+    }
+    else
+    {
+        // Reservoir sampling (Algorithm R), O(distance).
+        const size_t k = static_cast<size_t>(n);
+        std::vector<_PopIt> reservoir;
+        reservoir.reserve(k);
+
+        size_t i = 0;
+        for (auto it = first; it != last; ++it, ++i)
+        {
+            if (i < k)
+            {
+                reservoir.push_back(it);
+            }
+            else
+            {
+                const size_t j = static_cast<size_t>(Rand(static_cast<int>(i + 1)));
+                if (j < k) reservoir[j] = it;
+            }
+        }
+
+        for (auto &it : reservoir)
+            *out++ = *it;
+    }
+    return out;
+}
+
+template <typename _PopIt, typename _WeightIt,
+          typename _OutIt, typename _Distance>
+_OutIt LLBC_Random::WeightedSample(_PopIt first, _PopIt last,
+                                   _WeightIt wfirst, _WeightIt wlast,
+                                   _OutIt out, _Distance n)
+{
+    if (n <= 0)
+        return out;
+
+    // Buffer iterators and aligned weights (NaN / <=0 -> 0).
+    // Empty range or all-zero weights -> total == 0.0 -> handled below.
+    std::vector<_PopIt> pop;
+    std::vector<double> ws;
+    double total = 0.0;
+    auto wit = wfirst;
+    for (auto it = first; it != last; ++it)
+    {
+        double dw = 0.0;
+        if (wit != wlast)
+        {
+            dw = static_cast<double>(*wit++);
+            if (!(dw > 0.0)) dw = 0.0;
+        }
+        pop.push_back(it);
+        ws.push_back(dw);
+        total += dw;
+    }
+
+    if (total <= 0.0)
+    {
+        LLBC_SetLastError(LLBC_ERROR_INVALID);
+        return out;
+    }
+
+    // Roulette-wheel without replacement: O(n * popLen).
+    const size_t popLen = pop.size();
+    const size_t want = static_cast<size_t>(n);
+    double remain = total;
+    for (size_t picks = 0; picks < want && remain > 0.0; ++picks)
+    {
+        const double r = RandReal() * remain;
+        double acc = 0.0;
+        for (size_t j = 0; j < popLen; ++j)
+        {
+            if (ws[j] > 0.0 && (acc += ws[j]) > r)
+            {
+                *out++ = *pop[j];
+                remain -= ws[j];
+                ws[j] = 0.0;
+                break;
+            }
+        }
+    }
+    return out;
 }
 
 template <typename _RandomAccessIter>

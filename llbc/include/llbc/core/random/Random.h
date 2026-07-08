@@ -59,17 +59,6 @@ public:
     int Rand(int begin, int end);
 
     /**
-     * Generate a random index based on the weight values of the input weights.
-     * @return int - the random index of the weights[0, weights.size()).
-     */
-    template <typename _Weights>
-    typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
-                            LLBC_IsTemplSpec<_Weights, std::list>::value ||
-                            LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
-                            std::is_array<_Weights>::value, int>::type
-    Rand(const _Weights &weights);
-
-    /**
      * Generate a floating point number N such that: 0 <= N < 1.
      * @return int - the random floating point number N.
      */
@@ -82,11 +71,54 @@ public:
     bool BoolJudge();
 
     /**
-     * Random choose one element at given range.
-     * @return _RandomAccessIter - the choose element iterator.
+     * Pick one element uniformly at random from the range [first, last).
+     * @param[in] first - begin iterator of the population.
+     * @param[in] last  - end iterator of the population.
+     * @return _InputIt - iterator to the picked element, or `last` if the range is empty.
      */
-    template <typename _RandomAccessIter>
-    _RandomAccessIter Choice(const _RandomAccessIter &begin, const _RandomAccessIter &end);
+    template <typename _InputIt>
+    _InputIt Choice(_InputIt first, _InputIt last);
+
+    /**
+     * Pick one element with weights from the range [first, last).
+     * Weights range [wfirst, wlast) is aligned by position to [first, last):
+     * @param[in] first  - begin iterator of the population.
+     * @param[in] last   - end iterator of the population.
+     * @param[in] wfirst - begin iterator of the weights.
+     * @param[in] wlast  - end iterator of the weights.
+     * @return _InputIt - iterator to the picked element; `last` if range is empty or sum(weights) <= 0
+     */
+    template <typename _InputIt, typename _WeightIt>
+    _InputIt WeightedChoice(_InputIt first, _InputIt last,
+                            _WeightIt wfirst, _WeightIt wlast);
+
+    /**
+     * Sample n elements WITHOUT replacement, uniformly, from [first, last) into out. Output order is unspecified.
+     * @param[in]  first - begin iterator of the population.
+     * @param[in]  last  - end iterator of the population.
+     * @param[out] out   - output iterator to write the selected elements.
+     * @param[in]  n     - number of elements to sample.
+     * @return _OutIt - the iterator one past the last written element.
+     */
+    template <typename _PopIt, typename _OutIt, typename _Distance>
+    _OutIt Sample(_PopIt first, _PopIt last,
+                  _OutIt out, _Distance n);
+
+    /**
+     * Sample n elements WITHOUT replacement, with weights, from [first, last) into out. Output order is unspecified.
+     * @param[in]  first  - begin iterator of the population.
+     * @param[in]  last   - end iterator of the population.
+     * @param[in]  wfirst - begin iterator of the weights.
+     * @param[in]  wlast  - end iterator of the weights.
+     * @param[out] out    - output iterator to write the selected elements.
+     * @param[in]  n      - number of elements to sample.
+     * @return _OutIt - the iterator one past the last written element.
+     */
+    template <typename _PopIt, typename _WeightIt,
+              typename _OutIt, typename _Distance>
+    _OutIt WeightedSample(_PopIt first, _PopIt last,
+                          _WeightIt wfirst, _WeightIt wlast,
+                          _OutIt out, _Distance n);
 
     /**
      * Reorders the elements in the given range [begin, end) such that each possible permutation 
@@ -114,5 +146,3 @@ LLBC_EXPORT bool LLBC_BoolJudge();
 __LLBC_NS_END
 
 #include "llbc/core/random/RandomInl.h"
-
-
