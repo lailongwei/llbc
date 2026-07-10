@@ -66,12 +66,11 @@ LLBC_LogTrace::TraceData<_TraceStrLimit>::TraceData(const _TraceDataTy &traceDat
     }
     else if constexpr (LLBC_IsTemplSpec<_TraceDataTy, std::basic_string>::value ||
                        LLBC_IsTemplSpec<_TraceDataTy, std::basic_string_view>::value ||
-                       LLBC_IsTemplSpec<_TraceDataTy, LLBC_BasicString>::value ||
-                       LLBC_IsTemplSpec<_TraceDataTy, LLBC_BasicCString>::value)
+                       LLBC_IsTemplSpec<_TraceDataTy, LLBC_BasicString>::value)
     {
         strLen = std::min(traceData.size(), sizeof(str) - 1);
         if (strLen > 0)
-            memcpy(str, traceData.c_str(), strLen);
+            memcpy(str, traceData.data(), strLen);
         str[strLen] = '\0';
     }
     else if constexpr (std::is_same_v<_TraceDataTy, LLBC_Variant>)

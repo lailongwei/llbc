@@ -23,7 +23,6 @@
 
 #include "llbc/common/Compiler.h"
 #include "llbc/common/Errno.h"
-#include "llbc/common/BasicCString.h"
 
 __LLBC_NS_BEGIN
 
@@ -65,7 +64,7 @@ public:
     LLBC_BasicString(const _Base &rhs):_Base(rhs) {  }
     LLBC_BasicString(_Base &&rhs) noexcept
         :_Base(std::move(rhs)) {  }
-    LLBC_BasicString(const LLBC_BasicCString<_Elem> &rhs):_Base(rhs.c_str(), rhs.size()) {  }
+    LLBC_BasicString(const std::basic_string_view<_Elem> &rhs):_Base(rhs.data(), rhs.size()) {  }
     LLBC_BasicString(const _This &rhs, size_type pos, size_type n):_Base(rhs, pos, n) {  }
     LLBC_BasicString(const _Elem *s, const _Ax &al = _Ax()):_Base(al) { if (s) _Base::append(s); }
     LLBC_BasicString(const _Elem *s, size_type n, const _Ax &al = _Ax()):_Base(s, n, al) {  }
@@ -96,9 +95,9 @@ public:
         return *this;
     }
 
-    _This &operator=(const LLBC_BasicCString<_Elem> &cstr)
+    _This &operator=(const std::basic_string_view<_Elem> &cstr)
     {
-        _Base::assign(cstr.c_str(), cstr.size());
+        _Base::assign(cstr.data(), cstr.size());
         return *this;
     }
 
@@ -133,7 +132,7 @@ public:
         return ret;
     }
 
-    _This operator+(const LLBC_BasicCString<_Elem> &cstr) const
+    _This operator+(const std::basic_string_view<_Elem> &cstr) const
     {
         _This ret = *this;
         ret.append(cstr);
@@ -165,9 +164,9 @@ public:
         return append(rhs);
     }
 
-    _This &operator+=(const LLBC_BasicCString<_Elem> &cstr)
+    _This &operator+=(const std::basic_string_view<_Elem> &cstr)
     {
-        return append(cstr.c_str(), cstr.size());
+        return append(cstr.data(), cstr.size());
     }
 
     _This &operator+=(const _Elem *s)
@@ -227,7 +226,7 @@ public:
         return this->compare(str) == 0;
     }
 
-    bool operator==(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator==(const std::basic_string_view<_Elem> &cstr) const
     {
         return this->compare(cstr) == 0;
     }
@@ -253,7 +252,7 @@ public:
         return this->compare(str) != 0;
     }
 
-    bool operator!=(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator!=(const std::basic_string_view<_Elem> &cstr) const
     {
         return this->compare(cstr) != 0;
     }
@@ -279,7 +278,7 @@ public:
         return this->compare(str) < 0;
     }
 
-    bool operator<(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator<(const std::basic_string_view<_Elem> &cstr) const
     {
         return this->compare(cstr) < 0;
     }
@@ -305,7 +304,7 @@ public:
         return this->compare(str) <= 0;
     }
 
-    bool operator<=(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator<=(const std::basic_string_view<_Elem> &cstr) const
     {
         return this->compare(cstr) <= 0;
     }
@@ -331,7 +330,7 @@ public:
         return this->compare(str) > 0;
     }
 
-    bool operator>(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator>(const std::basic_string_view<_Elem> &cstr) const
     {
         return this->compare(cstr) > 0;
     }
@@ -357,7 +356,7 @@ public:
         return this->compare(str) >= 0;
     }
 
-    bool operator>=(const LLBC_BasicCString<_Elem> &cstr) const
+    bool operator>=(const std::basic_string_view<_Elem> &cstr) const
     {
         return this->compare(cstr) >= 0;
     }
@@ -419,9 +418,9 @@ public:
         return *this;
     }
 
-    _This &append(const LLBC_BasicCString<_Elem> &cstr)
+    _This &append(const std::basic_string_view<_Elem> &cstr)
     {
-        _Base::append(cstr.c_str(), cstr.size());
+        _Base::append(cstr.data(), cstr.size());
         return *this;
     }
 
@@ -928,9 +927,9 @@ public:
         return _Base::compare(str);
     }
 
-    int compare(const LLBC_BasicCString<_Elem> &cstr) const
+    int compare(const std::basic_string_view<_Elem> &cstr) const
     {
-        return _Base::compare(0, this->size(), cstr.c_str(), cstr.size());
+        return _Base::compare(0, this->size(), cstr.data(), cstr.size());
     }
 
     int compare(size_type p0, size_type n0, const _This &str)

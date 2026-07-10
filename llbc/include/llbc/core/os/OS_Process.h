@@ -65,7 +65,7 @@ LLBC_HIDDEN int __LLBC_CleanUpCrashHandleEnv();
  *                            in Non-Windows platform, is a core pattern, fobid empty file path.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath = "");
+LLBC_EXPORT int LLBC_SetCrashDumpFilePath(std::string_view dumpFilePath = "");
 
 /**
  * Set crash handler.
@@ -73,7 +73,7 @@ LLBC_EXPORT int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath = "")
  * @param[in] crashHandler     - the crash callback delegate.
  * @return int - return 0 if success, otherwise return -1.
  */
-LLBC_EXPORT int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName = "",
+LLBC_EXPORT int LLBC_SetCrashHandler(std::string_view crashHandlerName = "",
                                      const LLBC_Delegate<void(const char *stackBacktrace,
                                                               int sig)> &crashHandler = nullptr);
 /**

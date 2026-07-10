@@ -27,7 +27,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static const LLBC_NS LLBC_CString __level2StrRepr[LLBC_NS LLBC_LogLevel::End + 1][2] =
+static const std::string_view __level2StrRepr[LLBC_NS LLBC_LogLevel::End + 1][2] =
 {
     {"TRACE", "T"},
     {"DEBUG", "D"},
@@ -43,14 +43,14 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-const LLBC_CString &LLBC_LogLevel::GetLevelStr(int level, bool shortLevelStr)
+std::string_view LLBC_LogLevel::GetLevelStr(int level, bool shortLevelStr)
 {
     auto &strReprs = LLBC_INTERNAL_NS __level2StrRepr;
     return ((level >= LLBC_LogLevel::Begin && level < LLBC_LogLevel::End) ?
         strReprs[level][shortLevelStr] : strReprs[LLBC_LogLevel::End][shortLevelStr]);
 }
 
-int LLBC_LogLevel::GetLevelEnum(const LLBC_CString &levelStr)
+int LLBC_LogLevel::GetLevelEnum(std::string_view levelStr)
 {
     if (UNLIKELY(levelStr.empty()))
         return LLBC_LogLevel::End;

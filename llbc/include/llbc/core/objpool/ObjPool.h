@@ -707,7 +707,7 @@ private:
     mutable LLBC_SpinLockHandle _lock; // Typed object pool lock.
 
     LLBC_ObjPool *_objPool; // object pool.
-    LLBC_CString _objTypeName; // Object type name(rtti name).
+    std::string_view _objTypeName; // Object type name(rtti name).
     std::vector<_ObjStripe *> _stripes; // Stripes.
     _ObjStripe *_freeStripes; // Free stripes.
 
@@ -809,13 +809,13 @@ public:
      * Set name for objPool.
      * @param[in] poolName - the name of this objPool.
      */
-    void SetName(const LLBC_CString &poolName);
+    void SetName(std::string_view poolName);
 
 private:
     // The wrapped TypedObjPool structure encapsulation.
     struct _WrappedTypedObjPool
     {
-        LLBC_CString rttiName;
+        std::string_view rttiName;
         void (*ReleaseObj)(void *, void *);
         void (*Destruct)(void *);
         void (*Collect)(void *, bool);
@@ -835,37 +835,37 @@ private:
     class _OrderedDeleteNode
     {
     public:
-        explicit _OrderedDeleteNode(const LLBC_CString &name);
+        explicit _OrderedDeleteNode(std::string_view name);
         ~_OrderedDeleteNode();
 
     public:
         // Get node name.
-        const LLBC_CString &GetName() const { return _name; }
+        std::string_view GetName() const { return _name; }
 
         // Get root node(if _front is null, return null).
         _OrderedDeleteNode *GetRoot() const;
         // Get front node.
         _OrderedDeleteNode *GetFront() const { return _front; }
         // Get back nodes.
-        const std::map<LLBC_CString, _OrderedDeleteNode *> &GetBacks() const;
+        const std::map<std::string_view, _OrderedDeleteNode *> &GetBacks() const;
 
         // Add node to back nodes.
         int AddBack(_OrderedDeleteNode *backNode);
         // Remove node from back nodes.
-        int RemoveBack(const LLBC_CString &name);
+        int RemoveBack(std::string_view name);
 
         // Front node check.
-        bool IsFront(const LLBC_CString &name) const;
+        bool IsFront(std::string_view name) const;
         // Back node check.
-        bool IsBack(const LLBC_String &name) const;
+        bool IsBack(std::string_view name) const;
 
         // Get ordered delete tree.
         LLBC_Json::Value GetOrderedDeleteTree(LLBC_Json::Document &jsonDoc) const;
 
     private:
-        LLBC_CString _name;
+        std::string_view _name;
         _OrderedDeleteNode *_front;
-        std::map<LLBC_CString, _OrderedDeleteNode *> *_backs;
+        std::map<std::string_view, _OrderedDeleteNode *> *_backs;
     };
 
     // Operate ordered delete nodes.
@@ -884,11 +884,11 @@ private:
     mutable LLBC_SpinLockHandle _lock;
 
     // Typed object pools.
-    std::map<LLBC_CString, _WrappedTypedObjPool *> _typedObjPools;
+    std::map<std::string_view, _WrappedTypedObjPool *> _typedObjPools;
 
     // Ordered delete nodes & node tree.
-    std::map<LLBC_CString, _OrderedDeleteNode *> *_orderedDeleteNodes;
-    std::map<LLBC_CString, _OrderedDeleteNode *> *_orderedDeleteNodeTree;
+    std::map<std::string_view, _OrderedDeleteNode *> *_orderedDeleteNodes;
+    std::map<std::string_view, _OrderedDeleteNode *> *_orderedDeleteNodeTree;
 
     // ReleaseObj() method offset in _WrappedTypedObjPool.
     static constexpr size_t _releaseObjMethOffset =

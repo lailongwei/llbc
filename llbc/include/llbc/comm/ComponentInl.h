@@ -36,7 +36,7 @@ inline const LLBC_ComponentMethods::Methods &LLBC_ComponentMethods::GetAllMethod
     return _meths;
 }
 
-inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const LLBC_CString &methName) const
+inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(std::string_view methName) const
 {
     static const LLBC_ComponentMethod nullMeth;
 
@@ -61,7 +61,7 @@ inline const LLBC_ComponentMethod &LLBC_ComponentMethods::GetMethod(const LLBC_C
     return nullMeth;
 }
 
-inline int LLBC_ComponentMethods::AddMethod(const LLBC_CString &methName, const LLBC_ComponentMethod &meth)
+inline int LLBC_ComponentMethods::AddMethod(std::string_view methName, const LLBC_ComponentMethod &meth)
 {
     if (UNLIKELY(methName.empty()))
     {
@@ -80,7 +80,7 @@ inline int LLBC_ComponentMethods::AddMethod(const LLBC_CString &methName, const 
     return LLBC_OK;
 }
 
-inline int LLBC_ComponentMethods::CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret)
+inline int LLBC_ComponentMethods::CallMethod(std::string_view methName, const LLBC_Variant &arg, LLBC_Variant &ret)
 {
     const LLBC_ComponentMethod &meth = GetMethod(methName);
     if (UNLIKELY(!meth))
@@ -101,7 +101,7 @@ LLBC_Component::GetComponent() const
     return const_cast<LLBC_Component *>(this)->GetComponent<Comp>();
 }
 
-inline const LLBC_Component *LLBC_Component::GetComponent(const LLBC_CString &compName) const
+inline const LLBC_Component *LLBC_Component::GetComponent(std::string_view compName) const
 {
     return const_cast<LLBC_Component *>(this)->GetComponent(compName);
 }
@@ -112,7 +112,7 @@ inline const LLBC_ComponentMethods &LLBC_Component::GetAllMethods() const
     return LIKELY(_meths) ? *_meths : emptyMethods;
 }
 
-inline int LLBC_Component::AddMethod(const LLBC_CString &methName,
+inline int LLBC_Component::AddMethod(std::string_view methName,
                                      const LLBC_ComponentMethod &meth)
 {
     if (UNLIKELY(!_meths))
@@ -122,13 +122,13 @@ inline int LLBC_Component::AddMethod(const LLBC_CString &methName,
 }
 
 template <typename Component>
-int LLBC_Component::AddMethod(const LLBC_CString &methName,
+int LLBC_Component::AddMethod(std::string_view methName,
                               int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret))
 {
     return AddMethod(methName, LLBC_ComponentMethod(dynamic_cast<Component *>(this), meth));
 }
 
-inline int LLBC_Component::CallMethod(const LLBC_CString &methName,
+inline int LLBC_Component::CallMethod(std::string_view methName,
                                       const LLBC_Variant &arg, LLBC_Variant &ret)
 {
     if (UNLIKELY(!_meths))

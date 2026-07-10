@@ -76,6 +76,7 @@ inline LLBC_Event::LLBC_Event(LLBC_Event &&other) noexcept
 inline LLBC_Event::~LLBC_Event()
 {
     ClearExtData(true);
+    ClearHeavyKeys();
 }
 
 inline int LLBC_Event::GetId() const
@@ -122,8 +123,9 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
         auto heavyIt = _heavyKeys.find(key);
         if (heavyIt == _heavyKeys.end())
         {
-            auto heavyKey = new std::string(key);
-            heavyIt = _heavyKeys.emplace(heavyKey->c_str(), heavyKey).first;
+            auto heavyKey = new std::string(key.data(), key.size());
+            const std::string_view heavyKeyView(heavyKey->data(), heavyKey->size());
+            heavyIt = _heavyKeys.emplace(heavyKeyView, heavyKey).first;
         }
 
         _params.emplace(heavyIt->first, param);
@@ -134,12 +136,12 @@ LLBC_Event::SetParam(const KeyType &key, const ParamType &param)
     }
 }
 
-inline const std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetParams() const
+inline const std::map<std::string_view, LLBC_Variant> &LLBC_Event::GetParams() const
 {
     return _params;
 }
 
-inline std::map<LLBC_CString, LLBC_Variant> &LLBC_Event::GetMutableParams()
+inline std::map<std::string_view, LLBC_Variant> &LLBC_Event::GetMutableParams()
 {
     return _params;
 }
@@ -236,11 +238,24 @@ inline void LLBC_Event::Reuse()
 {
     ClearExtData(true);
 
-    LLBC_STLHelper::DeleteContainer(_heavyKeys);
+    ClearHeavyKeys();
     _params.clear();
 
     _dontDelAfterFire = false;
     _id = 0;
+}
+
+inline void LLBC_Event::ClearHeavyKeys()
+{
+    while (!_heavyKeys.empty())
+    {
+        // Erase the map entry first(destroys the std::string_view key that points into the
+        // backing string buffer), then delete the backing string, to keep the order deterministic.
+        const auto it = _heavyKeys.begin();
+        std::string *heavyKey = it->second;
+        _heavyKeys.erase(it);
+        delete heavyKey;
+    }
 }
 
 #undef __LLBC_Inl_EventKeyMatch
