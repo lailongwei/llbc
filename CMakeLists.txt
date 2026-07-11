@@ -1,16 +1,22 @@
 # CMake minimum version.
 cmake_minimum_required (VERSION 3.2...3.5)
 
-# Setup c/cxx compilers and linker(if needed).
-# set(CMAKE_C_COMPILER "<path/to/your/c_compiler>")
-# set(CMAKE_CXX_COMPILER "<path/to/your/cxx_compiler")
-# set(CMAKE_LINKER, "<path/to/your/linker>")
+# Setup c/cxx compilers and linker, if needed.
+# set(CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir>")
+if (CUSTOM_COMPILE_TOOLSET_DIR)
+	message("Use custom compile toolset, dir:${CUSTOM_COMPILE_TOOLSET_DIR}")
+	set(STDC_LIB_DIR "${CUSTOM_COMPILE_TOOLSET_DIR}/lib64")
+	set(CMAKE_C_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/gcc")
+	set(CMAKE_CXX_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/g++")
+	set(CMAKE_LINKER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/ld")
+endif()
 
-# Set custom compiler, if you need.
-# set(CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir")
-# set(STDC_LIB_DIR "${CUSTOM_COMPILE_TOOLSET_DIR}/lib64")
-# set(CMAKE_CXX_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/g++")
-# set(CMAKE_C_COMPILER "${CUSTOM_COMPILE_TOOLSET_DIR}/bin/gcc")
+# Output compilers and linker.
+message("Compiler/Linker:")
+message("==> c compiler: ${CMAKE_C_COMPILER}")
+message("==> c++ compiler: ${CMAKE_CXX_COMPILER}")
+message("==> linker: ${CMAKE_LINKER}")
+message("==> stdc lib dir: ${STDC_LIB_DIR}")
 
 # Set project name.
 project(llbc)
@@ -30,8 +36,11 @@ endif()
 
 # Set llbc core lib directory.
 set(LLBC_LIB_DIR ${PROJECT_SOURCE_DIR}/llbc)
-# Set llbc testsuite directory.
-set(LLBC_TESTSUITE_DIR ${PROJECT_SOURCE_DIR}/testsuite)
+# Set llbc core lib tests directory.
+set(LLBC_LIB_EXAMPLE_DIR ${PROJECT_SOURCE_DIR}/tests/example)
+set(LLBC_LIB_FUNC_TEST_DIR ${PROJECT_SOURCE_DIR}/tests/func_test)
+set(LLBC_LIB_UNIT_TEST_DIR ${PROJECT_SOURCE_DIR}/tests/unit_test)
+set(LLBC_LIB_QUICK_START_DIR ${PROJECT_SOURCE_DIR}/tests/quick_start)
 # Set llbc wrap directory.
 set(LLBC_WRAP_DIR ${PROJECT_SOURCE_DIR}/wrap)
 
@@ -40,4 +49,7 @@ set(LLBC_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/output/cmake)
 
 # Add sub directory.
 add_subdirectory(${LLBC_LIB_DIR})
-add_subdirectory(${LLBC_TESTSUITE_DIR})
+add_subdirectory(${LLBC_LIB_EXAMPLE_DIR})
+add_subdirectory(${LLBC_LIB_FUNC_TEST_DIR})
+add_subdirectory(${LLBC_LIB_UNIT_TEST_DIR})
+add_subdirectory(${LLBC_LIB_QUICK_START_DIR})
