@@ -24,5 +24,5 @@
 
 int main(int argc, char *argv[])
 {
-    return TestSuite_Main(argc, argv);
+    return FuncTest_Main(argc, argv);
 }

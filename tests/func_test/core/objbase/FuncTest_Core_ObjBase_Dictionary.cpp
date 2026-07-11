@@ -105,11 +105,11 @@ struct GreaterThanFun
 
 }
 
-FuncTest_Core_ObjBase_Dictionary::TestCase_ObjBase_Dictionary()
+FuncTest_Core_ObjBase_Dictionary::FuncTest_Core_ObjBase_Dictionary()
 {
 }
 
-FuncTest_Core_ObjBase_Dictionary::~TestCase_ObjBase_Dictionary()
+FuncTest_Core_ObjBase_Dictionary::~FuncTest_Core_ObjBase_Dictionary()
 {
 }
 

@@ -101,11 +101,11 @@ struct GreaterSortFun
 
 }
 
-FuncTest_Core_ObjBase_Array::TestCase_ObjBase_Array()
+FuncTest_Core_ObjBase_Array::FuncTest_Core_ObjBase_Array()
 {
 }
 
-FuncTest_Core_ObjBase_Array::~TestCase_ObjBase_Array()
+FuncTest_Core_ObjBase_Array::~FuncTest_Core_ObjBase_Array()
 {
 }
 

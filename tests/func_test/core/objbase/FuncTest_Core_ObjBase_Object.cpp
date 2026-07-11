@@ -46,11 +46,11 @@ private:
 
 }
 
-FuncTest_Core_ObjBase_Object::TestCase_ObjBase_Object()
+FuncTest_Core_ObjBase_Object::FuncTest_Core_ObjBase_Object()
 {
 }
 
-FuncTest_Core_ObjBase_Object::~TestCase_ObjBase_Object()
+FuncTest_Core_ObjBase_Object::~FuncTest_Core_ObjBase_Object()
 {
 }
 
