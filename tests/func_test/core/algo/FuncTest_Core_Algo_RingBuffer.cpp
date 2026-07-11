@@ -19,17 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "core/algo/TestCase_Core_Algo_RingBuffer.h"
+#include "core/algo/FuncTest_Core_Algo_RingBuffer.h"
 
-TestCase_Core_Algo_RingBuffer::TestCase_Core_Algo_RingBuffer()
+FuncTest_Core_Algo_RingBuffer::FuncTest_Core_Algo_RingBuffer()
 {
 }
 
-TestCase_Core_Algo_RingBuffer::~TestCase_Core_Algo_RingBuffer()
+FuncTest_Core_Algo_RingBuffer::~FuncTest_Core_Algo_RingBuffer()
 {
 }
 
-int TestCase_Core_Algo_RingBuffer::Run(int argc, char *argv[])
+int FuncTest_Core_Algo_RingBuffer::Run(int argc, char *argv[])
 {
     std::cout << "core/algo/RingBuffer test:" << std::endl;
 
@@ -43,7 +43,7 @@ int TestCase_Core_Algo_RingBuffer::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Algo_RingBuffer::DoBasicTest()
+void FuncTest_Core_Algo_RingBuffer::DoBasicTest()
 {
     std::cout << "RingBuffer Basic test:" << std::endl;
     {
@@ -120,7 +120,7 @@ void TestCase_Core_Algo_RingBuffer::DoBasicTest()
     }
 }
 
-void TestCase_Core_Algo_RingBuffer::DoFrontTailTest()
+void FuncTest_Core_Algo_RingBuffer::DoFrontTailTest()
 {
     std::cout << "Front/Tail test:" << std::endl;
 
@@ -141,7 +141,7 @@ void TestCase_Core_Algo_RingBuffer::DoFrontTailTest()
     std::cout << "Front/Tail test end" << std::endl;
 }
 
-void TestCase_Core_Algo_RingBuffer::DoPerfTest()
+void FuncTest_Core_Algo_RingBuffer::DoPerfTest()
 {
 #if LLBC_DEBUG
     static constexpr size_t testTimes = 10000;

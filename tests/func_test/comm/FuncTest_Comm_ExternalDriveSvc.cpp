@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_ExternalDriveSvc.h"
+#include "comm/FuncTest_Comm_ExternalDriveSvc.h"
 
 namespace
 {
@@ -172,18 +172,18 @@ private:
 
 }
 
-TestCase_Comm_ExternalDriveSvc::TestCase_Comm_ExternalDriveSvc()
+FuncTest_Comm_ExternalDriveSvc::FuncTest_Comm_ExternalDriveSvc()
 : _svc(LLBC_Service::Create("ExternalDriveSvc"))
 {
     _svc->SuppressCoderNotFoundWarning();
 }
 
-TestCase_Comm_ExternalDriveSvc::~TestCase_Comm_ExternalDriveSvc()
+FuncTest_Comm_ExternalDriveSvc::~FuncTest_Comm_ExternalDriveSvc()
 {
     delete _svc;
 }
 
-int TestCase_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
+int FuncTest_Comm_ExternalDriveSvc::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("ExternalDrive type service test:");
 

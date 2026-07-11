@@ -20,18 +20,18 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/log/TestCase_Core_Log.h"
+#include "core/log/FuncTest_Core_Log.h"
 #include <iomanip>
 
-TestCase_Core_Log::TestCase_Core_Log()
+FuncTest_Core_Log::FuncTest_Core_Log()
 {
 }
 
-TestCase_Core_Log::~TestCase_Core_Log()
+FuncTest_Core_Log::~FuncTest_Core_Log()
 {
 }
 
-int TestCase_Core_Log::Run(int argc, char *argv[])
+int FuncTest_Core_Log::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/log test:");
     LLBC_PrintLn("Current dir:%s", LLBC_Directory::CurDir().c_str());
@@ -67,7 +67,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     // Set log hook(to root logger).
     LLBC_Logger *rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
     rootLogger->SetLogHook({ LLBC_LogLevel::Debug, LLBC_LogLevel::Trace },
-                            LLBC_Delegate<void(const LLBC_LogData *)>(this, &TestCase_Core_Log::OnLogHook));
+                            LLBC_Delegate<void(const LLBC_LogData *)>(this, &FuncTest_Core_Log::OnLogHook));
 
     // Use root logger to test.
     LLOG_TRACE("This is a trace log message.");
@@ -194,7 +194,7 @@ int TestCase_Core_Log::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Log::DoLogLevelSetTest()
+void FuncTest_Core_Log::DoLogLevelSetTest()
 {
     auto testLogger = LLBC_LoggerMgrSingleton->GetLogger("log_level_set_test");
     LLBC_PrintLn("Log level set test, test logger name:%s, default level:%s",
@@ -242,7 +242,7 @@ void TestCase_Core_Log::DoLogLevelSetTest()
     testOutput(LLBC_LogAppenderType::File, LLBC_LogLevel::End);
 }
 
-void TestCase_Core_Log::DoJsonLogTest()
+void FuncTest_Core_Log::DoJsonLogTest()
 {
     // Test LJLOG_TRACE macros.
     LJLOG_TRACE().Add("testKey", "testValue->LJLOG_TRACE().1").Finish("");
@@ -367,7 +367,7 @@ void TestCase_Core_Log::DoJsonLogTest()
     LJLOG_FATAL4("test", "testTag").Add("testKey", "testValue->LJLOG_FATAL4().4").Finish("%s%d", "Finish Test", 2);
 }
 
-void TestCase_Core_Log::DoUninitLogTest()
+void FuncTest_Core_Log::DoUninitLogTest()
 {
     char overeSizedLog[LLBC_CFG_LOG_FORMAT_BUF_SIZE << 1] = {};
     std::fill(overeSizedLog, overeSizedLog + sizeof(overeSizedLog), 'a');
@@ -387,7 +387,7 @@ void TestCase_Core_Log::DoUninitLogTest()
     LJLOG_DEBUG3("uninit_tag").Add("Key1", "Key1 value").Finish("This is a uninited json log message");
 }
 
-void TestCase_Core_Log::SyncLoggerMultiThreadTest()
+void FuncTest_Core_Log::SyncLoggerMultiThreadTest()
 {
     LLBC_PrintLn("Sync logger multi-thread test:");
 
@@ -427,7 +427,7 @@ void TestCase_Core_Log::SyncLoggerMultiThreadTest()
     LLBC_PrintLn("Sync logger multi-thread test finished");
 }
 
-void TestCase_Core_Log::DoConditionMacroLogTest()
+void FuncTest_Core_Log::DoConditionMacroLogTest()
 {
     LLBC_LogAndDoIf(true, Error, {});
     LLBC_LogAndDoIf(true, Error, {}, "DoConditionMacroLogTest DoIf: Purely text");
@@ -461,7 +461,7 @@ void TestCase_Core_Log::DoConditionMacroLogTest()
                                                    1, 3.14, "hello world"); }();
 }
 
-int TestCase_Core_Log::DoLoggerMgrReloadTest()
+int FuncTest_Core_Log::DoLoggerMgrReloadTest()
 {
     LLBC_PrintLn("LoggerMgr reload test, please modify logger config file, "
                  "then press any key to continue ...");
@@ -489,7 +489,7 @@ int TestCase_Core_Log::DoLoggerMgrReloadTest()
     return LLBC_OK;
 }
 
-void TestCase_Core_Log::DoLogTraceTest()
+void FuncTest_Core_Log::DoLogTraceTest()
 {
     LLBC_PrintLn("Press any key to start LogTrace test...");
     getchar();
@@ -671,7 +671,7 @@ void TestCase_Core_Log::DoLogTraceTest()
     getchar();
 }
 
-void TestCase_Core_Log::DoLogColorFilterTest()
+void FuncTest_Core_Log::DoLogColorFilterTest()
 {
     LLBC_PrintLn("DoLogColorFilterTest begin");
     auto rootLogger = LLBC_LoggerMgrSingleton->GetRootLogger();
@@ -837,7 +837,7 @@ void TestCase_Core_Log::DoLogColorFilterTest()
     LLOG_FATAL("This is a uninited fatal log message reload_12");
 }
 
-void TestCase_Core_Log::DoLogTraceEnableLevelTest()
+void FuncTest_Core_Log::DoLogTraceEnableLevelTest()
 {
     LLBC_PrintLn("DoLogTraceEnableLevelTest begin");
 
@@ -865,7 +865,7 @@ void TestCase_Core_Log::DoLogTraceEnableLevelTest()
 }
 
 template <typename _KeyTy, typename _ContentTy>
-void TestCase_Core_Log::AddLogTrace(const _KeyTy &key, const _ContentTy &content)
+void FuncTest_Core_Log::AddLogTrace(const _KeyTy &key, const _ContentTy &content)
 {
     const auto keyStr = LLBC_Variant(key).ToString();
     const auto contentStr = LLBC_Variant(content).ToString();
@@ -875,7 +875,7 @@ void TestCase_Core_Log::AddLogTrace(const _KeyTy &key, const _ContentTy &content
     LLOG_INFO("After add %s:%s", keyStr.c_str(), contentStr.c_str());
 }
 
-void TestCase_Core_Log::OnLogHook(const LLBC_LogData *logData)
+void FuncTest_Core_Log::OnLogHook(const LLBC_LogData *logData)
 {
     LLBC_PrintLn("Log hook, loggerName: %s, level: %s, message: %s",
                    logData->logger->GetLoggerName().c_str(),

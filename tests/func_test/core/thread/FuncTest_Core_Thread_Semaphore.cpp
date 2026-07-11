@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/thread/TestCase_Core_Thread_Semaphore.h"
+#include "core/thread/FuncTest_Core_Thread_Semaphore.h"
 
 static const int __g_waitersCount = 5;
 
@@ -100,15 +100,15 @@ static void SignalerThreadProc(void *arg)
     __g_outLock.Unlock();
 }
 
-TestCase_Core_Thread_Semaphore::TestCase_Core_Thread_Semaphore()
+FuncTest_Core_Thread_Semaphore::FuncTest_Core_Thread_Semaphore()
 {
 }
 
-TestCase_Core_Thread_Semaphore::~TestCase_Core_Thread_Semaphore()
+FuncTest_Core_Thread_Semaphore::~FuncTest_Core_Thread_Semaphore()
 {
 }
 
-int TestCase_Core_Thread_Semaphore::Run(int argc, char *argv[])
+int FuncTest_Core_Thread_Semaphore::Run(int argc, char *argv[])
 {
     std::cout <<"core/thread/semaphore test: " <<std::endl;
 

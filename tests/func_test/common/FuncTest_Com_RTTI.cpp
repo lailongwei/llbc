@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "common/TestCase_Com_RTTI.h"
+#include "common/FuncTest_Com_RTTI.h"
 
 namespace
 {
@@ -29,15 +29,15 @@ namespace
     class UserDefineClass {};
 }
 
-TestCase_Com_RTTI::TestCase_Com_RTTI()
+FuncTest_Com_RTTI::FuncTest_Com_RTTI()
 {
 }
 
-TestCase_Com_RTTI::~TestCase_Com_RTTI()
+FuncTest_Com_RTTI::~FuncTest_Com_RTTI()
 {
 }
 
-int TestCase_Com_RTTI::Run(int argc, char *argv[])
+int FuncTest_Com_RTTI::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Common/RTTI test:");
 

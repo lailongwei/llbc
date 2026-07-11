@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_Svc.h"
+#include "comm/FuncTest_Comm_Svc.h"
 
 namespace
 {
@@ -144,15 +144,15 @@ private:
 
 }
 
-TestCase_Comm_Svc::TestCase_Comm_Svc()
+FuncTest_Comm_Svc::FuncTest_Comm_Svc()
 {
 }
 
-TestCase_Comm_Svc::~TestCase_Comm_Svc()
+FuncTest_Comm_Svc::~FuncTest_Comm_Svc()
 {
 }
 
-int TestCase_Comm_Svc::Run(int argc, char *argv[])
+int FuncTest_Comm_Svc::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Server/Client test:");
     if (argc < 5)

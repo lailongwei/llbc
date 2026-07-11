@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_LazyTask final : public LLBC_BaseTestCase
+class FuncTest_Comm_LazyTask final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_LazyTask();
-    ~TestCase_Comm_LazyTask() override;
+    FuncTest_Comm_LazyTask();
+    ~FuncTest_Comm_LazyTask() override;
 
 public:
     int Run(int argc, char *argv[]) override;

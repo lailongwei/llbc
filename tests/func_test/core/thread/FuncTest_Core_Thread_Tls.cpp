@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/thread/TestCase_Core_Thread_Tls.h"
+#include "core/thread/FuncTest_Core_Thread_Tls.h"
 
 namespace
 {
@@ -42,15 +42,15 @@ static void ThreadProc(void *arg)
     LLBC_PrintLn("thread [%d] tls value: %lu", threadIndex, *__g_tls);
 }
 
-TestCase_Core_Thread_Tls::TestCase_Core_Thread_Tls()
+FuncTest_Core_Thread_Tls::FuncTest_Core_Thread_Tls()
 {
 }
 
-TestCase_Core_Thread_Tls::~TestCase_Core_Thread_Tls()
+FuncTest_Core_Thread_Tls::~FuncTest_Core_Thread_Tls()
 {
 }
 
-int TestCase_Core_Thread_Tls::Run(int argc, char *argv[])
+int FuncTest_Core_Thread_Tls::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/thread/tls test");
 

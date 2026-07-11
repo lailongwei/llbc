@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/file/TestCase_Core_File_File.h"
+#include "core/file/FuncTest_Core_File_File.h"
 
-TestCase_Core_File_File::TestCase_Core_File_File()
+FuncTest_Core_File_File::FuncTest_Core_File_File()
 : _testFileName("core_file_file__TestFile.test")
 {
 #if LLBC_TARGET_PLATFORM_IPHONE
@@ -30,12 +30,12 @@ TestCase_Core_File_File::TestCase_Core_File_File()
 #endif // iPhone
 }
 
-TestCase_Core_File_File::~TestCase_Core_File_File()
+FuncTest_Core_File_File::~FuncTest_Core_File_File()
 {
     LLBC_File::DeleteFile(_testFileName);
 }
 
-int TestCase_Core_File_File::Run(int argc, char *argv[])
+int FuncTest_Core_File_File::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Core/File test:");
 
@@ -72,7 +72,7 @@ int TestCase_Core_File_File::Run(int argc, char *argv[])
     return retCode;
 }
 
-bool TestCase_Core_File_File::FileModeDescTest()
+bool FuncTest_Core_File_File::FileModeDescTest()
 {
     LLBC_PrintLn("LLBC_FileMode describe test:");
     LLBC_PrintLn("LLBC_FileMode::TextRead(%08x): %s", LLBC_FileMode::TextRead, LLBC_FileMode::GetFileModeDesc(LLBC_FileMode::TextRead).c_str());
@@ -100,7 +100,7 @@ bool TestCase_Core_File_File::FileModeDescTest()
     return true;
 }
 
-bool TestCase_Core_File_File::OpenCloseTest()
+bool FuncTest_Core_File_File::OpenCloseTest()
 {
     LLBC_PrintLn("Open/Close file test:");
 
@@ -170,7 +170,7 @@ bool TestCase_Core_File_File::OpenCloseTest()
     return true;
 }
 
-bool TestCase_Core_File_File::GetXXXMethodsTest()
+bool FuncTest_Core_File_File::GetXXXMethodsTest()
 {
     LLBC_PrintLn("GetXXXMethods test:");
 
@@ -196,7 +196,7 @@ bool TestCase_Core_File_File::GetXXXMethodsTest()
     return true;
 }
 
-bool TestCase_Core_File_File::ReadWriteTest()
+bool FuncTest_Core_File_File::ReadWriteTest()
 {
     LLBC_PrintLn("Read/Write test:");
     // Open file as BinaryWrite mode for test.
@@ -331,7 +331,7 @@ bool TestCase_Core_File_File::ReadWriteTest()
     return true;
 }
 
-bool TestCase_Core_File_File::FileAttributeTest()
+bool FuncTest_Core_File_File::FileAttributeTest()
 {
     LLBC_PrintLn("file attribute about test:");
     LLBC_File file(_testFileName, LLBC_FileMode::BinaryRead);
@@ -396,7 +396,7 @@ bool TestCase_Core_File_File::FileAttributeTest()
     return true;
 }
 
-bool TestCase_Core_File_File::CopyFileTest()
+bool FuncTest_Core_File_File::CopyFileTest()
 {
     LLBC_PrintLn("Copy file test:");
 
@@ -450,7 +450,7 @@ bool TestCase_Core_File_File::CopyFileTest()
     return true;
 }
 
-bool TestCase_Core_File_File::MoveFileTest()
+bool FuncTest_Core_File_File::MoveFileTest()
 {
     LLBC_PrintLn("Move file test:");
 
@@ -508,7 +508,7 @@ bool TestCase_Core_File_File::MoveFileTest()
     return true;
 }
 
-void TestCase_Core_File_File::PrintFileAttributes(const LLBC_FileAttributes &fileAttrs)
+void FuncTest_Core_File_File::PrintFileAttributes(const LLBC_FileAttributes &fileAttrs)
 {
     LLBC_PrintLn("    Readable: %s", fileAttrs.readable ? "true" : "false");
     LLBC_PrintLn("    Writable: %s", fileAttrs.writable ? "true" : "false");

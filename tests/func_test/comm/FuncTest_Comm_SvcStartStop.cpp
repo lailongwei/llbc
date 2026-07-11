@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_SvcStartStop.h"
+#include "comm/FuncTest_Comm_SvcStartStop.h"
 
 namespace
 {
@@ -74,7 +74,7 @@ namespace
     };
 }
 
-int TestCase_Comm_SvcStartStop::Run(int argc, char *argv[])
+int FuncTest_Comm_SvcStartStop::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Service start/stop test:");
     LLBC_Service *svc = LLBC_Service::Create("SvcStartStopTest");

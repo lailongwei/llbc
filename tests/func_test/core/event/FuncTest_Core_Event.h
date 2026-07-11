@@ -24,12 +24,12 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Event final : public LLBC_BaseTestCase
+class FuncTest_Core_Event final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Event() = default;
+    FuncTest_Core_Event() = default;
 
-    ~TestCase_Core_Event() override = default;
+    ~FuncTest_Core_Event() override = default;
 
 public:
     int Run(int argc, char *argv[]) override;

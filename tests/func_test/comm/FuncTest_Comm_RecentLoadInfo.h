@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_RecentLoadInfo final : public LLBC_BaseTestCase
+class FuncTest_Comm_RecentLoadInfo final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_RecentLoadInfo();
-    ~TestCase_Comm_RecentLoadInfo() override;
+    FuncTest_Comm_RecentLoadInfo();
+    ~FuncTest_Comm_RecentLoadInfo() override;
 
 public:
     int Run(int argc, char *argv[]) override;

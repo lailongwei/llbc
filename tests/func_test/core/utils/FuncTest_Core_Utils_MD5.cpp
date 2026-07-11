@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/utils/TestCase_Core_Utils_MD5.h"
+#include "core/utils/FuncTest_Core_Utils_MD5.h"
 
-TestCase_Core_Utils_MD5::TestCase_Core_Utils_MD5()
+FuncTest_Core_Utils_MD5::FuncTest_Core_Utils_MD5()
 {
 }
 
-TestCase_Core_Utils_MD5::~TestCase_Core_Utils_MD5()
+FuncTest_Core_Utils_MD5::~FuncTest_Core_Utils_MD5()
 {
 }
 
-int TestCase_Core_Utils_MD5::Run(int argc, char *argv[])
+int FuncTest_Core_Utils_MD5::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/utils/md5 test:");
 

@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_Echo.h"
+#include "comm/FuncTest_Comm_Echo.h"
 
 namespace
 {
@@ -194,15 +194,15 @@ private:
 
 }
 
-TestCase_Comm_Echo::TestCase_Comm_Echo()
+FuncTest_Comm_Echo::FuncTest_Comm_Echo()
 {
 }
 
-TestCase_Comm_Echo::~TestCase_Comm_Echo()
+FuncTest_Comm_Echo::~FuncTest_Comm_Echo()
 {
 }
 
-int TestCase_Comm_Echo::Run(int argc, char *argv[])
+int FuncTest_Comm_Echo::Run(int argc, char *argv[])
 {
     std::cout <<"Echo test:" <<std::endl;
 

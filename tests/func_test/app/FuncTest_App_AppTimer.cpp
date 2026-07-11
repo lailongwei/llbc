@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "app/TestCase_App_AppTimer.h"
+#include "app/FuncTest_App_AppTimer.h"
 using namespace llbc;
 
 namespace
@@ -151,15 +151,15 @@ private:
 
 }
 
-TestCase_App_AppTimer::TestCase_App_AppTimer()
+FuncTest_App_AppTimer::FuncTest_App_AppTimer()
 {
 }
 
-TestCase_App_AppTimer::~TestCase_App_AppTimer()
+FuncTest_App_AppTimer::~FuncTest_App_AppTimer()
 {
 }
 
-int TestCase_App_AppTimer::Run(int argc, char *argv[])
+int FuncTest_App_AppTimer::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("App timer test:");
 

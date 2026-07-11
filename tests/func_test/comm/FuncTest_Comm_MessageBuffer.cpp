@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_MessageBuffer.h"
+#include "comm/FuncTest_Comm_MessageBuffer.h"
 
-TestCase_Comm_MessageBuffer::TestCase_Comm_MessageBuffer()
+FuncTest_Comm_MessageBuffer::FuncTest_Comm_MessageBuffer()
 {
 }
 
-TestCase_Comm_MessageBuffer::~TestCase_Comm_MessageBuffer()
+FuncTest_Comm_MessageBuffer::~FuncTest_Comm_MessageBuffer()
 {
 }
 
-int TestCase_Comm_MessageBuffer::Run(int argc, char *argv[])
+int FuncTest_Comm_MessageBuffer::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("MessageBuffer testcase:");
 

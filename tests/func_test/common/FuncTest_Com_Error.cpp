@@ -20,21 +20,21 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "common/TestCase_Com_Error.h"
+#include "common/FuncTest_Com_Error.h"
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
  #include <netdb.h>
 #endif // Non-Win32
 
-TestCase_Com_Error::TestCase_Com_Error()
+FuncTest_Com_Error::FuncTest_Com_Error()
 {
 }
 
-TestCase_Com_Error::~TestCase_Com_Error()
+FuncTest_Com_Error::~FuncTest_Com_Error()
 {
 }
 
-int TestCase_Com_Error::Run(int argc, char *argv[])
+int FuncTest_Com_Error::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("common/error test:\n");
 

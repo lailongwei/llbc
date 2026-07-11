@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/utils/TestCase_Core_Utils_Debug.h"
+#include "core/utils/FuncTest_Core_Utils_Debug.h"
 
-int TestCase_Core_Utils_Debug::Run(int argc, char *argv[])
+int FuncTest_Core_Utils_Debug::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/utils/Util_Debug test:");
 

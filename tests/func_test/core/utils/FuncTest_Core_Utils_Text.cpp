@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/utils/TestCase_Core_Utils_Text.h"
+#include "core/utils/FuncTest_Core_Utils_Text.h"
 
 namespace
 {
@@ -37,7 +37,7 @@ enum class Util_Text_TestEnumCls
 
 }
 
-int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
+int FuncTest_Core_Utils_Text::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/utils/Util_Text test:");
 
@@ -51,7 +51,7 @@ int TestCase_Core_Utils_Text::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-int TestCase_Core_Utils_Text::_Test_Num2Str()
+int FuncTest_Core_Utils_Text::_Test_Num2Str()
 {
     LLBC_PrintLn("- Num -> Str test:");
 
@@ -131,7 +131,7 @@ int TestCase_Core_Utils_Text::_Test_Num2Str()
     return LLBC_OK;
 }
 
-int TestCase_Core_Utils_Text::_Test_Str2Num()
+int FuncTest_Core_Utils_Text::_Test_Str2Num()
 {
     LLBC_PrintLn("- Str -> Num test:");
 
@@ -266,7 +266,7 @@ int TestCase_Core_Utils_Text::_Test_Str2Num()
     return LLBC_OK;
 }
 
-int TestCase_Core_Utils_Text::_Test_Str2LooseBool()
+int FuncTest_Core_Utils_Text::_Test_Str2LooseBool()
 {
     // Log.
     LLBC_PrintLn("- Str -> LooseBool test:");
@@ -312,7 +312,7 @@ int TestCase_Core_Utils_Text::_Test_Str2LooseBool()
 }
 
 template <typename _NumTy, bool _HexFormat>
-int TestCase_Core_Utils_Text::_Test_Num2StrImpl()
+int FuncTest_Core_Utils_Text::_Test_Num2StrImpl()
 {
     // Log:
     LLBC_PrintLn("  - Test LLBC_Num2Str<%s, %s>():",
@@ -442,7 +442,7 @@ int TestCase_Core_Utils_Text::_Test_Num2StrImpl()
 
 
 template <typename _NumTy>
-int TestCase_Core_Utils_Text::_Test_Str2NumImpl()
+int FuncTest_Core_Utils_Text::_Test_Str2NumImpl()
 {
     // Log.
     LLBC_PrintLn("  - Test LLBC_Str2Num<%s>():", typeid(_NumTy).name());
@@ -522,7 +522,7 @@ int TestCase_Core_Utils_Text::_Test_Str2NumImpl()
 }
 
 template <typename _NumTy>
-int TestCase_Core_Utils_Text::_Test_Str2NumExceptionTest(const char *str,
+int FuncTest_Core_Utils_Text::_Test_Str2NumExceptionTest(const char *str,
                                                          int expectErrno,
                                                          int expectSubErrno)
 {

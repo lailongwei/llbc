@@ -26,17 +26,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/os/TestCase_Core_OS_Console.h"
+#include "core/os/FuncTest_Core_OS_Console.h"
 
-TestCase_Core_OS_Console::TestCase_Core_OS_Console()
+FuncTest_Core_OS_Console::FuncTest_Core_OS_Console()
 {
 }
 
-TestCase_Core_OS_Console::~TestCase_Core_OS_Console()
+FuncTest_Core_OS_Console::~FuncTest_Core_OS_Console()
 {
 }
 
-int TestCase_Core_OS_Console::Run(int argc, char *argv[])
+int FuncTest_Core_OS_Console::Run(int argc, char *argv[])
 {
     std::cout <<"core/os/console test: " <<std::endl;
 

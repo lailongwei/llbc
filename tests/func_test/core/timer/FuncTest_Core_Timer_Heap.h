@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Timer_Heap final : public LLBC_BaseTestCase
+class FuncTest_Core_Timer_Heap final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Timer_Heap() = default;
-    ~TestCase_Core_Timer_Heap() override = default;
+    FuncTest_Core_Timer_Heap() = default;
+    ~FuncTest_Core_Timer_Heap() override = default;
 
 public:
     int Run(int argc, char *argv[]) override;

@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/objpool/TestCase_Core_ObjPool.h"
+#include "core/objpool/FuncTest_Core_ObjPool.h"
 
 namespace
 {
@@ -117,7 +117,7 @@ protected:
     int _testTimes = 10;
 };
 
-int TestCase_Core_ObjPool::Run(int argc, char *argv[])
+int FuncTest_Core_ObjPool::Run(int argc, char *argv[])
 {
     LLBC_ReturnIf(BaseTest() != LLBC_OK, LLBC_FAILED);
     LLBC_ReturnIf(AcquireTest() != LLBC_OK, LLBC_FAILED);
@@ -137,7 +137,7 @@ int TestCase_Core_ObjPool::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::BaseTest()
+int FuncTest_Core_ObjPool::BaseTest()
 {
     LLBC_PrintLn("Base test:");
 
@@ -190,7 +190,7 @@ int TestCase_Core_ObjPool::BaseTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::AcquireTest()
+int FuncTest_Core_ObjPool::AcquireTest()
 {
     LLBC_PrintLn("Acquire test:");
     LLBC_ObjPool objPool;
@@ -219,7 +219,7 @@ int TestCase_Core_ObjPool::AcquireTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::ComplexAcquireTest()
+int FuncTest_Core_ObjPool::ComplexAcquireTest()
 {
     LLBC_PrintLn("Complex acquire test:");
 
@@ -283,7 +283,7 @@ int TestCase_Core_ObjPool::ComplexAcquireTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::StatTest()
+int FuncTest_Core_ObjPool::StatTest()
 {
     LLBC_PrintLn("Stat test:");
 
@@ -303,7 +303,7 @@ int TestCase_Core_ObjPool::StatTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::ReflectTest()
+int FuncTest_Core_ObjPool::ReflectTest()
 {
     // Basic type reusable reflection.
     LLBC_PrintLn("Basic type IsReusable() Reflect test:");
@@ -425,7 +425,7 @@ int TestCase_Core_ObjPool::ReflectTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::MemoryLeakTest()
+int FuncTest_Core_ObjPool::MemoryLeakTest()
 {
     // Construct test sequence.
     constexpr bool simpleTest = true;
@@ -494,7 +494,7 @@ int TestCase_Core_ObjPool::MemoryLeakTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::MultiThreadThread()
+int FuncTest_Core_ObjPool::MultiThreadThread()
 {
     LLBC_PrintLn("Multi thread test:");
 
@@ -563,7 +563,7 @@ int TestCase_Core_ObjPool::MultiThreadThread()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::PerfTest()
+int FuncTest_Core_ObjPool::PerfTest()
 {
     LLBC_PrintLn("Begin object pool performance test:");
 
@@ -657,7 +657,7 @@ int TestCase_Core_ObjPool::PerfTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::OrderedDeleteTest()
+int FuncTest_Core_ObjPool::OrderedDeleteTest()
 {
     LLBC_PrintLn("Ordered delete test:");
 
@@ -716,7 +716,7 @@ int TestCase_Core_ObjPool::OrderedDeleteTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::GuardedPoolObjTest()
+int FuncTest_Core_ObjPool::GuardedPoolObjTest()
 {
     LLBC_PrintLn("GuardedPoolObj test:");
 
@@ -810,7 +810,7 @@ int _CheckObjPoolSupport()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::LibSupportedObjPoolClassesTest()
+int FuncTest_Core_ObjPool::LibSupportedObjPoolClassesTest()
 {
     LLBC_PrintLn("llbc core library supported object pool classes test:");
 
@@ -839,7 +839,7 @@ int TestCase_Core_ObjPool::LibSupportedObjPoolClassesTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::CommonClassTest_Stream()
+int FuncTest_Core_ObjPool::CommonClassTest_Stream()
 {
     LLBC_PrintLn("CommonClass - Stream test:");
 
@@ -888,7 +888,7 @@ int TestCase_Core_ObjPool::CommonClassTest_Stream()
 }
 
 template <typename Obj>
-void TestCase_Core_ObjPool::RandAllocAndRelease(LLBC_ObjPool &objPool,
+void FuncTest_Core_ObjPool::RandAllocAndRelease(LLBC_ObjPool &objPool,
                                                 const std::pair<int, int> allocRange,
                                                 const std::pair<int, int> &releaseRange)
 {
@@ -905,7 +905,7 @@ void TestCase_Core_ObjPool::RandAllocAndRelease(LLBC_ObjPool &objPool,
         objPool.Release(objs[releaseTimes]);
 }
 
-int TestCase_Core_ObjPool::RecycleTest()
+int FuncTest_Core_ObjPool::RecycleTest()
 {
     // obj from pool recycle test
     LLBC_ObjPool objPool;
@@ -937,7 +937,7 @@ int TestCase_Core_ObjPool::RecycleTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_ObjPool::SafeObjPoolSetNameTest()
+int FuncTest_Core_ObjPool::SafeObjPoolSetNameTest()
 {
     const int testTimes = 20;
 

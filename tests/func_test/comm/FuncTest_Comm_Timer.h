@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_Timer final : public LLBC_BaseTestCase
+class FuncTest_Comm_Timer final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_Timer();
-    ~TestCase_Comm_Timer() override;
+    FuncTest_Comm_Timer();
+    ~FuncTest_Comm_Timer() override;
 
 public:
     int Run(int argc, char *argv[]) override;

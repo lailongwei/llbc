@@ -19,8 +19,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "TestSuite.h"
-#include "TestTraits.h"
+#include "FuncTest.h"
+#include "FuncTestTraits.h"
 
 #if LLBC_TARGET_PLATFORM_WIN32
 #pragma warning(push)
@@ -46,7 +46,7 @@
 
 #define __DEPARATION_CHARACTER "--------------------------------------------------"
 
-int TestSuite_Main(int argc, char* argv[])
+int FuncTest_Main(int argc, char* argv[])
 {
     LLBC_Startup();
 

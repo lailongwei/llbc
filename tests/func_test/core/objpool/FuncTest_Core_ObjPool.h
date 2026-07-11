@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_ObjPool final : public LLBC_BaseTestCase
+class FuncTest_Core_ObjPool final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_ObjPool() = default;
-    ~TestCase_Core_ObjPool() override = default;
+    FuncTest_Core_ObjPool() = default;
+    ~FuncTest_Core_ObjPool() override = default;
 
 public:
     int Run(int argc, char *argv[]) override;

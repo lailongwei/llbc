@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "common/TestCase_Com_Stream.h"
+#include "common/FuncTest_Com_Stream.h"
 
 namespace
 {
@@ -221,7 +221,7 @@ struct MovableCls
 
 }
 
-int TestCase_Com_Stream::Run(int argc, char *argv[])
+int FuncTest_Com_Stream::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Stream test:");
 
@@ -243,7 +243,7 @@ int TestCase_Com_Stream::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::BasicTest()
+int FuncTest_Com_Stream::BasicTest()
 {
     LLBC_PrintLn("BasicTest:");
 
@@ -292,7 +292,7 @@ int TestCase_Com_Stream::BasicTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::EnumTest()
+int FuncTest_Com_Stream::EnumTest()
 {
     LLBC_PrintLn("Enum test:");
 
@@ -343,7 +343,7 @@ int TestCase_Com_Stream::EnumTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::ConstructAndAssignmentTest()
+int FuncTest_Com_Stream::ConstructAndAssignmentTest()
 {
     LLBC_PrintLn("Copy and Assignment test:");
 
@@ -397,7 +397,7 @@ int TestCase_Com_Stream::ConstructAndAssignmentTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::AttachTest()
+int FuncTest_Com_Stream::AttachTest()
 {
     LLBC_PrintLn("Attach test:");
 
@@ -427,7 +427,7 @@ int TestCase_Com_Stream::AttachTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::DetachTest()
+int FuncTest_Com_Stream::DetachTest()
 {
     LLBC_PrintLn("Detach test:");
 
@@ -447,7 +447,7 @@ int TestCase_Com_Stream::DetachTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::RecapTest()
+int FuncTest_Com_Stream::RecapTest()
 {
     LLBC_PrintLn("Recap test:");
     LLBC_Stream stream;
@@ -467,7 +467,7 @@ int TestCase_Com_Stream::RecapTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::SwapTest()
+int FuncTest_Com_Stream::SwapTest()
 {
     LLBC_PrintLn("Swap test:");
 
@@ -486,7 +486,7 @@ int TestCase_Com_Stream::SwapTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::EndianTest()
+int FuncTest_Com_Stream::EndianTest()
 {
     LLBC_PrintLn("Endian test:");
 
@@ -525,7 +525,7 @@ int TestCase_Com_Stream::EndianTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::PODTypeSerTest()
+int FuncTest_Com_Stream::PODTypeSerTest()
 {
     LLBC_PrintLn("PODType ser test:");
 
@@ -636,7 +636,7 @@ int TestCase_Com_Stream::PODTypeSerTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::TrivialClsSerTest()
+int FuncTest_Com_Stream::TrivialClsSerTest()
 {
     LLBC_PrintLn("Trivial type ser test:");
 
@@ -662,7 +662,7 @@ int TestCase_Com_Stream::TrivialClsSerTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::NonTrivialClsSerTest()
+int FuncTest_Com_Stream::NonTrivialClsSerTest()
 {
     LLBC_PrintLn("Non-Trivial type ser test:");
 
@@ -674,7 +674,7 @@ int TestCase_Com_Stream::NonTrivialClsSerTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::SerializableClsSerTest()
+int FuncTest_Com_Stream::SerializableClsSerTest()
 {
     LLBC_PrintLn("Serializable type ser test:");
 
@@ -739,7 +739,7 @@ int TestCase_Com_Stream::SerializableClsSerTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::MovableReadTest()
+int FuncTest_Com_Stream::MovableReadTest()
 {
     LLBC_PrintLn("Movable read test:");
 
@@ -764,7 +764,7 @@ int TestCase_Com_Stream::MovableReadTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_Stream::EndianThreadSpecObjPoolTest()
+int FuncTest_Com_Stream::EndianThreadSpecObjPoolTest()
 {
     // Stream obj pool test: reallocate stream obj and check whether the endian field of the stream is reset.
     LLBC_PrintLn("EndianThreadSpecObjPoolTest test:");
@@ -797,7 +797,7 @@ int TestCase_Com_Stream::EndianThreadSpecObjPoolTest()
     return LLBC_OK;
 }
 
-LLBC_FORCE_INLINE void TestCase_Com_Stream::GenRandStr(
+LLBC_FORCE_INLINE void FuncTest_Com_Stream::GenRandStr(
     LLBC_String &str, LLBC_Random &rander, const std::pair<int, int> &strLenRange)
 {
     const int randStrLen = rander.Rand(strLenRange.first, strLenRange.second);
@@ -805,7 +805,7 @@ LLBC_FORCE_INLINE void TestCase_Com_Stream::GenRandStr(
         str.append(1, static_cast<char>(rander.Rand(32, 127))); // [<space>, '~']
 }
 
-LLBC_FORCE_INLINE LLBC_String TestCase_Com_Stream::GenRandStr(
+LLBC_FORCE_INLINE LLBC_String FuncTest_Com_Stream::GenRandStr(
     LLBC_Random &rander, const std::pair<int, int> &strLenRange)
 {
     LLBC_String randStr;

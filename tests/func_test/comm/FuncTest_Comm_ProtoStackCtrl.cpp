@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_ProtoStackCtrl.h"
+#include "comm/FuncTest_Comm_ProtoStackCtrl.h"
 
 namespace
 {
@@ -98,17 +98,17 @@ namespace
     };
 }
 
-TestCase_Comm_ProtoStackCtrl::TestCase_Comm_ProtoStackCtrl()
+FuncTest_Comm_ProtoStackCtrl::FuncTest_Comm_ProtoStackCtrl()
 : _svc(LLBC_Service::Create("ProtoStackCtrl"))
 {
 }
 
-TestCase_Comm_ProtoStackCtrl::~TestCase_Comm_ProtoStackCtrl()
+FuncTest_Comm_ProtoStackCtrl::~FuncTest_Comm_ProtoStackCtrl()
 {
     delete _svc;
 }
 
-int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
+int FuncTest_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Communication Service protocol stack control test:");
     LLBC_PrintLn("Note: Maybe you must use gdb or windbg to trace!");
@@ -163,7 +163,7 @@ int TestCase_Comm_ProtoStackCtrl::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Comm_ProtoStackCtrl::TestCtrlScene(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData)
+void FuncTest_Comm_ProtoStackCtrl::TestCtrlScene(int sessionId, int ctrlCmd, const LLBC_Variant &ctrlData)
 {
     LLBC_PrintLn("Do control scene, cmd:%d, data:%s", ctrlCmd, ctrlData.ToString().c_str());
     _svc->CtrlProtocolStack(sessionId, ctrlCmd, ctrlData);

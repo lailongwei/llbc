@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "common/TestCase_Com_DataType.h"
+#include "common/FuncTest_Com_DataType.h"
 
-int TestCase_Com_DataType::Run(int argc, char *argv[])
+int FuncTest_Com_DataType::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("llbc library test case(datatype test):");
 
@@ -64,7 +64,7 @@ int TestCase_Com_DataType::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Com_DataType::RawTest()
+void FuncTest_Com_DataType::RawTest()
 {
     LLBC_PrintLn("Raw types test:");
     LLBC_PrintLn("sizeof(sint8): %lu", sizeof(sint8));
@@ -84,7 +84,7 @@ void TestCase_Com_DataType::RawTest()
     LLBC_PrintLn("\n");
 }
 
-void TestCase_Com_DataType::StringBaseTest()
+void FuncTest_Com_DataType::StringBaseTest()
 {
     LLBC_PrintLn("String base functions test:");
 
@@ -146,7 +146,7 @@ void TestCase_Com_DataType::StringBaseTest()
     LLBC_PrintLn("\n");
 }
 
-void TestCase_Com_DataType::StringConvertTest()
+void FuncTest_Com_DataType::StringConvertTest()
 {
     LLBC_PrintLn("String convert test:");
 
@@ -217,7 +217,7 @@ void TestCase_Com_DataType::StringConvertTest()
     #endif // MSVC compiler.
 }
 
-void TestCase_Com_DataType::StringCompareTest()
+void FuncTest_Com_DataType::StringCompareTest()
 {
     LLBC_PrintLn("String compare test:");
     {
@@ -315,7 +315,7 @@ void TestCase_Com_DataType::StringCompareTest()
     }
 }
 
-void TestCase_Com_DataType::StringLogicOperationTest()
+void FuncTest_Com_DataType::StringLogicOperationTest()
 {
     LLBC_PrintLn("String logic-operation test:");
 
@@ -359,7 +359,7 @@ void TestCase_Com_DataType::StringLogicOperationTest()
     }
 }
 
-void TestCase_Com_DataType::StringUTF8Test()
+void FuncTest_Com_DataType::StringUTF8Test()
 {
     LLBC_PrintLn("UTF-8 test:");
 
@@ -398,7 +398,7 @@ void TestCase_Com_DataType::StringUTF8Test()
     LLBC_PrintLn("\n");
 }
 
-void TestCase_Com_DataType::StringFindReplaceTest()
+void FuncTest_Com_DataType::StringFindReplaceTest()
 {
     LLBC_PrintLn("FindReplace test:");
 
@@ -410,7 +410,7 @@ void TestCase_Com_DataType::StringFindReplaceTest()
     LLBC_PrintLn("\n");
 }
 
-void TestCase_Com_DataType::StringStripTest()
+void FuncTest_Com_DataType::StringStripTest()
 {
     LLBC_PrintLn("Strip test:");
     LLBC_String str = "\t \t Hello World! \t \t";
@@ -420,7 +420,7 @@ void TestCase_Com_DataType::StringStripTest()
     LLBC_PrintLn("After strip, str: %s, len: %lu", str.c_str(), str.length());
 }
 
-void TestCase_Com_DataType::StringSplitTest(const LLBC_String &str, size_t maxSplit, const LLBC_String &sep)
+void FuncTest_Com_DataType::StringSplitTest(const LLBC_String &str, size_t maxSplit, const LLBC_String &sep)
 {
     LLBC_PrintLn("Will split string(maxSplit: %lu, sep: %s): %s", maxSplit, sep.c_str(), str.c_str());
     std::vector<LLBC_String> splitted = str.split(sep, maxSplit);

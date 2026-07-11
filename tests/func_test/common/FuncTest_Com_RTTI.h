@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Com_RTTI final : public LLBC_BaseTestCase
+class FuncTest_Com_RTTI final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Com_RTTI();
-    ~TestCase_Com_RTTI() override;
+    FuncTest_Com_RTTI();
+    ~FuncTest_Com_RTTI() override;
 
 public:
     int Run(int argc, char *argv[]) override;

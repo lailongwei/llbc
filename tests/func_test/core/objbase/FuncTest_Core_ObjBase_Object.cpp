@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/objbase/TestCase_ObjBase_Object.h"
+#include "core/objbase/FuncTest_Core_ObjBase_Object.h"
 
 namespace
 {
@@ -46,15 +46,15 @@ private:
 
 }
 
-TestCase_ObjBase_Object::TestCase_ObjBase_Object()
+FuncTest_Core_ObjBase_Object::TestCase_ObjBase_Object()
 {
 }
 
-TestCase_ObjBase_Object::~TestCase_ObjBase_Object()
+FuncTest_Core_ObjBase_Object::~TestCase_ObjBase_Object()
 {
 }
 
-int TestCase_ObjBase_Object::Run(int arg, char *argv[])
+int FuncTest_Core_ObjBase_Object::Run(int arg, char *argv[])
 {
     std::cout <<"objbase/object test: " <<std::endl;
     

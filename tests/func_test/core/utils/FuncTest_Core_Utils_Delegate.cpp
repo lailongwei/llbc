@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/utils/TestCase_Core_Utils_Delegate.h"
+#include "core/utils/FuncTest_Core_Utils_Delegate.h"
 
 namespace
 {
@@ -60,17 +60,17 @@ namespace
     }
 }
 
-TestCase_Core_Utils_Delegate::TestCase_Core_Utils_Delegate()
+FuncTest_Core_Utils_Delegate::FuncTest_Core_Utils_Delegate()
 {
 }
 
-TestCase_Core_Utils_Delegate::~TestCase_Core_Utils_Delegate()
+FuncTest_Core_Utils_Delegate::~FuncTest_Core_Utils_Delegate()
 {
 }
 
-int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
+int FuncTest_Core_Utils_Delegate::Run(int argc, char *argv[])
 {
-    typedef TestCase_Core_Utils_Delegate DelegObj;
+    typedef FuncTest_Core_Utils_Delegate DelegObj;
 
     std::cout <<"Delegate test:" <<std::endl;
     LLBC_Delegate<void()> func0(&Func_Foo_0);
@@ -152,31 +152,31 @@ int TestCase_Core_Utils_Delegate::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Utils_Delegate::Foo_0()
+void FuncTest_Core_Utils_Delegate::Foo_0()
 {
     std::cout <<"Foo_0() called" <<std::endl;
 }
 
-int TestCase_Core_Utils_Delegate::Foo_0_Rtn_Int()
+int FuncTest_Core_Utils_Delegate::Foo_0_Rtn_Int()
 {
     std::cout << "Foo_0_Rtn_Int() called, will return 10086" << std::endl;
     return 10086;
 }
 
-void TestCase_Core_Utils_Delegate::Foo_1(int arg1)
+void FuncTest_Core_Utils_Delegate::Foo_1(int arg1)
 {
     std::cout <<"Foo_1() called" <<std::endl;
     std::cout <<"\t arg1: " <<arg1 <<std::endl;
 }
 
-void TestCase_Core_Utils_Delegate::Foo_2(int arg1, const LLBC_String &arg2)
+void FuncTest_Core_Utils_Delegate::Foo_2(int arg1, const LLBC_String &arg2)
 {
     std::cout <<"Foo_2() called" <<std::endl;
     std::cout <<"\t arg1: " <<arg1 <<std::endl;
     std::cout <<"\t arg2: " <<arg2 <<std::endl;
 }
 
-void TestCase_Core_Utils_Delegate::Foo_3(int arg1, bool arg2, sint64 arg3)
+void FuncTest_Core_Utils_Delegate::Foo_3(int arg1, bool arg2, sint64 arg3)
 {
     std::cout <<"Foo_3() called" <<std::endl;
     std::cout <<"\t arg1: " <<arg1 <<std::endl;
@@ -184,7 +184,7 @@ void TestCase_Core_Utils_Delegate::Foo_3(int arg1, bool arg2, sint64 arg3)
     std::cout <<"\t arg3: " <<arg3 <<std::endl;
 }
 
-void TestCase_Core_Utils_Delegate::Foo_4(int arg1, int arg2, int arg3, int arg4)
+void FuncTest_Core_Utils_Delegate::Foo_4(int arg1, int arg2, int arg3, int arg4)
 {
     std::cout <<"Foo_4() called" <<std::endl;
     std::cout <<"\t arg1: " <<arg1 <<std::endl;
@@ -193,7 +193,7 @@ void TestCase_Core_Utils_Delegate::Foo_4(int arg1, int arg2, int arg3, int arg4)
     std::cout <<"\t arg4: " <<arg4 <<std::endl;
 }
 
-void TestCase_Core_Utils_Delegate::Foo_5(int arg1, int arg2, int arg3, int arg4, int arg5)
+void FuncTest_Core_Utils_Delegate::Foo_5(int arg1, int arg2, int arg3, int arg4, int arg5)
 {
     std::cout <<"Foo_5() called" <<std::endl;
     std::cout <<"\t arg1: " <<arg1 <<std::endl;
@@ -203,7 +203,7 @@ void TestCase_Core_Utils_Delegate::Foo_5(int arg1, int arg2, int arg3, int arg4,
     std::cout <<"\t arg5: " <<arg5 <<std::endl;
 }
 
-void TestCase_Core_Utils_Delegate::Foo_6(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
+void FuncTest_Core_Utils_Delegate::Foo_6(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
 {
     std::cout <<"Foo_6() called" <<std::endl;
     std::cout <<"\t arg1: " <<arg1 <<std::endl;
@@ -214,7 +214,7 @@ void TestCase_Core_Utils_Delegate::Foo_6(int arg1, int arg2, int arg3, int arg4,
     std::cout <<"\t arg6: " <<arg6 <<std::endl;
 }
 
-void TestCase_Core_Utils_Delegate::Foo_7(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)
+void FuncTest_Core_Utils_Delegate::Foo_7(int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7)
 {
     std::cout <<"Foo_7() called" <<std::endl;
     std::cout <<"\t arg1: " <<arg1 <<std::endl;
@@ -226,7 +226,7 @@ void TestCase_Core_Utils_Delegate::Foo_7(int arg1, int arg2, int arg3, int arg4,
     std::cout <<"\t arg7: " <<arg7 <<std::endl;
 }
 
-void *TestCase_Core_Utils_Delegate::FooEx(const LLBC_String &arg)
+void *FuncTest_Core_Utils_Delegate::FooEx(const LLBC_String &arg)
 {
     std::cout <<"FooEx() called" <<std::endl;
     std::cout <<"\t arg: " <<arg <<std::endl;

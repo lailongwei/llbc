@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "TestCase_Core_Variant.h"
+#include "FuncTest_Core_Variant.h"
 
 namespace
 {
@@ -41,7 +41,7 @@ enum class TestNewStyleEnum
 
 }
 
-int TestCase_Core_Variant::Run(int argc, char *argv[])
+int FuncTest_Core_Variant::Run(int argc, char *argv[])
 {
     LLBC_Expect(VariantTypeTest() == LLBC_OK);
     LLBC_Expect(ConstructTest() == LLBC_OK);
@@ -71,7 +71,7 @@ int TestCase_Core_Variant::Run(int argc, char *argv[])
     return 0;
 }
 
-int TestCase_Core_Variant::VariantTypeTest()
+int FuncTest_Core_Variant::VariantTypeTest()
 {
     LLBC_PrintLn("Variant type test:");
 
@@ -578,7 +578,7 @@ int TestCase_Core_Variant::VariantTypeTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ConstructTest()
+int FuncTest_Core_Variant::ConstructTest()
 {
     LLBC_Expect(ConstructTest_DftConstruct() == LLBC_OK);
     LLBC_Expect(ConstructTest_RawType() == LLBC_OK);
@@ -591,7 +591,7 @@ int TestCase_Core_Variant::ConstructTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ConstructTest_DftConstruct()
+int FuncTest_Core_Variant::ConstructTest_DftConstruct()
 {
     LLBC_PrintLn("Construct test(Default Construct):");
 
@@ -609,7 +609,7 @@ int TestCase_Core_Variant::ConstructTest_DftConstruct()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ConstructTest_RawType()
+int FuncTest_Core_Variant::ConstructTest_RawType()
 {
     LLBC_PrintLn("Construct test(Raw Type):");
 
@@ -968,7 +968,7 @@ int TestCase_Core_Variant::ConstructTest_RawType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ConstructTest_StrType()
+int FuncTest_Core_Variant::ConstructTest_StrType()
 {
     LLBC_PrintLn("Construct test(Str type):");
 
@@ -1103,7 +1103,7 @@ int TestCase_Core_Variant::ConstructTest_StrType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ConstructTest_SeqType()
+int FuncTest_Core_Variant::ConstructTest_SeqType()
 {
     LLBC_PrintLn("Construct test(All Seq type):");
 
@@ -1198,7 +1198,7 @@ int TestCase_Core_Variant::ConstructTest_SeqType()
 }
 
 template <typename _SeqTy>
-int TestCase_Core_Variant::ConstructTest_OneSeqType(_SeqTy &&seq)
+int FuncTest_Core_Variant::ConstructTest_OneSeqType(_SeqTy &&seq)
 {
     typedef std::remove_cv_t<std::remove_reference_t<_SeqTy>> _PureSeqTy;
 
@@ -1269,7 +1269,7 @@ int TestCase_Core_Variant::ConstructTest_OneSeqType(_SeqTy &&seq)
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ConstructTest_DictType()
+int FuncTest_Core_Variant::ConstructTest_DictType()
 {
     LLBC_PrintLn("Construct test(Dict type):");
 
@@ -1324,7 +1324,7 @@ int TestCase_Core_Variant::ConstructTest_DictType()
 }
 
 template <typename _DictTy>
-int TestCase_Core_Variant::ConstructTest_OneDictType(_DictTy &&dict)
+int FuncTest_Core_Variant::ConstructTest_OneDictType(_DictTy &&dict)
 {
     constexpr bool isConst = std::is_const_v<std::remove_reference_t<_DictTy>>;
     constexpr bool isCanMove = std::is_rvalue_reference_v<_DictTy &&> && !isConst;
@@ -1356,7 +1356,7 @@ int TestCase_Core_Variant::ConstructTest_OneDictType(_DictTy &&dict)
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ConstructTest_VariantType()
+int FuncTest_Core_Variant::ConstructTest_VariantType()
 {
     LLBC_PrintLn("Construct test(variant type):");
 
@@ -1492,7 +1492,7 @@ int TestCase_Core_Variant::ConstructTest_VariantType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ConstructTest_AssignConstruct()
+int FuncTest_Core_Variant::ConstructTest_AssignConstruct()
 {
     // bool:
     LLBC_Variant boolVar = true;
@@ -1641,7 +1641,7 @@ int TestCase_Core_Variant::ConstructTest_AssignConstruct()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AssignmentTest()
+int FuncTest_Core_Variant::AssignmentTest()
 {
     LLBC_PrintLn("Assignment test:");
 
@@ -1655,7 +1655,7 @@ int TestCase_Core_Variant::AssignmentTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AssignmentTest_RawType()
+int FuncTest_Core_Variant::AssignmentTest_RawType()
 {
     LLBC_PrintLn("Assignment test(Raw type):");
 
@@ -1821,7 +1821,7 @@ int TestCase_Core_Variant::AssignmentTest_RawType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AssignmentTest_StrType()
+int FuncTest_Core_Variant::AssignmentTest_StrType()
 {
     LLBC_PrintLn("Assignment test(Str type):");
 
@@ -1949,7 +1949,7 @@ int TestCase_Core_Variant::AssignmentTest_StrType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AssignmentTest_SeqType()
+int FuncTest_Core_Variant::AssignmentTest_SeqType()
 {
     LLBC_PrintLn("Assignment test(All Seq type):");
 
@@ -2055,7 +2055,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqType()
 }
 
 template <typename _SeqTy>
-int TestCase_Core_Variant::AssignmentTest_OneSeqType(_SeqTy &&seq)
+int FuncTest_Core_Variant::AssignmentTest_OneSeqType(_SeqTy &&seq)
 {
     typedef std::remove_cv_t<std::remove_reference_t<_SeqTy>> _PureSeqTy;
 
@@ -2131,7 +2131,7 @@ int TestCase_Core_Variant::AssignmentTest_OneSeqType(_SeqTy &&seq)
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AssignmentTest_DictType()
+int FuncTest_Core_Variant::AssignmentTest_DictType()
 {
     LLBC_PrintLn("Assignment test(Dict type):");
 
@@ -2183,7 +2183,7 @@ int TestCase_Core_Variant::AssignmentTest_DictType()
 }
 
 template <typename _DictTy>
-int TestCase_Core_Variant::AssignmentTest_OneDictType(_DictTy &&dict)
+int FuncTest_Core_Variant::AssignmentTest_OneDictType(_DictTy &&dict)
 {
     constexpr bool isConst = std::is_const_v<std::remove_reference_t<_DictTy>>;
     constexpr bool isCanMove = std::is_rvalue_reference_v<_DictTy &&> && !isConst;
@@ -2219,7 +2219,7 @@ int TestCase_Core_Variant::AssignmentTest_OneDictType(_DictTy &&dict)
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AssignmentTest_VariantType()
+int FuncTest_Core_Variant::AssignmentTest_VariantType()
 {
     LLBC_PrintLn("Assignment test(Variant type):");
 
@@ -2310,7 +2310,7 @@ int TestCase_Core_Variant::AssignmentTest_VariantType()
 }
 
 template <typename... _RawTys>
-int TestCase_Core_Variant::AssignmentTest_RawVariantTypes()
+int FuncTest_Core_Variant::AssignmentTest_RawVariantTypes()
 {
     const bool allExpect = (... && (AssignmentTest_OneRawVariantType<_RawTys>() == LLBC_OK));
     LLBC_Expect(allExpect, "RawTys Assignment test(Variant type)");
@@ -2319,7 +2319,7 @@ int TestCase_Core_Variant::AssignmentTest_RawVariantTypes()
 }
 
 template <typename _RawTy>
-int TestCase_Core_Variant::AssignmentTest_OneRawVariantType()
+int FuncTest_Core_Variant::AssignmentTest_OneRawVariantType()
 {
     LLBC_Variant rawVar1(static_cast<_RawTy>(std::numeric_limits<_RawTy>::min() + 1));
     LLBC_Expect(AssignmentTest_OneVariantType<_RawTy>(rawVar1) == LLBC_OK);
@@ -2331,7 +2331,7 @@ int TestCase_Core_Variant::AssignmentTest_OneRawVariantType()
 }
 
 template <typename... _StrTys>
-int TestCase_Core_Variant::AssignmentTest_StrVariantTypes()
+int FuncTest_Core_Variant::AssignmentTest_StrVariantTypes()
 {
     const bool allExpect = (... && (AssignmentTest_OneStrVariantType<_StrTys>() == LLBC_OK));
     LLBC_Expect(allExpect, "All StrTys Assignment test(Variant type)");
@@ -2340,7 +2340,7 @@ int TestCase_Core_Variant::AssignmentTest_StrVariantTypes()
 }
 
 template <typename _StrTy>
-int TestCase_Core_Variant::AssignmentTest_OneStrVariantType()
+int FuncTest_Core_Variant::AssignmentTest_OneStrVariantType()
 {
     _StrTy strVal("Hello world");
     LLBC_Variant strVar(strVal);
@@ -2350,7 +2350,7 @@ int TestCase_Core_Variant::AssignmentTest_OneStrVariantType()
 }
 
 template <typename... _SeqTys>
-int TestCase_Core_Variant::AssignmentTest_SeqVariantTypes()
+int FuncTest_Core_Variant::AssignmentTest_SeqVariantTypes()
 {
     const bool allExpect = (... && (AssignmentTest_OneSeqVariantType<_SeqTys>() == LLBC_OK));
     LLBC_Expect(allExpect, "All SeqTys Assignment test(Variant type)");
@@ -2359,7 +2359,7 @@ int TestCase_Core_Variant::AssignmentTest_SeqVariantTypes()
 }
 
 template <typename _SeqTy>
-int TestCase_Core_Variant::AssignmentTest_OneSeqVariantType()
+int FuncTest_Core_Variant::AssignmentTest_OneSeqVariantType()
 {
     _SeqTy seqVal;
     if constexpr (LLBC_IsTemplSpec<_SeqTy, std::pair>::value)
@@ -2419,7 +2419,7 @@ int TestCase_Core_Variant::AssignmentTest_OneSeqVariantType()
 }
 
 template <typename... _DictTys>
-int TestCase_Core_Variant::AssignmentTest_DictVariantTypes()
+int FuncTest_Core_Variant::AssignmentTest_DictVariantTypes()
 {
     const bool allExpect = (... && (AssignmentTest_OneDictVariantType<_DictTys>() == LLBC_OK));
     LLBC_Expect(allExpect, "All DictTys Assignment test(Variant type)");
@@ -2428,7 +2428,7 @@ int TestCase_Core_Variant::AssignmentTest_DictVariantTypes()
 }
 
 template <typename _DictTy>
-int TestCase_Core_Variant::AssignmentTest_OneDictVariantType()
+int FuncTest_Core_Variant::AssignmentTest_OneDictVariantType()
 {
     _DictTy dictVal;
     if constexpr (LLBC_IsTemplSpec<_DictTy, std::map>::value ||
@@ -2463,7 +2463,7 @@ int TestCase_Core_Variant::AssignmentTest_OneDictVariantType()
 }
 
 template <typename _RealTy>
-int TestCase_Core_Variant::AssignmentTest_OneVariantType(LLBC_Variant &var)
+int FuncTest_Core_Variant::AssignmentTest_OneVariantType(LLBC_Variant &var)
 {
     LLBC_Expect(AssignmentTest_OneVariantTypeOneRefType<_RealTy>(var) == LLBC_OK);
     LLBC_Expect(AssignmentTest_OneVariantTypeOneRefType<_RealTy>(static_cast<const LLBC_Variant &>(var)) == LLBC_OK);
@@ -2473,7 +2473,7 @@ int TestCase_Core_Variant::AssignmentTest_OneVariantType(LLBC_Variant &var)
 }
 
 template <typename _RealTy, typename _VarTy>
-int TestCase_Core_Variant::AssignmentTest_OneVariantTypeOneRefType(_VarTy &&var)
+int FuncTest_Core_Variant::AssignmentTest_OneVariantTypeOneRefType(_VarTy &&var)
 {
     // Print assignment test info.
     constexpr bool isRValueRef = std::is_rvalue_reference_v<_VarTy &&>;
@@ -2535,7 +2535,7 @@ int TestCase_Core_Variant::AssignmentTest_OneVariantTypeOneRefType(_VarTy &&var)
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignment()
+int FuncTest_Core_Variant::AssignmentTest_EfficientSeqAssignment()
 {
     LLBC_PrintLn("Assignment test(Efficient Seq assignment):");
 
@@ -2595,7 +2595,7 @@ int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignment()
     return LLBC_OK;
 }
 
-void TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignment_ConstructTestVariant(
+void FuncTest_Core_Variant::AssignmentTest_EfficientSeqAssignment_ConstructTestVariant(
     size_t testSeqVarSize,
     LLBC_Variant &testSeqVar)
 {
@@ -2605,7 +2605,7 @@ void TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignment_ConstructTestV
 }
 
 template <typename _PairTy>
-int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignmentOnePairType(_PairTy &&pairVal)
+int FuncTest_Core_Variant::AssignmentTest_EfficientSeqAssignmentOnePairType(_PairTy &&pairVal)
 {
     typedef std::remove_cv_t<std::remove_reference_t<_PairTy>> _PurePairTy;
 
@@ -2652,7 +2652,7 @@ int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignmentOnePairType(_Pai
 }
 
 template <typename _NonPairTy>
-int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignmentOneNonPairType(_NonPairTy &&nonPairVal)
+int FuncTest_Core_Variant::AssignmentTest_EfficientSeqAssignmentOneNonPairType(_NonPairTy &&nonPairVal)
 {
     typedef std::remove_cv_t<std::remove_reference_t<_NonPairTy>> _PureNonPairTy;
 
@@ -2709,7 +2709,7 @@ int TestCase_Core_Variant::AssignmentTest_EfficientSeqAssignmentOneNonPairType(_
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::BoolOperatorTest()
+int FuncTest_Core_Variant::BoolOperatorTest()
 {
     LLBC_PrintLn("Bool operator test:");
 
@@ -2768,7 +2768,7 @@ int TestCase_Core_Variant::BoolOperatorTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::GetTypeTest()
+int FuncTest_Core_Variant::GetTypeTest()
 {
     LLBC_Print("GetType/GetFirstType test:");
 
@@ -2846,7 +2846,7 @@ int TestCase_Core_Variant::GetTypeTest()
 }
 
 template <typename... _RawTys>
-int TestCase_Core_Variant::GetTypeTest_RawTypes()
+int FuncTest_Core_Variant::GetTypeTest_RawTypes()
 {
     LLBC_Expect(... && (GetTypeTest_OneRawType<_RawTys>() == LLBC_OK));
 
@@ -2854,7 +2854,7 @@ int TestCase_Core_Variant::GetTypeTest_RawTypes()
 }
 
 template <typename _RawTy>
-int TestCase_Core_Variant::GetTypeTest_OneRawType()
+int FuncTest_Core_Variant::GetTypeTest_OneRawType()
 {
     LLBC_Variant rawVar(_RawTy{});
     LLBC_Expect((rawVar.GetType() == LLBC_VariantType::DeduceType<_RawTy>()) &&
@@ -2864,7 +2864,7 @@ int TestCase_Core_Variant::GetTypeTest_OneRawType()
 }
 
 template <typename... _StrTys>
-int TestCase_Core_Variant::GetTypeTest_StrTypes()
+int FuncTest_Core_Variant::GetTypeTest_StrTypes()
 {
     LLBC_Expect(... && (GetTypeTest_OneStrType<_StrTys>() == LLBC_OK));
 
@@ -2872,7 +2872,7 @@ int TestCase_Core_Variant::GetTypeTest_StrTypes()
 }
 
 template <typename _StrTy>
-int TestCase_Core_Variant::GetTypeTest_OneStrType()
+int FuncTest_Core_Variant::GetTypeTest_OneStrType()
 {
     LLBC_Variant strVar(_StrTy{});
     LLBC_Expect((strVar.GetType() == LLBC_VariantType::DeduceType<_StrTy>()) &&
@@ -2882,14 +2882,14 @@ int TestCase_Core_Variant::GetTypeTest_OneStrType()
 }
 
 template <typename... _SeqTys>
-int TestCase_Core_Variant::GetTypeTest_SeqTypes()
+int FuncTest_Core_Variant::GetTypeTest_SeqTypes()
 {
     LLBC_Expect(... && (GetTypeTest_OneSeqType<_SeqTys>() == LLBC_OK));
     return LLBC_OK;
 }
 
 template <typename _SeqTy>
-int TestCase_Core_Variant::GetTypeTest_OneSeqType()
+int FuncTest_Core_Variant::GetTypeTest_OneSeqType()
 {
     LLBC_Variant seqVar(_SeqTy{});
     LLBC_Expect((seqVar.GetType() == LLBC_VariantType::DeduceType<_SeqTy>()) &&
@@ -2899,7 +2899,7 @@ int TestCase_Core_Variant::GetTypeTest_OneSeqType()
 }
 
 template <typename... _DictTys>
-int TestCase_Core_Variant::GetTypeTest_DictTypes()
+int FuncTest_Core_Variant::GetTypeTest_DictTypes()
 {
     LLBC_Expect(... &&(GetTypeTest_OneDictType<_DictTys>() == LLBC_OK));
 
@@ -2907,7 +2907,7 @@ int TestCase_Core_Variant::GetTypeTest_DictTypes()
 }
 
 template <typename _DictTy>
-int TestCase_Core_Variant::GetTypeTest_OneDictType()
+int FuncTest_Core_Variant::GetTypeTest_OneDictType()
 {
     LLBC_Variant dictVar(_DictTy{});
     LLBC_Expect((dictVar.GetType() == LLBC_VariantType::DeduceType<_DictTy>()) &&
@@ -2916,7 +2916,7 @@ int TestCase_Core_Variant::GetTypeTest_OneDictType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::IsXxxTest()
+int FuncTest_Core_Variant::IsXxxTest()
 {
     LLBC_PrintLn("IsXxx() test:");
 
@@ -2988,7 +2988,7 @@ int TestCase_Core_Variant::IsXxxTest()
 }
 
 template <typename... _RawTys>
-int TestCase_Core_Variant::IsXxxTest_RawTypes()
+int FuncTest_Core_Variant::IsXxxTest_RawTypes()
 {
     LLBC_Expect(... && (IsXxxTest_OneRawType<_RawTys>() == LLBC_OK));
 
@@ -2996,7 +2996,7 @@ int TestCase_Core_Variant::IsXxxTest_RawTypes()
 }
 
 template <typename _RawTy>
-int TestCase_Core_Variant::IsXxxTest_OneRawType()
+int FuncTest_Core_Variant::IsXxxTest_OneRawType()
 {
     LLBC_Variant rawVar(_RawTy{});
     LLBC_Expect((rawVar.Is<_RawTy>() &&
@@ -3008,7 +3008,7 @@ int TestCase_Core_Variant::IsXxxTest_OneRawType()
 }
 
 template <typename... _StrTys>
-int TestCase_Core_Variant::IsXxxTest_StrTypes()
+int FuncTest_Core_Variant::IsXxxTest_StrTypes()
 {
     LLBC_Expect(... && (IsXxxTest_OneStrType<_StrTys>() == LLBC_OK));
 
@@ -3016,7 +3016,7 @@ int TestCase_Core_Variant::IsXxxTest_StrTypes()
 }
 
 template <typename _StrTy>
-int TestCase_Core_Variant::IsXxxTest_OneStrType()
+int FuncTest_Core_Variant::IsXxxTest_OneStrType()
 {
     LLBC_Variant strVar(_StrTy{});
     LLBC_Expect((strVar.Is<_StrTy>() && strVar.Is<LLBC_Variant::Str>()));
@@ -3025,7 +3025,7 @@ int TestCase_Core_Variant::IsXxxTest_OneStrType()
 }
 
 template <typename... _SeqTys>
-int TestCase_Core_Variant::IsXxxTest_SeqTypes()
+int FuncTest_Core_Variant::IsXxxTest_SeqTypes()
 {
     LLBC_Expect(... && (IsXxxTest_OneSeqType<_SeqTys>() == LLBC_OK));
 
@@ -3033,7 +3033,7 @@ int TestCase_Core_Variant::IsXxxTest_SeqTypes()
 }
 
 template <typename _SeqTy>
-int TestCase_Core_Variant::IsXxxTest_OneSeqType()
+int FuncTest_Core_Variant::IsXxxTest_OneSeqType()
 {
     LLBC_Variant seqVar(_SeqTy{});
     LLBC_Expect(seqVar.Is<_SeqTy>() && seqVar.Is<LLBC_Variant::Seq>());
@@ -3042,7 +3042,7 @@ int TestCase_Core_Variant::IsXxxTest_OneSeqType()
 }
 
 template <typename... _DictTys>
-int TestCase_Core_Variant::IsXxxTest_DictTypes()
+int FuncTest_Core_Variant::IsXxxTest_DictTypes()
 {
     LLBC_Expect(... && (IsXxxTest_OneDictType<_DictTys>() == LLBC_OK));
 
@@ -3050,7 +3050,7 @@ int TestCase_Core_Variant::IsXxxTest_DictTypes()
 }
 
 template <typename _DictTy>
-int TestCase_Core_Variant::IsXxxTest_OneDictType()
+int FuncTest_Core_Variant::IsXxxTest_OneDictType()
 {
     LLBC_Variant dictVar(_DictTy{});
     LLBC_Expect(dictVar.Is<_DictTy>() && dictVar.Is<LLBC_Variant::Dict>());
@@ -3058,7 +3058,7 @@ int TestCase_Core_Variant::IsXxxTest_OneDictType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::BecomeTest()
+int FuncTest_Core_Variant::BecomeTest()
 {
     LLBC_PrintLn("Become() test:");
 
@@ -3110,14 +3110,14 @@ int TestCase_Core_Variant::BecomeTest()
 }
 
 template <typename... _RawTys>
-int TestCase_Core_Variant::BecomeTest_RawTypes()
+int FuncTest_Core_Variant::BecomeTest_RawTypes()
 {
     LLBC_Expect(... && (BecomeTest_OneRawType<_RawTys>() == LLBC_OK));
     return LLBC_OK;
 }
 
 template <typename _RawTy>
-int TestCase_Core_Variant::BecomeTest_OneRawType()
+int FuncTest_Core_Variant::BecomeTest_OneRawType()
 {
     LLBC_Variant var;
     if constexpr (std::is_integral_v<_RawTy>)
@@ -3143,14 +3143,14 @@ int TestCase_Core_Variant::BecomeTest_OneRawType()
 }
 
 template <typename... _StrTys>
-int TestCase_Core_Variant::BecomeTest_StrTypes()
+int FuncTest_Core_Variant::BecomeTest_StrTypes()
 {
     LLBC_Expect(... && (BecomeTest_OneStrType<_StrTys>() == LLBC_OK));
     return LLBC_OK;
 }
 
 template <typename _StrTy>
-int TestCase_Core_Variant::BecomeTest_OneStrType()
+int FuncTest_Core_Variant::BecomeTest_OneStrType()
 {
     // Str -> Str.
     _StrTy strVal("Hello world");
@@ -3173,7 +3173,7 @@ int TestCase_Core_Variant::BecomeTest_OneStrType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::BecomeTest_SeqType()
+int FuncTest_Core_Variant::BecomeTest_SeqType()
 {
     LLBC_Variant seqVar;
     for (int i = 0; i < 10; ++i)
@@ -3210,7 +3210,7 @@ int TestCase_Core_Variant::BecomeTest_SeqType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::BecomeTest_DictType()
+int FuncTest_Core_Variant::BecomeTest_DictType()
 {
     LLBC_Variant dictVar;
     for (int i = 0; i < 10; ++i)
@@ -3247,7 +3247,7 @@ int TestCase_Core_Variant::BecomeTest_DictType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::BecomeTest_UnsupportedType()
+int FuncTest_Core_Variant::BecomeTest_UnsupportedType()
 {
     // Note: If uncomment below code, will cause compile error.
     // - Error content: "error: no matching function for call to ‘llbc::LLBC_Variant::Become<xxx>()’"
@@ -3262,7 +3262,7 @@ int TestCase_Core_Variant::BecomeTest_UnsupportedType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AsTest()
+int FuncTest_Core_Variant::AsTest()
 {
     LLBC_PrintLn("As<Xxx>() test:");
 
@@ -3385,14 +3385,14 @@ int TestCase_Core_Variant::AsTest()
 }
 
 template <typename... _RawTys>
-int TestCase_Core_Variant::AsTest_RawTypes()
+int FuncTest_Core_Variant::AsTest_RawTypes()
 {
     LLBC_Expect(... && (AsTest_OneRawType<_RawTys>() == LLBC_OK));
     return LLBC_OK;
 }
 
 template <typename _RawTy>
-int TestCase_Core_Variant::AsTest_OneRawType()
+int FuncTest_Core_Variant::AsTest_OneRawType()
 {
     LLBC_PrintLn("- AsTest - OneRawType - %s", LLBC_GetTypeName(_RawTy));
 
@@ -3424,7 +3424,7 @@ int TestCase_Core_Variant::AsTest_OneRawType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AsTest_StrType()
+int FuncTest_Core_Variant::AsTest_StrType()
 {
     LLBC_String strVal("8");
     const LLBC_Variant strVar(strVal);
@@ -3449,7 +3449,7 @@ int TestCase_Core_Variant::AsTest_StrType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AsTest_SeqType()
+int FuncTest_Core_Variant::AsTest_SeqType()
 {
     // Emtpy Seq:
     LLBC_Variant emptySeqVar;
@@ -3507,7 +3507,7 @@ int TestCase_Core_Variant::AsTest_SeqType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AsTest_DictType()
+int FuncTest_Core_Variant::AsTest_DictType()
 {
     // Empty Dict:
     LLBC_Variant emptyDictVar;
@@ -3567,7 +3567,7 @@ int TestCase_Core_Variant::AsTest_DictType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::AsLooseBoolTest()
+int FuncTest_Core_Variant::AsLooseBoolTest()
 {
     LLBC_PrintLn("AsLooseBool() test:");
 
@@ -3630,14 +3630,14 @@ int TestCase_Core_Variant::AsLooseBoolTest()
 }
 
 template <typename... _RawTys>
-int TestCase_Core_Variant::AsLooseBoolTest_RawTypes()
+int FuncTest_Core_Variant::AsLooseBoolTest_RawTypes()
 {
     LLBC_Expect(... && (AsLooseBoolTest_OneRawType<_RawTys>() == LLBC_OK));
     return LLBC_OK;
 }
 
 template <typename _RawTy>
-int TestCase_Core_Variant::AsLooseBoolTest_OneRawType()
+int FuncTest_Core_Variant::AsLooseBoolTest_OneRawType()
 {
     // Default Raw: false.
     LLBC_Expect(LLBC_Variant(_RawTy{}).AsLooseBool() == false);
@@ -3655,7 +3655,7 @@ int TestCase_Core_Variant::AsLooseBoolTest_OneRawType()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ImplicitValueFetchTest()
+int FuncTest_Core_Variant::ImplicitValueFetchTest()
 {
     LLBC_PrintLn("Implicit value fetch test:");
 
@@ -3707,7 +3707,7 @@ int TestCase_Core_Variant::ImplicitValueFetchTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ClearTest()
+int FuncTest_Core_Variant::ClearTest()
 {
     LLBC_PrintLn("Clear() test:");
 
@@ -3748,7 +3748,7 @@ int TestCase_Core_Variant::ClearTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::IsEmptyTest()
+int FuncTest_Core_Variant::IsEmptyTest()
 {
     LLBC_PrintLn("IsEmpty() test:");
 
@@ -3781,7 +3781,7 @@ int TestCase_Core_Variant::IsEmptyTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::SizeAndCapacityTest()
+int FuncTest_Core_Variant::SizeAndCapacityTest()
 {
     LLBC_PrintLn("Size() && Capacity() test:");
 
@@ -3842,7 +3842,7 @@ int TestCase_Core_Variant::SizeAndCapacityTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::CountAndContainsTest()
+int FuncTest_Core_Variant::CountAndContainsTest()
 {
     LLBC_PrintLn("Count() test:");
 
@@ -3954,7 +3954,7 @@ int TestCase_Core_Variant::CountAndContainsTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::SeqSpecificTest()
+int FuncTest_Core_Variant::SeqSpecificTest()
 {
     LLBC_PrintLn("Sequence specific test:");
 
@@ -4224,7 +4224,7 @@ int TestCase_Core_Variant::SeqSpecificTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::DictSpecificTest()
+int FuncTest_Core_Variant::DictSpecificTest()
 {
     LLBC_PrintLn("Dictionary specific test:");
 
@@ -4327,7 +4327,7 @@ int TestCase_Core_Variant::DictSpecificTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::DictSpecificTest_Insert()
+int FuncTest_Core_Variant::DictSpecificTest_Insert()
 {
     LLBC_PrintLn("- DictSpecificTest_Insert:");
 
@@ -4453,7 +4453,7 @@ int TestCase_Core_Variant::DictSpecificTest_Insert()
 }
 
 template <typename _KeyTy, typename _ValTy>
-int TestCase_Core_Variant::DictSpecificTest_InsertOne(LLBC_Variant &var, const _KeyTy &key, const _ValTy &val, bool expectSucc)
+int FuncTest_Core_Variant::DictSpecificTest_InsertOne(LLBC_Variant &var, const _KeyTy &key, const _ValTy &val, bool expectSucc)
 {
     const LLBC_String keyTyName = LLBC_GetTypeName(_KeyTy);
     const LLBC_String valTyName = LLBC_GetTypeName(_ValTy);
@@ -4481,7 +4481,7 @@ int TestCase_Core_Variant::DictSpecificTest_InsertOne(LLBC_Variant &var, const _
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::DictSpecificTest_Erase()
+int FuncTest_Core_Variant::DictSpecificTest_Erase()
 {
     LLBC_PrintLn("- DictSpecificTest_Erase:");
 
@@ -4651,7 +4651,7 @@ int TestCase_Core_Variant::DictSpecificTest_Erase()
 }
 
 template <typename _KeyTy>
-int TestCase_Core_Variant::DictSpecificTest_EraseOne(LLBC_Variant &var, const _KeyTy &key, bool expectSucc)
+int FuncTest_Core_Variant::DictSpecificTest_EraseOne(LLBC_Variant &var, const _KeyTy &key, bool expectSucc)
 {
     LLBC_PrintLn(" - DictSpecificTest_EraseOne, key:%s, expectSucc:%d",
                  LLBC_Variant(key).ToString().c_str(),
@@ -4666,7 +4666,7 @@ int TestCase_Core_Variant::DictSpecificTest_EraseOne(LLBC_Variant &var, const _K
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::SubscriptOperatorTest()
+int FuncTest_Core_Variant::SubscriptOperatorTest()
 {
     LLBC_PrintLn("- SubscriptOperatorTest:");
 
@@ -4676,7 +4676,7 @@ int TestCase_Core_Variant::SubscriptOperatorTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::SubscriptOperatorTest_Seq()
+int FuncTest_Core_Variant::SubscriptOperatorTest_Seq()
 {
     LLBC_PrintLn(" - ubscriptOperatorTest_Seq:");
 
@@ -4735,7 +4735,7 @@ int TestCase_Core_Variant::SubscriptOperatorTest_Seq()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::SubscriptOperatorTest_Dict()
+int FuncTest_Core_Variant::SubscriptOperatorTest_Dict()
 {
     LLBC_PrintLn(" - SubscriptOperatorTest_Dict:");
 
@@ -4791,7 +4791,7 @@ int TestCase_Core_Variant::SubscriptOperatorTest_Dict()
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::RelationalOperatorTest()
+int FuncTest_Core_Variant::RelationalOperatorTest()
 {
     LLBC_PrintLn("- RelationalOperatorTest:");
 
@@ -4809,7 +4809,7 @@ int TestCase_Core_Variant::RelationalOperatorTest()
     return LLBC_OK;
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType(LLBC_Variant &testDatas)
 {
     RelationalOperatorTest_GenTestDatas_DiffType_NilVsOthers(testDatas);
     RelationalOperatorTest_GenTestDatas_DiffType_RawVsOthers(testDatas);
@@ -4818,7 +4818,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType(LLBC_Va
     RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(testDatas);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas)
 {
     // nil vs other types.
     const size_t beginPos = testDatas.Size();
@@ -4859,7 +4859,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_NilVsOt
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas)
 {
     // raw vs other types.
     const size_t beginPos = testDatas.Size();
@@ -4896,7 +4896,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_RawVsOt
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas)
 {
     // str vs other types.
     const size_t beginPos = testDatas.Size();
@@ -4929,7 +4929,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_StrVsOt
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas)
 {
     // seq vs other types.
     const size_t beginPos = testDatas.Size();
@@ -4962,7 +4962,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_SeqVsOt
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas)
 {
     // dict vs other types.
     const size_t beginPos1 = testDatas.Size();
@@ -4995,7 +4995,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_DiffType_DictVsO
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos1);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas)
 {
     RelationalOperatorTest_GenTestDatas_SameType_Nil(testDatas);
     RelationalOperatorTest_GenTestDatas_SameType_Raw(testDatas);
@@ -5004,7 +5004,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType(LLBC_Va
     RelationalOperatorTest_GenTestDatas_SameType_Dict(testDatas);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas)
 {
     testDatas.SeqPushBack(std::vector{LLBC_Variant::nil,
                                       LLBC_Variant::nil,
@@ -5012,7 +5012,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Nil(LLB
                                       LLBC_Variant(false)});
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas)
 {
     // - bool:
     const size_t beginPos = testDatas.Size();
@@ -5110,7 +5110,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Raw(LLB
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas)
 {
     // Empty Str vs Empty Str:
     const size_t beginPos = testDatas.Size();
@@ -5138,7 +5138,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Str(LLB
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas)
 {
     // Empty Seq vs Empty Seq:
     const size_t beginPos = testDatas.Size();
@@ -5166,7 +5166,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Seq(LLB
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas)
 {
     // Empty Dict vs Empty Dict:
     const size_t beginPos = testDatas.Size();
@@ -5194,7 +5194,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_GenTestDatas_SameType_Dict(LL
     RelationalOperatorTest_ReverseTestDatas(testDatas, beginPos);
 }
 
-void TestCase_Core_Variant::RelationalOperatorTest_ReverseTestDatas(LLBC_Variant &testDatas, size_t beginPos)
+void FuncTest_Core_Variant::RelationalOperatorTest_ReverseTestDatas(LLBC_Variant &testDatas, size_t beginPos)
 {
     const size_t endPos = testDatas.Size();
     for (size_t pos = beginPos; pos != endPos; ++pos)
@@ -5209,7 +5209,7 @@ void TestCase_Core_Variant::RelationalOperatorTest_ReverseTestDatas(LLBC_Variant
     }
 }
 
-int TestCase_Core_Variant::RelationOperatorTest_ExceptCheck(LLBC_Variant &testData)
+int FuncTest_Core_Variant::RelationOperatorTest_ExceptCheck(LLBC_Variant &testData)
 {
     LLBC_PrintLn(" - Relational operator test, except check: lhs:%s, rhs:%s, exceptEq:%s, exceptLt:%s",
                  testData[0].ToString().c_str(),
@@ -5238,7 +5238,7 @@ int TestCase_Core_Variant::RelationOperatorTest_ExceptCheck(LLBC_Variant &testDa
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::ArithmeticOperatorTest()
+int FuncTest_Core_Variant::ArithmeticOperatorTest()
 {
     LLBC_PrintLn("Arithmetic operator test:");
 
@@ -5257,7 +5257,7 @@ int TestCase_Core_Variant::ArithmeticOperatorTest()
     return LLBC_OK;
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType(LLBC_Variant &testDatas)
 {
     ArithmeticOperatorTest_GenTestDatas_DiffType_NilVsOthers(testDatas);
     ArithmeticOperatorTest_GenTestDatas_DiffType_RawVsOthers(testDatas);
@@ -5266,7 +5266,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType(LLBC_Va
     ArithmeticOperatorTest_GenTestDatas_DiffType_DictVsOthers(testDatas);
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_NilVsOthers(LLBC_Variant &testDatas)
 {
     // Nil vs Raw:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
@@ -5333,7 +5333,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_NilVsOt
                                                                   LLBC_Variant::nil));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_RawVsOthers(LLBC_Variant &testDatas)
 {
     // Raw vs Nil:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(1,
@@ -5377,7 +5377,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_RawVsOt
                                                                   123));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_StrVsOthers(LLBC_Variant &testDatas)
 {
     // Str vs Nil:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("123",
@@ -5431,7 +5431,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_StrVsOt
                                                                   "123"));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_SeqVsOthers(LLBC_Variant &testDatas)
 {
     // Seq vs Nil:
     LLBC_Variant expectAddResult;
@@ -5480,7 +5480,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_SeqVsOt
                                                                   std::vector<int>{1, 2, 3}));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_DictVsOthers(LLBC_Variant &testDatas)
 {
     // Dict vs Nil:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(std::map<int, int>{{1, 10}, {2, 20}, {3, 30}},
@@ -5535,7 +5535,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_DiffType_DictVsO
                                                                   std::map<int, int>{{1, 10}, {2, 20}, {3, 30}}));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType(LLBC_Variant &testDatas)
 {
     ArithmeticOperatorTest_GenTestDatas_SameType_Nil(testDatas);
     ArithmeticOperatorTest_GenTestDatas_SameType_Raw(testDatas);
@@ -5544,7 +5544,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType(LLBC_Va
     ArithmeticOperatorTest_GenTestDatas_SameType_Dict(testDatas);
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Nil(LLBC_Variant &testDatas)
 {
     // Nil vs Nil:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::nil,
@@ -5557,7 +5557,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Nil(LLB
                                                                   LLBC_Variant::nil));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Raw(LLBC_Variant &testDatas)
 {
     // Bool vs Bool:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(false,
@@ -5670,7 +5670,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Raw(LLB
                                                                   static_cast<sint64>(3.1) % static_cast<sint64>(1.3)));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Str(LLBC_Variant &testDatas)
 {
     // Empty Str vs Empty Str:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData("",
@@ -5713,7 +5713,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Str(LLB
                                                                   "Hello World Hello World"));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Seq(LLBC_Variant &testDatas)
 {
     // Empty Seq vs Empty Seq:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::Seq(),
@@ -5756,7 +5756,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Seq(LLB
                                                                   std::vector{1, 2, 3}));
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_GenTestDatas_SameType_Dict(LLBC_Variant &testDatas)
 {
     // Empty Dict vs Empty Dict:
     testDatas.SeqPushBack(ArithmeticOperatorTest_BuildOneTestData(LLBC_Variant::Dict(),
@@ -5806,7 +5806,7 @@ template <typename _LeftTy,
           typename _ExpectMulResultTy,
           typename _ExpectDivResultTy,
           typename _ExpectModResultTy>
-LLBC_Variant TestCase_Core_Variant::ArithmeticOperatorTest_BuildOneTestData(const _LeftTy &left,
+LLBC_Variant FuncTest_Core_Variant::ArithmeticOperatorTest_BuildOneTestData(const _LeftTy &left,
                                                                             const _RightTy &right,
                                                                             bool execXxxAndEqual,
                                                                             const _ExpectAddResultTy &expectAddResult,
@@ -5828,7 +5828,7 @@ LLBC_Variant TestCase_Core_Variant::ArithmeticOperatorTest_BuildOneTestData(cons
     return testData;
 }
 
-void TestCase_Core_Variant::ArithmeticOperatorTest_BuildXxxAndEqualTestDatas(LLBC_Variant &testDatas)
+void FuncTest_Core_Variant::ArithmeticOperatorTest_BuildXxxAndEqualTestDatas(LLBC_Variant &testDatas)
 {
     const auto size = testDatas.Size();
     for (size_t i = 0; i < size; ++i)
@@ -5839,7 +5839,7 @@ void TestCase_Core_Variant::ArithmeticOperatorTest_BuildXxxAndEqualTestDatas(LLB
     }
 }
 
-int TestCase_Core_Variant::ArithmeticOperatorTest_ExceptCheck(LLBC_Variant &testData)
+int FuncTest_Core_Variant::ArithmeticOperatorTest_ExceptCheck(LLBC_Variant &testData)
 {
     const auto &left = testData[0];
     const auto &right = testData[1];
@@ -5918,7 +5918,7 @@ int TestCase_Core_Variant::ArithmeticOperatorTest_ExceptCheck(LLBC_Variant &test
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::SerDeserTest()
+int FuncTest_Core_Variant::SerDeserTest()
 {
     LLBC_PrintLn("SerDeserTest:");
 
@@ -5940,7 +5940,7 @@ int TestCase_Core_Variant::SerDeserTest()
 }
 
 template <typename _Ty>
-int TestCase_Core_Variant::SerDeserTestOne(const _Ty &val)
+int FuncTest_Core_Variant::SerDeserTestOne(const _Ty &val)
 {
     LLBC_Variant var1(val);
 
@@ -5971,7 +5971,7 @@ int TestCase_Core_Variant::SerDeserTestOne(const _Ty &val)
     return LLBC_OK;
 }
 
-int TestCase_Core_Variant::OstreamOutputTest()
+int FuncTest_Core_Variant::OstreamOutputTest()
 {
     LLBC_PrintLn("OstreamOutputTest:");
 

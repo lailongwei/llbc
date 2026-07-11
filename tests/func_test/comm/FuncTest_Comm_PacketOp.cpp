@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_PacketOp.h"
+#include "comm/FuncTest_Comm_PacketOp.h"
 
 namespace
 {
@@ -31,15 +31,15 @@ namespace
     }
 }
 
-TestCase_Comm_PacketOp::TestCase_Comm_PacketOp()
+FuncTest_Comm_PacketOp::FuncTest_Comm_PacketOp()
 {
 }
 
-TestCase_Comm_PacketOp::~TestCase_Comm_PacketOp()
+FuncTest_Comm_PacketOp::~FuncTest_Comm_PacketOp()
 {
 }
 
-int TestCase_Comm_PacketOp::Run(int argc, char *argv[])
+int FuncTest_Comm_PacketOp::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("llbc library communication/packet test:");
 

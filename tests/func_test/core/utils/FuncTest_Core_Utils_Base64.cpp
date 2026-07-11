@@ -19,17 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "core/utils/TestCase_Core_Utils_Base64.h"
+#include "core/utils/FuncTest_Core_Utils_Base64.h"
 
-TestCase_Core_Utils_Base64::TestCase_Core_Utils_Base64()
+FuncTest_Core_Utils_Base64::FuncTest_Core_Utils_Base64()
 {
 }
 
-TestCase_Core_Utils_Base64::~TestCase_Core_Utils_Base64()
+FuncTest_Core_Utils_Base64::~FuncTest_Core_Utils_Base64()
 {
 }
 
-int TestCase_Core_Utils_Base64::Run(int argc, char *argv[])
+int FuncTest_Core_Utils_Base64::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/utils/base64 test: ");
 

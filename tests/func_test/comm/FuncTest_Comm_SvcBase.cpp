@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_SvcBase.h"
+#include "comm/FuncTest_Comm_SvcBase.h"
 
 namespace
 {
@@ -253,18 +253,18 @@ public:
 
 }
 
-TestCase_Comm_SvcBase::TestCase_Comm_SvcBase()
+FuncTest_Comm_SvcBase::FuncTest_Comm_SvcBase()
 : _svc(LLBC_Service::Create("SvcBaseTest"))
 // : _svc(LLBC_Service::Create("SvcBaseTest", nullptr, false))
 {
 }
 
-TestCase_Comm_SvcBase::~TestCase_Comm_SvcBase()
+FuncTest_Comm_SvcBase::~FuncTest_Comm_SvcBase()
 {
     delete _svc;
 }
 
-int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
+int FuncTest_Comm_SvcBase::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Communication Service Basic test:");
     LLBC_PrintLn("Note: Maybe you must use gdb or windbg to trace!");
@@ -316,7 +316,7 @@ int TestCase_Comm_SvcBase::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
+void FuncTest_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
 {
     LLBC_PrintLn("Listen in %s:%d", ip, port);
     int sid = _svc->Listen(ip, port);
@@ -339,7 +339,7 @@ void TestCase_Comm_SvcBase::ListenTest(const char *ip, uint16 port)
     }
 }
 
-void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
+void FuncTest_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
 {
     LLBC_PrintLn("Connect to %s:%d", ip, port);
     int sid = _svc->Connect(ip, port);
@@ -354,7 +354,7 @@ void TestCase_Comm_SvcBase::ConnectTest(const char *ip, uint16 port)
     }
 }
 
-void TestCase_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
+void FuncTest_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
 {
     int clientCount;
     if (strcmp(LLBC_CFG_COMM_POLLER_MODEL, "SelectPoller") == 0)
@@ -367,7 +367,7 @@ void TestCase_Comm_SvcBase::AsyncConnTest(const char *ip, uint16 port)
         _svc->AsyncConn(ip, port);
 }
 
-void TestCase_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
+void FuncTest_Comm_SvcBase::SendRecvTest(const char *ip, uint16 port)
 {
     LLBC_PrintLn("Send/Recv test:");
 

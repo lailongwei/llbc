@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/time/TestCase_Core_Time_Time.h"
+#include "core/time/FuncTest_Core_Time_Time.h"
 
-TestCase_Core_Time_Time::TestCase_Core_Time_Time()
+FuncTest_Core_Time_Time::FuncTest_Core_Time_Time()
 {
 }
 
-TestCase_Core_Time_Time::~TestCase_Core_Time_Time()
+FuncTest_Core_Time_Time::~FuncTest_Core_Time_Time()
 {
 }
 
-int TestCase_Core_Time_Time::Run(int argc, char *argv[])
+int FuncTest_Core_Time_Time::Run(int argc, char *argv[])
 {
     std::cout << "core/time/time test: " << std::endl;
 
@@ -64,7 +64,7 @@ int TestCase_Core_Time_Time::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Time_Time::OSTimeTest()
+void FuncTest_Core_Time_Time::OSTimeTest()
 {
     std::cout <<"OS_Time part test: " <<std::endl;
 
@@ -83,7 +83,7 @@ void TestCase_Core_Time_Time::OSTimeTest()
 #endif
 }
 
-void TestCase_Core_Time_Time::ConstexprTimeSpanTest()
+void FuncTest_Core_Time_Time::ConstexprTimeSpanTest()
 {
     std::cout <<"Constexpr TimeSpan test: " <<std::endl;
 
@@ -163,7 +163,7 @@ void TestCase_Core_Time_Time::ConstexprTimeSpanTest()
     std::cout << " - Success" <<std::endl;
 }
 
-void TestCase_Core_Time_Time::TimeClassTest()
+void FuncTest_Core_Time_Time::TimeClassTest()
 {
     std::cout <<"LLBC_Time test: " <<std::endl;
 
@@ -375,7 +375,7 @@ void TestCase_Core_Time_Time::TimeClassTest()
     std::cout <<"    millisec: " <<fromParts.GetMillisecond() <<", microsec: " <<fromParts.GetMicrosecond() <<std::endl;
 }
 
-void TestCase_Core_Time_Time::TimeSpanClassTest()
+void FuncTest_Core_Time_Time::TimeSpanClassTest()
 {
     std::cout << "LLBC_TimeSpan test:" << std::endl;
 
@@ -458,7 +458,7 @@ void TestCase_Core_Time_Time::TimeSpanClassTest()
               << std::endl;
 }
 
-void TestCase_Core_Time_Time::CpuTimeTest()
+void FuncTest_Core_Time_Time::CpuTimeTest()
 {
     std::cout << "Cpu time tsc test: " << std::endl;
     for(sint32 idx = 0; idx < 10; ++idx)
@@ -471,7 +471,7 @@ void TestCase_Core_Time_Time::CpuTimeTest()
     std::cout << "Cpu time tsc end\n" << std::endl;
 }
 
-void TestCase_Core_Time_Time::GetIntervalToTest()
+void FuncTest_Core_Time_Time::GetIntervalToTest()
 {
     std::cout << "Get interval to xxx test:" << std::endl;
 
@@ -530,7 +530,7 @@ void TestCase_Core_Time_Time::GetIntervalToTest()
         "2022-07-15 09:00:00"), LLBC_TimeSpan::FromDays(7 + 5, 8));
 }
 
-void TestCase_Core_Time_Time::CrossTimePeriodTest()
+void FuncTest_Core_Time_Time::CrossTimePeriodTest()
 {
     std::cout << "Cross time period test:" << std::endl;
 
@@ -812,7 +812,7 @@ void TestCase_Core_Time_Time::CrossTimePeriodTest()
                           2);
 }
 
-void TestCase_Core_Time_Time::WeekTest()
+void FuncTest_Core_Time_Time::WeekTest()
 {
     std::cout << "Week test:" << std::endl;
     LLBC_Time now = LLBC_Time::Now();
@@ -828,7 +828,7 @@ void TestCase_Core_Time_Time::WeekTest()
     std::cout << "- Begin time of week(beginIsSunday = false): " << now - now.GetOffsetTimeOfWeek(false) << std::endl;
 }
 
-void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
+void FuncTest_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
 {
     std::cout <<"\t tm_year: " <<ts.tm_year <<std::endl;
     std::cout <<"\t tm_mon : " <<ts.tm_mon  <<std::endl;
@@ -841,7 +841,7 @@ void TestCase_Core_Time_Time::PrintTimeStruct(const LLBC_TimeStruct &ts)
     std::cout <<"\t tm_gmtoff: " <<ts.tm_gmtoff <<std::endl;
 }
 
-void TestCase_Core_Time_Time::PrintCLibTimeStruct(const struct tm &ts)
+void FuncTest_Core_Time_Time::PrintCLibTimeStruct(const struct tm &ts)
 {
     std::cout <<"\t tm_year: " <<ts.tm_year <<std::endl;
     std::cout <<"\t tm_mon : " <<ts.tm_mon  <<std::endl;

@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/library/TestCase_Core_Library.h"
+#include "core/library/FuncTest_Core_Library.h"
 
-TestCase_Core_Library::TestCase_Core_Library()
+FuncTest_Core_Library::FuncTest_Core_Library()
 {
 }
 
-TestCase_Core_Library::~TestCase_Core_Library()
+FuncTest_Core_Library::~FuncTest_Core_Library()
 {
 }
 
-int TestCase_Core_Library::Run(int argc, char *argv[])
+int FuncTest_Core_Library::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("llbc library core/library module test case routine:");
 

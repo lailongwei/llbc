@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "comm/TestCase_Comm_RecentLoadInfo.h"
+#include "comm/FuncTest_Comm_RecentLoadInfo.h"
 
 #include <sstream>
 
@@ -101,15 +101,15 @@ namespace
     }
 }
 
-TestCase_Comm_RecentLoadInfo::TestCase_Comm_RecentLoadInfo()
+FuncTest_Comm_RecentLoadInfo::FuncTest_Comm_RecentLoadInfo()
 {
 }
 
-TestCase_Comm_RecentLoadInfo::~TestCase_Comm_RecentLoadInfo()
+FuncTest_Comm_RecentLoadInfo::~FuncTest_Comm_RecentLoadInfo()
 {
 }
 
-int TestCase_Comm_RecentLoadInfo::Run(int argc, char *argv[])
+int FuncTest_Comm_RecentLoadInfo::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("==== Service RecentLoadInfo TestCase ====");
     LLBC_PrintLn("Sample interval(from Config.h): %d seconds", kSampleIntervalSec);
@@ -117,19 +117,19 @@ int TestCase_Comm_RecentLoadInfo::Run(int argc, char *argv[])
     struct SubTest
     {
         const char *name;
-        int (TestCase_Comm_RecentLoadInfo::*func)();
+        int (FuncTest_Comm_RecentLoadInfo::*func)();
     };
     const SubTest tests[] = {
-        { "Disabled",                &TestCase_Comm_RecentLoadInfo::Test_Disabled                },
-        { "InvalidArgs",             &TestCase_Comm_RecentLoadInfo::Test_InvalidArgs             },
-        { "BasicStats",              &TestCase_Comm_RecentLoadInfo::Test_BasicStats              },
-        { "OverloadDetect",          &TestCase_Comm_RecentLoadInfo::Test_OverloadDetect          },
-        { "SlidingWindow",           &TestCase_Comm_RecentLoadInfo::Test_SlidingWindow           },
-        { "ConcurrentQuery",         &TestCase_Comm_RecentLoadInfo::Test_ConcurrentQuery         },
-        { "LargeSampleCount",        &TestCase_Comm_RecentLoadInfo::Test_LargeSampleCount        },
-        { "ExceedMaxSampleCount",    &TestCase_Comm_RecentLoadInfo::Test_ExceedMaxSampleCount    },
-        { "PartialSampleAtBoundary", &TestCase_Comm_RecentLoadInfo::Test_PartialSampleAtBoundary },
-        { "ToString",                &TestCase_Comm_RecentLoadInfo::Test_ToString                },
+        { "Disabled",                &FuncTest_Comm_RecentLoadInfo::Test_Disabled                },
+        { "InvalidArgs",             &FuncTest_Comm_RecentLoadInfo::Test_InvalidArgs             },
+        { "BasicStats",              &FuncTest_Comm_RecentLoadInfo::Test_BasicStats              },
+        { "OverloadDetect",          &FuncTest_Comm_RecentLoadInfo::Test_OverloadDetect          },
+        { "SlidingWindow",           &FuncTest_Comm_RecentLoadInfo::Test_SlidingWindow           },
+        { "ConcurrentQuery",         &FuncTest_Comm_RecentLoadInfo::Test_ConcurrentQuery         },
+        { "LargeSampleCount",        &FuncTest_Comm_RecentLoadInfo::Test_LargeSampleCount        },
+        { "ExceedMaxSampleCount",    &FuncTest_Comm_RecentLoadInfo::Test_ExceedMaxSampleCount    },
+        { "PartialSampleAtBoundary", &FuncTest_Comm_RecentLoadInfo::Test_PartialSampleAtBoundary },
+        { "ToString",                &FuncTest_Comm_RecentLoadInfo::Test_ToString                },
     };
 
     int failedCnt = 0;
@@ -153,7 +153,7 @@ int TestCase_Comm_RecentLoadInfo::Run(int argc, char *argv[])
 }
 
 // Sampling disabled(loadSampleTime=0): GetRecentLoadInfo() should return NOT_ALLOW.
-int TestCase_Comm_RecentLoadInfo::Test_Disabled()
+int FuncTest_Comm_RecentLoadInfo::Test_Disabled()
 {
     LLBC_PrintLn("Start service with loadSampleTime=0(disabled), expect GetRecentLoadInfo() return NOT_ALLOW.");
 
@@ -199,7 +199,7 @@ int TestCase_Comm_RecentLoadInfo::Test_Disabled()
 }
 
 // Invalid recentTime(zero/negative) should be rejected with ARG error.
-int TestCase_Comm_RecentLoadInfo::Test_InvalidArgs()
+int FuncTest_Comm_RecentLoadInfo::Test_InvalidArgs()
 {
     LLBC_Service *svc = LLBC_Service::Create("RLI_InvalidArgs");
     svc->AddComponent(new IdleComp);
@@ -235,7 +235,7 @@ int TestCase_Comm_RecentLoadInfo::Test_InvalidArgs()
 }
 
 // Idle service basic stats: recentTime/updateTimes>0, workingTime<=recentTime, avgFps around target.
-int TestCase_Comm_RecentLoadInfo::Test_BasicStats()
+int FuncTest_Comm_RecentLoadInfo::Test_BasicStats()
 {
     const int targetFps = 50;
     LLBC_Service *svc = LLBC_Service::Create("RLI_BasicStats");
@@ -298,7 +298,7 @@ int TestCase_Comm_RecentLoadInfo::Test_BasicStats()
 }
 
 // Force every frame overloaded, expect overloadTimes covers almost all frames.
-int TestCase_Comm_RecentLoadInfo::Test_OverloadDetect()
+int FuncTest_Comm_RecentLoadInfo::Test_OverloadDetect()
 {
     // FrameInterval=50ms, OnUpdate sleeps 80ms => every frame is overload.
     const int targetFps = 20;
@@ -344,7 +344,7 @@ int TestCase_Comm_RecentLoadInfo::Test_OverloadDetect()
 }
 
 // Fill & evict ring, query with small vs. big recentTime, verify sliding window scales.
-int TestCase_Comm_RecentLoadInfo::Test_SlidingWindow()
+int FuncTest_Comm_RecentLoadInfo::Test_SlidingWindow()
 {
     // Run long enough to fill & evict the ring, then query with various recentTime.
     const int sampleCount = 3;
@@ -400,7 +400,7 @@ int TestCase_Comm_RecentLoadInfo::Test_SlidingWindow()
 }
 
 // Multi-thread concurrent GetRecentLoadInfo(), expect all queries succeed(thread-safe).
-int TestCase_Comm_RecentLoadInfo::Test_ConcurrentQuery()
+int FuncTest_Comm_RecentLoadInfo::Test_ConcurrentQuery()
 {
     // Verify GetRecentLoadInfo() is thread-safe under concurrent queries.
     LLBC_Service *svc = LLBC_Service::Create("RLI_Concurrent");
@@ -459,7 +459,7 @@ int TestCase_Comm_RecentLoadInfo::Test_ConcurrentQuery()
 }
 
 // Sample count > stackBuf(64) triggers heap-allocation path in GetRecentLoadInfo().
-int TestCase_Comm_RecentLoadInfo::Test_LargeSampleCount()
+int FuncTest_Comm_RecentLoadInfo::Test_LargeSampleCount()
 {
     // stackBuf capacity is 64, use 100 to force the heap-allocation path.
     constexpr int kSampleCount = 100;
@@ -508,7 +508,7 @@ int TestCase_Comm_RecentLoadInfo::Test_LargeSampleCount()
 }
 
 // sampleTime over config upper bound should be silently clamped, sampling still works.
-int TestCase_Comm_RecentLoadInfo::Test_ExceedMaxSampleCount()
+int FuncTest_Comm_RecentLoadInfo::Test_ExceedMaxSampleCount()
 {
     // sampleTime over the config upper bound should be silently clamped.
     constexpr int kSampleTimeSec =
@@ -553,7 +553,7 @@ int TestCase_Comm_RecentLoadInfo::Test_ExceedMaxSampleCount()
 }
 
 // Query window crosses partial-full sample boundary, verify tail partial sample handling.
-int TestCase_Comm_RecentLoadInfo::Test_PartialSampleAtBoundary()
+int FuncTest_Comm_RecentLoadInfo::Test_PartialSampleAtBoundary()
 {
     // Query window crosses partial-full sample boundary.
     const int sampleTimeSec = kSampleIntervalSec * 10;
@@ -610,7 +610,7 @@ int TestCase_Comm_RecentLoadInfo::Test_PartialSampleAtBoundary()
 }
 
 // Print LLBC_ServiceRecentLoadInfo::ToString() / operator<< output for visual check.
-int TestCase_Comm_RecentLoadInfo::Test_ToString()
+int FuncTest_Comm_RecentLoadInfo::Test_ToString()
 {
     LLBC_ServiceRecentLoadInfo zeroInfo;
     LLBC_PrintLn("Zero info ToString: %s", zeroInfo.ToString().c_str());

@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/file/TestCase_Core_File_Directory.h"
+#include "core/file/FuncTest_Core_File_Directory.h"
 
-int TestCase_Core_File_Directory::Run(int argc, char *argv[])
+int FuncTest_Core_File_Directory::Run(int argc, char *argv[])
 {
     std::cout <<"core/file/Directory test:" <<std::endl;
 
@@ -61,7 +61,7 @@ int TestCase_Core_File_Directory::Run(int argc, char *argv[])
     return allTested ? LLBC_OK : LLBC_FAILED;
 }
 
-int TestCase_Core_File_Directory::CurDirTest()
+int FuncTest_Core_File_Directory::CurDirTest()
 {
     LLBC_PrintLn("CurDir/SetCurDir test:");
 
@@ -89,7 +89,7 @@ int TestCase_Core_File_Directory::CurDirTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::ExistsTest()
+int FuncTest_Core_File_Directory::ExistsTest()
 {
     LLBC_PrintLn("Exists test:");
 
@@ -107,7 +107,7 @@ int TestCase_Core_File_Directory::ExistsTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::CreateRemoveTest()
+int FuncTest_Core_File_Directory::CreateRemoveTest()
 {
     LLBC_PrintLn("Create/Remove test:");
     LLBC_PrintLn("Create directory: a");
@@ -156,7 +156,7 @@ int TestCase_Core_File_Directory::CreateRemoveTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::AbsPathTest()
+int FuncTest_Core_File_Directory::AbsPathTest()
 {
     LLBC_PrintLn("AbsPath test:");
     
@@ -184,7 +184,7 @@ int TestCase_Core_File_Directory::AbsPathTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::JoinTest()
+int FuncTest_Core_File_Directory::JoinTest()
 {
     LLBC_PrintLn("Join test:");
 
@@ -207,7 +207,7 @@ int TestCase_Core_File_Directory::JoinTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::SplitExtTest()
+int FuncTest_Core_File_Directory::SplitExtTest()
 {
     LLBC_PrintLn("SplitExt test:");
 
@@ -232,7 +232,7 @@ int TestCase_Core_File_Directory::SplitExtTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::GetFilesTest()
+int FuncTest_Core_File_Directory::GetFilesTest()
 {
     LLBC_PrintLn("GetFiles test:");
 
@@ -267,7 +267,7 @@ int TestCase_Core_File_Directory::GetFilesTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::GetDirectoriesTest()
+int FuncTest_Core_File_Directory::GetDirectoriesTest()
 {
     LLBC_PrintLn("GetDirectories test:");
 
@@ -303,7 +303,7 @@ int TestCase_Core_File_Directory::GetDirectoriesTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::ModuleFileTest()
+int FuncTest_Core_File_Directory::ModuleFileTest()
 {
     LLBC_PrintLn("ModuleFile test:");
     LLBC_PrintLn("Module file name(readLink = true): %s", LLBC_Directory::ModuleFileName().c_str());
@@ -318,7 +318,7 @@ int TestCase_Core_File_Directory::ModuleFileTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::DirNameBaseNameTest()
+int FuncTest_Core_File_Directory::DirNameBaseNameTest()
 {
     LLBC_PrintLn("DirName/BaseName test:");
 
@@ -348,7 +348,7 @@ int TestCase_Core_File_Directory::DirNameBaseNameTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::MiscTest()
+int FuncTest_Core_File_Directory::MiscTest()
 {
     LLBC_PrintLn("Misc test:");
 
@@ -362,7 +362,7 @@ int TestCase_Core_File_Directory::MiscTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::JoinTest(const LLBC_Strings &pathParts)
+int FuncTest_Core_File_Directory::JoinTest(const LLBC_Strings &pathParts)
 {
     LLBC_Print("Join [");
     for (size_t i = 0; i < pathParts.size(); ++i)
@@ -379,7 +379,7 @@ int TestCase_Core_File_Directory::JoinTest(const LLBC_Strings &pathParts)
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::GetFilesTest(const LLBC_String &path, bool recursive)
+int FuncTest_Core_File_Directory::GetFilesTest(const LLBC_String &path, bool recursive)
 {
     LLBC_PrintLn("Get files from directory: %s, recursive: %d", path.c_str(), recursive);
     
@@ -403,7 +403,7 @@ int TestCase_Core_File_Directory::GetFilesTest(const LLBC_String &path, bool rec
     return LLBC_OK;
 }
 
-int TestCase_Core_File_Directory::GetDirectoriesTest(const LLBC_String &path, bool recursive)
+int FuncTest_Core_File_Directory::GetDirectoriesTest(const LLBC_String &path, bool recursive)
 {
     LLBC_PrintLn("Get directories from directory: %s, recursive: %d", path.c_str(), recursive);
     

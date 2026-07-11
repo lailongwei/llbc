@@ -20,19 +20,19 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_DynLoadComp.h"
+#include "comm/FuncTest_Comm_DynLoadComp.h"
 
-TestCase_Comm_DynLoadComp::TestCase_Comm_DynLoadComp()
+FuncTest_Comm_DynLoadComp::FuncTest_Comm_DynLoadComp()
 : _svc(LLBC_Service::Create("DynLoadTestSvc"))
 {
 }
 
-TestCase_Comm_DynLoadComp::~TestCase_Comm_DynLoadComp()
+FuncTest_Comm_DynLoadComp::~FuncTest_Comm_DynLoadComp()
 {
     delete _svc;
 }
 
-int TestCase_Comm_DynLoadComp::Run(int argc, char *argv[])
+int FuncTest_Comm_DynLoadComp::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Communication Service Dynamic Load Comp Test:");
     LLBC_PrintLn("Note: You must be build your comp library first!");

@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_ObjBase_Dictionary final : public LLBC_BaseTestCase
+class FuncTest_Core_ObjBase_Dictionary final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_ObjBase_Dictionary();
-    ~TestCase_ObjBase_Dictionary() override;
+    FuncTest_Core_ObjBase_Dictionary();
+    ~FuncTest_Core_ObjBase_Dictionary() override;
 
 public:
     int Run(int argc, char *argv[]) override;

@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "common/TestCase_Com_ConcatMacro.h"
+#include "common/FuncTest_Com_ConcatMacro.h"
 
 #define __ClassNamePart1 F
 #define __ClassNamePart2 oo
@@ -35,7 +35,7 @@ public:
     }
 };
 
-int TestCase_Com_ConcatMacro::Run(int argc, char *argv[])
+int FuncTest_Com_ConcatMacro::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Concat macro test:");
 

@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/random/TestCase_Core_Random.h"
+#include "core/random/FuncTest_Core_Random.h"
 
-TestCase_Core_Random::TestCase_Core_Random()
+FuncTest_Core_Random::FuncTest_Core_Random()
 {
 }
 
-TestCase_Core_Random::~TestCase_Core_Random()
+FuncTest_Core_Random::~FuncTest_Core_Random()
 {
 }
 
-int TestCase_Core_Random::Run(int argc, char *argv[])
+int FuncTest_Core_Random::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/random test:");
 
@@ -119,7 +119,7 @@ int TestCase_Core_Random::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Random::Exec_RandInt_end_Test(int end, int times)
+void FuncTest_Core_Random::Exec_RandInt_end_Test(int end, int times)
 {
     LLBC_PrintLn("LLBC_Rand(%d) test(times:%d):", end, times);
     for(int i = 0; i < times; ++i)
@@ -143,7 +143,7 @@ void TestCase_Core_Random::Exec_RandInt_end_Test(int end, int times)
     LLBC_Print("\n\n");
 }
 
-void TestCase_Core_Random::Exec_RandInt_begin_end_Test(int begin, int end, int times)
+void FuncTest_Core_Random::Exec_RandInt_begin_end_Test(int begin, int end, int times)
 {
     LLBC_PrintLn("LLBC_Rand(%d, %d) test(times:%d):", begin, end, times);
     for(int i = 0; i < times; ++i)
@@ -172,7 +172,7 @@ typename std::enable_if<LLBC_IsTemplSpec<_Weights, std::vector>::value ||
                         LLBC_IsTemplSpec<_Weights, std::list>::value ||
                         LLBC_IsSTLArraySpec<_Weights, std::array>::value ||
                         std::is_array<_Weights>::value, void>::type
-TestCase_Core_Random::Exec_RandInt_array_Test(const _Weights &weights, int times)
+FuncTest_Core_Random::Exec_RandInt_array_Test(const _Weights &weights, int times)
 {
     LLBC_PrintLn("LLBC_Rand(weights) test(times:%d):", times);
 

@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_ExternalDriveSvc final : public LLBC_BaseTestCase
+class FuncTest_Comm_ExternalDriveSvc final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_ExternalDriveSvc();
-    ~TestCase_Comm_ExternalDriveSvc() override;
+    FuncTest_Comm_ExternalDriveSvc();
+    ~FuncTest_Comm_ExternalDriveSvc() override;
 
 public:
     int Run(int argc, char *argv[]) override;

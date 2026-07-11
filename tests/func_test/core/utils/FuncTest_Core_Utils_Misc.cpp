@@ -19,9 +19,9 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "core/utils/TestCase_Core_Utils_Misc.h"
+#include "core/utils/FuncTest_Core_Utils_Misc.h"
 
-int TestCase_Core_Utils_Misc::Run(int argc, char *argv[])
+int FuncTest_Core_Utils_Misc::Run(int argc, char *argv[])
 {
     std::cout <<"core/utils/Util_Misc test:" <<std::endl;
     TestStartArgs(argc, argv);
@@ -32,7 +32,7 @@ int TestCase_Core_Utils_Misc::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-int TestCase_Core_Utils_Misc::TestStartArgs(int argc, char *argv[])
+int FuncTest_Core_Utils_Misc::TestStartArgs(int argc, char *argv[])
 {
     std::cout <<"test startargs:" <<std::endl;
     LLBC_StartArgs startArgs;

@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/utils/TestCase_Core_Utils_Network.h"
+#include "core/utils/FuncTest_Core_Utils_Network.h"
 
-TestCase_Core_Utils_Network::TestCase_Core_Utils_Network()
+FuncTest_Core_Utils_Network::FuncTest_Core_Utils_Network()
 {
 }
 
-TestCase_Core_Utils_Network::~TestCase_Core_Utils_Network()
+FuncTest_Core_Utils_Network::~FuncTest_Core_Utils_Network()
 {
 }
 
-int TestCase_Core_Utils_Network::Run(int argc, char *argv[])
+int FuncTest_Core_Utils_Network::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("llbc library core/utils/Util_Network test:");
 
@@ -47,7 +47,7 @@ int TestCase_Core_Utils_Network::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-void TestCase_Core_Utils_Network::VerifyIPv4Addr(const LLBC_String &addr)
+void FuncTest_Core_Utils_Network::VerifyIPv4Addr(const LLBC_String &addr)
 {
     LLBC_PrintLn("%s is IPv4 address format? %s", 
             addr.c_str(), LLBC_IsIPv4Addr(addr) ? "true" : "false");

@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "app/TestCase_App_AppCfgTest.h"
+#include "app/FuncTest_App_AppCfgTest.h"
 using namespace llbc;
 
 namespace
@@ -192,15 +192,15 @@ private:
 
 }
 
-TestCase_App_AppCfgTest::TestCase_App_AppCfgTest()
+FuncTest_App_AppCfgTest::FuncTest_App_AppCfgTest()
 {
 }
 
-TestCase_App_AppCfgTest::~TestCase_App_AppCfgTest()
+FuncTest_App_AppCfgTest::~FuncTest_App_AppCfgTest()
 {
 }
 
-int TestCase_App_AppCfgTest::Run(int argc, char *argv[])
+int FuncTest_App_AppCfgTest::Run(int argc, char *argv[])
 {
     // Define app object.
     TestApp app(LLBC_TimeSpan::FromSeconds(3), LLBC_TimeSpan::FromSeconds(3));

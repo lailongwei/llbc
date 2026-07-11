@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_App_ReloadFailedTest final : public LLBC_BaseTestCase
+class FuncTest_App_ReloadFailedTest final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_App_ReloadFailedTest();
-    ~TestCase_App_ReloadFailedTest() override;
+    FuncTest_App_ReloadFailedTest();
+    ~FuncTest_App_ReloadFailedTest() override;
 
 public:
     int Run(int argc, char *argv[]) override;

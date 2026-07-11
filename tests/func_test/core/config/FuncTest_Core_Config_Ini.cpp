@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/config/TestCase_Core_Config_Ini.h"
+#include "core/config/FuncTest_Core_Config_Ini.h"
 
-TestCase_Core_Config_Ini::TestCase_Core_Config_Ini()
+FuncTest_Core_Config_Ini::FuncTest_Core_Config_Ini()
 {
 }
 
-TestCase_Core_Config_Ini::~TestCase_Core_Config_Ini()
+FuncTest_Core_Config_Ini::~FuncTest_Core_Config_Ini()
 {
 }
 
-int TestCase_Core_Config_Ini::Run(int argc, char *argv[])
+int FuncTest_Core_Config_Ini::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("LLBC_Ini test:");
 

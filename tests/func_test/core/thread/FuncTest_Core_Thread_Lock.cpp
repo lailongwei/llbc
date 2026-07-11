@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/thread/TestCase_Core_Thread_Lock.h"
+#include "core/thread/FuncTest_Core_Thread_Lock.h"
 
 static const int __g_threads_num = 5;
 static LLBC_SimpleLock __g_outLock;
@@ -54,15 +54,15 @@ static void ThreadProc(void *arg)
     free(arg);
 }
 
-TestCase_Core_Thread_Lock::TestCase_Core_Thread_Lock()
+FuncTest_Core_Thread_Lock::FuncTest_Core_Thread_Lock()
 {
 }
 
-TestCase_Core_Thread_Lock::~TestCase_Core_Thread_Lock()
+FuncTest_Core_Thread_Lock::~FuncTest_Core_Thread_Lock()
 {
 }
 
-int TestCase_Core_Thread_Lock::Run(int argc, char *argv[])
+int FuncTest_Core_Thread_Lock::Run(int argc, char *argv[])
 {
     std::cout <<"core/thread/lock test:" <<std::endl;
 

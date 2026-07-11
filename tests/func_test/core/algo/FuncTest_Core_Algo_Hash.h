@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Algo_Hash final : public LLBC_BaseTestCase
+class FuncTest_Core_Algo_Hash final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Algo_Hash();
-    ~TestCase_Core_Algo_Hash() override;
+    FuncTest_Core_Algo_Hash();
+    ~FuncTest_Core_Algo_Hash() override;
 
 public:
     int Run(int argc, char *argv[]) override;

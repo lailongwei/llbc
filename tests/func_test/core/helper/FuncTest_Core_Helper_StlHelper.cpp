@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/helper/TestCase_Core_Helper_StlHelper.h"
+#include "core/helper/FuncTest_Core_Helper_StlHelper.h"
 
-int TestCase_Core_Helper_StlHelper::Run(int argc, char *argv[])
+int FuncTest_Core_Helper_StlHelper::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("LLBC_StlHelper test");
 

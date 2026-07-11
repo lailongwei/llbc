@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Com_ConcatMacro final : public LLBC_BaseTestCase
+class FuncTest_Com_ConcatMacro final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Com_ConcatMacro() {  }
-    ~TestCase_Com_ConcatMacro() override {  }
+    FuncTest_Com_ConcatMacro() {  }
+    ~FuncTest_Com_ConcatMacro() override {  }
 
 public:
     int Run(int argc, char *argv[]) override;

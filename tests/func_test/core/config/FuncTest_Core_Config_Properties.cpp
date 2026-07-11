@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/config/TestCase_Core_Config_Properties.h"
+#include "core/config/FuncTest_Core_Config_Properties.h"
 
-TestCase_Core_Config_Properties::TestCase_Core_Config_Properties()
+FuncTest_Core_Config_Properties::FuncTest_Core_Config_Properties()
 {
 }
 
-TestCase_Core_Config_Properties::~TestCase_Core_Config_Properties()
+FuncTest_Core_Config_Properties::~FuncTest_Core_Config_Properties()
 {
 }
 
-int TestCase_Core_Config_Properties::Run(int argc, char *argv[])
+int FuncTest_Core_Config_Properties::Run(int argc, char *argv[])
 {
     std::cout <<"LLBC_Properties test: " <<std::endl;
 

@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/entity/TestCase_Core_Entity.h"
+#include "core/entity/FuncTest_Core_Entity.h"
 
-TestCase_Core_Entity::TestCase_Core_Entity()
+FuncTest_Core_Entity::FuncTest_Core_Entity()
 {
 }
 
-TestCase_Core_Entity::~TestCase_Core_Entity()
+FuncTest_Core_Entity::~FuncTest_Core_Entity()
 {
 }
 
-int TestCase_Core_Entity::Run(int argc, char *argv[])
+int FuncTest_Core_Entity::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/entity test:");
 

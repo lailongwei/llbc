@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "common/TestCase_Com_StreamFunc.h"
+#include "common/FuncTest_Com_StreamFunc.h"
 
-int TestCase_Com_StreamFunc::Run(int argc, char *argv[])
+int FuncTest_Com_StreamFunc::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Stream test:");
     LLBC_ErrorAndReturnIf(CtorTest() != LLBC_OK, LLBC_FAILED);
@@ -43,7 +43,7 @@ int TestCase_Com_StreamFunc::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::CtorTest()
+int FuncTest_Com_StreamFunc::CtorTest()
 {
     LLBC_PrintLn("Constructor test:");
 
@@ -197,7 +197,7 @@ int TestCase_Com_StreamFunc::CtorTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::AttachTest()
+int FuncTest_Com_StreamFunc::AttachTest()
 {
     LLBC_PrintLn("Attach test:");
 
@@ -306,7 +306,7 @@ int TestCase_Com_StreamFunc::AttachTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::SwapTest()
+int FuncTest_Com_StreamFunc::SwapTest()
 {
     LLBC_PrintLn("Swap test:");
 
@@ -361,7 +361,7 @@ int TestCase_Com_StreamFunc::SwapTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::EndianTest()
+int FuncTest_Com_StreamFunc::EndianTest()
 {
     LLBC_PrintLn("Endian test:");
 
@@ -391,7 +391,7 @@ int TestCase_Com_StreamFunc::EndianTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::RWPosTest()
+int FuncTest_Com_StreamFunc::RWPosTest()
 {
     LLBC_PrintLn("RWPos test:");
 
@@ -457,7 +457,7 @@ int TestCase_Com_StreamFunc::RWPosTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::SkipRWTest()
+int FuncTest_Com_StreamFunc::SkipRWTest()
 {
     LLBC_PrintLn("Skip rpos/wpos test:");
 
@@ -507,7 +507,7 @@ int TestCase_Com_StreamFunc::SkipRWTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::ReadableSizeTest()
+int FuncTest_Com_StreamFunc::ReadableSizeTest()
 {
     LLBC_PrintLn("Readable size test:");
 
@@ -537,7 +537,7 @@ int TestCase_Com_StreamFunc::ReadableSizeTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::WritableSizeTest()
+int FuncTest_Com_StreamFunc::WritableSizeTest()
 {
     LLBC_PrintLn("Writable size test:");
 
@@ -565,7 +565,7 @@ int TestCase_Com_StreamFunc::WritableSizeTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::GetBufTest()
+int FuncTest_Com_StreamFunc::GetBufTest()
 {
     LLBC_PrintLn("GetBuf test:");
 
@@ -607,7 +607,7 @@ int TestCase_Com_StreamFunc::GetBufTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::BufOpTest()
+int FuncTest_Com_StreamFunc::BufOpTest()
 {
     LLBC_PrintLn("Buf op test:");
 
@@ -663,7 +663,7 @@ int TestCase_Com_StreamFunc::BufOpTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::NumericSerTest()
+int FuncTest_Com_StreamFunc::NumericSerTest()
 {
     LLBC_PrintLn("Numeric type serialize test:");
 
@@ -741,7 +741,7 @@ int TestCase_Com_StreamFunc::NumericSerTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::StrSerTest()
+int FuncTest_Com_StreamFunc::StrSerTest()
 {
     LLBC_PrintLn("String serialize test:");
 
@@ -952,7 +952,7 @@ _StlContainerSerTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::StlContainerSerTest()
+int FuncTest_Com_StreamFunc::StlContainerSerTest()
 {
     LLBC_PrintLn("STL Container serialize test:");
 
@@ -1009,7 +1009,7 @@ int TestCase_Com_StreamFunc::StlContainerSerTest()
     return LLBC_OK;
 }
 
-int TestCase_Com_StreamFunc::SerializableObjSerTest()
+int FuncTest_Com_StreamFunc::SerializableObjSerTest()
 {
     LLBC_PrintLn("Serializable obj ser/deser test:");
 

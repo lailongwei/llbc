@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/thread/TestCase_Core_Thread_RWLock.h"
+#include "core/thread/FuncTest_Core_Thread_RWLock.h"
 
 static const long __g_readerCount = 5;
 static const int __g_updateTimes = 50000;
@@ -77,15 +77,15 @@ static void Writer_ThreadProc(void *arg)
     __g_outLock.Unlock();
 }
 
-TestCase_Core_Thread_RWLock::TestCase_Core_Thread_RWLock()
+FuncTest_Core_Thread_RWLock::FuncTest_Core_Thread_RWLock()
 {
 }
 
-TestCase_Core_Thread_RWLock::~TestCase_Core_Thread_RWLock()
+FuncTest_Core_Thread_RWLock::~FuncTest_Core_Thread_RWLock()
 {
 }
 
-int TestCase_Core_Thread_RWLock::Run(int argc, char *argv[])
+int FuncTest_Core_Thread_RWLock::Run(int argc, char *argv[])
 {
     std::cout <<"core/thread/rwlock test: " <<std::endl;
 

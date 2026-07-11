@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_SendBytes.h"
+#include "comm/FuncTest_Comm_SendBytes.h"
 
 namespace
 {
@@ -63,7 +63,7 @@ public:
 
 }
 
-TestCase_Comm_SendBytes::TestCase_Comm_SendBytes()
+FuncTest_Comm_SendBytes::FuncTest_Comm_SendBytes()
 : _asClient(true)
 , _useNmlProtocolFactory(true)
 
@@ -72,11 +72,11 @@ TestCase_Comm_SendBytes::TestCase_Comm_SendBytes()
 {
 }
 
-TestCase_Comm_SendBytes::~TestCase_Comm_SendBytes()
+FuncTest_Comm_SendBytes::~FuncTest_Comm_SendBytes()
 {
 }
 
-int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
+int FuncTest_Comm_SendBytes::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Servie send bytes test:");
     if (argc < 5)
@@ -151,7 +151,7 @@ int TestCase_Comm_SendBytes::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-void TestCase_Comm_SendBytes::FetchArgs(int argc, char *argv[])
+void FuncTest_Comm_SendBytes::FetchArgs(int argc, char *argv[])
 {
     _asClient = LLBC_String(argv[1]).tolower() == "client" ? true : false;
     _useNmlProtocolFactory = LLBC_String(argv[2]).tolower() == "normal" ? true : false;

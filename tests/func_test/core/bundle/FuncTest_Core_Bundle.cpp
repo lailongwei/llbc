@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/bundle/TestCase_Core_Bundle.h"
+#include "core/bundle/FuncTest_Core_Bundle.h"
 
-TestCase_Core_Bundle::TestCase_Core_Bundle()
+FuncTest_Core_Bundle::FuncTest_Core_Bundle()
 {
 }
 
-TestCase_Core_Bundle::~TestCase_Core_Bundle()
+FuncTest_Core_Bundle::~FuncTest_Core_Bundle()
 {
 }
 
-int TestCase_Core_Bundle::Run(int argc, char *argv[])
+int FuncTest_Core_Bundle::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/bundle test:");
     

@@ -1,6 +1,6 @@
-#include "common/TestCase_Com_Macro.h"
+#include "common/FuncTest_Com_Macro.h"
 
-int TestCase_Com_Macro::Run(int argc, char** argv)
+int FuncTest_Com_Macro::Run(int argc, char** argv)
 {
     LLBC_PrintLn("Common/Marco test:");
 

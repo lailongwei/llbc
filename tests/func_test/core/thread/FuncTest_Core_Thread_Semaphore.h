@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Thread_Semaphore final : public LLBC_BaseTestCase
+class FuncTest_Core_Thread_Semaphore final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Thread_Semaphore();
-    ~TestCase_Core_Thread_Semaphore() override;
+    FuncTest_Core_Thread_Semaphore();
+    ~FuncTest_Core_Thread_Semaphore() override;
 
 private:
     int Run(int argc, char *argv[]) override;

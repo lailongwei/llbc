@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Thread_Tls final : public LLBC_BaseTestCase
+class FuncTest_Core_Thread_Tls final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Thread_Tls();
-    ~TestCase_Core_Thread_Tls() override;
+    FuncTest_Core_Thread_Tls();
+    ~FuncTest_Core_Thread_Tls() override;
 
 public:
     int Run(int argc, char *argv[]) override;

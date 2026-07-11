@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_LazyTask.h"
+#include "comm/FuncTest_Comm_LazyTask.h"
 
 namespace
 {
@@ -42,15 +42,15 @@ namespace
     };
 }
 
-TestCase_Comm_LazyTask::TestCase_Comm_LazyTask()
+FuncTest_Comm_LazyTask::FuncTest_Comm_LazyTask()
 {
 }
 
-TestCase_Comm_LazyTask::~TestCase_Comm_LazyTask()
+FuncTest_Comm_LazyTask::~FuncTest_Comm_LazyTask()
 {
 }
 
-int TestCase_Comm_LazyTask::Run(int argc, char *argv[])
+int FuncTest_Comm_LazyTask::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("service/lazy task test:");
 

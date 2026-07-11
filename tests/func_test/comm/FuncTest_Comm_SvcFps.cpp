@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_SvcFps.h"
+#include "comm/FuncTest_Comm_SvcFps.h"
 
 namespace
 {
@@ -67,15 +67,15 @@ namespace
     };
 }
 
-TestCase_Comm_SvcFps::TestCase_Comm_SvcFps()
+FuncTest_Comm_SvcFps::FuncTest_Comm_SvcFps()
 {
 }
 
-TestCase_Comm_SvcFps::~TestCase_Comm_SvcFps()
+FuncTest_Comm_SvcFps::~FuncTest_Comm_SvcFps()
 {
 }
 
-int TestCase_Comm_SvcFps::Run(int argc, char *argv[])
+int FuncTest_Comm_SvcFps::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Service FPS test:");
 

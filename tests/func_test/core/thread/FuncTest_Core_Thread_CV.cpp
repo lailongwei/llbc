@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/thread/TestCase_Core_Thread_CV.h"
+#include "core/thread/FuncTest_Core_Thread_CV.h"
 
 static struct 
 {
@@ -140,15 +140,15 @@ static void SignalerThreadProc(void *arg)
     __g_outLock.Unlock();
 }
 
-TestCase_Core_Thread_CV::TestCase_Core_Thread_CV()
+FuncTest_Core_Thread_CV::FuncTest_Core_Thread_CV()
 {
 }
 
-TestCase_Core_Thread_CV::~TestCase_Core_Thread_CV()
+FuncTest_Core_Thread_CV::~FuncTest_Core_Thread_CV()
 {
 }
 
-int TestCase_Core_Thread_CV::Run(int argc, char *argv[])
+int FuncTest_Core_Thread_CV::Run(int argc, char *argv[])
 {
     std::cout <<"core/thread/cv test: " <<std::endl;
 

@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/objbase/TestCase_ObjBase_Array.h"
+#include "core/objbase/FuncTest_Core_ObjBase_Array.h"
 
 namespace
 {
@@ -101,15 +101,15 @@ struct GreaterSortFun
 
 }
 
-TestCase_ObjBase_Array::TestCase_ObjBase_Array()
+FuncTest_Core_ObjBase_Array::TestCase_ObjBase_Array()
 {
 }
 
-TestCase_ObjBase_Array::~TestCase_ObjBase_Array()
+FuncTest_Core_ObjBase_Array::~TestCase_ObjBase_Array()
 {
 }
 
-int TestCase_ObjBase_Array::Run(int argc, char *argv[])
+int FuncTest_Core_ObjBase_Array::Run(int argc, char *argv[])
 {
     std::cout <<"objbase/array test: " <<std::endl;
 
@@ -123,7 +123,7 @@ int TestCase_ObjBase_Array::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_ObjBase_Array::BasicTest()
+void FuncTest_Core_ObjBase_Array::BasicTest()
 {
     std::cout <<"Basic test: " <<std::endl;
 
@@ -172,7 +172,7 @@ void TestCase_ObjBase_Array::BasicTest()
     std::cout <<"Basic test done!" <<std::endl;
 }
 
-void TestCase_ObjBase_Array::IterTest()
+void FuncTest_Core_ObjBase_Array::IterTest()
 {
     std::cout <<"Iter test: " <<std::endl;
 
@@ -240,7 +240,7 @@ void TestCase_ObjBase_Array::IterTest()
     std::cout <<"Iter test done" <<std::endl;
 }
 
-void TestCase_ObjBase_Array::SortTest()
+void FuncTest_Core_ObjBase_Array::SortTest()
 {
     std::cout <<"Sort test: " <<std::endl;
 

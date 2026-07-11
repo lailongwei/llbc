@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "core/thread/TestCase_Core_Thread_Guard.h"
+#include "core/thread/FuncTest_Core_Thread_Guard.h"
 
 namespace
 {
@@ -52,15 +52,15 @@ namespace
     };
 }
 
-TestCase_Core_Thread_Guard::TestCase_Core_Thread_Guard()
+FuncTest_Core_Thread_Guard::FuncTest_Core_Thread_Guard()
 {
 }
 
-TestCase_Core_Thread_Guard::~TestCase_Core_Thread_Guard()
+FuncTest_Core_Thread_Guard::~FuncTest_Core_Thread_Guard()
 {
 }
 
-int TestCase_Core_Thread_Guard::Run(int argc, char *argv[])
+int FuncTest_Core_Thread_Guard::Run(int argc, char *argv[])
 {
     std::cout <<"core/thread/guard test:" <<std::endl;
     TestGuardFunc();
@@ -72,13 +72,13 @@ int TestCase_Core_Thread_Guard::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_Thread_Guard::TestGuardFunc()
+void FuncTest_Core_Thread_Guard::TestGuardFunc()
 {
     std::cout <<"Guard Function test:" <<std::endl;
     LLBC_InvokeGuard guard(&GuardFunc, (void *)0x01);
 }
 
-void TestCase_Core_Thread_Guard::TestGuardMeth()
+void FuncTest_Core_Thread_Guard::TestGuardMeth()
 {
     std::cout <<"Guard Method test:" <<std::endl;
     GuardCls obj;
@@ -87,7 +87,7 @@ void TestCase_Core_Thread_Guard::TestGuardMeth()
     }
 }
 
-void TestCase_Core_Thread_Guard::TestGuardVariableArgument() 
+void FuncTest_Core_Thread_Guard::TestGuardVariableArgument() 
 {
     std::cout << "Guard Method test:" << std::endl;
     { 

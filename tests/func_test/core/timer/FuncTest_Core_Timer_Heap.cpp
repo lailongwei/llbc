@@ -19,10 +19,10 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "core/timer/TestCase_Core_Timer_Heap.h"
+#include "core/timer/FuncTest_Core_Timer_Heap.h"
 
 
-int TestCase_Core_Timer_Heap::Run(int argc, char** argv)
+int FuncTest_Core_Timer_Heap::Run(int argc, char** argv)
 {
     LLBC_PrintLn("Timer heap test:");
 
@@ -39,7 +39,7 @@ int TestCase_Core_Timer_Heap::Run(int argc, char** argv)
 }
 
 template <typename Heap>
-int TestCase_Core_Timer_Heap::BaseTest(bool isMaxHeap)
+int FuncTest_Core_Timer_Heap::BaseTest(bool isMaxHeap)
 {
     // Log: begin test.
     LLBC_PrintLn("- Base test(%s):", isMaxHeap ? "Max heap" : "Min heap");
@@ -132,7 +132,7 @@ int TestCase_Core_Timer_Heap::BaseTest(bool isMaxHeap)
     return LLBC_OK;
 }
 
-void TestCase_Core_Timer_Heap::PerfTest()
+void FuncTest_Core_Timer_Heap::PerfTest()
 {
     LLBC_PrintLn("PerfTest:");
 

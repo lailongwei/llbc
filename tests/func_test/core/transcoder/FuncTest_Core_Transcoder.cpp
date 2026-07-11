@@ -23,17 +23,17 @@
     #pragma clang diagnostic ignored "-Winvalid-source-encoding"
 #endif
 
-#include "core/transcoder/TestCase_Core_Transcoder.h"
+#include "core/transcoder/FuncTest_Core_Transcoder.h"
 
-TestCase_Core_Transcoder::TestCase_Core_Transcoder()
+FuncTest_Core_Transcoder::FuncTest_Core_Transcoder()
 {
 }
 
-TestCase_Core_Transcoder::~TestCase_Core_Transcoder()
+FuncTest_Core_Transcoder::~FuncTest_Core_Transcoder()
 {
 }
 
-int TestCase_Core_Transcoder::Run(int argc, char *argv[])
+int FuncTest_Core_Transcoder::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/transfer test:");
 	LLBC_PrintLn("sizeof(wchar): %lu", sizeof(wchar));
@@ -81,11 +81,11 @@ int TestCase_Core_Transcoder::Run(int argc, char *argv[])
 #endif // LLBC_TARGET_PLATFORM_IPHONE
 }
 
-int TestCase_Core_Transcoder::SimpleConvertTest()
+int FuncTest_Core_Transcoder::SimpleConvertTest()
 {
     LLBC_PrintLn("Simple convert test");
 
-    // Test coding string(gbk coding): ÄãºÃ.
+    // Test coding string(gbk coding): ï¿½ï¿½ï¿½.
     // GBK binary view:      c4 e3 ba c3
     const LLBC_String gbkBinaryData = "c4 e3 ba c3";
     // UTF8 binary view:     e4 bd a0 e5 a5 bd
@@ -99,7 +99,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
 
     // Test GBK->UTF8.
     LLBC_String utf8Str;
-    LLBC_String gbkStr = "ÄãºÃ";
+    LLBC_String gbkStr = "ï¿½ï¿½ï¿½";
     if(LLBC_Transcoder::MultiByteToMultiByte(
         "GBK", gbkStr, "UTF-8", utf8Str) != LLBC_OK)
     {
@@ -138,7 +138,7 @@ int TestCase_Core_Transcoder::SimpleConvertTest()
     return 0;
 }
 
-int TestCase_Core_Transcoder::UTF8ConvertTest(const LLBC_String &inputFile)
+int FuncTest_Core_Transcoder::UTF8ConvertTest(const LLBC_String &inputFile)
 {
     LLBC_File input;
     if(input.Open(inputFile, LLBC_FileMode::BinaryRead) != LLBC_OK)
@@ -204,7 +204,7 @@ int TestCase_Core_Transcoder::UTF8ConvertTest(const LLBC_String &inputFile)
     return 0;
 }
 
-int TestCase_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
+int FuncTest_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
 {
     LLBC_File input;
     if(input.Open(inputFile, LLBC_FileMode::BinaryRead) != LLBC_OK)
@@ -268,7 +268,7 @@ int TestCase_Core_Transcoder::GBKConvertTest(const LLBC_String &inputFile)
     return 0;
 }
 
-int TestCase_Core_Transcoder::UTF16ConvertTest(const LLBC_String &inputFile)
+int FuncTest_Core_Transcoder::UTF16ConvertTest(const LLBC_String &inputFile)
 {
     // Test UTF16->UTF8.
     const LLBC_String utf8FileName = 
@@ -302,7 +302,7 @@ int TestCase_Core_Transcoder::UTF16ConvertTest(const LLBC_String &inputFile)
     return 0;
 }
 
-void TestCase_Core_Transcoder::DeleteOutputFiles(const std::vector<LLBC_String> &files)
+void FuncTest_Core_Transcoder::DeleteOutputFiles(const std::vector<LLBC_String> &files)
 {
     LLBC_PrintLn("Press any key to delete these output files ...");
     getchar();

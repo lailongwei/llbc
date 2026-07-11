@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "common/TestCase_Com_Endian.h"
+#include "common/FuncTest_Com_Endian.h"
 
-int TestCase_Com_Endian::Run(int argc, char *argv[])
+int FuncTest_Com_Endian::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("common/endian test:");
 

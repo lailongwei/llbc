@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include <signal.h>
-#include "core/os/TestCase_Core_OS_Signal.h"
+#include "core/os/FuncTest_Core_OS_Signal.h"
 
 namespace
 {
@@ -99,7 +99,7 @@ private:
 
 }
 
-int TestCase_Core_OS_Signal::Run(int argc, char *argv[])
+int FuncTest_Core_OS_Signal::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/os/signal test:\n");
 
@@ -109,7 +109,7 @@ int TestCase_Core_OS_Signal::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-int TestCase_Core_OS_Signal::SetSignalHandlerTest()
+int FuncTest_Core_OS_Signal::SetSignalHandlerTest()
 {
     LLBC_PrintLn("SetSignalHandler test:");
 
@@ -279,7 +279,7 @@ int TestCase_Core_OS_Signal::SetSignalHandlerTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_OS_Signal::SignalTriggerTest()
+int FuncTest_Core_OS_Signal::SignalTriggerTest()
 {
     LLBC_PrintLn("\nSignalTrigger test:");
 

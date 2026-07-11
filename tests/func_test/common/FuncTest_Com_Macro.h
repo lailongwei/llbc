@@ -3,11 +3,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Com_Macro final : public LLBC_BaseTestCase
+class FuncTest_Com_Macro final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Com_Macro() = default;
-    ~TestCase_Com_Macro() override = default;
+    FuncTest_Com_Macro() = default;
+    ~FuncTest_Com_Macro() override = default;
 
 public:
     int Run(int argc, char *argv[]) override;

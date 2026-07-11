@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/os/TestCase_Core_OS_Symbol.h"
+#include "core/os/FuncTest_Core_OS_Symbol.h"
 
-TestCase_Core_OS_Symbol::TestCase_Core_OS_Symbol()
+FuncTest_Core_OS_Symbol::FuncTest_Core_OS_Symbol()
 {
 }
 
-TestCase_Core_OS_Symbol::~TestCase_Core_OS_Symbol()
+FuncTest_Core_OS_Symbol::~FuncTest_Core_OS_Symbol()
 {
 }
 
-int TestCase_Core_OS_Symbol::Run(int argc, char *argv[])
+int FuncTest_Core_OS_Symbol::Run(int argc, char *argv[])
 {
     std::cout <<"core/os/symbol test: " <<std::endl;
 
@@ -43,27 +43,27 @@ int TestCase_Core_OS_Symbol::Run(int argc, char *argv[])
     return 0;
 }
 
-void TestCase_Core_OS_Symbol::Foo1()
+void FuncTest_Core_OS_Symbol::Foo1()
 {
     Foo2();
 }
 
-void TestCase_Core_OS_Symbol::Foo2()
+void FuncTest_Core_OS_Symbol::Foo2()
 {
     Foo3();
 }
 
-void TestCase_Core_OS_Symbol::Foo3()
+void FuncTest_Core_OS_Symbol::Foo3()
 {
     Goo1();
 }
 
-void TestCase_Core_OS_Symbol::Goo1()
+void FuncTest_Core_OS_Symbol::Goo1()
 {
     Goo2();
 }
 
-void TestCase_Core_OS_Symbol::Goo2()
+void FuncTest_Core_OS_Symbol::Goo2()
 {
     int a = 3;
     int b = 4;
@@ -72,12 +72,12 @@ void TestCase_Core_OS_Symbol::Goo2()
     Goo3();
 }
 
-void TestCase_Core_OS_Symbol::Goo3()
+void FuncTest_Core_OS_Symbol::Goo3()
 {
     PrintBackTrace();
 }
 
-void TestCase_Core_OS_Symbol::PrintBackTrace()
+void FuncTest_Core_OS_Symbol::PrintBackTrace()
 {
     LLBC_Stopwatch sw;
 

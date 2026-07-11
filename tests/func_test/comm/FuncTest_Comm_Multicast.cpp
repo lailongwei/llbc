@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_Multicast.h"
+#include "comm/FuncTest_Comm_Multicast.h"
 
 namespace
 {
@@ -122,9 +122,9 @@ private:
 
 }
 
-const int TestCase_Comm_Multicast::_clientCnt = 50;
+const int FuncTest_Comm_Multicast::_clientCnt = 50;
 
-TestCase_Comm_Multicast::TestCase_Comm_Multicast()
+FuncTest_Comm_Multicast::FuncTest_Comm_Multicast()
 : _asClient(true)
 , _useNmlProtocolFactory(true)
 
@@ -135,11 +135,11 @@ TestCase_Comm_Multicast::TestCase_Comm_Multicast()
 {
 }
 
-TestCase_Comm_Multicast::~TestCase_Comm_Multicast()
+FuncTest_Comm_Multicast::~FuncTest_Comm_Multicast()
 {
 }
 
-int TestCase_Comm_Multicast::Run(int argc, char *argv[])
+int FuncTest_Comm_Multicast::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Service multicast test:");
     if (argc < 5)
@@ -179,7 +179,7 @@ int TestCase_Comm_Multicast::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
+void FuncTest_Comm_Multicast::FetchArgs(int argc, char *argv[])
 {
     _asClient = LLBC_String(argv[1]).tolower() == "client" ? true : false;
     _useNmlProtocolFactory = LLBC_String(argv[2]).tolower() == "normal" ? true : false;
@@ -191,7 +191,7 @@ void TestCase_Comm_Multicast::FetchArgs(int argc, char *argv[])
         _useBst = LLBC_String(argv[5]).tolower() == "true" ? true : false;
 }
 
-int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_Service *svc)
+int FuncTest_Comm_Multicast::PrepareClientLogic(LLBC_Service *svc)
 {
     for (int i = 0; i < _clientCnt; ++i)
     {
@@ -210,7 +210,7 @@ int TestCase_Comm_Multicast::PrepareClientLogic(LLBC_Service *svc)
     return LLBC_OK;
 }
 
-int TestCase_Comm_Multicast::PrepareServerLogic(LLBC_Service *svc)
+int FuncTest_Comm_Multicast::PrepareServerLogic(LLBC_Service *svc)
 {
     const int sessionId = svc->Listen(_runIp.c_str(), _runPort);
     if (sessionId == 0)

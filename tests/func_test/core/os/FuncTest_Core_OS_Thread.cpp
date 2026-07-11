@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/os/TestCase_Core_OS_Thread.h"
+#include "core/os/FuncTest_Core_OS_Thread.h"
 
 static void ThreadProc(void *arg)
 {
@@ -48,15 +48,15 @@ static void ThreadProc(void *arg)
     LLBC_PrintLn("%s end sleep 10 seconds", threadDesc);
 }
 
-TestCase_Core_OS_Thread::TestCase_Core_OS_Thread()
+FuncTest_Core_OS_Thread::FuncTest_Core_OS_Thread()
 {
 }
 
-TestCase_Core_OS_Thread::~TestCase_Core_OS_Thread()
+FuncTest_Core_OS_Thread::~FuncTest_Core_OS_Thread()
 {
 }
 
-int TestCase_Core_OS_Thread::Run(int argc, char *argv[])
+int FuncTest_Core_OS_Thread::Run(int argc, char *argv[])
 {
     std::cout <<"OS_Thread test:" <<std::endl;
     std::cout <<"Main thread: " <<LLBC_GetCurrentThread() <<std::endl;

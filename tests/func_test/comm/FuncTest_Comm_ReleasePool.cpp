@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_ReleasePool.h"
+#include "comm/FuncTest_Comm_ReleasePool.h"
 
 namespace
 {
@@ -81,15 +81,15 @@ public:
 
 }
 
-TestCase_Comm_ReleasePool::TestCase_Comm_ReleasePool()
+FuncTest_Comm_ReleasePool::FuncTest_Comm_ReleasePool()
 {
 }
 
-TestCase_Comm_ReleasePool::~TestCase_Comm_ReleasePool()
+FuncTest_Comm_ReleasePool::~FuncTest_Comm_ReleasePool()
 {
 }
 
-int TestCase_Comm_ReleasePool::Run(int argc, char *argv[])
+int FuncTest_Comm_ReleasePool::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("ReleasePool test:");
 

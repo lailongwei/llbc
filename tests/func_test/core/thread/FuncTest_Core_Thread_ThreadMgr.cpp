@@ -21,17 +21,17 @@
 
 
 #include <signal.h>
-#include "core/thread/TestCase_Core_Thread_ThreadMgr.h"
+#include "core/thread/FuncTest_Core_Thread_ThreadMgr.h"
 
-TestCase_Core_Thread_ThreadMgr::TestCase_Core_Thread_ThreadMgr()
+FuncTest_Core_Thread_ThreadMgr::FuncTest_Core_Thread_ThreadMgr()
 {
 }
 
-TestCase_Core_Thread_ThreadMgr::~TestCase_Core_Thread_ThreadMgr()
+FuncTest_Core_Thread_ThreadMgr::~FuncTest_Core_Thread_ThreadMgr()
 {
 }
 
-int TestCase_Core_Thread_ThreadMgr::Run(int argc, char *argv[])
+int FuncTest_Core_Thread_ThreadMgr::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/thread/ThreadManager test:");
 
@@ -54,7 +54,7 @@ int TestCase_Core_Thread_ThreadMgr::Run(int argc, char *argv[])
     return 0;
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_StaticMethods()
+int FuncTest_Core_Thread_ThreadMgr::Test_StaticMethods()
 {
     LLBC_SpinLock syncLock;
     LLBC_PrintLn("Static Methods test:");
@@ -81,7 +81,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_StaticMethods()
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_WaitAndCancelInEnryThread()
+int FuncTest_Core_Thread_ThreadMgr::Test_WaitAndCancelInEnryThread()
 {
     // Check in entry thread.
     LLBC_PrintLn("Wait&Cancel entry thread test:");
@@ -133,7 +133,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_WaitAndCancelInEnryThread()
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_SuspendAndResumeEntryThread()
+int FuncTest_Core_Thread_ThreadMgr::Test_SuspendAndResumeEntryThread()
 {
     LLBC_PrintLn("Suspend&Resume entry thread test:");
 
@@ -176,7 +176,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_SuspendAndResumeEntryThread()
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_KillEntryThread()
+int FuncTest_Core_Thread_ThreadMgr::Test_KillEntryThread()
 {
     LLBC_PrintLn("Kill entry thread test:");
     LLBC_LogAndReturnIf(!LLBC_ThreadMgr::InLLBCEntryThread(), Error, LLBC_FAILED);
@@ -205,7 +205,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_KillEntryThread()
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_CreateThreads()
+int FuncTest_Core_Thread_ThreadMgr::Test_CreateThreads()
 {
     static constexpr int threadNum = 5;
 
@@ -281,7 +281,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_CreateThreads()
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_KillThreads()
+int FuncTest_Core_Thread_ThreadMgr::Test_KillThreads()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_PrintLn("Kill threads test will raise process level "
@@ -390,7 +390,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_KillThreads()
 #endif // Non-Win32
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_WaitThreads()
+int FuncTest_Core_Thread_ThreadMgr::Test_WaitThreads()
 {
     static constexpr int threadNum = 10;
 
@@ -450,7 +450,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_WaitThreads()
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_CancelThreads()
+int FuncTest_Core_Thread_ThreadMgr::Test_CancelThreads()
 {
     static constexpr int threadNum = 10;
 
@@ -518,7 +518,7 @@ int TestCase_Core_Thread_ThreadMgr::Test_CancelThreads()
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_ThreadMgr::Test_SuspendAndResumeThreads()
+int FuncTest_Core_Thread_ThreadMgr::Test_SuspendAndResumeThreads()
 {
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     LLBC_PrintLn("For, Suspend or resume threads operation "

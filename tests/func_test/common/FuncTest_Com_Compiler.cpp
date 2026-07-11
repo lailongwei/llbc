@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "common/TestCase_Com_Compiler.h"
+#include "common/FuncTest_Com_Compiler.h"
 
-TestCase_Com_Compiler::TestCase_Com_Compiler()
+FuncTest_Com_Compiler::FuncTest_Com_Compiler()
 {
 }
 
-TestCase_Com_Compiler::~TestCase_Com_Compiler()
+FuncTest_Com_Compiler::~FuncTest_Com_Compiler()
 {
 }
 
-int TestCase_Com_Compiler::Run(int argc, char *argv[])
+int FuncTest_Com_Compiler::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("common/compiler test:");
 

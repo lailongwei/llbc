@@ -20,17 +20,17 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "common/TestCase_Com_Version.h"
+#include "common/FuncTest_Com_Version.h"
 
-TestCase_Com_Version::TestCase_Com_Version()
+FuncTest_Com_Version::FuncTest_Com_Version()
 {
 }
 
-TestCase_Com_Version::~TestCase_Com_Version()
+FuncTest_Com_Version::~FuncTest_Com_Version()
 {
 }
 
-int TestCase_Com_Version::Run(int argc, char *argv[])
+int FuncTest_Com_Version::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("llbc library version test: ");
 

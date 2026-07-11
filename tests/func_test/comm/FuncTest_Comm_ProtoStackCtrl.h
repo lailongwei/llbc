@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_ProtoStackCtrl final : public LLBC_BaseTestCase
+class FuncTest_Comm_ProtoStackCtrl final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_ProtoStackCtrl();
-    ~TestCase_Comm_ProtoStackCtrl() override;
+    FuncTest_Comm_ProtoStackCtrl();
+    ~FuncTest_Comm_ProtoStackCtrl() override;
 
 public:
     int Run(int argc, char *argv[]) override;

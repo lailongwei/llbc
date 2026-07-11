@@ -20,11 +20,11 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/os/TestCase_Core_OS_Process.h"
+#include "core/os/FuncTest_Core_OS_Process.h"
 
 static int __Test_Os_Process_Hook_Times = 0;
 
-int TestCase_Core_OS_Process::Run(int argc, char *argvp[])
+int FuncTest_Core_OS_Process::Run(int argc, char *argvp[])
 {
     std::cout <<"core/os/process test:" <<std::endl;
 
@@ -38,13 +38,13 @@ int TestCase_Core_OS_Process::Run(int argc, char *argvp[])
     return 0;
 }
 
-static void TestCase_Core_OS_Process_Crash_Hook_test(const char *traceback, int sig)
+static void FuncTest_Core_OS_Process_Crash_Hook_test(const char *traceback, int sig)
 {
     std::cerr << std::endl;
-    std::cerr << "TestCase_Core_OS_Process_Crash_Hook_test success. times:" << __Test_Os_Process_Hook_Times++ << std::endl;
+    std::cerr << "FuncTest_Core_OS_Process_Crash_Hook_test success. times:" << __Test_Os_Process_Hook_Times++ << std::endl;
 }
 
-int TestCase_Core_OS_Process::TestCrash()
+int FuncTest_Core_OS_Process::TestCrash()
 {
     std::cout << "Crash hook test:" << std::endl;
 
@@ -59,19 +59,19 @@ int TestCase_Core_OS_Process::TestCrash()
     }
 
     //Set crash hook1.
-    if (LLBC_SetCrashHandler("hook_test", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    if (LLBC_SetCrashHandler("hook_test", FuncTest_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {
         std::cerr << "Handle crash 1 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
     //Set crash hook2.
-    if (LLBC_SetCrashHandler("hook_test2", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    if (LLBC_SetCrashHandler("hook_test2", FuncTest_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {
         std::cerr << "Handle crash 2 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
     }
     //Set crash hook3.
-    if (LLBC_SetCrashHandler("hook_test3", TestCase_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
+    if (LLBC_SetCrashHandler("hook_test3", FuncTest_Core_OS_Process_Crash_Hook_test) != LLBC_OK)
     {
         std::cerr << "Handle crash 3 failed, err:" << LLBC_FormatLastError() << std::endl;
         return LLBC_FAILED;
@@ -88,13 +88,13 @@ int TestCase_Core_OS_Process::TestCrash()
 #endif
 }
 
-void TestCase_Core_OS_Process::TestCrash_DivisionByZero()
+void FuncTest_Core_OS_Process::TestCrash_DivisionByZero()
 {
     std::cout << "Trigger division by 0 exception..." << std::endl;
     std::cout << "3 / 0 = " << 3 / LLBC_Str2Num<int>("0") << std::endl;
 }
 
-void TestCase_Core_OS_Process::TestCrash_InvalidPtrWrite()
+void FuncTest_Core_OS_Process::TestCrash_InvalidPtrWrite()
 {
     std::cout << "Test invalid pointer write" << std::endl;
 
@@ -104,7 +104,7 @@ void TestCase_Core_OS_Process::TestCrash_InvalidPtrWrite()
     std::cout << *invalidPtr4Write << std::endl;
 }
 
-void TestCase_Core_OS_Process::TestCrash_InvalidPtrRead()
+void FuncTest_Core_OS_Process::TestCrash_InvalidPtrRead()
 {
     LLBC_PrintLn("Test invalid pointer read");
 

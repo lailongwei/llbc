@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/thread/TestCase_Core_Thread_Task.h"
+#include "core/thread/FuncTest_Core_Thread_Task.h"
 
 namespace
 {
@@ -85,15 +85,15 @@ void BasicTestTask::Cleanup()
 
 }
 
-TestCase_Core_Thread_Task::TestCase_Core_Thread_Task()
+FuncTest_Core_Thread_Task::FuncTest_Core_Thread_Task()
 {
 }
 
-TestCase_Core_Thread_Task::~TestCase_Core_Thread_Task()
+FuncTest_Core_Thread_Task::~FuncTest_Core_Thread_Task()
 {
 }
 
-int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
+int FuncTest_Core_Thread_Task::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("core/thread/task test:");
 
@@ -103,7 +103,7 @@ int TestCase_Core_Thread_Task::Run(int argc, char *argv[])
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_Task::BasicTaskTest()
+int FuncTest_Core_Thread_Task::BasicTaskTest()
 {
     LLBC_PrintLn("Basic task test:");
 
@@ -145,7 +145,7 @@ int TestCase_Core_Thread_Task::BasicTaskTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Thread_Task::EmptyTaskTest()
+int FuncTest_Core_Thread_Task::EmptyTaskTest()
 {
     LLBC_PrintLn("Empty task test:");
 

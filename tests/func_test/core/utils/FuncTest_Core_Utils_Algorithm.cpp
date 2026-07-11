@@ -20,9 +20,9 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/utils/TestCase_Core_Utils_Algorithm.h"
+#include "core/utils/FuncTest_Core_Utils_Algorithm.h"
 
-int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
+int FuncTest_Core_Utils_Algorithm::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("llbc library core/utils/Util_Algorithm test");
 
@@ -51,7 +51,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
 	LLBC_PrintLn("\nLLBC_StringEscape test:");
 
     LLBC_String willEscape = ".#=";
-    //Ä©Î²±àÂë²âÊÔ
+    //Ä©Î²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     LLBC_String escapeTail1 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.";
     LLBC_String escapeTail2 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn.";
     escapeTail1.escape(willEscape, '\\');
@@ -59,7 +59,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     llbc_assert(escapeTail1 == escapeTail2);
     LLBC_PrintLn("Tail escape test: %s", (escapeTail1 == escapeTail2) ? "true" : "false");
 
-    //·ÇÄ©±àÂë²âÊÔ
+    //ï¿½ï¿½Ä©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     LLBC_String escapeNotTail1 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn";
     LLBC_String escapeNotTail2 = "\\abcdefghijklmn.abcdefghijklmn=abcdefghijklmn#abcdefghijklmn";
     escapeNotTail1.escape(willEscape, '\\');
@@ -67,7 +67,7 @@ int TestCase_Core_Utils_Algorithm::Run(int argc, char *argv[])
     llbc_assert(escapeNotTail1 == escapeNotTail2);
     LLBC_PrintLn("Not Tail escape test: %s", (escapeNotTail1 == escapeNotTail2) ? "true" : "false");
 
-    //¶à×Ö·û²âÊÔ
+    //ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½
     LLBC_String speEscape2 = "!.#=$:?<>_^[]@+-{}~/|&*`";
     LLBC_String speStr1 = "!.#=$:?<>_^[]@+-{}~/|&*`";
     LLBC_String speStr2 = "!.#=$:?<>_^[]@+-{}~/|&*`";

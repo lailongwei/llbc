@@ -19,17 +19,17 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "core/algo/TestCase_Core_Algo_Hash.h"
+#include "core/algo/FuncTest_Core_Algo_Hash.h"
 
-TestCase_Core_Algo_Hash::TestCase_Core_Algo_Hash()
+FuncTest_Core_Algo_Hash::FuncTest_Core_Algo_Hash()
 {
 }
 
-TestCase_Core_Algo_Hash::~TestCase_Core_Algo_Hash()
+FuncTest_Core_Algo_Hash::~FuncTest_Core_Algo_Hash()
 {
 }
 
-int TestCase_Core_Algo_Hash::Run(int argc, char *argv[])
+int FuncTest_Core_Algo_Hash::Run(int argc, char *argv[])
 {
     std::cout << "core/algo/Hash test:" << std::endl;
 
@@ -41,7 +41,7 @@ int TestCase_Core_Algo_Hash::Run(int argc, char *argv[])
     return 0;
 }
 
-int TestCase_Core_Algo_Hash::SimpleTest()
+int FuncTest_Core_Algo_Hash::SimpleTest()
 {
     std::cout << "Simple test:" << std::endl;
 

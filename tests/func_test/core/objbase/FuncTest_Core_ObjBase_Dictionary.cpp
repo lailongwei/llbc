@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "core/objbase/TestCase_ObjBase_Dictionary.h"
+#include "core/objbase/FuncTest_Core_ObjBase_Dictionary.h"
 
 namespace
 {
@@ -105,15 +105,15 @@ struct GreaterThanFun
 
 }
 
-TestCase_ObjBase_Dictionary::TestCase_ObjBase_Dictionary()
+FuncTest_Core_ObjBase_Dictionary::TestCase_ObjBase_Dictionary()
 {
 }
 
-TestCase_ObjBase_Dictionary::~TestCase_ObjBase_Dictionary()
+FuncTest_Core_ObjBase_Dictionary::~TestCase_ObjBase_Dictionary()
 {
 }
 
-int TestCase_ObjBase_Dictionary::Run(int argc, char *argv[])
+int FuncTest_Core_ObjBase_Dictionary::Run(int argc, char *argv[])
 {
     std::cout <<"objbase/dictionary test: " <<std::endl;
 

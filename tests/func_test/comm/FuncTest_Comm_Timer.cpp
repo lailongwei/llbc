@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_Timer.h"
+#include "comm/FuncTest_Comm_Timer.h"
 
 namespace
 {
@@ -555,15 +555,15 @@ private:
 
 }
 
-TestCase_Comm_Timer::TestCase_Comm_Timer()
+FuncTest_Comm_Timer::FuncTest_Comm_Timer()
 {
 }
 
-TestCase_Comm_Timer::~TestCase_Comm_Timer()
+FuncTest_Comm_Timer::~FuncTest_Comm_Timer()
 {
 }
 
-int TestCase_Comm_Timer::Run(int argc, char *argv[])
+int FuncTest_Comm_Timer::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Timer testcase:");
 

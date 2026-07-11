@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "TestSuite.h"
+#include "FuncTest.h"
 
 int main(int argc, char *argv[])
 {

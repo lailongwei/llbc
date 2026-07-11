@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Algo_RingBuffer final : public LLBC_BaseTestCase
+class FuncTest_Core_Algo_RingBuffer final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_Algo_RingBuffer();
-    ~TestCase_Core_Algo_RingBuffer() override;
+    FuncTest_Core_Algo_RingBuffer();
+    ~FuncTest_Core_Algo_RingBuffer() override;
 
 public:
     int Run(int argc, char *argv[]) override;

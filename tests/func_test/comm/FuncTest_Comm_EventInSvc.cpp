@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_EventInSvc.h"
+#include "comm/FuncTest_Comm_EventInSvc.h"
 
 namespace
 {
@@ -146,15 +146,15 @@ private:
 
 }
 
-TestCase_Comm_EventInSvc::TestCase_Comm_EventInSvc()
+FuncTest_Comm_EventInSvc::FuncTest_Comm_EventInSvc()
 {
 }
 
-TestCase_Comm_EventInSvc::~TestCase_Comm_EventInSvc()
+FuncTest_Comm_EventInSvc::~FuncTest_Comm_EventInSvc()
 {
 }
 
-int TestCase_Comm_EventInSvc::Run(int argc, char *argv[])
+int FuncTest_Comm_EventInSvc::Run(int argc, char *argv[])
 {
     std::cout <<"Core/Event component testcase..." <<std::endl;
 

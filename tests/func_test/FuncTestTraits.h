@@ -56,7 +56,7 @@ struct __TestCaseTraits
         }                                                  \
     };
 
-#include "TestSuiteDef.h"
+#include "FuncTestDef.h"
 
 template <int i>
 struct __TraitsLoop

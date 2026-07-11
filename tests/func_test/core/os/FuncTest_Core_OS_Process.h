@@ -25,11 +25,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_OS_Process final : public LLBC_BaseTestCase
+class FuncTest_Core_OS_Process final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Core_OS_Process() = default;
-    ~TestCase_Core_OS_Process() override = default;
+    FuncTest_Core_OS_Process() = default;
+    ~FuncTest_Core_OS_Process() override = default;
 
 public:
     int Run(int argc, char *argv[]) override;

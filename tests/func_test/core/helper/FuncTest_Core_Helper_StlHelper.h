@@ -24,7 +24,7 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Core_Helper_StlHelper final : public LLBC_BaseTestCase
+class FuncTest_Core_Helper_StlHelper final : public LLBC_BaseTestCase
 {
 public:
     int Run(int argc, char *argv[]) override;

@@ -24,11 +24,11 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Comm_SvcFps final : public LLBC_BaseTestCase
+class FuncTest_Comm_SvcFps final : public LLBC_BaseTestCase
 {
 public:
-    TestCase_Comm_SvcFps();
-    ~TestCase_Comm_SvcFps() override;
+    FuncTest_Comm_SvcFps();
+    ~FuncTest_Comm_SvcFps() override;
 
 public:
     int Run(int argc, char *argv[]) override;

@@ -20,7 +20,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#include "comm/TestCase_Comm_CompReflectionMethod.h"
+#include "comm/FuncTest_Comm_CompReflectionMethod.h"
 
 namespace
 {
@@ -133,7 +133,7 @@ namespace
     };
 }
 
-int TestCase_Comm_CompReflectionMethod::Run(int argc, char *argv[])
+int FuncTest_Comm_CompReflectionMethod::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("Comp reflection method test:");
 

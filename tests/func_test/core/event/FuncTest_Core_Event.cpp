@@ -19,7 +19,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "core/event/TestCase_Core_Event.h"
+#include "core/event/FuncTest_Core_Event.h"
 
 namespace
 {
@@ -38,7 +38,7 @@ namespace
     static LLBC_EventMgr evMgr;
 }
 
-int TestCase_Core_Event::Run(int argc, char *argv[])
+int FuncTest_Core_Event::Run(int argc, char *argv[])
 {
     LLBC_PrintLn("EventMgr test:");
 
@@ -55,7 +55,7 @@ int TestCase_Core_Event::Run(int argc, char *argv[])
     return 0;
 }
 
-int TestCase_Core_Event::BasicTest()
+int FuncTest_Core_Event::BasicTest()
 {
     LLBC_PrintLn("Basic test:");
 
@@ -167,7 +167,7 @@ int TestCase_Core_Event::BasicTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Event::EventFireDeadLoopDetectionTest()
+int FuncTest_Core_Event::EventFireDeadLoopDetectionTest()
 {
     #if LLBC_CFG_CORE_ENABLE_EVENT_FIRE_DEAD_LOOP_DETECTION
     LLBC_PrintLn("Event fire dead loop detection test:");
@@ -216,7 +216,7 @@ int TestCase_Core_Event::EventFireDeadLoopDetectionTest()
     return LLBC_OK;
 }
 
-int TestCase_Core_Event::CopyEventTest()
+int FuncTest_Core_Event::CopyEventTest()
 {
     LLBC_PrintLn("==================================");
     LLBC_PrintLn("Event copy test:");
@@ -265,7 +265,7 @@ int TestCase_Core_Event::CopyEventTest()
 }
 
 #if LLBC_CFG_CORE_ENABLE_EVENT_HOOK
-int TestCase_Core_Event::EventHookTest()
+int FuncTest_Core_Event::EventHookTest()
 {
     LLBC_PrintLn("==================================");
     LLBC_PrintLn("Event hook test:");
@@ -576,7 +576,7 @@ int TestCase_Core_Event::EventHookTest()
 }
 #endif // LLBC_CFG_CORE_ENABLE_EVENT_HOOK
 
-void TestCase_Core_Event::DumpEvParams(const LLBC_Event &ev)
+void FuncTest_Core_Event::DumpEvParams(const LLBC_Event &ev)
 {
     std::stringstream s;
     s << ev;

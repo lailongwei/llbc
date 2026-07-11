@@ -24,7 +24,7 @@
 #include "llbc.h"
 using namespace llbc;
 
-class TestCase_Com_StreamFunc final : public LLBC_BaseTestCase
+class FuncTest_Com_StreamFunc final : public LLBC_BaseTestCase
 {
 public:
     int Run(int argc, char *argv[]) override;
