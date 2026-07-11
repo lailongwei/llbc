@@ -96,8 +96,11 @@ end
 ---- solution/projects path.
 llbc_sln_path = "../.."
 llbc_core_lib_path = llbc_sln_path .. "/llbc"
-llbc_testsuite_path = llbc_sln_path .. "/testsuite"
-llbc_quick_start_path = llbc_sln_path .. "/quick_start"
+llbc_core_lib_tests_path = llbc_sln_path .. "/tests"
+llbc_core_lib_example_path = llbc_core_lib_tests_path .. "/example"
+llbc_core_lib_func_test_path = llbc_core_lib_tests_path .. "/func_test"
+llbc_core_lib_unit_test_path = llbc_core_lib_tests_path .. "/unit_test"
+llbc_core_lib_quick_start_path = llbc_core_lib_tests_path .. "/quick_start"
 llbc_wraps_path = llbc_sln_path .. "/wrap"
 llbc_py_wrap_path = llbc_wraps_path .. "/pyllbc"
 llbc_lu_wrap_path = llbc_wraps_path .. "/lullbc"
@@ -130,9 +133,6 @@ if llbc_system_type == llbc_system_types.windows then
 else
     llbc_output_dir = llbc_output_base_dir .. "/$(config)"
 end
-
--- wrap libraries testsuite directory.
-llbc_wrap_testsuite_output_dir = llbc_output_dir .. '/wrap_testsuites'
 
 -- building script directory.
 llbc_building_script_dir = llbc_sln_path .. "/tools/building_script"
