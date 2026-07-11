@@ -300,7 +300,7 @@ public:
     /**
      * Get component.
      */
-    LLBC_Component *GetComponent(std::string_view compName) override;
+    LLBC_Component *GetComponent(const LLBC_CString &compName) override;
 
 
 public:
@@ -662,7 +662,7 @@ private:
     using _CompRunningPhase = LLBC_NS LLBC_Component::_CompRunningPhase; // Component running phase.
     std::list<LLBC_Component *> _willRegComps; // Will register component list.
     std::vector<LLBC_Component *> _compList; // Component list.
-    std::map<std::string_view, LLBC_Component *> _name2Comps; // Name->Component map.
+    std::map<LLBC_CString, LLBC_Component *> _name2Comps; // Name->Component map.
     std::map<LLBC_String, LLBC_Library *> _compLibraries; // Component libraries(if is dynamic load component).
 
     // Coder & Handler about members.

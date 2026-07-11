@@ -96,7 +96,7 @@ public:
      * @param[in] name - logger name.
      * @return LLBC_Logger * - logger.
      */
-    LLBC_Logger *GetLogger(std::string_view name) const;
+    LLBC_Logger *GetLogger(const LLBC_CString &name) const;
 
     /**
      * Uninit output.
@@ -149,9 +149,9 @@ private:
     LLBC_LogRunnable *_sharedLogRunnable;
 
     LLBC_Logger * volatile _rootLogger;
-    std::map<std::string_view, LLBC_Logger *> _cstr2Loggers;
-    std::vector<std::pair<std::string_view, LLBC_Logger *> > _loggerList;
-    std::map<std::string_view, LLBC_Logger *>::const_iterator _cstr2LoggersEnd;
+    std::map<LLBC_CString, LLBC_Logger *> _cstr2Loggers;
+    std::vector<std::pair<LLBC_CString, LLBC_Logger *> > _loggerList;
+    std::map<LLBC_CString, LLBC_Logger *>::const_iterator _cstr2LoggersEnd;
 
     static LLBC_FastLock _uninitColorfulOutputLock;
 };

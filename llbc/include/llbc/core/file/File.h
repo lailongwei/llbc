@@ -354,7 +354,7 @@ public:
     template <typename StrType>
     typename std::enable_if<LLBC_IsTemplSpec<StrType, std::basic_string>::value ||
                             LLBC_IsTemplSpec<StrType, LLBC_BasicString>::value ||
-                            LLBC_IsTemplSpec<StrType, std::basic_string_view>::value, int>::type
+                            LLBC_IsTemplSpec<StrType, LLBC_BasicCString>::value, int>::type
     Write(const StrType &str);
 
     /**

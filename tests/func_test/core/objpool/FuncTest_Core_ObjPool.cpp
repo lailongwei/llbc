@@ -328,7 +328,7 @@ int FuncTest_Core_ObjPool::ReflectTest()
     LLBC_PrintLn("String type IsReusable() Reflect test:");
     LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<LLBC_String>() == false, LLBC_FAILED);
     LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::string>() == false, LLBC_FAILED);
-    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<std::string_view>(), LLBC_FAILED);
+    LLBC_ErrorAndReturnIf(LLBC_ObjReflector::IsReusable<LLBC_CString>(), LLBC_FAILED);
     LLBC_PrintLn("Success");
 
     // STL containers reusable reflection.

@@ -55,7 +55,8 @@ constexpr bool LLBC_VariantType::IsConvertable()
     }
     else if constexpr (std::is_same_v<_PureTy, std::string> ||
                        std::is_same_v<_PureTy, std::string_view> ||
-                       std::is_same_v<_PureTy, LLBC_String>)
+                       std::is_same_v<_PureTy, LLBC_String> ||
+                       std::is_same_v<_PureTy, LLBC_CString>)
     {
         return true;
     }
@@ -176,7 +177,8 @@ constexpr LLBC_VariantType::ENUM LLBC_VariantType::DeduceType()
     }
     else if constexpr (std::is_same_v<_PureTy, std::string> ||
                        std::is_same_v<_PureTy, std::string_view> ||
-                       std::is_same_v<_PureTy, LLBC_String>) // str
+                       std::is_same_v<_PureTy, LLBC_String> ||
+                       std::is_same_v<_PureTy, LLBC_CString>) // str
     {
         return STR_DFT;
     }
@@ -832,7 +834,8 @@ LLBC_Variant::As() const
 
 template <typename _Ty>
 std::enable_if_t<!std::is_reference_v<_Ty> &&
-                    (std::is_same_v<std::remove_cv_t<_Ty>, std::string_view>),
+                    (std::is_same_v<std::remove_cv_t<_Ty>, std::string_view> ||
+                     std::is_same_v<std::remove_cv_t<_Ty>, LLBC_CString>),
                   _Ty>
 LLBC_Variant::As() const
 {
@@ -1673,7 +1676,8 @@ void LLBC_Variant::ConstructOrAssignFromStr(_Ty &&str)
         else
             _data.str().assign(str);
     }
-    else if constexpr (std::is_same_v<_PureTy, std::string_view>)
+    else if constexpr (std::is_same_v<_PureTy, std::string_view> ||
+                       std::is_same_v<_PureTy, LLBC_CString>)
     {
         if constexpr (IsConstruct)
             new (&_data.str()) Str(str.data(), str.size());
@@ -2021,6 +2025,7 @@ size_t LLBC_Variant::CountImpl(const _Key &key, bool returnIfFound) const
         const char *subStrPtr = nullptr;
         if constexpr (std::is_same_v<_Key, LLBC_String> ||
                       std::is_same_v<_Key, std::string> ||
+                      std::is_same_v<_Key, LLBC_CString> ||
                       std::is_same_v<_Key, std::string_view>)
         {
             subStrPtr = key.data();

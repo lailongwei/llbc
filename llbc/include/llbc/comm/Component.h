@@ -378,8 +378,8 @@ typedef LLBC_Delegate<int(const LLBC_Variant &, LLBC_Variant &)> LLBC_ComponentM
 class LLBC_ComponentMethods
 {
 public:
-    typedef std::map<std::string_view, LLBC_ComponentMethod> Methods;
-    typedef std::vector < std::pair<std::string_view, LLBC_ComponentMethod> > MethodList;
+    typedef std::map<LLBC_CString, LLBC_ComponentMethod> Methods;
+    typedef std::vector < std::pair<LLBC_CString, LLBC_ComponentMethod> > MethodList;
 
 public:
     /**
@@ -400,7 +400,7 @@ public:
      * @param[in] methName - the method name.
      * @return const LLBC_ComponentMethod & - the component method, if not found return nullptr.
      */
-    const LLBC_ComponentMethod &GetMethod(std::string_view methName) const;
+    const LLBC_ComponentMethod &GetMethod(const LLBC_CString &methName) const;
 
 public:
     /**
@@ -409,7 +409,7 @@ public:
      * @param[in] meth      - the component method.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AddMethod(std::string_view methName, const LLBC_ComponentMethod &meth);
+    int AddMethod(const LLBC_CString &methName, const LLBC_ComponentMethod &meth);
 
 public:
     /**
@@ -419,7 +419,7 @@ public:
      * @param[in] ret      - the method execute result.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int CallMethod(std::string_view methName, const LLBC_Variant &arg, LLBC_Variant &ret);
+    int CallMethod(const LLBC_CString &methName, const LLBC_Variant &arg, LLBC_Variant &ret);
 
 private:
     // Disable assignment.
@@ -485,11 +485,11 @@ public:
     template <typename Comp>
     typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, Comp *>::type
     GetComponent();
-    LLBC_Component *GetComponent(std::string_view compName);
+    LLBC_Component *GetComponent(const LLBC_CString &compName);
     template <typename Comp>
     typename std::enable_if<std::is_base_of<LLBC_Component, Comp>::value, const Comp *>::type
     GetComponent() const;
-    const LLBC_Component *GetComponent(std::string_view compName) const;
+    const LLBC_Component *GetComponent(const LLBC_CString &compName) const;
 
     /**
      * Get component list.
@@ -528,7 +528,7 @@ public:
      * @param[in] meth     - the method.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int AddMethod(std::string_view methName,
+    int AddMethod(const LLBC_CString &methName,
                   const LLBC_ComponentMethod &meth);
 
     /**
@@ -538,7 +538,7 @@ public:
      * @return int - return 0 if success, otherwise return -1.
      */
     template <typename Component>
-    int AddMethod(std::string_view methName,
+    int AddMethod(const LLBC_CString &methName,
                   int (Component::*meth)(const LLBC_Variant &arg, LLBC_Variant &ret));
 
     /**
@@ -548,7 +548,7 @@ public:
      * @param[in] ret      - the method execute result.
      * @return int - return 0 if success, otherwise return -1.
      */
-    virtual int CallMethod(std::string_view methName,
+    virtual int CallMethod(const LLBC_CString &methName,
                            const LLBC_Variant &arg, LLBC_Variant &ret);
 
 public:

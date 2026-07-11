@@ -82,14 +82,14 @@ namespace
         }
 
     public:
-        int Foo(int x, std::string_view y)
+        int Foo(int x, LLBC_CString y)
         {
             return static_cast<int>(x + y.size());
         }
 
-        LLBC_String Goo(int x, std::string_view y)
+        LLBC_String Goo(int x, LLBC_CString y)
         {
-            return LLBC_Num2Str(x) + LLBC_String(y);
+            return LLBC_Num2Str(x) + y.c_str();
         }
 
     private:

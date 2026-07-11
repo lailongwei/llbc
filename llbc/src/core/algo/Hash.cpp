@@ -26,7 +26,7 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
-static std::string_view __g_HashAlgoEnumStrs[LLBC_NS LLBC_HashAlgo::End + 1] = {
+static LLBC_NS LLBC_CString __g_HashAlgoEnumStrs[LLBC_NS LLBC_HashAlgo::End + 1] = {
     "BKDR",
     "DJB",
     "SDBM",
@@ -44,7 +44,7 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-std::string_view LLBC_HashAlgo::GetEnumStr(int hashAlgo)
+LLBC_CString LLBC_HashAlgo::GetEnumStr(int hashAlgo)
 {
     return hashAlgo >= Begin && hashAlgo < End ?
         LLBC_INL_NS __g_HashAlgoEnumStrs[hashAlgo] :

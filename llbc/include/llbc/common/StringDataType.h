@@ -22,6 +22,7 @@
 #pragma once
 
 #include "llbc/common/BasicString.h"
+#include "llbc/common/BasicCString.h"
 
 __LLBC_NS_BEGIN
 
@@ -30,12 +31,17 @@ typedef LLBC_BasicString<wchar> LLBC_WString;
 typedef std::vector<LLBC_BasicString<char> > LLBC_Strings;
 typedef std::vector<LLBC_BasicString<wchar> > LLBC_WStrings;
 
+typedef LLBC_BasicCString<char> LLBC_CString;
+typedef LLBC_BasicCString<wchar> LLBC_CWString;
+
 #ifdef LLBC_UNICODE
  typedef LLBC_WString LLBC_TString;
  typedef LLBC_WStrings LLBC_TStrings;
+ typedef LLBC_CWString LLBC_CTString;
 #else // !LLBC_UNICODE
  typedef LLBC_String LLBC_TString;
  typedef LLBC_Strings LLBC_TStrings;
+ typedef LLBC_CString LLBC_TCString;
 #endif // LLBC_UNICODE
 
 __LLBC_NS_END

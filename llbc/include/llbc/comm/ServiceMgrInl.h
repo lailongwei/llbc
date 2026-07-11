@@ -47,7 +47,7 @@ inline LLBC_Service *LLBC_ServiceMgr::GetServiceNonLock(int id)
     return it != _id2Services.end() ? it->second : nullptr;
 }
 
-inline LLBC_Service *LLBC_ServiceMgr::GetServiceNonLock(std::string_view name)
+inline LLBC_Service *LLBC_ServiceMgr::GetServiceNonLock(const LLBC_CString &name)
 {
     if (_serviceList.size() < 30)
     {

@@ -52,9 +52,9 @@ public:
     /**
      * Get hash algorithm enum string.
      * @param[in] hashAlgo - the hash algorithm.
-     * @return std::string_view - the enum string.
+     * @return LLBC_CString - the enum string.
      */
-    static std::string_view GetEnumStr(int hashAlgo);
+    static LLBC_CString GetEnumStr(int hashAlgo);
 };
 
 /**

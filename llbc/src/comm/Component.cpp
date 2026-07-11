@@ -392,7 +392,7 @@ LLBC_Component::~LLBC_Component()
     LLBC_XDelete(_meths);
 }
 
-LLBC_Component *LLBC_Component::GetComponent(std::string_view compName)
+LLBC_Component *LLBC_Component::GetComponent(const LLBC_CString &compName)
 {
     return _svc->GetComponent(compName);
 }
@@ -418,7 +418,7 @@ void LLBC_Component::UpdateComponentCfg()
 
     // Update component config.
     auto &svcCfg = _svc->GetConfig();
-    const std::string_view compName(LLBC_GetCompName(*this));
+    const LLBC_CString compName(LLBC_GetCompName(*this));
     if (_cfgType == LLBC_AppConfigType::Property ||
         _cfgType == LLBC_AppConfigType::Ini)
     {

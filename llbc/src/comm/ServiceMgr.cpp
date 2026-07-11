@@ -47,7 +47,7 @@ LLBC_Service *LLBC_ServiceMgr::GetService(int id)
     return GetServiceNonLock(id);
 }
 
-LLBC_Service *LLBC_ServiceMgr::GetService(std::string_view name)
+LLBC_Service *LLBC_ServiceMgr::GetService(const LLBC_CString &name)
 {
     LLBC_LockGuard guard(_lock);
     return GetServiceNonLock(name);
@@ -71,7 +71,7 @@ int LLBC_ServiceMgr::Stop(int id, bool del, bool destroyComp)
     return Stop(svc, del, destroyComp);
 }
 
-int LLBC_ServiceMgr::Stop(std::string_view name, bool del, bool destroyComp)
+int LLBC_ServiceMgr::Stop(const LLBC_CString &name, bool del, bool destroyComp)
 {
     // Find service.
     _lock.Lock();

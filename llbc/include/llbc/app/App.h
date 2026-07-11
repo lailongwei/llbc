@@ -342,7 +342,7 @@ public:
      * @param[in] name - service name.
      * @return LLBC_Service * - service.
      */
-    LLBC_Service *GetService(std::string_view name) const;
+    LLBC_Service *GetService(const LLBC_CString &name) const;
 
     /**
      * Stop service by service Id.
@@ -359,7 +359,7 @@ public:
      * @param[in] destroyComp - destroy service components or not, default is false.
      * @return int - return 0 if success, otherwise return -1.
      */
-    int StopService(std::string_view name, bool del = true, bool destroyComp = false);
+    int StopService(const LLBC_CString &name, bool del = true, bool destroyComp = false);
 
 private:
     /**
