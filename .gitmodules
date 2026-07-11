@@ -4,3 +4,6 @@
 [submodule "wrap/pyllbc/cpython"]
 	path = wrap/pyllbc/cpython
 	url = https://github.com/python/cpython.git
+[submodule "tests/3rdparty/googletest"]
+	path = tests/3rdparty/googletest
+	url = https://github.com/google/googletest
