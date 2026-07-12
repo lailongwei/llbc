@@ -9,17 +9,23 @@ import datetime
 
 class Log(object):
     """简易日志封装"""
-    Debug = 0
-    Info = 1
-    Warn = 2
-    Error = 3
+    Trace = 0
+    Debug = 1
+    Info = 2
+    Warn = 3
+    Error = 4
 
     _log_lv_str = {
+        Trace: 'TRACE',
         Debug: 'DEBUG',
-        Info: 'INFO ',
-        Warn: 'INFO ',
+        Info: 'INFO',
+        Warn: 'WARN',
         Error: 'ERROR',
     }
+
+    @classmethod
+    def t(cls, msg):
+        cls._log(cls.Trace, msg)
 
     @classmethod
     def d(cls, msg):
@@ -36,6 +42,10 @@ class Log(object):
     @classmethod
     def e(cls, msg):
         cls._log(cls.Error, msg)
+
+    @classmethod
+    def ft(cls, msg, *args):
+        cls._log(cls.Trace, msg.format(*args))
 
     @classmethod
     def fd(cls, msg, *args):
@@ -56,9 +66,26 @@ class Log(object):
     @classmethod
     def _log(cls, lv, msg):
         f = sys.stderr if lv >= cls.Warn else sys.stdout
-        f.write('{} [{}] {}\n'.format(datetime.datetime.now().strftime('%m-%d %H:%M:%S'),
-                                      cls._log_lv_str[lv],
-                                      msg))
+
+        log_prefix = ''
+        log_suffix = ''
+        is_win = sys.platform.lower().startswith('win')
+        if not is_win and lv >= cls.Info:
+            log_prefix = '\033['
+            if lv == cls.Info:
+                log_prefix += '32m'
+            elif lv == cls.Warn:
+                log_prefix += '33m'
+            elif lv == cls.Error:
+                log_prefix += '31m'
+
+            log_suffix = '\033[0m'
+
+        f.write('{}{} [{:<5}] {}{}\n'.format(log_prefix,
+                                             datetime.datetime.now().strftime('%m-%d %H:%M:%S'),
+                                             cls._log_lv_str[lv],
+                                             msg,
+                                             log_suffix))
         if lv < cls.Warn:
             f.flush()
 
