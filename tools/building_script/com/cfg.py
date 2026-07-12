@@ -38,10 +38,12 @@ class _Cfg(object):
         self._is_debug = self._building_cfg.startswith('debug')
         self._premake_action = sys.argv[3].strip()
         disable_cxx11_abi_cfg = sys.argv[4].strip().lower()
-        if disable_cxx11_abi_cfg == 'true' or disable_cxx11_abi_cfg == 'yes' or int(disable_cxx11_abi_cfg) != 0:
+        if disable_cxx11_abi_cfg in ('true', 'yes'):
             self._disable_cxx11_abi = True
-        else:
+        elif disable_cxx11_abi_cfg in ('false', 'no'):
             self._disable_cxx11_abi = False
+        else:
+            self._disable_cxx11_abi = int(disable_cxx11_abi_cfg)
         self._custom_ccpp_toolset_bin_path = sys.argv[5].strip() if len(sys.argv) > 5 else ''
     # endregion
 
