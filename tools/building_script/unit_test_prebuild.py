@@ -104,7 +104,7 @@ def _compile_gtest_non_win32():
         if not updated:
             Log.t('  - Not find LLBC_CUSTOM_CCPP_TOOLSET_BIN_PATH, update CMakeLists.txt')
             insert_lines = [
-                '# Custom ccpp toolset bin path(add by llbc unit_test prebuild script)',
+                '# Custom ccpp toolset bin path(add by llbc unit_test prebuild script).',
                 'set(LLBC_CUSTOM_CCPP_TOOLSET_BIN_PATH "{}")'.format(custom_ccpp_toolset_bin_path),
                 'set(CMAKE_CXX_COMPILER "${LLBC_CUSTOM_CCPP_TOOLSET_BIN_PATH}/g++")',
                 'set(CMAKE_C_COMPILER "${LLBC_CUSTOM_CCPP_TOOLSET_BIN_PATH}/gcc")',
