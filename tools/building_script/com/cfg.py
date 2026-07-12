@@ -3,8 +3,10 @@
 llbc项目构建脚本脚本配置
 要求调用参数:
 - sys.argv[1] - 构建架构: 如x86/x64/...
-- sys.argv[2] - 构建配置: debug/release
+- sys.argv[2] - 构建配置: debug32/release32/debug64/release64/...
 - sys.argv[3] - premake action参数: vs2022/gmake(deprecated)/gmake2/...
+- sys.argv[4] - 是否禁用 c++11 abi
+- sys.argv[5] - llbc 项目自定义 c/cpp 工具集 bin/ 路径, 如果没有, 则为空串
 """
 
 import os
@@ -32,8 +34,15 @@ class _Cfg(object):
         self._license = None
         self._arch = ArchType.desc2type(sys.argv[1])
         assert(ArchType.is_valid(self._arch))
-        self._is_debug = sys.argv[2].strip().lower() == 'debug'
+        self._building_cfg = sys.argv[2].strip().lower()
+        self._is_debug = self._building_cfg.startswith('debug')
         self._premake_action = sys.argv[3].strip()
+        disable_cxx11_abi_cfg = sys.argv[4].strip().lower()
+        if disable_cxx11_abi_cfg == 'true' or disable_cxx11_abi_cfg == 'yes' or int(disable_cxx11_abi_cfg) != 0:
+            self._disable_cxx11_abi = True
+        else:
+            self._disable_cxx11_abi = False
+        self._custom_ccpp_toolset_bin_path = sys.argv[5].strip() if len(sys.argv) > 5 else ''
     # endregion
 
     # region 平台/构建信息
@@ -46,6 +55,11 @@ class _Cfg(object):
     def arch(self):
         """构架"""
         return self._arch
+
+    @property
+    def building_cfg(self):
+        """构建配置"""
+        return self._building_cfg
 
     @property
     def is_debug(self):
@@ -144,11 +158,36 @@ class _Cfg(object):
 
     # endregion
 
-    # region 核心库测试项目(testsuite)相关
+    # region 核心库测试项目相关
     @property
-    def testsuite_proj_path(self):
-        """核心库测试项目路径"""
-        return op.join(self.sln_path, 'testsuite')
+    def llbc_test_projs_path(self):
+        """核心库所 有测试项目 路径"""
+        return op.join(self.sln_path, 'tests')
+
+    @property
+    def llbc_test_projs_3rdparty_dir(self):
+        """核心库测试项目3rdparty目录"""
+        return op.join(self.llbc_test_projs_path, '3rdparty')
+
+    @property
+    def llbc_example_proj_path(self):
+        """核心库 示例项目 路径"""
+        return op.join(self.llbc_test_projs_path, 'examples')
+
+    @property
+    def llbc_func_test_proj_path(self):
+        """核心库 功能测试项目 路径"""
+        return op.join(self.llbc_test_projs_path, 'func_test')
+
+    @property
+    def llbc_unit_test_proj_path(self):
+        """核心库 单元测试项目 路径"""
+        return op.join(self.llbc_test_projs_path, 'unit_test')
+
+    @property
+    def llbc_quick_start_proj_path(self):
+        """核心库 快速开始项目 路径"""
+        return op.join(self.llbc_test_projs_path, 'quick_start')
     # endregion
 
     # region 包装库相关
@@ -253,6 +292,18 @@ class _Cfg(object):
     def csllbc_proj_path(self):
         """csllbc项目路径"""
     # endregion
+    # endregion
+
+    # region 构建工具链相关
+    @property
+    def disable_cxx11_abi(self):
+        """是否禁用 c++11 abi"""
+        return self._disable_cxx11_abi
+
+    @property
+    def custom_ccpp_toolset_bin_path(self):
+        """自定义ccpp工具链路径, 如未指定, 返回空str"""
+        return self._custom_ccpp_toolset_bin_path
     # endregion
 
     # region 辅助方法

@@ -57,7 +57,7 @@ workspace ("llbc_" .. _ACTION)
     -- target directory define.
     targetdir (llbc_output_dir)
     -- start project.
-    startproject("testsuite")
+    startproject("tests/func_test")
 
     -- configurations.
     configurations { "release32", "debug32", "release64", "debug64" }
@@ -254,16 +254,20 @@ project "llbc"
 
     -- prebuild.
     local prebuild_script = '../../tools/building_script/llbc_prebuild.py'
-    local prebuild_cmd = string.format('%s %s %%s %%s %s',
-                                       llbc_py_exec_path, prebuild_script, _ACTION)
+    local prebuild_cmd = string.format('%s %s %%s %%s %s %s %s',
+                                       llbc_py_exec_path,
+                                       prebuild_script,
+                                       _ACTION,
+                                       llbc_disable_cxx11_abi,
+                                       llbc_custom_ccpp_toolset_bin_path)
     filter { "configurations:debug32" }
-    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug32') }
     filter { "configurations:release32" }
-    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release32') }
     filter { "configurations:debug64" }
-    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug64') }
     filter { "configurations:release64" }
-    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release64') }
     filter {}
 
     -- Note: For now, disable auto update mechanism of LLBC_CFG_CORE_OBJPOOL_USE_MALLOC_INSTEAD macro.
@@ -278,10 +282,12 @@ project "llbc"
     --     }
     -- end
 
-group "tests"
 -- ****************************************************************************
--- core library testsuite compile setting.
-project "testsuite"
+-- core library test projects.
+group "tests"
+
+-- example project:
+project "example"
     -- language, kind.
     language "c++"
     kind "ConsoleApp"
@@ -298,11 +304,11 @@ project "testsuite"
 
     -- files.
     files {
-        llbc_testsuite_path .. "/**.h",
-        llbc_testsuite_path .. "/**.cpp",
-        llbc_testsuite_path .. "/**.xml",
-        llbc_testsuite_path .. "/**.cfg",
-        llbc_testsuite_path .. "/**.ini",
+        llbc_core_lib_example_path .. "/**.h",
+        llbc_core_lib_example_path .. "/**.cpp",
+        llbc_core_lib_example_path .. "/**.xml",
+        llbc_core_lib_example_path .. "/**.cfg",
+        llbc_core_lib_example_path .. "/**.ini",
     }
 
     -- include llbc core lib.
@@ -310,7 +316,50 @@ project "testsuite"
 
     -- includedirs.
     includedirs {
-        llbc_testsuite_path,
+        llbc_core_lib_example_path,
+    }
+
+    -- Enable c++17 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++17",
+        }
+    filter {}
+
+    -- Specific debug directory.
+    debugdir(llbc_output_dir)
+
+-- function test project:
+project "func_test"
+    -- language, kind.
+    language "c++"
+    kind "ConsoleApp"
+
+    -- toolset.
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
+
+    -- dependents.
+    dependson {
+        "llbc",
+    }
+
+    -- files.
+    files {
+        llbc_core_lib_func_test_path .. "/**.h",
+        llbc_core_lib_func_test_path .. "/**.cpp",
+        llbc_core_lib_func_test_path .. "/**.xml",
+        llbc_core_lib_func_test_path .. "/**.cfg",
+        llbc_core_lib_func_test_path .. "/**.ini",
+    }
+
+    -- include llbc core lib.
+    include_llbc_core_lib()
+
+    -- includedirs.
+    includedirs {
+        llbc_core_lib_func_test_path,
     }
 
     -- Enable c++17 support.
@@ -324,7 +373,7 @@ project "testsuite"
     debugdir(llbc_output_dir)
 
     -- Copy all testcases config files to output directory.
-    postbuildmessage("Copying all testcase config files to output directory...");
+    postbuildmessage("Copying all function test project config files to output directory...");
     local test_cfgs = {
         "core/config/test_ini.ini",
         "core/config/test_prop.properties",
@@ -341,19 +390,95 @@ project "testsuite"
     filter { "system:windows" }
         for _, test_cfg in pairs(test_cfgs) do
             postbuildcommands(string.format("COPY /Y \"%s\\%s\" \"%s\"",
-                                            string.gsub(llbc_testsuite_path, "/", "\\"),
+                                            string.gsub(llbc_core_lib_func_test_path, "/", "\\"),
                                             string.gsub(test_cfg, "/", "\\"),
                                             string.gsub(llbc_output_dir, "/", "\\")))
         end
     filter {}
     filter { "system:not windows" }
         for _, test_cfg in pairs(test_cfgs) do
-            postbuildcommands(string.format("cp -rf \"%s/%s\" \"%s\"", llbc_testsuite_path, test_cfg, llbc_output_dir))
+            postbuildcommands(string.format("cp -rf \"%s/%s\" \"%s\"",
+                                            llbc_core_lib_func_test_path,
+                                            test_cfg,
+                                            llbc_output_dir))
         end
     filter {}
 
--- ****************************************************************************
--- quick start project compile setting.
+-- example project:
+project "unit_test"
+    -- language, kind.
+    language "c++"
+    kind "ConsoleApp"
+
+    -- toolset.
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
+
+    -- dependents.
+    dependson {
+        "llbc",
+    }
+
+    -- files.
+    files {
+        llbc_core_lib_unit_test_path .. "/**.h",
+        llbc_core_lib_unit_test_path .. "/**.cpp",
+        llbc_core_lib_unit_test_path .. "/**.xml",
+        llbc_core_lib_unit_test_path .. "/**.cfg",
+        llbc_core_lib_unit_test_path .. "/**.ini",
+    }
+
+    -- include llbc core lib.
+    include_llbc_core_lib()
+
+    -- includedirs.
+    local gtest_path = llbc_core_lib_tests_3rdparty_path .. "/googletest"
+    includedirs {
+        llbc_core_lib_unit_test_path,
+        gtest_path .. "/googletest/include",
+
+    }
+
+    -- link gtest lib.
+    filter { "system:windows"}
+    -- TODO: will link gtest lib on windows platform.
+    buildmessage('TODO: will link gtest lib on windows platform')
+    filter { "system:not windows" }
+    libdirs{ gtest_path .. "/build/lib" }
+    links { "gtest" }
+    filter {}
+
+    -- Enable c++17 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++17",
+        }
+    filter {}
+
+    -- Specific debug directory.
+    debugdir(llbc_output_dir)
+
+    -- prebuild & postbuild.
+    local prebuild_script = '../../tools/building_script/unit_test_prebuild.py'
+    local prebuild_cmd = string.format('%s %s %%s %%s %s %s %s',
+                                        llbc_py_exec_path,
+                                        prebuild_script,
+                                        _ACTION,
+                                        llbc_disable_cxx11_abi,
+                                        llbc_custom_ccpp_toolset_bin_path)
+
+    filter { "configurations:debug32" }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug32') }
+    filter { "configurations:release32" }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release32') }
+    filter { "configurations:debug64" }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug64') }
+    filter { "configurations:release64" }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release64') }
+    filter {}
+
+-- quick start project:
 project "quick_start"
     -- laugnage, kind.
     language "c++"
@@ -371,11 +496,11 @@ project "quick_start"
 
     -- files.
     files {
-        llbc_quick_start_path .. "/**.h",
-        llbc_quick_start_path .. "/**.cpp",
-        llbc_quick_start_path .. "/**.xml",
-        llbc_quick_start_path .. "/**.cfg",
-        llbc_quick_start_path .. "/**.ini",
+        llbc_core_lib_quick_start_path .. "/**.h",
+        llbc_core_lib_quick_start_path .. "/**.cpp",
+        llbc_core_lib_quick_start_path .. "/**.xml",
+        llbc_core_lib_quick_start_path .. "/**.cfg",
+        llbc_core_lib_quick_start_path .. "/**.ini",
     }
 
     -- include llbc core lib.
@@ -383,7 +508,7 @@ project "quick_start"
 
     -- includedirs.
     includedirs {
-        llbc_quick_start_path,
+        llbc_core_lib_quick_start_path,
     }
 
     -- Enable c++17 support.
@@ -452,25 +577,33 @@ project "pyllbc"
         defines { "HAVE_ROUND" }
     filter {}
 
-    -- prebuild & postbuild
+    -- prebuild & postbuild.
     local prebuild_script = '../../tools/building_script/py_prebuild.py'
     local postbuild_script = '../../tools/building_script/py_postbuild.py'
-    local prebuild_cmd = string.format('%s %s %%s %%s %s',
-                                       llbc_py_exec_path, prebuild_script, _ACTION)
-    local postbuild_cmd = string.format('%s %s %%s %%s %s',
-                                        llbc_py_exec_path, postbuild_script, _ACTION)
+    local prebuild_cmd = string.format('%s %s %%s %%s %s %s %s',
+                                       llbc_py_exec_path,
+                                       prebuild_script,
+                                       _ACTION,
+                                       llbc_disable_cxx11_abi,
+                                       llbc_custom_ccpp_toolset_bin_path)
+    local postbuild_cmd = string.format('%s %s %%s %%s %s %s %s',
+                                        llbc_py_exec_path,
+                                        postbuild_script,
+                                        _ACTION,
+                                       llbc_disable_cxx11_abi,
+                                        llbc_custom_ccpp_toolset_bin_path)
     filter { "configurations:debug32" }
-    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
-    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug32') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'debug32') }
     filter { "configurations:release32" }
-    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
-    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release32') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'release32') }
     filter { "configurations:debug64" }
-    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
-    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug64') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug64') }
     filter { "configurations:release64" }
-    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
-    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
+    prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release64') }
+    postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release64') }
     filter {}
 
     -- target name, target prefix, extension.
@@ -871,20 +1004,30 @@ project "lullbc"
     -- prebuild & postbuild.
     local prebuild_script = llbc_building_script_dir .. '/lu_prebuild.py'
     local postbuild_script = llbc_building_script_dir .. '/lu_postbuild.py'
-    local prebuild_cmd = string.format('%s %s %%s %%s %s', llbc_py_exec_path, prebuild_script, _ACTION)
-    local postbuild_cmd = string.format('%s %s %%s %%s %s', llbc_py_exec_path, postbuild_script, _ACTION)
+    local prebuild_cmd = string.format('%s %s %%s %%s %s %s %s',
+                                       llbc_py_exec_path,
+                                       prebuild_script,
+                                       _ACTION,
+                                       llbc_disable_cxx11_abi,
+                                       llbc_custom_ccpp_toolset_bin_path)
+    local postbuild_cmd = string.format('%s %s %%s %%s %s %s %s',
+                                        llbc_py_exec_path,
+                                        postbuild_script,
+                                        _ACTION,
+                                       llbc_disable_cxx11_abi,
+                                        llbc_custom_ccpp_toolset_bin_path)
     filter { "configurations:debug32" }
-        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug') }
-        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'debug') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'debug32') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'debug32') }
     filter { "configurations:release32" }
-        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release') }
-        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'release') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type, 'release32') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type, 'release32') }
     filter { "configurations:debug64" }
-        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
-        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug64') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'debug64') }
     filter { "configurations:release64" }
-        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
-        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release') }
+        prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release64') }
+        postbuildcommands { string.format(postbuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release64') }
     filter {}
 
     -- target name, target prefix, extension.

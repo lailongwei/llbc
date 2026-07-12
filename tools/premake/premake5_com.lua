@@ -38,6 +38,9 @@ function set_custom_ccpp_toolset(toolset_bin_path)
 
     -- install to premake.
     premake.tools.custom_ccpp_toolset = custom_ccpp_toolset
+
+    -- export custom c/cpp toolset bin path(global lua variable).
+    llbc_custom_ccpp_toolset_bin_path = toolset_bin_path
 end
 
 -- determine system type.
@@ -97,6 +100,7 @@ end
 llbc_sln_path = "../.."
 llbc_core_lib_path = llbc_sln_path .. "/llbc"
 llbc_core_lib_tests_path = llbc_sln_path .. "/tests"
+llbc_core_lib_tests_3rdparty_path = llbc_sln_path .. "/tests/3rdparty"
 llbc_core_lib_example_path = llbc_core_lib_tests_path .. "/example"
 llbc_core_lib_func_test_path = llbc_core_lib_tests_path .. "/func_test"
 llbc_core_lib_unit_test_path = llbc_core_lib_tests_path .. "/unit_test"
