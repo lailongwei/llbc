@@ -281,7 +281,7 @@ clean_$(CORELIB_FUNC_TEST_TARGET):
 clean_$(CORELIB_UNIT_TEST_TARGET):
 	@(if [ -e build/$(PREMAKE_ACTION)/unit_test.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f unit_test.make clean; fi)
 clean_$(CORELIB_QUICK_START_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/quick_start.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f quick_start_test.make clean; fi)
+	@(if [ -e build/$(PREMAKE_ACTION)/quick_start.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f quick_start.make clean; fi)
 
 clean_$(WRAPS_TARGET): $(addprefix clean_,$(ALL_WRAP_TARGETS))
 clean_$(PYWRAP_TARGET):
