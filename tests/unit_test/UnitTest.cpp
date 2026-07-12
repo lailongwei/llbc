@@ -19,7 +19,31 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include <llbc.h>
+using namespace llbc;
+
+#include <gtest/gtest.h>
+
+/**
+ * \brief The llbc framework initer.
+ */
+class TestEnv_LLBCIniter : public ::testing::Environment
+{
+public:
+    void SetUp() override
+    {
+        LLBC_Startup();
+    }
+
+    void TearDown() override
+    {
+        LLBC_Cleanup();
+    }
+};
+
 int main(int argc, char *argv[])
 {
-    return 0;
+    testing::AddGlobalTestEnvironment(new TestEnv_LLBCIniter());
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
