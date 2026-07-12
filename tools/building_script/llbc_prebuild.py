@@ -48,7 +48,7 @@ def main():
         Log.fe('Parse version cpp file failed, file:{}', ver_cpp_file)
         return
     elif lib_ver_parts == cfg_ver_parts:
-        Log.i('The version number is the same, no need to update')
+        Log.t('The version number is the same, no need to update')
         return
 
     lib_ver = '.'.join(str(ver_part) for ver_part in lib_ver_parts)
@@ -57,8 +57,6 @@ def main():
 
     with open(ver_cpp_file, 'w') as f:
         f.writelines(lines)
-
-    Log.i('Done!')
 
 
 if __name__ == '__main__':
