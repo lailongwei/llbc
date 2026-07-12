@@ -85,10 +85,6 @@ def main():
         print 'tar testsuite...'
         tar.add('testsuite', filter=common_filter)
 
-        # tar llbc.xcodeproj
-        # TODO: Will delete
-        tar.add('llbc.xcodeproj')
-
         # tar .git directory, if exists and specified
         if TAR_GIT and op.exists('.git'):
             print 'tar .git...'
