@@ -1,0 +1,33 @@
+# 侧边栏导航（渐进旅程式）：入门 → 核心概念 → 使用指南 → 更多
+# url 使用不含 baseurl 的站内路径（.html 后缀），与页面 page.url 对齐以高亮当前项。
+nav:
+- section: "入门"
+  items:
+  - title: "安装与构建"
+    url: "/getting-started/build.html"
+  - title: "Hello World"
+    url: "/getting-started/hello-world.html"
+  - title: "第一个 Service"
+    url: "/getting-started/first-service.html"
+- section: "核心概念"
+  items:
+  - title: "架构总览"
+    url: "/concepts/architecture.html"
+  - title: "Service 与 Component"
+    url: "/concepts/service-component.html"
+  - title: "生命周期与事件"
+    url: "/concepts/lifecycle-event.html"
+- section: "使用指南"
+  items:
+  - title: "序列化 Stream"
+    url: "/guides/stream.html"
+- section: "更多"
+  items:
+  - title: "示例项目"
+    url: "/examples.html"
+  - title: "常见问题"
+    url: "/faq.html"
+  - title: "贡献指南"
+    url: "/contributing.html"
+  - title: "更新日志"
+    url: "/changelog.html"

@@ -1,0 +1,6 @@
+# Jekyll 本地构建产物
+_site/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+Gemfile.lock

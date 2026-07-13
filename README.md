@@ -13,6 +13,7 @@ llbc开发过程中，使用了以下JetBrains产品：
 
 ## 构建状态
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://lailongwei.github.io/llbc/)
 | 平台         | 编译器        | 类型                        | 状态                                                                                                                                                                     |
 |-------------|---------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Linux**   | g++, clang++  | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/linux-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/linux-build.yml) |
@@ -20,7 +21,11 @@ llbc开发过程中，使用了以下JetBrains产品：
 | **Windows** | Visual Studio | Build, ~~Test~~, ~~Deploy~~ | [![Build status](https://github.com/lailongwei/llbc/actions/workflows/windows-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/windows-build.yml) |  
 
 ## 文档
-请点击 [llbc wiki](https://github.com/lailongwei/llbc/wiki)查阅，当前文档在完善中，也欢迎您贡献文档。
+📖 **[llbc 文档站点](https://lailongwei.github.io/llbc/)** —— 快速开始、核心概念、使用指南与参考手册（推荐）。
+
+文档源码位于本仓库 [`docs/`](docs/) 目录，由 GitHub Pages 原生 Jekyll 构建，欢迎贡献与补全（带 `TODO` 标记的页面尤其欢迎）。
+
+> 历史 [llbc wiki](https://github.com/lailongwei/llbc/wiki) 仍可查阅，内容正逐步迁移至上述文档站点。
 
 ## 支持平台：
 **Windows**: 提供稳定版本支持, 并保持所有特性处于最新状态, 可用于线上产品环境。  
@@ -48,6 +53,6 @@ llbc欢迎大家使用、提出问题及贡献代码。
 作者QQ：964855959  
 作者Email：lailongwei@126.com, 964855959@qq.com  
 QQ交流群：662590231  
-手册：[llbc wiki](https://github.com/lailongwei/llbc/wiki)   
+手册：[llbc 文档站点](https://lailongwei.github.io/llbc/)   
 
 

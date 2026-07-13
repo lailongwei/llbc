@@ -1,0 +1,7 @@
+# 本地预览用（GitHub Pages 线上构建不依赖此文件）：
+#   cd docs && bundle install && bundle exec jekyll serve
+# 然后浏览器打开 http://127.0.0.1:4000/llbc/
+source "https://rubygems.org"
+
+# 与 GitHub Pages 线上环境保持一致的构建栈
+gem "github-pages", group: :jekyll_plugins
