@@ -42,13 +42,18 @@
 #define LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES               100
 // Determine crash signal set.
 #define LLBC_CFG_OS_CRASH_SIGNALS                           {SIGSEGV, SIGABRT, SIGFPE, SIGILL}
-// Determine NPTL reserved signal set.
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+ // [Non-Win32 only] Use alternative stack for crash signal, default is true.
+ #define LLBC_CFG_OS_USE_ALT_STACK_FOR_CRASH_SIGNAL         true
+ // [Non-Win32 only] Alternative crash signal stack size, default is 48KB, stack size range: [16KB, 512KB].
+ #define LLBC_CFG_OS_ALT_CRASH_SIGNAL_STACK_SIZE            (512 * 1024)
+#endif // Non-Win32
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
-// __SIGRTMIN is a kernel-internal symbol (value 32), not reliably available in user-space headers,
-// so the values are hardcoded here.
-#define LLBC_CFG_OS_NPTL_RESERVED_SIGNALS                   {32, 33} // __SIGRTMIN + 0, __SIGRTMIN + 1
+ // __SIGRTMIN is a kernel-internal symbol (value 32), not reliably available in user-space headers,
+ // so the values are hardcoded here.
+ #define LLBC_CFG_OS_NPTL_RESERVED_SIGNALS                  {32, 33} // __SIGRTMIN + 0, __SIGRTMIN + 1
 #else // Non Linux like platform.
-#define LLBC_CFG_OS_NPTL_RESERVED_SIGNALS                   {}
+ #define LLBC_CFG_OS_NPTL_RESERVED_SIGNALS                  {}
 #endif
 
 /**

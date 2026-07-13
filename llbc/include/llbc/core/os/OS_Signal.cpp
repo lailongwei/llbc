@@ -229,6 +229,109 @@ static void __LLBC_SignalDispatcher(int sig, siginfo_t *sigInfo, void *sigCtx)
         LLBC_NS LLBC_AtomicFetchAndAdd(&__receivedSignalCount, 1);
 }
 
+/** 
+ * Internal function: Set crash signal alternative stack.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_HIDDEN int __LLBC_SetCrashSignalAltStack()
+{
+    #if LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_OS_USE_ALT_STACK_FOR_CRASH_SIGNAL
+    // Get lib tls.
+    LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls();
+    if (UNLIKELY(!libTls))
+    {
+        // Warn: libTls is nullptr, Setting last error has no effect.
+        // LLBC_NS LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+        return LLBC_FAILED;
+    }
+
+    // Calculate alternative signal stack size.
+    size_t &sigStackSize = libTls->coreTls.crashSignalAltStackSize;
+    constexpr std::pair<size_t, size_t> altSigStackSizeRange {16 * 1024, 512 * 1024};
+    sigStackSize = std::clamp(static_cast<size_t>(LLBC_CFG_OS_ALT_CRASH_SIGNAL_STACK_SIZE),
+                              altSigStackSizeRange.first,
+                              altSigStackSizeRange.second);
+    
+    // - Allocate alternative signal stack and set it.
+    void *&sigStack = libTls->coreTls.crashSignalAltStack;
+    sigStack = LLBC_Malloc(void, sigStackSize);
+    if (UNLIKELY(!sigStack))
+    {
+        LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);
+        sigStackSize = 0;
+
+        return LLBC_FAILED;
+    }
+
+    stack_t ss;
+    memset(&ss, 0, sizeof(ss));
+    ss.ss_sp = sigStack;
+    ss.ss_size = sigStackSize;
+    ss.ss_flags = 0;
+    if (UNLIKELY(sigaltstack(&ss, nullptr) != 0))
+    {
+        LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);
+        free(sigStack);
+        sigStack = nullptr;
+        sigStackSize = 0;
+
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+    #else // Alt crash signal stack is not supported or disabled.
+    LLBC_NS LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
+    return LLBC_FAILED;
+    #endif
+}
+
+/** 
+ * Internal function: Clear crash signal alternative stack.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_HIDDEN int __LLBC_ClearCrashSignalAltStack()
+{
+    #if LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_OS_USE_ALT_STACK_FOR_CRASH_SIGNAL
+    // Get lib tls.
+    LLBC_NS __LLBC_LibTls *libTls = LLBC_NS __LLBC_GetLibTls();
+    if (UNLIKELY(!libTls))
+    {
+        // Warn: libTls is nullptr, Set last error is no effect.
+        // LLBC_NS LLBC_SetLastError(LLBC_ERROR_UNKNOWN);
+        return LLBC_FAILED;
+    }
+
+    // sigStack is nullptr, no need to reset.
+    void *&sigStack = libTls->coreTls.crashSignalAltStack;
+    if (!sigStack)
+        return LLBC_OK;
+
+    // Reset alternative signal stack.
+    stack_t ss;
+    memset(&ss, 0, sizeof(ss));
+    ss.ss_flags = SS_DISABLE;
+    if (UNLIKELY(sigaltstack(&ss, nullptr) != 0))
+    {
+        LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);
+        fprintf(stderr,
+                "[%d] Clear alternative signal stack failed, error:%s\n",
+                LLBC_NS LLBC_GetCurrentThreadId(),
+                LLBC_NS LLBC_FormatLastError());
+        return LLBC_FAILED;
+    }
+
+    // Free alternative signal stack.
+    free(sigStack);
+    sigStack = nullptr;
+    libTls->coreTls.crashSignalAltStackSize = 0;
+
+    return LLBC_OK;
+    #else // Alt crash signal stack is not supported or disabled.
+    LLBC_NS LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
+    return LLBC_FAILED;
+    #endif
+}
+
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN

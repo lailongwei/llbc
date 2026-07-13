@@ -90,7 +90,7 @@
 
 // Lastest, check LLBC_TARGET_PLATFORM macro set or not.
 #if !LLBC_TARGET_PLATFORM
- #error "Cannot recognize the target platform; are you targeting an unsuported platform?"
+ #error "Cannot recognize the target platform; are you targeting an unsupported platform?"
 #endif
 
 // Linux/Non-Linux platform macro define.
@@ -245,7 +245,7 @@
  #define LLBC_TARGET_PROCESSOR_ARM_64                       1
  #define LLBC_TARGET_PROCESSOR_DESC                         "arm64"
 #else // Unknown processor
- #error "Cannot recognize the target processor; are you targeting an unsuported processor?"
+ #error "Cannot recognize the target processor; are you targeting an unsupported processor?"
 #endif // LLBC_TARGET_PROCESSOR == LLBC_PROCESSOR_X86
 
 

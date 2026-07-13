@@ -80,6 +80,12 @@ struct LLBC_EXPORT __LLBC_LibTls
         void *safeObjPool;
         void *unsafeObjPool;
 
+        /* Crash signal alternative stack. */
+        #if LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_OS_USE_ALT_STACK_FOR_CRASH_SIGNAL
+        void *crashSignalAltStack;
+        size_t crashSignalAltStackSize;
+        #endif // Crash signal alternative stack is enabled.
+
         /* symbol about data. */
         #if LLBC_CFG_OS_IMPL_SYMBOL
         struct
