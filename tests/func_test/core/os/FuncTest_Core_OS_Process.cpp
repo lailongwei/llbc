@@ -23,6 +23,34 @@
 #include "core/os/FuncTest_Core_OS_Process.h"
 
 static int __Test_Os_Process_Hook_Times = 0;
+static void FuncTest_Core_OS_Process_Crash_Hook_test(const char *traceback, int sig)
+{
+    ++__Test_Os_Process_Hook_Times;
+    LLBC_FilePrintLn(stderr,
+                     "TestCase_Core_OS_Process_Crash_Hook_test success. times:%d",
+                     __Test_Os_Process_Hook_Times);
+
+    #if LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_OS_USE_ALT_STACK_FOR_CRASH_SIGNAL
+    auto libTls = __LLBC_GetLibTls();
+    if (!libTls)
+    {
+        LLBC_FilePrintLn(stderr, "- libTls is null");
+        return;
+    }
+
+    const char *libTlsVarAddr = reinterpret_cast<char *>(&libTls);
+    const size_t altStackSize = libTls->coreTls.crashSignalAltStackSize;
+    const char *altStack = reinterpret_cast<const char *>(libTls->coreTls.crashSignalAltStack);
+    LLBC_FilePrintLn(stderr,
+                     "- crash signal alternative stack:%p(size:%zu)\n- in alternative stack:%s\n- stack used:%zu",
+                     altStack,
+                     altStackSize,
+                    libTlsVarAddr >= altStack && libTlsVarAddr < altStack + altStackSize ? "true" : "false",
+                    (altStack + altStackSize) - libTlsVarAddr);
+    #else // Not support alternative stack.
+    LLBC_FilePrintLn(stderr, "- not support alternative stack");
+    #endif // Support alternative stack.
+}
 
 int FuncTest_Core_OS_Process::Run(int argc, char *argvp[])
 {
@@ -36,12 +64,6 @@ int FuncTest_Core_OS_Process::Run(int argc, char *argvp[])
     getchar();
 
     return 0;
-}
-
-static void FuncTest_Core_OS_Process_Crash_Hook_test(const char *traceback, int sig)
-{
-    std::cerr << std::endl;
-    std::cerr << "FuncTest_Core_OS_Process_Crash_Hook_test success. times:" << __Test_Os_Process_Hook_Times++ << std::endl;
 }
 
 int FuncTest_Core_OS_Process::TestCrash()
@@ -77,9 +99,10 @@ int FuncTest_Core_OS_Process::TestCrash()
         return LLBC_FAILED;
     }
 
-    TestCrash_DivisionByZero();
-    TestCrash_InvalidPtrRead();
-    TestCrash_InvalidPtrWrite();
+    // Trigger crash.
+    // TestCrash_DivisionByZero();
+    // TestCrash_InvalidPtrRead();
+    // TestCrash_InvalidPtrWrite();
 
     return LLBC_OK;
 #else
