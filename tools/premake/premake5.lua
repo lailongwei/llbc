@@ -286,49 +286,6 @@ project "llbc"
 -- core library test projects.
 group "tests"
 
--- example project:
-project "example"
-    -- language, kind.
-    language "c++"
-    kind "ConsoleApp"
-
-    -- toolset.
-    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
-        toolset(llbc_ccpp_compile_toolset)
-    end
-
-    -- dependents.
-    dependson {
-        "llbc",
-    }
-
-    -- files.
-    files {
-        llbc_core_lib_example_path .. "/**.h",
-        llbc_core_lib_example_path .. "/**.cpp",
-        llbc_core_lib_example_path .. "/**.xml",
-        llbc_core_lib_example_path .. "/**.cfg",
-        llbc_core_lib_example_path .. "/**.ini",
-    }
-
-    -- include llbc core lib.
-    include_llbc_core_lib()
-
-    -- includedirs.
-    includedirs {
-        llbc_core_lib_example_path,
-    }
-
-    -- Enable c++17 support.
-    filter { "system:not windows" }
-        buildoptions {
-            "-std=c++17",
-        }
-    filter {}
-
-    -- Specific debug directory.
-    debugdir(llbc_output_dir)
-
 -- function test project:
 project "func_test"
     -- language, kind.
@@ -521,7 +478,50 @@ project "quick_start"
     -- Specific debug directory.
     debugdir(llbc_output_dir)
 
-group "wrap"
+-- example project:
+project "example"
+    -- language, kind.
+    language "c++"
+    kind "ConsoleApp"
+
+    -- toolset.
+    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
+        toolset(llbc_ccpp_compile_toolset)
+    end
+
+    -- dependents.
+    dependson {
+        "llbc",
+    }
+
+    -- files.
+    files {
+        llbc_core_lib_example_path .. "/**.h",
+        llbc_core_lib_example_path .. "/**.cpp",
+        llbc_core_lib_example_path .. "/**.xml",
+        llbc_core_lib_example_path .. "/**.cfg",
+        llbc_core_lib_example_path .. "/**.ini",
+    }
+
+    -- include llbc core lib.
+    include_llbc_core_lib()
+
+    -- includedirs.
+    includedirs {
+        llbc_core_lib_example_path,
+    }
+
+    -- Enable c++17 support.
+    filter { "system:not windows" }
+        buildoptions {
+            "-std=c++17",
+        }
+    filter {}
+
+    -- Specific debug directory.
+    debugdir(llbc_output_dir)
+
+group "wraps"
 -- ****************************************************************************
 -- python wrap library(pyllbc) compile setting.
 -- import pylib_setting.
