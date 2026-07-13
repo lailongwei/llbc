@@ -26,6 +26,16 @@
 
 __LLBC_NS_BEGIN
 
+// Pre-declare prepare/clean up crash handle environment function.
+#if LLBC_SUPPORT_HANDLE_CRASH
+int __LLBC_PrepareCrashHandleEnv();
+int __LLBC_CleanUpCrashHandleEnv();
+#endif // Support handle crash.
+
+__LLBC_NS_END
+
+__LLBC_NS_BEGIN
+
 int __LLBC_CoreStartup()
 {
     if (__LLBC_InitSysConf() != LLBC_OK)
@@ -74,7 +84,7 @@ int __LLBC_CoreStartup()
     if (__LLBC_PrepareCrashHandleEnv() != LLBC_OK)
         return LLBC_FAILED;
     #endif // LLBC_SUPPORT_HANDLE_CRASH
-  
+
     return LLBC_OK;
 }
 

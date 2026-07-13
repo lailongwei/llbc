@@ -38,6 +38,11 @@
 
 __LLBC_INTERNAL_NS_BEGIN
 
+// Pre-declare crash signal alt stack set function.
+int __LLBC_SetCrashSignalAltStack();
+// Pre-declare crash signal alt stack clear function.
+int __LLBC_ClearCrashSignalAltStack();
+
 struct __LLBC_ThreadMgr_WrapThreadArg
 {
     LLBC_NS LLBC_Delegate<void(void *)> entry;
@@ -371,6 +376,9 @@ void LLBC_ThreadMgr::ThreadEntry(void *arg)
     tls->objbaseTls.poolStack = new LLBC_NS LLBC_AutoReleasePoolStack;
     new LLBC_NS LLBC_AutoReleasePool;
 
+    // Set alternative crash signal stack.
+    LLBC_INL_NS __LLBC_SetCrashSignalAltStack();
+
      // Set thread to <Running> state.
     LLBC_ThreadMgr * const threadMgr = wrapArg->threadMgr;
     threadMgr->_lock.Lock();
@@ -411,6 +419,9 @@ void LLBC_ThreadMgr::ThreadEntry(void *arg)
 
     // Delete arg.
     delete wrapArg;
+
+    // Cleanup alternative signal stack.
+    LLBC_INL_NS __LLBC_ClearCrashSignalAltStack();
 
     // Cleanup objbase tls components.
     delete reinterpret_cast<LLBC_NS LLBC_AutoReleasePoolStack *>(

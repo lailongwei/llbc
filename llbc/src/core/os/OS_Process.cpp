@@ -25,15 +25,20 @@
 #include "llbc/core/time/Time.h"
 #include "llbc/core/os/OS_Process.h"
 #if LLBC_SUPPORT_HANDLE_CRASH
-#include "llbc/core/file/Directory.h"
-#include "llbc/common/RTTI.h"
-#endif
+ // iPhone/Macosx implementation:
+ #if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+  #include <mach-o/dyld.h>
+ #endif // iPhone/Macosx.
+
+ #include "llbc/core/file/Directory.h"
+#endif // Support handle crash.
+
 #include "llbc/core/log/LoggerMgr.h"
 
 #if LLBC_CUR_COMP == LLBC_COMP_GCC
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
-#endif // GCC compiler
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wunused-result"
+#endif // GCC compiler.
 
 __LLBC_NS_BEGIN
 
@@ -52,13 +57,22 @@ __LLBC_NS_END
 
 __LLBC_INTERNAL_NS_BEGIN
 
+// Crash signal hooked flag.
 static bool __hookedCrashSignals = false;
+
+// Stack backtrace buffer.
 static char __stackBacktrace[128 * 1024 + 1] {'\0'};
 
+// Crash info lock and crash handler infos.
 static LLBC_NS LLBC_SpinLock *__crashInfoLock = nullptr;
 typedef std::pair<LLBC_NS LLBC_String, 
                   LLBC_NS LLBC_Delegate<void(const char *stackBacktrace, int sig)>> __CrashHandlerInfo;
 static std::list<__CrashHandlerInfo> *__crashHandlerInfos = nullptr;
+
+// Pre-declare crash signal alt stack set function.
+LLBC_HIDDEN int __LLBC_SetCrashSignalAltStack();
+// Pre-declare crash signal alt stack clear function.
+LLBC_HIDDEN int __LLBC_ClearCrashSignalAltStack();
 
 __LLBC_INTERNAL_NS_END
 
@@ -77,31 +91,31 @@ static void __GetExceptionBackTrace(PCONTEXT ctx, char *stackBacktrace, size_t b
     stackBacktrace += fmtRet;
     backtraceSize -= fmtRet;
 
-#if LLBC_TARGET_PROCESSOR_X86
+    #if LLBC_TARGET_PROCESSOR_X86
     DWORD machineType = IMAGE_FILE_MACHINE_I386;
-#elif LLBC_TARGET_PROCESSOR_X86_64
+    #elif LLBC_TARGET_PROCESSOR_X86_64
     DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
-#else // Not supported dump processor types.
+    #else // Not supported dump processor types.
     return;
-#endif
+    #endif // X86
 
     STACKFRAME64 stackFrame64;
     memset(&stackFrame64, 0, sizeof(STACKFRAME64));
-#if LLBC_TARGET_PROCESSOR_X86
+    #if LLBC_TARGET_PROCESSOR_X86
     stackFrame64.AddrPC.Offset = ctx->Eip;
     stackFrame64.AddrPC.Mode = AddrModeFlat;
     stackFrame64.AddrStack.Offset = ctx->Esp;
     stackFrame64.AddrStack.Mode = AddrModeFlat;
     stackFrame64.AddrFrame.Offset = ctx->Ebp;
     stackFrame64.AddrFrame.Mode = AddrModeFlat;
-#elif LLBC_TARGET_PROCESSOR_X86_64
+    #elif LLBC_TARGET_PROCESSOR_X86_64
     stackFrame64.AddrPC.Offset = ctx->Rip;
     stackFrame64.AddrPC.Mode = AddrModeFlat;
     stackFrame64.AddrStack.Offset = ctx->Rsp;
     stackFrame64.AddrStack.Mode = AddrModeFlat;
     stackFrame64.AddrFrame.Offset = ctx->Rbp;
     stackFrame64.AddrFrame.Mode = AddrModeFlat;
-#endif
+    #endif
 
     int frameNo = 0;
     HANDLE curProc = ::GetCurrentProcess();
@@ -220,19 +234,19 @@ static BOOL __PreventSetUnhandledExceptionFilter()
     if (orgEntry == nullptr)
         return FALSE;
 
-#ifdef _M_IX86
+    #ifdef _M_IX86
     // Code for x86:
     // 33 C0    xor eax, eax
     // C2 04 00 ret 4
     unsigned char execute[] = { 0x33, 0xc0, 0xc2, 0x04, 0x00 };
-#elif _M_X64
+    #elif _M_X64
     // Code for x64
     // 33 c0    xor eax, eax
     // c3       ret
     unsigned char execute[] = { 0x33, 0xc0, 0xc3 };
-#else
- #error "Unsupported architecture(on windows platform)!"
-#endif
+    #else // Unsupported architecture.
+    #error "Unsupported architecture(on windows platform)!"
+    #endif // X86
 
     SIZE_T bytesWritten = 0;
     return ::WriteProcessMemory(GetCurrentProcess(),
@@ -344,10 +358,9 @@ static void __NonWin32CrashHandler(int sig)
         write(coreDescFileFd, descFileHead, fmtRet);
     }
 
+    // Initialize the context and cursor.
     unw_cursor_t cursor;
     unw_context_t context;
-
-    // Initialize the context and cursor.
     unw_getcontext(&context);
     unw_init_local(&cursor, &context);
 
@@ -427,14 +440,23 @@ __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
-int __LLBC_PrepareCrashHandleEnv()
+/**
+ * Prepare crash handle env, include:
+ * 1) allocate crash handle lock and crash handler infos container;
+ * 2) set default dump file path:
+ *      -in Windows platform, set default dump file path is <your_app_path>.dmp.
+ *      -in Non-Windows platform, default dump file path use system default config.
+ * 3) In non-windows platform, set alternative crash signal stack.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_HIDDEN int __LLBC_PrepareCrashHandleEnv()
 {
     //Init crash handle lock and infos container.
     LLBC_INL_NS __crashInfoLock = new LLBC_SpinLock;
     LLBC_INL_NS __crashHandlerInfos = new std::list<LLBC_INL_NS __CrashHandlerInfo>;
 
     // Set default crash dump file path.
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     LLBC_String nmlDumpFilePath(LLBC_Directory::SplitExt(LLBC_Directory::ModuleFilePath())[0]);
     nmlDumpFilePath.append_format("_%d_%s.dmp",
                                   LLBC_GetCurrentProcessId(),
@@ -449,21 +471,34 @@ int __LLBC_PrepareCrashHandleEnv()
     memcpy(LLBC_INL_NS __dumpFilePath, nmlDumpFilePath.c_str(), nmlDumpFilePath.size());
     LLBC_INL_NS __dumpFilePath[nmlDumpFilePath.size()] = '\0';
 
-#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+    #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     // No-win32 not support set default crash dump file path, will use system default config.
-#else 
+    #else // Unsupported platforms.
     // Unsupported platforms.
-#endif // Win32
-    
+    #endif // Win32
+
+    // Set alternative crash signal stack.
+    LLBC_INL_NS __LLBC_SetCrashSignalAltStack();
+
     return LLBC_OK;
 }
 
-int __LLBC_CleanUpCrashHandleEnv()
+/**
+ * Clean up crash handle env, include:
+ * 1) free crash handle lock and crash handler infos container;
+ * 2) reset default dump file path.
+ * 3) In non-windows platform, free alternative crash signal stack.
+ * @return int - return 0 if success, otherwise return -1.
+ */
+LLBC_EXPORT int __LLBC_CleanUpCrashHandleEnv()
 {
+    // Cleanup alternative signal stack.
+    LLBC_INL_NS __LLBC_ClearCrashSignalAltStack();
+
     // Clear crash dump file path.
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     memset(&LLBC_INL_NS __dumpFilePath, 0, sizeof(LLBC_INL_NS __dumpFilePath));
-#endif
+    #endif
     // Delete crash handle lock and infos container.
     LLBC_XDelete(LLBC_INL_NS __crashInfoLock);
     LLBC_XDelete(LLBC_INL_NS __crashHandlerInfos);
@@ -481,7 +516,7 @@ int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
         return LLBC_FAILED;
     }
 
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     if (dumpFilePath.size() >= sizeof(LLBC_INL_NS __dumpFilePath))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
@@ -492,7 +527,7 @@ int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
     LLBC_INL_NS __dumpFilePath[dumpFilePath.size()] = '\0';
 
     return LLBC_OK;
-#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+    #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     // Save old core pattern.
     const auto oldCorePattern = LLBC_File::ReadToEnd(LLBC_INL_NS __corePatternPath);
     if (LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
@@ -513,20 +548,18 @@ int LLBC_SetCrashDumpFilePath(const LLBC_CString &dumpFilePath)
     }
 
     return LLBC_OK;
-#else // Unsupported platforms
-    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    #else // Unsupported platforms.
+    LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
     return LLBC_FAILED;
-#endif // Win32
+    #endif // Supported platforms.
 }
 
 int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
                          const LLBC_Delegate<void(const char *stackBacktrace, int sig)> &crashHandler)
 {
 
-#if LLBC_TARGET_PLATFORM_WIN32 || LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
-
-    if (crashHandlerName.empty())
+    if (UNLIKELY(crashHandlerName.empty()))
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
@@ -553,55 +586,45 @@ int LLBC_SetCrashHandler(const LLBC_CString &crashHandlerName,
         (*foundIt).second = crashHandler;
 
     return LLBC_OK;
-
-#else // Unsupported platforms
-    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
-    return LLBC_FAILED;
-#endif // Win32
 }
 
 int LLBC_EnableCrashHandle()
 {
     LLBC_LockGuard guard(*LLBC_INL_NS __crashInfoLock);
 
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     if (!LLBC_INL_NS __hookedCrashSignals)
     {
         ::SetUnhandledExceptionFilter(LLBC_INL_NS __Win32CrashHandler);
-#ifdef LLBC_RELEASE
+        #ifdef LLBC_RELEASE
         LLBC_INL_NS __PreventSetUnhandledExceptionFilter();
-#endif
+        #endif
         LLBC_INL_NS __hookedCrashSignals = true;
     }
 
     return LLBC_OK;
-#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+    #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     // Set signals handler.
     if (!LLBC_INL_NS __hookedCrashSignals)
     {
         // Set signals handler.
-        sigset_t ss;
-        sigemptyset(&ss);
         struct sigaction sa;
         memset(&sa, 0, sizeof(sa));
+        #if LLBC_TARGET_PLATFORM_NON_WIN32 && LLBC_CFG_OS_USE_ALT_STACK_FOR_CRASH_SIGNAL
+        sa.sa_flags = SA_ONSTACK;
+        #endif // Enabled alt signal stack.
         sa.sa_handler = LLBC_INL_NS __NonWin32CrashHandler;
         for (auto &sig : LLBC_INL_NS __crashSignals)
-        {
-            sigaddset(&ss, sig);
             sigaction(sig, &sa, nullptr);
-        }
-
-        // Make signals unblock.
-        sigprocmask(SIG_UNBLOCK, &ss, nullptr);
 
         LLBC_INL_NS __hookedCrashSignals = true;
     }
 
     return LLBC_OK;
-#else // Unsupported platforms
-    LLBC_SetLastError(LLBC_ERROR_NOT_IMPL);
+    #else // Unsupported platforms
+    LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
     return LLBC_FAILED;
-#endif // Win32
+    #endif // Win32
 }
 
 void LLBC_DisableCrashHandle()
@@ -611,15 +634,15 @@ void LLBC_DisableCrashHandle()
     if (!LLBC_INL_NS __hookedCrashSignals)
         return;
 
-#if LLBC_TARGET_PLATFORM_WIN32
+    #if LLBC_TARGET_PLATFORM_WIN32
     ::SetUnhandledExceptionFilter(NULL);
-#elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
+    #elif LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_MAC
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = SIG_DFL;
     for (auto &sig : LLBC_INL_NS __crashSignals)
         sigaction(sig, &sa, nullptr);
-#endif // Win32
+    #endif // Win32
 
     LLBC_INL_NS __hookedCrashSignals = false;
 }
