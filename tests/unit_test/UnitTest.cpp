@@ -43,7 +43,15 @@ public:
 
 int main(int argc, char *argv[])
 {
+    // Add llbc framework initer.
     testing::AddGlobalTestEnvironment(new TestEnv_LLBCIniter());
+
+    // Init google test.
     testing::InitGoogleTest(&argc, argv);
+
+    // Set gtest flag: death test style: threadsafe.
+    GTEST_FLAG_SET(death_test_style, "threadsafe");
+
+    // Run all tests.
     return RUN_ALL_TESTS();
 }
