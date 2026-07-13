@@ -238,6 +238,7 @@ private:
     void SchedulePhaseTimer(LLBC_Timer &timer, const char *phaseDesc, bool exceptTimeout)
     {
         timer.SetTimeoutHandler([this, phaseDesc, exceptTimeout](LLBC_Timer *timer) {
+            (void)exceptTimeout;
             assert(exceptTimeout);
             LLBC_PrintLn("%s-%s Timeout: timeout times:%zu/%zu",
                          LLBC_GetTypeName(*this),
