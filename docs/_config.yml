@@ -1,0 +1,36 @@
+# llbc 文档站点 Jekyll 配置
+# 由 GitHub Pages 原生构建（Settings → Pages → Deploy from branch: master / docs）
+title: llbc 文档
+description: 简洁、高性能、跨平台、多语言支持的 C++ 服务端开发框架
+lang: zh-CN
+
+# 项目页部署在 https://reckfullol.github.io/llbc/ 下，需设置 baseurl。
+# 若改用自定义域名或根路径，把下面两项按实际调整（或置空）。
+url: https://reckfullol.github.io
+baseurl: /llbc
+
+# 基础主题：GitHub Pages 白名单内的 primer 主题，assets/css/style.scss 会 @import 它。
+theme: jekyll-theme-primer
+
+# GitHub Pages 白名单插件
+plugins:
+  - jekyll-seo-tag
+
+# 仓库信息（供 {% seo %} 与主题使用）
+repository: lailongwei/llbc
+github:
+  repository_url: https://github.com/lailongwei/llbc
+
+# markdown 渲染
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# 构建产物/无关文件不纳入站点
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - README.md
+  - .gitignore
