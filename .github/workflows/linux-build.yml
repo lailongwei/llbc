@@ -16,6 +16,7 @@ env:
 
 jobs:
   linux-build:
+    if: false
     name: Linux build job
     runs-on: ubuntu-latest
     if: false

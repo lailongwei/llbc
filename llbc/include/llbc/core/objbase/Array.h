@@ -428,6 +428,12 @@ public:
     Iter Erase(difference_type n0);
     Iter Erase(Iter n0, Iter n1);
     Iter Erase(difference_type n0, difference_type n1);
+    
+    /**
+     * Erase single object using swap-and-pop strategy (O(1) removal).
+     * Note: This method does NOT preserve element order.
+     */
+    bool UnstableErase(Obj *o, bool releaseObj);
 
     /**
      * Push front/back, Pop front/back support.
