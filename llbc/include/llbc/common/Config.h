@@ -46,7 +46,7 @@
  // [Non-Win32 only] Use alternative stack for crash signal, default is true.
  #define LLBC_CFG_OS_USE_ALT_STACK_FOR_CRASH_SIGNAL         true
  // [Non-Win32 only] Alternative crash signal stack size, default is 48KB, stack size range: [16KB, 512KB].
- #define LLBC_CFG_OS_ALT_CRASH_SIGNAL_STACK_SIZE            (512 * 1024)
+ #define LLBC_CFG_OS_ALT_CRASH_SIGNAL_STACK_SIZE            (48 * 1024)
 #endif // Non-Win32
 // Determine NPTL reserved signal set.
 #if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
