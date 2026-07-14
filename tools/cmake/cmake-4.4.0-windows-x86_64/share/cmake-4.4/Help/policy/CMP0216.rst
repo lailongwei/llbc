@@ -1,0 +1,32 @@
+CMP0216
+-------
+
+.. versionadded:: 4.4
+
+Swift targets have a default project name.
+
+CMake 4.3 and below did not compile Swift targets with ``-package-name``.
+The package name is useful because Swift package access control makes types,
+functions, and properties visible to other libraries within the same package,
+but not from sources outside of the package.  CMake 4.4 and above prefer to
+pass ``-package-name`` by default using the :variable:`PROJECT_NAME` variable
+value.  This policy provides compatibility for projects that have not been
+updated to expect a package name.
+
+.. note::
+
+   Package access control was added in Swift 5.8 and Xcode 15. This policy has
+   no effect when using an earlier version of Swift or Xcode.
+
+The ``OLD`` behavior for this policy is to build Swift source files without
+passing a package-name.  The ``NEW`` behavior for this policy is to build
+Swift source files with a default package name from :variable:`PROJECT_NAME`.
+
+Regardless of whether this policy is set, the :prop_tgt:`Swift_PACKAGE_NAME`
+target property may be set to explicitly specify or suppress a package name.
+
+.. |INTRODUCED_IN_CMAKE_VERSION| replace:: 4.4
+.. |WARNS_OR_DOES_NOT_WARN| replace:: does *not* warn
+.. include:: include/STANDARD_ADVICE.rst
+
+.. include:: include/DEPRECATED.rst

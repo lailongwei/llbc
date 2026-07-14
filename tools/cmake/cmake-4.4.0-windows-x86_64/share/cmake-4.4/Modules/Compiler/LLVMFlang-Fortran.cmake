@@ -1,0 +1,50 @@
+set(CMAKE_Fortran_SUBMODULE_SEP "-")
+set(CMAKE_Fortran_SUBMODULE_EXT ".mod")
+
+set(CMAKE_Fortran_PREPROCESS_SOURCE
+    "<CMAKE_Fortran_COMPILER> -cpp <DEFINES> <INCLUDES> <FLAGS> -E <SOURCE> > <PREPROCESSED_SOURCE>")
+
+set(CMAKE_Fortran_FORMAT_FIXED_FLAG "-ffixed-form")
+set(CMAKE_Fortran_FORMAT_FREE_FLAG "-ffree-form")
+
+set(CMAKE_Fortran_MODDIR_FLAG "-J")
+
+set(CMAKE_Fortran_COMPILE_OPTIONS_PREPROCESS_ON "-cpp")
+set(CMAKE_Fortran_COMPILE_OPTIONS_PREPROCESS_OFF "-nocpp")
+set(CMAKE_Fortran_POSTPROCESS_FLAG "-ffixed-line-length-72")
+
+set(CMAKE_Fortran_COMPILE_OPTIONS_TARGET "--target=")
+
+set(CMAKE_Fortran_LINKER_WRAPPER_FLAG "-Wl,")
+set(CMAKE_Fortran_LINKER_WRAPPER_FLAG_SEP ",")
+
+if("x${CMAKE_Fortran_SIMULATE_ID}" STREQUAL "xMSVC")
+  set(CMAKE_Fortran_LINK_MODE LINKER)
+else()
+  set(CMAKE_Fortran_VERBOSE_FLAG "-v")
+
+  set(CMAKE_Fortran_LINK_MODE DRIVER)
+
+  set(CMAKE_Fortran_COMPILE_OPTIONS_PIC "-fPIC")
+  set(CMAKE_Fortran_COMPILE_OPTIONS_PIE "-fPIE")
+
+  string(APPEND CMAKE_Fortran_FLAGS_DEBUG_INIT " -O0 -g")
+  string(APPEND CMAKE_Fortran_FLAGS_RELWITHDEBINFO_INIT " -O2 -g")
+  string(APPEND CMAKE_Fortran_FLAGS_RELEASE_INIT " -O3")
+endif()
+
+set(CMAKE_SHARED_LIBRARY_Fortran_FLAGS -fPIC)
+set(CMAKE_SHARED_LIBRARY_CREATE_Fortran_FLAGS "-shared")
+
+# Determine LTO support
+set(_CMAKE_Fortran_IPO_SUPPORTED_BY_CMAKE NO)
+set(_CMAKE_Fortran_IPO_MAY_BE_SUPPORTED_BY_COMPILER NO)
+if(CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL 18.0)
+  set(_CMAKE_Fortran_IPO_SUPPORTED_BY_CMAKE YES)
+  set(_CMAKE_Fortran_IPO_MAY_BE_SUPPORTED_BY_COMPILER YES)
+  if(CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 23.0)
+    set(CMAKE_Fortran_COMPILE_OPTIONS_IPO "-flto")
+  else()
+    set(CMAKE_Fortran_COMPILE_OPTIONS_IPO "-flto=thin")
+  endif()
+endif()
