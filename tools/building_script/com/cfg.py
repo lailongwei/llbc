@@ -110,6 +110,11 @@ class _Cfg(object):
     def sln_path(self):
         """解决方案路径"""
         return op.dirname(op.dirname(self.building_script_path))
+    
+    @property
+    def tools_path(self):
+        """工具路径"""
+        return op.join(self.sln_path, 'tools')
 
     @property
     def output_path(self):

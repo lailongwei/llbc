@@ -3,7 +3,7 @@
 --  @brief  The llbc library(included all wrap libraries) premake script common variables/functions define.
 
 -- Capture shell cmd's output function define.
-local function os_capture(cmd, raw)
+function os_capture(cmd, raw)
     local f = assert(io.popen(cmd .. ' 2>&1', 'r'))
     local s = assert(f:read('*a'))
     f:close()

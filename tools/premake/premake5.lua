@@ -326,6 +326,11 @@ project "func_test"
         }
     filter {}
 
+    -- buildoptions.
+    filter { "system:windows" }
+        buildoptions("/bigobj")
+    filter {}
+
     -- Specific debug directory.
     debugdir(llbc_output_dir)
 
@@ -398,13 +403,16 @@ project "unit_test"
     }
 
     -- link gtest lib.
-    filter { "system:windows"}
-    -- TODO: will link gtest lib on windows platform.
-    buildmessage('TODO: will link gtest lib on windows platform')
-    filter { "system:not windows" }
-    libdirs{ gtest_path .. "/build/lib" }
+    if llbc_system_type == llbc_system_types.windows then
+        filter { "configurations:debug*" }
+        libdirs { gtest_path .. "/build_windows/lib/Debug" }
+        filter { "configurations:release*" }
+        libdirs { gtest_path .. "/build_windows/lib/Release" }
+        filter {}
+    else
+        libdirs{ gtest_path .. string.format("/build_%s/lib", os_capture("uname -s"):lower()) }
+    end
     links { "gtest" }
-    filter {}
 
     -- Enable c++17 support.
     filter { "system:not windows" }

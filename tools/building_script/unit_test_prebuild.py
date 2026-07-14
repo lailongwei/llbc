@@ -7,31 +7,22 @@ unit_test项目预编译脚本, 用于:
 import os
 from os import path as op
 import re
+import platform
 
 from com.sh import Sh
 from com.log import Log
 from com.cfg import cfg
-from com.defs import PlatformType
+from com.defs import PlatformType, ArchType
 
 
 def _compile_gtest():
     """编译 gtest/gmock 测试框架"""
-    if cfg.platform == PlatformType.Windows:
-        _compile_gtest_win32()
-    else:
-        _compile_gtest_non_win32()
-
-
-def _compile_gtest_win32():
-    """
-    编译 gtest/gmock 测试框架 - Win32 平台
-    """
-    raise Log.e('Win32 platform gtest/gmock framework compile is not implemented for now')
-
-def _compile_gtest_non_win32():
-    """
-    编译 gtest/gmock 测试框架 - Non-Win32 平台
-    """
+    # 构建 cmake 构建目录
+    cmake_build_dir = op.join(cfg.llbc_test_projs_3rdparty_dir,
+                              'googletest',
+                              'build_{}'.format(PlatformType.type2desc(cfg.platform)))
+    if not op.exists(cmake_build_dir):
+        os.makedirs(cmake_build_dir)
 
     # Log 信息
     gtest_fwk_path = op.join(cfg.llbc_test_projs_3rdparty_dir, 'googletest')
@@ -40,6 +31,78 @@ def _compile_gtest_non_win32():
     Log.t('    >> framework path: {}'.format(gtest_fwk_path))
     Log.t('    >> disable cxx11 abi: {}'.format(cfg.disable_cxx11_abi))
     Log.t('    >> custom ccpp toolset bin path: {}'.format(custom_ccpp_toolset_bin_path))
+    Log.t('    >> cmake build dir: {}'.format(cmake_build_dir))
+
+    # 根据平台类型编译 googletest 测试框架
+    if cfg.platform == PlatformType.Windows:
+        _compile_gtest_win32(gtest_fwk_path, cmake_build_dir)
+    else:
+        _compile_gtest_non_win32(gtest_fwk_path, cmake_build_dir)
+
+    Log.t('  - Compile googletest framework success')
+
+
+def _compile_gtest_win32(gtest_fwk_path, cmake_build_dir):
+    """
+    编译 gtest/gmock 测试框架 - Win32 平台
+    """
+    # 得到 cmake 构建工具路径(框架为 windows 独立提供构建工具二进制)
+    cmake_ver = '4.4.0'
+    machine = platform.machine().lower()
+    if machine == 'amd64':
+        machine_type = 'x86_64'
+    elif machine == 'arm64':
+        machine_type = 'arm64'
+    else:
+        machine_type = 'i386' # default use 32 bit cmake toolset.
+    cmake_tool_path = op.join(cfg.tools_path,
+                              'cmake',
+                              'cmake-{}-windows-{}'.format(cmake_ver, machine_type),
+                              'bin', 'cmake.exe')
+    cmake_tool_path = op.abspath(cmake_tool_path)
+
+    Log.t('  - cmake tool path: {}'.format(cmake_tool_path))
+    if not op.exists(cmake_tool_path):
+        Log.e('cmake tool not exists: {}'.format(cmake_tool_path))
+        return
+
+    # 执行 cmake
+    Log.t('  - cmake configure')
+    cur_dir = os.getcwd()
+    os.chdir(cmake_build_dir)
+    cmake_ret = Sh.execute('{} ..'.format(cmake_tool_path))
+    if cmake_ret != 0:
+        Log.e('cmake configure failed, ret: {}'.format(cmake_ret))
+        return
+    os.chdir(cur_dir)
+    
+    # 执行 msbuild
+    msbuild_platform = 'x64'
+    if cfg.arch == ArchType.x86:
+        msbuild_platform = 'x86'
+    elif cfg.arch == ArchType.x86_64:
+        msbuild_platform = 'x64'
+    elif cfg.arch == ArchType.arm64:
+        msbuild_platform = 'arm64'
+    else:
+        Log.e('Unsupported arch:{}'.format(cfg.arch))
+        return
+
+    Log.t('  - msbuild build')
+    msbuild_ret = Sh.execute(
+        'pushd "{}" && msbuild googletest-distribution.sln \
+/t:gtest /p:Platform={} /p:Configuration={} /p:ToolsVersion=Latest && popd'.format(
+            cmake_build_dir, msbuild_platform, 'Debug' if cfg.is_debug else 'Release')
+    )
+    if msbuild_ret != 0:
+        Log.e('msbuild build failed, ret: {}'.format(msbuild_ret))
+        return
+
+
+def _compile_gtest_non_win32(gtest_fwk_path, cmake_build_dir):
+    """
+    编译 gtest/gmock 测试框架 - Non-Win32 平台
+    """
 
     # 辅助函数: 获取 cmake list lines
     gtest_cmake_lists_file_path = op.join(gtest_fwk_path, 'CMakeLists.txt')
@@ -74,6 +137,7 @@ def _compile_gtest_non_win32():
 
     # region 设置自定义编译工具集
     # 如有 custom ccpp toolset bin path, 更新 googletest/CMakeLists.txt.
+    custom_ccpp_toolset_bin_path = cfg.custom_ccpp_toolset_bin_path
     if op.exists(custom_ccpp_toolset_bin_path):
 
         # 得到 CMakeLists.txt 文件内容
@@ -151,19 +215,16 @@ def _compile_gtest_non_win32():
     # endregion
 
     # 编译 googletest.
-    cmake_building_dir = op.join(gtest_fwk_path, 'build')
-    if not op.exists(cmake_building_dir):
-        Log.t('  - Create googletest cmake building dir: {}'.format(cmake_building_dir))
-        os.makedirs(cmake_building_dir)
+    if not op.exists(cmake_build_dir):
+        Log.t('  - Create googletest cmake building dir: {}'.format(cmake_build_dir))
+        os.makedirs(cmake_build_dir)
 
     # 进入 cmake building dir, 执行编译
-    compile_cmd = 'pushd {} && cmake .. && make && popd > /dev/null'.format(cmake_building_dir)
+    compile_cmd = 'pushd {} && cmake .. && make && popd > /dev/null'.format(cmake_build_dir)
     ret = Sh.execute(compile_cmd)
     if ret != 0:
         Log.e('  - Compile googletest framework failed, ret code:{}'.format(ret))
         return
-
-    Log.t('  - Compile googletest framework success')
 
 
 def main():
