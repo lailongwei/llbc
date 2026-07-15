@@ -245,7 +245,7 @@ def _compile_gtest_non_win32(gtest_fwk_path, cmake_build_dir):
         os.makedirs(cmake_build_dir)
 
     # 进入 cmake building dir, 执行编译
-    compile_cmd = 'pushd {} && cmake ../../.. && make && popd > /dev/null'.format(cmake_build_dir)
+    compile_cmd = 'pushd {} && cmake ../../.. && make gtest gmock && popd > /dev/null'.format(cmake_build_dir)
     ret = Sh.execute(compile_cmd)
     if ret != 0:
         Log.e('  - Compile googletest framework failed, ret code:{}'.format(ret))
