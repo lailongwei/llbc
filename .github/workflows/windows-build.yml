@@ -15,7 +15,6 @@ jobs:
   windows-build:
     name: Windows build job
     runs-on: windows-latest
-    if: false
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -42,19 +41,12 @@ jobs:
           msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:llbc
           msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
         
-      - name: Compile testsuite
+      - name: Compile tests
         run: |
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests\testsuite
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:tests\testsuite
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests\testsuite
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\testsuite
-
-      - name: Compile quick_start
-        run: |
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests\quick_start
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:tests\quick_start
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests\quick_start
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\quick_start
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:tests
+          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests
 
 #      - name: Compile pyllbc lib code
 #        run: |
@@ -70,11 +62,11 @@ jobs:
 #          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:lullbc
 #          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:lullbc
 
-      - name: Build all target by cmake
-        run: |
-          mkdir cmake_build
-          cd cmake_build
-          cmake ..
-          cmake --build . --config Release -j
+      # - name: Build all target by cmake
+      #   run: |
+      #     mkdir cmake_build
+      #     cd cmake_build
+      #     cmake ..
+      #     cmake --build . --config Release -j
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
