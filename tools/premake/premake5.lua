@@ -403,15 +403,15 @@ project "unit_test"
     }
 
     -- link gtest lib.
-    if llbc_system_type == llbc_system_types.windows then
-        filter { "configurations:debug*" }
-        libdirs { gtest_path .. "/build_windows/lib/Debug" }
-        filter { "configurations:release*" }
-        libdirs { gtest_path .. "/build_windows/lib/Release" }
-        filter {}
-    else
-        libdirs{ gtest_path .. string.format("/build_%s/lib", os_capture("uname -s"):lower()) }
-    end
+    filter { "configurations:debug32" }
+    libdirs { gtest_path .. string.format("/build/%s/debug32/lib/Debug", _ACTION) }
+    filter { "configurations:release32" }
+    libdirs { gtest_path .. string.format("/build/%s/release32/lib/Release", _ACTION) }
+    filter { "configurations:debug64" }
+    libdirs { gtest_path .. string.format("/build/%s/debug64/lib/Debug", _ACTION) }
+    filter { "configurations:release64" }
+    libdirs { gtest_path .. string.format("/build/%s/release64/lib/Release", _ACTION) }
+    filter {}
     links { "gtest" }
 
     -- Enable c++17 support.

@@ -20,7 +20,9 @@ def _compile_gtest():
     # 构建 cmake 构建目录
     cmake_build_dir = op.join(cfg.llbc_test_projs_3rdparty_dir,
                               'googletest',
-                              'build_{}'.format(PlatformType.type2desc(cfg.platform)))
+                              'build',
+                              cfg.premake_action,
+                              cfg.build_cfg)
     if not op.exists(cmake_build_dir):
         os.makedirs(cmake_build_dir)
 
@@ -66,20 +68,43 @@ def _compile_gtest_win32(gtest_fwk_path, cmake_build_dir):
         Log.e('cmake tool not exists: {}'.format(cmake_tool_path))
         return
 
+    # 得到 cmake 参数: 平台/生成器
+    if cfg.arch == ArchType.x86:
+        cmake_platform = 'Win32'
+    elif cfg.arch == ArchType.x86_64:
+        cmake_platform = 'x64'
+    elif cfg.arch == ArchType.ARM64:
+        cmake_platform = 'ARM64'
+    else:
+        Log.e('Unsupported arch: {}'.format(cfg.arch))
+        return
+    
+    if cfg.premake_action == 'vs2017':
+        cmake_generator = 'Visual Studio 15 2017'
+    elif cfg.premake_action == 'vs2019':
+        cmake_generator = 'Visual Studio 16 2019'
+    elif cfg.premake_action == 'vs2022':
+        cmake_generator = 'Visual Studio 17 2022'
+    elif cfg.premake_action == 'vs2026':
+        cmake_generator = 'Visual Studio 18 2026'
+    else:
+        Log.e('Unsupported premake action: {}'.format(cfg.premake_action))
+        return
+
     # 执行 cmake
-    Log.t('  - cmake configure')
+    Log.ft('  - cmake configure, cmake platform: {}, cmake generator: {}',
+           cmake_platform, cmake_generator)
     cur_dir = os.getcwd()
     os.chdir(cmake_build_dir)
-    cmake_ret = Sh.execute('{} ..'.format(cmake_tool_path))
+    cmake_ret = Sh.execute('{} -A {} -G "{}" ../../..'.format(cmake_tool_path, cmake_platform, cmake_generator))
     if cmake_ret != 0:
         Log.e('cmake configure failed, ret: {}'.format(cmake_ret))
         return
     os.chdir(cur_dir)
     
     # 执行 msbuild
-    msbuild_platform = 'x64'
     if cfg.arch == ArchType.x86:
-        msbuild_platform = 'x86'
+        msbuild_platform = 'Win32'
     elif cfg.arch == ArchType.x86_64:
         msbuild_platform = 'x64'
     elif cfg.arch == ArchType.arm64:
@@ -91,7 +116,7 @@ def _compile_gtest_win32(gtest_fwk_path, cmake_build_dir):
     Log.t('  - msbuild build')
     msbuild_ret = Sh.execute(
         'pushd "{}" && msbuild googletest-distribution.sln \
-/t:gtest /p:Platform={} /p:Configuration={} /p:ToolsVersion=Latest && popd'.format(
+/t:gtest;gmock /p:Platform={} /p:Configuration={} /p:ToolsVersion=Latest && popd'.format(
             cmake_build_dir, msbuild_platform, 'Debug' if cfg.is_debug else 'Release')
     )
     if msbuild_ret != 0:
@@ -220,7 +245,7 @@ def _compile_gtest_non_win32(gtest_fwk_path, cmake_build_dir):
         os.makedirs(cmake_build_dir)
 
     # 进入 cmake building dir, 执行编译
-    compile_cmd = 'pushd {} && cmake .. && make && popd > /dev/null'.format(cmake_build_dir)
+    compile_cmd = 'pushd {} && cmake ../../.. && make && popd > /dev/null'.format(cmake_build_dir)
     ret = Sh.execute(compile_cmd)
     if ret != 0:
         Log.e('  - Compile googletest framework failed, ret code:{}'.format(ret))

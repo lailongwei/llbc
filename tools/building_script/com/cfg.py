@@ -34,8 +34,8 @@ class _Cfg(object):
         self._license = None
         self._arch = ArchType.desc2type(sys.argv[1])
         assert(ArchType.is_valid(self._arch))
-        self._building_cfg = sys.argv[2].strip().lower()
-        self._is_debug = self._building_cfg.startswith('debug')
+        self._build_cfg = sys.argv[2].strip().lower()
+        self._is_debug = self._build_cfg.startswith('debug')
         self._premake_action = sys.argv[3].strip()
         disable_cxx11_abi_cfg = sys.argv[4].strip().lower()
         if disable_cxx11_abi_cfg in ('true', 'yes'):
@@ -59,14 +59,19 @@ class _Cfg(object):
         return self._arch
 
     @property
-    def building_cfg(self):
+    def build_cfg(self):
         """构建配置"""
-        return self._building_cfg
+        return self._build_cfg
 
     @property
     def is_debug(self):
         """是否构建debug版本"""
         return self._is_debug
+    
+    @property
+    def premake_action(self):
+        """premake action"""
+        return self._premake_action
     # endregion
 
     # region 版本/license/作者信息
@@ -102,14 +107,14 @@ class _Cfg(object):
 
     # region 目录/后缀相关
     @property
-    def building_script_path(self):
+    def build_script_path(self):
         """构建脚本路径"""
         return op.dirname(op.dirname(op.abspath(__file__)))
 
     @property
     def sln_path(self):
         """解决方案路径"""
-        return op.dirname(op.dirname(self.building_script_path))
+        return op.dirname(op.dirname(self.build_script_path))
     
     @property
     def tools_path(self):
