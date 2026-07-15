@@ -99,7 +99,7 @@ int FuncTest_Core_Transcoder::SimpleConvertTest()
 
     // Test GBK->UTF8.
     LLBC_String utf8Str;
-    LLBC_String gbkStr = "���";
+    LLBC_String gbkStr = "\xC4\xE3\xBA\xC3"; // Chinese: Hello
     if(LLBC_Transcoder::MultiByteToMultiByte(
         "GBK", gbkStr, "UTF-8", utf8Str) != LLBC_OK)
     {

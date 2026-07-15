@@ -1174,7 +1174,7 @@ size_t LLBC_Variant::SeqEraseIf(const _UnaryPred &pred,
          pos != endPos && (eraseCount == infEraseCount || erasedCount < eraseCount);
          )
     {
-        if (!pred(seq[pos]))
+        if (!pred(seq[static_cast<Seq::size_type>(pos)]))
         {
             pos += step;
             continue;
@@ -1182,12 +1182,12 @@ size_t LLBC_Variant::SeqEraseIf(const _UnaryPred &pred,
 
         if (stableErase)
         {
-            seq.erase(seq.begin() + pos);
+            seq.erase(seq.begin() + static_cast<Seq::difference_type>(pos));
         }
         else
         {
             if (static_cast<size_t>(pos) != seq.size() - 1)
-                seq[pos] = std::move(seq[seq.size() - 1]);
+                seq[static_cast<Seq::size_type>(pos)] = std::move(seq[seq.size() - 1]);
             seq.erase(--seq.end());
         }
 
