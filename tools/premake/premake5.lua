@@ -403,15 +403,30 @@ project "unit_test"
     }
 
     -- link gtest lib.
-    filter { "configurations:debug32" }
+    filter { "configurations:debug32", "system:not windows" }
+    libdirs { gtest_path .. string.format("/build/%s/debug32/lib", _ACTION) }
+    filter { "configurations:debug32", "system:windows" }
     libdirs { gtest_path .. string.format("/build/%s/debug32/lib/Debug", _ACTION) }
-    filter { "configurations:release32" }
+    filter {}
+
+    filter { "configurations:release32", "system:not windows" }
+    libdirs { gtest_path .. string.format("/build/%s/release32/lib", _ACTION) }
+    filter { "configurations:release32", "system:windows" }
     libdirs { gtest_path .. string.format("/build/%s/release32/lib/Release", _ACTION) }
-    filter { "configurations:debug64" }
+    filter {}
+
+    filter { "configurations:debug64", "system:not windows" }
+    libdirs { gtest_path .. string.format("/build/%s/debug64/lib", _ACTION) }
+    filter { "configurations:debug64", "system:windows" }
     libdirs { gtest_path .. string.format("/build/%s/debug64/lib/Debug", _ACTION) }
-    filter { "configurations:release64" }
+    filter {}
+
+    filter { "configurations:release64", "system:not windows" }
+    libdirs { gtest_path .. string.format("/build/%s/release64/lib", _ACTION) }
+    filter { "configurations:release64", "system:windows" }
     libdirs { gtest_path .. string.format("/build/%s/release64/lib/Release", _ACTION) }
     filter {}
+
     links { "gtest" }
 
     -- Enable c++17 support.
