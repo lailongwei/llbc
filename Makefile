@@ -3,7 +3,7 @@
 #############################################################################
 
 #****************************************************************************
-# Determine platform name
+# Determine platform name.
 #****************************************************************************
 SUPPORTED_SYSTEMS := linux,darwin
 SYSTEM_NAME       ?= $(shell echo $(shell uname) | tr "[:upper:]" "[:lower:]")
@@ -11,29 +11,29 @@ ARCHITECTURE_NAME ?= $(shell echo $(shell uname -m) | tr "[:upper:]" "[:lower:]"
 $(if $(findstring $(SYSTEM_NAME),$(SUPPORTED_SYSTEMS)),,$(error "Unsupported system, must be one of '$(SUPPORTED_SYSTEMS)'"))
 
 #****************************************************************************
-# Default config define
+# Default config define.
 ifndef config
   export config=release64
 endif
 #****************************************************************************
 
 #****************************************************************************
-# Enable verbose log(for premake tool)
+# Enable verbose log(for premake tool).
 ifndef verbose
   export verbose=1
 endif
 #****************************************************************************
 
 #****************************************************************************
-# some useful variables
+# Some useful variables.
 #****************************************************************************
-# Parse debug option
+# Parse debug option.
 CONFIG_OPT          ?= $(shell echo $(config) | tr "[:upper:]" "[:lower:]")
 SUPPORTED_CONFIGS   :=debug32,release32,debug64,release64
 $(if $(findstring $(CONFIG_OPT),$(SUPPORTED_CONFIGS)),,$(error "Unsupported config, must be one of'$(SUPPORTED_CONFIGS)'))
 DEBUG_OPT           := $(shell echo $(CONFIG_OPT) | tr -d "[:digit:]" | tr "[:lower:]" "[:upper:]")
 
-# All make targets define
+# All make targets define.
 PREMAKE_TARGET  			:= build_makefiles
 
 CORELIB_TARGET    			:= core_lib
@@ -52,11 +52,11 @@ LUWRAP_LUALIB_TARGET		:= lu_wrap_lualib
 LUWRAP_LUAEXE_TARGET		:= lu_wrap_luaexe
 ALL_WRAP_TARGETS			:= $(PYWRAP_TARGET) $(CSWRAP_TARGET) $(LUWRAP_TARGET)
 
-# Premake action
+# Premake action.
 PREMAKE_ACTION  := gmake2
-# All targets output directory
+# All targets output directory.
 ALL_TARGETS_OUTPUT := output/$(PREMAKE_ACTION)/$(config)
-# Some prefixs/suffixes define
+# Some prefixs/suffixes define.
 ifeq ($(SYSTEM_NAME),darwin)
   DYNLIB_SUFFIX := .dylib
 else
@@ -65,7 +65,7 @@ endif
 DEBUG_SUFFIX    := _debug
 EXE_SUFFIX      :=
 
-# Target names/paths define
+# Target names/paths define.
 ifeq ($(DEBUG_OPT),RELEASE)
   CORELIB_TARGET_NAME    			:= libllbc$(DYNLIB_SUFFIX)
   CORELIB_EXAMPLE_TARGET_NAME  		:= example$(EXE_SUFFIX)
@@ -92,14 +92,14 @@ CORELIB_QUICK_START_TARGET_PATH   	:= $(ALL_TARGETS_OUTPUT)/$(CORELIB_QUICK_STAR
 PYWRAP_TARGET_PATH     				:= $(ALL_TARGETS_OUTPUT)/$(PYWRAP_TARGET_NAME)
 LUWRAP_TARGET_PATH     				:= $(ALL_TARGETS_OUTPUT)/$(LUWRAP_TARGET_NAME)
 
-# Some variables define
+# Some variables define.
 PREMAKE_PATH := "tools/premake"
 PREMAKE_NAME := "premake5_$(SYSTEM_NAME)_$(ARCHITECTURE_NAME)"
 
 #****************************************************************************
-# useful functions
+# Useful functions.
 #****************************************************************************
-# log functions
+# log functions.
 define output_r
 	@if [ "$(2)" = "true" ]; then \
 		@echo -n -e "\e[31m$(1)\e[0m\n"; \
@@ -155,9 +155,8 @@ define output
 endef
 
 #****************************************************************************
-# all real make commands
+# all real make commands.
 #****************************************************************************
-# Set phonies
 .PHONY: help all install clean tar $(PREMAKE_TARGET)
 help:
 	$(call output_hg,"Makefile commands:","true")
@@ -236,7 +235,7 @@ help:
 all: $(PREMAKE_TARGET) $(CORELIB_TARGET) $(ALL_CORELIB_TEST_TARGETS) $(ALL_WRAP_TARGETS)
 
 $(PREMAKE_TARGET):
-	@(cd $(PREMAKE_PATH) && ./$(PREMAKE_NAME) $(PREMAKE_ACTION))
+	@cd $(PREMAKE_PATH) && ./$(PREMAKE_NAME) $(PREMAKE_ACTION)
 
 $(CORELIB_TARGET): $(PREMAKE_TARGET)
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f llbc.make
@@ -266,55 +265,58 @@ $(LUWRAP_TARGET): $(CORELIB_TARGET) $(LUWRAP_LUALIB_TARGET) $(LUWRAP_LUAEXE_TARG
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc.make
 
 clean: $(addprefix clean_,$(CORELIB_TARGET) $(CORELIB_TESTS_TARGET) $(WRAPS_TARGET))
-	@$(shell find ./ -name "._*" -exec rm {} \;)
-	@$(shell find ./ -name ".DS_Store" -exec rm {} \;)
-	@$(shell find ./ -type f -name "*.buildlog" -exec rm {} \;)
+	@echo "Cleaning up temporary files ..."
+	@find ./ \( -name "._*" -o -name ".DS_Store" -o -name ".*buildlog" \) -delete
 
 clean_$(CORELIB_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/llbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f llbc.make clean; fi)
+	@if [ -e build/$(PREMAKE_ACTION)/llbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f llbc.make clean; fi
 
 clean_$(CORELIB_TESTS_TARGET): $(addprefix clean_,$(ALL_CORELIB_TEST_TARGETS))
 clean_$(CORELIB_EXAMPLE_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/example.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f example.make clean; fi)
+	@if [ -e build/$(PREMAKE_ACTION)/example.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f example.make clean; fi
 clean_$(CORELIB_FUNC_TEST_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/func_test.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f func_test.make clean; fi)
+	@if [ -e build/$(PREMAKE_ACTION)/func_test.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f func_test.make clean; fi
 clean_$(CORELIB_UNIT_TEST_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/unit_test.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f unit_test.make clean; fi)
+	@if [ -e build/$(PREMAKE_ACTION)/unit_test.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f unit_test.make clean; fi
+	@echo "Cleaning up googletest build directory ..."
+	@if [ -e tests/3rdparty/googletest/build ]; then \rm -rf tests/3rdparty/googletest/build ; fi
 clean_$(CORELIB_QUICK_START_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/quick_start.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f quick_start.make clean; fi)
+	@if [ -e build/$(PREMAKE_ACTION)/quick_start.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f quick_start.make clean; fi
 
 clean_$(WRAPS_TARGET): $(addprefix clean_,$(ALL_WRAP_TARGETS))
 clean_$(PYWRAP_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/pyllbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f pyllbc.make clean; fi)
-	@(if [ -f ./wrap/pyllbc/cpython/Makefile ]; then cd ./wrap/pyllbc/cpython && make clean; fi)
-	@$(shell find ./wrap/pyllbc -type f -name "*.pyc" -exec rm {} \;)
+	@if [ -e build/$(PREMAKE_ACTION)/pyllbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f pyllbc.make clean; fi
+	@echo "Cleaning up cpython build targets ..."
+	@if [ -f ./wrap/pyllbc/cpython/Makefile ]; then cd ./wrap/pyllbc/cpython && make clean; fi
+	@echo "Cleaning up python cache files(.pyc/__pycache__) ..."
+	@find ./wrap/pyllbc \( -type f -name "*.pyc" -o -type d -name "__pycache__" \) -delete
 clean_$(CSWRAP_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/csllbc_native.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_native.make clean; fi)
-	@(if [ -e build/$(PREMAKE_ACTION)/csllbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc.make clean; fi)
-	@(if [ -e build/$(PREMAKE_ACTION)/csllbc_testsuite.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_testsuite.make clean; fi)
+	@if [ -e build/$(PREMAKE_ACTION)/csllbc_native.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_native.make clean; fi
+	@if [ -e build/$(PREMAKE_ACTION)/csllbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc.make clean; fi
+	@if [ -e build/$(PREMAKE_ACTION)/csllbc_testsuite.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f csllbc_testsuite.make clean; fi
 clean_$(LUWRAP_TARGET):
-	@(if [ -e build/$(PREMAKE_ACTION)/lullbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc.make clean; fi)
-	@(if [ -e build/$(PREMAKE_ACTION)/lullbc_lualib.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_lualib.make clean; fi)
-	@(if [ -e build/$(PREMAKE_ACTION)/lullbc_luaexec.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_luaexec.make clean; fi)
+	@if [ -e build/$(PREMAKE_ACTION)/lullbc.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc.make clean; fi
+	@if [ -e build/$(PREMAKE_ACTION)/lullbc_lualib.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_lualib.make clean; fi
+	@if [ -e build/$(PREMAKE_ACTION)/lullbc_luaexec.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f lullbc_luaexec.make clean; fi
 
 install: install_$(CORELIB_TARGET) install_$(WRAPS_TARGET)
 
 install_$(CORELIB_TARGET):
-	@(if [ ! -e $(CORELIB_TARGET_PATH) ]; then echo "not found '$(CORELIB_TARGET)' targets, install failed!"; exit -1; fi)
+	@if [ ! -e $(CORELIB_TARGET_PATH) ]; then echo "not found '$(CORELIB_TARGET)' targets, install failed!"; exit -1; fi
 	@rm -rf /usr/include/llbc
-	@(cd $(ALL_TARGETS_OUTPUT) && \cp -rfv $(CORELIB_TARGET_NAME) /usr/lib)
-	@(cd llbc/include && \cp -rfv llbc.h /usr/include)
-	@(cd llbc/include && \rsync -av --exclude='*.svn' llbc /usr/include/)
+	@cd $(ALL_TARGETS_OUTPUT) && \cp -rfv $(CORELIB_TARGET_NAME) /usr/lib
+	@cd llbc/include && \cp -rfv llbc.h /usr/include
+	@cd llbc/include && \rsync -av --exclude='*.svn' llbc /usr/include/
 
 install_$(WRAPS_TARGET): install_$(CORELIB_TARGET) $(addprefix install_,$(ALL_WRAP_TARGETS))
 install_$(PYWRAP_TARGET):
-	@(if [ ! -e $(PYWRAP_TARGET_PATH) ]; then echo "not found '$(PYWRAP_TARGET)' targets, install failed!"; exit -1; fi)
-	@(cd $(ALL_TARGETS_OUTPUT) && \cp -rfv $(PYWRAP_TARGET_NAME) /usr/local/lib/python2.7/site-packages/)
+	@if [ ! -e $(PYWRAP_TARGET_PATH) ]; then echo "not found '$(PYWRAP_TARGET)' targets, install failed!"; exit -1; fi
+	@cd $(ALL_TARGETS_OUTPUT) && \cp -rfv $(PYWRAP_TARGET_NAME) /usr/local/lib/python2.7/site-packages/
 install_$(CSWRAP_TARGET):
 	@echo "!!!csrarp library could not be install, please copy the libraries file to your project directory"
 install_$(LUWRAP_TARGET):
 	@echo "!!!luwrap library could not be install, please copy the libraries file to your project directory"
 	
 tar:
-	@(cd tools && python tar.py)
+	@cd tools && python tar.py
 
