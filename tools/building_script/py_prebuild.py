@@ -11,17 +11,17 @@ from com.cfg import cfg
 from com.log import Log
 from py_integrator_builder import PyIntegratorBuilder
 from native_method_collector import PyNativeMethodCollector as PyNMC
-from py_cpython_compiler import CPythonCompiler
+from cpython_compiler import CPythonCompiler
 
 
 def main():
     # 编译cpython submodule
-    Log.i("Compile cpython submodule...")
+    Log.i("Compile cpython submodule ...")
     CPythonCompiler().compile()
     Log.i('Done!')
 
     # 收集pyllbc native method
-    Log.i('Collect python native methods...')
+    Log.i('Collect python native methods ...')
     src_path = op.join(cfg.pyllbc_proj_path, 'src')
     PyNMC(op.join(src_path, 'common')).build()
     PyNMC(op.join(src_path, 'testcase')).build()
@@ -31,7 +31,7 @@ def main():
     Log.i('Done!')
 
     # 生成python代码整合器
-    Log.i('Build python script integrator...')
+    Log.i('Build python script integrator ...')
     PyIntegratorBuilder.build()
     Log.i('Done!')
 

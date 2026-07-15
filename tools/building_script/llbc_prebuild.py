@@ -14,7 +14,7 @@ from com.log import Log
 def main():
     # 更新Version.cpp中的版本号
     cfg_ver = cfg.ver
-    Log.i('Update llbc lib version number[{}]...'.format(cfg_ver))
+    Log.i('Update llbc lib version number[{}] ...'.format(cfg_ver))
 
     lib_ver_parts = [-1, -1, -1]
     cfg_ver_parts = [int(part) for part in cfg_ver.split('.')]

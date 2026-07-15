@@ -81,11 +81,11 @@ class Log(object):
 
             log_suffix = '\033[0m'
 
-        f.write('{}{} [{:<5}] {}{}\n'.format(log_prefix,
-                                             datetime.datetime.now().strftime('%m-%d %H:%M:%S'),
-                                             cls._log_lv_str[lv],
-                                             msg,
-                                             log_suffix))
+        f.write('{}{} [{:<5}]<llbc> {}{}\n'.format(log_prefix,
+                                                   datetime.datetime.now().strftime('%y-%m-%d %H:%M:%S'),
+                                                   cls._log_lv_str[lv],
+                                                   msg,
+                                                   log_suffix))
         if lv < cls.Warn:
             f.flush()
 
