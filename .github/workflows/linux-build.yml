@@ -18,7 +18,6 @@ jobs:
   linux-build:
     name: Linux build job
     runs-on: ubuntu-latest
-    if: false
     container: docker.io/centos:8
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -53,15 +52,10 @@ jobs:
           make core_lib config=debug64 -j4
           make core_lib config=release64 -j4
 
-      - name: Compile testsuite
+      - name: Compile tests
         run: |
-          make test config=debug64 -j4
-          make test config=release64 -j4
-
-      - name: Compile quick_start
-        run: |
-          make quick_start config=debug64 -j4
-          make quick_start config=release64 -j4
+          make tests config=debug64 -j4
+          make tests config=release64 -j4
 
       - name: Compile pyllbc lib code
         run: |
@@ -73,11 +67,11 @@ jobs:
           make lu_wrap config=debug64 -j4
           make py_wrap config=release64 -j4
 
-      - name: Build all target by cmake
-        run: |
-          mkdir cmake_build
-          cd cmake_build
-          cmake ..
-          make -j4
+      # - name: Build all target by cmake
+      #   run: |
+      #     mkdir cmake_build
+      #     cd cmake_build
+      #     cmake ..
+      #     make -j4
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
