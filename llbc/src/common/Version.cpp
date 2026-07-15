@@ -28,7 +28,7 @@
 
 __LLBC_NS_BEGIN
 
-// The version number is automatically updated by the building_script
+// The version number is automatically updated by the build script
 // and configured in cfg.py, please do not update it manually.
 int LLBC_majorVersion       = 1;
 int LLBC_minorVersion       = 1;

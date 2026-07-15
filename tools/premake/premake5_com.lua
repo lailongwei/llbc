@@ -138,8 +138,8 @@ else
     llbc_output_dir = llbc_output_base_dir .. "/$(config)"
 end
 
--- building script directory.
-llbc_building_script_dir = llbc_sln_path .. "/tools/building_script"
+-- Build scripts directory.
+llbc_build_scripts_dir = llbc_sln_path .. "/tools/build_scripts"
 
 
 

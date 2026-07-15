@@ -253,7 +253,7 @@ project "llbc"
     filter {}
 
     -- prebuild.
-    local prebuild_script = '../../tools/building_script/llbc_prebuild.py'
+    local prebuild_script = llbc_build_scripts_dir .. '/llbc_prebuild.py'
     local prebuild_cmd = string.format('%s %s %%s %%s %s %s %s',
                                        llbc_py_exec_path,
                                        prebuild_script,
@@ -440,7 +440,7 @@ project "unit_test"
     debugdir(llbc_output_dir)
 
     -- prebuild & postbuild.
-    local prebuild_script = '../../tools/building_script/unit_test_prebuild.py'
+    local prebuild_script = llbc_build_scripts_dir .. '/unit_test_prebuild.py'
     local prebuild_cmd = string.format('%s %s %%s %%s %s %s %s',
                                         llbc_py_exec_path,
                                         prebuild_script,
@@ -601,8 +601,8 @@ project "pyllbc"
     filter {}
 
     -- prebuild & postbuild.
-    local prebuild_script = '../../tools/building_script/py_prebuild.py'
-    local postbuild_script = '../../tools/building_script/py_postbuild.py'
+    local prebuild_script = llbc_build_scripts_dir .. '/py_prebuild.py'
+    local postbuild_script = llbc_build_scripts_dir .. '/py_postbuild.py'
     local prebuild_cmd = string.format('%s %s %%s %%s %s %s %s',
                                        llbc_py_exec_path,
                                        prebuild_script,
@@ -1025,8 +1025,8 @@ project "lullbc"
     filter {}
 
     -- prebuild & postbuild.
-    local prebuild_script = llbc_building_script_dir .. '/lu_prebuild.py'
-    local postbuild_script = llbc_building_script_dir .. '/lu_postbuild.py'
+    local prebuild_script = llbc_build_scripts_dir .. '/lu_prebuild.py'
+    local postbuild_script = llbc_build_scripts_dir .. '/lu_postbuild.py'
     local prebuild_cmd = string.format('%s %s %%s %%s %s %s %s',
                                        llbc_py_exec_path,
                                        prebuild_script,

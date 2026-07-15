@@ -28,8 +28,8 @@ if(LLBC_SYNC_VERSION)
     if(Python3_Interpreter_FOUND)
         add_custom_target(llbc_version_sync ALL
             COMMAND ${Python3_EXECUTABLE}
-                    ${PROJECT_SOURCE_DIR}/tools/building_script/llbc_prebuild.py
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tools/building_script
+                    ${PROJECT_SOURCE_DIR}/tools/build_scripts/llbc_prebuild.py
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/tools/build_scripts
             COMMENT "Syncing llbc version into Version.cpp")
     else()
         message(WARNING "LLBC_SYNC_VERSION=ON but Python3 interpreter not found; skipping version sync")
