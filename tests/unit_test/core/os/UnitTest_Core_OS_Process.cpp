@@ -24,6 +24,9 @@ using namespace llbc;
 
 #include <gtest/gtest.h>
 
+// Coverage targets exercised by this test (collected by tools/coverage/run_unit_test_coverage.sh):
+// @coverage-target: llbc/src/core/os/OS_Process.cpp
+
 #if LLBC_SUPPORT_HANDLE_CRASH
 
 /**
@@ -83,10 +86,17 @@ private:
 // Division by zero.
 TEST(CrashTest, DivisionByZero)
 {
+#if defined(__aarch64__) || defined(__arm64__) || defined(_M_ARM64)
+    // On AArch64 (e.g. Apple Silicon), integer division by zero is well-defined:
+    // the SDIV/UDIV instruction returns 0 and does NOT raise SIGFPE. There is thus
+    // no crash for the handler to catch, so the death test cannot "die" here.
+    GTEST_SKIP() << "AArch64 does not trap on integer division by zero (SDIV returns 0)";
+#else
     EXPECT_DEATH({
         auto result = 3 / LLBC_Str2Num<int>("0");
         std::cout << "3 / 0 = " << result << std::endl;
     }, ".*");
+#endif
 }
 
 // Invalid pointer read.
