@@ -27,6 +27,7 @@ option(LLBC_DISABLE_CXX11_ABI "Disable libstdc++ CXX11 ABI (define _GLIBCXX_USE_
 option(LLBC_ENABLE_ASAN       "Enable AddressSanitizer (non-Windows only)"                    OFF)
 option(LLBC_WARNINGS_AS_ERRORS "Treat warnings as errors (-Werror, non-MSVC)"                 ON)
 option(LLBC_SYNC_VERSION      "Run llbc_prebuild.py to sync version into Version.cpp"         OFF)
+option(LLBC_ENABLE_COVERAGE   "Enable clang source-based coverage instrumentation (non-MSVC)" OFF)
 
 # Default to Release when no build type / multi-config is specified.
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -102,6 +103,14 @@ endif()
 if (LLBC_ENABLE_ASAN AND NOT WIN32)
 	target_compile_options(llbc_build_flags INTERFACE -fsanitize=address -g)
 	target_link_options(llbc_build_flags INTERFACE -fsanitize=address)
+endif()
+
+# Coverage: clang source-based coverage instrumentation (non-MSVC). Because both the core lib and
+# unit_test link llbc_build_flags, this instruments the module .cpp (in the lib) AND the inline
+# overloads (*Inl.h) compiled into the test TU. googletest does not inherit these flags.
+if (LLBC_ENABLE_COVERAGE AND NOT MSVC)
+	target_compile_options(llbc_build_flags INTERFACE -fprofile-instr-generate -fcoverage-mapping)
+	target_link_options(llbc_build_flags INTERFACE -fprofile-instr-generate -fcoverage-mapping)
 endif()
 
 # ****************************************************************************

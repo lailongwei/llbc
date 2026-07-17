@@ -24,6 +24,9 @@ using namespace llbc;
 
 #include <gtest/gtest.h>
 
+// Coverage targets exercised by this test (collected by tools/coverage/run_unit_test_coverage.sh):
+// @coverage-target: llbc/include/llbc/common/StreamInl.h
+
 // Test stream global setting:
 TEST(StreamTest, GlobalStreamSetting)
 {

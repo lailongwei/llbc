@@ -106,7 +106,7 @@ int LLBC_Base64::Decode(const char *input, size_t inputLen, char *output, size_t
     if (UNLIKELY(outputLen < CalcDecodedLen(input, inputLen)))
     {
         LLBC_SetLastError(LLBC_ERROR_LIMIT);
-        return LLBC_OK;
+        return LLBC_FAILED;
     }
 
     int i = 0, j;
