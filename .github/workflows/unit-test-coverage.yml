@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5   # node24 runtime
         with:
           submodules: recursive   # tests/3rdparty/googletest is required by unit_test
 
@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload coverage artifacts
         if: always()   # publish the report even if a test failed
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6   # node24 runtime
         with:
           name: unit-test-coverage
           path: |
