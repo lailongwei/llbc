@@ -3,6 +3,8 @@
 option(LLBC_DISABLE_CXX11_ABI  "Disable libstdc++ CXX11 ABI (define _GLIBCXX_USE_CXX11_ABI=0)" OFF)
 # Asan support switch.
 option(LLBC_ENABLE_ASAN "Enable AddressSanitizer (non-Windows only)" OFF)
+# Coverage support switch.
+option(LLBC_ENABLE_COVERAGE "Enable coverage (non-Windows only)" OFF)
 # Custom c/cpp compile toolset dir setting.
 # set(LLBC_CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir>" CACHE STRING "Custom compile toolset dir")
 
@@ -154,6 +156,14 @@ endif()
 if (LLBC_ENABLE_ASAN AND NOT WIN32)
 	target_compile_options(llbc_sln_build_settings INTERFACE -fsanitize=address -g)
 	target_link_options(llbc_sln_build_settings INTERFACE -fsanitize=address)
+endif()
+
+# Coverage: clang source-based coverage instrumentation (non-MSVC). Because both the core lib and
+# unit_test link llbc_sln_build_settings, this instruments the module .cpp (in the lib) AND the inline
+# overloads (*Inl.h) compiled into the test TU. googletest does not inherit these flags.
+if (LLBC_ENABLE_COVERAGE AND NOT MSVC)
+	target_compile_options(llbc_sln_build_settings INTERFACE -fprofile-instr-generate -fcoverage-mapping)
+	target_link_options(llbc_sln_build_settings INTERFACE -fprofile-instr-generate -fcoverage-mapping)
 endif()
 
 # Function: Apply config postfix to all targets.

@@ -15,21 +15,6 @@ if (LLBC_ENABLE_COVERAGE AND NOT MSVC)
 	target_link_options(llbc_build_flags INTERFACE -fprofile-instr-generate -fcoverage-mapping)
 endif()
 
-# ****************************************************************************
-# Set llbc core lib directory.
-set(LLBC_LIB_DIR ${PROJECT_SOURCE_DIR}/llbc)
-# Set llbc core lib tests directory.
-set(LLBC_LIB_TESTS_DIR ${PROJECT_SOURCE_DIR}/tests)
-set(LLBC_LIB_EXAMPLE_DIR ${PROJECT_SOURCE_DIR}/tests/example)
-set(LLBC_LIB_FUNC_TEST_DIR ${PROJECT_SOURCE_DIR}/tests/func_test)
-set(LLBC_LIB_UNIT_TEST_DIR ${PROJECT_SOURCE_DIR}/tests/unit_test)
-set(LLBC_LIB_QUICK_START_DIR ${PROJECT_SOURCE_DIR}/tests/quick_start)
-# Set llbc wrap directory.
-set(LLBC_WRAP_DIR ${PROJECT_SOURCE_DIR}/wrap)
-
-# Set llbc output directory.
-set(LLBC_OUTPUT_DIR ${PROJECT_SOURCE_DIR}/output/cmake)
-
 # Add llbc lib directory.
 add_subdirectory(${LLBC_LIB_DIR})
 # Add llbc lib test directories.
