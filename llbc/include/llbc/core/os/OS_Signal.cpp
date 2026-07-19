@@ -310,6 +310,10 @@ LLBC_HIDDEN int __LLBC_ClearCrashSignalAltStack()
     stack_t ss;
     memset(&ss, 0, sizeof(ss));
     ss.ss_flags = SS_DISABLE;
+    // Note: macOS(XNU) validates ss_size >= MINSIGSTKSZ even when SS_DISABLE is set and would
+    // otherwise fail with ENOMEM, so pass the still-valid stack pointer/size along with SS_DISABLE.
+    ss.ss_sp = sigStack;
+    ss.ss_size = libTls->coreTls.crashSignalAltStackSize;
     if (UNLIKELY(sigaltstack(&ss, nullptr) != 0))
     {
         LLBC_NS LLBC_SetLastError(LLBC_ERROR_CLIB);

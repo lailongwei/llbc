@@ -1,0 +1,52 @@
+name: Unit test coverage
+
+# Report-only unit-test coverage (clang source-based coverage via llvm-cov).
+# Runs on every push / PR; publishes a coverage report for the modules under
+# test (tests/unit_test/coverage_targets.txt). Coverage numbers DO NOT gate CI.
+
+on:
+  push:
+    paths-ignore:
+      - "static/**"
+      - "docs/**"
+      - "README.md"
+      - "LICENSE"
+      - "CHANGELOG"
+  pull_request: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-test-coverage:
+    name: Unit test coverage (clang/llvm-cov)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5   # node24 runtime
+        with:
+          submodules: recursive   # tests/3rdparty/googletest is required by unit_test
+
+      - name: Install toolchain & deps
+        run: |
+          sudo apt-get update
+          # clang + llvm (matching llvm-cov/llvm-profdata), cmake, and the libs the
+          # CMake unit_test target links on Linux (-luuid -lunwind).
+          sudo apt-get install -y clang llvm cmake uuid-dev libunwind-dev
+
+      - name: Run unit-test coverage
+        env:
+          CC: clang
+          CXX: clang++
+        run: bash tools/coverage/run_unit_test_coverage.sh
+
+      - name: Upload coverage artifacts
+        if: always()   # publish the report even if a test failed
+        uses: actions/upload-artifact@v6   # node24 runtime
+        with:
+          name: unit-test-coverage
+          path: |
+            output/coverage_html
+            output/coverage.lcov
+          if-no-files-found: warn

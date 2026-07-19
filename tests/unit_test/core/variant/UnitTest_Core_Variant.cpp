@@ -24,6 +24,10 @@ using namespace llbc;
 
 #include <gtest/gtest.h>
 
+// Coverage targets exercised by this test (collected by tools/coverage/run_unit_test_coverage.sh):
+// @coverage-target: llbc/src/core/variant/Variant.cpp
+// @coverage-target: llbc/include/llbc/core/variant/VariantInl.h
+
 namespace
 {
 
