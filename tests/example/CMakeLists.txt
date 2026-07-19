@@ -1,7 +1,7 @@
 project(llbc_example)
 
 # Recurse all cpp files.
-file(GLOB_RECURSE LLBC_LIB_EXAMPLE_SRC_FILES *.cpp *.h)
+file(GLOB_RECURSE LLBC_LIB_EXAMPLE_SRC_FILES *.cpp)
 
 # Build link static llbc library executable.
 set(LLBC_LIB_EXAMPLE_LINK_STATIC_EXE ${PROJECT_NAME}_static)
