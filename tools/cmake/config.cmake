@@ -5,7 +5,6 @@ option(LLBC_DISABLE_CXX11_ABI  "Disable libstdc++ CXX11 ABI (define _GLIBCXX_USE
 option(LLBC_ENABLE_ASAN "Enable AddressSanitizer (non-Windows only)" OFF)
 # Custom c/cpp compile toolset dir setting.
 # set(LLBC_CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir>" CACHE STRING "Custom compile toolset dir")
-set(LLBC_CUSTOM_COMPILE_TOOLSET_DIR "/data/home/user00/workspace/projects/nrc/code/3rdparty/x86_64-unknown-linux-gnu-gcc")
 
 # ==================== User imutable settings ====================
 # Some directories define.

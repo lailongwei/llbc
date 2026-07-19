@@ -62,16 +62,19 @@
 // llbc clib error format buffer size.
 #define __LLBC_CLIB_ERROR_FORMAT_BUF_SIZE 1024
 
-// Debug macro define.
-#ifdef DEBUG
- #ifndef LLBC_DEBUG
+// llbc library debug macro define.
+#ifdef LLBC_DEBUG
+ #error "Not allow pre-define LLBC_DEBUG macro!"
+#endif // LLBC_DEBUG
+#if LLBC_TARGET_PLATFORM_WIN32
+ #if defined(_DEBUG) || defined(DEBUG)
+  #define LLBC_DEBUG 1
+ #endif // _DEBUG
+#else // Non-Win32
+ #ifdef DEBUG
   #define LLBC_DEBUG 1
  #endif
-#else
- #ifdef LLBC_DEBUG
-  #error "Defined LLBC_DEBUG macro, but DEBUG macro undefined!"
- #endif
-#endif
+#endif // Win32
 
 // NDebug/Release macro define.
 #ifndef LLBC_DEBUG

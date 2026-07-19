@@ -123,9 +123,9 @@ int FuncTest_Com_StreamFunc::CtorTest()
                               stream2.GetWritePos() != stream1Copy.GetWritePos(),
                               LLBC_FAILED);
 
-        int intVal;
-        bool boolVal;
-        double dblVal;
+        int intVal = 0;
+        bool boolVal = false;
+        double dblVal = 0.0;
         stream2 >> intVal >> boolVal >> dblVal;
         LLBC_ErrorAndReturnIf(intVal != 3 || boolVal != false || dblVal != 6.3, LLBC_FAILED);
     }

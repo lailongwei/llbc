@@ -59,6 +59,7 @@ class GoogleTestCompiler(object):
             machine_type = 'i386' # default use 32 bit cmake toolset.
         cmake_tool_path = op.join(cfg.tools_path,
                                   'cmake',
+                                  'bin',
                                   'cmake-{}-windows-{}'.format(cmake_ver, machine_type),
                                   'bin', 'cmake.exe')
         cmake_tool_path = op.abspath(cmake_tool_path)

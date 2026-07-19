@@ -249,6 +249,7 @@ project "llbc"
     filter { "system:not windows" }
         buildoptions {
             "-fvisibility=hidden",
+            "-fvisibility-inlines-hidden"
         }
     filter {}
 
