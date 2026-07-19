@@ -3,18 +3,19 @@ project(llbc_func_test)
 # Recurse all cpp files.
 file(GLOB_RECURSE LLBC_LIB_FUNC_TEST_SRC_FILES *.cpp)
 
-# Copy all func test config file to output directory (mirror premake func_test postbuild copy).
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/core/config/test_ini.ini DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/core/config/test_prop.properties DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/core/log/LogTestCfg.cfg DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/core/log/LogTestCfg.xml DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/app/AppCfgTest.cfg DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/app/AppCfgTest.properties DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/app/AppCfgTest.ini DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/app/AppCfgTest.xml DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/app/AppCfgReloadFailedTest.cfg DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/app/AppCfgReloadFailedTest.ini DESTINATION ${LLBC_OUTPUT_DIR})
-file(COPY ${LLBC_LIB_FUNC_TEST_DIR}/app/AppCfgReloadFailedTest.xml DESTINATION ${LLBC_OUTPUT_DIR})
+# Collect all func test config files.
+file(GLOB_RECURSE LLBC_LIB_FUNC_TEST_CFG_FILES
+     CONFIGURE_DEPENDS
+     ${CMAKE_CURRENT_SOURCE_DIR}/*.cfg
+     ${CMAKE_CURRENT_SOURCE_DIR}/*.xml
+     ${CMAKE_CURRENT_SOURCE_DIR}/*.ini
+     ${CMAKE_CURRENT_SOURCE_DIR}/*.properties)
+# Copy func test config files to output dir at build time.
+add_custom_target(llbc_func_test_copy_cfg
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${LLBC_OUTPUT_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LLBC_LIB_FUNC_TEST_CFG_FILES} "${LLBC_OUTPUT_DIR}/"
+    COMMENT "Copying func_test config files to ${LLBC_OUTPUT_DIR}"
+    VERBATIM)
 
 # Build link static llbc library executable.
 set(LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE ${PROJECT_NAME}_static)
@@ -24,6 +25,7 @@ target_include_directories(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE}
 target_link_libraries(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE}
                       PRIVATE llbc_sln_build_settings llbc_lib_static)
 llbc_apply_config_postfix(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE})
+add_dependencies(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE} llbc_func_test_copy_cfg)
 
 # Build link shared llbc library executable.
 set(LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE ${PROJECT_NAME}_shared)
@@ -33,3 +35,4 @@ target_include_directories(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE}
 target_link_libraries(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE}
                       PRIVATE llbc_sln_build_settings llbc_lib_shared)
 llbc_apply_config_postfix(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE})
+add_dependencies(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE} llbc_func_test_copy_cfg)
