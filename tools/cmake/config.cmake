@@ -176,10 +176,3 @@ function(llbc_apply_config_postfix)
             MINSIZEREL_POSTFIX     "${CMAKE_MINSIZEREL_POSTFIX}")
     endforeach()
 endfunction() 
-
-
-
-
-
-
-
