@@ -23,7 +23,7 @@ set(LLBC_LIB_QUICK_START_DIR ${LLBC_LIB_TESTS_DIR}/quick_start)
 # - Set llbc wrap libraries directory.
 set(LLBC_WRAP_DIR ${LLBC_TOP_DIR}/wrap)
 # - 3rd direstories.
-set(LLBC_3RD_DIR_GOOGLETEST "${LLBC_LIB_UNIT_TEST_DIR}/3rdparty/googletest")
+set(LLBC_3RD_DIR_GOOGLETEST "${LLBC_LIB_TESTS_DIR}/3rdparty/googletest")
 # - Set llbc output directory.
 set(LLBC_OUTPUT_DIR ${LLBC_TOP_DIR}/output/cmake)
 file(MAKE_DIRECTORY ${LLBC_OUTPUT_DIR})

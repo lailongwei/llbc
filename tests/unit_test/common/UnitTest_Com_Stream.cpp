@@ -351,7 +351,10 @@ TEST(StreamTest, SelfAssign)
     const size_t wposBefore = stream.GetWritePos();
     const void *bufBefore = stream.GetBuf();
 
-    stream = stream;
+    // Assign through a reference so the intentional self-assignment still exercises the
+    // self-assign path at runtime without tripping clang's syntactic -Wself-assign-overloaded.
+    LLBC_Stream &streamSelfRef = stream;
+    stream = streamSelfRef;
 
     ASSERT_EQ(stream.GetWritePos(), wposBefore);
     ASSERT_EQ(stream.GetBuf(), bufBefore);

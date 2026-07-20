@@ -43,10 +43,11 @@ jobs:
         
       - name: Compile tests
         run: |
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:tests
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:tests
-          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:tests
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests
+          # Solution-folder target syntax is <group>\<project>; there is no target named "tests"
+          # (that is the solution folder), so -t:tests fails with MSB4057. Build the actual projects.
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\func_test
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\quick_start
+          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\example
 
 #      - name: Compile pyllbc lib code
 #        run: |
