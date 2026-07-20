@@ -12,13 +12,13 @@ link_directories(${LLBC_OUTPUT_DIR})
 # gtest is provided as a CMake target by add_subdirectory(tests/3rdparty/googletest) in the root
 # CMakeLists (it carries its own include dirs), so no manual include/link paths are needed here.
 if(WIN32)
-    set(LLBC_LIB_UNIT_TEST_STATIC_LIB ws2_32 Mswsock DbgHelp gtest llbc_lib)
+    set(LLBC_LIB_UNIT_TEST_STATIC_LIB ws2_32 Mswsock DbgHelp gtest llbc_lib_static)
     set(LLBC_LIB_UNIT_TEST_SHARED_LIB ws2_32 Mswsock DbgHelp gtest llbc_lib_shared)
 elseif(UNIX AND NOT APPLE)
-    set(LLBC_LIB_UNIT_TEST_STATIC_LIB -ldl -lpthread -luuid -lunwind -lunwind-x86_64 gtest llbc_lib)
+    set(LLBC_LIB_UNIT_TEST_STATIC_LIB -ldl -lpthread -luuid -lunwind -lunwind-x86_64 gtest llbc_lib_static)
     set(LLBC_LIB_UNIT_TEST_SHARED_LIB -ldl -lpthread -luuid -lunwind -lunwind-x86_64 gtest llbc_lib_shared)
 elseif(APPLE)
-    set(LLBC_LIB_UNIT_TEST_STATIC_LIB -liconv gtest llbc_lib)
+    set(LLBC_LIB_UNIT_TEST_STATIC_LIB -liconv gtest llbc_lib_static)
     set(LLBC_LIB_UNIT_TEST_SHARED_LIB gtest llbc_lib_shared)
 endif()
 
