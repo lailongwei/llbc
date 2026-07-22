@@ -180,6 +180,18 @@ int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime
     // Reset output.
     loadInfo.Reset();
 
+    if (UNLIKELY(!IsEnabled()))
+    {
+        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        return LLBC_FAILED;
+    }
+
+    if (UNLIKELY(recentTime <= LLBC_TimeSpan::zero))
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
     const sint64 wantedMillis = recentTime.GetTotalMillis();
     const sint64 nowMillis = LLBC_GetMilliseconds();
 
@@ -194,18 +206,6 @@ int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime
     {
         loadInfo = cacheIt->second;
         return LLBC_OK;
-    }
-
-    if (UNLIKELY(!IsEnabled()))
-    {
-        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
-        return LLBC_FAILED;
-    }
-
-    if (UNLIKELY(recentTime <= LLBC_TimeSpan::zero))
-    {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
     }
 
     // Walk from newest to oldest, accumulate until covered time >= wantedMillis.
