@@ -29,6 +29,8 @@ __LLBC_NS_BEGIN
 LLBC_ServiceRecentLoadInfo::LLBC_ServiceRecentLoadInfo()
 : updateTimes(0)
 , overloadTimes(0)
+, loadRate(0.0)
+, overloadRate(0.0)
 {
 }
 
@@ -38,19 +40,22 @@ void LLBC_ServiceRecentLoadInfo::Reset()
     workingTime = LLBC_TimeSpan::zero;
     updateTimes = 0;
     overloadTimes = 0;
+    loadRate = 0.0;
+    overloadRate = 0.0;
 }
 
 LLBC_String LLBC_ServiceRecentLoadInfo::ToString() const
 {
     return LLBC_String().format(
         "ServiceRecentLoadInfo[recentTime:%s, workingTime:%s, "
-        "updateTimes:%zu, overloadTimes:%zu]",
+        "updateTimes:%zu, overloadTimes:%zu, loadRate:%f, overloadRate:%f]",
         recentTime.ToString().c_str(), workingTime.ToString().c_str(),
-        updateTimes, overloadTimes);
+        updateTimes, overloadTimes, loadRate, overloadRate);
 }
 
 __LLBC_ServiceLoadSampler::__LLBC_ServiceLoadSampler()
 : _loadSampleRing(0)
+, _recentLoadInfoCacheExpireTime(0)
 {
 }
 
@@ -71,12 +76,16 @@ void __LLBC_ServiceLoadSampler::Init(const LLBC_TimeSpan &loadSampleTime)
         LLBC_CFG_COMM_SERVICE_LOAD_SAMPLE_INTERVAL);
 
     LLBC_LockGuard guard(_loadSampleLock);
+    _recentLoadInfoCache.clear();
+    _recentLoadInfoCacheExpireTime = 0;
     _loadSampleRing.ReCapacity(sampleCount);
 }
 
 void __LLBC_ServiceLoadSampler::Clear()
 {
     LLBC_LockGuard guard(_loadSampleLock);
+    _recentLoadInfoCache.clear();
+    _recentLoadInfoCacheExpireTime = 0;
     if (IsEnabled())
         _loadSampleRing.Clear();
 }
@@ -184,6 +193,20 @@ int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime
     }
 
     const sint64 wantedMillis = recentTime.GetTotalMillis();
+    const sint64 nowMillis = LLBC_GetMilliseconds();
+
+    if (_recentLoadInfoCacheExpireTime > 0 && nowMillis >= _recentLoadInfoCacheExpireTime)
+    {
+        _recentLoadInfoCache.clear();
+        _recentLoadInfoCacheExpireTime = 0;
+    }
+
+    const auto cacheIt = _recentLoadInfoCache.find(wantedMillis);
+    if (cacheIt != _recentLoadInfoCache.end())
+    {
+        loadInfo = cacheIt->second;
+        return LLBC_OK;
+    }
 
     // Walk from newest to oldest, accumulate until covered time >= wantedMillis.
     sint64 accMillis = 0;
@@ -208,6 +231,16 @@ int __LLBC_ServiceLoadSampler::GetRecentLoadInfo(const LLBC_TimeSpan &recentTime
     loadInfo.workingTime = LLBC_TimeSpan::FromMillis(accWorking);
     loadInfo.updateTimes = accUpdateTimes;
     loadInfo.overloadTimes = accOverloadTimes;
+    loadInfo.loadRate = accMillis > 0
+        ? static_cast<double>(accWorking) / static_cast<double>(accMillis)
+        : 0.0;
+    loadInfo.overloadRate = accUpdateTimes > 0
+        ? static_cast<double>(accOverloadTimes) / static_cast<double>(accUpdateTimes)
+        : 0.0;
+
+    if (_recentLoadInfoCache.empty())
+        _recentLoadInfoCacheExpireTime = LLBC_GetMilliseconds() + 1000;
+    _recentLoadInfoCache.emplace(wantedMillis, loadInfo);
 
     return LLBC_OK;
 }

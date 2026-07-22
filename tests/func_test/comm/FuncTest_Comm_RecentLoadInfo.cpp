@@ -129,6 +129,7 @@ int FuncTest_Comm_RecentLoadInfo::Run(int argc, char *argv[])
         { "LargeSampleCount",        &FuncTest_Comm_RecentLoadInfo::Test_LargeSampleCount        },
         { "ExceedMaxSampleCount",    &FuncTest_Comm_RecentLoadInfo::Test_ExceedMaxSampleCount    },
         { "PartialSampleAtBoundary", &FuncTest_Comm_RecentLoadInfo::Test_PartialSampleAtBoundary },
+        { "QueryCache",              &FuncTest_Comm_RecentLoadInfo::Test_QueryCache              },
         { "ToString",                &FuncTest_Comm_RecentLoadInfo::Test_ToString                },
     };
 
@@ -187,7 +188,8 @@ int FuncTest_Comm_RecentLoadInfo::Test_Disabled()
     // Output must be zero-cleared on failure.
     if (info.recentTime != LLBC_TimeSpan::zero ||
         info.workingTime != LLBC_TimeSpan::zero ||
-        info.updateTimes != 0 || info.overloadTimes != 0)
+        info.updateTimes != 0 || info.overloadTimes != 0 ||
+        info.loadRate != 0.0 || info.overloadRate != 0.0)
     {
         LLBC_PrintLn("Output info should be zero-cleared on failure.");
         return LLBC_FAILED;
@@ -284,6 +286,18 @@ int FuncTest_Comm_RecentLoadInfo::Test_BasicStats()
     {
         LLBC_PrintLn("Idle service should not be heavily overloaded(updateTimes:%zu, overloadTimes:%zu).",
                      info.updateTimes, info.overloadTimes);
+        return LLBC_FAILED;
+    }
+
+    const double expectedLoadRate = static_cast<double>(info.workingTime.GetTotalMillis()) /
+                                    static_cast<double>(info.recentTime.GetTotalMillis());
+    const double expectedOverloadRate = static_cast<double>(info.overloadTimes) /
+                                        static_cast<double>(info.updateTimes);
+    if (info.loadRate != expectedLoadRate || info.overloadRate != expectedOverloadRate)
+    {
+        LLBC_PrintLn("Unexpected rates, load:%f/%f, overload:%f/%f.",
+                     info.loadRate, expectedLoadRate,
+                     info.overloadRate, expectedOverloadRate);
         return LLBC_FAILED;
     }
 
@@ -609,6 +623,59 @@ int FuncTest_Comm_RecentLoadInfo::Test_PartialSampleAtBoundary()
     return LLBC_OK;
 }
 
+// Same recentTime should return the cached value for one second, then refresh it.
+int FuncTest_Comm_RecentLoadInfo::Test_QueryCache()
+{
+    LLBC_Service *svc = LLBC_Service::Create("RLI_QueryCache");
+    svc->AddComponent(new IdleComp);
+    svc->SetFPS(100);
+    LLBC_ServiceStartArgs startArgs;
+    startArgs.pollerCount = 1;
+    startArgs.loadSampleTime = LLBC_TimeSpan::FromSeconds(4 * kSampleIntervalSec);
+    if (svc->Start(startArgs) != LLBC_OK)
+    {
+        delete svc;
+        return LLBC_FAILED;
+    }
+    LLBC_Defer(delete svc);
+
+    LLBC_Sleep(500);
+    const LLBC_TimeSpan queryTime = LLBC_TimeSpan::FromSeconds(10);
+    LLBC_ServiceRecentLoadInfo firstInfo;
+    if (svc->GetRecentLoadInfo(queryTime, firstInfo) != LLBC_OK)
+        return LLBC_FAILED;
+
+    LLBC_Sleep(100);
+    LLBC_ServiceRecentLoadInfo cachedInfo;
+    if (svc->GetRecentLoadInfo(queryTime, cachedInfo) != LLBC_OK)
+        return LLBC_FAILED;
+
+    if (cachedInfo.recentTime != firstInfo.recentTime ||
+        cachedInfo.workingTime != firstInfo.workingTime ||
+        cachedInfo.updateTimes != firstInfo.updateTimes ||
+        cachedInfo.overloadTimes != firstInfo.overloadTimes ||
+        cachedInfo.loadRate != firstInfo.loadRate ||
+        cachedInfo.overloadRate != firstInfo.overloadRate)
+    {
+        LLBC_PrintLn("The query result changed before the one-second cache expired.");
+        return LLBC_FAILED;
+    }
+
+    LLBC_Sleep(1000);
+    LLBC_ServiceRecentLoadInfo refreshedInfo;
+    if (svc->GetRecentLoadInfo(queryTime, refreshedInfo) != LLBC_OK)
+        return LLBC_FAILED;
+
+    if (refreshedInfo.updateTimes <= cachedInfo.updateTimes)
+    {
+        LLBC_PrintLn("The query cache did not refresh after one second, updates:%zu/%zu.",
+                     refreshedInfo.updateTimes, cachedInfo.updateTimes);
+        return LLBC_FAILED;
+    }
+
+    return LLBC_OK;
+}
+
 // Print LLBC_ServiceRecentLoadInfo::ToString() / operator<< output for visual check.
 int FuncTest_Comm_RecentLoadInfo::Test_ToString()
 {
@@ -620,6 +687,10 @@ int FuncTest_Comm_RecentLoadInfo::Test_ToString()
     info.workingTime = LLBC_TimeSpan::FromMillis(6789);
     info.updateTimes = 100;
     info.overloadTimes = 7;
+    info.loadRate = static_cast<double>(info.workingTime.GetTotalMillis()) /
+                    static_cast<double>(info.recentTime.GetTotalMillis());
+    info.overloadRate = static_cast<double>(info.overloadTimes) /
+                        static_cast<double>(info.updateTimes);
     LLBC_PrintLn("Filled info ToString: %s", info.ToString().c_str());
 
     std::ostringstream oss;

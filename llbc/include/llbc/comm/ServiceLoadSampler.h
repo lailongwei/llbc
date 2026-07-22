@@ -36,6 +36,9 @@ struct LLBC_EXPORT LLBC_ServiceRecentLoadInfo
     size_t updateTimes;
     size_t overloadTimes;
 
+    double loadRate;
+    double overloadRate;
+
     LLBC_ServiceRecentLoadInfo();
 
     /**
@@ -113,7 +116,9 @@ private:
 
 private:
     mutable LLBC_RingBuffer<_ServiceLoadSample> _loadSampleRing; // Ring buffer of load samples.
-    mutable LLBC_SpinLock _loadSampleLock; // Protects _loadSampleRing.
+    mutable std::map<sint64, LLBC_ServiceRecentLoadInfo> _recentLoadInfoCache; // Recent time(in millis) -> recent load info cache.
+    mutable sint64 _recentLoadInfoCacheExpireTime; // Recent load info cache expire time, in millis.
+    mutable LLBC_SpinLock _loadSampleLock; // Protects load samples and recent query cache.
 };
 
 __LLBC_NS_END

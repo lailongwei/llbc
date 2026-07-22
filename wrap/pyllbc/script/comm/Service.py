@@ -330,6 +330,8 @@ class pyllbcService(object):
                  - working_time: the working time within the recent time range, in milliseconds.
                  - update_times: the update times within the recent time range.
                  - overload_times: the overload times within the recent time range.
+                 - load_rate: working_time / recent_time, range [0.0, 1.0].
+                 - overload_rate: overload_times / update_times, range [0.0, 1.0].
         """
         return llbc.inl.GetRecentLoadInfo(self._c_obj, recent_time)
 

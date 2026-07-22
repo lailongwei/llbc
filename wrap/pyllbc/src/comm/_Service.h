@@ -143,6 +143,14 @@ LLBC_EXTERN_C PyObject *_pyllbc_GetRecentLoadInfo(PyObject *self, PyObject *args
     PyDict_SetItemString(dict, "overload_times", overloadTimes);
     Py_DECREF(overloadTimes);
 
+    PyObject *loadRate = PyFloat_FromDouble(loadInfo.loadRate);
+    PyDict_SetItemString(dict, "load_rate", loadRate);
+    Py_DECREF(loadRate);
+
+    PyObject *overloadRate = PyFloat_FromDouble(loadInfo.overloadRate);
+    PyDict_SetItemString(dict, "overload_rate", overloadRate);
+    Py_DECREF(overloadRate);
+
     return dict;
 }
 
