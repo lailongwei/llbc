@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="760" height="430" role="img" aria-labelledby="t d">
+  <title id="t">LLBC_ObjPool 结构：按 RTTI 分桶 → TypedObjPool → Stripe 条带</title>
+  <desc id="d">ObjPool 以 RTTI name 为 key 管理各类型的 TypedObjPool；每个 TypedObjPool 以 Stripe 条带批量管理连续内存中的对象槽。</desc>
+  <defs>
+    <style>
+      .lbl { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif; }
+      .h   { font-weight: 700; font-size: 14px; }
+      .sub { font-size: 11px; }
+      .edge{ font-size: 10.5px; fill: #475569; }
+      .cap { font-size: 11.5px; fill: #64748b; }
+    </style>
+    <marker id="a3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#475569"/></marker>
+  </defs>
+
+  <!-- ObjPool -->
+  <rect x="24" y="150" width="176" height="110" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="lbl h" x="112" y="196" text-anchor="middle" fill="#1e40af">LLBC_ObjPool</text>
+  <text class="lbl sub" x="112" y="218" text-anchor="middle" fill="#1e40af">按 RTTI name 分桶</text>
+
+  <!-- arrows ObjPool -> Typed -->
+  <line x1="202" y1="180" x2="262" y2="122" stroke="#475569" stroke-width="2" marker-end="url(#a3)"/>
+  <line x1="202" y1="230" x2="262" y2="288" stroke="#475569" stroke-width="2" marker-end="url(#a3)"/>
+  <text class="lbl edge" x="214" y="172" text-anchor="middle">RTTI→子池</text>
+
+  <!-- TypedObjPool 1 -->
+  <rect x="266" y="76" width="212" height="80" rx="11" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.8"/>
+  <text class="lbl h" x="372" y="108" text-anchor="middle" fill="#1e40af" font-size="13">LLBC_TypedObjPool</text>
+  <text class="lbl sub" x="372" y="130" text-anchor="middle" fill="#1e40af">&lt;LLBC_Packet&gt;</text>
+
+  <!-- TypedObjPool 2 -->
+  <rect x="266" y="256" width="212" height="80" rx="11" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.8"/>
+  <text class="lbl h" x="372" y="288" text-anchor="middle" fill="#1e40af" font-size="13">LLBC_TypedObjPool</text>
+  <text class="lbl sub" x="372" y="310" text-anchor="middle" fill="#1e40af">&lt;std::string&gt;</text>
+
+  <!-- arrows Typed -> Stripe -->
+  <line x1="480" y1="116" x2="516" y2="116" stroke="#475569" stroke-width="2" marker-end="url(#a3)"/>
+  <line x1="480" y1="296" x2="516" y2="296" stroke="#475569" stroke-width="2" marker-end="url(#a3)"/>
+
+  <!-- Stripe 1 -->
+  <rect x="520" y="64" width="216" height="104" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.6"/>
+  <text class="lbl h" x="628" y="88" text-anchor="middle" fill="#334155" font-size="13">Stripe 条带</text>
+  <g>
+    <rect x="534" y="100" width="18" height="18" rx="3" fill="#2563eb"/>
+    <rect x="556" y="100" width="18" height="18" rx="3" fill="#2563eb"/>
+    <rect x="578" y="100" width="18" height="18" rx="3" fill="#2563eb"/>
+    <rect x="600" y="100" width="18" height="18" rx="3" fill="#2563eb"/>
+    <rect x="622" y="100" width="18" height="18" rx="3" fill="#2563eb"/>
+    <rect x="644" y="100" width="18" height="18" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+    <rect x="666" y="100" width="18" height="18" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+    <rect x="688" y="100" width="18" height="18" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+  </g>
+  <text class="lbl sub" x="628" y="150" text-anchor="middle" fill="#64748b">默认 1024 槽 · 连续内存</text>
+
+  <!-- Stripe 2 -->
+  <rect x="520" y="244" width="216" height="104" rx="11" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.6"/>
+  <text class="lbl h" x="628" y="268" text-anchor="middle" fill="#334155" font-size="13">Stripe 条带</text>
+  <g>
+    <rect x="534" y="280" width="18" height="18" rx="3" fill="#2563eb"/>
+    <rect x="556" y="280" width="18" height="18" rx="3" fill="#2563eb"/>
+    <rect x="578" y="280" width="18" height="18" rx="3" fill="#2563eb"/>
+    <rect x="600" y="280" width="18" height="18" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+    <rect x="622" y="280" width="18" height="18" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+    <rect x="644" y="280" width="18" height="18" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+    <rect x="666" y="280" width="18" height="18" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+    <rect x="688" y="280" width="18" height="18" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+  </g>
+  <text class="lbl sub" x="628" y="330" text-anchor="middle" fill="#64748b">批量分配 / 批量释放</text>
+
+  <!-- legend + caption -->
+  <rect x="266" y="366" width="16" height="16" rx="3" fill="#2563eb"/>
+  <text class="lbl edge" x="288" y="379">使用中</text>
+  <rect x="346" y="366" width="16" height="16" rx="3" fill="#fff" stroke="#93c5fd" stroke-dasharray="3 2"/>
+  <text class="lbl edge" x="368" y="379">空闲</text>
+  <text class="lbl cap" x="24" y="410">无复用方法则回收时析构，但保留所在内存块，下次原地 placement new —— 因此既是对象池，也是内存池。</text>
+</svg>

@@ -5,20 +5,23 @@ title: llbc 文档
 
 # llbc 用户指南
 
-**llbc** 是一个简洁、高性能、跨平台、多语言支持的服务端开发框架，面向 **Service + Component**
-的组织方式，底层由 C++17 实现，广泛用于游戏与通用服务端开发。
+**llbc**（Low Level Base Component）是一套简洁、高效、跨平台、多语言支持的服务端开发框架，
+秉持「麻雀虽小，五脏俱全」的理念，以 **App → Service → Component** 的方式组织业务，
+让开发者以极低的学习、使用与接入成本完成服务端底层搭建与功能开发。底层由 C++17 实现，
+广泛用于游戏与通用服务端开发。
 
 > 注：llbc 框架本身不包含具体业务组件；较为通用的组件由独立仓库
 > [llbc_comps](https://github.com/lailongwei/llbc_comps) 提供，欢迎贡献。
 
-## 为什么选 llbc
+## llbc 提供了什么
 
-- **Service + Component 模型** —— 业务逻辑以 `LLBC_Component` 挂载到 `LLBC_Service`，生命周期钩子清晰，天然可组合。
+在一个库中集成了服务端开发常用的一整套子系统，并尽量减少对第三方库的依赖：
+
 - **高性能网络层** —— 可插拔 Poller 后端（Linux `epoll` / Windows `IOCP` / 通用 `select`），协议栈可定制。
 - **一站式核心库** —— 线程、定时器、日志、对象池、序列化（`LLBC_Stream`）、配置（ini/xml/properties）、
-  时间、随机、`LLBC_Variant` 等常用能力开箱即用。
-- **跨平台** —— Linux / Windows 一级支持；macOS 二级支持；iOS/Android 尽力支持。
-- **多语言封装** —— 在 C++ 核心之上提供 Python（`pyllbc`）、C#（`csllbc`）、Lua（`lullbc`）封装。
+  时间、随机、`LLBC_Variant`、委托（`LLBC_Delegate`）、事件、文件/目录、动态库加载、文本编码转换、
+  调试工具、错误码等常用能力开箱即用。
+- **多语言封装** —— 在 C++ 核心之上提供 Python / C# / Lua 封装，脚本层可直接复用底层能力。
 
 ## 适用场景
 
@@ -27,18 +30,21 @@ title: llbc 文档
 
 ## 从这里开始
 
-本文档按**学习旅程**线性组织。当前正以 [llbc wiki](https://github.com/lailongwei/llbc/wiki) 为内容基准逐步迁移完善——
-下列标 ✅ 的页面已就绪可直接阅读，其余页面暂为占位、保留目录结构，内容后续补充。
+本文档按**学习旅程**线性组织，覆盖入门、核心概念、基础库与网络使用指南、参考与更多。
 
 1. **入门**
-   - [安装与构建](getting-started/build.md) ✅：在 Linux/macOS/Windows 上编译核心库。
-   - [Hello World](getting-started/hello-world.md) ✅：最小可运行程序，理解 `LLBC_Startup`/`LLBC_Cleanup`。
+   - [安装与构建](getting-started/build.md)：用 CMake（Linux/macOS）或 Visual Studio（Windows）编译核心库。
+   - [Hello World](getting-started/hello-world.md)：最小可运行程序，理解 `LLBC_Startup`/`LLBC_Cleanup`。
    - [第一个 Service](getting-started/first-service.md)：创建 Service、挂载 Component、启动运行。
+   - [第一个网络回显服务](getting-started/echo-service.md)：监听、订阅 opcode、收发网络包。
 2. **核心概念**
-   - [架构总览](concepts/architecture.md)、[Service 与 Component](concepts/service-component.md)、[生命周期与事件](concepts/lifecycle-event.md)。
-3. **使用指南**
-   - [序列化 Stream](guides/stream.md) ✅。
-4. **更多** —— [示例项目](examples.md)、[常见问题](faq.md)、[贡献指南](contributing.md)、[更新日志](changelog.md)。
+   - [架构总览](concepts/architecture.md)、[Service 与 Component](concepts/service-component.md)、[生命周期与事件](concepts/lifecycle-event.md)、[App 与多服务组合](concepts/app-multiservice.md)、[错误处理与返回约定](concepts/error-handling.md)、[内存与对象所有权](concepts/memory-ownership.md)。
+3. **使用指南 · 基础库**
+   - [Stream](guides/stream.md)、[Variant](guides/variant.md)、[Delegate](guides/delegate.md)、[Object](guides/object.md)、[ObjPool](guides/objpool.md)、[Array/Dictionary](guides/objbase-collections.md)、[日志](guides/logger.md)、[定时器](guides/timer.md)、[时间](guides/time.md)、[线程与任务](guides/thread.md)、[事件](guides/event.md)、[配置](guides/config.md)、[字符串](guides/string.md)、[文件与目录](guides/file-directory.md)、[随机](guides/random.md)、[动态库](guides/library.md)、[编码转换](guides/transcoder.md)、[工具箱 utils](guides/utils.md)。
+4. **使用指南 · 网络**
+   - [Service 消息处理](guides/service-messaging.md)、[Packet 与 Coder](guides/packet-coder.md)、[Session 与连接](guides/session.md)、[协议栈与自定义协议](guides/protocol.md)、[Poller 后端](guides/poller.md)。
+5. **参考** —— [错误码一览](reference/error-codes.md)、[日志配置项](reference/log-config.md)、[Service / App 配置项](reference/service-app-config.md)。
+6. **更多** —— [常见问题](faq.md)、[贡献指南](contributing.md)、[版本迁移指南 v1.1.1](migration-v1.1.1.md)、[术语表](glossary.md)、[更新日志](changelog.md)。
 
 ## 支持平台
 
@@ -47,8 +53,8 @@ title: llbc 文档
 | **Linux** | 一级 | 稳定，特性最新，可用于线上生产环境 |
 | **Windows** | 一级 | 稳定，特性最新，可用于线上生产环境 |
 | **macOS** | 二级 | 稳定，但网络部分性能较低，不建议线上生产 |
-| **iOS** | 尽力 | 稳定，但特性无法保持最新 |
-| **Android** | 尽力 | 理论可编译使用，不提供稳定版本支持 |
+| **iOS** | 尽力 | 理论支持，已不再主动维护 |
+| **Android** | 尽力 | 理论支持，已不再主动维护 |
 
 ## 构建状态
 

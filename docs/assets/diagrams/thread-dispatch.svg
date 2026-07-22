@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" width="820" height="300" role="img" aria-labelledby="t d">
+  <title id="t">LLBC_Task 任务队列模型</title>
+  <desc id="d">生产者线程 Push 消息块进入线程安全的 LLBC_MessageQueue，LLBC_Task 经 Activate 启动的多条工作线程各自 Svc() 循环取出处理。</desc>
+  <defs>
+    <style>
+      .lbl{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+      .n{font-weight:700;font-size:14px;} .s{font-size:10.5px;} .e{font-size:11px;fill:#475569;font-weight:600;} .cap{font-size:11.5px;fill:#64748b;} .w{font-weight:700;font-size:12px;}
+    </style>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#475569"/></marker>
+  </defs>
+
+  <!-- 生产者 -->
+  <rect x="24" y="118" width="170" height="80" rx="11" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+  <text class="lbl n" x="109" y="150" text-anchor="middle" fill="#334155">生产者线程</text>
+  <text class="lbl s" x="109" y="172" text-anchor="middle" fill="#334155">Push(MessageBlock)</text>
+
+  <!-- MessageQueue -->
+  <rect x="244" y="108" width="200" height="100" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="lbl n" x="344" y="146" text-anchor="middle" fill="#1e40af">LLBC_MessageQueue</text>
+  <text class="lbl s" x="344" y="168" text-anchor="middle" fill="#1e40af">MessageBlock 链表</text>
+  <text class="lbl s" x="344" y="184" text-anchor="middle" fill="#1e40af">线程安全 收发</text>
+
+  <!-- Task container -->
+  <rect x="494" y="30" width="300" height="240" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text class="lbl n" x="514" y="58" fill="#1e40af">LLBC_Task</text>
+  <text class="lbl s" x="600" y="58" fill="#2563eb">Activate(N) 启动 N 条工作线程</text>
+  <rect x="514" y="72" width="260" height="52" rx="9" fill="#fff" stroke="#3b82f6" stroke-width="1.6"/>
+  <text class="lbl w" x="644" y="94" text-anchor="middle" fill="#1e40af">工作线程 · Svc()</text>
+  <text class="lbl s" x="644" y="112" text-anchor="middle" fill="#1e40af">while(IsActivated()) Pop/TimedPop → 处理</text>
+  <rect x="514" y="132" width="260" height="40" rx="9" fill="#fff" stroke="#3b82f6" stroke-width="1.6"/>
+  <text class="lbl w" x="644" y="157" text-anchor="middle" fill="#1e40af">工作线程 · Svc()</text>
+  <rect x="514" y="180" width="260" height="40" rx="9" fill="#fff" stroke="#3b82f6" stroke-width="1.6"/>
+  <text class="lbl w" x="644" y="205" text-anchor="middle" fill="#1e40af">工作线程 · Svc()</text>
+  <text class="lbl s" x="644" y="244" text-anchor="middle" fill="#2563eb">全部线程退出后调一次 Cleanup()</text>
+
+  <!-- arrows -->
+  <line x1="194" y1="158" x2="242" y2="158" stroke="#475569" stroke-width="2" marker-end="url(#ar)"/>
+  <text class="lbl e" x="218" y="149" text-anchor="middle">Push</text>
+  <line x1="444" y1="158" x2="492" y2="158" stroke="#475569" stroke-width="2" marker-end="url(#ar)"/>
+  <text class="lbl e" x="468" y="149" text-anchor="middle">Pop</text>
+
+  <text class="lbl cap" x="410" y="292" text-anchor="middle">共享数据用锁 + LLBC_LockGuard 保护；线程局部数据用 LLBC_Tls。</text>
+</svg>

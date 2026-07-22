@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 250" width="820" height="250" role="img" aria-labelledby="t d">
+  <title id="t">协议栈分层与收发方向</title>
+  <desc id="d">每个 Session 挂一条 ProtocolStack：接收时字节流经 PackLayer→CompressLayer→CodecLayer 还原为业务对象；发送时反向。</desc>
+  <defs>
+    <style>
+      .lbl{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+      .n{font-weight:700;font-size:14px;} .s{font-size:10.5px;} .dir{font-size:12px;font-weight:600;} .cap{font-size:11.5px;fill:#64748b;}
+    </style>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#475569"/></marker>
+    <marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#059669"/></marker>
+  </defs>
+
+  <!-- receive arrow (top, L->R) -->
+  <line x1="30" y1="60" x2="790" y2="60" stroke="#475569" stroke-width="2" marker-end="url(#ar)"/>
+  <text class="lbl dir" x="30" y="48" fill="#475569">接收（上行）字节流 → PackLayer → CompressLayer → CodecLayer</text>
+
+  <!-- nodes -->
+  <rect x="20" y="90" width="130" height="70" rx="11" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+  <text class="lbl n" x="85" y="122" text-anchor="middle" fill="#334155">字节流</text>
+  <text class="lbl s" x="85" y="142" text-anchor="middle" fill="#334155">网络 I/O</text>
+
+  <rect x="180" y="90" width="140" height="70" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl n" x="250" y="120" text-anchor="middle" fill="#065f46">PackLayer</text>
+  <text class="lbl s" x="250" y="140" text-anchor="middle" fill="#065f46">字节 ↔ Packet 拆装</text>
+
+  <rect x="350" y="90" width="140" height="70" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl n" x="420" y="120" text-anchor="middle" fill="#065f46">CompressLayer</text>
+  <text class="lbl s" x="420" y="140" text-anchor="middle" fill="#065f46">压缩 / 解压</text>
+
+  <rect x="520" y="90" width="140" height="70" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl n" x="590" y="120" text-anchor="middle" fill="#065f46">CodecLayer</text>
+  <text class="lbl s" x="590" y="140" text-anchor="middle" fill="#065f46">对象编解码</text>
+
+  <rect x="690" y="90" width="110" height="70" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="lbl n" x="745" y="120" text-anchor="middle" fill="#1e40af" font-size="13">业务对象</text>
+  <text class="lbl s" x="745" y="140" text-anchor="middle" fill="#1e40af">Packet/Coder</text>
+
+  <!-- send arrow (bottom, R->L) -->
+  <line x1="790" y1="190" x2="30" y2="190" stroke="#059669" stroke-width="2" marker-end="url(#ag)"/>
+  <text class="lbl dir" x="790" y="208" text-anchor="end" fill="#059669">发送（下行）CodecLayer → CompressLayer → PackLayer → 字节流</text>
+
+  <text class="lbl cap" x="410" y="238" text-anchor="middle">每个 Session 挂一条 ProtocolStack；实现 LLBC_IProtocolFactory 可替换任意层，LLBC_IProtocolFilter 可拦截收发。</text>
+</svg>

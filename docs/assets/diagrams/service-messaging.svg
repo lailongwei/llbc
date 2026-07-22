@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 300" width="860" height="300" role="img" aria-labelledby="t d">
+  <title id="t">Service 消息处理流程</title>
+  <desc id="d">网络字节经协议栈解码后按 opcode 路由到 Handler；Handler 取回包经编码后 Send 下行。</desc>
+  <defs>
+    <style>
+      .lbl{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+      .n{font-weight:700;font-size:13.5px;} .s{font-size:10px;} .cap{font-size:11.5px;fill:#64748b;} .e{font-size:10.5px;fill:#475569;}
+    </style>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#475569"/></marker>
+  </defs>
+
+  <!-- nodes row -->
+  <rect x="18" y="70" width="118" height="82" rx="11" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+  <text class="lbl n" x="77" y="104" text-anchor="middle" fill="#334155">网络字节</text>
+  <text class="lbl s" x="77" y="124" text-anchor="middle" fill="#334155">来自对端 Session</text>
+
+  <rect x="166" y="70" width="150" height="82" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl n" x="241" y="100" text-anchor="middle" fill="#065f46">协议栈解码</text>
+  <text class="lbl s" x="241" y="120" text-anchor="middle" fill="#065f46">PackLayer→CodecLayer</text>
+  <text class="lbl s" x="241" y="134" text-anchor="middle" fill="#065f46">Coder::Decode</text>
+
+  <rect x="346" y="70" width="150" height="82" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl n" x="421" y="100" text-anchor="middle" fill="#065f46">按 opcode 派发</text>
+  <text class="lbl s" x="421" y="120" text-anchor="middle" fill="#065f46">PreSubscribe 前置</text>
+  <text class="lbl s" x="421" y="134" text-anchor="middle" fill="#065f46">Subscribe 路由表</text>
+
+  <rect x="526" y="70" width="156" height="82" rx="11" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="lbl n" x="604" y="100" text-anchor="middle" fill="#1e40af">Handler 处理</text>
+  <text class="lbl s" x="604" y="120" text-anchor="middle" fill="#1e40af">void(LLBC_Packet &amp;)</text>
+  <text class="lbl s" x="604" y="134" text-anchor="middle" fill="#1e40af">pkt.GetDecoder&lt;T&gt;()</text>
+
+  <rect x="712" y="70" width="130" height="82" rx="11" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl n" x="777" y="100" text-anchor="middle" fill="#065f46">回发 Send</text>
+  <text class="lbl s" x="777" y="120" text-anchor="middle" fill="#065f46">Acquire&lt;Packet&gt;</text>
+  <text class="lbl s" x="777" y="134" text-anchor="middle" fill="#065f46">SetEncoder → Send</text>
+
+  <!-- forward arrows -->
+  <line x1="136" y1="111" x2="166" y2="111" stroke="#475569" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="316" y1="111" x2="346" y2="111" stroke="#475569" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="496" y1="111" x2="526" y2="111" stroke="#475569" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="682" y1="111" x2="712" y2="111" stroke="#475569" stroke-width="2" marker-end="url(#ar)"/>
+
+  <!-- return arrow (Send -> 网络, curved bottom) -->
+  <path d="M777,152 C777,220 77,220 77,152" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#ar)"/>
+  <text class="lbl e" x="427" y="214" text-anchor="middle">下行：经协议栈编码为字节流发回对端</text>
+
+  <text class="lbl cap" x="430" y="266" text-anchor="middle">会话创建/销毁、异步连接结果等通知不走 Subscribe，而是经 Component 的 OnEvent() 分发。</text>
+</svg>

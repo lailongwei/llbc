@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 450" width="760" height="450" role="img" aria-labelledby="t d">
+  <title id="t">App → Service → Component 组合模型</title>
+  <desc id="d">LLBC_App 编排多个 LLBC_Service；每个 Service 自带逐帧循环并承载会话、定时器、事件与一组 LLBC_Component。</desc>
+  <defs>
+    <style>
+      .lbl { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif; }
+      .h   { font-weight: 700; font-size: 15px; }
+      .sub { font-size: 11px; }
+      .comp{ font-weight: 700; font-size: 13.5px; fill: #1e40af; }
+      .compsub { font-size: 10px; fill: #2563eb; }
+      .chip { font-size: 10px; fill: #475569; }
+      .cap  { font-size: 12px; fill: #64748b; }
+    </style>
+  </defs>
+
+  <!-- App container -->
+  <rect x="30" y="38" width="700" height="358" rx="14" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text class="lbl h" x="50" y="66" fill="#9a3412">LLBC_App</text>
+  <text class="lbl sub" x="128" y="66" fill="#c2410c">进程级 · 编排多个 Service · 统一停止 / Reload</text>
+
+  <!-- Service A -->
+  <rect x="58" y="88" width="332" height="286" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl h" x="76" y="116" fill="#065f46">LLBC_Service</text>
+  <text class="lbl sub" x="200" y="116" fill="#047857">自带线程逐帧循环 · SetFPS</text>
+  <!-- chips -->
+  <g>
+    <rect x="76" y="130" width="94" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text class="lbl chip" x="123" y="146" text-anchor="middle">会话 Session</text>
+    <rect x="176" y="130" width="94" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text class="lbl chip" x="223" y="146" text-anchor="middle">定时器 Timer</text>
+    <rect x="276" y="130" width="94" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text class="lbl chip" x="323" y="146" text-anchor="middle">事件 Event</text>
+  </g>
+  <!-- components -->
+  <rect x="76" y="176" width="140" height="80" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+  <text class="lbl comp" x="146" y="210" text-anchor="middle">LLBC_Component</text>
+  <text class="lbl compsub" x="146" y="230" text-anchor="middle">OnInit · OnStart</text>
+  <text class="lbl compsub" x="146" y="244" text-anchor="middle">OnUpdate · OnEvent</text>
+
+  <rect x="230" y="176" width="140" height="80" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+  <text class="lbl comp" x="300" y="210" text-anchor="middle">LLBC_Component</text>
+  <text class="lbl compsub" x="300" y="232" text-anchor="middle">业务逻辑载体</text>
+
+  <rect x="76" y="272" width="294" height="84" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+  <text class="lbl comp" x="223" y="306" text-anchor="middle">LLBC_Component</text>
+  <text class="lbl compsub" x="223" y="328" text-anchor="middle">svc-&gt;AddComponent&lt;T&gt;() 挂载 · GetComponent&lt;T&gt;() 互访</text>
+
+  <!-- Service B -->
+  <rect x="410" y="88" width="292" height="286" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl h" x="428" y="116" fill="#065f46">LLBC_Service</text>
+  <text class="lbl sub" x="552" y="116" fill="#047857">可承载多个 Service</text>
+  <g>
+    <rect x="428" y="130" width="80" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text class="lbl chip" x="468" y="146" text-anchor="middle">会话</text>
+    <rect x="514" y="130" width="80" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text class="lbl chip" x="554" y="146" text-anchor="middle">定时器</text>
+    <rect x="600" y="130" width="84" height="24" rx="12" fill="#f1f5f9" stroke="#cbd5e1"/>
+    <text class="lbl chip" x="642" y="146" text-anchor="middle">事件</text>
+  </g>
+  <rect x="428" y="176" width="256" height="80" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+  <text class="lbl comp" x="556" y="212" text-anchor="middle">LLBC_Component</text>
+  <text class="lbl compsub" x="556" y="234" text-anchor="middle">Subscribe(opcode, ...) 处理消息</text>
+  <rect x="428" y="272" width="256" height="84" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+  <text class="lbl comp" x="556" y="308" text-anchor="middle">LLBC_Component</text>
+  <text class="lbl compsub" x="556" y="330" text-anchor="middle">OnEvent 收会话/连接通知</text>
+
+  <!-- caption -->
+  <text class="lbl cap" x="380" y="424" text-anchor="middle">App 可选：也可直接 LLBC_Service::Create(...) 独立创建并驱动一个 Service</text>
+</svg>
