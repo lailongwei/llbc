@@ -24,7 +24,7 @@ LLBC_Variant v1 = 123;                                  // RAW(sint32)
 LLBC_Variant v2 = 3.14;                                 // RAW(double)
 LLBC_Variant v3 = "hello";                              // STR
 LLBC_Variant v4 = std::vector<int>{1, 2, 3};            // SEQ
-LLBC_Variant v5 = std::map<int, std::string>{{1, "a"}}; // DICT
+LLBC_Variant v5 = std::map<int, std::string>{ {1, "a"} }; // DICT
 
 LLBC_Variant v6;          // 默认构造：NIL（空值）
 v6 = v1;                  // 拷贝赋值

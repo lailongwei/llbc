@@ -1,7 +1,14 @@
 # 本地预览用（GitHub Pages 线上构建不依赖此文件）：
 #   cd docs && bundle install && bundle exec jekyll serve
 # 然后浏览器打开 http://127.0.0.1:4000/llbc/
+#
+# 说明：GitHub Pages 线上用其自带的 github-pages 构建栈（锁定 Jekyll 3.9）。
+# 但该旧栈依赖 Ruby 已在 3.2 移除的 String#tainted?，无法在新 Ruby(3.4/4.0) 本地运行，
+# 故本地预览改用现代 Jekyll 4 —— 主题/插件一致，渲染结果等同线上。
 source "https://rubygems.org"
 
-# 与 GitHub Pages 线上环境保持一致的构建栈
-gem "github-pages", group: :jekyll_plugins
+gem "jekyll", "~> 4.3"
+gem "jekyll-theme-primer"
+gem "jekyll-seo-tag"
+gem "jekyll-relative-links"
+gem "webrick"

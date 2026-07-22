@@ -15,6 +15,14 @@ theme: jekyll-theme-primer
 # GitHub Pages 白名单插件
 plugins:
   - jekyll-seo-tag
+  # 把正文里的相对 .md 链接重写为生成后的 .html（GitHub Pages 默认启用；
+  # 本地 Jekyll 需显式声明，否则页内 .md 链接会 404）。
+  - jekyll-relative-links
+
+# jekyll-relative-links 配置
+relative_links:
+  enabled: true
+  collections: false
 
 # 仓库信息（供 {% seo %} 与主题使用）
 repository: lailongwei/llbc
