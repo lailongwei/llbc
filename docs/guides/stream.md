@@ -35,6 +35,8 @@ stream >> b >> i32 >> u32 >> i64 >> u64 >> f >> d >> s;
 
 ## 游标控制
 
+![LLBC_Stream 读写游标分离](../assets/diagrams/stream-cursors.svg)
+
 读写游标独立，可分别定位：
 
 ```cpp

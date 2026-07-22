@@ -5,11 +5,10 @@ title: 安装与构建
 
 # 安装与构建
 
-llbc 提供三条构建路径，按你的目标平台选择即可。本页先教你把**核心库**编译出来，
+llbc 提供两条构建路径，按你的目标平台选择即可。本页先教你把**核心库**编译出来，
 后续的 [Hello World](hello-world.md) 会直接链接它。
 
-- **premake → make**：Linux / macOS 首选。
-- **CMake**：Linux / macOS 次选（仅构建 C++ 核心库与 `tests/` 四个测试项目，不含语言封装）。
+- **CMake**：Linux / macOS。构建 C++ 核心库与 `tests/` 四个测试项目。
 - **Visual Studio**：Windows。
 
 ## 获取源码
@@ -20,47 +19,19 @@ cd llbc
 ```
 
 <div class="callout important" markdown="1">
-**子模块**：语言封装与单元测试依赖三个 git 子模块——`wrap/pyllbc/cpython`、`wrap/lullbc/lua`
-（Python/Lua 封装用）与 `tests/3rdparty/googletest`（`unit_test` 用）。
-普通 clone 下这些目录**存在但为空**，会导致封装构建产出损坏的产物。务必带 `--recurse-submodules`，
-或在已有仓库中执行：
+**子模块**：`unit_test` 依赖 git 子模块 `tests/3rdparty/googletest`。普通 clone 下该目录
+**存在但为空**，CMake 在配置阶段检测不到它时会**跳过 `unit_test` 目标**（其余目标照常构建）。
+如需构建单元测试，务必带 `--recurse-submodules`，或在已有仓库中执行：
 
 ```bash
-git submodule update --init --recursive
+git submodule update --init tests/3rdparty/googletest
 ```
 </div>
 
-## 路径一：premake → make（Linux / macOS，首选）
+## 路径一：CMake（Linux / macOS）
 
-`Makefile` 会先调用 `tools/premake/premake5_<os>_<arch>` 生成 `build/gmake2/*.make`，
-再分派到对应目标。产物落在 `output/gmake2/<config>/`。
-
-`config` 默认 `release64`，可选值：`debug32`、`release32`、`debug64`、`release64`。
-
-```bash
-make help                          # 查看完整目标列表
-make core_lib                      # 只编译 C++ 核心库（libllbc[.so|.dylib]）
-make all                           # 核心库 + 全部测试 + 全部封装
-make tests                         # 四个测试项目（example func_test unit_test quick_start）
-
-# 常用：带 config 与并行
-make core_lib config=debug64 -j4
-make quick_start config=debug64    # 核心库 + 交互式 quick_start 演示
-make unit_test  config=debug64     # 核心库 + gtest 单元测试
-```
-
-清理与安装：
-
-```bash
-make clean                         # 全量清理
-make clean_core_lib                # 按目标清理（clean_tests / clean_func_test / ...）
-make install                       # 安装核心库与头文件到 /usr/lib + /usr/include（需 sudo）
-```
-
-## 路径二：CMake（Linux / macOS，次选）
-
-构建 C++ 核心库（`llbc_lib` 静态库 + `llbc_lib_shared`）与四个 `tests/` 项目，不含语言封装。
-产物落在 `output/cmake/`。
+要求 CMake **≥ 3.16**。构建 C++ 核心库（`llbc_lib` 静态库 + `llbc_lib_shared` 动态库）
+与四个 `tests/` 项目（`example`、`func_test`、`unit_test`、`quick_start`）。
 
 ```bash
 mkdir cmake_build && cd cmake_build
@@ -68,14 +39,38 @@ cmake ..
 make -j4
 ```
 
-## 路径三：Visual Studio（Windows）
+产物统一落在 `output/cmake/`（平铺目录）：
+
+- 核心库：`libllbc.a`（静态）、`libllbc.dylib` / `libllbc.so`（动态）。
+- 测试程序：每个测试各产出静态链接与动态链接两个可执行文件，例如
+  `unit_test` 与 `unit_test_shared`。
+
+<div class="callout note" markdown="1">
+默认构建类型为 **Release**。单配置生成器（Makefile / Ninja）下切换到 Debug 需在配置时指定：
+
+```bash
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+```
+
+Debug 目标带 `_debug` 后缀（如 `libllbc_debug.a`、`unit_test_debug`）。
+</div>
+
+可选开关（配置时以 `-D<OPTION>=ON` 传入，均定义于 `tools/cmake/config.cmake`）：
+
+| 开关 | 作用 |
+|------|------|
+| `LLBC_ENABLE_ASAN` | 启用 AddressSanitizer（非 Windows）。 |
+| `LLBC_ENABLE_COVERAGE` | 启用 clang 源码级覆盖率插桩（非 MSVC）。 |
+| `LLBC_DISABLE_CXX11_ABI` | 定义 `_GLIBCXX_USE_CXX11_ABI=0`。 |
+
+## 路径二：Visual Studio（Windows）
 
 1. 运行仓库根目录的 `WinPreBuild.bat`。
 
    ![运行 WinPreBuild.bat](../assets/img/windows_prebuild_screenshot.png)
 
-2. 选择一个 Visual Studio 版本（vs2005 … vs2022）。脚本会调用
-   `tools/premake/premake5_windows.exe` 生成 `build/<vsXXXX>/llbc_<vsXXXX>.sln`。
+2. 输入一个 Visual Studio 版本（`vs2017`、`vs2019` 或 `vs2022`）。脚本会调用
+   `tools/premake/premake5_windows.exe` 生成解决方案 `build/<vsXXXX>/llbc_<vsXXXX>.sln`。
 
    ![选择 VS 版本](../assets/img/llbc_win_configuration_choice_screenshot.png)
 
@@ -83,20 +78,22 @@ make -j4
 
    ![VS 项目列表](../assets/img/llbc_win_vs_projectlist_screenshot.png)
 
-## 路径四：Xcode（iOS）
+## 语言封装（Python / C# / Lua）
 
-iOS 使用预生成的工程，位于 `iOSBuild/`。
-
-## 语言封装
-
-在核心库之上，可分别构建 Python / C# / Lua 封装（依赖前述子模块）：
+本页的 CMake 与 Visual Studio 两条路径只构建 C++ 核心库与测试项目，**不含**语言封装。
+如需 `pyllbc` / `csllbc` / `lullbc`，需改用仓库根的 premake→make 构建（Linux/macOS）：
 
 ```bash
-make wraps                         # 全部封装
-make py_wrap                       # Python（pyllbc）
-make cs_wrap                       # C#（csllbc）
-make lu_wrap                       # Lua（lullbc）
+make wraps        # 全部封装
+make py_wrap      # 仅 Python
+make cs_wrap      # 仅 C#
+make lu_wrap      # 仅 Lua
 ```
+
+<div class="callout note" markdown="1">
+封装依赖对应子模块：`wrap/pyllbc/cpython`（Python）、`wrap/lullbc/lua`（Lua）。
+普通 clone 下它们存在但为空，务必先 `git submodule update --init --recursive`。
+</div>
 
 ## 下一步
 

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 480" width="760" height="480" role="img" aria-labelledby="t d">
+  <title id="t">llbc 五大模块与依赖关系</title>
+  <desc id="d">common 为基座，core、comm、app 逐层向上依赖；testcase 依赖 core。LLBC_Startup 按 common→core→comm→testcase→app 顺序初始化。</desc>
+  <defs>
+    <style>
+      .lbl { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif; }
+      .name { font-weight: 700; font-size: 17px; }
+      .role { font-size: 11.5px; }
+      .cap  { font-size: 12px; fill: #64748b; }
+      .edge { font-size: 12px; fill: #475569; font-weight: 600; }
+    </style>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto-start-reverse">
+      <path d="M0,0 L7,3 L0,6 Z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <!-- init order arrow (bottom -> top) -->
+  <line x1="96" y1="360" x2="96" y2="56" stroke="#94a3b8" stroke-width="2" marker-end="url(#arr)"/>
+  <text class="lbl edge" x="70" y="212" transform="rotate(-90 70 212)" text-anchor="middle" fill="#64748b">LLBC_Startup 初始化顺序</text>
+
+  <!-- dependency arrows (upper depends on lower) -->
+  <line x1="340" y1="106" x2="340" y2="130" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="340" y1="198" x2="340" y2="222" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="340" y1="290" x2="340" y2="314" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+  <text class="lbl edge" x="352" y="122" text-anchor="start">依赖 ↓</text>
+
+  <!-- app -->
+  <rect x="150" y="42" width="380" height="64" rx="12" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+  <text class="lbl name" x="340" y="68" text-anchor="middle" fill="#9a3412">app</text>
+  <text class="lbl role" x="340" y="90" text-anchor="middle" fill="#9a3412">LLBC_App · 进程级生命周期 / 多 Service 编排</text>
+
+  <!-- comm -->
+  <rect x="150" y="134" width="380" height="64" rx="12" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+  <text class="lbl name" x="340" y="160" text-anchor="middle" fill="#065f46">comm</text>
+  <text class="lbl role" x="340" y="182" text-anchor="middle" fill="#065f46">Service · Component · Session · Packet · 协议栈</text>
+
+  <!-- core -->
+  <rect x="150" y="226" width="380" height="64" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text class="lbl name" x="340" y="252" text-anchor="middle" fill="#1e40af">core</text>
+  <text class="lbl role" x="340" y="274" text-anchor="middle" fill="#1e40af">线程 · 定时器 · 日志 · 对象池 · Variant · 配置 · 事件</text>
+
+  <!-- common -->
+  <rect x="150" y="318" width="380" height="64" rx="12" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+  <text class="lbl name" x="340" y="344" text-anchor="middle" fill="#334155">common</text>
+  <text class="lbl role" x="340" y="366" text-anchor="middle" fill="#334155">平台/编译器抽象 · 错误码 · 基础类型(String/Stream) · 宏</text>
+
+  <!-- testcase -->
+  <rect x="562" y="226" width="176" height="64" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text class="lbl name" x="650" y="252" text-anchor="middle" fill="#5b21b6" font-size="15">testcase</text>
+  <text class="lbl role" x="650" y="274" text-anchor="middle" fill="#5b21b6">交互式测试基类</text>
+  <line x1="560" y1="258" x2="534" y2="258" stroke="#475569" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- caption -->
+  <text class="lbl cap" x="340" y="420" text-anchor="middle">一行 #include "llbc.h" 即按依赖顺序引入全部模块</text>
+</svg>
