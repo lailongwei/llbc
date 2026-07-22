@@ -51,10 +51,12 @@ endif()
 
 # Output compilers and linker.
 message(TRACE "c/c++ compiler/linker:")
-message(TRACE "==> c compiler: ${CMAKE_C_COMPILER}")
-message(TRACE "==> c++ compiler: ${CMAKE_CXX_COMPILER}")
-message(TRACE "==> linker: ${CMAKE_LINKER}")
-message(TRACE "==> stdc lib dir: ${STDC_LIB_DIR}")
+message(TRACE "==> cmake generator(CMAKE_GENERATOR): ${CMAKE_GENERATOR}")
+message(TRACE "==> cxx compiler: ${CMAKE_CXX_COMPILER}")
+message(TRACE "==> cxx compiler id(CMAKE_CXX_COMPILER_ID): ${CMAKE_CXX_COMPILER_ID}")
+message(TRACE "==> c compiler(CMAKE_C_COMPILER): ${CMAKE_C_COMPILER}")
+message(TRACE "==> c compiler(CMAKE_C_COMPILER_ID): ${CMAKE_C_COMPILER_ID}")
+message(TRACE "==> cmake linker(CMAKE_LINKER): ${CMAKE_LINKER}")
 
 # Build type && Configuration types detect.
 if (CMAKE_CONFIGURATION_TYPES)
@@ -131,11 +133,24 @@ set(LLBC_VERSION "${LLBC_MAJOR_VERSION}.${LLBC_MINOR_VERSION}.${LLBC_UPDATE_NUMB
 
 message(STATUS "llbc framework version: ${LLBC_VERSION}")
 
-# Common build settings carrier (mirror premake workspace-level c++ settings).
-# Only llbc's own targets link this; 3rdparty(googletest) must NOT inherit -Werror etc.
+# Common build settings carrier: llbc_sln_build_settings.
+# Enable more strict warnings and enable all warnings as errors.
 add_library(llbc_sln_build_settings INTERFACE)
-if (NOT MSVC)
+if (MSVC)
+    # msvc compiler option warning level: 
+	# - https://learn.microsoft.com/en-us/cpp/build/reference/compiler-option-warning-level?view=msvc-170
+	#
+	# Disable warnings:
+	# - C4251: https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4251?view=msvc-170
+	# - C4819: https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4819?view=msvc-170
+	target_compile_options(llbc_sln_build_settings INTERFACE /WX /W3 /wd4251 /wd4819)
+else()
 	target_compile_options(llbc_sln_build_settings INTERFACE -Wall -Werror -Wno-strict-aliasing)
+endif()
+
+# Enable multi-threaded compilation.
+if (MSVC)
+	target_compile_options(llbc_sln_build_settings INTERFACE /MP)
 endif()
 
 # DEBUG macro on debug builds (mirror premake "configurations:debug*" defines { "DEBUG" }).
