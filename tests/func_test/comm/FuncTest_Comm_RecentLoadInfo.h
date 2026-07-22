@@ -43,5 +43,6 @@ private:
     int Test_LargeSampleCount();
     int Test_ExceedMaxSampleCount();
     int Test_PartialSampleAtBoundary();
+    int Test_QueryCache();
     int Test_ToString();
 };
