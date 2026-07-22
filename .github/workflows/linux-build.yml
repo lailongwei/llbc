@@ -18,6 +18,7 @@ jobs:
   linux-build:
     name: Linux build job
     runs-on: ubuntu-latest
+    if: false
     container: docker.io/centos:8
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."

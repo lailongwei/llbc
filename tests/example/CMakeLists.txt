@@ -1,10 +1,8 @@
-project(llbc_example)
-
 # Recurse all cpp files.
 file(GLOB_RECURSE LLBC_LIB_EXAMPLE_SRC_FILES *.cpp)
 
 # Build link static llbc library executable.
-set(LLBC_LIB_EXAMPLE_LINK_STATIC_EXE ${PROJECT_NAME}_static)
+set(LLBC_LIB_EXAMPLE_LINK_STATIC_EXE example_static)
 add_executable(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE} ${LLBC_LIB_EXAMPLE_SRC_FILES})
 target_include_directories(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE}
                            PRIVATE ${LLBC_LIB_EXAMPLE_DIR})
@@ -13,7 +11,7 @@ target_link_libraries(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE}
 llbc_apply_config_postfix(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE})
 
 # Build link shared llbc library executable.
-set(LLBC_LIB_EXAMPLE_LINK_SHARED_EXE ${PROJECT_NAME}_shared)
+set(LLBC_LIB_EXAMPLE_LINK_SHARED_EXE example_shared)
 add_executable(${LLBC_LIB_EXAMPLE_LINK_SHARED_EXE} ${LLBC_LIB_EXAMPLE_SRC_FILES})
 target_include_directories(${LLBC_LIB_EXAMPLE_LINK_SHARED_EXE}
                            PRIVATE ${LLBC_LIB_EXAMPLE_DIR})

@@ -22,7 +22,9 @@ iOSBuild/*.xcodeproj/xcuserdata/
 iOSBuild/*.xcodeproj/project.xcworkspace/xcuserdata/
 
 build/
+build_debug/
 cmake_build/
+cmake_build_debug/
 output/
 
 # wrap/lullbc

@@ -38,6 +38,9 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
+# Reset Release cxx flags to: '-O2 -DNDEBUG'.
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+
 # Set c/cxx compilers and linker, if needed.
 if (LLBC_CUSTOM_COMPILE_TOOLSET_DIR)
 	message(STATUS "Use custom c/cpp compile toolset, dir:${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}")
@@ -64,13 +67,19 @@ else()
 endif()
 
 # Debug/asan target file suffix (mirror premake targetsuffix: _debug / _asan / _asan_debug).
-# Note: 
-# - Apply notes:
-#           Var						|    cmake supported  | lib target | exe target
-#      CMAKE_DEBUG_POSTFIX          |           Y	      |     Y      |     N
-#      CMAKE_RELEASE_POSTFIX        |           N	      |     N      |     N
-#   CMAKE_RELWITHDEBINFO_POSTFIX    |           N	      |     N      |     N
-#     CMAKE_MINSIZEREL_POSTFIX      |           N	      |     N      |     N
+# Notes:
+# - CMake only auto-reads CMAKE_DEBUG_POSTFIX and applies it to a library target's DEBUG_POSTFIX
+#   property. The other three variables are NOT auto-read by CMake; they must be applied manually
+#   via set_target_properties() (see the llbc_apply_config_postfix helper below).
+# - The <CONFIG>_POSTFIX property does not affect executable targets by default. CMake 3.27+ added
+#   CMAKE_EXECUTABLE_ENABLE_DEBUG_POSTFIX to opt-in for DEBUG_POSTFIX on exe targets, but the
+#   Release-series postfixes still do not apply to executables.
+#
+#           Var                     | auto-read by cmake | apply on lib (via property) | apply on exe
+#      CMAKE_DEBUG_POSTFIX          |         Y          |            Y                |    N (3.27+ opt-in)
+#      CMAKE_RELEASE_POSTFIX        |         N          |            Y (manual)       |    N
+#   CMAKE_RELWITHDEBINFO_POSTFIX    |         N          |            Y (manual)       |    N
+#     CMAKE_MINSIZEREL_POSTFIX      |         N          |            Y (manual)       |    N
 if (LLBC_ENABLE_ASAN)
 	set(CMAKE_DEBUG_POSTFIX _asan_debug)
 	set(CMAKE_RELEASE_POSTFIX _asan)
@@ -96,29 +105,29 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif()
 
 # Generate LLBC_VERSION.
-set(LLBC_PY_CFG_FILE_PATH "${LLBC_TOP_DIR}/tools/build_scripts/com/cfg.py")
 file(STRINGS
-	 "${LLBC_PY_CFG_FILE_PATH}"
-	 LLBC_VERSION_LINES
-	 REGEX "^[ \t]*LIB_VER[ \t]*=[ \t]*'([0-9]+\\.[0-9]+\\.[0-9]+)'")
-if (NOT LLBC_VERSION_LINES)
-    message(FATAL_ERROR "LLBC_VER variable not found in cfg.py, dir: ${CMAKE_SOURCE_DIR}")
+	 "${LLBC_LIB_DIR}/src/common/Version.cpp"
+	 _llbc_version_lines
+	 REGEX "^[ \t]*int[ \t]+LLBC_[a-zA-Z0-9_]+[ \t]*=[ \t]*([0-9]+);")
+
+if (NOT _llbc_version_lines)
+	message(FATAL_ERROR "Version.cpp not found: ${LLBC_LIB_DIR}/src/common/Version.cpp")
 endif()
 
-list(GET LLBC_VERSION_LINES 0 LLBC_VERSION_LINE)
-string(REGEX MATCH "'([0-9]+\\.[0-9]+\\.[0-9]+)'" _ "${LLBC_VERSION_LINE}")
-set(LLBC_VERSION "${CMAKE_MATCH_1}")
-if (NOT LLBC_VERSION)
-	message(FATAL_ERROR "Failed to get llbc framework version")
+foreach(_llbc_version_line ${_llbc_version_lines})
+	if (_llbc_version_line MATCHES "LLBC_majorVersion[ \t]*=[ \t]*([0-9]+)")
+		set(LLBC_MAJOR_VERSION ${CMAKE_MATCH_1})
+	elseif (_llbc_version_line MATCHES "LLBC_minorVersion[ \t]*=[ \t]*([0-9]+)")
+		set(LLBC_MINOR_VERSION ${CMAKE_MATCH_1})
+	elseif (_llbc_version_line MATCHES "LLBC_updateNo[ \t]*=[ \t]*([0-9]+)")
+		set(LLBC_UPDATE_NUMBER ${CMAKE_MATCH_1})
+	endif()
+endforeach()
+if  (NOT LLBC_MAJOR_VERSION OR NOT LLBC_MINOR_VERSION OR NOT LLBC_UPDATE_NUMBER)
+	message(FATAL_ERROR "Illegal version config")
 endif()
 
-string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$" _ "${LLBC_VERSION}")
-set(LLBC_MAJOR_VERSION ${CMAKE_MATCH_1})
-set(LLBC_MINOR_VERSION ${CMAKE_MATCH_2})
-set(LLBC_UPDATE_NUMBER ${CMAKE_MATCH_3})
-if (NOT LLBC_MAJOR_VERSION OR NOT LLBC_MINOR_VERSION OR NOT LLBC_UPDATE_NUMBER)
-    message(FATAL_ERROR "LLBC_VER version config illegal")
-endif()
+set(LLBC_VERSION "${LLBC_MAJOR_VERSION}.${LLBC_MINOR_VERSION}.${LLBC_UPDATE_NUMBER}")
 
 message(STATUS "llbc framework version: ${LLBC_VERSION}")
 
@@ -166,13 +175,23 @@ if (LLBC_ENABLE_COVERAGE AND NOT MSVC)
 	target_link_options(llbc_sln_build_settings INTERFACE -fprofile-instr-generate -fcoverage-mapping)
 endif()
 
+# googletest submodule configuration.
+if (EXISTS "${LLBC_3RD_DIR_GOOGLETEST}/CMakeLists.txt")
+	# Skip building gmock.
+	set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+	# Skip installation of googletest.
+	set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+	# For Windows: Force use dynamic CRT(/MD /MDd) for googletest.
+	if (WIN32)
+		set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+	endif()
+endif()
+
 # Function: Apply config postfix to all targets.
 function(llbc_apply_config_postfix)
-    foreach(_tgt IN LISTS ARGN)
-        set_target_properties(${_tgt} PROPERTIES
-            DEBUG_POSTFIX          "${CMAKE_DEBUG_POSTFIX}"
-            RELEASE_POSTFIX        "${CMAKE_RELEASE_POSTFIX}"
-            RELWITHDEBINFO_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}"
-            MINSIZEREL_POSTFIX     "${CMAKE_MINSIZEREL_POSTFIX}")
-    endforeach()
-endfunction() 
+    set_target_properties(${ARGN} PROPERTIES
+        DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
+        RELEASE_POSTFIX "${CMAKE_RELEASE_POSTFIX}"
+        RELWITHDEBINFO_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}"
+        MINSIZEREL_POSTFIX "${CMAKE_MINSIZEREL_POSTFIX}")
+endfunction()

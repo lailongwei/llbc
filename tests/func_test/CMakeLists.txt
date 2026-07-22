@@ -1,5 +1,3 @@
-project(llbc_func_test)
-
 # Recurse all cpp files.
 file(GLOB_RECURSE LLBC_LIB_FUNC_TEST_SRC_FILES *.cpp)
 
@@ -18,7 +16,7 @@ add_custom_target(llbc_func_test_copy_cfg
     VERBATIM)
 
 # Build link static llbc library executable.
-set(LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE ${PROJECT_NAME}_static)
+set(LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE func_test_static)
 add_executable(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE} ${LLBC_LIB_FUNC_TEST_SRC_FILES})
 target_include_directories(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE}
                            PRIVATE ${LLBC_LIB_FUNC_TEST_DIR})
@@ -28,7 +26,7 @@ llbc_apply_config_postfix(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE})
 add_dependencies(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE} llbc_func_test_copy_cfg)
 
 # Build link shared llbc library executable.
-set(LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE ${PROJECT_NAME}_shared)
+set(LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE func_test_shared)
 add_executable(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE} ${LLBC_LIB_FUNC_TEST_SRC_FILES})
 target_include_directories(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE}
                            PRIVATE ${LLBC_LIB_FUNC_TEST_DIR})

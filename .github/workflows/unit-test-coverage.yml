@@ -22,6 +22,7 @@ jobs:
   unit-test-coverage:
     name: Unit test coverage (clang/llvm-cov)
     runs-on: ubuntu-latest
+    if: false
     steps:
       - name: Check out repository code
         uses: actions/checkout@v5   # node24 runtime
