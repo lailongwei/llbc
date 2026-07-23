@@ -174,6 +174,7 @@ void OnEvent(int eventType, const LLBC_Variant &eventParams) override
 - 真实用例：
   - `tests/func_test/comm/FuncTest_Comm_Echo.cpp`
   - `tests/func_test/comm/FuncTest_Comm_SvcBase.cpp`
+- 快速上手示例（可跑）：`tests/example/comm/Example_Comm_Session.cpp`
 
 ## 下一步
 

@@ -137,6 +137,7 @@ thread_local LLBC_Random tl_rng(static_cast<uint32>(std::hash<std::thread::id>{}
 - 头文件：`llbc/include/llbc/core/random/Random.h`
 - 内联实现：`llbc/include/llbc/core/random/RandomInl.h`
 - 功能测试：`tests/func_test/core/random/FuncTest_Core_Random.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Random.cpp`
 
 ## 下一步
 

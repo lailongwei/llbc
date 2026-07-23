@@ -609,7 +609,7 @@ template <typename _RawTy>
 LLBC_FORCE_INLINE int LLBC_Packet::WriteRawType(_RawTy val)
 {
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
-    LLBC_Host2Net(val);
+    val = LLBC_Host2Net(val);
 #endif // LLBC_CFG_COMM_ORDER_IS_NET_ORDER
 
     return GetMutablePayload(sizeof(val))->Write(&val, sizeof(val));
@@ -633,4 +633,3 @@ inline std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Packet &pack
 {
     return (o << packet.ToString());
 }
-

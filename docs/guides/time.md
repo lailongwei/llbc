@@ -271,6 +271,7 @@ LLBC_Time t = LLBC_Time::FromTimeStr("2024/07/01 20.05.08#123456", sep);
 - 头文件：`llbc/include/llbc/core/time/TimeSpan.h`
 - 头文件：`llbc/include/llbc/core/time/TimeConst.h`
 - 功能测试：`tests/func_test/core/time/FuncTest_Core_Time_Time.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Time.cpp`
 
 ## 下一步
 

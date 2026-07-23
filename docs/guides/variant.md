@@ -230,3 +230,4 @@ union Data
 - 头文件：`llbc/include/llbc/core/variant/Variant.h`
 - 功能测试：`tests/func_test/core/variant/FuncTest_Core_Variant.cpp`
 - 单元测试：`tests/unit_test/core/variant/UnitTest_Core_Variant.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Variant.cpp`

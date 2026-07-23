@@ -163,3 +163,4 @@ service 会在每帧结束时对当前线程的池栈做一次 <code>Purge()</co
   `llbc/include/llbc/core/objbase/AutoReleasePoolStack.h`
 - 手动 Retain/Release 示例：`tests/func_test/core/objbase/FuncTest_Core_ObjBase_Object.cpp`
 - AutoRelease + service 池示例：`tests/func_test/comm/FuncTest_Comm_ReleasePool.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Object.cpp`

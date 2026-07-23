@@ -133,3 +133,4 @@ Obj *Acquire()
 - 头文件：`llbc/include/llbc/core/objpool/ObjPool.h`、`llbc/include/llbc/core/objpool/ThreadSpecObjPool.h`
 - 内联实现：`llbc/include/llbc/core/objpool/ObjPoolInl.h`
 - 示例 / 测试：`tests/func_test/core/objpool/FuncTest_Core_ObjPool.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_ObjPool.cpp`

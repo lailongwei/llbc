@@ -48,8 +48,7 @@ CORELIB_TESTS_TARGET 		:= tests
 CORELIB_EXAMPLE_TARGET 		:= example
 CORELIB_FUNC_TEST_TARGET  	:= func_test
 CORELIB_UNIT_TEST_TARGET  	:= unit_test
-CORELIB_QUICK_START_TARGET 	:= quick_start
-ALL_CORELIB_TEST_TARGETS    := $(CORELIB_EXAMPLE_TARGET) $(CORELIB_FUNC_TEST_TARGET) $(CORELIB_UNIT_TEST_TARGET) $(CORELIB_QUICK_START_TARGET)
+ALL_CORELIB_TEST_TARGETS    := $(CORELIB_EXAMPLE_TARGET) $(CORELIB_FUNC_TEST_TARGET) $(CORELIB_UNIT_TEST_TARGET)
 
 WRAPS_TARGET      			:= wraps
 PYWRAP_TARGET       		:= py_wrap
@@ -152,8 +151,6 @@ help:
 	$(call output,"\ \ \ - make c++ core library test target: $(CORELIB_FUNC_TEST_TARGET)","true")
 	$(call output_g,"make\ $(CORELIB_UNIT_TEST_TARGET)")
 	$(call output,"\ \ \ - make c++ core library test target: $(CORELIB_UNIT_TEST_TARGET)","true")
-	$(call output_g,"make\ $(CORELIB_QUICK_START_TARGET)")
-	$(call output," - make c++ core library test target: quick start target","true")
 	$(call output,"","true")
 	$(call output_g,"make\ $(WRAPS_TARGET)")
 	$(call output,"\ \ \ \ \ \ \ - make all language specificed warpped libraries[$(ALL_WRAP_TARGETS)]","true")
@@ -178,8 +175,6 @@ help:
 	$(call output,"\ \ \ - remove '$(CORELIB_FUNC_TEST_TARGET)' target output files","true")
 	$(call output_g,"make\ clean_$(CORELIB_UNIT_TEST_TARGET)")
 	$(call output,"\ \ \ - remove '$(CORELIB_UNIT_TEST_TARGET)' target output files","true")
-	$(call output_g,"make\ clean_$(CORELIB_QUICK_START_TARGET)")
-	$(call output," - remove '$(CORELIB_QUICK_START_TARGET)' target output files","true")
 	$(call output,"","true")
 	$(call output_g,"make\ clean_$(WRAPS_TARGET)")
 	$(call output,"\ \ \ \ \ \ \ - remove all wrap targets[$(WRAPS_TARGET)] output files","true")
@@ -226,9 +221,6 @@ $(CORELIB_FUNC_TEST_TARGET): $(CORELIB_TARGET)
 $(CORELIB_UNIT_TEST_TARGET): $(CORELIB_TARGET)
 	@cd $(BUILD_DIR) && $(MAKE) unit_test_shared
 	@cd $(BUILD_DIR) && $(MAKE) unit_test_static
-$(CORELIB_QUICK_START_TARGET): $(CORELIB_TARGET)
-	@cd $(BUILD_DIR) && $(MAKE) quick_start_shared
-	@cd $(BUILD_DIR) && $(MAKE) quick_start_static
 
 $(WRAPS_TARGET): $(ALL_WRAP_TARGETS)
 $(PYWRAP_TARGET): $(CORELIB_TARGET)
@@ -254,8 +246,6 @@ clean_$(CORELIB_FUNC_TEST_TARGET):
 	@if [ -e $(BUILD_DIR)/tests/func_test/Makefile ]; then cd $(BUILD_DIR)/tests/func_test && $(MAKE) clean; fi
 clean_$(CORELIB_UNIT_TEST_TARGET):
 	@if [ -e $(BUILD_DIR)/tests/unit_test/Makefile ]; then cd $(BUILD_DIR)/tests/unit_test && $(MAKE) clean; fi
-clean_$(CORELIB_QUICK_START_TARGET):
-	@if [ -e $(BUILD_DIR)/tests/quick_start/Makefile ]; then cd $(BUILD_DIR)/tests/quick_start && $(MAKE) clean; fi
 
 clean_$(WRAPS_TARGET): $(addprefix clean_,$(ALL_WRAP_TARGETS))
 clean_$(PYWRAP_TARGET):

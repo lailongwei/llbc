@@ -153,6 +153,7 @@ public:
 - 头文件：`llbc/include/llbc/comm/Component.h`
 - 示例：`tests/func_test/comm/FuncTest_Comm_SvcBase.cpp`（含 `OnInit`/`OnStart`/`OnUpdate`/`OnEvent` 重写）
 - 迁移日志：仓库根 `CHANGELOG`（第 17、26 条）
+- 快速上手示例（可跑）：`tests/example/comm/Example_Comm_LifecycleEvent.cpp`
 
 ## 下一步
 

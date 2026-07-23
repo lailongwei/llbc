@@ -24,7 +24,7 @@
 #include "llbc.h"
 using namespace llbc;
 
-class QuickStart_HelloWorld : public LLBC_BaseTestCase
+class Example_Core_Random : public LLBC_BaseTestCase
 {
 public:
     int Run(int argc, char *argv[]) override;
