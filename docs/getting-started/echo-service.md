@@ -188,6 +188,7 @@ g++ -std=c++17 -Illbc/include main.cpp -Loutput/gmake2/debug64 -lllbc_debug -o e
   - `llbc/include/llbc/comm/Packet.h`
   - `llbc/include/llbc/comm/Component.h`
   - `llbc/include/llbc/comm/protocol/RawProtocolFactory.h`
+- 快速上手示例（可跑）：`tests/example/comm/Example_Comm_EchoService.cpp`
 
 ## 下一步
 

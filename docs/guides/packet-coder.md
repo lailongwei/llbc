@@ -177,6 +177,7 @@ if (complete)
 - 头文件：`llbc/include/llbc/comm/PacketHeaderAssembler.h`
 - 功能测试（Coder 完整示例）：`tests/func_test/comm/FuncTest_Comm_SvcBase.cpp`
 - 功能测试（Packet 读写）：`tests/func_test/comm/FuncTest_Comm_PacketOp.cpp`
+- 快速上手示例（可跑）：`tests/example/comm/Example_Comm_PacketCoder.cpp`
 
 ## 下一步
 

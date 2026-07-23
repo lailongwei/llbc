@@ -31,7 +31,7 @@ git submodule update --init tests/3rdparty/googletest
 ## 路径一：CMake（Linux / macOS）
 
 要求 CMake **≥ 3.16**。构建 C++ 核心库（`llbc_lib` 静态库 + `llbc_lib_shared` 动态库）
-与四个 `tests/` 项目（`example`、`func_test`、`unit_test`、`quick_start`）。
+与三个 `tests/` 项目（`example`、`func_test`、`unit_test`）。
 
 ```bash
 mkdir cmake_build && cd cmake_build

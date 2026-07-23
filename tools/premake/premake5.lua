@@ -459,49 +459,6 @@ project "unit_test"
     prebuildcommands { string.format(prebuild_cmd, llbc_arch_type .. llbc_arch_connect_char .. '64', 'release64') }
     filter {}
 
--- quick start project:
-project "quick_start"
-    -- laugnage, kind.
-    language "c++"
-    kind "ConsoleApp"
-
-    -- toolset.
-    if llbc_ccpp_compile_toolset ~= nil and llbc_ccpp_compile_toolset ~= '' then
-        toolset(llbc_ccpp_compile_toolset)
-    end
-
-    -- dependents.
-    dependson {
-        "llbc",
-    }
-
-    -- files.
-    files {
-        llbc_core_lib_quick_start_path .. "/**.h",
-        llbc_core_lib_quick_start_path .. "/**.cpp",
-        llbc_core_lib_quick_start_path .. "/**.xml",
-        llbc_core_lib_quick_start_path .. "/**.cfg",
-        llbc_core_lib_quick_start_path .. "/**.ini",
-    }
-
-    -- include llbc core lib.
-    include_llbc_core_lib()
-
-    -- includedirs.
-    includedirs {
-        llbc_core_lib_quick_start_path,
-    }
-
-    -- Enable c++17 support.
-    filter { "system:not windows" }
-        buildoptions {
-            "-std=c++17",
-        }
-    filter {}
-
-    -- Specific debug directory.
-    debugdir(llbc_output_dir)
-
 -- example project:
 project "example"
     -- language, kind.

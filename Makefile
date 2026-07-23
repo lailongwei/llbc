@@ -41,8 +41,7 @@ CORELIB_TESTS_TARGET 		:= tests
 CORELIB_EXAMPLE_TARGET 		:= example
 CORELIB_FUNC_TEST_TARGET  	:= func_test
 CORELIB_UNIT_TEST_TARGET  	:= unit_test
-CORELIB_QUICK_START_TARGET 	:= quick_start
-ALL_CORELIB_TEST_TARGETS    := $(CORELIB_EXAMPLE_TARGET) $(CORELIB_FUNC_TEST_TARGET) $(CORELIB_UNIT_TEST_TARGET) $(CORELIB_QUICK_START_TARGET)
+ALL_CORELIB_TEST_TARGETS    := $(CORELIB_EXAMPLE_TARGET) $(CORELIB_FUNC_TEST_TARGET) $(CORELIB_UNIT_TEST_TARGET)
 
 WRAPS_TARGET      			:= wraps
 PYWRAP_TARGET       		:= py_wrap
@@ -71,7 +70,6 @@ ifeq ($(DEBUG_OPT),RELEASE)
   CORELIB_EXAMPLE_TARGET_NAME  		:= example$(EXE_SUFFIX)
   CORELIB_FUNC_TEST_TARGET_NAME  	:= func_test$(EXE_SUFFIX)
   CORELIB_UNIT_TEST_TARGET_NAME  	:= unit_test$(EXE_SUFFIX)
-  CORELIB_QUICK_START_TARGET_NAME  	:= quick_start$(EXE_SUFFIX)
   PYWRAP_TARGET_NAME     			:= llbc$(DYNLIB_SUFFIX)
   LUWRAP_TARGET_NAME     			:= lullbc$(DYNLIB_SUFFIX)
 else
@@ -79,7 +77,6 @@ else
   CORELIB_EXAMPLE_TARGET_NAME  		:= example$(DEBUG_SUFFIX)$(EXE_SUFFIX)
   CORELIB_FUNC_TEST_TARGET_NAME  	:= func_test$(DEBUG_SUFFIX)$(EXE_SUFFIX)
   CORELIB_UNIT_TEST_TARGET_NAME  	:= unit_test$(DEBUG_SUFFIX)$(EXE_SUFFIX)
-  CORELIB_QUICK_START_TARGET_NAME  	:= quick_start$(DEBUG_SUFFIX)$(EXE_SUFFIX)
   PYWRAP_TARGET_NAME     			:= llbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
   LUWRAP_TARGET_NAME     			:= lullbc$(DEBUG_SUFFIX)$(DYNLIB_SUFFIX)
 endif
@@ -88,7 +85,6 @@ CORELIB_TARGET_PATH    				:= $(ALL_TARGETS_OUTPUT)/$(CORELIB_TARGET_NAME)
 CORELIB_EXAMPLE_TARGET_PATH   		:= $(ALL_TARGETS_OUTPUT)/$(CORELIB_EXAMPLE_TARGET_NAME)
 CORELIB_FUNC_TEST_TARGET_PATH   	:= $(ALL_TARGETS_OUTPUT)/$(CORELIB_FUNC_TEST_TARGET_NAME)
 CORELIB_UNIT_TEST_TARGET_PATH   	:= $(ALL_TARGETS_OUTPUT)/$(CORELIB_UNIT_TEST_TARGET_NAME)
-CORELIB_QUICK_START_TARGET_PATH   	:= $(ALL_TARGETS_OUTPUT)/$(CORELIB_QUICK_START_TARGET_NAME)
 PYWRAP_TARGET_PATH     				:= $(ALL_TARGETS_OUTPUT)/$(PYWRAP_TARGET_NAME)
 LUWRAP_TARGET_PATH     				:= $(ALL_TARGETS_OUTPUT)/$(LUWRAP_TARGET_NAME)
 
@@ -178,8 +174,6 @@ help:
 	$(call output,"\ \ \ - make c++ core library test target: $(CORELIB_FUNC_TEST_TARGET)","true")
 	$(call output_g,"make $(CORELIB_UNIT_TEST_TARGET)")
 	$(call output,"\ \ \ - make c++ core library test target: $(CORELIB_UNIT_TEST_TARGET)","true")
-	$(call output_g,"make $(CORELIB_QUICK_START_TARGET)")
-	$(call output," - make c++ core library test target: quick start target","true")
 	$(call output,"","true")
 	$(call output_g,"make $(WRAPS_TARGET)")
 	$(call output,"\ \ \ \ \ \ \ - make all language specificed warpped libraries[$(ALL_WRAP_TARGETS)]","true")
@@ -204,8 +198,6 @@ help:
 	$(call output,"\ \ \ - remove '$(CORELIB_FUNC_TEST_TARGET)' target output files","true")
 	$(call output_g,"make clean_$(CORELIB_UNIT_TEST_TARGET)")
 	$(call output,"\ \ \ - remove '$(CORELIB_UNIT_TEST_TARGET)' target output files","true")
-	$(call output_g,"make clean_$(CORELIB_QUICK_START_TARGET)")
-	$(call output," - remove '$(CORELIB_QUICK_START_TARGET)' target output files","true")
 	$(call output,"","true")
 	$(call output_g,"make clean_$(WRAPS_TARGET)")
 	$(call output,"\ \ \ \ \ \ \ - remove all wrap targets[$(WRAPS_TARGET)] output files","true")
@@ -247,8 +239,6 @@ $(CORELIB_FUNC_TEST_TARGET): $(CORELIB_TARGET)
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f func_test.make
 $(CORELIB_UNIT_TEST_TARGET): $(CORELIB_TARGET)
 	$(MAKE) -C build/$(PREMAKE_ACTION) -f unit_test.make
-$(CORELIB_QUICK_START_TARGET): $(CORELIB_TARGET)
-	$(MAKE) -C build/$(PREMAKE_ACTION) -f quick_start.make
 
 $(WRAPS_TARGET): $(ALL_WRAP_TARGETS)
 $(PYWRAP_TARGET): $(CORELIB_TARGET)
@@ -280,8 +270,6 @@ clean_$(CORELIB_UNIT_TEST_TARGET):
 	@if [ -e build/$(PREMAKE_ACTION)/unit_test.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f unit_test.make clean; fi
 	@echo "Cleaning up googletest build directory ..."
 	@if [ -e tests/3rdparty/googletest/build ]; then \rm -rf tests/3rdparty/googletest/build ; fi
-clean_$(CORELIB_QUICK_START_TARGET):
-	@if [ -e build/$(PREMAKE_ACTION)/quick_start.make ]; then $(MAKE) -C build/$(PREMAKE_ACTION) -f quick_start.make clean; fi
 
 clean_$(WRAPS_TARGET): $(addprefix clean_,$(ALL_WRAP_TARGETS))
 clean_$(PYWRAP_TARGET):

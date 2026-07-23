@@ -150,6 +150,7 @@ if (!ptr)
   - `llbc/include/llbc/common/Exceptions.h` — 异常类
   - `llbc/include/llbc/common/Macro.h` — `LLBC_OK` / `LLBC_FAILED`
 - 真实示例：`tests/func_test/common/FuncTest_Com_Error.cpp`
+- 快速上手示例（可跑）：`tests/example/common/Example_Common_ErrorHandling.cpp`
 
 ## 下一步
 

@@ -202,6 +202,7 @@ LLBC_Directory::CacheDir();       // 缓存目录
 - 头文件：`llbc/include/llbc/core/file/Directory.h`、`DirectoryInl.h`
 - 功能测试：`tests/func_test/core/file/FuncTest_Core_File_File.cpp`
 - 功能测试：`tests/func_test/core/file/FuncTest_Core_File_Directory.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_FileDirectory.cpp`
 
 ## 下一步
 

@@ -178,6 +178,7 @@ tests/ 真实示例：
 - `tests/func_test/core/utils/FuncTest_Core_Utils_Text.cpp`
 - `tests/func_test/core/utils/FuncTest_Core_Utils_Network.cpp`
 - `tests/func_test/core/utils/FuncTest_Core_Utils_Debug.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Utils.cpp`
 
 ## 下一步
 
