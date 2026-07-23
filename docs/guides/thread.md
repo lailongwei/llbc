@@ -223,6 +223,7 @@ g_tls.ClearValue();            // 清除并 delete 当前线程的值
 - `tests/func_test/core/thread/FuncTest_Core_Thread_Lock.cpp`
 - `tests/func_test/core/thread/FuncTest_Core_Thread_RWLock.cpp`
 - `tests/func_test/core/thread/FuncTest_Core_Thread_Tls.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Thread.cpp`
 
 ## 下一步
 

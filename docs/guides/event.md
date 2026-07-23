@@ -193,6 +193,7 @@ private:
 - 真实用例
   - `tests/func_test/core/event/FuncTest_Core_Event.cpp`（基础订阅/触发/退订、嵌套 Fire、死循环检测）
   - `tests/func_test/comm/FuncTest_Comm_EventInSvc.cpp`（Service 层 SubscribeEvent / BeginFireEvent 用法）
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Event.cpp`
 
 ---
 

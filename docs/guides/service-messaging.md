@@ -134,6 +134,13 @@ svc->Send(sessionId, /*opcode=*/2, buf, len);
 ```
 
 <div class="callout important" markdown="1">
+使用默认 `NormalProtocolFactory` 发送原始字节、且该 opcode **未**通过
+`AddCoderFactory` 注册 Coder 时，必须在 `Start()` 前调用
+`svc->SuppressCoderNotFoundWarning()`。否则 `CodecProtocol` 会丢弃收包，
+`Subscribe` 的 Handler 不会被调用。若注册了 CoderFactory，则不需要抑制。
+</div>
+
+<div class="callout important" markdown="1">
 无论 `Send` 成功与否，`LLBC_Packet *` 和 `LLBC_Coder *` 的所有权在调用后
 立即归框架管理；调用方绝不能在 `Send` 后再访问这两个指针。
 </div>
@@ -225,6 +232,7 @@ GetService()->AddComponentEvent(MyCompEv1, LLBC_Variant("hello"));
 - 头文件：`llbc/include/llbc/comm/Packet.h` / `PacketInl.h`
 - 头文件：`llbc/include/llbc/comm/Coder.h`
 - 功能测试（完整收发 + PreSubscribe + CoderFactory 示例）：`tests/func_test/comm/FuncTest_Comm_SvcBase.cpp`
+- 快速上手示例（可跑）：`tests/example/comm/Example_Comm_ServiceMessaging.cpp`
 
 ## 下一步
 

@@ -19,26 +19,26 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "stream/QuickStart_Stream.h"
+#include "core/Example_Core_Stream.h"
 
-// 玩家性别enum
+// Player sex enum
 enum class PlayerSex
 {
     Male,
     Female,
 };
 
-// 玩家数据, 可通过编译期探测进行序列化
+// Player data, serializable via compile-time detection
 struct PlayerData
 {
-    // 玩家Id
+    // Player id
     uint64 playerId;
-    // 玩家名
+    // Player name
     LLBC_String playerName;
 
-    // 玩家等级
+    // Player level
     int level;
-    // 玩家性别
+    // Player sex
     PlayerSex sex;
 
     // ToString
@@ -52,7 +52,7 @@ struct PlayerData
             sex == PlayerSex::Female ? "Female" : "Male");
     }
 
-    // 序列化支持
+    // Serialization support
     void Serialize(LLBC_Stream &stream) const
     {
         stream << playerId
@@ -61,7 +61,7 @@ struct PlayerData
                << sex;
     }
 
-    // 反序列化支持
+    // Deserialization support
     bool Deserialize(LLBC_Stream &stream)
     {
         stream >> playerId
@@ -73,24 +73,19 @@ struct PlayerData
     }
 };
 
-int QuickStart_Stream::Run(int argc, char *argv[])
+int Example_Core_Stream::Run(int argc, char *argv[])
 {
-    // 初始化llbc框架
-    LLBC_Startup();
-    // Defer清理llbc框架
-    LLBC_Defer(LLBC_Cleanup());
-
-    // 定义一个流对象
+    // Define a stream object
     LLBC_Stream stream;
-    // 通过ToString()方法看默认Stream信息
+    // Inspect the default stream info via ToString()
     LLBC_PrintLn("Default stream: %s", stream.ToString().c_str());
 
-    // 设置字节序为networld byte order, 默认为LLBC_DefaultEndian, 可通过Config.h中的配置修改默认字节序
+    // Set byte order to network byte order; defaults to LLBC_DefaultEndian, which can be changed via the config in Config.h
     stream.SetEndian(LLBC_Endian::NetEndian);
 
-    // ========================= 基础数据类型序列化, 反序列化 =========================
+    // ========================= Basic datatype serialize/deserialize =========================
     LLBC_PrintLn("Basic datatypes serialize/deserialize:");
-    // 序列化numbers/string数据
+    // Serialize numbers/string data
     stream << true // bool
            << -32 // int32
            << 32u // uint32
@@ -99,15 +94,15 @@ int QuickStart_Stream::Run(int argc, char *argv[])
            << 3.14f // float
            << 6.28 // double
            << "Hello World!"; // string
-    // 打印stream信息
+    // Print stream info
     LLBC_PrintLn("- After serialize numbers/string, stream: %s", stream.ToString().c_str());
 
-    // 轻量级构造stream(attach from buffer or another stream).
+    // Lightweight stream construction (attach from buffer or another stream).
     LLBC_Stream stream2;
     stream2.Attach(stream);
     LLBC_PrintLn("- Attach from stream, stream2: %s", stream2.ToString().c_str());
 
-    // 反序列化numbers/string数据
+    // Deserialize numbers/string data
     bool boolVal = false;
     sint32 int32Val = 0;
     uint32 uint32Val = 0;
@@ -124,7 +119,7 @@ int QuickStart_Stream::Run(int argc, char *argv[])
             >> floatVal
             >> doubleVal
             >> strVal;
-    // 打印stream信息及反序列化后的各numbers/string值(使用streaming方式输出)
+    // Print stream info and each deserialized number/string value (output via streaming)
     std::cout << "- After deserialize numbers/string, stream: " << stream << std::endl;
     LLBC_PrintLn("  - boolVal: %d", boolVal);
     LLBC_PrintLn("  - int32Val: %d", int32Val);
@@ -136,7 +131,7 @@ int QuickStart_Stream::Run(int argc, char *argv[])
     LLBC_PrintLn("  - strVal: %s", strVal.c_str());
     LLBC_PrintLn("\n");
 
-    // ========================= stl容器序列化/反序列化 =========================
+    // ========================= Stl container serialize/deserialize =========================
     LLBC_PrintLn("Stl container serialize/deserialize:");
     std::vector<std::map<LLBC_String, std::set<int> > > stlContainer = {
         {
@@ -145,20 +140,20 @@ int QuickStart_Stream::Run(int argc, char *argv[])
         }
     };
 
-    // reset stream读指针
-    // stream.SetReadPos(0); // 无需reset read指针, SetWritePos(0)时, read指针将自动规整
-    // reset stream写指针
+    // reset stream read pointer
+    // stream.SetReadPos(0); // no need to reset the read pointer; on SetWritePos(0) the read pointer is auto-clamped
+    // reset stream write pointer
     stream.SetWritePos(0);
 
-    // 执行读写
+    // Perform read/write
     decltype(stlContainer) stlContainer2;
     stream << stlContainer >> stlContainer2;
-    // Dump重新反序列化出来的结果(通过LLBC_Variant打印复杂容器)
+    // Dump the re-deserialized result (print the complex container via LLBC_Variant)
     LLBC_PrintLn("- After write & read stl container: %s, container:", LLBC_GetTypeName(stlContainer));
     LLBC_PrintLn("  - %s", LLBC_Variant(stlContainer2).ValueToString().c_str());
     LLBC_PrintLn("\n");
 
-    // ========================= 用户自定义类序列化 =========================
+    // ========================= User-defined class serialize =========================
     LLBC_PrintLn("User define class/struct serialize/deserialize:");
     PlayerData playerData {9527llu, "Judy", 99, PlayerSex::Female};
 

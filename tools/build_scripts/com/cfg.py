@@ -184,7 +184,7 @@ class _Cfg(object):
     @property
     def llbc_example_proj_path(self):
         """核心库 示例项目 路径"""
-        return op.join(self.llbc_test_projs_path, 'examples')
+        return op.join(self.llbc_test_projs_path, 'example')
 
     @property
     def llbc_func_test_proj_path(self):
@@ -195,11 +195,6 @@ class _Cfg(object):
     def llbc_unit_test_proj_path(self):
         """核心库 单元测试项目 路径"""
         return op.join(self.llbc_test_projs_path, 'unit_test')
-
-    @property
-    def llbc_quick_start_proj_path(self):
-        """核心库 快速开始项目 路径"""
-        return op.join(self.llbc_test_projs_path, 'quick_start')
     # endregion
 
     # region 包装库相关

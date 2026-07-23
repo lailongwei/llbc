@@ -136,6 +136,7 @@ make func_test config=debug64
 
 - 完整可运行示例：`tests/func_test/comm/FuncTest_Comm_SvcBase.cpp`（Service + Component + 编解码 + 收发）
 - 头文件：`llbc/include/llbc/comm/Service.h`、`llbc/include/llbc/comm/Component.h`
+- 快速上手示例（可跑）：`tests/example/comm/Example_Comm_FirstService.cpp`
 
 ## 下一步
 

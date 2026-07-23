@@ -12,6 +12,3 @@ else()
 	message(NOTICE "3rd - googletest not found(dir: ${LLBC_3RD_DIR_GOOGLETEST}), unit_test will be skipped")
 	message(NOTICE "- run <git submodule update --init tests/3rdparty/googletest> to update")
 endif()
-
-# Add quick start.
-add_subdirectory(${LLBC_LIB_QUICK_START_DIR})

@@ -19,7 +19,6 @@ set(LLBC_LIB_TESTS_DIR "${LLBC_TOP_DIR}/tests")
 set(LLBC_LIB_EXAMPLE_DIR ${LLBC_LIB_TESTS_DIR}/example)
 set(LLBC_LIB_FUNC_TEST_DIR ${LLBC_LIB_TESTS_DIR}/func_test)
 set(LLBC_LIB_UNIT_TEST_DIR ${LLBC_LIB_TESTS_DIR}/unit_test)
-set(LLBC_LIB_QUICK_START_DIR ${LLBC_LIB_TESTS_DIR}/quick_start)
 # - Set llbc wrap libraries directory.
 set(LLBC_WRAP_DIR ${LLBC_TOP_DIR}/wrap)
 # - 3rd direstories.

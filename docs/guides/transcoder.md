@@ -136,6 +136,7 @@ if (LLBC_Transcoder::MultiByteToMultiByte("GBK", src, "UTF-8", dest) != LLBC_OK)
 
 - 头文件：`llbc/include/llbc/core/transcoder/Transcoder.h`
 - func_test 示例：`tests/func_test/core/transcoder/FuncTest_Core_Transcoder.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Transcoder.cpp`
 
 ## 下一步
 

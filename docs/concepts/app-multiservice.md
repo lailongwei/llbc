@@ -203,6 +203,7 @@ LLBC_Cleanup();
   - `tests/func_test/app/FuncTest_App_AppCfgTest.cpp`（多 Service + 配置重载）
   - `tests/func_test/app/FuncTest_App_ReloadFailedTest.cpp`（重载失败处理）
   - `tests/func_test/app/FuncTest_App_AppPhaseWaitingTest.cpp`（多帧启停等待）
+- 快速上手示例（可跑）：`tests/example/app/Example_App_MultiService.cpp`
 
 ## 下一步
 
