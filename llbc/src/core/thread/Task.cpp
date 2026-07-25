@@ -100,9 +100,6 @@ int LLBC_Task::Activate(int threadNum,
     // Incr activate times.
     ++_activateTimes;
 
-    // Unlock
-    _lock.Unlock();
-
     return LLBC_OK;
 }
 

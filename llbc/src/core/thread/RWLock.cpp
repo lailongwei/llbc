@@ -79,6 +79,7 @@ void LLBC_RWLock::ReadLock()
         {
             _holder.readCond.Wait(_holder.lock);
         }
+        --_holder.r_wait;
     }
 
     _holder.r_active ++;
