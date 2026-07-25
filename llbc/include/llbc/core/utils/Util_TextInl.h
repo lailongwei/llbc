@@ -66,9 +66,12 @@ LLBC_FORCE_INLINE char *__LLBC_Integral2Str(_IntegralTy val, size_t *strLen)
     }
     else
     {
+        using _UnsignedTy = std::make_unsigned_t<_IntegralTy>;
+        _UnsignedTy magnitude = static_cast<_UnsignedTy>(val);
+        if (val < 0)
+            magnitude = _UnsignedTy(0) - magnitude;
         str = __LLBC_UIntegral2StrImpl<
-            std::make_unsigned_t<_IntegralTy>, _HexFormat>(
-                std::make_unsigned_t<_IntegralTy>(val < 0 ? -val : val), strEnd);
+            _UnsignedTy, _HexFormat>(magnitude, strEnd);
         if (val < 0)
             *--str = '-';
     }
@@ -98,7 +101,9 @@ LLBC_Num2Str2(_NumTy num, size_t *strLen)
     }
     else if constexpr (std::is_enum_v<_NumTy>)
     {
-        return LLBC_INL_NS __LLBC_Integral2Str<sint64, _HexFormat>(static_cast<sint64>(num), strLen);
+        using _UnderlyingTy = std::underlying_type_t<_NumTy>;
+        return LLBC_INL_NS __LLBC_Integral2Str<_UnderlyingTy, _HexFormat>(
+            static_cast<_UnderlyingTy>(num), strLen);
     }
     else if constexpr (std::is_integral_v<_NumTy>)
     {
@@ -163,12 +168,12 @@ LLBC_Num2Str(_NumTy num)
 }
 
 #define __LLBC_InlMacro_Num2StrProcessErr()           \
-    if (errno != 0) {                                 \
-        LLBC_SetLastError(LLBC_ERROR_CLIB);           \
+    if (strEnd == str) {                              \
+        LLBC_SetLastError(LLBC_ERROR_INVALID);        \
         return _NumTy();                              \
     }                                                 \
-    else if (strEnd == str) {                         \
-        LLBC_SetLastError(LLBC_ERROR_INVALID);        \
+    else if (errno != 0) {                            \
+        LLBC_SetLastError(LLBC_ERROR_CLIB);           \
         return _NumTy();                              \
     }                                                 \
     else if (*strEnd != '\0') {                       \

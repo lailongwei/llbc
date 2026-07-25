@@ -44,11 +44,18 @@ bool LLBC_IsIPv4Addr(const LLBC_String &addr)
         if (part.empty())
             return false;
 
+        uint32 value = 0;
         for (LLBC_String::size_type i = 0;
              i < part.length();
              i++)
+        {
             if (!('0' <= part[i] && part[i] <= '9'))
                 return false;
+
+            value = value * 10 + static_cast<uint32>(part[i] - '0');
+            if (value > 255)
+                return false;
+        }
     }
 
     return true;

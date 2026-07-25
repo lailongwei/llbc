@@ -91,7 +91,7 @@ void LLBC_VariantUtil::Xml2Variant(const LLBC_TINYXML2_NS XMLElement &elem, LLBC
 
     // Children elements.
     auto &childrenVar = var[LLBC_XMLKeys::Children];
-    childrenVar.Become<LLBC_Variant::Dict>();
+    childrenVar.Become<LLBC_Variant::Seq>();
 
     auto child = elem.FirstChildElement();
     for (; child; child = child->NextSiblingElement())
