@@ -54,7 +54,7 @@ public:
 
 public:
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    static const size_type npos = _Base::npos;
+    static constexpr size_type npos = _Base::npos;
 #endif
 
 public:

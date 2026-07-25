@@ -60,14 +60,14 @@ int LLBC_Endian::Str2Type(const char *str)
     lowerCaseStr[len] = '\0';
 
     int type;
-    if (memcmp(LLBC_INTERNAL_NS
-        __g_endian_type_desc[LLBC_Endian::BigEndian], lowerCaseStr, len) == 0)
+    if (strcmp(LLBC_INTERNAL_NS
+        __g_endian_type_desc[LLBC_Endian::BigEndian], lowerCaseStr) == 0)
     {
         type = LLBC_Endian::BigEndian;
         goto finally;
     }
-    else if (memcmp(LLBC_INTERNAL_NS
-        __g_endian_type_desc[LLBC_Endian::LittleEndian], lowerCaseStr, len) == 0)
+    else if (strcmp(LLBC_INTERNAL_NS
+        __g_endian_type_desc[LLBC_Endian::LittleEndian], lowerCaseStr) == 0)
     {
         type = LLBC_Endian::LittleEndian;
         goto finally;
