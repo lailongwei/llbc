@@ -48,6 +48,8 @@ int LLBC_Properties::LoadFromFile(const LLBC_String &filePath,
                                   LLBC_Variant &properties,
                                   LLBC_String *errMsg)
 {
+    properties.Become<void>();
+
     LLBC_File file;
     if (file.Open(filePath, LLBC_FileMode::TextRead) != LLBC_OK)
     {
@@ -59,7 +61,12 @@ int LLBC_Properties::LoadFromFile(const LLBC_String &filePath,
 
     const auto str = file.ReadToEnd();
     if (str.empty() && LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
+    {
+        LLBC_DoIf(errMsg,
+                  errMsg->format("Read properties file '%s' failed, error:%s",
+                                 filePath.c_str(), LLBC_FormatLastError()));
         return LLBC_FAILED;
+    }
 
     file.Close();
     return LoadFromString(str, properties, errMsg);
@@ -73,6 +80,7 @@ int LLBC_Properties::LoadFromString(const LLBC_String &str,
     LLBC_Strings keyItems;
 
     // Foreach parse property lines.
+    properties.Become<void>();
     properties.Become<LLBC_Variant::Dict>();
     const auto lines = str.split("\n", -1, true);
     for (size_t i = 0; i < lines.size(); ++i)
@@ -81,7 +89,10 @@ int LLBC_Properties::LoadFromString(const LLBC_String &str,
         value.clear();
         keyItems.clear();
         if (ParseLine(static_cast<int>(i) + 1, lines[i], keyItems, value, errMsg) != LLBC_OK)
+        {
+            properties.Become<void>();
             return LLBC_FAILED;
+        }
 
         // If keyItems is empty, continue.
         if (keyItems.empty())
@@ -145,9 +156,11 @@ int LLBC_Properties::SaveToString(const LLBC_Variant &properties,
         return LLBC_FAILED;
     }
 
-    if (SaveLine("", properties, content, errMsg) != LLBC_OK)
+    LLBC_String serialized;
+    if (SaveLine("", properties, serialized, errMsg) != LLBC_OK)
         return LLBC_FAILED;
 
+    content.swap(serialized);
     LLBC_DoIf(errMsg, errMsg->assign("Success"));
     
     return LLBC_OK;

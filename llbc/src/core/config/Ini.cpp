@@ -45,8 +45,7 @@ bool LLBC_IniSection::IsHasKey(const LLBC_String &key) const
 const LLBC_String &LLBC_IniSection::GetComment(const LLBC_String &key) const
 {
     _Comments::const_iterator it = _comments.find(key);
-    if (it == _comments.end() &&
-        _values.find(key) != _values.end())
+    if (it == _comments.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return __emptyStr;
@@ -67,7 +66,7 @@ int LLBC_IniSection::RemoveValue(const LLBC_String &key)
 
     _values.erase(valIt);
     _comments.erase(key);
-    (void)std::remove(_keys.begin(), _keys.end(), key);
+    _keys.erase(std::remove(_keys.begin(), _keys.end(), key), _keys.end());
 
     return LLBC_OK;
 }
@@ -134,9 +133,23 @@ int LLBC_Ini::LoadFromFile(const LLBC_String &file)
 {
     LLBC_File f(file, LLBC_FileMode::TextRead);
     if (!f.IsOpened())
+    {
+        _errMsg.format("open ini file '%s' failed, error:%s",
+                       file.c_str(),
+                       LLBC_FormatLastError());
         return LLBC_FAILED;
+    }
 
-    return LoadFromContent(f.ReadToEnd());
+    const LLBC_String content = f.ReadToEnd();
+    if (content.empty() && LLBC_GetLastError() != LLBC_ERROR_SUCCESS)
+    {
+        _errMsg.format("read ini file '%s' failed, error:%s",
+                       file.c_str(),
+                       LLBC_FormatLastError());
+        return LLBC_FAILED;
+    }
+
+    return LoadFromContent(content);
 }
 
 int LLBC_Ini::LoadFromContent(const LLBC_String &content)
@@ -187,15 +200,17 @@ int LLBC_Ini::SaveToFile(const LLBC_String &file, const LLBC_Strings &headerLine
 
 int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKeys) const
 {
-    LLBC_Strings *sortedSections = nullptr;
+    content.clear();
+
+    LLBC_Strings sortedSections;
     if (sortSections)
     {
-        sortedSections = new LLBC_Strings(_sectionNames);
-        std::sort(sortedSections->begin(), sortedSections->end());
+        sortedSections = _sectionNames;
+        std::sort(sortedSections.begin(), sortedSections.end());
     }
 
     const LLBC_Strings &finalSectionNames = 
-        sortedSections != nullptr ? *sortedSections : _sectionNames;
+        sortSections ? sortedSections : _sectionNames;
     for (LLBC_Strings::const_iterator sectionIt = finalSectionNames.begin();
          sectionIt != finalSectionNames.end();
          ++sectionIt)
@@ -208,12 +223,8 @@ int LLBC_Ini::SaveToContent(LLBC_String &content, bool sortSections, bool sortKe
             content.append_format(" %c %s", CommentBegin, section._sectionComment.c_str());
         EndLine(content);
 
-        LLBC_Strings sectionKeys;
+        LLBC_Strings sectionKeys = section._keys;
         const LLBC_IniSection::_Values &sectionValues = section._values;
-        for (LLBC_IniSection::_Values::const_iterator it = sectionValues.begin();
-             it != section._values.end();
-             ++it)
-            sectionKeys.push_back(it->first);
 
         if (sortKeys)
             std::sort(sectionKeys.begin(), sectionKeys.end());
@@ -291,8 +302,10 @@ int LLBC_Ini::SetSection(const LLBC_String &sectionName, const LLBC_IniSection &
             {
                 const LLBC_String &key = sectionIt->first;
                 LLBC_IniSection::_Comments::const_iterator commentIt = section._comments.find(key);
-                existSection.SetValue(key, sectionIt->second, 
+                existSection.SetValue(key, sectionIt->second,
                     commentIt != section._comments.end() ? commentIt->second : "");
+                if (commentIt == section._comments.end())
+                    existSection._comments.erase(key);
             }
 
             return LLBC_OK;
