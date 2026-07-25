@@ -92,18 +92,25 @@ int LLBC_Directory::Create(const LLBC_String &path)
             continue;
 
 #if LLBC_TARGET_PLATFORM_WIN32
-        if (!::CreateDirectoryA(toPath.c_str(), nullptr) &&
-            ::GetLastError() != ERROR_ALREADY_EXISTS)
+        if (!::CreateDirectoryA(toPath.c_str(), nullptr))
         {
-            LLBC_SetLastError(LLBC_ERROR_OSAPI);
-            return LLBC_FAILED;
+            const DWORD error = ::GetLastError();
+            if (error != ERROR_ALREADY_EXISTS || !Exists(toPath))
+            {
+                LLBC_SetLastError(LLBC_ERROR_OSAPI);
+                return LLBC_FAILED;
+            }
         }
 #else
-        if (mkdir(toPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0 &&
-            errno != EEXIST) // permission: rwxrwxr-x
+        if (mkdir(toPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) != 0)
         {
-            LLBC_SetLastError(LLBC_ERROR_CLIB);
-            return LLBC_FAILED;
+            const int error = errno;
+            if (error != EEXIST || !Exists(toPath)) // permission: rwxrwxr-x
+            {
+                errno = error;
+                LLBC_SetLastError(LLBC_ERROR_CLIB);
+                return LLBC_FAILED;
+            }
         }
 #endif
     }
@@ -404,7 +411,10 @@ int LLBC_Directory::GetFiles(const LLBC_String &path, LLBC_Strings &files, const
             if (!recursive ||
                 (strcmp(".", direntList[procIdx]->d_name) == 0 ||
                 strcmp("..", direntList[procIdx]->d_name) == 0))
+            {
+                free(direntList[procIdx]);
                 continue;
+            }
 
             if (GetFiles(fileName, files, recursive) != LLBC_OK)
             {

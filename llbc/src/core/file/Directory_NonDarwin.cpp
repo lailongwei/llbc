@@ -169,7 +169,7 @@ LLBC_String LLBC_Directory::HomeDir()
     free(envVal);
 #else // Non-Win32
     char *envVal = getenv("HOME");
-    if (!envVal)
+    if (!envVal || envVal[0] == '\0')
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
         return "";
