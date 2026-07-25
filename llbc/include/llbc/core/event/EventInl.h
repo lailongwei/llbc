@@ -158,15 +158,17 @@ inline void LLBC_Event::SetExtData(void *extData, const LLBC_Delegate<void(void 
         if (_extDataClearDeleg)
             *_extDataClearDeleg = clearDeleg;
         else
-            delete _extDataClearDeleg;
+            _extDataClearDeleg = new LLBC_Delegate<void(void *)>(clearDeleg);
     }
+    else
+        LLBC_XDelete(_extDataClearDeleg);
 }
 
 inline void LLBC_Event::ClearExtData(bool delDeleg)
 {
     if (_extData)
     {
-        if (_extDataClearDeleg)
+        if (_extDataClearDeleg && *_extDataClearDeleg)
             (*_extDataClearDeleg)(_extData);
         _extData = nullptr;
     }
@@ -184,7 +186,8 @@ LLBC_Variant &LLBC_Event::operator[](const KeyType &key)
 template<typename KeyType>
 const LLBC_Variant &LLBC_Event::operator[](const KeyType &key) const
 {
-    return GetParam(key);
+    const auto it = _params.find(key);
+    return it != _params.end() ? it->second : LLBC_INTERNAL_NS __nilVariant;
 }
 
 inline LLBC_Event &LLBC_Event::operator=(const LLBC_Event &other)
