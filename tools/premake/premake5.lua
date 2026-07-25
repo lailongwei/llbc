@@ -430,6 +430,11 @@ project "unit_test"
 
     links { "gtest" }
 
+    -- GCC 8 ships the C++17 filesystem implementation in a separate archive.
+    filter { "system:linux", "toolset:gcc" }
+        links { "stdc++fs" }
+    filter {}
+
     -- Enable c++17 support.
     filter { "system:not windows" }
         buildoptions {
