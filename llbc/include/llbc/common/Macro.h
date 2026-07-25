@@ -180,11 +180,11 @@
  #endif
 #elif LLBC_TARGET_PLATFORM_WIN32
  #ifndef LLBC_EXPORT
-   #ifdef LLBC_LINK_STATIC_LIBRARY
+   #ifdef LLBC_LIB_STATIC
     #define LLBC_EXPORTING 0
     #define LLBC_EXPORT
    #else
-    #define LLBC_EXPORTING 1
+    #define LLBC_EXPORTING 0
     #define LLBC_EXPORT  __declspec(dllimport)
    #endif
  #endif

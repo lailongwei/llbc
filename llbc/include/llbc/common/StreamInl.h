@@ -957,7 +957,7 @@ LLBC_Stream::Write(const T &str)
         return;
     }
 
-    const uint32 strLen = strlen(str);
+    const uint32 strLen = static_cast<uint32>(strlen(str));
     Write(strLen);
     if (strLen > 0)
         Write(str, strLen);

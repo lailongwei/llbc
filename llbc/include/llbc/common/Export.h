@@ -39,11 +39,11 @@
 // WIN32
 #if LLBC_TARGET_PLATFORM_WIN32
  #ifndef LLBC_EXPORT
-  #ifdef LLBC_CORE_LIB_STATIC
+  #ifdef LLBC_LIB_STATIC
    #define LLBC_EXPORTING 2
    #define LLBC_EXPORT
-  #else
-   #define LLBC_EXPORTING 3
+  #else // defined(LLBC_LIB_SHARED)
+   #define LLBC_EXPORTING 1
    #define LLBC_EXPORT __declspec(dllexport)
   #endif
 #endif
