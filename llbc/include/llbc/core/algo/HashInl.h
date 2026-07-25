@@ -43,9 +43,11 @@ uint32 LLBC_Hasher::Hash(const void *bytes, size_t size)
     else if constexpr (HashAlgo == LLBC_HashAlgo::MurmurHash3)
         return MurmurHash3Hash(bytes, size);
     else
-        static_assert("Invalid hash algorithm");
-
-    return 0;
+    {
+        static_assert(HashAlgo >= LLBC_HashAlgo::Begin && HashAlgo < LLBC_HashAlgo::End,
+                      "Invalid hash algorithm");
+        return 0;
+    }
 }
 
 inline uint32 LLBC_Hasher::Hash(LLBC_HashAlgo::ENUM hashAlgo, const void *bytes, size_t size)
