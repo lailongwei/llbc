@@ -27,6 +27,12 @@ __LLBC_INTERNAL_NS_BEGIN
 
 static LLBC_NS LLBC_Variant __g_invalidProperty;
 
+static LLBC_NS LLBC_Variant &__LLBC_GetInvalidProperty()
+{
+    __g_invalidProperty.Become<void>();
+    return __g_invalidProperty;
+}
+
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
@@ -105,14 +111,14 @@ LLBC_Variant &LLBC_Entity::GetProperty(const LLBC_String &name)
     if (name.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_INTERNAL_NS __g_invalidProperty;
+        return LLBC_INTERNAL_NS __LLBC_GetInvalidProperty();
     }
 
     std::map<LLBC_String, LLBC_Variant>::iterator iter = _properties.find(name);
     if (iter == _properties.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_INTERNAL_NS __g_invalidProperty;
+        return LLBC_INTERNAL_NS __LLBC_GetInvalidProperty();
     }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
@@ -125,14 +131,14 @@ const LLBC_Variant &LLBC_Entity::GetProperty(const LLBC_String &name) const
     if (name.empty())
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_INTERNAL_NS __g_invalidProperty;
+        return LLBC_INTERNAL_NS __LLBC_GetInvalidProperty();
     }
 
     std::map<LLBC_String, LLBC_Variant>::const_iterator iter = _properties.find(name);
     if (iter == _properties.end())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
-        return LLBC_INTERNAL_NS __g_invalidProperty;
+        return LLBC_INTERNAL_NS __LLBC_GetInvalidProperty();
     }
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
