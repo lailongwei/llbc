@@ -91,14 +91,15 @@ int LLBC_Logger::RemoveColorLogKey(const _TraceKeyTy &traceKey)
 
 
 #define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
-    LLBC_FORCE_INLINE int LLBC_Logger::level(const char *tag, \
+    inline int LLBC_Logger::level(const char *tag, \
                                              const char *file, \
                                              int line, \
                                              const char *func, \
                                              const char *fmt, \
                                              ...) \
     {                                             \
-        if (_logLevel > LLBC_LogLevel::level)     \
+        if (_logLevel > LLBC_LogLevel::level &&   \
+            !GetColorLogTag())                    \
             return LLBC_OK;                       \
                                                   \
         va_list va;                               \
