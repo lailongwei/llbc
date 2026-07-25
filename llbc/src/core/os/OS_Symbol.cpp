@@ -68,10 +68,15 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
     LLBC_String backTrace;
 
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    const size_t maxCaptureFrames = LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES;
+    if (skipFrames >= maxCaptureFrames)
+        return backTrace;
+
+    const size_t availableCaptureFrames = maxCaptureFrames - skipFrames;
     if (captureFrames == static_cast<size_t>(LLBC_INFINITE))
-        captureFrames = LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES;
+        captureFrames = availableCaptureFrames;
     else
-        captureFrames = MIN(captureFrames, LLBC_CFG_OS_SYMBOL_MAX_CAPTURE_FRAMES);
+        captureFrames = MIN(captureFrames, availableCaptureFrames);
 
     void **stack = libTls->coreTls.symbol.stack;
 
@@ -111,6 +116,11 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
         {
             backTrace.append_format("#%d ", frames - i - 1);
 
+#if LLBC_TARGET_PLATFORM_MAC || LLBC_TARGET_PLATFORM_IPHONE
+            // Darwin's backtrace_symbols() format does not use the
+            // Linux-style "(mangled_symbol+offset)" segment.
+            backTrace.append_format("%s", strs[i]);
+#else
             char *parenthesisEnd = nullptr;
             char *parenthesisBeg = strchr(strs[i], '(');
             if (parenthesisBeg)
@@ -130,14 +140,14 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
                 *addrOffsetBeg = '\0';
 
                 int status = 0;
-                size_t length = sizeof(libTls->commonTls.rtti);
-                abi::__cxa_demangle(parenthesisBeg, libTls->commonTls.rtti, &length, &status);
+                char *demangledName = abi::__cxa_demangle(parenthesisBeg, nullptr, nullptr, &status);
                 *addrOffsetBeg = oldAddrOffsetBegCh;
-                if (status == 0)
+                if (status == 0 && demangledName)
                 {
                     backTrace.append(strs[i], parenthesisBeg - strs[i]);
-                    backTrace.append(libTls->commonTls.rtti);
+                    backTrace.append(demangledName);
                     backTrace.append(addrOffsetBeg);
+                    free(demangledName);
                 }
                 else
                 {
@@ -148,6 +158,7 @@ LLBC_String LLBC_CaptureStackBackTrace(size_t skipFrames, size_t captureFrames)
             {
                 backTrace.append_format("%s", strs[i]);
             }
+#endif
 
             if (i != frames - 1)
                 backTrace.append(1, '\n');

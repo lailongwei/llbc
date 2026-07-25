@@ -182,6 +182,7 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
         }
     }
 
+    int printRet = 0;
     #if LLBC_TARGET_PLATFORM_NON_WIN32
     flockfile(file);
     bool fmtPrint = false;
@@ -193,22 +194,33 @@ int __LLBC_FilePrint(bool newline, FILE *file, const char *fmt, ...)
             fmtPrint = true;
             char colorFmt[LLBC_INTERNAL_NS __g_consoleColorFmtLen] = {};
             LLBC_INTERNAL_NS __GetConsoleColorCode(color, colorFmt);
-            fprintf(file, (newline ? "%s%s%s\n" : "%s%s%s"), colorFmt, buf, LLBC_INTERNAL_NS __g_consoleColorEndFmt);
+            printRet = fprintf(file,
+                               (newline ? "%s%s%s\n" : "%s%s%s"),
+                               colorFmt,
+                               buf,
+                               LLBC_INTERNAL_NS __g_consoleColorEndFmt);
         }
     }
 
     if (!fmtPrint)
     {
-        fprintf(file, (newline ? "%s\n" : "%s"), buf);
+        printRet = fprintf(file, (newline ? "%s\n" : "%s"), buf);
     }
     funlockfile(file);
     #else // Win32
     LLBC_FastLock &lock = LLBC_INTERNAL_NS __g_consoleLock[fileNo - 1];
 
     lock.Lock();
-    fprintf(file, newline ? "%s\n" : "%s", buf);
+    printRet = fprintf(file, newline ? "%s\n" : "%s", buf);
     lock.Unlock();
     #endif // !Non-Win32
+
+    if (UNLIKELY(printRet < 0))
+    {
+        LLBC_DoIf(len >= static_cast<int>(sizeof(stackBuf)), free(buf));
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
 
     LLBC_DoIf(len >= static_cast<int>(sizeof(stackBuf)), free(buf));
 
