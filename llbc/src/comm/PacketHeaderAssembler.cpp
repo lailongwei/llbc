@@ -27,6 +27,25 @@
 
 __LLBC_NS_BEGIN
 
+namespace
+{
+
+// Reads a header field out of the raw byte buffer. The fields are not guaranteed
+// to be naturally aligned (the 64-bit extData1 sits at offset 12), so a memcpy is
+// used instead of dereferencing a reinterpret_cast'ed pointer, which would be
+// unaligned-access / strict-aliasing UB (flagged by UBSan). With a compile-time
+// constant size the compiler lowers this to a single load, so it is exactly as
+// efficient as the raw dereference.
+template <typename _RawTy>
+inline _RawTy ReadHeaderField(const char *header)
+{
+    _RawTy val;
+    memcpy(&val, header, sizeof(_RawTy));
+    return val;
+}
+
+} // anonymous namespace
+
 LLBC_PacketHeaderAssembler::LLBC_PacketHeaderAssembler(size_t headerLen)
 : _headerLen(headerLen)
 , _header(LLBC_Malloc(char, headerLen))
@@ -74,11 +93,11 @@ void LLBC_PacketHeaderAssembler::Reset()
 
 void LLBC_PacketHeaderAssembler::SetToPacket(LLBC_Packet &packet) const
 {
-    uint32 len = *reinterpret_cast<uint32 *>(_header);
-    sint32 opcode = *reinterpret_cast<sint32 *>(_header + 4);
-    uint16 status = *reinterpret_cast<uint16 *>(_header + 8);
-    uint16 flags = *reinterpret_cast<uint16 *>(_header + 10);
-    sint64 extData1 = *reinterpret_cast<sint64 *>(_header + 12);
+    uint32 len = ReadHeaderField<uint32>(_header);
+    sint32 opcode = ReadHeaderField<sint32>(_header + 4);
+    uint16 status = ReadHeaderField<uint16>(_header + 8);
+    uint16 flags = ReadHeaderField<uint16>(_header + 10);
+    sint64 extData1 = ReadHeaderField<sint64>(_header + 12);
 
 #if LLBC_CFG_COMM_ORDER_IS_NET_ORDER
     len = LLBC_Net2Host(len);
