@@ -49,6 +49,7 @@ void LLBC_Dictionary::Sort(_Fn2 &fn)
     {
         LLBC_DictionaryElem *curElem = elem;
         elem = elem->GetElemNext();
+        LLBC_DictionaryElem *prevElem = curElem->GetElemPrev();
 
         // Remove current object from double-linked list.
         if (curElem->GetElemPrev())
@@ -59,12 +60,15 @@ void LLBC_Dictionary::Sort(_Fn2 &fn)
         {
             curElem->GetElemNext()->SetElemPrev(curElem->GetElemPrev());
         }
+        else
+        {
+            _tail = curElem->GetElemPrev();
+        }
 
         curElem->SetElemPrev(nullptr);
         curElem->SetElemNext(nullptr);
 
         // Compare it.
-        LLBC_DictionaryElem *prevElem = curElem->GetElemPrev();
         for (; prevElem != nullptr; prevElem = prevElem->GetElemPrev())
         {
             if (fn(static_cast<const LLBC_DictionaryElem *>(prevElem),
@@ -94,4 +98,3 @@ void LLBC_Dictionary::Sort(_Fn2 &fn)
 }
 
 __LLBC_NS_END
-
