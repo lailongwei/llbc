@@ -1,5 +1,8 @@
 # Recurse all cpp files.
-file(GLOB_RECURSE LLBC_LIB_FUNC_TEST_SRC_FILES *.cpp)
+file(GLOB_RECURSE LLBC_LIB_FUNC_TEST_SRC_FILES *.h *.cpp)
+
+# Group source files.
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${LLBC_LIB_FUNC_TEST_SRC_FILES})
 
 # Collect all func test config files.
 file(GLOB_RECURSE LLBC_LIB_FUNC_TEST_CFG_FILES
@@ -14,6 +17,7 @@ add_custom_target(llbc_func_test_copy_cfg
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LLBC_LIB_FUNC_TEST_CFG_FILES} "${LLBC_OUTPUT_DIR}/"
     COMMENT "Copying func_test config files to ${LLBC_OUTPUT_DIR}"
     VERBATIM)
+set_target_properties(llbc_func_test_copy_cfg PROPERTIES FOLDER "tests/assistant")
 
 # Build link static llbc library executable.
 set(LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE func_test_static)
@@ -24,6 +28,7 @@ target_link_libraries(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE}
                       PRIVATE llbc_sln_build_settings llbc_lib_static)
 llbc_apply_config_postfix(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE})
 add_dependencies(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE} llbc_func_test_copy_cfg)
+set_target_properties(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE} PROPERTIES FOLDER "tests")
 
 # Build link shared llbc library executable.
 set(LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE func_test_shared)
@@ -34,3 +39,4 @@ target_link_libraries(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE}
                       PRIVATE llbc_sln_build_settings llbc_lib_shared)
 llbc_apply_config_postfix(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE})
 add_dependencies(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE} llbc_func_test_copy_cfg)
+set_target_properties(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE} PROPERTIES FOLDER "tests")

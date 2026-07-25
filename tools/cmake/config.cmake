@@ -28,6 +28,9 @@ set(LLBC_3RD_DIR_GOOGLETEST "${LLBC_LIB_TESTS_DIR}/3rdparty/googletest")
 set(LLBC_OUTPUT_DIR ${LLBC_TOP_DIR}/output/cmake)
 file(MAKE_DIRECTORY ${LLBC_OUTPUT_DIR})
 
+# Enable sln folder ability.
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 # Set project c++ standard (strict C++17, no GNU extensions -> -std=c++17).
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

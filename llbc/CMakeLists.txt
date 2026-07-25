@@ -1,9 +1,12 @@
 # Recurse all source files.
-file(GLOB_RECURSE LLBC_LIB_COMMON_SRC_FILES *.cpp)
+file(GLOB_RECURSE LLBC_LIB_COMMON_SRC_FILES *.h *.cpp)
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     file(GLOB_RECURSE LLBC_LIB_PLATFORM_SRC_FILES *.mm)
 endif()
 set(SOURCES ${LLBC_LIB_COMMON_SRC_FILES} ${LLBC_LIB_PLATFORM_SRC_FILES})
+
+# Group source files.
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
 
 # Include llbc lib directory.
 set(LLBC_LIB_INCLUDE_DIR "${LLBC_LIB_DIR}/include")
@@ -23,7 +26,7 @@ add_library(${LLBC_LIB_STATIC} STATIC ${SOURCES})
 target_include_directories(${LLBC_LIB_STATIC}
                            PUBLIC "${LLBC_LIB_DIR}/include")
 target_compile_definitions(${LLBC_LIB_STATIC}
-                           PRIVATE LLBC_LIB_STATIC)
+                           PUBLIC LLBC_LIB_STATIC)
 target_link_libraries(${LLBC_LIB_STATIC}
                       PRIVATE llbc_sln_build_settings 
                       INTERFACE ${LLBC_DEP_LIBS})
@@ -34,15 +37,15 @@ add_library(${LLBC_LIB_SHARED} SHARED ${SOURCES})
 target_include_directories(${LLBC_LIB_SHARED}
                            PUBLIC "${LLBC_LIB_DIR}/include")
 target_compile_definitions(${LLBC_LIB_SHARED}
-                           PRIVATE LLBC_LIB_SHARED)
+                           PUBLIC LLBC_LIB_SHARED)
 target_link_libraries(${LLBC_LIB_SHARED}
                       PRIVATE llbc_sln_build_settings
                       PUBLIC ${LLBC_DEP_LIBS})
 
 # Set output name.
 if (WIN32)
-    set_target_properties(${LLBC_LIB_STATIC} PROPERTIES OUTPUT_NAME ${LLBC_LIB_STATIC})
-    set_target_properties(${LLBC_LIB_SHARED} PROPERTIES OUTPUT_NAME ${LLBC_LIB_SHARED})
+    set_target_properties(${LLBC_LIB_STATIC} PROPERTIES OUTPUT_NAME llbc_static)
+    set_target_properties(${LLBC_LIB_SHARED} PROPERTIES OUTPUT_NAME llbc_shared)
 else()
     set_target_properties(${LLBC_LIB_STATIC} ${LLBC_LIB_SHARED} PROPERTIES OUTPUT_NAME llbc)
 endif()

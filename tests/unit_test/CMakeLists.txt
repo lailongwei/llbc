@@ -1,5 +1,8 @@
 # Recurse all cpp files.
-file(GLOB_RECURSE LLBC_LIB_UNIT_TEST_SRC_FILES *.cpp)
+file(GLOB_RECURSE LLBC_LIB_UNIT_TEST_SRC_FILES *.h *.cpp)
+
+# Group source files.
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${LLBC_LIB_UNIT_TEST_SRC_FILES})
 
 # Build link static llbc library executable.
 set(LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE unit_test_static)
@@ -9,6 +12,7 @@ target_include_directories(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE}
 target_link_libraries(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE}
                       PRIVATE llbc_sln_build_settings llbc_lib_static GTest::gtest)
 llbc_apply_config_postfix(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE})
+set_target_properties(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE} PROPERTIES FOLDER "tests")
 
 # Build link shared llbc library executable.
 set(LLBC_LIB_UNIT_TEST_LINK_SHARED_EXE unit_test_shared)
@@ -18,3 +22,4 @@ target_include_directories(${LLBC_LIB_UNIT_TEST_LINK_SHARED_EXE}
 target_link_libraries(${LLBC_LIB_UNIT_TEST_LINK_SHARED_EXE}
                       PRIVATE llbc_sln_build_settings llbc_lib_shared GTest::gtest)
 llbc_apply_config_postfix(${LLBC_LIB_UNIT_TEST_LINK_SHARED_EXE})
+set_target_properties(${LLBC_LIB_UNIT_TEST_LINK_SHARED_EXE} PROPERTIES FOLDER "tests")
