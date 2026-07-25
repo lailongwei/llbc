@@ -28,7 +28,7 @@ target_include_directories(${LLBC_LIB_STATIC}
 target_compile_definitions(${LLBC_LIB_STATIC}
                            PUBLIC LLBC_LIB_STATIC)
 target_link_libraries(${LLBC_LIB_STATIC}
-                      PRIVATE llbc_sln_build_settings 
+                      PRIVATE llbc_build_settings 
                       INTERFACE ${LLBC_DEP_LIBS})
 
 # Build shared library.
@@ -39,13 +39,18 @@ target_include_directories(${LLBC_LIB_SHARED}
 target_compile_definitions(${LLBC_LIB_SHARED}
                            PUBLIC LLBC_LIB_SHARED)
 target_link_libraries(${LLBC_LIB_SHARED}
-                      PRIVATE llbc_sln_build_settings
+                      PRIVATE llbc_build_settings
                       PUBLIC ${LLBC_DEP_LIBS})
 
 # Set output name.
 if (WIN32)
-    set_target_properties(${LLBC_LIB_STATIC} PROPERTIES OUTPUT_NAME llbc_static)
-    set_target_properties(${LLBC_LIB_SHARED} PROPERTIES OUTPUT_NAME llbc_shared)
+    set_target_properties(${LLBC_LIB_STATIC} PROPERTIES
+                          OUTPUT_NAME llbc_static
+                          PREFIX "lib")
+    set_target_properties(${LLBC_LIB_SHARED} PROPERTIES
+                          OUTPUT_NAME llbc
+                          PREFIX "lib"
+                          ARCHIVE_OUTPUT_NAME "libllbc")
 else()
     set_target_properties(${LLBC_LIB_STATIC} ${LLBC_LIB_SHARED} PROPERTIES OUTPUT_NAME llbc)
 endif()

@@ -15,21 +15,51 @@ set(LLBC_TOP_DIR "${CMAKE_SOURCE_DIR}")
 # - llbc core library directory.
 set(LLBC_LIB_DIR "${LLBC_TOP_DIR}/llbc")
 # - llbc core library tests directory.
-set(LLBC_LIB_TESTS_DIR "${LLBC_TOP_DIR}/tests")
-set(LLBC_LIB_EXAMPLE_DIR ${LLBC_LIB_TESTS_DIR}/example)
-set(LLBC_LIB_FUNC_TEST_DIR ${LLBC_LIB_TESTS_DIR}/func_test)
-set(LLBC_LIB_UNIT_TEST_DIR ${LLBC_LIB_TESTS_DIR}/unit_test)
-set(LLBC_LIB_QUICK_START_DIR ${LLBC_LIB_TESTS_DIR}/quick_start)
+set(LLBC_LIB_TESTS_DIR 		 "${LLBC_TOP_DIR}/tests")
+set(LLBC_LIB_EXAMPLE_DIR     "${LLBC_LIB_TESTS_DIR}/example")
+set(LLBC_LIB_FUNC_TEST_DIR   "${LLBC_LIB_TESTS_DIR}/func_test")
+set(LLBC_LIB_UNIT_TEST_DIR   "${LLBC_LIB_TESTS_DIR}/unit_test")
+set(LLBC_LIB_QUICK_START_DIR "${LLBC_LIB_TESTS_DIR}/quick_start")
 # - Set llbc wrap libraries directory.
-set(LLBC_WRAP_DIR ${LLBC_TOP_DIR}/wrap)
+set(LLBC_WRAP_DIR 		 "${LLBC_TOP_DIR}/wrap")
+set(LLBC_WRAP_PYLLBC_DIR "${LLBC_WRAP_DIR}/pyllbc")
+set(LLBC_WRAP_LULLBC_DIR "${LLBC_WRAP_DIR}/lullbc")
+set(LLBC_WRAP_CSLLBC_DIR "${LLBC_WRAP_DIR}/csllbc")
 # - 3rd direstories.
+set(LLBC_3RD_DIR_LUA        "${LLBC_WRAP_LULLBC_DIR}/lua")
+set(LLBC_3RD_DIR_CPYTHON    "${LLBC_WRAP_PYLLBC_DIR}/cpython")
 set(LLBC_3RD_DIR_GOOGLETEST "${LLBC_LIB_TESTS_DIR}/3rdparty/googletest")
+# - tools directory.
+set(LLBC_TOOLS_DIR "${LLBC_TOP_DIR}/tools")
 # - Set llbc output directory.
-set(LLBC_OUTPUT_DIR ${LLBC_TOP_DIR}/output/cmake)
-file(MAKE_DIRECTORY ${LLBC_OUTPUT_DIR})
+set(LLBC_OUTPUT_DIR "${LLBC_TOP_DIR}/output/$<CONFIG>")
 
 # Enable sln folder ability.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+# find Python package.
+find_package(Python COMPONENTS Interpreter REQUIRED)
+message("Python executable: ${Python_EXECUTABLE}")
+
+# Get platform architecture.
+string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} _llbc_system_processor)
+if(_llbc_system_processor MATCHES "amd64|x86_64")
+	set(LLBC_PLATFORM_ARCH "x64")
+elseif(_llbc_system_processor MATCHES "i386|i486|i586|i686|x86")
+	set(LLBC_PLATFORM_ARCH "x86")
+elseif(_llbc_system_processor MATCHES "aarch64|arm64")
+	set(LLBC_PLATFORM_ARCH "arm64")
+elseif(_llbc_system_processor MATCHES "^arm")
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(LLBC_PLATFORM_ARCH "arm64")
+	else()
+		set(LLBC_PLATFORM_ARCH "arm")
+	endif()
+else()
+	message(FATAL_ERROR "Unsupported platform architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
+message(STATUS "Platform architecture: ${LLBC_PLATFORM_ARCH}")
 
 # Set project c++ standard (strict C++17, no GNU extensions -> -std=c++17).
 set(CMAKE_CXX_STANDARD 17)
@@ -136,9 +166,9 @@ set(LLBC_VERSION "${LLBC_MAJOR_VERSION}.${LLBC_MINOR_VERSION}.${LLBC_UPDATE_NUMB
 
 message(STATUS "llbc framework version: ${LLBC_VERSION}")
 
-# Common build settings carrier: llbc_sln_build_settings.
+# Common build settings carrier: llbc_build_settings_loose/llbc_build_settings.
 # Enable more strict warnings and enable all warnings as errors.
-add_library(llbc_sln_build_settings INTERFACE)
+add_library(llbc_build_settings_loose INTERFACE)
 if (MSVC)
     # msvc compiler option warning level: 
 	# - https://learn.microsoft.com/en-us/cpp/build/reference/compiler-option-warning-level?view=msvc-170
@@ -146,51 +176,57 @@ if (MSVC)
 	# Disable warnings:
 	# - C4251: https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4251?view=msvc-170
 	# - C4819: https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4819?view=msvc-170
-	target_compile_options(llbc_sln_build_settings INTERFACE /WX /W3 /wd4251 /wd4819)
+	target_compile_options(llbc_build_settings_loose INTERFACE /W3 /wd4251 /wd4819)
 else()
-	target_compile_options(llbc_sln_build_settings INTERFACE -Wall -Werror -Wno-strict-aliasing)
+	target_compile_options(llbc_build_settingsloose INTERFACE -Wall -Werror -Wno-strict-aliasing)
 endif()
 
 # Enable multi-threaded compilation.
 if (MSVC)
-	target_compile_options(llbc_sln_build_settings INTERFACE /MP)
+	target_compile_options(llbc_build_settings_loose INTERFACE /MP)
 endif()
 
 # DEBUG macro on debug builds (mirror premake "configurations:debug*" defines { "DEBUG" }).
-target_compile_definitions(llbc_sln_build_settings INTERFACE $<$<CONFIG:Debug>:DEBUG>)
+target_compile_definitions(llbc_build_settings_loose INTERFACE $<$<CONFIG:Debug>:DEBUG>)
 
 # CXX11 ABI selection (non-msvc compiler).
 if (NOT MSVC)
 	if (LLBC_DISABLE_CXX11_ABI)
-		target_compile_definitions(llbc_sln_build_settings INTERFACE _GLIBCXX_USE_CXX11_ABI=0)
+		target_compile_definitions(llbc_build_settings_loose INTERFACE _GLIBCXX_USE_CXX11_ABI=0)
 	else()
-		target_compile_definitions(llbc_sln_build_settings INTERFACE _GLIBCXX_USE_CXX11_ABI=1)
+		target_compile_definitions(llbc_build_settings_loose INTERFACE _GLIBCXX_USE_CXX11_ABI=1)
 	endif()
 endif()
 
 # Export dynamic symbol table for backtraces (mirror premake linkoptions { "-rdynamic" }).
 if (NOT MSVC)
-	target_link_options(llbc_sln_build_settings INTERFACE -rdynamic)
+	target_link_options(llbc_build_settings_loose INTERFACE -rdynamic)
 endif()
 
 # macOS: Foundation framework(.mm sources) + rpath so shared-linked exes find the dylib in the flat output dir.
 if (APPLE)
-	target_link_options(llbc_sln_build_settings INTERFACE "SHELL:-framework Foundation")
-	target_link_options(llbc_sln_build_settings INTERFACE "SHELL:-Wl,-rpath,@loader_path")
+	target_link_options(llbc_build_settings_loose INTERFACE "SHELL:-framework Foundation")
+	target_link_options(llbc_build_settings_loose INTERFACE "SHELL:-Wl,-rpath,@loader_path")
 endif()
 
 # AddressSanitizer (non-Windows).
 if (LLBC_ENABLE_ASAN AND NOT WIN32)
-	target_compile_options(llbc_sln_build_settings INTERFACE -fsanitize=address -g)
-	target_link_options(llbc_sln_build_settings INTERFACE -fsanitize=address)
+	target_compile_options(llbc_build_settings_loose INTERFACE -fsanitize=address -g)
+	target_link_options(llbc_build_settings_loose INTERFACE -fsanitize=address)
 endif()
 
 # Coverage: clang source-based coverage instrumentation (non-MSVC). Because both the core lib and
-# unit_test link llbc_sln_build_settings, this instruments the module .cpp (in the lib) AND the inline
+# unit_test link llbc_build_settings, this instruments the module .cpp (in the lib) AND the inline
 # overloads (*Inl.h) compiled into the test TU. googletest does not inherit these flags.
 if (LLBC_ENABLE_COVERAGE AND NOT MSVC)
-	target_compile_options(llbc_sln_build_settings INTERFACE -fprofile-instr-generate -fcoverage-mapping)
-	target_link_options(llbc_sln_build_settings INTERFACE -fprofile-instr-generate -fcoverage-mapping)
+	target_compile_options(llbc_build_settings_loose INTERFACE -fprofile-instr-generate -fcoverage-mapping)
+	target_link_options(llbc_build_settings_loose INTERFACE -fprofile-instr-generate -fcoverage-mapping)
+endif()
+
+add_library(llbc_build_settings INTERFACE)
+target_link_libraries(llbc_build_settings INTERFACE llbc_build_settings_loose)
+if (MSVC)
+	target_compile_options(llbc_build_settings INTERFACE /WX)
 endif()
 
 # googletest submodule configuration.

@@ -10,7 +10,7 @@ add_executable(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE} ${LLBC_LIB_EXAMPLE_SRC_FILES}
 target_include_directories(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE}
                            PRIVATE ${LLBC_LIB_EXAMPLE_DIR})
 target_link_libraries(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE}
-                      PRIVATE llbc_sln_build_settings llbc_lib_static)
+                      PRIVATE llbc_build_settings llbc_lib_static)
 llbc_apply_config_postfix(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE})
 set_target_properties(${LLBC_LIB_EXAMPLE_LINK_STATIC_EXE} PROPERTIES FOLDER "tests")
 
@@ -20,6 +20,8 @@ add_executable(${LLBC_LIB_EXAMPLE_LINK_SHARED_EXE} ${LLBC_LIB_EXAMPLE_SRC_FILES}
 target_include_directories(${LLBC_LIB_EXAMPLE_LINK_SHARED_EXE}
                            PRIVATE ${LLBC_LIB_EXAMPLE_DIR})
 target_link_libraries(${LLBC_LIB_EXAMPLE_LINK_SHARED_EXE}
-                      PRIVATE llbc_sln_build_settings llbc_lib_shared)
+                      PRIVATE llbc_build_settings llbc_lib_shared)
 llbc_apply_config_postfix(${LLBC_LIB_EXAMPLE_LINK_SHARED_EXE})
-set_target_properties(${LLBC_LIB_EXAMPLE_LINK_SHARED_EXE} PROPERTIES FOLDER "tests")
+set_target_properties(${LLBC_LIB_EXAMPLE_LINK_SHARED_EXE} PROPERTIES
+                      FOLDER "tests"
+                      OUTPUT_NAME "example")

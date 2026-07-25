@@ -26,6 +26,7 @@ class PlatformType(object):
     @classmethod
     def desc2type(cls, plat_desc):
         """平台描述转类型"""
+        plat_desc = plat_desc.strip().lower()
         if plat_desc == 'windows' or plat_desc.startswith('win32'):
             return cls.Windows
         elif plat_desc.startswith('linux'):

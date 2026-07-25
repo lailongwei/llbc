@@ -25,7 +25,7 @@ add_executable(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE} ${LLBC_LIB_FUNC_TEST_SRC_FI
 target_include_directories(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE}
                            PRIVATE ${LLBC_LIB_FUNC_TEST_DIR})
 target_link_libraries(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE}
-                      PRIVATE llbc_sln_build_settings llbc_lib_static)
+                      PRIVATE llbc_build_settings llbc_lib_static)
 llbc_apply_config_postfix(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE})
 add_dependencies(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE} llbc_func_test_copy_cfg)
 set_target_properties(${LLBC_LIB_FUNC_TEST_LINK_STATIC_EXE} PROPERTIES FOLDER "tests")
@@ -36,7 +36,9 @@ add_executable(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE} ${LLBC_LIB_FUNC_TEST_SRC_FI
 target_include_directories(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE}
                            PRIVATE ${LLBC_LIB_FUNC_TEST_DIR})
 target_link_libraries(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE}
-                      PRIVATE llbc_sln_build_settings llbc_lib_shared)
+                      PRIVATE llbc_build_settings llbc_lib_shared)
 llbc_apply_config_postfix(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE})
 add_dependencies(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE} llbc_func_test_copy_cfg)
-set_target_properties(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE} PROPERTIES FOLDER "tests")
+set_target_properties(${LLBC_LIB_FUNC_TEST_LINK_SHARED_EXE} PROPERTIES
+                      FOLDER "tests"
+                      OUTPUT_NAME "func_test")

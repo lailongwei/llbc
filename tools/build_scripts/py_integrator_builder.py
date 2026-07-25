@@ -21,7 +21,7 @@ class PyIntegratorBuilder(object):
         src_path = op.join(cfg.pyllbc_proj_path, 'src')
         cpp_file_path = op.join(src_path, 'pyllbc_scripts.h')
         cpp_file = CppFile(cpp_file_path,
-                           author=cfg.author_and_email,
+                           author=cfg.authors,
                            ver=cfg.ver,
                            include_macro_prefix=ProjType.pyllbc.upper())
         cpp_file.custom_filehead = cfg.gen_file_license_head(LangType.cplusplus) + \

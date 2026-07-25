@@ -2,16 +2,17 @@
 """
 llbc项目构建脚本脚本配置
 要求调用参数:
-- sys.argv[1] - 构建架构: 如x86/x64/...
-- sys.argv[2] - 构建配置: debug32/release32/debug64/release64/...
-- sys.argv[3] - premake action参数: vs2022/gmake(deprecated)/gmake2/...
-- sys.argv[4] - 是否禁用 c++11 abi
-- sys.argv[5] - llbc 项目自定义 c/cpp 工具集 bin/ 路径, 如果没有, 则为空串
+- sys.argv[1] - llbc 版本
+- sys.argv[2] - 生成目标架构: x86/x64/arm64
+- sys.argv[3] - 构建配置: Debug/Release/MinSizeRel/RelWithDebInfo
+- sys.argv[4] - 是否关闭 c++11 abi
+- sys.argv[5] - windows only: devenv.exe 路径
 """
 
 import os
 import re
 import sys
+import platform
 from os import path as op
 
 from com.defs import LangType, ArchType, PlatformType
@@ -19,10 +20,8 @@ from com.log import Log
 
 # 库版本(majorVer.minorVer.updateNo)
 LIB_VER = '1.1.1'
-# 库作者描述
-LIB_AUTHOR = 'Longwei Lai'
-# 库作者邮箱
-LIB_AUTHOR_EMAIL = '964855959@qq.com'
+# 库作者
+LIB_AUTHORS = 'Longwei Lai<964855959@qq.com>;reckful<snakeflutes@gmail.com>'
 # 文件系统编码
 SYS_ENC = sys.getfilesystemencoding()
 
@@ -31,27 +30,54 @@ class _Cfg(object):
     """llbc构架构建配置"""
     # region __init__
     def __init__(self):
+        # llbc 版本
+        self._ver = sys.argv[1]
+
+        # license, 惰式初始化
         self._license = None
-        self._arch = ArchType.desc2type(sys.argv[1])
+
+        # 当前平台
+        self._platform = PlatformType.desc2type(platform.system())
+
+        # 生成目标架构: x86/x64/arm64/...
+        self._arch = ArchType.desc2type(sys.argv[2])
         assert(ArchType.is_valid(self._arch))
-        self._build_cfg = sys.argv[2].strip().lower()
-        self._is_debug = self._build_cfg.startswith('debug')
-        self._premake_action = sys.argv[3].strip()
+
+        # 构建配置: Debug/Release/MinSizeRel/RelWithDebInfo
+        self._build_cfg = sys.argv[3].strip()
+        self._is_debug = self._build_cfg.lower().startswith('debug')
+
+        # 是否关闭 c++11 abi
         disable_cxx11_abi_cfg = sys.argv[4].strip().lower()
-        if disable_cxx11_abi_cfg in ('true', 'yes'):
+        if disable_cxx11_abi_cfg in ('true', 'yes', 'y', 'on') or \
+                (disable_cxx11_abi_cfg.isdigit() and int(disable_cxx11_abi_cfg) != 0):
             self._disable_cxx11_abi = True
-        elif disable_cxx11_abi_cfg in ('false', 'no'):
-            self._disable_cxx11_abi = False
         else:
-            self._disable_cxx11_abi = int(disable_cxx11_abi_cfg)
-        self._custom_ccpp_toolset_bin_path = sys.argv[5].strip() if len(sys.argv) > 5 else ''
+            self._disable_cxx11_abi = False
+
+        # windows only: devenv.exe 路径
+        self._devenv_path = sys.argv[5].strip() if self._platform == PlatformType.Windows else ''
+
+        # 相关路径定义
+        # - sln 路径
+        cur_path = op.dirname(op.abspath(__file__))
+        self._sln_path = op.dirname(op.dirname(op.dirname(cur_path)))
+
+        # Log
+        Log.fi('Build llbc(ver: {}) for {}-{}, build cfg: {}, disable_cxx11_abi: {}{}',
+               self._ver,
+               ArchType.type2desc(self._arch),
+               PlatformType.type2desc(self._platform),
+               self._build_cfg,
+               self._disable_cxx11_abi,
+               ', devenv: {}'.format(self._devenv_path) if self._devenv_path else '')
     # endregion
 
     # region 平台/构建信息
     @property
     def platform(self):
         """获取平台"""
-        return PlatformType.desc2type(sys.platform)
+        return self._platform
 
     @property
     def arch(self):
@@ -67,18 +93,13 @@ class _Cfg(object):
     def is_debug(self):
         """是否构建debug版本"""
         return self._is_debug
-    
-    @property
-    def premake_action(self):
-        """premake action"""
-        return self._premake_action
     # endregion
 
     # region 版本/license/作者信息
     @property
     def ver(self):
         """库版本"""
-        return os.getenv('LLBC_LIB_VER', LIB_VER)
+        return self._ver
 
     @property
     def license(self):
@@ -90,19 +111,9 @@ class _Cfg(object):
         return self._license
 
     @property
-    def author(self):
-        """库作者"""
-        return LIB_AUTHOR
-
-    @property
-    def author_email(self):
-        """库作者email"""
-        return LIB_AUTHOR_EMAIL
-
-    @property
-    def author_and_email(self):
-        """库作者+email"""
-        return self.author + '<' + self.author_email + '>'
+    def authors(self):
+        """库作者(包含 email)"""
+        return LIB_AUTHORS
     # endregion
 
     # region 目录/后缀相关
@@ -114,7 +125,7 @@ class _Cfg(object):
     @property
     def sln_path(self):
         """解决方案路径"""
-        return op.dirname(op.dirname(self.build_script_path))
+        return self._sln_path
     
     @property
     def tools_path(self):
@@ -124,12 +135,11 @@ class _Cfg(object):
     @property
     def output_path(self):
         """输出目录"""
-        base_output_path = op.join(self.sln_path, 'output', self._premake_action)
+        output_path = op.join(self.sln_path, 'output')
+        if self._platform == PlatformType.Windows:
+            output_path = op.join(output_path, self._build_cfg)
 
-        output_dir_name = '{}{}'.format('debug' if self.is_debug else 'release',
-                                        '32' if ArchType.is_32bit_arch(self.arch) else '64')
-
-        return op.join(base_output_path, output_dir_name)
+        return output_path
 
     @property
     def exe_suffix(self):
@@ -161,13 +171,6 @@ class _Cfg(object):
     def llbc_proj_path(self):
         """核心库路径"""
         return op.join(self.sln_path, 'llbc')
-
-    @property
-    def llbc_dll_path(self):
-        """核心库dll路径"""
-        return op.join(self.output_path,
-                       'libllbc' + ('_debug' if self.is_debug else '') + self.dll_suffix)
-
     # endregion
 
     # region 核心库测试项目相关
@@ -222,7 +225,7 @@ class _Cfg(object):
     @property
     def pyllbc_cpython_output_path(self):
         """cpython submodule输出路径"""
-        if sys.platform.startswith('win32'):
+        if sys._platform == PlatformType.Windows:
             pcbuild_path = op.join(self.pyllbc_cpython_path, 'PCbuild')
             return op.join(pcbuild_path, 'amd64') \
                 if ArchType.is_64bit_arch(cfg.arch) else pcbuild_path
@@ -313,9 +316,9 @@ class _Cfg(object):
         return self._disable_cxx11_abi
 
     @property
-    def custom_ccpp_toolset_bin_path(self):
-        """自定义ccpp工具链路径, 如未指定, 返回空str"""
-        return self._custom_ccpp_toolset_bin_path
+    def devenv_path(self):
+        """windows 平台特定: devenv.exe路径"""
+        return self._devenv_path
     # endregion
 
     # region 辅助方法

@@ -26,7 +26,7 @@ class CPythonCompiler(object):
         if op.exists(op.join(pcbuild_path, 'UpgradeLog.htm')):
             Log.i('pcbuild.sln has been upgraded, skip...')
         else:
-            ret = Sh.execute('pushd "{}" && devenv.exe pcbuild.sln /Upgrade && popd'.format(pcbuild_path))
+            ret = Sh.execute('pushd "{}" && "{}" pcbuild.sln /Upgrade && popd'.format(pcbuild_path, cfg.devenv_path))
             if ret != 0:
                 Log.e('Upgrade pcbuild.sln failed, ret code:{}'.format(ret))
 
@@ -55,6 +55,10 @@ class CPythonCompiler(object):
             platform = 'Win32'
         elif cfg.arch == ArchType.x86_64:
             platform = 'x64'
+        elif cfg.arch == ArchType.arm64:
+            platform = 'ARM64'
+        elif cfg.arch == ArchType.arm:
+            platform = 'ARM'
         else:
             Log.e('Unsupported arch:{}'.format(cfg.arch))
             return
@@ -63,9 +67,8 @@ class CPythonCompiler(object):
 
         Log.i('Compile cpython, platform:{}, configuration:{}...'.format(platform, configuration))
         ret = Sh.execute(
-            'pushd "{}" && msbuild pcbuild.sln \
-    /t:python /p:Platform={} /p:Configuration={} /p:ToolsVersion=Latest && popd'.format(
-                pcbuild_path, platform, configuration))
+            'pushd "{}" && "{}" pcbuild.sln /Build "{}|{}" /project python && popd'.format(
+                pcbuild_path, cfg.devenv_path, configuration, platform))
         if ret != 0:
             Log.e('Compile cpython failed, ret code:{}'.format(ret))
 

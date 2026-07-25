@@ -51,7 +51,7 @@ class BaseNativeMethodCollector(object):
         cpp_file_path = op.join(self.search_path, '_{0}Methods.h'.format(self.filename_base))
         cpp_file = CppFile(
             cpp_file_path,
-            author=cfg.author_and_email,
+            author=cfg.authors,
             ver=cfg.ver,
             include_macro_prefix=self.proj_name.upper())
         cpp_file.custom_filehead = cfg.gen_file_license_head(LangType.cplusplus) + \
