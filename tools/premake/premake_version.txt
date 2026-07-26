@@ -1,2 +1,0 @@
-releases download url: https://github.com/premake/premake-core/releases
-ver: Premake 5.0-beta1
