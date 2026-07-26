@@ -44,7 +44,7 @@ set(LLBC_WRAP_DIR_PYLLBC "${LLBC_WRAP_DIR}/pyllbc")
 set(LLBC_WRAP_DIR_LULLBC "${LLBC_WRAP_DIR}/lullbc")
 set(LLBC_WRAP_DIR_CSLLBC "${LLBC_WRAP_DIR}/csllbc")
 # - 3rd direstories.
-set(LBC_3RD_DIR_LUA        "${LLBC_WRAP_DIR_LULLBC}/lua")
+set(LLBC_3RD_DIR_LUA        "${LLBC_WRAP_DIR_LULLBC}/lua")
 set(LLBC_3RD_DIR_CPYTHON    "${LLBC_WRAP_DIR_PYLLBC}/cpython")
 set(LLBC_3RD_DIR_GOOGLETEST "${LLBC_LIB_TESTS_DIR}/3rdparty/googletest")
 # - tools directory.
@@ -200,7 +200,7 @@ if (MSVC)
 	# - C4819: https://learn.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-1-c4819?view=msvc-170
 	target_compile_options(llbc_build_settings_loose INTERFACE /W3 /wd4251 /wd4819)
 else()
-	target_compile_options(llbc_build_settingsloose INTERFACE -Wall -Werror -Wno-strict-aliasing)
+	target_compile_options(llbc_build_settings_loose INTERFACE -Wall -Werror -Wno-strict-aliasing)
 endif()
 
 # Enable multi-threaded compilation.

@@ -32,9 +32,23 @@ else()
     set(LLBC_3RD_CPYTHON_LIB_BASE_NAME "python${LLBC_3RD_CPYTHON_MAJOR_VERSION}.${LLBC_3RD_CPYTHON_MINOR_VERSION}")
 endif()
 
+# Add pyllbc pre-build target: execute pyllbc_prebuild.py script.
+add_custom_target(pyllbc_prebuild
+                  COMMAND ${Python_EXECUTABLE}
+                    "${LLBC_TOOLS_DIR}/build_scripts/pyllbc_prebuild.py"
+                    ${LLBC_VERSION}
+                    ${LLBC_PLATFORM_ARCH} 
+                    $<CONFIG>
+                    ${LLBC_DISABLE_CXX11_ABI}
+                    ${CMAKE_VS_DEVENV_COMMAND}
+                  COMMENT "Pre-build ${LLBC_WRAP_LIB_PYLLBC}")
+set_target_properties(pyllbc_prebuild PROPERTIES
+                      FOLDER "_llbc_internal_targets")
+
 # Build pyllbc library(shared).
 set(LLBC_WRAP_LIB_PYLLBC pyllbc)
 add_library(${LLBC_WRAP_LIB_PYLLBC} SHARED ${SOURCES})
+add_dependencies(${LLBC_WRAP_LIB_PYLLBC} pyllbc_prebuild)
 target_include_directories(${LLBC_WRAP_LIB_PYLLBC}
                            PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include"
                            PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -61,17 +75,6 @@ if (WIN32)
                           SUFFIX ".pyd")
 endif()
 
-# Add pre-build command: execute pyllbc_prebuild.py script.
-add_custom_command(TARGET ${LLBC_WRAP_LIB_PYLLBC}
-                   PRE_BUILD
-                   COMMAND ${Python_EXECUTABLE}
-                        "${LLBC_TOOLS_DIR}/build_scripts/pyllbc_prebuild.py"
-                        ${LLBC_VERSION}
-                        ${LLBC_PLATFORM_ARCH} 
-                        $<CONFIG>
-                        ${LLBC_DISABLE_CXX11_ABI}
-                        ${CMAKE_VS_DEVENV_COMMAND}
-                   COMMENT "Pre-build ${LLBC_WRAP_LIB_PYLLBC}")
 # Add post-build command: execute pyllbc_postbuild.py script.
 add_custom_command(TARGET ${LLBC_WRAP_LIB_PYLLBC}
                    POST_BUILD

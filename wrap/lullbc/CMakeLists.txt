@@ -40,6 +40,19 @@ if (WIN32)
                           ARCHIVE_OUTPUT_NAME "liblua")
 endif()
 
+# Add pre-build target: execute lullbc_prebuild.py script.
+add_custom_target(lullbc_prebuild
+                  COMMAND ${Python_EXECUTABLE}
+                    "${LLBC_TOOLS_DIR}/build_scripts/lullbc_prebuild.py"
+                    ${LLBC_VERSION}
+                    ${LLBC_PLATFORM_ARCH} 
+                    $<CONFIG>
+                    ${LLBC_DISABLE_CXX11_ABI}
+                    ${CMAKE_VS_DEVENV_COMMAND}
+                  COMMENT "Pre-build ${LLBC_WRAP_LIB_LULLBC}")
+set_target_properties(lullbc_prebuild PROPERTIES
+                      FOLDER "_llbc_internal_targets")
+
 # Build lua executable(link shared lua lib).
 set(LLBC_3RD_LUA_EXEC lullbc_luaexec)
 add_executable(${LLBC_3RD_LUA_EXEC} ${LUA_EXEC_SOURCES})
@@ -64,24 +77,14 @@ set_target_properties(${LLBC_WRAP_LIB_LULLBC} PROPERTIES
                       PREFIX ""
                       OUTPUT_NAME "_lullbc")
 if (APPLE)
-    set_target_properties(${LLBC_WRAP_LIB_LULLBC}
+    set_target_properties(${LLBC_WRAP_LIB_LULLBC} PROPERTIES
                           SUFFIX ".so")
 endif()
 
 # Set targets postfix.
 llbc_apply_config_postfix(${LLBC_3RD_LUA_LIB} ${LLBC_3RD_LUA_EXEC} ${LLBC_WARP_LIB_LULLBC})
 
-# Add pre-build command: execute lullbc_prebuild.py script.
-add_custom_command(TARGET ${LLBC_WRAP_LIB_LULLBC}
-                   PRE_BUILD
-                   COMMAND ${Python_EXECUTABLE}
-                        "${LLBC_TOOLS_DIR}/build_scripts/lullbc_prebuild.py"
-                        ${LLBC_VERSION}
-                        ${LLBC_PLATFORM_ARCH} 
-                        $<CONFIG>
-                        ${LLBC_DISABLE_CXX11_ABI}
-                        ${CMAKE_VS_DEVENV_COMMAND}
-                   COMMENT "Pre-build ${LLBC_WRAP_LIB_LULLBC}")
+# Add post-build command: execute lullbc_postbuild.py script.
 add_custom_command(TARGET ${LLBC_WRAP_LIB_LULLBC}
                    POST_BUILD
                    COMMAND ${Python_EXECUTABLE}
