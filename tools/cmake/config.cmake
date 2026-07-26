@@ -1,3 +1,5 @@
+include(CheckLanguage)
+
 # ==================== User mutable settings ====================
 # CXX11 abi disable switch.
 option(LLBC_DISABLE_CXX11_ABI  "Disable libstdc++ CXX11 ABI (define _GLIBCXX_USE_CXX11_ABI=0)" OFF)
@@ -9,6 +11,22 @@ option(LLBC_ENABLE_COVERAGE "Enable coverage (non-Windows only)" OFF)
 # set(LLBC_CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir>" CACHE STRING "Custom compile toolset dir")
 
 # ==================== User imutable settings ====================
+# [Required] Enable language: c/c++.
+enable_language(C CXX)
+# [Optional] Enable language: csharp.
+check_language(CSharp)
+if (CMAKE_CSharp_COMPILER)
+	message(NOTICE "CSharp compiler found, llbc c# wrap targets can be built")
+	message(NOTICE "- CSharp compiler: ${CMAKE_CSharp_COMPILER}")
+else()
+	message(NOTICE "CSharp compiler not found, llbc c# wrap targets will be skipped")
+endif()
+
+
+# llbc core lib name define.
+set(LLBC_LIB_SHARED ${PROJECT_NAME}_shared)
+set(LLBC_LIB_STATIC ${PROJECT_NAME}_static)
+
 # Some directories define.
 # - llbc top directory.
 set(LLBC_TOP_DIR "${CMAKE_SOURCE_DIR}")
@@ -22,12 +40,12 @@ set(LLBC_LIB_UNIT_TEST_DIR   "${LLBC_LIB_TESTS_DIR}/unit_test")
 set(LLBC_LIB_QUICK_START_DIR "${LLBC_LIB_TESTS_DIR}/quick_start")
 # - Set llbc wrap libraries directory.
 set(LLBC_WRAP_DIR 		 "${LLBC_TOP_DIR}/wrap")
-set(LLBC_WRAP_PYLLBC_DIR "${LLBC_WRAP_DIR}/pyllbc")
-set(LLBC_WRAP_LULLBC_DIR "${LLBC_WRAP_DIR}/lullbc")
-set(LLBC_WRAP_CSLLBC_DIR "${LLBC_WRAP_DIR}/csllbc")
+set(LLBC_WRAP_DIR_PYLLBC "${LLBC_WRAP_DIR}/pyllbc")
+set(LLBC_WRAP_DIR_LULLBC "${LLBC_WRAP_DIR}/lullbc")
+set(LLBC_WRAP_DIR_CSLLBC "${LLBC_WRAP_DIR}/csllbc")
 # - 3rd direstories.
-set(LLBC_3RD_DIR_LUA        "${LLBC_WRAP_LULLBC_DIR}/lua")
-set(LLBC_3RD_DIR_CPYTHON    "${LLBC_WRAP_PYLLBC_DIR}/cpython")
+set(LBC_3RD_DIR_LUA        "${LLBC_WRAP_DIR_LULLBC}/lua")
+set(LLBC_3RD_DIR_CPYTHON    "${LLBC_WRAP_DIR_PYLLBC}/cpython")
 set(LLBC_3RD_DIR_GOOGLETEST "${LLBC_LIB_TESTS_DIR}/3rdparty/googletest")
 # - tools directory.
 set(LLBC_TOOLS_DIR "${LLBC_TOP_DIR}/tools")
@@ -38,7 +56,11 @@ set(LLBC_OUTPUT_DIR "${LLBC_TOP_DIR}/output/$<CONFIG>")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # find Python package.
-find_package(Python COMPONENTS Interpreter REQUIRED)
+if (WIN32)
+	set(Python_EXECUTABLE "${LLBC_TOOLS_DIR}/py.exe")
+else()
+	find_package(Python COMPONENTS Interpreter REQUIRED)
+endif()
 message("Python executable: ${Python_EXECUTABLE}")
 
 # Get platform architecture.

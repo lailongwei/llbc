@@ -8,7 +8,7 @@ from os import path as op
 from com.log import Log
 from com.cfg import cfg
 from com.defs import ProjType
-from lu_script_integrator import LuScriptIntegrator
+from tools.build_scripts.lua_script_integrator import LuaScriptIntegrator
 from native_method_collector import LuNativeMethodCollector as LuNMC
 
 
@@ -23,7 +23,7 @@ def main():
 
     # 整合所有lua脚本
     Log.i('Integrate lua script...')
-    LuScriptIntegrator().build()
+    LuaScriptIntegrator().build()
 
     Log.i('Done!')
 

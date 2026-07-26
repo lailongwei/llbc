@@ -27,12 +27,12 @@ LICENSE_FILE_CONTENT = ''.join(LICENSE_FILE_CONTENT)
 # Csharp code path
 CSHARP_PATH = op.dirname(SCRIPT_PATH)
 # Csharp/Native directory path
-CSHARP_NATIVE_PATH = op.join(CSHARP_PATH, u'native')
+CSHARP_NATIVE_PATH = op.join(CSHARP_PATH, 'native')
 
 # C++ native code path
-NATIVE_PATH = op.join(op.dirname(CSHARP_PATH), u'native')
+NATIVE_PATH = op.join(op.dirname(CSHARP_PATH), 'native')
 # C++ native code header file path
-NATIVE_INCLUDE_PATH = op.join(NATIVE_PATH, u'include', u'csllbc')
+NATIVE_INCLUDE_PATH = op.join(NATIVE_PATH, 'include', 'csllbc')
 
 # All types map, use to convert C++ type to C# type.
 TYPE_MAP = {
@@ -152,10 +152,10 @@ class NativeCodeFile(object):
         rel_path = self._native_header_file[len(NATIVE_INCLUDE_PATH) + 1:]
         rel_name = op.basename(rel_path)
 
-        cs_code_file = op.splitext(rel_name)[0] + u'Native.cs'
-        if cs_code_file[0:3] == u'_cs':
+        cs_code_file = op.splitext(rel_name)[0] + 'Native.cs'
+        if cs_code_file[0:3] == '_cs':
             cs_code_file = cs_code_file[3:]
-        elif cs_code_file[0] == u'_':
+        elif cs_code_file[0] == '_':
             cs_code_file = cs_code_file[1:]
 
         return cs_code_file
@@ -319,11 +319,11 @@ def main():
     fileCount = 0
     for root, dirs, files in os.walk(NATIVE_INCLUDE_PATH):
         for name in files:
-            if op.splitext(name)[1] != u'.h':
+            if op.splitext(name)[1] != '.h':
                 continue
 
             filename = op.join(root, name)
-            if u'.svn' in filename or u'.git' in filename:
+            if '.svn' in filename or '.git' in filename:
                 continue
 
             native_file = NativeCodeFile()

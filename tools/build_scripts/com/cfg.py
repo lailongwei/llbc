@@ -171,6 +171,12 @@ class _Cfg(object):
     def llbc_proj_path(self):
         """核心库路径"""
         return op.join(self.sln_path, 'llbc')
+
+    @property
+    def llbc_dll_path(self):
+        """核心库 shared lib 路径"""
+        lib_name = ('libllbc_debug' if self.is_debug else 'libllbc') + self.dll_suffix
+        return op.join(self.output_path, lib_name)
     # endregion
 
     # region 核心库测试项目相关
@@ -225,7 +231,7 @@ class _Cfg(object):
     @property
     def pyllbc_cpython_output_path(self):
         """cpython submodule输出路径"""
-        if sys._platform == PlatformType.Windows:
+        if self._platform == PlatformType.Windows:
             pcbuild_path = op.join(self.pyllbc_cpython_path, 'PCbuild')
             return op.join(pcbuild_path, 'amd64') \
                 if ArchType.is_64bit_arch(cfg.arch) else pcbuild_path

@@ -1,4 +1,4 @@
-# Recurse all source files.
+# Collect all .h/.cpp files.
 file(GLOB_RECURSE LLBC_LIB_COMMON_SRC_FILES *.h *.cpp)
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     file(GLOB_RECURSE LLBC_LIB_PLATFORM_SRC_FILES *.mm)
@@ -21,7 +21,6 @@ else()
 endif()
 
 # Build static library.
-set(LLBC_LIB_STATIC ${PROJECT_NAME}_lib_static)
 add_library(${LLBC_LIB_STATIC} STATIC ${SOURCES})
 target_include_directories(${LLBC_LIB_STATIC}
                            PUBLIC "${LLBC_LIB_DIR}/include")
@@ -32,7 +31,6 @@ target_link_libraries(${LLBC_LIB_STATIC}
                       INTERFACE ${LLBC_DEP_LIBS})
 
 # Build shared library.
-set(LLBC_LIB_SHARED ${PROJECT_NAME}_lib_shared)
 add_library(${LLBC_LIB_SHARED} SHARED ${SOURCES})
 target_include_directories(${LLBC_LIB_SHARED}
                            PUBLIC "${LLBC_LIB_DIR}/include")

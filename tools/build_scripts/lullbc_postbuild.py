@@ -34,7 +34,10 @@ def _publish_lua():
     # 复制lua exe & dll
     will_pub_files = ['lua' + cfg.exe_suffix, 'liblua' + cfg.dll_suffix]
     if cfg.platform == PlatformType.Windows:
-        will_pub_files.extend(['lua.pdb', 'liblua.lib', 'liblua.pdb'])
+        will_pub_files.append('liblua.lib')
+        if cfg.build_cfg not in ('Release', 'MinSizeRel'):
+            will_pub_files.extend(['lua.pdb', 'liblua.pdb'])
+        
     Log.d('Copy lua exe & dll to publish path...')
     for f in _normalize_files(will_pub_files):
         shutil.copy(op.join(cfg.output_path, f), pub_path)

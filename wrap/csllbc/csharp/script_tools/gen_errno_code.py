@@ -17,13 +17,13 @@ import hashlib
 SCRIPT_PATH = op.abspath(op.dirname(__file__))
 
 # LLBC root path
-LLBC_ROOT_PATH = op.normpath(op.join(SCRIPT_PATH, u'../../../../'))
+LLBC_ROOT_PATH = op.normpath(op.join(SCRIPT_PATH, '../../../../'))
 
 # CPP errno file name
-CPP_ERRNO_FILE = op.join(LLBC_ROOT_PATH, u'llbc', u'include', u'llbc', u'common', u'Errno.h')
+CPP_ERRNO_FILE = op.join(LLBC_ROOT_PATH, 'llbc', 'include', 'llbc', 'common', 'Errno.h')
 
 # Csharp code path
-CS_ERRNO_FILE = op.join(LLBC_ROOT_PATH, u'wrap', u'csllbc', u'csharp', u'native', u'common', u'ErrnoNative.cs')
+CS_ERRNO_FILE = op.join(LLBC_ROOT_PATH, 'wrap', 'csllbc', 'csharp', 'native', 'common', 'ErrnoNative.cs')
 
 # analyse csharp file
 def analyse_file(name):
@@ -95,7 +95,7 @@ def generate_file(name, ls):
     if md5.digest() == olddigest:
       return 'Errno: file check finished!'
     
-    f = open(name, 'wb')
+    f = open(name, 'w')
     if not f:
       return 'Errno: file open failure: ' + name
     

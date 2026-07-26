@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SOURCES include/*.h src/*.cpp)
+file(GLOB_RECURSE SOURCES include/*.h src/*.h src/*.cpp)
 
 # Group source files.
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
@@ -23,18 +23,6 @@ else()
     message(FATAL_ERROR "Failed to get 3rd:cpython version")
 endif()
 
-# Add custom target: pyllbc_prebuild
-add_custom_target(pyllbc_prebuild
-                  COMMAND ${Python_EXECUTABLE}
-                    "${LLBC_TOOLS_DIR}/build_scripts/py_prebuild.py"
-                    ${LLBC_VERSION}
-                    ${LLBC_PLATFORM_ARCH} 
-                    $<CONFIG>
-                    ${LLBC_DISABLE_CXX11_ABI}
-                    ${CMAKE_VS_DEVENV_COMMAND}
-                  COMMENT "Prebuild pyllbc")
-set_target_properties(pyllbc_prebuild PROPERTIES FOLDER "wrap/assistant")
-
 # Get cpython lib output directory & name.
 if (WIN32)
     set(LLBC_3RD_CPYTHON_LIB_OUTPUT_DIR "${LLBC_3RD_DIR_CPYTHON}/PCbuild/$<IF:$<STREQUAL:${LLBC_PLATFORM_ARCH},x64>,amd64,${LLBC_PLATFORM_ARCH}>")
@@ -53,7 +41,7 @@ target_include_directories(${LLBC_WRAP_LIB_PYLLBC}
                            PRIVATE "${LLBC_3RD_DIR_CPYTHON}/Include"
                            PRIVATE "$<IF:$<PLATFORM_ID:Windows>,${LLBC_3RD_DIR_CPYTHON}/PC,${LLBC_3RD_DIR_CPYTHON}>")
 target_link_libraries(${LLBC_WRAP_LIB_PYLLBC}
-                      PRIVATE llbc_build_settings_loose llbc_lib_shared)
+                      PRIVATE llbc_build_settings_loose ${LLBC_LIB_SHARED})
 if (WIN32)
     target_link_libraries(${LLBC_WRAP_LIB_PYLLBC}
                           PRIVATE $<IF:$<CONFIG:Debug>,${LLBC_3RD_CPYTHON_LIB_BASE_NAME}_d,${LLBC_3RD_CPYTHON_LIB_BASE_NAME}>)
@@ -64,7 +52,35 @@ endif()
 target_link_directories(${LLBC_WRAP_LIB_PYLLBC}
                         PRIVATE "${LLBC_3RD_CPYTHON_LIB_OUTPUT_DIR}")
 llbc_apply_config_postfix(${LLBC_WRAP_LIB_PYLLBC})
-add_dependencies(${LLBC_WRAP_LIB_PYLLBC} pyllbc_prebuild)
 set_target_properties(${LLBC_WRAP_LIB_PYLLBC} PROPERTIES
                       FOLDER "wrap"
-                      SUFFIX ".pyd")
+                      OUTPUT_NAME "llbc")
+if (WIN32)
+    set_target_properties(${LLBC_WRAP_LIB_PYLLBC} PROPERTIES
+                          FOLDER "wrap"
+                          SUFFIX ".pyd")
+endif()
+
+# Add pre-build command: execute pyllbc_prebuild.py script.
+add_custom_command(TARGET ${LLBC_WRAP_LIB_PYLLBC}
+                   PRE_BUILD
+                   COMMAND ${Python_EXECUTABLE}
+                        "${LLBC_TOOLS_DIR}/build_scripts/pyllbc_prebuild.py"
+                        ${LLBC_VERSION}
+                        ${LLBC_PLATFORM_ARCH} 
+                        $<CONFIG>
+                        ${LLBC_DISABLE_CXX11_ABI}
+                        ${CMAKE_VS_DEVENV_COMMAND}
+                   COMMENT "Pre-build ${LLBC_WRAP_LIB_PYLLBC}")
+# Add post-build command: execute pyllbc_postbuild.py script.
+add_custom_command(TARGET ${LLBC_WRAP_LIB_PYLLBC}
+                   POST_BUILD
+                   COMMAND ${Python_EXECUTABLE}
+                        "${LLBC_TOOLS_DIR}/build_scripts/pyllbc_postbuild.py"
+                        ${LLBC_VERSION}
+                        ${LLBC_PLATFORM_ARCH}
+                        $<CONFIG>
+                        ${LLBC_DISABLE_CXX11_ABI}
+                        ${CMAKE_VS_DEVENV_COMMAND}
+                   COMMENT "Pre-build ${LLBC_WRAP_LIB_PYLLBC}")
+

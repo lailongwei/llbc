@@ -10,7 +10,7 @@ from com.cfg import cfg
 from com.defs import LangType
 
 
-class LuScriptIntegrator(object):
+class LuaScriptIntegrator(object):
     def __init__(self):
         self._script_path = op.join(cfg.lullbc_proj_path, 'script')
 

@@ -62,6 +62,7 @@ def _publish_cpython_win32():
         os.mkdir(dlls_pub_path)
 
     Log.d('Copy llbc dll to DLLs/...')
+    Log.fd('cfg.llbc_dll_path: {}', cfg.llbc_dll_path)
     shutil.copy(cfg.llbc_dll_path, dlls_pub_path)
     Log.d('Copy pyllbc dll to DLLs/...')
     shutil.copy(cfg.pyllbc_dll_path, dlls_pub_path)
