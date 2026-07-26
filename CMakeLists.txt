@@ -14,3 +14,12 @@ add_subdirectory(${LLBC_LIB_DIR})
 add_subdirectory(${LLBC_LIB_TESTS_DIR})
 # Add llbc wrap directory.
 add_subdirectory(${LLBC_WRAP_DIR})
+# Add tools directory.
+add_subdirectory(${LLBC_TOOLS_DIR})
+
+# Set VS solution startup project (Windows/Visual Studio generator only).
+# NOTE: VS_STARTUP_PROJECT is a DIRECTORY property and must be set on the
+#       top-level source dir (where project() lives), otherwise CMake ignores it.
+if (WIN32 AND TARGET func_test_shared)
+    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT func_test_shared)
+endif()
