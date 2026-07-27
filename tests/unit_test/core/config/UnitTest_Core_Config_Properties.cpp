@@ -141,31 +141,39 @@ TEST(PropertiesTest, RejectsMalformedInputAndResetsDestinationOnFailure)
                                                &error),
               LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
-    EXPECT_TRUE(properties.Is<void>());
+    EXPECT_TRUE(properties.Is<LLBC_Variant::Dict>());
+    EXPECT_TRUE(properties.IsEmpty());
     EXPECT_NE(error.find("#2"), static_cast<LLBC_String::size_type>(-1));
 
     EXPECT_EQ(LLBC_Properties::LoadFromString("bad-key = value", properties, &error), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
-    EXPECT_TRUE(properties.Is<void>());
+    EXPECT_TRUE(properties.Is<LLBC_Variant::Dict>());
+    EXPECT_TRUE(properties.IsEmpty());
 
     EXPECT_EQ(LLBC_Properties::LoadFromString("value = trailing\\", properties, &error), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
-    EXPECT_TRUE(properties.Is<void>());
+    EXPECT_TRUE(properties.Is<LLBC_Variant::Dict>());
+    EXPECT_TRUE(properties.IsEmpty());
 
+    properties["stale"] = "value";
     ScopedPropertiesFile file;
     EXPECT_EQ(LLBC_Properties::LoadFromFile(file.Path(), properties, &error), LLBC_FAILED);
-    EXPECT_TRUE(properties.Is<void>());
+    EXPECT_TRUE(properties.Is<LLBC_Variant::Dict>());
+    EXPECT_TRUE(properties.IsEmpty());
     EXPECT_NE(error.find("Open properties file"), static_cast<LLBC_String::size_type>(-1));
 
     LLBC_String content("unchanged");
     EXPECT_EQ(LLBC_Properties::SaveToString(LLBC_Variant(42), content, &error), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
+    EXPECT_TRUE(content.empty());
     EXPECT_NE(error.find("dictionary"), static_cast<LLBC_String::size_type>(-1));
 
     LLBC_Variant invalidKeys;
     invalidKeys["bad-key"] = 1;
+    content = "unchanged";
     EXPECT_EQ(LLBC_Properties::SaveToString(invalidKeys, content, &error), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
+    EXPECT_TRUE(content.empty());
     EXPECT_NE(error.find("bad-key"), static_cast<LLBC_String::size_type>(-1));
 }
 
@@ -187,18 +195,21 @@ TEST(PropertiesTest, PreservesEscapedTrailingWhitespaceAndRejectsInvalidEscapes)
 
     EXPECT_EQ(LLBC_Properties::LoadFromString(" = missing-key", properties, &error), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
-    EXPECT_TRUE(properties.Is<void>());
+    EXPECT_TRUE(properties.Is<LLBC_Variant::Dict>());
+    EXPECT_TRUE(properties.IsEmpty());
     EXPECT_NE(error.find("Property key invalid"), static_cast<LLBC_String::size_type>(-1));
 
     EXPECT_EQ(LLBC_Properties::LoadFromString("... = no-key-items", properties, &error),
               LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
-    EXPECT_TRUE(properties.Is<void>());
+    EXPECT_TRUE(properties.Is<LLBC_Variant::Dict>());
+    EXPECT_TRUE(properties.IsEmpty());
     EXPECT_NE(error.find("Property key invalid"), static_cast<LLBC_String::size_type>(-1));
 
     EXPECT_EQ(LLBC_Properties::LoadFromString("key = invalid\\q", properties, &error), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
-    EXPECT_TRUE(properties.Is<void>());
+    EXPECT_TRUE(properties.Is<LLBC_Variant::Dict>());
+    EXPECT_TRUE(properties.IsEmpty());
     EXPECT_NE(error.find("invalid escape"), static_cast<LLBC_String::size_type>(-1));
 }
 
@@ -225,6 +236,7 @@ TEST(PropertiesTest, SavesEmptyDictionariesAndReportsRecursiveAndFileFailures)
     recursiveInvalidKey["outer"]["bad-key"] = "value";
     EXPECT_EQ(LLBC_Properties::SaveToString(recursiveInvalidKey, content, &error), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
+    EXPECT_TRUE(content.empty());
     EXPECT_NE(error.find("outer.bad-key"), static_cast<LLBC_String::size_type>(-1));
 
     ScopedPropertiesFile file;
@@ -239,7 +251,8 @@ TEST(PropertiesTest, SavesEmptyDictionariesAndReportsRecursiveAndFileFailures)
 
     LLBC_Variant unreadable(LLBC_String("stale"));
     EXPECT_EQ(LLBC_Properties::LoadFromFile(directory.Path(), unreadable, &error), LLBC_FAILED);
-    EXPECT_TRUE(unreadable.Is<void>());
+    EXPECT_TRUE(unreadable.Is<LLBC_Variant::Str>());
+    EXPECT_TRUE(unreadable.IsEmpty());
 #if LLBC_TARGET_PLATFORM_NON_WIN32
     EXPECT_NE(error.find("Read properties file"), static_cast<LLBC_String::size_type>(-1));
 #else
@@ -248,8 +261,8 @@ TEST(PropertiesTest, SavesEmptyDictionariesAndReportsRecursiveAndFileFailures)
 }
 
 // SaveToString owns its output parameter: repeated saves replace prior content,
-// and a nested validation failure must not leak partially serialized properties.
-TEST(PropertiesTest, ReplacesOutputAndPreservesItOnSerializationFailure)
+// and a nested validation failure clears any old or partially serialized data.
+TEST(PropertiesTest, ReplacesOutputAndClearsItOnSerializationFailure)
 {
     LLBC_String error;
     LLBC_String content("stale");
@@ -270,6 +283,6 @@ TEST(PropertiesTest, ReplacesOutputAndPreservesItOnSerializationFailure)
     content = "sentinel";
     EXPECT_EQ(LLBC_Properties::SaveToString(invalid, content, &error), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_FORMAT);
-    EXPECT_EQ(content, "sentinel");
+    EXPECT_TRUE(content.empty());
     EXPECT_NE(error.find("zz-invalid"), static_cast<LLBC_String::size_type>(-1));
 }

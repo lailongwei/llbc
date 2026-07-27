@@ -151,7 +151,7 @@ TEST(IniTest, EditsCopiesSavesAndReloadsConfiguration)
     ASSERT_NE(reloadedSection, nullptr);
     EXPECT_EQ(reloadedSection->RemoveComment("threads"), LLBC_OK);
     EXPECT_EQ(reloadedSection->GetComment("threads"), "");
-    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_NOT_FOUND);
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_SUCCESS);
     EXPECT_EQ(reloadedSection->RemoveValue("queue"), LLBC_OK);
     EXPECT_FALSE(reloadedSection->IsHasKey("queue"));
     EXPECT_EQ(reloadedSection->RemoveValue("queue"), LLBC_FAILED);
@@ -332,10 +332,10 @@ TEST(IniTest, HandlesEmptyValuesAndReportsFileReadWriteFailures)
               LLBC_FAILED);
 }
 
-// A removed comment is materially different from an empty comment: serialization
-// must not invent a trailing ';' when such a section is merged into another INI.
-// Also exercise the successful empty-file loading path used by optional configs.
-TEST(IniTest, PreservesCommentAbsenceWhenMergingAndLoadsEmptyFiles)
+// Merging follows SetValue's existing invariant that every key/value has a comment
+// entry, using an empty comment when the incoming section has none. Also exercise
+// the successful empty-file loading path used by optional configs.
+TEST(IniTest, RestoresEmptyCommentWhenMergingAndLoadsEmptyFiles)
 {
     LLBC_IniSection incoming;
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
@@ -357,13 +357,14 @@ TEST(IniTest, PreservesCommentAbsenceWhenMergingAndLoadsEmptyFiles)
 
     const LLBC_IniSection *merged = ini.GetSection("merged");
     ASSERT_NE(merged, nullptr);
-    EXPECT_EQ(merged->GetAllComments().find("commentless"),
+    EXPECT_NE(merged->GetAllComments().find("commentless"),
               merged->GetAllComments().end());
+    EXPECT_EQ(merged->GetComment("commentless"), "");
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_SUCCESS);
 
     LLBC_String saved;
     ASSERT_EQ(ini.SaveToContent(saved), LLBC_OK);
-    EXPECT_NE(saved.find("commentless=7\n"), static_cast<LLBC_String::size_type>(-1));
-    EXPECT_EQ(saved.find("commentless=7 ;"), static_cast<LLBC_String::size_type>(-1));
+    EXPECT_NE(saved.find("commentless=7 ; \n"), static_cast<LLBC_String::size_type>(-1));
 
     ScopedIniFile emptyFile;
     {

@@ -48,7 +48,7 @@ int LLBC_Properties::LoadFromFile(const LLBC_String &filePath,
                                   LLBC_Variant &properties,
                                   LLBC_String *errMsg)
 {
-    properties.Become<void>();
+    properties.Clear();
 
     LLBC_File file;
     if (file.Open(filePath, LLBC_FileMode::TextRead) != LLBC_OK)
@@ -80,8 +80,7 @@ int LLBC_Properties::LoadFromString(const LLBC_String &str,
     LLBC_Strings keyItems;
 
     // Foreach parse property lines.
-    properties.Become<void>();
-    properties.Become<LLBC_Variant::Dict>();
+    properties.Become<LLBC_Variant::Dict>().Clear();
     const auto lines = str.split("\n", -1, true);
     for (size_t i = 0; i < lines.size(); ++i)
     {
@@ -90,7 +89,7 @@ int LLBC_Properties::LoadFromString(const LLBC_String &str,
         keyItems.clear();
         if (ParseLine(static_cast<int>(i) + 1, lines[i], keyItems, value, errMsg) != LLBC_OK)
         {
-            properties.Become<void>();
+            properties.Clear();
             return LLBC_FAILED;
         }
 
@@ -146,6 +145,8 @@ int LLBC_Properties::SaveToString(const LLBC_Variant &properties,
                                   LLBC_String &content,
                                   LLBC_String *errMsg)
 {
+    content.clear();
+
     // Check properties value.
     if (!properties.Is<LLBC_Variant::Dict>())
     {
@@ -156,11 +157,12 @@ int LLBC_Properties::SaveToString(const LLBC_Variant &properties,
         return LLBC_FAILED;
     }
 
-    LLBC_String serialized;
-    if (SaveLine("", properties, serialized, errMsg) != LLBC_OK)
+    if (SaveLine("", properties, content, errMsg) != LLBC_OK)
+    {
+        content.clear();
         return LLBC_FAILED;
+    }
 
-    content.swap(serialized);
     LLBC_DoIf(errMsg, errMsg->assign("Success"));
     
     return LLBC_OK;
