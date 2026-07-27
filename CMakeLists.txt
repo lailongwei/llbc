@@ -2,7 +2,6 @@
 cmake_minimum_required (VERSION 3.16)
 
 # Config solution.
-project(llbc)
 include("${CMAKE_SOURCE_DIR}/tools/cmake/config.cmake")
 
 # Set project.
