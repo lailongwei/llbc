@@ -58,17 +58,17 @@ LLBC_String LLBC_GUIDHelper::Format(LLBC_GUIDCRef guid)
 {
     LLBC_String str;
     str.format("%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X", 
-            static_cast<unsigned int>(guid.Data1),
-            static_cast<unsigned int>(guid.Data2),
-            static_cast<unsigned int>(guid.Data3),
-            static_cast<unsigned int>(guid.Data4[0]),
-            static_cast<unsigned int>(guid.Data4[1]),
-            static_cast<unsigned int>(guid.Data4[2]),
-            static_cast<unsigned int>(guid.Data4[3]),
-            static_cast<unsigned int>(guid.Data4[4]),
-            static_cast<unsigned int>(guid.Data4[5]),
-            static_cast<unsigned int>(guid.Data4[6]),
-            static_cast<unsigned int>(guid.Data4[7]));
+            guid.Data1,
+            guid.Data2,
+            guid.Data3,
+            guid.Data4[0],
+            guid.Data4[1],
+            guid.Data4[2],
+            guid.Data4[3],
+            guid.Data4[4],
+            guid.Data4[5],
+            guid.Data4[6],
+            guid.Data4[7]);
 
     return str;
 }
