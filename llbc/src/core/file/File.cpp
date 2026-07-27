@@ -118,6 +118,25 @@ int LLBC_File::Open(const LLBC_String &path, int mode)
         return LLBC_FAILED;
     }
 
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    struct stat fileStat {};
+    int openErrno = 0;
+    if (fstat(fileno(_handle), &fileStat) != 0)
+        openErrno = errno;
+    else if (S_ISDIR(fileStat.st_mode))
+        openErrno = EISDIR;
+
+    if (openErrno != 0)
+    {
+        fclose(_handle);
+        _handle = LLBC_INVALID_FILE_HANDLE;
+
+        errno = openErrno;
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
+        return LLBC_FAILED;
+    }
+#endif
+
     _mode = mode;
     _path.assign(path.c_str(), path.length());
 
@@ -288,28 +307,6 @@ sint64 LLBC_File::GetFileSize() const
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
         return -1;
     }
-
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    struct stat fileStat {};
-    const int fileNo = GetFileNo();
-    if (fileNo == -1)
-        return -1;
-
-    if (fstat(fileNo, &fileStat) != 0)
-    {
-        LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return -1;
-    }
-
-    // Directory stream positions are opaque cookies on POSIX and can look like
-    // enormous file sizes. Reject them before ReadToEnd() sizes its buffer.
-    if (S_ISDIR(fileStat.st_mode))
-    {
-        errno = EISDIR;
-        LLBC_SetLastError(LLBC_ERROR_CLIB);
-        return -1;
-    }
-#endif
 
 #if LLBC_TARGET_PLATFORM_WIN32
     const sint64 oldPos = _ftelli64(_handle);
@@ -1008,13 +1005,13 @@ int LLBC_File::CopyFile(const LLBC_String &destFilePath, bool overlapped)
 
 int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destFilePath, bool overlapped)
 {
+#if LLBC_TARGET_PLATFORM_WIN32
     if (srcFilePath == destFilePath)
     {
         LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
-#if LLBC_TARGET_PLATFORM_WIN32
     if (!::CopyFileA(srcFilePath.c_str(), destFilePath.c_str(), !overlapped))
     {
         LLBC_SetLastError(LLBC_ERROR_OSAPI);
@@ -1023,32 +1020,32 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
 
     return LLBC_OK;
 #else // Non_WIN32
-    if (!Exists(srcFilePath))
+    struct stat srcFileStat {};
+    if (stat(srcFilePath.c_str(), &srcFileStat) != 0)
     {
-        LLBC_SetLastError(LLBC_ERROR_NOT_FOUND);
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
     }
 
-#if LLBC_TARGET_PLATFORM_NON_WIN32
-    struct stat srcFileStat;
-    struct stat destFileStat;
-    if (stat(srcFilePath.c_str(), &srcFileStat) == 0 &&
-        stat(destFilePath.c_str(), &destFileStat) == 0 &&
-        srcFileStat.st_dev == destFileStat.st_dev &&
-        srcFileStat.st_ino == destFileStat.st_ino)
+    struct stat destFileStat {};
+    if (stat(destFilePath.c_str(), &destFileStat) == 0)
     {
-        LLBC_SetLastError(LLBC_ERROR_ARG);
-        return LLBC_FAILED;
+        if (srcFileStat.st_dev == destFileStat.st_dev &&
+            srcFileStat.st_ino == destFileStat.st_ino)
+        {
+            LLBC_SetLastError(LLBC_ERROR_ARG);
+            return LLBC_FAILED;
+        }
+
+        if (!overlapped)
+        {
+            LLBC_SetLastError(LLBC_ERROR_EXIST);
+            return LLBC_FAILED;
+        }
     }
-#endif
-
-    LLBC_FileAttributes srcFileAttrs {};
-    if (GetFileAttributes(srcFilePath, srcFileAttrs) != LLBC_OK)
-        return LLBC_FAILED;
-
-    if (srcFileAttrs.isDirectory)
+    else if (errno != ENOENT)
     {
-        LLBC_SetLastError(LLBC_ERROR_NOT_ALLOW);
+        LLBC_SetLastError(LLBC_ERROR_CLIB);
         return LLBC_FAILED;
     }
 
@@ -1060,13 +1057,6 @@ int LLBC_File::CopyFile(const LLBC_String &srcFilePath, const LLBC_String &destF
     const sint64 srcFileSize = srcFile.GetFileSize();
     if (srcFileSize < 0)
         return LLBC_FAILED;
-
-    // Check dest file exist or not.
-    if (!overlapped && Exists(destFilePath))
-    {
-        LLBC_SetLastError(LLBC_ERROR_EXIST);
-        return LLBC_FAILED;
-    }
 
     // Open dest file with BinaryWrite mode.
     LLBC_File destFile(destFilePath, LLBC_FileMode::BinaryWrite);

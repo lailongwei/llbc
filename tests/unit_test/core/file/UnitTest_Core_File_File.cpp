@@ -739,7 +739,12 @@ TEST(FileTest, WritesFormatsAppendsAndUsesInstanceCopyMoveOperations)
     EXPECT_EQ(LLBC_File::CopyFile(emptyPath, emptyCopyPath), LLBC_OK);
     EXPECT_TRUE(LLBC_File::ReadToEnd(emptyCopyPath).empty());
     EXPECT_EQ(LLBC_File::CopyFile(paths.Path(".missing"), paths.Path(".copy")), LLBC_FAILED);
-    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_NOT_FOUND);
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+    EXPECT_EQ(LLBC_GetSubErrorNo(), ENOENT);
+#else
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_OSAPI);
+#endif
 
     const auto moveSourcePath = paths.Path(".move-source");
     const auto moveDestPath = paths.Path(".move-destination");
@@ -854,13 +859,20 @@ TEST(FileTest, ReportsDirectionalIoAndStaticFilesystemFailurePaths)
     const LLBC_String tempDirectory(
         std::filesystem::temp_directory_path().string().c_str());
     LLBC_File directoryFile(tempDirectory, LLBC_FileMode::BinaryRead);
-    ASSERT_TRUE(directoryFile.IsOpened());
-    EXPECT_TRUE(directoryFile.ReadLns().empty());
+    EXPECT_FALSE(directoryFile.IsOpened());
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+    EXPECT_EQ(LLBC_GetSubErrorNo(), EISDIR);
+    EXPECT_TRUE(directoryFile.GetFilePath().empty());
     const LLBC_String directoryCopyPath = paths.Path(".directory-copy");
     EXPECT_EQ(LLBC_File::CopyFile(tempDirectory, directoryCopyPath), LLBC_FAILED);
-    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_NOT_ALLOW);
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+    EXPECT_EQ(LLBC_GetSubErrorNo(), EISDIR);
     EXPECT_FALSE(LLBC_File::Exists(directoryCopyPath));
+
+    const LLBC_String invalidDestinationPath = sourcePath + "/child";
+    EXPECT_EQ(LLBC_File::CopyFile(sourcePath, invalidDestinationPath), LLBC_FAILED);
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+    EXPECT_EQ(LLBC_GetSubErrorNo(), ENOTDIR);
 
     if (::geteuid() != 0)
     {
