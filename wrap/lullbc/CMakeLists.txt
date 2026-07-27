@@ -26,10 +26,15 @@ target_compile_definitions(${LLBC_3RD_LUA_LIB}
                            PRIVATE "$<IF:$<PLATFORM_ID:Windows>,LUA_BUILD_AS_DLL,LUA_USE_DLOPEN>")
 target_link_libraries(${LLBC_3RD_LUA_LIB}
                       PRIVATE llbc_build_settings
-                      PUBLIC "$<$<NOT:$<PLATFORM_ID:Windows>>:dl>")
+                      PRIVATE "$<$<NOT:$<PLATFORM_ID:Windows>>:dl>"
+                      PRIVATE "$<$<NOT:$<PLATFORM_ID:Windows>>:m>")
 set_target_properties(${LLBC_3RD_LUA_LIB} PROPERTIES
                       FOLDER "wrap/lullbc"
                       OUTPUT_NAME "lua")
+set_target_properties(${LLBC_3RD_LUA_LIB} PROPERTIES
+                      C_VISIBILITY_PRESET default
+                      CXX_VISIBILITY_PRESET default
+                      VISIBILITY_INLINES_HIDDEN OFF)
 if (APPLE)
     set_target_properties(${LLBC_3RD_LUA_LIB} PROPERTIES
                           SUFFIX ".so")
