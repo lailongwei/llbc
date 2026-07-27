@@ -251,6 +251,7 @@ LLBC_LoggerMgrSingleton->Reload("NewLogConfig.cfg");
 真实用例：
 - `tests/func_test/core/log/FuncTest_Core_Log.cpp` — 全功能演示（初始化、宏、JSON、条件宏、hook、trace、重载）
 - `tests/func_test/core/log/LogTestCfg.cfg` — 完整配置文件示例
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Logger.cpp`
 
 ## 下一步
 

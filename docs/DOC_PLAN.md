@@ -128,7 +128,7 @@ title: 文档规划
 ### 5.1 信息源优先级（冲突时以上为准）
 1. **头文件 `*.h`** —— 公开接口的唯一真相；以此确定类名、方法名、签名、默认参数。
 2. **`*Inl.h`** —— 模板/内联实现，确认真实模板特化与重载（签名常在这里才看得全）。
-3. **`tests/`** —— 可编译的权威用法示例。取例优先级：`unit_test`（自动化）> `func_test` > `quick_start`。
+3. **`tests/`** —— 可编译的权威用法示例。取例优先级：`unit_test`（自动化）> `func_test` > `example`（入门/上手）。
 4. **`CHANGELOG`** —— **设计意图与变更缘由**的权威来源（为什么这样改、废弃了什么）。
 5. **类/头顶部注释** —— 作者写下的动机与约束。
 6. **既有笔记 / PDF / wiki** —— 只用于**选题和结构**，所有结论必须回到 1–3 校验。
@@ -254,7 +254,7 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
 | 页面 | 文件 | 主要源头 | 图 | 状态 |
 |---|---|---|---|---|
 | 安装与构建 | `getting-started/build.md` | CMakeLists / config.cmake / WinPreBuild.bat | — | ✅ |
-| Hello World | `getting-started/hello-world.md` | quick_start/hello_world | — | ✅ |
+| Hello World | `getting-started/hello-world.md` | example/common/Example_Common_HelloWorld | — | ✅ |
 | 第一个 Service | `getting-started/first-service.md` | func_test/comm/SvcBase | — | ✅ |
 | 第一个网络回显服务 | `getting-started/echo-service.md` | comm/Service.h · func_test SvcBase | — | ✅ |
 
@@ -314,7 +314,7 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
 | 贡献指南 | `contributing.md` | 构建/子模块/命名约定/PR | — | ✅ |
 | 版本迁移指南 v1.1.1 | `migration-v1.1.1.md` | 仓库根 CHANGELOG | — | ✅ |
 | 术语表 | `glossary.md` | 全局 | — | ✅ |
-| 示例项目 | `examples.md` | tests/example | — | ⏸（内容不足） |
+| 示例项目 | `examples.md` | tests/example（30 例，菜单+traits，按模块分组） | — | ✅ |
 | 更新日志 | `changelog.md` | 外链 CHANGELOG | — | ✅ |
 
 > "图"列：✅ 已配图 · 🚧 待配图（手写 SVG，见 §6）· —— 无需配图。新增 `getting-started` / `concepts` / `guides` / `reference` 页写完后，需在 `_data/navigation.yml` 与 `index.md` 路线图登记（新增「使用指南 · 网络」「参考」两个分区）。

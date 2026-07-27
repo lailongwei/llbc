@@ -53,16 +53,20 @@ Hello World!
 
 这段代码改编自仓库内的快速开始项目：
 
-- `tests/quick_start/hello_world/QuickStart_HelloWorld.cpp` —— Hello World 本体
-- `tests/quick_start/QuickStart.cpp` —— `main` 入口与库启停
+- `tests/example/common/Example_Common_HelloWorld.cpp` —— Hello World 本体
+- `tests/example/Example.cpp` —— `main` 入口与库启停
 
-你可以直接构建并运行 quick_start 看到效果：
+你可以直接构建并运行 example（菜单驱动），在菜单里选择 “Hello World” 看到效果：
 
 ```bash
-make quick_start config=debug64
-./output/gmake2/debug64/quick_start_debug
+make example config=debug64
+./output/gmake2/debug64/example_debug   # 运行后在菜单输入 Hello World 对应的序号
 ```
 
 ## 下一步
 
 前往 [序列化 Stream](../guides/stream.md)，了解 llbc 的二进制序列化容器 `LLBC_Stream`。
+
+## 参照
+
+- 快速上手示例（可跑）：`tests/example/common/Example_Common_HelloWorld.cpp`

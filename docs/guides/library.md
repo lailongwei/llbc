@@ -119,6 +119,7 @@ if (lib.Close() != LLBC_OK)
 - 底层 OS 封装：`llbc/include/llbc/core/os/OS_Library.h`（`LLBC_LoadLibrary` / `LLBC_GetProcAddress` / `LLBC_CloseLibrary`）
 - 类型定义：`llbc/include/llbc/common/BasicDataType.h`（`LLBC_LibraryHandle`、`LLBC_LibraryFun`）
 - 功能测试：`tests/func_test/core/library/FuncTest_Core_Library.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Library.cpp`
 
 ## 下一步
 

@@ -131,6 +131,7 @@ else
 - 编译期配置宏：`llbc/include/llbc/common/Config.h`（第 314–328 行）
 - 服务启动参数：`llbc/include/llbc/comm/Service.h`（`LLBC_ServiceStartArgs`）
 - 真实用例：`tests/func_test/comm/FuncTest_Comm_Svc.cpp`
+- 快速上手示例（可跑）：`tests/example/comm/Example_Comm_Poller.cpp`
 
 ## 下一步
 

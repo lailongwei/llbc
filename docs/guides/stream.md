@@ -102,7 +102,8 @@ stream >> out;
 
 ## 参照
 
-- 完整示例：`tests/quick_start/stream/QuickStart_Stream.cpp`
+- 完整示例：`tests/example/core/Example_Core_Stream.cpp`
 - 头文件：`llbc/include/llbc/common/`（Stream 属于 common 模块）
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Stream.cpp`
 
 > TODO：补充版本兼容/前后兼容策略、`LLBC_Variant` 与 Stream 的互转、性能与预分配建议。

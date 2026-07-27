@@ -210,6 +210,7 @@ dict.SetHashBucketSize(101);
 - 头文件：`llbc/include/llbc/core/objbase/Object.h`（引用计数基类）
 - func_test 示例：`tests/func_test/core/objbase/FuncTest_Core_ObjBase_Array.cpp`
 - func_test 示例：`tests/func_test/core/objbase/FuncTest_Core_ObjBase_Dictionary.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_ObjbaseCollections.cpp`
 
 ## 下一步
 

@@ -196,6 +196,7 @@ while (running) {
 - 头文件：`llbc/include/llbc/core/timer/Timer.h`、`llbc/include/llbc/core/timer/TimerScheduler.h`
 - 真实示例：`tests/func_test/comm/FuncTest_Comm_Timer.cpp`
 - App 阶段定时器示例：`tests/func_test/app/FuncTest_App_AppTimer.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Timer.cpp`
 
 ## 下一步
 

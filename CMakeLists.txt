@@ -10,6 +10,7 @@ project(llbc VERSION ${LLBC_VERSION})
 
 # Add llbc lib directory.
 add_subdirectory(${LLBC_LIB_DIR})
+
 # Add llbc lib tests directory.
 add_subdirectory(${LLBC_LIB_TESTS_DIR})
 # Add llbc wrap directory.

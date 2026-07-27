@@ -19,17 +19,13 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "hello_world/QuickStart_HelloWorld.h"
+#pragma once
 
-int QuickStart_HelloWorld::Run(int argc, char *argv[])
+#include "llbc.h"
+using namespace llbc;
+
+class Example_Core_Stream : public LLBC_BaseTestCase
 {
-    // 初始化llbc框架
-    LLBC_Startup();
-    // Defer清理llbc框架
-    LLBC_Defer(LLBC_Cleanup());
-
-    // Print hello world, 你也可以用std::cout/printf, 用LLBC_PrintLn省去你打\n
-    LLBC_PrintLn("Hello World!");
-
-    return LLBC_OK;
-}
+public:
+    int Run(int argc, char *argv[]) override;
+};

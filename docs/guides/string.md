@@ -173,6 +173,7 @@ auto it = registry.find("HP");   // 无堆分配
 - 头文件：`llbc/include/llbc/common/BasicCString.h`
 - 类型别名：`llbc/include/llbc/common/StringDataType.h`
 - 功能测试：`tests/func_test/common/FuncTest_Com_DataType.cpp`
+- 快速上手示例（可跑）：`tests/example/common/Example_Common_String.cpp`
 
 ## 下一步
 

@@ -167,13 +167,18 @@ public:
 `LLBC_IProtocolFilter` 目前没有公开的 `AddFilter` / `SetFilter` 入口位于 `LLBC_Service` 接口；过滤器通过 `LLBC_ProtocolStack::SetFilter(filter, layer)` 安装，而 `LLBC_ProtocolStack` 由框架内部管理。如需拦截逻辑，通常在自定义协议层的 `Send`/`Recv` 内部实现更为直接。
 </div>
 
-## 抑制编解码器未注册警告
+## 允许未注册 Coder 的原始 payload
 
-当使用 Raw 模式或某些 opcode 故意不注册 Coder 时，可关闭框架的警告日志：
+默认 `NormalProtocolFactory` 中，若收到的 opcode 未注册 Coder，`CodecProtocol`
+会报告警告并丢弃该包。要让未注册 Coder 的原始 payload 继续流向 `Subscribe`
+处理函数，应在 `Start()` 前调用：
 
 ```cpp
 svc->SuppressCoderNotFoundWarning();
 ```
+
+注册了 `AddCoderFactory` 的 opcode 不需要此设置；使用 `RawProtocolFactory` 时也不涉及
+CodecProtocol 的 Coder 查找。
 
 <div class="callout note" markdown="1">
 **线程安全：** 协议栈对象随 Session 生命周期存在于 Poller 线程，不应在业务线程直接操作 `LLBC_ProtocolStack` 成员。控制命令请使用 `LLBC_Service::CtrlProtocolStack`，它是线程安全的。
@@ -190,6 +195,7 @@ svc->SuppressCoderNotFoundWarning();
 - `llbc/include/llbc/comm/protocol/NormalProtocolFactory.h` / `RawProtocolFactory.h` — 内置工厂
 - 真实用例：`tests/func_test/comm/FuncTest_Comm_ProtoStackCtrl.cpp`
 - 真实用例：`tests/func_test/comm/FuncTest_Comm_Svc.cpp`（Normal vs Raw 工厂选择）
+- 快速上手示例（可跑）：`tests/example/comm/Example_Comm_Protocol.cpp`
 
 ## 下一步
 

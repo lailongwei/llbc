@@ -79,8 +79,7 @@ llbc 有四个测试项目；新代码的自动化验证依赖 **unit_test**：
 |------|------|------|
 | `tests/unit_test` | **自动化**，gtest/gmock | 进行中的质量门，CI 必须全绿 |
 | `tests/func_test` | 交互式，菜单驱动 | 框架开发者功能验证，用 `__DEFINE_TEST_CASE(...)` 注册用例 |
-| `tests/quick_start` | 交互式 | 新手上手 demo |
-| `tests/example` | 交互式 | 各特性用法演示 |
+| `tests/example` | 交互式，菜单驱动 | 新手上手 + 各特性用法演示，按 `common/core/comm/app` 分组，用 `__DEFINE_EXAMPLE(...)` 在 `ExampleDef.h` 注册 |
 
 **为新特性 / 修复提交 unit_test 用例是硬性要求。** 编写方式：
 

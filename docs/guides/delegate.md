@@ -123,3 +123,4 @@ void SafeCallback(LLBC_Delegate<void()> &callback)
 
 - 头文件：`llbc/include/llbc/core/utils/Util_Delegate.h`（内联实现见同目录 `Util_DelegateInl.h`）
 - 示例：`tests/func_test/core/utils/FuncTest_Core_Utils_Delegate.cpp`
+- 快速上手示例（可跑）：`tests/example/core/Example_Core_Delegate.cpp`
