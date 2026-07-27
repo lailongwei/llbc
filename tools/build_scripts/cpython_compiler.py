@@ -79,9 +79,25 @@ class CPythonCompiler(object):
                             'is unsupported, arch:{}'.format(ArchType.type2desc(cfg.arch)))
 
         # 定义cpython配置选项
+        # Note：
+        # - CPython 启用 --enable-shared 编译，运行时需要编辑器 llbc 框架编译的 cpython so
+        #   故通过 LDFLAGS 传入 rpath, 确保运行 python exec 时能正确加载 cpython so
+        #
+        #  rpath指定方式:
+        #   - Linux (ELF):  $ORIGIN         由 glibc ld.so 展开为 exec/so 所在目录
+        #   - macOS (Mach-O): @executable_path  由 dyld 展开为可执行文件所在目录
+        if cfg.platform == PlatformType.Darwin:
+            # macOS: @executable_path 由 dyld 在加载时展开
+            ldflags_opt = "LDFLAGS='-Wl,-rpath,@executable_path/../lib'"
+        else:
+            # Linux: $ORIGIN 由 ld.so 在加载时展开；此处 \$$ORIGIN 是为了穿过
+            # Python 字符串 + shell 两层解析后，最终传给 configure 的仍是 $ORIGIN。
+            ldflags_opt = "LDFLAGS='-Wl,-rpath,\\$$ORIGIN/../lib'"
+
         cpython_config_opts = [
             '--enable-shared',
             'CFLAGS="-Wno-register"',
+            ldflags_opt,
             '--prefix="{}"'.format(cfg.pyllbc_cpython_publish_path)
         ]
 
