@@ -54,6 +54,8 @@ target_include_directories(${LLBC_WRAP_LIB_PYLLBC}
                            PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
                            PRIVATE "${LLBC_3RD_DIR_CPYTHON}/Include"
                            PRIVATE "$<IF:$<PLATFORM_ID:Windows>,${LLBC_3RD_DIR_CPYTHON}/PC,${LLBC_3RD_DIR_CPYTHON}>")
+target_compile_options(${LLBC_WRAP_LIB_PYLLBC}
+                      PRIVATE "$<$<NOT:$<PLATFORM_ID:Windows>>:-Wno-register>")
 target_link_libraries(${LLBC_WRAP_LIB_PYLLBC}
                       PRIVATE llbc_build_settings_loose ${LLBC_LIB_SHARED})
 if (WIN32)
@@ -68,10 +70,10 @@ target_link_directories(${LLBC_WRAP_LIB_PYLLBC}
 llbc_apply_config_postfix(${LLBC_WRAP_LIB_PYLLBC})
 set_target_properties(${LLBC_WRAP_LIB_PYLLBC} PROPERTIES
                       FOLDER "wrap"
+                      PREFIX ""
                       OUTPUT_NAME "llbc")
 if (WIN32)
     set_target_properties(${LLBC_WRAP_LIB_PYLLBC} PROPERTIES
-                          FOLDER "wrap"
                           SUFFIX ".pyd")
 endif()
 
