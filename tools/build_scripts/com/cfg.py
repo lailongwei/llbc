@@ -64,7 +64,7 @@ class _Cfg(object):
         self._sln_path = op.dirname(op.dirname(op.dirname(cur_path)))
 
         # Log
-        Log.fi('Build llbc(ver: {}) for {}-{}, build cfg: {}, disable_cxx11_abi: {}{}',
+        Log.ft('Build llbc(ver: {}) for {}-{}, build cfg: {}, disable_cxx11_abi: {}{}',
                self._ver,
                ArchType.type2desc(self._arch),
                PlatformType.type2desc(self._platform),
@@ -135,11 +135,7 @@ class _Cfg(object):
     @property
     def output_path(self):
         """输出目录"""
-        output_path = op.join(self.sln_path, 'output')
-        if self._platform == PlatformType.Windows:
-            output_path = op.join(output_path, self._build_cfg)
-
-        return output_path
+        return op.join(self.sln_path, 'output', self._build_cfg)
 
     @property
     def exe_suffix(self):
