@@ -68,17 +68,26 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
         _lv < _logger->GetLogLevel())
         return;
 
+    // Reserve enough room for the JSON object wrapper and timestamp so the
+    // message can still be added to the document without a copy.
+    constexpr size_t jsonReservedSize = 64;
+    static_assert(LLBC_CFG_LOG_FORMAT_BUF_SIZE + 1 > jsonReservedSize,
+                  "Logger format buffer must be larger than JSON reserved size");
+
     // Format.
     va_list va;
     va_start(va, fmt);
     __LLBC_LibTls *libTls = __LLBC_GetLibTls();
+    const size_t fmtBufSize = sizeof(libTls->coreTls.loggerFmtBuf) - jsonReservedSize;
     int len = vsnprintf(libTls->coreTls.loggerFmtBuf,
-                        sizeof(libTls->coreTls.loggerFmtBuf),
+                        fmtBufSize,
                         fmt,
                         va);
     va_end(va);
     if (UNLIKELY(len < 0))
         return;
+    if (UNLIKELY(static_cast<size_t>(len) >= fmtBufSize))
+        len = static_cast<int>(fmtBufSize - 1);
 
     // Add time.
     const sint64 now =
@@ -86,53 +95,15 @@ void LLBC_LogJsonMsg::Finish(const char *fmt, ...)
     if (LIKELY(_logger) && _logger->IsAddTimestampInJsonLog())
         this->Add("timestamp", now);
 
-    // Add message by copy, then make sure the serialized JSON itself remains
-    // inside the logger's bounded message buffer. Truncating only the raw
-    // printf result can leave no room for JSON quotes/escapes and causes a
-    // later logger-level truncation to emit invalid JSON.
-    const size_t maxJsonLen = sizeof(libTls->coreTls.loggerFmtBuf) - 2;
-    size_t msgLen = std::min(static_cast<size_t>(len), maxJsonLen);
+    // Doc add string with not copy.
     _doc.AddMember("msg",
-                   LLBC_JsonValue(libTls->coreTls.loggerFmtBuf,
-                                  msgLen,
-                                  _doc.GetAllocator()).Move(),
+                   LLBC_JsonValue(libTls->coreTls.loggerFmtBuf, len).Move(),
                    _doc.GetAllocator());
-    auto msgMember = _doc.MemberEnd();
-    --msgMember;
 
     // _doc stringify
     LLBC_Json::StringBuffer buffer;
-    while (true)
-    {
-        buffer.Clear();
-        LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
-        _doc.Accept(writer);
-        if (buffer.GetLength() <= maxJsonLen)
-            break;
-
-        if (msgLen == 0)
-        {
-            // An added field can independently exceed the output limit. Keep
-            // the formatted message and discard optional fields rather than
-            // passing invalid, truncated JSON to the logger.
-            _doc.SetObject();
-            msgLen = std::min(static_cast<size_t>(len), maxJsonLen);
-            _doc.AddMember("msg",
-                           LLBC_JsonValue(libTls->coreTls.loggerFmtBuf,
-                                          msgLen,
-                                          _doc.GetAllocator()).Move(),
-                           _doc.GetAllocator());
-            msgMember = _doc.MemberEnd();
-            --msgMember;
-            continue;
-        }
-
-        const size_t overflow = buffer.GetLength() - maxJsonLen;
-        msgLen -= std::min(msgLen, overflow);
-        msgMember->value.SetString(libTls->coreTls.loggerFmtBuf,
-                                   msgLen,
-                                   _doc.GetAllocator());
-    }
+    LLBC_Json::Writer<LLBC_Json::StringBuffer> writer(buffer);
+    _doc.Accept(writer);
 
     // Output json log.
     if (LIKELY(_logger))

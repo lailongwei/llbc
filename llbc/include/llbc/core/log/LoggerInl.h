@@ -89,7 +89,7 @@ int LLBC_Logger::RemoveColorLogKey(const _TraceKeyTy &traceKey)
     return RemoveColorLogKey(LLBC_LogTrace::TraceKey(traceKey));
 }
 
-
+// GCC rejects always_inline functions that use variable argument lists.
 #define __LLBC_INL_GEN_LEVEL_LOG_METH_IMPL(level) \
     inline int LLBC_Logger::level(const char *tag, \
                                              const char *file, \

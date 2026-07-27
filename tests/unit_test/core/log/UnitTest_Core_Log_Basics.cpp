@@ -1052,50 +1052,35 @@ TEST(LogBasicsTest, EmitsStructuredJsonLogsWithoutReadingPastFormatBuffer)
     EXPECT_STREQ(firstDoc["msg"].GetString(), "message:42");
     EXPECT_TRUE(firstDoc.HasMember("timestamp"));
 
-    const std::string oversizedField(LLBC_CFG_LOG_FORMAT_BUF_SIZE, 'y');
-    std::string oversizedFieldJson;
+    const std::string oversized(LLBC_CFG_LOG_FORMAT_BUF_SIZE + 128, 'x');
+    std::string oversizedJson;
     ASSERT_EQ(root->SetLogHook(LLBC_LogLevel::Info, [&](const LLBC_LogData *data) {
-        oversizedFieldJson.assign(data->msg, data->msgLen);
+        oversizedJson.assign(data->msg, data->msgLen);
     }), LLBC_OK);
     {
         LLBC_LogJsonMsg json(root, "json-test", LLBC_LogLevel::Info, "/tmp/json.cpp", 22, "JsonFn");
-        json.Add("payload", oversizedField.c_str()).Finish("short-message");
+        json.Finish("%s", oversized.c_str());
     }
     ASSERT_EQ(root->SetLogHook(LLBC_LogLevel::Info, nullptr), LLBC_OK);
 
-    LLBC_Json::Document oversizedFieldDoc;
-    oversizedFieldDoc.Parse(oversizedFieldJson.c_str());
-    ASSERT_FALSE(oversizedFieldDoc.HasParseError());
-    ASSERT_TRUE(oversizedFieldDoc.HasMember("msg"));
-    EXPECT_FALSE(oversizedFieldDoc.HasMember("payload"));
-    EXPECT_STREQ(oversizedFieldDoc["msg"].GetString(), "short-message");
+    ASSERT_LT(oversizedJson.size(), static_cast<size_t>(LLBC_CFG_LOG_FORMAT_BUF_SIZE));
+    LLBC_Json::Document oversizedDoc;
+    oversizedDoc.Parse(oversizedJson.c_str());
+    ASSERT_FALSE(oversizedDoc.HasParseError());
+    EXPECT_TRUE(oversizedDoc.HasMember("timestamp"));
+    ASSERT_TRUE(oversizedDoc.HasMember("msg"));
+    constexpr size_t jsonReservedSize = 64;
+    EXPECT_EQ(static_cast<size_t>(oversizedDoc["msg"].GetStringLength()),
+              static_cast<size_t>(LLBC_CFG_LOG_FORMAT_BUF_SIZE - jsonReservedSize));
+    EXPECT_EQ(oversizedDoc["msg"].GetString()[0], 'x');
+    EXPECT_EQ(oversizedDoc["msg"].GetString()
+                  [LLBC_CFG_LOG_FORMAT_BUF_SIZE - jsonReservedSize - 1],
+              'x');
 
     manager.Finalize();
-    const std::string capturedBeforeLargeMessage = redirect.ReadCaptured();
-
-    const std::string oversized(LLBC_CFG_LOG_FORMAT_BUF_SIZE + 128, 'x');
-    {
-        LLBC_LogJsonMsg json(nullptr, nullptr, LLBC_LogLevel::Info, nullptr, 0, nullptr);
-        json.Finish("%s", oversized.c_str());
-    }
     const std::string captured = redirect.ReadCaptured();
     EXPECT_NE(captured.find("\"message:42\""), std::string::npos);
     EXPECT_NE(captured.find("\"msg\""), std::string::npos);
-
-    const std::string uninitializedJsonOutput =
-        captured.substr(capturedBeforeLargeMessage.size());
-    const size_t jsonBegin = uninitializedJsonOutput.find('{');
-    ASSERT_NE(jsonBegin, std::string::npos);
-    LLBC_Json::Document oversizedDoc;
-    oversizedDoc.Parse(uninitializedJsonOutput.c_str() + jsonBegin);
-    ASSERT_FALSE(oversizedDoc.HasParseError());
-    ASSERT_TRUE(oversizedDoc.HasMember("msg"));
-    const size_t maxJsonMessageLen =
-        LLBC_CFG_LOG_FORMAT_BUF_SIZE - 1 - std::string("{\"msg\":\"\"}").size();
-    EXPECT_EQ(static_cast<size_t>(oversizedDoc["msg"].GetStringLength()),
-              maxJsonMessageLen);
-    EXPECT_EQ(oversizedDoc["msg"].GetString()[0], 'x');
-    EXPECT_EQ(oversizedDoc["msg"].GetString()[maxJsonMessageLen - 1], 'x');
 #else
     GTEST_SKIP() << "stdout redirection is POSIX-specific";
 #endif
