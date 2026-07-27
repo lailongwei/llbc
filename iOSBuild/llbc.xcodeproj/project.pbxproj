@@ -20,8 +20,6 @@
 		D88A7DC11D9AC877008C9A1F /* Ini.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7D481D9AC877008C9A1F /* Ini.cpp */; };
 		D88A7DC21D9AC877008C9A1F /* Property.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7D491D9AC877008C9A1F /* Property.cpp */; };
 		D88A7DC31D9AC877008C9A1F /* Core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7D4A1D9AC877008C9A1F /* Core.cpp */; };
-		D88A7DC41D9AC877008C9A1F /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7D4C1D9AC877008C9A1F /* Entity.cpp */; };
-		D88A7DC51D9AC877008C9A1F /* Holder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7D4D1D9AC877008C9A1F /* Holder.cpp */; };
 		D88A7DC61D9AC877008C9A1F /* Event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7D4F1D9AC877008C9A1F /* Event.cpp */; };
 		D88A7DC71D9AC877008C9A1F /* EventManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7D501D9AC877008C9A1F /* EventManager.cpp */; };
 		D88A7DC81D9AC877008C9A1F /* Directory_Com.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88A7D521D9AC877008C9A1F /* Directory_Com.cpp */; };
@@ -185,8 +183,6 @@
 		D88A7D481D9AC877008C9A1F /* Ini.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Ini.cpp; sourceTree = "<group>"; };
 		D88A7D491D9AC877008C9A1F /* Property.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Property.cpp; sourceTree = "<group>"; };
 		D88A7D4A1D9AC877008C9A1F /* Core.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Core.cpp; path = ../llbc/src/core/Core.cpp; sourceTree = "<group>"; };
-		D88A7D4C1D9AC877008C9A1F /* Entity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Entity.cpp; sourceTree = "<group>"; };
-		D88A7D4D1D9AC877008C9A1F /* Holder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Holder.cpp; sourceTree = "<group>"; };
 		D88A7D4F1D9AC877008C9A1F /* Event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Event.cpp; sourceTree = "<group>"; };
 		D88A7D501D9AC877008C9A1F /* EventManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventManager.cpp; sourceTree = "<group>"; };
 		D88A7D521D9AC877008C9A1F /* Directory_Com.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Directory_Com.cpp; sourceTree = "<group>"; };
@@ -408,12 +404,6 @@
 		D88A7ED21D9ACA3D008C9A1F /* Property.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Property.h; sourceTree = "<group>"; };
 		D88A7ED31D9ACA3D008C9A1F /* PropertyImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PropertyImpl.h; sourceTree = "<group>"; };
 		D88A7ED41D9ACA3D008C9A1F /* Core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Core.h; sourceTree = "<group>"; };
-		D88A7ED61D9ACA3D008C9A1F /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
-		D88A7ED71D9ACA3D008C9A1F /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Entity.h; sourceTree = "<group>"; };
-		D88A7ED81D9ACA3D008C9A1F /* EntityImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EntityImpl.h; sourceTree = "<group>"; };
-		D88A7ED91D9ACA3D008C9A1F /* Holder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Holder.h; sourceTree = "<group>"; };
-		D88A7EDA1D9ACA3D008C9A1F /* HolderImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HolderImpl.h; sourceTree = "<group>"; };
-		D88A7EDB1D9ACA3D008C9A1F /* IHolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IHolder.h; sourceTree = "<group>"; };
 		D88A7EDD1D9ACA3D008C9A1F /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
 		D88A7EDE1D9ACA3D008C9A1F /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Event.h; sourceTree = "<group>"; };
 		D88A7EDF1D9ACA3D008C9A1F /* EventManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventManager.h; sourceTree = "<group>"; };
@@ -672,7 +662,6 @@
 				D88A7D4A1D9AC877008C9A1F /* Core.cpp */,
 				D88A7D431D9AC877008C9A1F /* bundle */,
 				D88A7D461D9AC877008C9A1F /* config */,
-				D88A7D4B1D9AC877008C9A1F /* entity */,
 				D88A7D4E1D9AC877008C9A1F /* event */,
 				D88A7D511D9AC877008C9A1F /* file */,
 				D88A7D561D9AC877008C9A1F /* helper */,
@@ -712,16 +701,6 @@
 			);
 			name = config;
 			path = ../llbc/src/core/config;
-			sourceTree = "<group>";
-		};
-		D88A7D4B1D9AC877008C9A1F /* entity */ = {
-			isa = PBXGroup;
-			children = (
-				D88A7D4C1D9AC877008C9A1F /* Entity.cpp */,
-				D88A7D4D1D9AC877008C9A1F /* Holder.cpp */,
-			);
-			name = entity;
-			path = ../llbc/src/core/entity;
 			sourceTree = "<group>";
 		};
 		D88A7D4E1D9AC877008C9A1F /* event */ = {
@@ -1116,7 +1095,6 @@
 				D88A7EC91D9ACA3D008C9A1F /* comstring */,
 				D88A7ECD1D9ACA3D008C9A1F /* config */,
 				D88A7ED41D9ACA3D008C9A1F /* Core.h */,
-				D88A7ED51D9ACA3D008C9A1F /* entity */,
 				D88A7EDC1D9ACA3D008C9A1F /* event */,
 				D88A7EE11D9ACA3D008C9A1F /* file */,
 				D88A7EE61D9ACA3D008C9A1F /* helper */,
@@ -1169,19 +1147,6 @@
 				D88A7ED31D9ACA3D008C9A1F /* PropertyImpl.h */,
 			);
 			path = config;
-			sourceTree = "<group>";
-		};
-		D88A7ED51D9ACA3D008C9A1F /* entity */ = {
-			isa = PBXGroup;
-			children = (
-				D88A7ED61D9ACA3D008C9A1F /* Common.h */,
-				D88A7ED71D9ACA3D008C9A1F /* Entity.h */,
-				D88A7ED81D9ACA3D008C9A1F /* EntityImpl.h */,
-				D88A7ED91D9ACA3D008C9A1F /* Holder.h */,
-				D88A7EDA1D9ACA3D008C9A1F /* HolderImpl.h */,
-				D88A7EDB1D9ACA3D008C9A1F /* IHolder.h */,
-			);
-			path = entity;
 			sourceTree = "<group>";
 		};
 		D88A7EDC1D9ACA3D008C9A1F /* event */ = {
@@ -1581,7 +1546,6 @@
 				D88A7DDC1D9AC877008C9A1F /* LoggerConfigInfo.cpp in Sources */,
 				D88A7DBF1D9AC877008C9A1F /* Bundle.mm in Sources */,
 				D88A7DE11D9AC877008C9A1F /* LogLineToken.cpp in Sources */,
-				D88A7DC41D9AC877008C9A1F /* Entity.cpp in Sources */,
 				D88A7DC21D9AC877008C9A1F /* Property.cpp in Sources */,
 				D88A7DDD1D9AC877008C9A1F /* LoggerConfigurator.cpp in Sources */,
 				D88A7E121D9AC878008C9A1F /* ThreadDescriptor.cpp in Sources */,
@@ -1615,7 +1579,6 @@
 				D88A7E5C1D9AC8AA008C9A1F /* Packet.cpp in Sources */,
 				D88A7E2F1D9AC899008C9A1F /* KeyHashAlgorithm.cpp in Sources */,
 				D88A7DC01D9AC877008C9A1F /* Config.cpp in Sources */,
-				D88A7DC51D9AC877008C9A1F /* Holder.cpp in Sources */,
 				D88A7E071D9AC878008C9A1F /* Guard.cpp in Sources */,
 				D88A7E681D9AC8AA008C9A1F /* ProtocolLayer.cpp in Sources */,
 				D88A7DD71D9AC877008C9A1F /* LogEscapeToken.cpp in Sources */,

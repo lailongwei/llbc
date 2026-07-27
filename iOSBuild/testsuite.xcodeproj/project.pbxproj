@@ -39,7 +39,6 @@
 		D87A14D71DA3559100DB1F62 /* TestCase_Core_Config_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14681DA3559100DB1F62 /* TestCase_Core_Config_Config.cpp */; };
 		D87A14D81DA3559100DB1F62 /* TestCase_Core_Config_Ini.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A146A1DA3559100DB1F62 /* TestCase_Core_Config_Ini.cpp */; };
 		D87A14D91DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A146C1DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp */; };
-		D87A14DA1DA3559100DB1F62 /* TestCase_Core_Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A146F1DA3559100DB1F62 /* TestCase_Core_Entity.cpp */; };
 		D87A14DB1DA3559100DB1F62 /* TestCase_Core_File_Directory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14721DA3559100DB1F62 /* TestCase_Core_File_Directory.cpp */; };
 		D87A14DC1DA3559100DB1F62 /* TestCase_Core_File_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14741DA3559100DB1F62 /* TestCase_Core_File_File.cpp */; };
 		D87A14DD1DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D87A14771DA3559100DB1F62 /* TestCase_Core_Helper_JVHelper.cpp */; };
@@ -141,8 +140,6 @@
 		D87A146B1DA3559100DB1F62 /* TestCase_Core_Config_Ini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Config_Ini.h; sourceTree = "<group>"; };
 		D87A146C1DA3559100DB1F62 /* TestCase_Core_Config_Property.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Config_Property.cpp; sourceTree = "<group>"; };
 		D87A146D1DA3559100DB1F62 /* TestCase_Core_Config_Property.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Config_Property.h; sourceTree = "<group>"; };
-		D87A146F1DA3559100DB1F62 /* TestCase_Core_Entity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_Entity.cpp; sourceTree = "<group>"; };
-		D87A14701DA3559100DB1F62 /* TestCase_Core_Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_Entity.h; sourceTree = "<group>"; };
 		D87A14721DA3559100DB1F62 /* TestCase_Core_File_Directory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_File_Directory.cpp; sourceTree = "<group>"; };
 		D87A14731DA3559100DB1F62 /* TestCase_Core_File_Directory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCase_Core_File_Directory.h; sourceTree = "<group>"; };
 		D87A14741DA3559100DB1F62 /* TestCase_Core_File_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TestCase_Core_File_File.cpp; sourceTree = "<group>"; };
@@ -330,7 +327,6 @@
 			children = (
 				D87A14621DA3559100DB1F62 /* bundle */,
 				D87A14651DA3559100DB1F62 /* config */,
-				D87A146E1DA3559100DB1F62 /* entity */,
 				D87A14711DA3559100DB1F62 /* file */,
 				D87A14761DA3559100DB1F62 /* helper */,
 				D87A147B1DA3559100DB1F62 /* library */,
@@ -369,15 +365,6 @@
 				D87A146D1DA3559100DB1F62 /* TestCase_Core_Config_Property.h */,
 			);
 			path = config;
-			sourceTree = "<group>";
-		};
-		D87A146E1DA3559100DB1F62 /* entity */ = {
-			isa = PBXGroup;
-			children = (
-				D87A146F1DA3559100DB1F62 /* TestCase_Core_Entity.cpp */,
-				D87A14701DA3559100DB1F62 /* TestCase_Core_Entity.h */,
-			);
-			path = entity;
 			sourceTree = "<group>";
 		};
 		D87A14711DA3559100DB1F62 /* file */ = {
@@ -619,7 +606,6 @@
 				D87A14DE1DA3559100DB1F62 /* TestCase_Core_Helper_StlHelper.cpp in Sources */,
 				D87A14E61DA3559100DB1F62 /* TestCase_Core_Thread_Lock.cpp in Sources */,
 				D87A14F61DA3559100DB1F62 /* TestCase_Core_Utils_Misc.cpp in Sources */,
-				D87A14DA1DA3559100DB1F62 /* TestCase_Core_Entity.cpp in Sources */,
 				D87A14271DA3541D00DB1F62 /* ViewController.mm in Sources */,
 				D87A14F71DA3559100DB1F62 /* TestCase_Core_Utils_Network.cpp in Sources */,
 				D87A14EB1DA3559100DB1F62 /* TestCase_Core_Thread_Tls.cpp in Sources */,

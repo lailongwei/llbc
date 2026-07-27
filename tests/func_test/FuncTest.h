@@ -67,7 +67,6 @@
 #include "core/thread/FuncTest_Core_Thread_Task.h"
 #include "core/random/FuncTest_Core_Random.h"
 #include "core/log/FuncTest_Core_Log.h"
-#include "core/entity/FuncTest_Core_Entity.h"
 #include "core/transcoder/FuncTest_Core_Transcoder.h"
 #include "core/library/FuncTest_Core_Library.h"
 #include "core/objbase/FuncTest_Core_ObjBase_Object.h"
@@ -102,5 +101,4 @@
 #include "app/FuncTest_App_ReloadFailedTest.h"
 
 extern int FuncTest_Main(int argc, char *argv[]);
-
 
