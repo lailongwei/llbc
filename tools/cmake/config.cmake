@@ -11,8 +11,32 @@ option(LLBC_ENABLE_COVERAGE "Enable coverage (non-Windows only)" OFF)
 # set(LLBC_CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir>" CACHE STRING "Custom compile toolset dir")
 
 # ==================== User imutable settings ====================
+# Set custom compile toolset.
+if (LLBC_CUSTOM_COMPILE_TOOLSET_DIR)
+	message(STATUS "Use custom c/cpp compile toolset, dir:${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}")
+	set(CMAKE_C_COMPILER   "${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}/bin/gcc" CACHE FILEPATH "C compiler"   FORCE)
+	set(CMAKE_CXX_COMPILER "${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}/bin/g++" CACHE FILEPATH "CXX compiler" FORCE)
+	set(CMAKE_LINKER       "${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}/bin/ld"  CACHE FILEPATH "Linker"       FORCE)
+endif()
+
+# Set project after setup custom compile toolset dir.
+project(llbc)
+
 # [Required] Enable language: c/c++.
 enable_language(C CXX)
+# Set project c++ standard (strict C++17, no GNU extensions -> -std=c++17).
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+# Output compilers and linker.
+message(TRACE "c/c++ compiler/linker:")
+message(TRACE "==> cmake generator(CMAKE_GENERATOR): ${CMAKE_GENERATOR}")
+message(TRACE "==> cxx compiler: ${CMAKE_CXX_COMPILER}")
+message(TRACE "==> cxx compiler id(CMAKE_CXX_COMPILER_ID): ${CMAKE_CXX_COMPILER_ID}")
+message(TRACE "==> c compiler(CMAKE_C_COMPILER): ${CMAKE_C_COMPILER}")
+message(TRACE "==> c compiler(CMAKE_C_COMPILER_ID): ${CMAKE_C_COMPILER_ID}")
+message(TRACE "==> cmake linker(CMAKE_LINKER): ${CMAKE_LINKER}")
+
 # [Optional] Enable language: csharp.
 check_language(CSharp)
 if (CMAKE_CSharp_COMPILER)
@@ -21,7 +45,6 @@ if (CMAKE_CSharp_COMPILER)
 else()
 	message(NOTICE "CSharp compiler not found, llbc c# wrap targets will be skipped")
 endif()
-
 
 # llbc core lib name define.
 set(LLBC_LIB_SHARED ${PROJECT_NAME}_shared)
@@ -82,11 +105,6 @@ endif()
 
 message(STATUS "Platform architecture: ${LLBC_PLATFORM_ARCH}")
 
-# Set project c++ standard (strict C++17, no GNU extensions -> -std=c++17).
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 # Default hidden symbol visibility.
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
@@ -94,23 +112,6 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 # Reset Release cxx flags to: '-O2 -DNDEBUG'.
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
-
-# Set c/cxx compilers and linker, if needed.
-if (LLBC_CUSTOM_COMPILE_TOOLSET_DIR)
-	message(STATUS "Use custom c/cpp compile toolset, dir:${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}")
-	set(CMAKE_C_COMPILER "${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}/bin/gcc")
-	set(CMAKE_CXX_COMPILER "${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}/bin/g++")
-	set(CMAKE_LINKER "${LLBC_CUSTOM_COMPILE_TOOLSET_DIR}/bin/ld")
-endif()
-
-# Output compilers and linker.
-message(TRACE "c/c++ compiler/linker:")
-message(TRACE "==> cmake generator(CMAKE_GENERATOR): ${CMAKE_GENERATOR}")
-message(TRACE "==> cxx compiler: ${CMAKE_CXX_COMPILER}")
-message(TRACE "==> cxx compiler id(CMAKE_CXX_COMPILER_ID): ${CMAKE_CXX_COMPILER_ID}")
-message(TRACE "==> c compiler(CMAKE_C_COMPILER): ${CMAKE_C_COMPILER}")
-message(TRACE "==> c compiler(CMAKE_C_COMPILER_ID): ${CMAKE_C_COMPILER_ID}")
-message(TRACE "==> cmake linker(CMAKE_LINKER): ${CMAKE_LINKER}")
 
 # Build type && Configuration types detect.
 if (CMAKE_CONFIGURATION_TYPES)
