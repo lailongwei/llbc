@@ -69,13 +69,24 @@ public:
     int lastValue = 0;
 };
 
+class TestableEvent final : public LLBC_Event
+{
+public:
+    using LLBC_Event::LLBC_Event;
+
+    void InvalidateExtDataClearDeleg()
+    {
+        *_extDataClearDeleg = nullptr;
+    }
+};
+
 } // namespace
 
 // Events are reusable parameter carriers. Validate mixed key ownership,
 // const indexed access, copy/move behavior, and external-data cleanup.
 TEST(EventTest, CarriesParametersAndCleansExternalDataCorrectly)
 {
-    LLBC_Event event(7, true);
+    TestableEvent event(7, true);
     EXPECT_EQ(event.GetId(), 7);
     EXPECT_TRUE(event.IsDontDelAfterFire());
     event.SetId(8);
@@ -90,7 +101,11 @@ TEST(EventTest, CarriesParametersAndCleansExternalDataCorrectly)
     EXPECT_EQ(event.GetParam("number").As<int>(), 42);
     EXPECT_EQ(event["owned-key"].As<LLBC_String>(), "updated");
     EXPECT_EQ(event["level"].As<int>(), 9);
+    event.GetParam("number") = 43;
+    EXPECT_EQ(event.GetParam("number").As<int>(), 43);
+    event.GetParam("number") = 42;
     const LLBC_Event &constEvent = event;
+    EXPECT_TRUE(constEvent.GetParam("missing").Is<void>());
     EXPECT_TRUE(constEvent["missing"].Is<void>());
     EXPECT_EQ(event.GetParams().size(), 3lu);
     event.GetMutableParams()["level"] = 10;
@@ -116,6 +131,13 @@ TEST(EventTest, CarriesParametersAndCleansExternalDataCorrectly)
     event.ClearExtData(true);
     EXPECT_EQ(clearCount, 3);
     delete withoutDeleg;
+
+    int *withoutCallableDeleg = new int(5);
+    event.SetExtData(withoutCallableDeleg, clearInt);
+    event.InvalidateExtDataClearDeleg();
+    event.ClearExtData(true);
+    EXPECT_EQ(clearCount, 3);
+    delete withoutCallableDeleg;
 
     LLBC_Event copied(event);
     EXPECT_EQ(copied.GetId(), event.GetId());

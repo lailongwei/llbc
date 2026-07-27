@@ -74,11 +74,20 @@ public:
     /**
     * Get LLBC_Variant key indexed event param.
     * @param[in] key - the key.
+    * @return LLBC_Variant & - the event param.
+    */
+    template<typename KeyType>
+    std::enable_if_t<__LLBC_Inl_EventKeyMatch, LLBC_Variant &>
+    GetParam(const KeyType &key);
+
+    /**
+    * Get LLBC_Variant key indexed event param(const version).
+    * @param[in] key - the key.
     * @return const LLBC_Variant & - the event param.
     */
     template<typename KeyType>
     std::enable_if_t<__LLBC_Inl_EventKeyMatch, const LLBC_Variant &>
-    GetParam(const KeyType &key);
+    GetParam(const KeyType &key) const;
 
     /**
     * Get LLBC_CString key indexed event param.
