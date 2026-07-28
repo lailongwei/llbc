@@ -35,10 +35,6 @@ set_target_properties(${LLBC_3RD_LUA_LIB} PROPERTIES
                       C_VISIBILITY_PRESET default
                       CXX_VISIBILITY_PRESET default
                       VISIBILITY_INLINES_HIDDEN OFF)
-if (APPLE)
-    set_target_properties(${LLBC_3RD_LUA_LIB} PROPERTIES
-                          SUFFIX ".so")
-endif() 
 if (WIN32)
     set_target_properties(${LLBC_3RD_LUA_LIB} PROPERTIES
                           PREFIX "lib"
@@ -71,6 +67,7 @@ set_target_properties(${LLBC_3RD_LUA_EXEC} PROPERTIES
 # Build lullbc library.
 set(LLBC_WRAP_LIB_LULLBC lullbc)
 add_library(${LLBC_WRAP_LIB_LULLBC} SHARED ${LULLBC_SOURCES})
+add_dependencies(${LLBC_WRAP_LIB_LULLBC} lullbc_prebuild)
 target_include_directories(${LLBC_WRAP_LIB_LULLBC}
                            PRIVATE ${LLBC_WRAP_DIR_LULLBC}/include
                            PRIVATE ${LLBC_WRAP_DIR_LULLBC})

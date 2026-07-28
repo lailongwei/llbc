@@ -8,7 +8,7 @@ from os import path as op
 from com.log import Log
 from com.cfg import cfg
 from com.defs import ProjType
-from tools.build_scripts.lua_script_integrator import LuaScriptIntegrator
+from lua_script_integrator import LuaScriptIntegrator
 from native_method_collector import LuNativeMethodCollector as LuNMC
 
 
