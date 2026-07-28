@@ -369,7 +369,7 @@ int LLBC_File::SetFilePosition(sint64 position)
     if (!IsOpened())
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_OPEN);
-        return -1;
+        return LLBC_FAILED;
     }
 
 #if LLBC_TARGET_PLATFORM_WIN32
