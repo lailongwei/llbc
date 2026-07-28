@@ -17,6 +17,7 @@
 
 .vscode/
 .idea/
+.cache/
 
 iOSBuild/*.xcodeproj/xcuserdata/
 iOSBuild/*.xcodeproj/project.xcworkspace/xcuserdata/
