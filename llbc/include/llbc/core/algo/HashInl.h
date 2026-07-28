@@ -19,15 +19,19 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-__LLBC_NS_BEGIN
+__LLBC_INTERNAL_NS_BEGIN
 
 // Always-false-but-dependent trait for the Hash<>() default branch below.
 // Using it (instead of a bare `static_assert(false, ...)`) keeps the assert
 // from firing for valid instantiations on pre-CWG2518 compilers
 // (GCC < 13 / Clang < 17), where a non-dependent static_assert in a discarded
 // `if constexpr` branch is ill-formed.
-template <LLBC_HashAlgo::ENUM>
-constexpr bool __LLBC_InvalidHashAlgo = false;
+template <LLBC_NS LLBC_HashAlgo::ENUM>
+constexpr bool __g_invalidHashAlgoJudgeCond = false;
+
+__LLBC_INTERNAL_NS_END
+
+__LLBC_NS_BEGIN
 
 template <LLBC_HashAlgo::ENUM HashAlgo>
 uint32 LLBC_Hasher::Hash(const void *bytes, size_t size)
@@ -70,7 +74,7 @@ uint32 LLBC_Hasher::Hash(const void *bytes, size_t size)
     }
     else
     {
-        static_assert(__LLBC_InvalidHashAlgo<HashAlgo>, "Invalid hash algorithm");
+        static_assert(LLBC_INL_NS __g_invalidHashAlgoJudgeCond<HashAlgo>, "Invalid hash algorithm");
         return 0;
     }
 }
