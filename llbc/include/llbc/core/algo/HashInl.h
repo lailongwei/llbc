@@ -21,31 +21,58 @@
 
 __LLBC_NS_BEGIN
 
+// Always-false-but-dependent trait for the Hash<>() default branch below.
+// Using it (instead of a bare `static_assert(false, ...)`) keeps the assert
+// from firing for valid instantiations on pre-CWG2518 compilers
+// (GCC < 13 / Clang < 17), where a non-dependent static_assert in a discarded
+// `if constexpr` branch is ill-formed.
+template <LLBC_HashAlgo::ENUM>
+constexpr bool __LLBC_InvalidHashAlgo = false;
+
 template <LLBC_HashAlgo::ENUM HashAlgo>
 uint32 LLBC_Hasher::Hash(const void *bytes, size_t size)
 {
     if constexpr (HashAlgo == LLBC_HashAlgo::BKDR)
+    {
         return BKDRHash(bytes, size);
+    }
     else if constexpr (HashAlgo == LLBC_HashAlgo::DJB)
+    {
         return DJBHash(bytes, size);
+    }
     else if constexpr (HashAlgo == LLBC_HashAlgo::SDBM)
+    {
         return SDBMHash(bytes, size);
+    }
     else if constexpr (HashAlgo == LLBC_HashAlgo::RS)
+    {
         return RSHash(bytes, size);
+    }
     else if constexpr (HashAlgo == LLBC_HashAlgo::JS)
+    {
         return JSHash(bytes, size);
+    }
     else if constexpr (HashAlgo == LLBC_HashAlgo::PJW)
+    {
         return PJWHash(bytes, size);
+    }
     else if constexpr (HashAlgo == LLBC_HashAlgo::ELF)
+    {
         return ELFHash(bytes, size);
+    }
     else if constexpr (HashAlgo == LLBC_HashAlgo::AP)
+    {
         return APHash(bytes, size);
+    }
     else if constexpr (HashAlgo == LLBC_HashAlgo::MurmurHash3)
+    {
         return MurmurHash3Hash(bytes, size);
+    }
     else
-        static_assert("Invalid hash algorithm");
-
-    return 0;
+    {
+        static_assert(__LLBC_InvalidHashAlgo<HashAlgo>, "Invalid hash algorithm");
+        return 0;
+    }
 }
 
 inline uint32 LLBC_Hasher::Hash(LLBC_HashAlgo::ENUM hashAlgo, const void *bytes, size_t size)
