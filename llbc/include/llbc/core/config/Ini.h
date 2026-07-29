@@ -318,6 +318,9 @@ private:
     void Copy(const This &another);
 
 private:
+    void Err_OpenFileFailed(const LLBC_String &file);
+    void Err_ReadFileFailed(const LLBC_String &file);
+
     void Err_UnSpecificSection(size_t lineNum, size_t columnNum);
 
     void Err_KeyEmpty(size_t lineNum, size_t columnNum);
@@ -334,4 +337,3 @@ private:
 __LLBC_NS_END
 
 #include "llbc/core/config/IniInl.h"
-
