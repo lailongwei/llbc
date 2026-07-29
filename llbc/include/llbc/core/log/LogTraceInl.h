@@ -35,7 +35,7 @@ LLBC_LogTrace::TraceData<_TraceStrLimit>::TraceData(const _TraceDataTy &traceDat
         size_t traceStrLen;
         const char *traceStr = LLBC_Num2Str2<_TraceDataTy, false>(traceData, &traceStrLen);
         strLen = std::min(traceStrLen, sizeof(str) - 1);
-        if (strLen > 0)
+        if (LIKELY(strLen))
             memcpy(str, traceStr, strLen);
         str[strLen] = '\0';
     }
