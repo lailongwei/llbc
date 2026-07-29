@@ -99,11 +99,19 @@ inline void LLBC_Event::SetDontDelAfterFire(bool dontDelAfterFire)
 }
 
 template<typename KeyType>
-std::enable_if_t<__LLBC_Inl_EventKeyMatch, const LLBC_Variant &>
+std::enable_if_t<__LLBC_Inl_EventKeyMatch, LLBC_Variant &>
 LLBC_Event::GetParam(const KeyType &key)
 {
     auto it = _params.find(key);
     return it != _params.end() ? it->second : _params.emplace(key, LLBC_Variant()).first->second;
+}
+
+template<typename KeyType>
+std::enable_if_t<__LLBC_Inl_EventKeyMatch, const LLBC_Variant &>
+LLBC_Event::GetParam(const KeyType &key) const
+{
+    const auto it = _params.find(key);
+    return it != _params.end() ? it->second : LLBC_INTERNAL_NS __nilVariant;
 }
 
 template<typename KeyType, typename ParamType>
@@ -158,7 +166,11 @@ inline void LLBC_Event::SetExtData(void *extData, const LLBC_Delegate<void(void 
         if (_extDataClearDeleg)
             *_extDataClearDeleg = clearDeleg;
         else
-            delete _extDataClearDeleg;
+            _extDataClearDeleg = new LLBC_Delegate<void(void *)>(clearDeleg);
+    }
+    else
+    {
+        LLBC_XDelete(_extDataClearDeleg);
     }
 }
 
@@ -178,7 +190,7 @@ inline void LLBC_Event::ClearExtData(bool delDeleg)
 template<typename KeyType>
 LLBC_Variant &LLBC_Event::operator[](const KeyType &key)
 {
-    return const_cast<LLBC_Variant &>(GetParam(key));
+    return GetParam(key);
 }
 
 template<typename KeyType>
