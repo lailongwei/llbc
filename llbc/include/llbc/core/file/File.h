@@ -124,7 +124,7 @@ struct LLBC_FileAttributes
 {
     bool readable; /* file readable or not */
     bool writable; /* file writable or not */
-    bool execable; /* file execable or not */
+    bool executable; /* file executable or not */
     bool hidden; /* file is hidden or not  */
 
     bool isDirectory; /* file is directory or not */

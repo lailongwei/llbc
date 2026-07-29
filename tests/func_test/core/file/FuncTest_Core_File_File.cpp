@@ -512,7 +512,7 @@ void FuncTest_Core_File_File::PrintFileAttributes(const LLBC_FileAttributes &fil
 {
     LLBC_PrintLn("    Readable: %s", fileAttrs.readable ? "true" : "false");
     LLBC_PrintLn("    Writable: %s", fileAttrs.writable ? "true" : "false");
-    LLBC_PrintLn("    Execable: %s", fileAttrs.execable ? "true" : "false");
+    LLBC_PrintLn("    Execable: %s", fileAttrs.executable ? "true" : "false");
 
     LLBC_PrintLn("    Is directory: %s", fileAttrs.isDirectory ? "true" : "false");
 

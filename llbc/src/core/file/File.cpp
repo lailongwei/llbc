@@ -755,9 +755,9 @@ int LLBC_File::GetFileAttributes(const LLBC_String &filePath, LLBC_FileAttribute
     attrs.writable = (sysFileAttrData.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != FILE_ATTRIBUTE_READONLY;
     attrs.isDirectory = (sysFileAttrData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
     if (attrs.isDirectory || filePath.length() < 4)
-        attrs.execable = false;
+        attrs.executable = false;
     else
-        attrs.execable = filePath.substr(filePath.length() - 4, 4).tolower() == exeSuffix;
+        attrs.executable = filePath.substr(filePath.length() - 4, 4).tolower() == exeSuffix;
     attrs.hidden = (sysFileAttrData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == FILE_ATTRIBUTE_HIDDEN;
 
     LLBC_WinFileTime2TimeSpec(sysFileAttrData.ftCreationTime, attrs.createTime);
@@ -778,7 +778,7 @@ int LLBC_File::GetFileAttributes(const LLBC_String &filePath, LLBC_FileAttribute
 
     attrs.readable = (cStat.st_mode & S_IRUSR) == S_IRUSR;
     attrs.writable = (cStat.st_mode & S_IWUSR) == S_IWUSR;
-    attrs.execable = (cStat.st_mode & S_IXUSR) == S_IXUSR;
+    attrs.executable = (cStat.st_mode & S_IXUSR) == S_IXUSR;
 
     const LLBC_String baseName = LLBC_Directory::BaseName(filePath);
     if (baseName.length() > 0 && baseName[0] == '.')
