@@ -35,7 +35,18 @@ LLBC_GUID LLBC_GUIDHelper::Gen()
     memset(&guid, 0, sizeof(LLBC_GUID));
 
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    uuid_generate(reinterpret_cast<unsigned char *>(&guid));
+    uuid_t uuid;
+    uuid_generate(uuid);
+
+    guid.Data1 = (static_cast<uint32>(uuid[0]) << 24) |
+                 (static_cast<uint32>(uuid[1]) << 16) |
+                 (static_cast<uint32>(uuid[2]) << 8) |
+                 static_cast<uint32>(uuid[3]);
+    guid.Data2 = static_cast<uint16>((static_cast<uint16>(uuid[4]) << 8) |
+                                     static_cast<uint16>(uuid[5]));
+    guid.Data3 = static_cast<uint16>((static_cast<uint16>(uuid[6]) << 8) |
+                                     static_cast<uint16>(uuid[7]));
+    memcpy(guid.Data4, uuid + 8, sizeof(guid.Data4));
 #else
     ::CoCreateGuid(&guid);
 #endif
