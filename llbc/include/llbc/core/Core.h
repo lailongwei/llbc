@@ -126,10 +126,6 @@
 // core/random
 #include "llbc/core/random/Random.h"
 
-// core/entity
-#include "llbc/core/entity/IHolder.h"
-#include "llbc/core/entity/Entity.h"
-
 // core/transcoder
 #include "llbc/core/transcoder/Transcoder.h"
 

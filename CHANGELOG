@@ -43,6 +43,7 @@
 # 30. LLBC_App调度线程完整支持LLBC_Timer的调度, 即: 主线程也可以使用LLBC_Timer
 # 31. LLBC_File相关接口改进、优化
 # 32. 其它杂项优化及改进
+# 33. 删除未使用且已可由LLBC_Variant替代的LLBC_Entity及配套Holder接口
 #
 # Version: 1.1.0
 # 2022/8 - 23/4/4
