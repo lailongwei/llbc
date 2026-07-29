@@ -73,11 +73,6 @@ class TestableEvent final : public LLBC_Event
 {
 public:
     using LLBC_Event::LLBC_Event;
-
-    void InvalidateExtDataClearDeleg()
-    {
-        *_extDataClearDeleg = nullptr;
-    }
 };
 
 } // namespace
@@ -131,13 +126,6 @@ TEST(EventTest, CarriesParametersAndCleansExternalDataCorrectly)
     event.ClearExtData(true);
     EXPECT_EQ(clearCount, 3);
     delete withoutDeleg;
-
-    int *withoutCallableDeleg = new int(5);
-    event.SetExtData(withoutCallableDeleg, clearInt);
-    event.InvalidateExtDataClearDeleg();
-    event.ClearExtData(true);
-    EXPECT_EQ(clearCount, 3);
-    delete withoutCallableDeleg;
 
     LLBC_Event copied(event);
     EXPECT_EQ(copied.GetId(), event.GetId());

@@ -178,7 +178,7 @@ inline void LLBC_Event::ClearExtData(bool delDeleg)
 {
     if (_extData)
     {
-        if (_extDataClearDeleg && *_extDataClearDeleg)
+        if (_extDataClearDeleg)
             (*_extDataClearDeleg)(_extData);
         _extData = nullptr;
     }
