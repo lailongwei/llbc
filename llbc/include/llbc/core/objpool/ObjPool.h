@@ -329,17 +329,18 @@ public:
 private:
     template <typename Obj>
     static
-    LLBC_ObjPool *GetTypedObjPoolInl(void *mem,
-                                     object_pool_detectable_type<Obj,
-                                                                 &Obj::GetTypedObjPool,
-                                                                 &Obj::SetTypedObjPool> *)
+    LLBC_TypedObjPool<Obj> *GetTypedObjPoolInl(
+        void *mem,
+        object_pool_detectable_type<Obj,
+                                    &Obj::GetTypedObjPool,
+                                    &Obj::SetTypedObjPool> *)
     {
         return reinterpret_cast<Obj *>(mem)->GetTypedObjPool();
     }
 
     template <typename Obj>
     static constexpr
-    LLBC_ObjPool *GetTypedObjPoolInl(void *mem, ...) { return nullptr; }
+    LLBC_TypedObjPool<Obj> *GetTypedObjPoolInl(void *mem, ...) { return nullptr; }
 
 public:
     // SetTypedObjPool implement.
@@ -380,31 +381,39 @@ public:
     template <typename Obj>
     static size_t GetStripeCapacity()
     {
-        return GetStripeCapacityInl<Obj>(0);
+        return GetStaticStripeCapacityInl<Obj>(0);
     }
 
 private:
-    template <typename Obj, size_t (Obj::*)()>
-    struct stripe_capacity_detectable_type;
+    template <typename Obj, size_t (*)()>
+    struct static_stripe_capacity_detectable_type;
 
     template <typename Obj>
-    static size_t GetStripeCapacityInl(
-        stripe_capacity_detectable_type<Obj, &Obj::GetStripeCapacity> *)
+    static size_t GetStaticStripeCapacityInl(
+        static_stripe_capacity_detectable_type<Obj, &Obj::GetStripeCapacity> *)
     {
-        #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wnonnull"
-        #endif
-
-        return reinterpret_cast<Obj *>(NULL)->GetStripeCapacity();
-
-        #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
-        #pragma GCC diagnostic pop
-        #endif
+        return Obj::GetStripeCapacity();
     }
 
     template <typename Obj>
-    static constexpr size_t GetStripeCapacityInl(...)
+    static size_t GetStaticStripeCapacityInl(...)
+    {
+        return GetMemberStripeCapacityInl<Obj>(0);
+    }
+
+    template <typename Obj, size_t (Obj::*)()>
+    struct member_stripe_capacity_detectable_type;
+
+    template <typename Obj>
+    static size_t GetMemberStripeCapacityInl(
+        member_stripe_capacity_detectable_type<Obj, &Obj::GetStripeCapacity> *)
+    {
+        Obj obj;
+        return obj.GetStripeCapacity();
+    }
+
+    template <typename Obj>
+    static constexpr size_t GetMemberStripeCapacityInl(...)
     {
         return LLBC_CFG_CORE_OBJPOOL_STRIPE_CAPACITY;
     }
@@ -413,31 +422,41 @@ public:
     template <typename Obj>
     static void OnTypedObjPoolCreated(LLBC_TypedObjPool<Obj> *typedObjPool)
     {
-        OnTypedObjPoolCreatedInl<Obj>(typedObjPool, 0);
+        OnStaticTypedObjPoolCreatedInl<Obj>(typedObjPool, 0);
     }
 
 private:
-    template <typename Obj, void (Obj::*)(LLBC_TypedObjPool<Obj> *typedObjPool)>
-    struct typed_obj_pool_created_ev_handler;
+    template <typename Obj, void (*)(LLBC_TypedObjPool<Obj> *typedObjPool)>
+    struct static_typed_obj_pool_created_ev_handler;
 
     template <typename Obj>
-    static void OnTypedObjPoolCreatedInl(LLBC_TypedObjPool<Obj> *typedObjPool,
-                                         typed_obj_pool_created_ev_handler<Obj, &Obj::OnTypedObjPoolCreated> *)
+    static void OnStaticTypedObjPoolCreatedInl(
+        LLBC_TypedObjPool<Obj> *typedObjPool,
+        static_typed_obj_pool_created_ev_handler<Obj, &Obj::OnTypedObjPoolCreated> *)
     {
-        #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wnonnull"
-        #endif
-
-        return reinterpret_cast<Obj *>(NULL)->OnTypedObjPoolCreated(typedObjPool);
-
-        #if LLBC_CUR_COMP == LLBC_COMP_GCC || LLBC_CUR_COMP == LLBC_COMP_CLANG
-        #pragma GCC diagnostic pop
-        #endif
+        Obj::OnTypedObjPoolCreated(typedObjPool);
     }
 
     template <typename Obj>
-    static void OnTypedObjPoolCreatedInl(LLBC_TypedObjPool<Obj> *typedObjPool, ...)
+    static void OnStaticTypedObjPoolCreatedInl(LLBC_TypedObjPool<Obj> *typedObjPool, ...)
+    {
+        OnMemberTypedObjPoolCreatedInl<Obj>(typedObjPool, 0);
+    }
+
+    template <typename Obj, void (Obj::*)(LLBC_TypedObjPool<Obj> *typedObjPool)>
+    struct member_typed_obj_pool_created_ev_handler;
+
+    template <typename Obj>
+    static void OnMemberTypedObjPoolCreatedInl(
+        LLBC_TypedObjPool<Obj> *typedObjPool,
+        member_typed_obj_pool_created_ev_handler<Obj, &Obj::OnTypedObjPoolCreated> *)
+    {
+        Obj obj;
+        obj.OnTypedObjPoolCreated(typedObjPool);
+    }
+
+    template <typename Obj>
+    static void OnMemberTypedObjPoolCreatedInl(LLBC_TypedObjPool<Obj> *typedObjPool, ...)
     {
         // Do nothing.
     }

@@ -254,7 +254,7 @@ public:
     /**
      * Object-Pool event handler: typed object pool created.
      */
-    void OnTypedObjPoolCreated(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool);
+    static void OnTypedObjPoolCreated(LLBC_TypedObjPool<LLBC_Packet> *typedObjPool);
 
 public:
     /**
@@ -540,5 +540,4 @@ __LLBC_NS_END
 std::ostream &operator<<(std::ostream &o, const LLBC_NS LLBC_Packet &packet);
 
 #include "llbc/comm/PacketInl.h"
-
 
