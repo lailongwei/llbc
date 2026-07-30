@@ -33,6 +33,8 @@ set_source_files_properties(${CSLLBC_PY_SOURCES} PROPERTIES
                             VS_TOOL_OVERRIDE "None"
                             HEADER_FILE_ONLY TRUE)
 add_library(${LLBC_WRAP_LIB_CSLLBC} SHARED ${CSLLBC_CS_SOURCES} ${CSLLBC_PY_SOURCES})
+target_compile_definitions(${LLBC_WRAP_LIB_CSLLBC}
+                           PUBLIC $<IF:$<CONFIG:Debug>,DEBUG,>)
 set_target_properties(${LLBC_WRAP_LIB_CSLLBC} PROPERTIES
                       LINKER_LANGUAGE CSharp
                       VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.7.2"
@@ -67,6 +69,12 @@ set_target_properties(${LLBC_WRAP_LIB_CSLLBC_TESTSUITE} PROPERTIES
                       VS_DOTNET_TARGET_FRAMEWORK_VERSION "v4.7.2"
                       VS_DOTNET_REFERENCES "System;System.Net;System.Core"
                       FOLDER "wrap/csllbc")
+if (WIN32)
+    get_filename_component(_llbc_output_parent_dir "${LLBC_OUTPUT_DIR}" DIRECTORY)
+    set_target_properties(${LLBC_WRAP_LIB_CSLLBC_TESTSUITE} PROPERTIES
+                          VS_GLOBAL_Prefer32Bit "false"
+                          VS_GLOBAL_StartWorkingDirectory "${_llbc_output_parent_dir}/$(Configuration)")
+endif()
 
 # Set targets postfix.
 llbc_apply_config_postfix(${LLBC_WRAP_LIB_CSLLBC_NATIVE} ${LLBC_WRAP_LIB_CSLLBC} ${LLBC_WRAP_LIB_CSLLBC_TESTSUITE})
