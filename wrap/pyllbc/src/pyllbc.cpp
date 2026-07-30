@@ -27,11 +27,7 @@
 /**
  * model init method.
  */
-#ifndef LLBC_DEBUG
-void initllbc()
-#else // defined LLBC_DEBUG macro
-void initllbc_debug()
-#endif // not define LLBC_DEBUG
+PYLLBC_MOD_INIT_FUNC void initllbc()
 {
     /* Init llbc library. */
     if (LLBC_Startup() != LLBC_OK &&

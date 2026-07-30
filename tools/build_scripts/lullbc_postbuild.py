@@ -28,7 +28,10 @@ def _publish_lua():
         nml_files = []
         for idx in range(len(files)):
             f_pair = op.splitext(files[idx])
-            nml_files.append(f_pair[0] + '_debug' + f_pair[1])
+            if f_pair[1] == '.lua':
+                nml_files.append(files[idx])
+            else:
+                nml_files.append(f_pair[0] + '_debug' + f_pair[1])
         return nml_files
 
     # 复制lua exe & dll
@@ -54,7 +57,7 @@ def main():
     # 复制llbc.lua到目标目录
     script_path = op.join(cfg.lullbc_proj_path, 'script')
     src = op.join(script_path, 'llbc.lua')
-    target = op.join(cfg.output_path, 'llbc.lua' if not cfg.is_debug else 'llbc_debug.lua')
+    target = op.join(cfg.output_path, 'llbc.lua')
     Log.i('Copy [{0}] to [{1}]...'.format(src, target))
     shutil.copy(src, target)
 

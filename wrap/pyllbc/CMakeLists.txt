@@ -71,6 +71,7 @@ llbc_apply_config_postfix(${LLBC_WRAP_LIB_PYLLBC})
 set_target_properties(${LLBC_WRAP_LIB_PYLLBC} PROPERTIES
                       FOLDER "wrap"
                       PREFIX ""
+                      DEBUG_POSTFIX ""
                       OUTPUT_NAME "llbc")
 if (WIN32)
     set_target_properties(${LLBC_WRAP_LIB_PYLLBC} PROPERTIES

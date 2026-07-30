@@ -253,8 +253,7 @@ class _Cfg(object):
     @property
     def pyllbc_dll_path(self):
         """pyllbc dll路径"""
-        return op.join(self.output_path, 'llbc' +
-                       ('_debug' if self.is_debug else '') + cfg.py_dll_suffix)
+        return op.join(self.output_path, 'llbc' + self.py_dll_suffix)
     # endregion
 
     # region lua包装库(lullbc)相关
