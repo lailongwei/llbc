@@ -38,10 +38,11 @@ jobs:
           make tests config=Debug verbose=1 -j4
           make tests config=Release verbose=1 -j4
 
-      - name: Compile pyllbc wrap library(Debug and Release)
-        run: |
-          make pyllbc config=Debug verbose=1 -j4
-          make pyllbc config=Release verbose=1 -j4
+      # arm platform is not supported for now.
+      # - name: Compile pyllbc wrap library(Debug and Release)
+      #   run: |
+      #     make pyllbc config=Debug verbose=1 -j4
+      #     make pyllbc config=Release verbose=1 -j4
 
       - name: Compile lullbc wrap library(Debug and Release)
         run: |
