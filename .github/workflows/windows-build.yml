@@ -15,7 +15,6 @@ jobs:
   windows-build:
     name: Windows build job
     runs-on: windows-latest
-    if: false
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -35,39 +34,53 @@ jobs:
       - name: PreBuild
         run: echo vs2022 | ./WinPreBuild.bat 0
         
-      - name: Compile core lib code
+      - name: Compile llbc core lib
         run: |
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:llbc
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:llbc
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:llbc
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:llbc
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:llbc_shared;llbc_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:llbc_shared;llbc_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:llbc_shared;llbc_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:llbc_shared;llbc_static
         
-      - name: Compile tests
+      - name: Compile example
         run: |
-          # Solution-folder target syntax is <group>\<project>; there is no target named "tests"
-          # (that is the solution folder), so -t:tests fails with MSB4057. Build the actual projects.
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\func_test
-          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:tests\example
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:example_shared;example_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:example_shared;example_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:example_shared;example_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:example_shared;example_static
 
-#      - name: Compile pyllbc lib code
-#        run: |
-#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:pyllbc
-#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:pyllbc
-#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:pyllbc
-#          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:pyllbc
-#
-#      - name: Compile lullbc lib code
-#        run: |
-#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug32 -p:Platform=x86 -t:lullbc
-#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release32 -p:Platform=x86 -t:lullbc
-#          # msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=debug64 -p:Platform=x64 -t:lullbc
-#          msbuild.exe build/vs2022/llbc_vs2022.sln -p:Configuration=release64 -p:Platform=x64 -t:lullbc
+      - name: Compile func_test
+        run: |
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:func_test_shared;func_test_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:func_test_shared;func_test_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:func_test_shared;func_test_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:func_test_shared;func_test_static
 
-      # - name: Build all target by cmake
-      #   run: |
-      #     mkdir cmake_build
-      #     cd cmake_build
-      #     cmake ..
-      #     cmake --build . --config Release -j
-        
+      - name: Compile unit_test
+        run: |
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:unit_test_shared;unit_test_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:unit_test_shared;unit_test_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:unit_test_shared;unit_test_static
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:unit_test_shared;unit_test_static
+
+      - name: Compile python wrap library
+        run: |
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:pyllbc
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:pyllbc
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:pyllbc
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:pyllbc
+
+      - name: Compile lua wrap library
+        run: |
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:lullbc
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:lullbc
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:lullbc
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:lullbc
+
+      - name: Compile c# wrap library
+        run: |
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:csllbc_testsuite
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:csllbc_testsuite
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:csllbc_testsuite
+          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:csllbc_testsuite
+
       - run: echo "🍏 This job's status is ${{ job.status }}."
