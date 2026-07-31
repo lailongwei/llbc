@@ -1,8 +1,9 @@
 # Add pyllbc.
-if (EXISTS "${LLBC_3RD_DIR_CPYTHON}/README")
+if (EXISTS "${LLBC_3RD_DIR_CPYTHON}/README" AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|x64|AMD64)")
     add_subdirectory(${LLBC_WRAP_DIR_PYLLBC})
 else()
-    message(NOTICE "3rd - cpython not found(dir: ${LLBC_3RD_DIR_CPYTHON}), pyllbc will be skipped")
+    message(NOTICE "3rd - cpython not found(dir: ${LLBC_3RD_DIR_CPYTHON}) or "
+                   "unsupported processor(processor: ${CMAKE_SYSTEM_PROCESSOR}), pyllbc will be skipped")
     message(NOTICE "- run <git submodule update --init wrap/pyllbc/cpython> to update")
 endif()
 

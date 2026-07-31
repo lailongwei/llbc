@@ -18,7 +18,6 @@ jobs:
   linux-build:
     name: Linux build job
     runs-on: ubuntu-latest
-    if: false
     container: docker.io/centos:8
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -48,31 +47,24 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
 
-      - name: Compile core lib code
+      - name: Compile core library(Debug and Release)
         run: |
-          make core_lib config=debug64 -j4
-          make core_lib config=release64 -j4
+          make llbc config=Debug verbose=1 -j4
+          make llbc config=Release verbose=1 -j4
 
-      - name: Compile tests
+      - name: Compile test targets(Debug and Release)
         run: |
-          make tests config=debug64 -j4
-          make tests config=release64 -j4
+          make tests config=Debug verbose=1 -j4
+          make tests config=Release verbose=1 -j4
 
-      - name: Compile pyllbc lib code
+      - name: Compile pyllbc wrap library(Debug and Release)
         run: |
-          make py_wrap config=debug64 -j4
-          make py_wrap config=release64 -j4
+          make pyllbc config=Debug verbose=1 -j4
+          make pyllbc config=Release verbose=1 -j4
 
-      - name: Compile lullbc lib code
+      - name: Compile lullbc wrap library(Debug and Release)
         run: |
-          make lu_wrap config=debug64 -j4
-          make py_wrap config=release64 -j4
+          make lullbc config=Debug verbose=1 -j4
+          make lullbc config=Release verbose=1 -j4
 
-      # - name: Build all target by cmake
-      #   run: |
-      #     mkdir cmake_build
-      #     cd cmake_build
-      #     cmake ..
-      #     make -j4
-        
       - run: echo "🍏 This job's status is ${{ job.status }}."
