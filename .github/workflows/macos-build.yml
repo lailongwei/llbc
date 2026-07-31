@@ -28,12 +28,12 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
 
-      - name: Compile core lib code(Debug and Release)
+      - name: Compile core library(Debug and Release)
         run: |
           make llbc config=Debug verbose=1 -j4
           make llbc config=Release verbose=1 -j4
 
-      - name: Compile tests(Debug and Release)
+      - name: Compile tests targets(Debug and Release)
         run: |
           make tests config=Debug verbose=1 -j4
           make tests config=Release verbose=1 -j4
