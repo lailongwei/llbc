@@ -3,6 +3,7 @@
 cpython submodule编译器
 """
 
+import os
 from os import path as op
 
 from com.sh import Sh
@@ -18,6 +19,53 @@ class CPythonCompiler(object):
             self._compile_cpython_in_win32()
         else:
             self._compile_cpython_in_non_win32()
+
+    @staticmethod
+    def _detect_platform_toolset():
+        """根据当前 VS 环境探测 PlatformToolset. 探测失败时返回 None(让 msbuild 使用默认)."""
+        # Visual Studio 版本 -> PlatformToolset 映射表.
+        # 说明: CPython 2.7 自带的 vcxproj 硬编码使用 v90(VS 2008) toolset,
+        # 在新版 VS(尤其 VS 2026) 上 devenv /Upgrade 不能自动升级 toolset,
+        # 需要在 msbuild 编译时通过 /p:PlatformToolset=xxx 强制指定当前 VS 对应的 toolset.
+        vs_version_to_toolset = {
+            '15.0': 'v141',  # VS 2017
+            '16.0': 'v142',  # VS 2019
+            '17.0': 'v143',  # VS 2022
+            '18.0': 'v144',  # VS 2026
+        }
+
+        vs_version = os.environ.get('VisualStudioVersion', '').strip()
+        toolset = vs_version_to_toolset.get(vs_version)
+        if toolset:
+            Log.i('Detected VisualStudioVersion:{}, PlatformToolset:{}'.format(vs_version, toolset))
+            return toolset
+
+        # 兜底: 未识别的 VS 版本(如更新的 VS), 尝试从 VCToolsVersion 推断(14.4x -> v143, 14.5x -> v144).
+        vc_tools_version = os.environ.get('VCToolsVersion', '').strip()
+        if vc_tools_version:
+            try:
+                major, minor = vc_tools_version.split('.')[:2]
+                major = int(major)
+                minor = int(minor)
+                if major == 14:
+                    if minor >= 50:
+                        toolset = 'v144'
+                    elif minor >= 40:
+                        toolset = 'v143'
+                    elif minor >= 30:
+                        toolset = 'v142'
+                    elif minor >= 20:
+                        toolset = 'v141'
+                if toolset:
+                    Log.i('Fallback from VCToolsVersion:{}, PlatformToolset:{}'.format(vc_tools_version, toolset))
+                    return toolset
+            except (ValueError, IndexError):
+                pass
+
+        Log.w('Cannot detect PlatformToolset from environment(VisualStudioVersion:{}, '
+              'VCToolsVersion:{}), will not pass /p:PlatformToolset to msbuild.'.format(
+                  vs_version, os.environ.get('VCToolsVersion', '')))
+        return None
 
     @staticmethod
     def _compile_cpython_in_win32():
@@ -66,9 +114,18 @@ class CPythonCompiler(object):
         configuration = 'Debug' if cfg.is_debug else 'Release'
 
         Log.i('Compile cpython, platform:{}, configuration:{}...'.format(platform, configuration))
-        ret = Sh.execute(
-            'pushd "{}" && "{}" pcbuild.sln /Build "{}|{}" /project python && popd'.format(
-                pcbuild_path, cfg.devenv_path, configuration, platform))
+        # 使用 msbuild 编译, 以便通过 /p:PlatformToolset=xxx 覆盖 cpython vcxproj 里硬编码的 v90.
+        # 若无法从环境探测到 toolset, 则回退到原来的 devenv /Build 行为.
+        platform_toolset = CPythonCompiler._detect_platform_toolset()
+        if platform_toolset:
+            ret = Sh.execute(
+                'pushd "{}" && msbuild pcbuild.sln /t:python '
+                '/p:Configuration={} /p:Platform={} /p:PlatformToolset={} && popd'.format(
+                    pcbuild_path, configuration, platform, platform_toolset))
+        else:
+            ret = Sh.execute(
+                'pushd "{}" && "{}" pcbuild.sln /Build "{}|{}" /project python && popd'.format(
+                    pcbuild_path, cfg.devenv_path, configuration, platform))
         if ret != 0:
             Log.e('Compile cpython failed, ret code:{}'.format(ret))
 
