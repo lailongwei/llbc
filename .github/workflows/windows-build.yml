@@ -28,8 +28,10 @@ jobs:
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       
-      - name: Setup Visual Studio environment
-        uses: compnerd/gha-setup-vsdevenv@main
+      - name: Setup Visual Studio and MSBuild environment
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: "17.0"
         
       - name: PreBuild
         run: echo vs2022 | ./WinPreBuild.bat 0
