@@ -21,6 +21,7 @@ echo For now supported Visual Studio versions:
 echo    vs2017
 echo    vs2019
 echo    vs2022
+echo    vs2026
 set /p choose=Please input:
 
 set build_dir=%~dp0build_%choose%
@@ -34,6 +35,8 @@ if "%choose%"=="vs2017" (
     "%cmake_bin_path%" -G "Visual Studio 16 2019" ..
 ) else if "%choose%"=="vs2022" (
     "%cmake_bin_path%" -G "Visual Studio 17 2022" ..
+) else if "%choose%"=="vs2026" (
+    "%cmake_bin_path%" -G "Visual Studio 18 2026" ..
 ) else (
     echo Unsupported Visual Studio version: %choose%
     popd
