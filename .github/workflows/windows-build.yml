@@ -23,10 +23,10 @@ jobs:
           - { os: windows-2022, vs_version: 'vs2022', configuration: Release }
           - { os: windows-2022, vs_version: 'vs2022', configuration: MinSizeRel }
           - { os: windows-2022, vs_version: 'vs2022', configuration: RelWithDebInfo }
-          - { os: windows-2025, vs_version: 'vs2026', configuration: Debug }
-          - { os: windows-2025, vs_version: 'vs2026', configuration: Release }
-          - { os: windows-2025, vs_version: 'vs2026', configuration: MinSizeRel }
-          - { os: windows-2025, vs_version: 'vs2026', configuration: RelWithDebInfo }
+          # - { os: windows-2025, vs_version: 'vs2026', configuration: Debug }
+          # - { os: windows-2025, vs_version: 'vs2026', configuration: Release }
+          # - { os: windows-2025, vs_version: 'vs2026', configuration: MinSizeRel }
+          # - { os: windows-2025, vs_version: 'vs2026', configuration: RelWithDebInfo }
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
