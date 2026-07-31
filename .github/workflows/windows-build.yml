@@ -48,49 +48,25 @@ jobs:
       - name: PreBuild
         run: echo ${{ matrix.vs_version }} | ./WinPreBuild.bat 0
 
-      - name: Diagnose build dir
-        shell: pwsh
-        run: |
-          Write-Host "PWD: $PWD"
-          Write-Host "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
-          Write-Host "Listing repo root:"
-          Get-ChildItem -Force | Select-Object Mode, Name
-          $sln = "build_${{ matrix.vs_version }}/llbc.sln"
-          Write-Host "Test-Path $sln : $(Test-Path $sln)"
-          if (Test-Path $sln) {
-            Write-Host "Resolved: $((Resolve-Path $sln).Path)"
-          }
-          Write-Host "==== Listing build_${{ matrix.vs_version }} ===="
-          Get-ChildItem -Force "build_${{ matrix.vs_version }}" | Select-Object Mode, Length, Name
-          Write-Host "==== All *.sln in build dir (recursive) ===="
-          Get-ChildItem -Recurse -Filter *.sln "build_${{ matrix.vs_version }}" | Select-Object FullName
-        
       - name: Compile llbc core lib
-        run: |
-          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=${{ matrix.configuration }} -p:Platform=x64 "-t:llbc_shared;llbc_static"
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target llbc_shared llbc_static
 
       - name: Compile example
-        run: |
-          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=${{ matrix.configuration }} -p:Platform=x64 "-t:example_shared;example_static"
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target example_shared example_static
 
       - name: Compile func_test
-        run: |
-          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=${{ matrix.configuration }} -p:Platform=x64 "-t:func_test_shared;func_test_static"
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target func_test_shared func_test_static
 
       - name: Compile unit_test
-        run: |
-          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=${{ matrix.configuration }}  -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target unit_test_shared unit_test_static
 
       - name: Compile python wrap library
-        run: |
-          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=${{ matrix.configuration }} -p:Platform=x64 -t:pyllbc
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target pyllbc
 
       - name: Compile lua wrap library
-        run: |
-          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=${{ matrix.configuration }} -p:Platform=x64 -t:lullbc
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target lullbc
 
       - name: Compile c# wrap library
-        run: |
-          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=${{ matrix.configuration }} -p:Platform=x64 -t:csllbc_testsuite
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target csllbc_testsuite
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
