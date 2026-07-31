@@ -49,24 +49,24 @@ jobs:
         run: echo ${{ matrix.vs_version }} | ./WinPreBuild.bat 0
 
       - name: Compile llbc core lib
-        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target llbc_shared llbc_static
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --parallel --target llbc_shared llbc_static -- /v:detailed
 
       - name: Compile example
-        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target example_shared example_static
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --parallel --target example_shared example_static -- /v:detailed
 
       - name: Compile func_test
-        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target func_test_shared func_test_static
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --parallel --target func_test_shared func_test_static -- /v:detailed
 
       - name: Compile unit_test
-        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target unit_test_shared unit_test_static
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --parallel --target unit_test_shared unit_test_static -- /v:detailed
 
       - name: Compile python wrap library
-        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target pyllbc
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --parallel --target pyllbc -- /v:detailed
 
       - name: Compile lua wrap library
-        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target lullbc
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --parallel --target lullbc -- /v:detailed
 
       - name: Compile c# wrap library
-        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --target csllbc_testsuite
+        run: cmake --build build_${{ matrix.vs_version }} --config ${{ matrix.configuration }} --parallel --target csllbc_testsuite -- /v:detailed
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
