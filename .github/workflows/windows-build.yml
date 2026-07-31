@@ -60,6 +60,10 @@ jobs:
           if (Test-Path $sln) {
             Write-Host "Resolved: $((Resolve-Path $sln).Path)"
           }
+          Write-Host "==== Listing build_${{ matrix.vs_version }} ===="
+          Get-ChildItem -Force "build_${{ matrix.vs_version }}" | Select-Object Mode, Length, Name
+          Write-Host "==== All *.sln in build dir (recursive) ===="
+          Get-ChildItem -Recurse -Filter *.sln "build_${{ matrix.vs_version }}" | Select-Object FullName
         
       - name: Compile llbc core lib
         run: |
