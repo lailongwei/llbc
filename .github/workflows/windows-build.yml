@@ -47,6 +47,19 @@ jobs:
         
       - name: PreBuild
         run: echo ${{ matrix.vs_version }} | ./WinPreBuild.bat 0
+
+      - name: Diagnose build dir
+        shell: pwsh
+        run: |
+          Write-Host "PWD: $PWD"
+          Write-Host "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
+          Write-Host "Listing repo root:"
+          Get-ChildItem -Force | Select-Object Mode, Name
+          $sln = "build_${{ matrix.vs_version }}/llbc.sln"
+          Write-Host "Test-Path $sln : $(Test-Path $sln)"
+          if (Test-Path $sln) {
+            Write-Host "Resolved: $((Resolve-Path $sln).Path)"
+          }
         
       - name: Compile llbc core lib
         run: |
