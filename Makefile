@@ -55,7 +55,11 @@ WRAPS_TARGET      			:= wraps
 PYWRAP_TARGET       		:= pyllbc
 CSWRAP_TARGET       		:= csllbc
 LUWRAP_TARGET       		:= lullbc
-ALL_WRAP_TARGETS			:= $(PYWRAP_TARGET) $(CSWRAP_TARGET) $(LUWRAP_TARGET)
+ifeq ($(SYSTEM_NAME),darwin)
+	ALL_WRAP_TARGETS			:= $(LUWRAP_TARGET)
+else
+	ALL_WRAP_TARGETS			:= $(PYWRAP_TARGET) $(LUWRAP_TARGET)
+endif
 
 # Some prefixs/suffixes define.
 ifeq ($(SYSTEM_NAME),darwin)
