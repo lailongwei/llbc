@@ -67,4 +67,72 @@ jobs:
           make lullbc config=Debug verbose=1 -j4
           make lullbc config=Release verbose=1 -j4
 
+      - name: "Upload output directory"
+        uses: actions/upload-artifact@v4
+        with:
+          name: llbc_unit_test_artifact
+          path: |
+            output/Debug/libllbc_debug.so
+            output/Debug/unit_test_debug
+            output/Debug/unit_test_static_debug
+            output/Release/libllbc.so
+            output/Release/unit_test
+            output/Release/unit_test_static
+
       - run: echo "🍏 This job's status is ${{ job.status }}."
+
+  run-unit-test:
+    needs: linux-build
+    name: Run unit test
+    runs-on: ubuntu-latest
+    container: docker.io/centos:8
+    steps:
+      - name: update yum repo baseurl
+        run: |
+          sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+          sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+          sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+          # yum clean all
+          # yum makecache
+
+      - name: install runtime deps
+        run: |
+          yum install -y openssl-devel wget tar gcc gcc-c++ libuuid-devel automake autoconf libtool make git cmake python2
+          ln -s /usr/bin/python2 /usr/bin/python
+          wget https://github.com/libunwind/libunwind/archive/refs/tags/v1.2.1.tar.gz
+          tar -zxvf v1.2.1.tar.gz && cd libunwind-1.2.1 && ./autogen.sh && ./configure && make && make install
+
+      - name: Download artifact from previous step(linux-build)
+        uses: actions/download-artifact@v4
+        with:
+          name: llbc_unit_test_artifact
+          path: output
+
+      - name: Fix executable permission
+        run: |
+          chmod +x output/Release/unit_test
+          chmod +x output/Release/unit_test_static
+          chmod +x output/Debug/unit_test_debug
+          chmod +x output/Debug/unit_test_static_debug
+
+      - name: Run unit test(Release version, linked to static library)
+        run: |
+          cd output/Release
+          ./unit_test_static
+
+      - name: Run unit test(Release version, linked to shared library)
+        run: |
+          cd output/Release
+          LD_LIBRARY_PATH=. ./unit_test
+
+      - name: Run unit test(Debug version, linked to static library)
+        run: |
+          cd output/Debug
+          ./unit_test_static_debug
+
+      - name: Run unit test(Debug version, linked to shared library)
+        run: |
+          cd output/Debug
+          LD_LIBRARY_PATH=. ./unit_test_debug
+
+
