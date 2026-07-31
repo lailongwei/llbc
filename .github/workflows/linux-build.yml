@@ -38,6 +38,8 @@ jobs:
           ln -s /usr/bin/python2 /usr/bin/python
           wget https://github.com/libunwind/libunwind/archive/refs/tags/v1.2.1.tar.gz
           tar -zxvf v1.2.1.tar.gz && cd libunwind-1.2.1 && ./autogen.sh && ./configure && make && make install
+          echo "/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
+          ldconfig
 
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -101,6 +103,8 @@ jobs:
           ln -s /usr/bin/python2 /usr/bin/python
           wget https://github.com/libunwind/libunwind/archive/refs/tags/v1.2.1.tar.gz
           tar -zxvf v1.2.1.tar.gz && cd libunwind-1.2.1 && ./autogen.sh && ./configure && make && make install
+          echo "/usr/local/lib" > /etc/ld.so.conf.d/usr-local.conf
+          ldconfig
 
       - name: Download artifact from previous step(linux-build)
         uses: actions/download-artifact@v4
