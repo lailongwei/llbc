@@ -295,7 +295,7 @@ void FuncTest_Core_Time_Time::TimeClassTest()
     tv.tv_sec = 10; tv.tv_usec = 10;
     std::cout <<"FromTimeVal(tv.sec=10, tv.usec=10): " <<LLBC_Time::FromTimeVal(tv) <<std::endl;
 #if LLBC_TARGET_PLATFORM_WIN32
-    LLBC_NS timespec ts;
+    timespec ts;
 #else
     timespec ts;
 #endif

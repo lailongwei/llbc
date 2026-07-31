@@ -223,7 +223,10 @@ typedef FILE * LLBC_FileHandle;
 // timer data type define.
 typedef uint64 LLBC_TimerId;
 #define LLBC_INVALID_TIMER_ID    (0)
-#if LLBC_TARGET_PLATFORM_WIN32
+
+// timespec structure define.
+#if LLBC_TARGET_PLATFORM_WIN32 && defined(_CRT_NO_TIME_T)
+__LLBC_NS_END
 extern "C"
 {
     // For compatible with Linux like system, 
@@ -234,6 +237,7 @@ extern "C"
         long tv_nsec;  /* nanoseconds */
     } timespec;
 }
+__LLBC_NS_BEGIN
 #endif
 
 // guid data type define.

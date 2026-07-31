@@ -6,3 +6,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TOOLS_FILES})
 
 # Define custom target for eidt in VS/xcode.
 add_custom_target(llbc_tools SOURCES ${TOOLS_FILES})
+
+# Add to _llbc_internal_targets group.
+set_target_properties(llbc_tools PROPERTIES
+                      FOLDER "_llbc_internal_targets")
