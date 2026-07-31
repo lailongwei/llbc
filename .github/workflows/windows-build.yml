@@ -29,9 +29,9 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       
       - name: Setup Visual Studio and MSBuild environment
-        uses: microsoft/setup-msbuild@v2
+        uses: ilammy/msvc-dev-cmd@v1
         with:
-          vs-version: "17.0"
+          arch: x64
         
       - name: PreBuild
         run: echo vs2022 | ./WinPreBuild.bat 0
