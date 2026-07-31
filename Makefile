@@ -193,7 +193,9 @@ $(CORELIB_TARGET): $(PREMAKE_TARGET)
 
 $(CORELIB_TESTS_TARGET): $(ALL_CORELIB_TEST_TARGETS)
 $(CORELIB_EXAMPLE_TARGET): $(CORELIB_TARGET)
+	@cd $(BUILD_DIR) && $(MAKE) $(addprefix $@,_shared _static)
 $(CORELIB_UNIT_TEST_TARGET): $(CORELIB_TARGET)
+	@cd $(BUILD_DIR) && $(MAKE) $(addprefix $@,_shared _static)
 $(CORELIB_FUNC_TEST_TARGET): $(CORELIB_TARGET)
 	@cd $(BUILD_DIR) && $(MAKE) $(addprefix $@,_shared _static)
 
