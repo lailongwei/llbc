@@ -3,7 +3,7 @@ name: Windows build
 on:
   push:
     paths-ignore:
-      - ".github/workflows/linux-build.yml"
+      - ".github/workflows/linux-build-and-test.yml"
       - ".github/workflows/macos-build.yml"
       - "static/**"
       - "README.md"
