@@ -322,7 +322,7 @@ TEST(IniTest, HandlesEmptyValuesAndReportsFileReadWriteFailures)
         std::filesystem::temp_directory_path().string().c_str());
     EXPECT_EQ(ini.LoadFromFile(tempDirectory), LLBC_FAILED);
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    EXPECT_NE(ini.GetLoadError().find("read ini file"), static_cast<LLBC_String::size_type>(-1));
+    EXPECT_NE(ini.GetLoadError().find("open ini file"), static_cast<LLBC_String::size_type>(-1));
 #else
     EXPECT_NE(ini.GetLoadError().find("ini file"), static_cast<LLBC_String::size_type>(-1));
 #endif

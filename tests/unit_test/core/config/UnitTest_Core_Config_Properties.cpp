@@ -254,7 +254,7 @@ TEST(PropertiesTest, SavesEmptyDictionariesAndReportsRecursiveAndFileFailures)
     EXPECT_TRUE(unreadable.Is<LLBC_Variant::Str>());
     EXPECT_TRUE(unreadable.IsEmpty());
 #if LLBC_TARGET_PLATFORM_NON_WIN32
-    EXPECT_NE(error.find("Read properties file"), static_cast<LLBC_String::size_type>(-1));
+    EXPECT_NE(error.find("Open properties file"), static_cast<LLBC_String::size_type>(-1));
 #else
     EXPECT_NE(error.find("properties file"), static_cast<LLBC_String::size_type>(-1));
 #endif
