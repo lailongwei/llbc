@@ -13,8 +13,16 @@ on:
 
 jobs:
   windows-build:
-    name: Windows build job
-    runs-on: windows-2022
+    name: Windows build (${{ matrix.os }} / ${{ matrix.vs_version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            vs_version: 'vs2022'
+          - os: windows-2025
+            vs_version: 'vs2026'
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -34,54 +42,55 @@ jobs:
           arch: x64
         
       - name: PreBuild
-        run: echo vs2022 | ./WinPreBuild.bat 0
+        run: echo ${{ matrix.vs_version }} | ./WinPreBuild.bat 0
         
       - name: Compile llbc core lib
         run: |
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 "-t:llbc_shared;llbc_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 "-t:llbc_shared;llbc_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 "-t:llbc_shared;llbc_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 "-t:llbc_shared;llbc_static"        
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Debug -p:Platform=x64 "-t:llbc_shared;llbc_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Release -p:Platform=x64 "-t:llbc_shared;llbc_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 "-t:llbc_shared;llbc_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 "-t:llbc_shared;llbc_static"
+
       - name: Compile example
         run: |
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 "-t:example_shared;example_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 "-t:example_shared;example_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 "-t:example_shared;example_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 "-t:example_shared;example_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Debug -p:Platform=x64 "-t:example_shared;example_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Release -p:Platform=x64 "-t:example_shared;example_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 "-t:example_shared;example_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 "-t:example_shared;example_static"
 
       - name: Compile func_test
         run: |
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 "-t:func_test_shared;func_test_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 "-t:func_test_shared;func_test_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 "-t:func_test_shared;func_test_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 "-t:func_test_shared;func_test_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Debug -p:Platform=x64 "-t:func_test_shared;func_test_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Release -p:Platform=x64 "-t:func_test_shared;func_test_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 "-t:func_test_shared;func_test_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 "-t:func_test_shared;func_test_static"
 
       - name: Compile unit_test
         run: |
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Debug -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Release -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 "-t:unit_test_shared;unit_test_static"
 
       - name: Compile python wrap library
         run: |
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:pyllbc
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:pyllbc
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:pyllbc
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:pyllbc
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:pyllbc
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:pyllbc
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:pyllbc
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:pyllbc
 
       - name: Compile lua wrap library
         run: |
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:lullbc
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:lullbc
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:lullbc
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:lullbc
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:lullbc
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:lullbc
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:lullbc
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:lullbc
 
       - name: Compile c# wrap library
         run: |
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:csllbc_testsuite
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:csllbc_testsuite
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:csllbc_testsuite
-          msbuild.exe build_vs2022/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:csllbc_testsuite
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Debug -p:Platform=x64 -t:csllbc_testsuite
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=Release -p:Platform=x64 -t:csllbc_testsuite
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=MinSizeRel -p:Platform=x64 -t:csllbc_testsuite
+          msbuild.exe build_${{ matrix.vs_version }}/llbc.sln -p:Configuration=RelWithDebInfo -p:Platform=x64 -t:csllbc_testsuite
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
