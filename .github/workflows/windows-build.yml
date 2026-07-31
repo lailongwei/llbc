@@ -13,7 +13,7 @@ on:
 
 jobs:
   windows-build:
-    name: Windows build (${{ matrix.os }} / ${{ matrix.vs_version }})
+    name: Windows build (${{ matrix.os }} / ${{ matrix.vs_version }}, ${{ matrix.configuration }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
