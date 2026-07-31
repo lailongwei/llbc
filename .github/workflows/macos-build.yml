@@ -28,22 +28,25 @@ jobs:
         
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-        
-      - name: Compile core lib code
-        run: |
-          make core_lib config=debug64 -j4
-          make core_lib config=release64 -j4
-        
-      - name: Compile tests
-        run: |
-          make tests config=release64 -j4
 
-      # - name: Build all target by cmake
-      #   run: |
-      #     cmake --version
-      #     mkdir cmake_build
-      #     cd cmake_build
-      #     cmake ..
-      #     make -j4
+      - name: Compile core lib code(Debug and Release)
+        run: |
+          make llbc config=Debug verbose=1 -j4
+          make llbc config=Release verbose=1 -j4
+
+      - name: Compile tests(Debug and Release)
+        run: |
+          make tests config=Debug verbose=1 -j4
+          make tests config=Release verbose=1 -j4
+
+      - name: Compile pyllbc wrap library(Debug and Release)
+        run: |
+          make pyllbc config=Debug verbose=1 -j4
+          make pyllbc config=Release verbose=1 -j4
+
+      - name: Compile lullbc wrap library(Debug and Release)
+        run: |
+          make lullbc config=Debug verbose=1 -j4
+          make lullbc config=Release verbose=1 -j4
         
       - run: echo "🍏 This job's status is ${{ job.status }}."
