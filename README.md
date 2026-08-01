@@ -16,7 +16,7 @@ llbc开发过程中，使用了以下JetBrains产品：
 [![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://lailongwei.github.io/llbc/)
 | 平台         | 编译器        | 类型                        | 状态                                                                                                                                                                     |
 |-------------|---------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Linux**   | g++, clang++  | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/linux-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/linux-build.yml) |
+| **Linux**   | g++, clang++  | Build, Test, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/linux-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/linux-build-and-test.yml) |
 | **MacOS**   | g++, clang++  | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/macos-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/macos-build.yml) |
 | **Windows** | Visual Studio | Build, ~~Test~~, ~~Deploy~~ | [![Build status](https://github.com/lailongwei/llbc/actions/workflows/windows-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/windows-build.yml) |  
 
