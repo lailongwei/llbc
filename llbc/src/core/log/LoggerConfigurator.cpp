@@ -22,14 +22,14 @@
 
 #include "llbc/common/Export.h"
 
+#include "llbc/core/os/OS_Console.h"
 #include "llbc/core/file/Directory.h"
 #include "llbc/core/helper/STLHelper.h"
 #include "llbc/core/config/Properties.h"
-#include "llbc/core/tinyxml2/tinyxml2.h"
 #include "llbc/core/utils/Util_Text.h"
-#include "llbc/core/utils/Util_Variant.h"
 
 #include "llbc/core/log/Logger.h"
+#include "llbc/core/log/LogConfigLoader.h"
 #include "llbc/core/log/LoggerConfigInfo.h"
 #include "llbc/core/log/BaseLogAppender.h"
 #include "llbc/core/log/LoggerConfigurator.h"
@@ -60,33 +60,39 @@ int LLBC_LoggerConfigurator::Initialize(const LLBC_String &cfgFilePath,
     }
     else if (ext == ".xml")
     {
-        // Load xml file.
-        LLBC_TINYXML2_NS XMLDocument xmlDoc;
-        const auto xmlLoadRet = xmlDoc.LoadFile(cfgFilePath.c_str());
-        if (xmlLoadRet != LLBC_TINYXML2_NS XML_SUCCESS)
-        {
-            LLBC_String customErrStr;
-            customErrStr.format("load log config file failed(xml format), "
-                                "file:%s, errno(tinyxml2:%d), error str:%s",
-                                cfgFilePath.c_str(), xmlLoadRet, xmlDoc.ErrorStr());
-            LLBC_SetLastError(LLBC_ERROR_FORMAT, customErrStr.c_str());
+        // XML -> CIR (plain map/seq/scalar). LogConfigLoader returns the
+        // full document CIR keyed by top-level tag(s); log configs always
+        // wrap loggers under <Log>, so strip that wrapper to align with the
+        // Properties-loaded shape: Dict<loggerName, loggerCfg>.
+        LLBC_Variant docCir;
+        if (LLBC_LogConfigLoader::LoadXmlFromFile(cfgFilePath, docCir) != LLBC_OK)
             return LLBC_FAILED;
-        }
-
-        // Convert to variant object(brief format).
-        LLBC_Variant detailCfg;
-        LLBC_VariantUtil::Xml2Variant(xmlDoc, detailCfg);
-        for (auto &loggerXmlCfg : detailCfg["Log"][LLBC_XMLKeys::Children].As<LLBC_Variant::Seq>())
-        {
-            LLBC_Variant &loggerCfg = cfg[loggerXmlCfg[LLBC_XMLKeys::Name].As<LLBC_String>()];
-            for (auto &logCfgItem : loggerXmlCfg[LLBC_XMLKeys::Children].As<LLBC_Variant::Seq>())
-                loggerCfg[logCfgItem[LLBC_XMLKeys::Name]] = logCfgItem[LLBC_XMLKeys::Value];
-        }
+        cfg = std::move(docCir["Log"]);
     }
     else
     {
         LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT);
         return LLBC_FAILED;
+    }
+
+    if (ext == ".cfg")
+    {
+        for (auto &loggerCfgItem : cfg.As<LLBC_Variant::Dict>())
+        {
+            const auto &loggerCfg = loggerCfgItem.second;
+            if (!loggerCfg.Is<LLBC_Variant::Dict>() || !loggerCfg["logControls"])
+                continue;
+
+            // `logControls` is XML-only (its structure is XML-tree shaped).    
+            LLBC_String customErrStr;
+            customErrStr.format(
+                "cfg key `%s.logControls` is not supported -- log control "
+                "items must be configured via XML (<logControls> nested "
+                "element block); see doc/log_control.md.",
+                loggerCfgItem.first.As<LLBC_Variant::Str>().c_str());
+            LLBC_SetLastError(LLBC_ERROR_NOT_SUPPORT, customErrStr.c_str());
+            return LLBC_FAILED;
+        }
     }
 
     // Save config file path.
@@ -228,7 +234,16 @@ int LLBC_LoggerConfigurator::ReConfig(LLBC_Logger *logger) const
         // - Re-Config other appender attributes.
         // ... ...
     }
-    
+
+    // Re-Config log output controls (logger-wide, not per-appender).
+    // The logger config parsing layer (LoggerConfigInfo) has already filtered
+    // out malformed entries; we still propagate any failure faithfully so the
+    // caller sees it. SetLogControls is atomic: on failure the previous
+    // snapshot stays effective, on success the new snapshot is published in
+    // one step (no transient empty state observable to log emitters).
+    if (logger->SetLogControls(info->GetLogControls()) != LLBC_OK)
+        return LLBC_FAILED;
+
     return LLBC_OK;
 }
 

@@ -56,4 +56,27 @@ std::ostream &operator<<(std::ostream &o, const LLBC_JsonValue &value)
     return o << buffer.GetString();
 }
 
+const LLBC_JsonValue &LLBC_JsonGetMember(const LLBC_JsonValue &parent, const char *key)
+{
+    static const LLBC_JsonValue kNull;
+    if (!parent.IsObject())
+        return kNull;
+    auto it = parent.FindMember(key);
+    return it != parent.MemberEnd() ? it->value : kNull;
+}
+
+const char *LLBC_JsonGetStr(const LLBC_JsonValue &v, const char *def)
+{
+    return v.IsString() ? v.GetString() : def;
+}
+
+int LLBC_JsonGetInt(const LLBC_JsonValue &v, int def)
+{
+    if (v.IsInt())
+        return v.GetInt();
+    if (v.IsInt64())
+        return static_cast<int>(v.GetInt64());
+    return def;
+}
+
 __LLBC_NS_END
