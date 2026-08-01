@@ -906,7 +906,7 @@ void FuncTest_Core_Log::OnLogHook(const LLBC_LogData *logData)
 //   2) LoggerMgr::Reload re-installs the config-driven control list.
 // ----------------------------------------------------------------------------
 
-bool TestCase_Core_Log::EmitAndCheckSuppressed(LLBC_Logger *logger,
+bool FuncTest_Core_Log::EmitAndCheckSuppressed(LLBC_Logger *logger,
                                                int level,
                                                const char *file,
                                                int line,
@@ -923,7 +923,7 @@ bool TestCase_Core_Log::EmitAndCheckSuppressed(LLBC_Logger *logger,
     return logger->GetLogControlSuppressedCount() == before + expectedHits;
 }
 
-int TestCase_Core_Log::DoLogControlTest()
+int FuncTest_Core_Log::DoLogControlTest()
 {
     LLBC_PrintLn("DoLogControlTest (log control items) begin");
 
