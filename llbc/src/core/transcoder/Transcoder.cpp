@@ -123,6 +123,7 @@ int LLBC_Transcoder::WideCharToMultiByte(const LLBC_String &toCode, const LLBC_W
 {
     if (toCode.empty())
     {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
         return LLBC_FAILED;
     }
 
@@ -199,6 +200,12 @@ int LLBC_Transcoder::MultiByteToMultiByte(const LLBC_String &fromCode,
                                           const LLBC_String &toCode,
                                           LLBC_String &dest)
 {
+    if (fromCode.empty() || toCode.empty())
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
     if (fromCode == toCode)
     {
         dest.clear();
