@@ -114,6 +114,16 @@ TEST(Base64Test, CalcEncodeLen)
     }
 }
 
+TEST(Base64Test, CalcDecodedLenHandlesEmptyAndDegeneratePadding)
+{
+    EXPECT_EQ(LLBC_Base64::CalcDecodedLen(nullptr, 0), 0lu);
+    EXPECT_EQ(LLBC_Base64::CalcDecodedLen("", 0), 0lu);
+    EXPECT_EQ(LLBC_Base64::CalcDecodedLen("====", 4), 0lu);
+    EXPECT_EQ(LLBC_Base64::CalcDecodedLen("Zg==", 4), 1lu);
+    EXPECT_EQ(LLBC_Base64::CalcDecodedLen("Zm8=", 4), 2lu);
+    EXPECT_EQ(LLBC_Base64::CalcDecodedLen("Zm9v", 4), 3lu);
+}
+
 // Test that the LLBC_String / raw-buffer overloads agree with the std::string overload:
 TEST(Base64Test, OverloadConsistency)
 {

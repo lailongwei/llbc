@@ -313,9 +313,6 @@ LLBC_String LLBC_MD5::Digest(const void *bytes, size_t len)
 LLBC_String LLBC_MD5::HexDigest(const void *bytes, size_t len)
 {
     const auto digest = Digest(bytes, len);
-    if (digest.empty())
-        return "";
-
     char hexDigest[33];
     const auto digestPtr = reinterpret_cast<const uint8 *>(digest.data());
     snprintf(hexDigest,

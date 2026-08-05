@@ -159,10 +159,11 @@ size_t LLBC_Base64::CalcEncodeLen(size_t bytesLen)
 size_t LLBC_Base64::CalcDecodedLen(const char *input, size_t inputLen)
 {
     size_t placeHolderCount = 0;
-    for (size_t i = inputLen - 1; input[i] == '='; --i)
+    for (size_t i = inputLen; i > 0 && input[i - 1] == '='; --i)
         ++placeHolderCount;
 
-    return ((6 * inputLen) / 8) - placeHolderCount;
+    const size_t decodedLen = (inputLen / 4) * 3 + ((inputLen % 4) * 3) / 4;
+    return decodedLen > placeHolderCount ? decodedLen - placeHolderCount : 0;
 }
 
 __LLBC_NS_END
