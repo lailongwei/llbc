@@ -219,10 +219,10 @@ int LLBC_TimerScheduler::Cancel(LLBC_Timer *timer)
         data->handle - LLBC_GetMilliseconds() >= LLBC_CFG_CORE_TIMER_LONG_TIMEOUT_TIME)
     {
         _heap.erase(data, true);
+        // The cancel handler may delete the timer, so only use timer-data here.
         if (--data->refCount == 0)
         {
             delete data;
-            timer->_timerData = nullptr;
         }
     }
 
