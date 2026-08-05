@@ -72,10 +72,11 @@ LLBC_Time LLBC_Time::FromTimeParts(int year,
             minute * LLBC_TimeConst::numOfSecondsPerMinute + second;
         if (tz < 0 && totalSeconds < -tz)
         {
-            hour = -tz / LLBC_TimeConst::numOfSecondsPerHour;
-            minute = (-tz % LLBC_TimeConst::numOfSecondsPerHour) /
+            totalSeconds += -tz;
+            hour = totalSeconds / LLBC_TimeConst::numOfSecondsPerHour;
+            minute = (totalSeconds % LLBC_TimeConst::numOfSecondsPerHour) /
                 LLBC_TimeConst::numOfSecondsPerMinute;
-            second = -tz % LLBC_TimeConst::numOfSecondsPerMinute;
+            second = totalSeconds % LLBC_TimeConst::numOfSecondsPerMinute;
         }
     }
 
@@ -166,7 +167,7 @@ LLBC_Time LLBC_Time::AddYears(int years) const
     newTimeStruct.tm_year += years;
     bool isLeap = IsLeapYear(GetYear());
     if (isLeap && 
-        GetMonth() == 2 && GetDayOfMonth() == 29)
+        GetMonth() == 1 && GetDayOfMonth() == 29)
     {
         if (!IsLeapYear(GetYear() + years))
             newTimeStruct.tm_mday -= 1;
@@ -211,8 +212,8 @@ LLBC_Time LLBC_Time::AddMonths(int months) const
         }
     }
 
-    newTimeStruct.tm_mday = MIN(newTimeStruct.tm_mday, 
-        GetMonthMaxDays(yearAddedTime.GetYear(), newTimeStruct.tm_mon + 1));
+    newTimeStruct.tm_mday = MIN(newTimeStruct.tm_mday,
+        GetMonthMaxDays(newTimeStruct.tm_year + 1900, newTimeStruct.tm_mon + 1));
 
     return FromTimeStruct(newTimeStruct, GetMillisecond(), GetMicrosecond());
 }

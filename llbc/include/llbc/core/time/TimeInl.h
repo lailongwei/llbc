@@ -88,7 +88,7 @@ LLBC_Time LLBC_Time::FromTimeStr(const char (&timeStr)[_StrArrLen],
 inline LLBC_Time LLBC_Time::FromTimeStr(const char *timeStr,
                                         const LLBC_TimeSep &timeSep)
 {
-    return FromTimeStr(timeStr, strlen(timeStr), timeSep);
+    return FromTimeStr(timeStr, timeStr ? strlen(timeStr) : 0, timeSep);
 }
 
 template <typename _StrType>
@@ -312,4 +312,3 @@ inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_Time &t
 {
     return stream << t.ToString();
 }
-
