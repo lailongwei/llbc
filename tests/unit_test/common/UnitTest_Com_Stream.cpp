@@ -1411,3 +1411,215 @@ TEST(StreamTest, OstreamOperator)
 
     ASSERT_EQ(oss.str(), std::string(stream.ToString().c_str()));
 }
+
+
+// =============================================================================
+// [BatchRead / BatchWrite]
+// =============================================================================
+TEST(StreamTest, BatchWriteReadMixedTypes)
+{
+    // Mixed arithmetic + string + STL container + custom serializable type round-trip.
+    LLBC_Stream stream(256);
+
+    const sint32 i1 = 1;
+    const sint32 i2 = -2;
+    const double d = 3.1415926;
+    const LLBC_String s = "hello batch";
+    const std::vector<int> vec = {10, 20, 30};
+    const UCCTypeA obj{111, 222};
+
+    stream.BatchWrite(i1, i2, d, s, vec, obj);
+
+    sint32 i1R = 0, i2R = 0;
+    double dR = 0.0;
+    LLBC_String sR;
+    std::vector<int> vecR;
+    UCCTypeA objR{};
+
+    ASSERT_TRUE(stream.BatchRead(i1R, i2R, dR, sR, vecR, objR));
+    ASSERT_EQ(i1R, i1);
+    ASSERT_EQ(i2R, i2);
+    ASSERT_DOUBLE_EQ(dR, d);
+    ASSERT_EQ(sR, s);
+    ASSERT_EQ(vecR, vec);
+    ASSERT_EQ(objR.a, obj.a);
+    ASSERT_EQ(objR.b, obj.b);
+
+    // All bytes consumed.
+    ASSERT_EQ(stream.GetReadPos(), stream.GetWritePos());
+}
+
+TEST(StreamTest, BatchWriteReadSingleArg)
+{
+    // Single-arg fold expression should also work.
+    LLBC_Stream stream(32);
+
+    const int v = 12345;
+    stream.BatchWrite(v);
+    ASSERT_EQ(stream.GetWritePos(), sizeof(int));
+
+    int vR = 0;
+    ASSERT_TRUE(stream.BatchRead(vR));
+    ASSERT_EQ(vR, v);
+}
+
+TEST(StreamTest, BatchWriteReadNoArgs)
+{
+    // Zero-arg fold: BatchWrite is a no-op, BatchRead returns true (empty conjunction).
+    LLBC_Stream stream(16);
+
+    stream.BatchWrite();
+    ASSERT_EQ(stream.GetWritePos(), 0lu);
+
+    ASSERT_TRUE(stream.BatchRead());
+    ASSERT_EQ(stream.GetReadPos(), 0lu);
+}
+
+TEST(StreamTest, BatchWriteEqualsSequentialWrite)
+{
+    // BatchWrite must produce byte-identical output to `<<` chain / sequential Write.
+    LLBC_Stream a(128);
+    LLBC_Stream b(128);
+
+    const sint32 i = 42;
+    const double d = 2.71828;
+    const LLBC_String s = "same-bytes";
+
+    a.BatchWrite(i, d, s);
+    b << i << d << s;
+
+    ASSERT_EQ(a.GetWritePos(), b.GetWritePos());
+    ASSERT_EQ(memcmp(a.GetBuf(), b.GetBuf(), a.GetWritePos()), 0);
+}
+
+TEST(StreamTest, BatchReadShortCircuitOnFailure)
+{
+    // BatchRead uses (... && Read(vals)) which short-circuits.
+    // Only write 1 int, but ask for 3 ints: 1st succeeds, 2nd fails,
+    // 3rd Read must NOT be called (short-circuit).
+    LLBC_Stream stream(32);
+    const int first = 999;
+    stream << first;
+
+    int a = 0;
+    int b = 0;
+    int c = 0xDEADBEEF; // Sentinel: should stay untouched.
+    ASSERT_FALSE(stream.BatchRead(a, b, c));
+
+    // First value was read (BatchRead advances readPos through each successful Read).
+    ASSERT_EQ(a, first);
+    // Second read failed -> b stays default.
+    ASSERT_EQ(b, 0);
+    // Third read must be short-circuited -> sentinel preserved.
+    ASSERT_EQ(c, static_cast<int>(0xDEADBEEF));
+}
+
+TEST(StreamTest, BatchReadOrderPreserved)
+{
+    // Values must be read in the SAME order they were written.
+    LLBC_Stream stream(64);
+    stream.BatchWrite(sint32(1), sint32(2), sint32(3), sint32(4));
+
+    sint32 v1 = 0, v2 = 0, v3 = 0, v4 = 0;
+    ASSERT_TRUE(stream.BatchRead(v1, v2, v3, v4));
+
+    ASSERT_EQ(v1, 1);
+    ASSERT_EQ(v2, 2);
+    ASSERT_EQ(v3, 3);
+    ASSERT_EQ(v4, 4);
+}
+
+TEST(StreamTest, BatchReadWriteWithEndian)
+{
+    // Ensure endian setting is respected for every value in the batch.
+    for (int endian : {LLBC_Endian::BigEndian, LLBC_Endian::LittleEndian})
+    {
+        LLBC_Stream stream(64);
+        stream.SetEndian(endian);
+
+        const uint32 v1 = 0x12345678u;
+        const uint16 v2 = 0xABCDu;
+        const uint64 v3 = 0x0102030405060708ULL;
+
+        stream.BatchWrite(v1, v2, v3);
+
+        uint32 v1R = 0;
+        uint16 v2R = 0;
+        uint64 v3R = 0;
+        ASSERT_TRUE(stream.BatchRead(v1R, v2R, v3R));
+        ASSERT_EQ(v1R, v1);
+        ASSERT_EQ(v2R, v2);
+        ASSERT_EQ(v3R, v3);
+    }
+}
+
+TEST(StreamTest, BatchReadFailureLeavesReadPosAtFailPoint)
+{
+    // After failure, readPos should reflect that the successful reads consumed bytes,
+    // but the failing Read did not advance further (Read() rolls back on insufficient data).
+    LLBC_Stream stream(32);
+    const sint32 a = 11;
+    const sint16 b = 22;
+    stream << a << b;
+
+    LLBC_Stream reader;
+    reader.Attach(stream.GetBuf(), stream.GetWritePos());
+
+    sint32 aR = 0;
+    sint16 bR = 0;
+    sint64 cR = 0; // Not enough bytes left for a sint64 -> fails.
+    ASSERT_FALSE(reader.BatchRead(aR, bR, cR));
+
+    ASSERT_EQ(aR, a);
+    ASSERT_EQ(bR, b);
+    // After 2 successful reads, readPos should be sizeof(sint32) + sizeof(sint16).
+    ASSERT_EQ(reader.GetReadPos(), sizeof(sint32) + sizeof(sint16));
+}
+
+TEST(StreamTest, BatchMacrosRoundtrip)
+{
+    // Verify LLBC_STREAM_BATCH_WRITE / LLBC_STREAM_BATCH_READ macros.
+    LLBC_Stream stream;
+
+    const sint32 iV = 7;
+    const LLBC_String sV = "macro";
+    const double dV = 1.25;
+
+    LLBC_STREAM_BEGIN_WRITE(stream);
+    LLBC_STREAM_BATCH_WRITE(iV, sV, dV);
+    LLBC_STREAM_END_WRITE();
+
+    auto reader = [](LLBC_Stream &s) -> bool
+    {
+        sint32 i = 0;
+        LLBC_String str;
+        double d = 0.0;
+        LLBC_STREAM_BEGIN_READ(s, false);
+        LLBC_STREAM_BATCH_READ(i, str, d);
+        LLBC_STREAM_END_READ();
+
+        return i == 7 && str == "macro" && d == 1.25;
+    };
+
+    ASSERT_TRUE(reader(stream));
+}
+
+TEST(StreamTest, BatchMacrosReturnFailValueOnFailure)
+{
+    // When BATCH_READ fails, the enclosing scope should return the fail-value
+    // supplied to LLBC_STREAM_BEGIN_READ.
+    LLBC_Stream stream(16);
+    const sint32 only = 42;
+    stream << only;
+
+    auto reader = [](LLBC_Stream &s) -> int
+    {
+        sint32 a = 0;
+        sint32 b = 0; // Missing in the stream -> BATCH_READ fails, returns -1.
+        LLBC_STREAM_BEGIN_READ(s, -1);
+        LLBC_STREAM_BATCH_READ(a, b);
+        LLBC_STREAM_END_READ_RET(0);
+    };
+
+    ASSERT_EQ(reader(stream), -1);
+}
