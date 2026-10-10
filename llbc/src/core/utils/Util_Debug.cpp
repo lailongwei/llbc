@@ -77,8 +77,10 @@ LLBC_String LLBC_Byte2Hex(const void *bytes, size_t len, char byteSep, size_t li
     hexStr.resize(hexSize);
     while (true)
     {
-        *reinterpret_cast<uint16*>(&hexStr[hexStrIdx]) =
+        const uint16 hex =
             LLBC_INL_NS __g_hexTable[(reinterpret_cast<const uint8 *>(bytes))[byteIdx++]];
+        hexStr[hexStrIdx] = static_cast<char>(hex & 0xff);
+        hexStr[hexStrIdx + 1] = static_cast<char>(hex >> 8);
         hexStrIdx += 2;
 
         if (byteSep != '\0')
@@ -106,4 +108,3 @@ uint64 LLBC_Stopwatch::_frequency = 0;
 #endif
 
 __LLBC_NS_END
-

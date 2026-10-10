@@ -53,8 +53,8 @@ static const char *__flow_descs[] =
 
 const char *LLBC_FlowType::Type2Str(int type)
 {
-    return ((type >= LLBC_FlowType::Unknown) ? 
-        __flow_descs[LLBC_FlowType::Unknown] : __flow_descs[type]);
+    return type >= LLBC_FlowType::NoFlow && type < LLBC_FlowType::Unknown ?
+        __flow_descs[type] : __flow_descs[LLBC_FlowType::Unknown];
 }
 
 int LLBC_FlowType::Str2Type(const char *type)
@@ -142,9 +142,8 @@ __LLBC_NS_END
   char *_itoa(int value, char *string, int radix)
   {
       LLBC_String result = LLBC_ItoA(value, radix);
-      strcmp(string, result.c_str());
-
-      return nullptr;
+      strcpy(string, result.c_str());
+      return string;
   }
  #endif
 
@@ -152,9 +151,8 @@ __LLBC_NS_END
   char *_i64toa(long long value, char *string, int radix)
   {
       LLBC_String result = LLBC_I64toA(value, radix);
-      strcmp(string, result.c_str());
-
-      return nullptr;
+      strcpy(string, result.c_str());
+      return string;
   }
  #endif
 
@@ -162,9 +160,8 @@ __LLBC_NS_END
   char *_ui64toa(unsigned long long value, char *string, int radix)
   {
       LLBC_String result = LLBC_UI64toA(value, radix);
-      strcmp(string, result.c_str());
-
-      return nullptr;
+      strcpy(string, result.c_str());
+      return string;
   }
  #endif
 

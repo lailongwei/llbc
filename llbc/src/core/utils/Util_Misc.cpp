@@ -77,6 +77,8 @@ int LLBC_StartArgs::Parse(int argc, char *argv[])
         _namingArgs[splitedArg[0]] = splitedArg[1];
     }
 
+    _parsed = true;
+
     return LLBC_OK;
 }
 
