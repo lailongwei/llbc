@@ -893,7 +893,7 @@ LLBC_Variant::As() const
 {
     __LLBC_INL_Var_PureType(_Ty);
 
-    if constexpr (LLBC_IsTemplSpec<_Ty, std::pair>::value)
+    if constexpr (LLBC_IsTemplSpec<_PureTy, std::pair>::value)
     {
         if (Is<Seq>() && !_data.seq().empty())
         {
