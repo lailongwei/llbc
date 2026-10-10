@@ -40,9 +40,11 @@ LLBC_Semaphore::LLBC_Semaphore(int initVal)
  #else
     LLBC_GUID guid = LLBC_GUIDHelper::Gen();
     LLBC_String str = LLBC_GUIDHelper::Format(guid);
-    str = str.substr(0, 20);
+    str = LLBC_String("/").append(str.substr(0, 20));
 
-    _sem = sem_open(str.c_str(), O_CREAT | O_EXCL, 0644, 0);
+    _sem = sem_open(str.c_str(), O_CREAT | O_EXCL, 0644, initVal);
+    if (_sem != SEM_FAILED)
+        sem_unlink(str.c_str());
  #endif
 #else
     _sem = ::CreateSemaphore(nullptr,
@@ -104,7 +106,7 @@ bool LLBC_Semaphore::TryWait()
 
 bool LLBC_Semaphore::TimedWait(int milliSeconds)
 {
-#if LLBC_TARGET_PLATFORM_LINUX || LLB_TARGET_PLATFORM_ANDROID
+#if LLBC_TARGET_PLATFORM_LINUX || LLBC_TARGET_PLATFORM_ANDROID
     struct timeval tvStart, tvEnd;
     struct timespec ts;
 
