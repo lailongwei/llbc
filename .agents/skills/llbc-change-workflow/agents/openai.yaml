@@ -1,0 +1,4 @@
+interface:
+  display_name: "llbc Change Workflow"
+  short_description: "Implement and verify llbc changes safely"
+  default_prompt: "Use $llbc-change-workflow to implement and verify this llbc change."
