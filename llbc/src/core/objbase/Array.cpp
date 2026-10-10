@@ -155,8 +155,9 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
         return End();
     }
 
-    if (_capacity < n0._idx + other._size)
-        Recapacity(n0._idx + other._size);
+    const difference_type shift = other._size - (n1._idx - n0._idx);
+    if (shift > 0 && _capacity < _size + shift)
+        Recapacity(_size + shift);
 
     for (difference_type i = n0._idx; i < n1._idx; ++i)
     {
@@ -164,7 +165,6 @@ LLBC_Array::Iter LLBC_Array::Replace(LLBC_Array::Iter n0, LLBC_Array::Iter n1, c
         _objs[i] = nullptr;
     }
 
-    difference_type shift = other._size - (n1._idx - n0._idx);
     memmove(_objs + n1._idx + shift, _objs + n1._idx, (_size - n1._idx) * sizeof(Obj *));
     memmove(_objs + n0._idx, other._objs, other._size * sizeof(Obj *));
     for (difference_type i = n0._idx; i < n0._idx + other._size; ++i)

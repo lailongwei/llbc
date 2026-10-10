@@ -288,7 +288,7 @@ void LLBC_Dictionary::Erase(Obj *o)
 
 LLBC_Dictionary::Iter LLBC_Dictionary::Find(int key)
 {
-    int hash = key % _bucketSize;
+    const uint32 hash = static_cast<uint32>(key) % static_cast<uint32>(_bucketSize);
     LLBC_DictionaryElem *elem = _bucket[hash];
     for (; elem != nullptr; elem = elem->GetBucketElemNext())
     {
@@ -473,11 +473,15 @@ bool LLBC_Dictionary::Deserialize(LLBC_Stream &s)
 
     uint32 bucketSize = 0;
     LLBC_STREAM_READ(bucketSize);
-    SetHashBucketSize(static_cast<size_type>(bucketSize));
 
-    Clear();
     if (bucketSize == 0)
+    {
+        Clear();
         return true;
+    }
+
+    SetHashBucketSize(static_cast<size_type>(bucketSize));
+    Clear();
 
     uint32 size = 0;
     LLBC_STREAM_READ(size);

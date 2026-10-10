@@ -126,7 +126,7 @@ void LLBC_DictionaryElem::Hash(LLBC_DictionaryElem **bucket, size_t bucketSize)
     // Generate hash key.
     if(IsIntKey())
     {
-        _hash = _intKey % _bucketSize;
+        _hash = static_cast<uint32>(_intKey) % static_cast<uint32>(_bucketSize);
     }
     else
     {
