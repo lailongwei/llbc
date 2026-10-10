@@ -29,9 +29,9 @@ sint64 LLBC_pageSize = 0;
 
 int __LLBC_InitSysConf()
 {
-    #if LLBC_TARGET_PLATFORM_LINUX
+    #if LLBC_TARGET_PLATFORM_NON_WIN32
     errno = 0;
-    int tmpValue = sysconf(_SC_PAGESIZE);
+    long tmpValue = sysconf(_SC_PAGESIZE);
     if (UNLIKELY(tmpValue == -1))
     {
         if (UNLIKELY(errno == 0))

@@ -27,6 +27,44 @@ using namespace llbc;
 // Coverage targets exercised by this test (collected by tools/coverage/run_unit_test_coverage.sh):
 // @coverage-target: llbc/src/core/os/OS_Process.cpp
 
+namespace
+{
+
+void NoopCrashHandler(const char *, int)
+{
+}
+
+} // namespace
+
+// The process helper exposes a small, safe configuration surface around crash
+// handling. Test validation and idempotent state changes without triggering a
+// crash or attempting to overwrite the host's core-pattern configuration.
+TEST(ProcessApiTest, ProcessIdAndCrashConfigurationValidation)
+{
+    EXPECT_GT(LLBC_GetCurrentProcessId(), 0);
+
+#if LLBC_SUPPORT_HANDLE_CRASH
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    EXPECT_EQ(LLBC_SetCrashDumpFilePath(), LLBC_FAILED);
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_ARG);
+
+    LLBC_SetLastError(LLBC_ERROR_SUCCESS);
+    EXPECT_EQ(LLBC_SetCrashHandler("", &NoopCrashHandler), LLBC_FAILED);
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_ARG);
+
+    constexpr const char *handlerName = "unit-test-noop-crash-handler";
+    EXPECT_EQ(LLBC_SetCrashHandler(handlerName, &NoopCrashHandler), LLBC_OK);
+    EXPECT_EQ(LLBC_SetCrashHandler(handlerName, &NoopCrashHandler), LLBC_OK);
+    EXPECT_EQ(LLBC_SetCrashHandler(handlerName), LLBC_OK);
+    EXPECT_EQ(LLBC_SetCrashHandler(handlerName), LLBC_OK);
+
+    EXPECT_EQ(LLBC_EnableCrashHandle(), LLBC_OK);
+    EXPECT_EQ(LLBC_EnableCrashHandle(), LLBC_OK);
+    LLBC_DisableCrashHandle();
+    LLBC_DisableCrashHandle();
+#endif
+}
+
 #if LLBC_SUPPORT_HANDLE_CRASH
 
 /**

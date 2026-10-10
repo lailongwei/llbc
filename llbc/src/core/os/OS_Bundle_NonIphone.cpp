@@ -77,8 +77,7 @@ LLBC_String LLBC_GetBundlePath(LLBC_BundleHandle bundle)
     bool needRelease = false;
     if (bundle == LLBC_INVALID_BUNDLE_HANDLE)
     {
-        if ((bundle = LLBC_CreateBundle(
-             LLBC_GetMainBundlePath())) == LLBC_INVALID_BUNDLE_HANDLE)
+        if ((bundle = LLBC_CreateBundle("")) == LLBC_INVALID_BUNDLE_HANDLE)
             return "";
 
         needRelease = true;
