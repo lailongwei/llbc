@@ -437,7 +437,7 @@
                                                                                                           \
         LLBC_FilePrint(LLBC_Concat(outputFile, __LINE__), ">>> %s ...... [", "LLBC_Expect(" #cond ")");   \
         LLBC_SetConsoleColor(LLBC_Concat(outputFile, __LINE__), LLBC_Concat(consoleColor, __LINE__));     \
-        LLBC_FilePrint(LLBC_Concat(outputFile, __LINE__), LLBC_Concat(expectStr, __LINE__));              \
+        LLBC_FilePrint(LLBC_Concat(outputFile, __LINE__), "%s", LLBC_Concat(expectStr, __LINE__));        \
         LLBC_SetConsoleColor(LLBC_Concat(outputFile, __LINE__), LLBC_NS LLBC_ConsoleColor::Fg_Default);   \
         LLBC_FilePrintLn(LLBC_Concat(outputFile, __LINE__), "]");                                         \
                                                                                                           \
@@ -461,4 +461,3 @@
 #define LLBC_Expect_LT(val1, val2, ...)  LLBC_Expect((val1) < (val2), ##__VA_ARGS__)
 #define LLBC_Expect_GET(val1, val2, ...) LLBC_Expect((val1) >= (val2), ##__VA_ARGS__)
 #define LLBC_Expect_LET(val1, val2, ...) LLBC_Expect((val1) <= (val2), ##__VA_ARGS__)
-

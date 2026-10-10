@@ -64,7 +64,9 @@ public:
 
     LLBC_String Path(const LLBC_String &child) const
     {
-        return LLBC_Directory::Join(Root(), child);
+        auto path = _root / std::filesystem::path(child.c_str());
+        path.make_preferred();
+        return LLBC_String(path.string().c_str());
     }
 
 private:
@@ -205,20 +207,25 @@ TEST(DirectoryTest, NormalizesJoinsSplitsAndReportsRuntimeDirectories)
     ASSERT_FALSE(current.empty());
     EXPECT_TRUE(LLBC_Directory::Exists(current));
     EXPECT_FALSE(LLBC_Directory::IsAbsPath(""));
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_FALSE(LLBC_Directory::IsAbsPath("/"));
+#else
     EXPECT_TRUE(LLBC_Directory::IsAbsPath("/"));
+#endif
     EXPECT_EQ(LLBC_Directory::AbsPath(""), current);
-    EXPECT_EQ(LLBC_Directory::AbsPath("/"), "/");
+    const LLBC_String root = LLBC_Directory::AbsPath("/");
+    EXPECT_TRUE(LLBC_Directory::IsAbsPath(root));
     EXPECT_EQ(LLBC_Directory::AbsPath("alpha/./beta/../gamma"),
-              LLBC_Directory::Join(current, "alpha/gamma"));
-    EXPECT_EQ(LLBC_Directory::AbsPath("/tmp///"), "/tmp");
+              LLBC_Directory::Join(current, "alpha", "gamma"));
+    EXPECT_EQ(LLBC_Directory::AbsPath("/tmp///"), LLBC_Directory::Join(root, "tmp"));
 
     EXPECT_EQ(LLBC_Directory::Join("", "beta"), "beta");
-    EXPECT_EQ(LLBC_Directory::Join("alpha", "beta"), "alpha/beta");
+    const LLBC_String alphaBeta = LLBC_Directory::Join("alpha", "beta");
     EXPECT_EQ(LLBC_Directory::Join("alpha/", "/beta"), "alpha/beta");
     EXPECT_EQ(LLBC_Directory::Join(LLBC_Strings {"alpha", "beta", "gamma"}),
-              "alpha/beta/gamma");
+              LLBC_Directory::Join(alphaBeta, "gamma"));
     EXPECT_EQ(LLBC_Directory::Join("alpha", "beta", "gamma", "delta"),
-              "alpha/beta/gamma/delta");
+              LLBC_Directory::Join(alphaBeta, "gamma", "delta"));
 
     const auto split = LLBC_Directory::SplitExt("/tmp/archive.tar.gz");
     ASSERT_EQ(split.size(), 2lu);
@@ -228,7 +235,11 @@ TEST(DirectoryTest, NormalizesJoinsSplitsAndReportsRuntimeDirectories)
     ASSERT_EQ(noExtension.size(), 2lu);
     EXPECT_EQ(noExtension[0], "README");
     EXPECT_TRUE(noExtension[1].empty());
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_TRUE(LLBC_Directory::DirName("/").empty());
+#else
     EXPECT_EQ(LLBC_Directory::DirName("/"), "/");
+#endif
     EXPECT_TRUE(LLBC_Directory::BaseName("/").empty());
     EXPECT_EQ(LLBC_Directory::DirName("/usr/local/bin/tool"), "/usr/local/bin");
     EXPECT_EQ(LLBC_Directory::BaseName("/usr/local/bin/tool"), "tool");
@@ -253,7 +264,11 @@ TEST(DirectoryTest, NormalizesJoinsSplitsAndReportsRuntimeDirectories)
     EXPECT_EQ(LLBC_Directory::SetCurDir(""), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_INVALID);
     EXPECT_EQ(LLBC_Directory::SetCurDir("/definitely/not/a/real/llbc-directory"), LLBC_FAILED);
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_OSAPI);
+#else
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+#endif
 }
 
 // Recursive create/list/remove is the common deployment and cache-cleanup
@@ -339,6 +354,10 @@ TEST(DirectoryTest, CreatesEnumeratesFiltersAndRecursivelyRemovesTrees)
 // deployment race without mutating paths outside the test-owned tree.
 TEST(DirectoryTest, ClearsEnumerationResultsForDanglingEntriesAndInvalidRoots)
 {
+#if LLBC_TARGET_PLATFORM_WIN32
+    GTEST_SKIP() << "dangling symlink traversal semantics are POSIX-specific";
+#endif
+
     ScopedDirectoryTree tree;
     const LLBC_String root = tree.Root();
     ASSERT_EQ(LLBC_Directory::Create(root), LLBC_OK);

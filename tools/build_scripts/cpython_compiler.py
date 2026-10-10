@@ -172,8 +172,9 @@ class CPythonCompiler(object):
 
         # 编译cpython(使用当前机器核数的一半来进行编译)
         Log.i('Compile cpython...')
-        ret = Sh.execute('cd "{}" && make -j$([[ `nproc` -gt 1 ]] && echo -n $((`nproc` / 2)) || echo -n 1)'
-                         .format(cfg.pyllbc_cpython_path))
+        build_jobs = max(1, (os.cpu_count() or 1) // 2)
+        ret = Sh.execute('cd "{}" && make -j{}'
+                         .format(cfg.pyllbc_cpython_path, build_jobs))
         if ret != 0:
             Log.fe('Compile cpython failed, ret code:{}', ret)
 

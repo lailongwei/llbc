@@ -46,14 +46,14 @@
 //  MSVC++16.0  -> 1920(Visual Studio 2019)
 //  MSVC++17.0  -> 1930(Visual Studio 2022)
 //  ... ...
-#if LLBC_TARGET_PLATFORM_WIN32 && defined(_MSC_VER)
+#if LLBC_TARGET_PLATFORM_WIN32 && defined(_MSC_VER) && !defined(__clang__)
  #define LLBC_CUR_COMP          LLBC_COMP_MSVC
  #define LLBC_CUR_COMP_DESC     "MSC"
  #define LLBC_COMP_VER          _MSC_VER
  #define LLBC_COMP_MAJOR_VER    _MSC_VER
  #define LLBC_COMP_MINOR_VER    0
  #define LLBC_COMP_PATCH_LEVEL  0
-#endif // LLBC_TARGET_PLATFORM_WIN32 && defined(_MSC_VER)
+#endif // LLBC_TARGET_PLATFORM_WIN32 && defined(_MSC_VER) && !defined(__clang__)
 
 // GNU C compiler.
 // The compiler version is converted, if gcc version is 3.2.0
@@ -88,5 +88,3 @@
  #define LLBC_COMP_MINOR_VER    0
  #define LLBC_COMP_PATCH_LEVEL  0
  #endif
-
-

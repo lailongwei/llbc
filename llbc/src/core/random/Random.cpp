@@ -32,12 +32,18 @@ __LLBC_INTERNAL_NS_BEGIN
 static LLBC_NS LLBC_Random __g_random;
 static LLBC_NS LLBC_SpinLock __g_randomLock;
 
+static LLBC_NS uint32 __LLBC_GenerateRandomSeed()
+{
+    thread_local std::random_device randomDevice;
+    return randomDevice();
+}
+
 __LLBC_INTERNAL_NS_END
 
 __LLBC_NS_BEGIN
 
 LLBC_Random::LLBC_Random(uint32 seed)
-: _mtRand(seed != 0 ? seed : [] { thread_local std::random_device randomDevice; return randomDevice(); }())
+: _mtRand(seed != 0 ? seed : LLBC_INL_NS __LLBC_GenerateRandomSeed())
 {
 }
 

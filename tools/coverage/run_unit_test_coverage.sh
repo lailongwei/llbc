@@ -1,45 +1,72 @@
 #!/usr/bin/env bash
 # ============================================================================
-# llbc unit-test coverage runner (clang source-based coverage).
+# llbc unit-test coverage runner.
 #
-# Builds the unit_test target with coverage instrumentation, runs it, and emits
-# a coverage report for the "modules under test".
+# Clang/AppleClang use source-based coverage (llvm-cov); GCC uses gcov/gcovr.
+# By default this script configures, builds, and runs the unit tests. Pass
+# --report-only to reuse an already-built and already-tested CI build.
 #
-# The set of reported source files is sensed DIRECTLY from the unit test sources:
-# each test file declares the file(s) it exercises with co-located marker comments
+# Reported sources are sensed directly from tests/unit_test/ marker comments:
 #   // @coverage-target: <path relative to repo root>   (globs allowed)
-# and this script collects every such marker under tests/unit_test/. No separate
-# manifest to maintain -- add a test, add its marker in the same file.
 #
-# Policy: REPORT-ONLY. Coverage numbers never fail this script. It exits non-zero
-# ONLY when configure/build fails, or when the test binary itself fails (so real
-# regressions still surface) -- and even then the report is produced first.
+# Coverage percentages are report-only. Configuration, build, test, profile
+# processing, or report-generation failures still fail the script.
 #
 # Env overrides:
 #   CC / CXX                  compilers (default: clang / clang++)
-#   LLVM_COV / LLVM_PROFDATA   llvm tools (default: llvm-cov / llvm-profdata)
-#   UNIT_TEST_GTEST_FILTER    value for --gtest_filter (default: run all)
-#   COVERAGE_JOBS             parallel build jobs (default: nproc/sysctl)
+#   COVERAGE_BACKEND          llvm or gcov (auto-detected from CXX)
+#   LLVM_COV / LLVM_PROFDATA  LLVM tools (default: llvm-cov / llvm-profdata)
+#   GCOV / GCOVR              GNU coverage tools (default: gcov / gcovr)
+#   UNIT_TEST_GTEST_FILTER     GoogleTest filter (default: run all)
+#   COVERAGE_JOBS              parallel build jobs (default: nproc/sysctl)
+#   COVERAGE_BUILD_DIR         CMake build directory
+#   COVERAGE_CONFIGURATION     CMake configuration (default: Debug)
+#   COVERAGE_UNIT_TEST_BIN     instrumented static unit-test executable (LLVM)
+#   COVERAGE_PLATFORM          display platform for the normalized summary
+#   COVERAGE_COMPILER          display compiler for the normalized summary
+#   COVERAGE_SUMMARY_FILE      normalized per-file summary output path
 # ============================================================================
 set -uo pipefail
 
-# --- Locate repo root (this script lives in tools/coverage/). --------------
+MODE="${1:-run}"
+if [ "${MODE}" != "run" ] && [ "${MODE}" != "--report-only" ]; then
+    echo "Usage: $0 [--report-only]"
+    exit 2
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-cd "${ROOT}"
+cd "${ROOT}" || exit 1
 
 CC="${CC:-clang}"
 CXX="${CXX:-clang++}"
 LLVM_COV="${LLVM_COV:-llvm-cov}"
 LLVM_PROFDATA="${LLVM_PROFDATA:-llvm-profdata}"
+GCOV="${GCOV:-gcov}"
+GCOVR="${GCOVR:-gcovr}"
 UNIT_TEST_DIR="${ROOT}/tests/unit_test"
 
-BUILD_DIR="${ROOT}/output/coverage_build"
-BIN_DIR="${ROOT}/output/cmake"
-PROFRAW="${ROOT}/output/unit_test.profraw"
-PROFDATA="${ROOT}/output/unit_test.profdata"
-HTML_DIR="${ROOT}/output/coverage_html"
-LCOV_FILE="${ROOT}/output/coverage.lcov"
+BACKEND="${COVERAGE_BACKEND:-}"
+if [ -z "${BACKEND}" ]; then
+    if "${CXX}" --version 2>/dev/null | grep -qi clang; then
+        BACKEND=llvm
+    else
+        BACKEND=gcov
+    fi
+fi
+if [ "${BACKEND}" != "llvm" ] && [ "${BACKEND}" != "gcov" ]; then
+    echo "!! unsupported coverage backend: ${BACKEND}"
+    exit 2
+fi
+
+BUILD_DIR="${COVERAGE_BUILD_DIR:-${ROOT}/output/coverage_build}"
+CONFIGURATION="${COVERAGE_CONFIGURATION:-Debug}"
+OUTPUT_DIR="${ROOT}/output"
+PROFRAW_PATTERN="${OUTPUT_DIR}/unit_test-%p.profraw"
+PROFDATA="${OUTPUT_DIR}/unit_test.profdata"
+LCOV_FILE="${OUTPUT_DIR}/coverage.lcov"
+SUMMARY_FILE="${COVERAGE_SUMMARY_FILE:-${OUTPUT_DIR}/coverage-summary.json}"
+PYTHON="${PYTHON:-python3}"
 
 if command -v nproc >/dev/null 2>&1; then JOBS="${COVERAGE_JOBS:-$(nproc)}";
 elif command -v sysctl >/dev/null 2>&1; then JOBS="${COVERAGE_JOBS:-$(sysctl -n hw.ncpu)}";
@@ -47,52 +74,48 @@ else JOBS="${COVERAGE_JOBS:-4}"; fi
 
 echo "==> repo root      : ${ROOT}"
 echo "==> compiler       : ${CC} / ${CXX}"
-echo "==> llvm tools     : ${LLVM_COV} / ${LLVM_PROFDATA}"
+echo "==> coverage       : ${BACKEND}"
+echo "==> configuration  : ${CONFIGURATION}"
 echo "==> build jobs     : ${JOBS}"
 
-# --- 1. Configure (coverage-instrumented Debug build). ---------------------
-echo "==> Configuring coverage build..."
-cmake -S "${ROOT}" -B "${BUILD_DIR}" \
-    -DCMAKE_BUILD_TYPE=Debug \
-    -DLLBC_ENABLE_COVERAGE=ON \
-    -DCMAKE_C_COMPILER="${CC}" \
-    -DCMAKE_CXX_COMPILER="${CXX}" || { echo "!! cmake configure failed"; exit 1; }
+TEST_RC=0
+if [ "${MODE}" = "run" ]; then
+    echo "==> Configuring coverage build..."
+    cmake -S "${ROOT}" -B "${BUILD_DIR}" \
+        -DCMAKE_BUILD_TYPE="${CONFIGURATION}" \
+        -DLLBC_ENABLE_COVERAGE=ON \
+        -DCMAKE_C_COMPILER="${CC}" \
+        -DCMAKE_CXX_COMPILER="${CXX}" || { echo "!! cmake configure failed"; exit 1; }
 
-# --- 2. Build unit_test. ---------------------------------------------------
-# CMake target is llbc_unit_test (project name); its output binary is unit_test[_debug].
-echo "==> Building unit_test..."
-cmake --build "${BUILD_DIR}" --target llbc_unit_test -j "${JOBS}" || { echo "!! build failed"; exit 1; }
+    echo "==> Building unit tests..."
+    cmake --build "${BUILD_DIR}" \
+        --target unit_test_static unit_test_shared \
+        --parallel "${JOBS}" || { echo "!! build failed"; exit 1; }
 
-# The DEBUG build carries the _debug suffix (CMAKE_DEBUG_POSTFIX).
-UNIT_TEST_BIN="${BIN_DIR}/unit_test_debug"
-[ -x "${UNIT_TEST_BIN}" ] || UNIT_TEST_BIN="${BIN_DIR}/unit_test"
-if [ ! -x "${UNIT_TEST_BIN}" ]; then
-    echo "!! unit_test binary not found under ${BIN_DIR}"; exit 1
+    rm -f "${OUTPUT_DIR}"/unit_test-*.profraw "${PROFDATA}"
+    find "${BUILD_DIR}" -type f -name '*.gcda' -delete
+    echo "==> Running unit tests through CTest..."
+    if [ -n "${UNIT_TEST_GTEST_FILTER:-}" ]; then
+        export GTEST_FILTER="${UNIT_TEST_GTEST_FILTER}"
+    fi
+    if [ "${BACKEND}" = "llvm" ]; then
+        LLVM_PROFILE_FILE="${PROFRAW_PATTERN}" \
+            ctest --test-dir "${BUILD_DIR}" --build-config "${CONFIGURATION}" \
+                  --output-on-failure --no-tests=error
+    else
+        ctest --test-dir "${BUILD_DIR}" --build-config "${CONFIGURATION}" \
+              --output-on-failure --no-tests=error
+    fi
+    TEST_RC=$?
+    [ "${TEST_RC}" -eq 0 ] && echo "==> tests passed" || \
+        echo "!! tests exited with code ${TEST_RC} (report still generated below)"
 fi
-echo "==> unit_test bin  : ${UNIT_TEST_BIN}"
 
-# --- 3. Run the tests (records profile). -----------------------------------
-rm -f "${PROFRAW}" "${PROFDATA}"
-GTEST_ARGS=()
-[ -n "${UNIT_TEST_GTEST_FILTER:-}" ] && GTEST_ARGS+=("--gtest_filter=${UNIT_TEST_GTEST_FILTER}")
-echo "==> Running unit_test ${GTEST_ARGS[*]:-}"
-# ${arr[@]+"${arr[@]}"} safely expands a possibly-empty array under `set -u` (bash 3.2 compat).
-LLVM_PROFILE_FILE="${PROFRAW}" "${UNIT_TEST_BIN}" ${GTEST_ARGS[@]+"${GTEST_ARGS[@]}"}
-TEST_RC=$?
-[ "${TEST_RC}" -eq 0 ] && echo "==> tests passed" || echo "!! tests exited with code ${TEST_RC} (report still generated below)"
-
-# --- 4. Merge raw profile. -------------------------------------------------
-if [ ! -f "${PROFRAW}" ]; then
-    echo "!! no profile produced (${PROFRAW}); cannot report coverage"; exit "${TEST_RC}"
-fi
-"${LLVM_PROFDATA}" merge -sparse "${PROFRAW}" -o "${PROFDATA}" || { echo "!! llvm-profdata merge failed"; exit 1; }
-
-# --- 5. Collect @coverage-target markers from the unit test sources. -------
-#     Sensed directly from tests/unit_test/**/*.cpp; expand globs; keep existing.
+# Collect and expand co-located @coverage-target markers.
 TARGETS=()
 declare -a RAW_TARGETS=()
 while IFS= read -r rel; do
-    rel="$(echo "${rel}" | xargs 2>/dev/null || true)"   # trim
+    rel="$(echo "${rel}" | xargs 2>/dev/null || true)"
     [ -z "${rel}" ] && continue
     RAW_TARGETS+=("${rel}")
 done < <(grep -rhoE '@coverage-target:[[:space:]]*[^[:space:]]+' "${UNIT_TEST_DIR}" \
@@ -100,49 +123,99 @@ done < <(grep -rhoE '@coverage-target:[[:space:]]*[^[:space:]]+' "${UNIT_TEST_DI
          | sed -E 's/.*@coverage-target:[[:space:]]*//' | sort -u)
 
 if [ "${#RAW_TARGETS[@]}" -eq 0 ]; then
-    echo "!! no @coverage-target markers found under ${UNIT_TEST_DIR}"; exit 1
+    echo "!! no @coverage-target markers found under ${UNIT_TEST_DIR}"
+    exit 1
 fi
 
 for rel in "${RAW_TARGETS[@]}"; do
     matched=0
-    for path in ${ROOT}/${rel}; do        # glob expansion
+    for path in ${ROOT}/${rel}; do
         if [ -e "${path}" ]; then TARGETS+=("${path}"); matched=1; fi
     done
     [ "${matched}" -eq 0 ] && echo "!! @coverage-target path not found: ${rel}"
 done
 
 if [ "${#TARGETS[@]}" -eq 0 ]; then
-    echo "!! no coverage target files resolved from @coverage-target markers"; exit 1
+    echo "!! no coverage target files resolved from @coverage-target markers"
+    exit 1
 fi
 echo "==> coverage targets (${#TARGETS[@]}) sensed from @coverage-target markers"
 
-# --- 6. Report (tested modules only). --------------------------------------
-echo ""
-echo "================ Unit-test coverage (tested modules) ================"
-REPORT="$("${LLVM_COV}" report "${UNIT_TEST_BIN}" -instr-profile="${PROFDATA}" "${TARGETS[@]}" 2>/dev/null)"
-echo "${REPORT}"
+mkdir -p "${OUTPUT_DIR}"
 
-# GitHub Actions job summary (markdown).
-if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
-    {
-        echo "## Unit-test coverage (tested modules)"
-        [ "${TEST_RC}" -ne 0 ] && echo ":warning: unit_test exited with code ${TEST_RC}."
-        echo '```'
-        echo "${REPORT}"
-        echo '```'
-        echo "_Report-only: coverage numbers do not gate CI. Targets are sensed from \`@coverage-target:\` markers in tests/unit_test/._"
-    } >> "${GITHUB_STEP_SUMMARY}"
+if [ "${BACKEND}" = "llvm" ]; then
+    UNIT_TEST_BIN="${COVERAGE_UNIT_TEST_BIN:-}"
+    if [ -z "${UNIT_TEST_BIN}" ]; then
+        for candidate in \
+            "${OUTPUT_DIR}/${CONFIGURATION}/unit_test_static_debug" \
+            "${OUTPUT_DIR}/${CONFIGURATION}/unit_test_static" \
+            "${OUTPUT_DIR}/cmake/unit_test_static_debug" \
+            "${OUTPUT_DIR}/cmake/Debug/unit_test_static_debug" \
+            "${OUTPUT_DIR}/cmake/unit_test_static"; do
+            if [ -x "${candidate}" ]; then
+                UNIT_TEST_BIN="${candidate}"
+                break
+            fi
+        done
+    fi
+    if [ ! -x "${UNIT_TEST_BIN}" ]; then
+        echo "!! unit_test binary not found under ${OUTPUT_DIR}"
+        exit 1
+    fi
+    echo "==> unit_test bin  : ${UNIT_TEST_BIN}"
+
+    shopt -s nullglob
+    PROFRAW_FILES=("${OUTPUT_DIR}"/unit_test-*.profraw)
+    shopt -u nullglob
+    if [ "${#PROFRAW_FILES[@]}" -eq 0 ]; then
+        echo "!! no profiles produced (${PROFRAW_PATTERN}); cannot report coverage"
+        [ "${TEST_RC}" -ne 0 ] && exit "${TEST_RC}"
+        exit 1
+    fi
+    "${LLVM_PROFDATA}" merge -sparse "${PROFRAW_FILES[@]}" -o "${PROFDATA}" || \
+        { echo "!! llvm-profdata merge failed"; exit 1; }
+
+    REPORT="$("${LLVM_COV}" report "${UNIT_TEST_BIN}" \
+        -instr-profile="${PROFDATA}" "${TARGETS[@]}" 2>/dev/null)" || \
+        { echo "!! coverage summary generation failed"; exit 1; }
+
+    "${LLVM_COV}" export "${UNIT_TEST_BIN}" -instr-profile="${PROFDATA}" \
+        -format=lcov "${TARGETS[@]}" > "${LCOV_FILE}" 2>/dev/null || \
+        { echo "!! lcov export failed"; exit 1; }
+else
+    GCOVR_ARGS=(
+        --root "${ROOT}"
+        --gcov-executable "${GCOV}"
+        # GCC can emit negative branch hits for exception-related branches.
+        # Gcovr documents this as GCC bug 68080; retain the rest of the data.
+        --gcov-ignore-parse-errors negative_hits.warn_once_per_file
+    )
+    for path in "${TARGETS[@]}"; do
+        # Relative filters are stable even when the Actions workspace is
+        # reached through a symlink and gcovr canonicalizes source paths.
+        relative_path="${path#"${ROOT}/"}"
+        escaped_path="$(printf '%s' "${relative_path}" | sed 's/[][\\.^$*+?(){}|]/\\&/g')"
+        GCOVR_ARGS+=(--filter "^${escaped_path}$")
+    done
+    REPORT="$("${GCOVR}" "${GCOVR_ARGS[@]}" "${BUILD_DIR}" \
+        --txt - \
+        --lcov "${LCOV_FILE}")" || \
+        { echo "!! gcovr report generation failed"; exit 1; }
 fi
 
-# --- 7. Export HTML + lcov artifacts. --------------------------------------
-rm -rf "${HTML_DIR}"
-"${LLVM_COV}" show "${UNIT_TEST_BIN}" -instr-profile="${PROFDATA}" \
-    -format=html -output-dir="${HTML_DIR}" \
-    -show-line-counts-or-regions "${TARGETS[@]}" >/dev/null 2>&1 \
-    && echo "==> HTML report  : ${HTML_DIR}/index.html" || echo "!! HTML export failed (non-fatal)"
-"${LLVM_COV}" export "${UNIT_TEST_BIN}" -instr-profile="${PROFDATA}" \
-    -format=lcov "${TARGETS[@]}" > "${LCOV_FILE}" 2>/dev/null \
-    && echo "==> lcov report  : ${LCOV_FILE}" || echo "!! lcov export failed (non-fatal)"
+echo ""
+echo "================ Unit-test coverage (tested modules) ================"
+echo "${REPORT}"
+echo "==> lcov report  : ${LCOV_FILE}"
+"${PYTHON}" "${SCRIPT_DIR}/coverage_summary.py" summarize \
+    --input "${LCOV_FILE}" \
+    --format lcov \
+    --source-root "${ROOT}" \
+    --markers-dir "${UNIT_TEST_DIR}" \
+    --platform "${COVERAGE_PLATFORM:-$(uname -s)}" \
+    --compiler "${COVERAGE_COMPILER:-${CXX}}" \
+    --backend "${BACKEND}" \
+    --output "${SUMMARY_FILE}" || { echo "!! coverage summary normalization failed"; exit 1; }
+echo "==> summary      : ${SUMMARY_FILE}"
 
-# Report-only: surface a genuine test failure via exit code, but never gate on coverage.
 exit "${TEST_RC}"

@@ -14,17 +14,19 @@ llbc 框架从 2011 年开始编写，到2026年，均依赖且只依赖此测�
 llbc 项目单元测试项目，使用 [gtest/gmock](https://github.com/google/googletest) 框架进行编码，gtest/gmock 版本: [v1.17.0](https://github.com/google/googletest/tree/v1.17.0)（发布于 May/1，2025），**llbc 框架的整体质量将慢慢通过此项目来确保**。
 
 ### 3.1、覆盖率（coverage）
-每次 push / PR 都会由 GitHub Action `unit-test-coverage`（`.github/workflows/unit-test-coverage.yml`）自动测量单元测试覆盖率。基于 clang source-based coverage（`llvm-cov`），**只报告、不阻断**——覆盖率数字不会让 action 失败（编译失败、测试失败仍会失败），报告写入 job summary，HTML / lcov 作为 artifact 上传。
+每次 push / PR 都会由 GitHub Action `CI`（`.github/workflows/ci.yml`）的每个「平台 + 编译器」矩阵任务运行一次 CTest 并测量单元测试覆盖率：GCC 使用 gcov/gcovr，Clang 与 AppleClang 使用 llvm-cov，MSVC 与 clang-cl 使用 Microsoft 原生 PDB coverage。**覆盖率数字只报告、不阻断**；编译、测试或报告生成失败仍会让 CI 失败。最终报告直接写入 GitHub Actions job summary，不上传需要另行下载的 artifact；报告按模块与文件汇总 5 个矩阵任务，并且只展示 Line Coverage。
 
 - **统计范围**：只统计「已有单测的模块」。被测源文件由**测试文件内的标记注释直接感知**，无需单独清单——脚本会扫描 `tests/unit_test/**` 下所有形如下面的标记并汇总：
   ```cpp
   // @coverage-target: llbc/src/core/utils/Util_Base64.cpp
   // @coverage-target: llbc/include/llbc/core/utils/Util_Base64Inl.h
   ```
-- **约定**：**每新增一个单测，在该测试文件里就近加上它覆盖的源文件 `// @coverage-target:` 标记**（`llbc/src/**` 的 `.cpp`，以及 inline 较多的模块的 `*Inl.h`）；目标是把被测模块驱动到尽量接近 100%（region / function / line / branch）。
-- **本地运行**（需要 `clang`/`clang++` 与配套 `llvm-cov`/`llvm-profdata`、`cmake`）：
+- **约定**：**每新增一个单测，在该测试文件里就近加上它覆盖的源文件 `// @coverage-target:` 标记**（`llbc/src/**` 的 `.cpp`，以及 inline 较多的模块的 `*Inl.h`）；目标是持续提高被测模块的行覆盖率。
+- **本地运行**（Clang 需要配套 `llvm-cov`/`llvm-profdata`；GCC 需要 `gcovr`）：
   ```bash
   CC=clang CXX=clang++ bash tools/coverage/run_unit_test_coverage.sh
+  # GCC：
+  # COVERAGE_BACKEND=gcov CC=gcc CXX=g++ bash tools/coverage/run_unit_test_coverage.sh
   # macOS 上 llvm 工具常不在 PATH，可显式指定：
   # LLVM_COV=$(brew --prefix llvm)/bin/llvm-cov LLVM_PROFDATA=$(brew --prefix llvm)/bin/llvm-profdata \
   #   CC=clang CXX=clang++ bash tools/coverage/run_unit_test_coverage.sh

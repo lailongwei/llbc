@@ -93,7 +93,8 @@ TEST(CrashTest, DivisionByZero)
     GTEST_SKIP() << "AArch64 does not trap on integer division by zero (SDIV returns 0)";
 #else
     EXPECT_DEATH({
-        auto result = 3 / LLBC_Str2Num<int>("0");
+        volatile int divisor = LLBC_Str2Num<int>("0");
+        auto result = 3 / divisor;
         std::cout << "3 / 0 = " << result << std::endl;
     }, ".*");
 #endif
@@ -103,7 +104,9 @@ TEST(CrashTest, DivisionByZero)
 TEST(CrashTest, InvalidPtrRead)
 {
     EXPECT_DEATH({
-        int *invalidPtr4Read = nullptr;
+        // Volatile keeps the invalid access observable in optimized CI builds;
+        // otherwise the compiler may fold this undefined behavior away.
+        volatile int *invalidPtr4Read = nullptr;
         std::cout << *invalidPtr4Read << std::endl;
     }, ".*");
 }
@@ -112,7 +115,7 @@ TEST(CrashTest, InvalidPtrRead)
 TEST(CrashTest, InvalidPtrWrite)
 {
     EXPECT_DEATH({
-        int *invalidPtr4Write = nullptr;
+        volatile int *invalidPtr4Write = nullptr;
         *invalidPtr4Write = 3;
         std::cout << *invalidPtr4Write << std::endl;
     }, ".*");

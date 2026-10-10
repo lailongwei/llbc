@@ -1,0 +1,259 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_test_coverage:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux / GCC
+            slug: linux-gcc
+            platform: Linux
+            compiler_label: GCC
+            os: ubuntu-24.04
+            compiler: gcc
+            cc: gcc
+            cxx: g++
+            # GCC 13 cannot track LLBC_Variant's type discriminator through
+            # its placement-new union. Keep the diagnostic visible, but do
+            # not promote this known false positive to an error.
+            cxx_flags: -Wno-error=maybe-uninitialized
+            coverage_backend: gcov
+            build_jobs: 4
+            packages: gcc g++ gcovr
+            toolset_args: ""
+          - name: Linux / Clang
+            slug: linux-clang
+            platform: Linux
+            compiler_label: Clang
+            os: ubuntu-24.04
+            compiler: clang
+            cc: clang
+            cxx: clang++
+            cxx_flags: ""
+            coverage_backend: llvm
+            build_jobs: 4
+            packages: clang llvm
+            toolset_args: ""
+          - name: macOS / AppleClang
+            slug: macos-appleclang
+            platform: macOS
+            compiler_label: AppleClang
+            os: macos-15-intel
+            compiler: appleclang
+            cc: clang
+            cxx: clang++
+            cxx_flags: ""
+            coverage_backend: llvm
+            build_jobs: 4
+            packages: ""
+            toolset_args: ""
+          - name: Windows / MSVC
+            slug: windows-msvc
+            platform: Windows
+            compiler_label: MSVC
+            os: windows-2022
+            compiler: msvc
+            cc: ""
+            cxx: ""
+            cxx_flags: ""
+            coverage_backend: microsoft
+            build_jobs: 2
+            packages: ""
+            toolset_args: ""
+          - name: Windows / clang-cl
+            slug: windows-clang-cl
+            platform: Windows
+            compiler_label: clang-cl
+            os: windows-2022
+            compiler: clang-cl
+            cc: ""
+            cxx: ""
+            cxx_flags: ""
+            coverage_backend: microsoft
+            build_jobs: 2
+            packages: ""
+            toolset_args: -T ClangCL
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            uuid-dev \
+            libunwind-dev \
+            ${{ matrix.packages }}
+
+      - name: Locate Apple coverage tools
+        if: runner.os == 'macOS'
+        run: |
+          echo "LLVM_COV=$(xcrun --find llvm-cov)" >> "${GITHUB_ENV}"
+          echo "LLVM_PROFDATA=$(xcrun --find llvm-profdata)" >> "${GITHUB_ENV}"
+
+      - name: Show toolchain
+        shell: bash
+        run: |
+          cmake --version
+          if [[ "${{ matrix.compiler }}" == "clang-cl" ]]; then
+            clang-cl --version
+          elif [[ "${{ runner.os }}" == "Windows" ]]; then
+            echo "MSVC toolchain selected by the Visual Studio CMake generator"
+          else
+            "${{ matrix.cxx }}" --version
+          fi
+
+      - name: Configure (Unix)
+        if: runner.os != 'Windows'
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+          CXXFLAGS: ${{ matrix.cxx_flags }}
+        run: >-
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DLLBC_ENABLE_COVERAGE=ON
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: >-
+          cmake -S . -B build -A x64
+          ${{ matrix.toolset_args }}
+          -DLLBC_ENABLE_COVERAGE=ON
+
+      - name: Build
+        run: >-
+          cmake --build build
+          --config Release
+          --parallel ${{ matrix.build_jobs }}
+
+      # Each matrix lane executes CTest exactly once. On Windows the Microsoft
+      # collector launches CTest and follows both unit-test child processes.
+      - name: Test
+        if: runner.os != 'Windows'
+        env:
+          LLVM_PROFILE_FILE: ${{ github.workspace }}/output/unit_test-%p.profraw
+        run: >-
+          ctest --test-dir build
+          --build-config Release
+          --output-on-failure
+          --no-tests=error
+
+      - name: Test
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          COVERAGE_PLATFORM: ${{ matrix.platform }}
+          COVERAGE_COMPILER: ${{ matrix.compiler_label }}
+          COVERAGE_SUMMARY_FILE: ${{ github.workspace }}/coverage-summaries/${{ matrix.slug }}/coverage-summary.json
+        run: >-
+          ./tools/coverage/run_unit_test_coverage.ps1
+          -BuildDir build
+          -Configuration Release
+
+      - name: Collect line coverage
+        if: ${{ always() && runner.os != 'Windows' }}
+        env:
+          COVERAGE_BACKEND: ${{ matrix.coverage_backend }}
+          COVERAGE_BUILD_DIR: ${{ github.workspace }}/build
+          COVERAGE_CONFIGURATION: Release
+          COVERAGE_PLATFORM: ${{ matrix.platform }}
+          COVERAGE_COMPILER: ${{ matrix.compiler_label }}
+          COVERAGE_SUMMARY_FILE: ${{ github.workspace }}/coverage-summaries/${{ matrix.slug }}/coverage-summary.json
+        run: bash tools/coverage/run_unit_test_coverage.sh --report-only
+
+      - name: Save coverage data for summary
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: coverage-summaries/${{ matrix.slug }}
+          key: coverage-summary-${{ github.run_id }}-${{ matrix.slug }}
+          enableCrossOsArchive: true
+
+  required:
+    name: CI / All platforms passed
+    if: ${{ always() }}
+    needs: build_test_coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Verify build, test and coverage matrix
+        env:
+          MATRIX_RESULT: ${{ needs.build_test_coverage.result }}
+        run: |
+          if [[ "${MATRIX_RESULT}" != "success" ]]; then
+            echo "Build, test and coverage matrix result: ${MATRIX_RESULT}"
+            exit 1
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Restore Linux GCC coverage data
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: coverage-summaries/linux-gcc
+          key: coverage-summary-${{ github.run_id }}-linux-gcc
+          fail-on-cache-miss: true
+          enableCrossOsArchive: true
+
+      - name: Restore Linux Clang coverage data
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: coverage-summaries/linux-clang
+          key: coverage-summary-${{ github.run_id }}-linux-clang
+          fail-on-cache-miss: true
+          enableCrossOsArchive: true
+
+      - name: Restore macOS AppleClang coverage data
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: coverage-summaries/macos-appleclang
+          key: coverage-summary-${{ github.run_id }}-macos-appleclang
+          fail-on-cache-miss: true
+          enableCrossOsArchive: true
+
+      - name: Restore Windows MSVC coverage data
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: coverage-summaries/windows-msvc
+          key: coverage-summary-${{ github.run_id }}-windows-msvc
+          fail-on-cache-miss: true
+          enableCrossOsArchive: true
+
+      - name: Restore Windows clang-cl coverage data
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: coverage-summaries/windows-clang-cl
+          key: coverage-summary-${{ github.run_id }}-windows-clang-cl
+          fail-on-cache-miss: true
+          enableCrossOsArchive: true
+
+      - name: Publish cross-platform coverage summary
+        run: >-
+          python3 tools/coverage/coverage_summary.py report
+          --input-dir coverage-summaries
+          --expected-count 5
+          --markdown-output "${GITHUB_STEP_SUMMARY}"

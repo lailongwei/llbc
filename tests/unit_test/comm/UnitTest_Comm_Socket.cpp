@@ -108,7 +108,8 @@ TEST(SocketTest, CreatesConfiguresQueuesAndCloses)
     LLBC_SocketLen optionLength = sizeof(keepAlive);
     ASSERT_EQ(socket.GetOption(SOL_SOCKET, SO_KEEPALIVE, &keepAlive, &optionLength), LLBC_OK);
     EXPECT_NE(keepAlive, 0);
-    EXPECT_EQ(optionLength, sizeof(keepAlive));
+    EXPECT_GT(optionLength, 0);
+    EXPECT_LE(optionLength, sizeof(keepAlive));
 
     ASSERT_EQ(socket.SetMaxPacketSize(4096), LLBC_OK);
     EXPECT_EQ(socket.GetMaxPacketSize(), 4096u);

@@ -168,7 +168,7 @@ void LLBC_Task::TaskEntry(void *arg)
 
     // Waiting for Task::Activate() call finished.
     while (GetTaskState() != LLBC_NS LLBC_TaskState::Activated)
-        LLBC_NS LLBC_Sleep(0);
+        LLBC_Sleep(0);
 
     // Call task Svc() meth.
     // ==========================================

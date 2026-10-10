@@ -141,7 +141,7 @@ TEST(BundleTest, ManagesIndependentBundleStateAndResources)
     EXPECT_EQ(bundle.GetResPath("top", "txt"),
               LLBC_Directory::Join(bundle.GetBundlePath(), "top.txt"));
     EXPECT_EQ(bundle.GetResPath("item", "dat", "nested"),
-              LLBC_Directory::Join(bundle.GetBundlePath(), "nested/item.dat"));
+              LLBC_Directory::Join(bundle.GetBundlePath(), "nested", "item.dat"));
 
     LLBC_SetLastError(LLBC_ERROR_SUCCESS);
     EXPECT_EQ(bundle.Initialize("nested"), LLBC_FAILED);

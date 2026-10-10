@@ -6,7 +6,7 @@ option(LLBC_DISABLE_CXX11_ABI  "Disable libstdc++ CXX11 ABI (define _GLIBCXX_USE
 # Asan support switch.
 option(LLBC_ENABLE_ASAN "Enable AddressSanitizer (non-Windows only)" OFF)
 # Coverage support switch.
-option(LLBC_ENABLE_COVERAGE "Enable coverage (non-Windows only)" OFF)
+option(LLBC_ENABLE_COVERAGE "Enable compiler-native coverage instrumentation" OFF)
 # Custom c/cpp compile toolset dir setting.
 # set(LLBC_CUSTOM_COMPILE_TOOLSET_DIR "<custom compile toolset dir>" CACHE STRING "Custom compile toolset dir")
 
@@ -113,6 +113,14 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 # Reset Release cxx flags to: '-O2 -DNDEBUG'.
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 
+# Compiler frontend compatibility is separate from compiler identity. In
+# particular, clang-cl identifies as Clang while accepting MSVC command-line
+# options and using the MSVC ABI/runtime.
+set(LLBC_MSVC_FRONTEND OFF)
+if (MSVC OR CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+	set(LLBC_MSVC_FRONTEND ON)
+endif()
+
 # Build type && Configuration types detect.
 if (CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Multi-config generator, configuration types: ${CMAKE_CONFIGURATION_TYPES}")
@@ -123,7 +131,7 @@ else()
     message(STATUS "Single-config generator, build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
-# Debug/asan target file suffix (mirror premake targetsuffix: _debug / _asan / _asan_debug).
+# Debug/asan target file suffix.
 # Notes:
 # - CMake only auto-reads CMAKE_DEBUG_POSTFIX and applies it to a library target's DEBUG_POSTFIX
 #   property. The other three variables are NOT auto-read by CMake; they must be applied manually
@@ -156,8 +164,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLBC_OUTPUT_DIR})
 
-# Disable min/max macro define(on MSVC compiler).
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+# Disable min/max macro define(on MSVC-compatible compiler frontends).
+if (LLBC_MSVC_FRONTEND)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
 endif()
 
@@ -191,7 +199,7 @@ message(STATUS "llbc framework version: ${LLBC_VERSION}")
 # Common build settings carrier: llbc_build_settings_loose/llbc_build_settings.
 # Enable more strict warnings and enable all warnings as errors.
 add_library(llbc_build_settings_loose INTERFACE)
-if (MSVC)
+if (LLBC_MSVC_FRONTEND)
     # msvc compiler option warning level: 
 	# - https://learn.microsoft.com/en-us/cpp/build/reference/compiler-option-warning-level?view=msvc-170
 	#
@@ -204,15 +212,15 @@ else()
 endif()
 
 # Enable multi-threaded compilation.
-if (MSVC)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	target_compile_options(llbc_build_settings_loose INTERFACE /MP)
 endif()
 
-# DEBUG macro on debug builds (mirror premake "configurations:debug*" defines { "DEBUG" }).
+# DEBUG macro on debug builds.
 target_compile_definitions(llbc_build_settings_loose INTERFACE $<$<CONFIG:Debug>:DEBUG>)
 
-# CXX11 ABI selection (non-msvc compiler).
-if (NOT MSVC)
+# CXX11 ABI selection (GNU-compatible standard libraries only).
+if (NOT LLBC_MSVC_FRONTEND)
 	if (LLBC_DISABLE_CXX11_ABI)
 		target_compile_definitions(llbc_build_settings_loose INTERFACE _GLIBCXX_USE_CXX11_ABI=0)
 	else()
@@ -220,8 +228,8 @@ if (NOT MSVC)
 	endif()
 endif()
 
-# Export dynamic symbol table for backtraces (mirror premake linkoptions { "-rdynamic" }).
-if (NOT MSVC)
+# Export dynamic symbol table for backtraces.
+if (NOT LLBC_MSVC_FRONTEND)
 	target_link_options(llbc_build_settings_loose INTERFACE -rdynamic)
 endif()
 
@@ -237,17 +245,28 @@ if (LLBC_ENABLE_ASAN AND NOT WIN32)
 	target_link_options(llbc_build_settings_loose INTERFACE -fsanitize=address)
 endif()
 
-# Coverage: clang source-based coverage instrumentation (non-MSVC). Because both the core lib and
+# Coverage: select the native format for each compiler frontend. Because both the core lib and
 # unit_test link llbc_build_settings, this instruments the module .cpp (in the lib) AND the inline
 # overloads (*Inl.h) compiled into the test TU. googletest does not inherit these flags.
-if (LLBC_ENABLE_COVERAGE AND NOT MSVC)
-	target_compile_options(llbc_build_settings_loose INTERFACE -fprofile-instr-generate -fcoverage-mapping)
-	target_link_options(llbc_build_settings_loose INTERFACE -fprofile-instr-generate -fcoverage-mapping)
+if (LLBC_ENABLE_COVERAGE)
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		target_compile_options(llbc_build_settings_loose INTERFACE --coverage)
+		target_link_options(llbc_build_settings_loose INTERFACE --coverage)
+	elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT LLBC_MSVC_FRONTEND)
+		target_compile_options(llbc_build_settings_loose INTERFACE -fprofile-instr-generate -fcoverage-mapping)
+		target_link_options(llbc_build_settings_loose INTERFACE -fprofile-instr-generate -fcoverage-mapping)
+	elseif (LLBC_MSVC_FRONTEND)
+		# Microsoft native coverage uses PDBs and requires /PROFILE for static instrumentation.
+		target_compile_options(llbc_build_settings_loose INTERFACE /Zi)
+		target_link_options(llbc_build_settings_loose INTERFACE /DEBUG:FULL /PROFILE)
+	else()
+		message(FATAL_ERROR "Coverage is not supported by ${CMAKE_CXX_COMPILER_ID}")
+	endif()
 endif()
 
 add_library(llbc_build_settings INTERFACE)
 target_link_libraries(llbc_build_settings INTERFACE llbc_build_settings_loose)
-if (MSVC)
+if (LLBC_MSVC_FRONTEND)
 	target_compile_options(llbc_build_settings INTERFACE /WX)
 endif()
 

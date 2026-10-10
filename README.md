@@ -14,11 +14,15 @@ llbc开发过程中，使用了以下JetBrains产品：
 ## 构建状态
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Docs](https://img.shields.io/badge/docs-online-blue.svg)](https://lailongwei.github.io/llbc/)
-| 平台         | 编译器        | 类型                        | 状态                                                                                                                                                                     |
-|-------------|---------------|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Linux**   | g++, clang++  | Build, Test, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/linux-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/linux-build-and-test.yml) |
-| **MacOS**   | g++, clang++  | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/macos-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/macos-build.yml) |
-| **Windows** | Visual Studio | Build, ~~Test~~, ~~Deploy~~ | [![Build status](https://github.com/lailongwei/llbc/actions/workflows/windows-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/windows-build.yml) |  
+[![CI](https://github.com/lailongwei/llbc/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/ci.yml)
+
+| 平台        | 编译器             | 自动验证                    |
+|------------|--------------------|----------------------------|
+| **Linux**  | GCC、Clang         | C++ 全量编译、unit test、coverage |
+| **macOS**  | AppleClang         | C++ 全量编译、unit test、coverage |
+| **Windows**| MSVC、clang-cl     | C++ 全量编译、unit test、coverage |
+
+每次矩阵验证成功后，`CI / All platforms passed` 会直接在 GitHub Actions 页面按文件/模块汇总各平台与编译器的 Line Coverage，不额外产出需要下载的 coverage 报表。
 
 ## 文档
 📖 **[llbc 文档站点](https://lailongwei.github.io/llbc/)** —— 快速开始、核心概念、使用指南与参考手册（推荐）。
@@ -54,5 +58,3 @@ llbc欢迎大家使用、提出问题及贡献代码。
 作者Email：lailongwei@126.com, 964855959@qq.com  
 QQ交流群：662590231  
 手册：[llbc 文档站点](https://lailongwei.github.io/llbc/)   
-
-

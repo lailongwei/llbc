@@ -133,7 +133,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
     ++ _cond.waitersBlocked;
     ::ReleaseSemaphore(_cond.blockLock, 1, nullptr);
 
- #ifdef _MSC_VER
+ #if defined(_MSC_VER) && !defined(__clang__)
   #pragma inline_depth(0)
  #endif
 
@@ -151,7 +151,7 @@ int LLBC_ConditionVariable::TimedWait(LLBC_ILock &lock, int milliSeconds)
 
     AfterWait(lock);
 
- #ifdef _MSC_VER
+ #if defined(_MSC_VER) && !defined(__clang__)
   #pragma inline_depth()
  #endif
 

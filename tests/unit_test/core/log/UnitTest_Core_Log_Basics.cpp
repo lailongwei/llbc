@@ -38,6 +38,7 @@ using namespace llbc;
 #include <iomanip>
 #include <limits>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -411,7 +412,9 @@ TEST(LogBasicsTest, BuildsMessagesThroughDirectAndStreamOperators)
     void *pointer = reinterpret_cast<void *>(static_cast<uintptr_t>(0x1234));
     std::ostream &pointerStream = message << pointer;
     const LLBC_String &withPointer = message.str(pointerStream);
-    EXPECT_NE(withPointer.find("0x"), static_cast<LLBC_String::size_type>(-1));
+    std::ostringstream expectedPointer;
+    expectedPointer << pointer;
+    EXPECT_NE(withPointer.find(expectedPointer.str()), static_cast<LLBC_String::size_type>(-1));
 
     std::string streamedStdText("-stream-std");
     char streamedMutableText[] = "-stream-mutable";

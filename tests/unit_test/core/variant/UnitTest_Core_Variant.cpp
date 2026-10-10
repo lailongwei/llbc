@@ -224,11 +224,8 @@ TEST_F(VariantTest, VariantType)
     EXPECT_EQ(LLBC_VariantType::DeduceType<const uint64 &&>(), LLBC_VariantType::RAW_UINT64);
 
     // ENUM
-    #if LLBC_CUR_COMP == LLBC_COMP_MSVC
-    EXPECT_EQ(LLBC_VariantType::DeduceType<TestTraditionalEnum>(), LLBC_VariantType::RAW_SINT32);
-    #else // Non-MSVC compiler.
-    EXPECT_EQ(LLBC_VariantType::DeduceType<TestTraditionalEnum>(), LLBC_VariantType::RAW_UINT32);
-    #endif // MSVC compiler.
+    EXPECT_EQ(LLBC_VariantType::DeduceType<TestTraditionalEnum>(),
+              LLBC_VariantType::DeduceType<std::underlying_type_t<TestTraditionalEnum>>());
     EXPECT_EQ(LLBC_VariantType::DeduceType<TestNewStyleEnum>(), LLBC_VariantType::RAW_SINT32);
 
     // FLOAT

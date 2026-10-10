@@ -63,9 +63,11 @@ title: llbc 文档
 
 | 平台 | 编译器 | 类型 | 状态 |
 |------|--------|------|------|
-| **Linux**   | g++, clang++  | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/linux-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/linux-build.yml) |
-| **macOS**   | g++, clang++  | Build, ~~Test~~, ~~Deploy~~ | [![Build Status](https://github.com/lailongwei/llbc/actions/workflows/macos-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/macos-build.yml) |
-| **Windows** | Visual Studio | Build, ~~Test~~, ~~Deploy~~ | [![Build status](https://github.com/lailongwei/llbc/actions/workflows/windows-build.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/windows-build.yml) |
+| **Linux**   | GCC、Clang         | C++ 全量编译、unit test、coverage | [![CI](https://github.com/lailongwei/llbc/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/lailongwei/llbc/actions/workflows/ci.yml) |
+| **macOS**   | AppleClang         | C++ 全量编译、unit test、coverage | 同一 CI 矩阵 |
+| **Windows** | MSVC、clang-cl     | C++ 全量编译、unit test、coverage | 同一 CI 矩阵 |
+
+矩阵通过后，`CI / All platforms passed` 会直接在 GitHub Actions 页面按文件/模块展示各平台与编译器的 Line Coverage。
 
 ## 商业案例
 

@@ -234,6 +234,14 @@ int LLBC_File::SetBufferMode(int bufferMode, size_t size)
         return LLBC_FAILED;
     }
 
+    if (bufferMode != LLBC_FileBufferMode::NoBuf &&
+        bufferMode != LLBC_FileBufferMode::LineBuf &&
+        bufferMode != LLBC_FileBufferMode::FullBuf)
+    {
+        LLBC_SetLastError(LLBC_ERROR_ARG);
+        return LLBC_FAILED;
+    }
+
     if (bufferMode == LLBC_FileBufferMode::NoBuf)
     {
         size = 0;

@@ -62,7 +62,7 @@ bool pyllbc_PackLemma_Dict::IsSerializable() const
 int pyllbc_PackLemma_Dict::Process(Symbol ch, Symbol nextCh)
 {
     // State logic.
-    if (_state == Base::Done && _state == Base::Error)
+    if (_state == Base::Done || _state == Base::Error)
     {
         pyllbc_SetError("dict-lemma state is done or error, could not continuing to parse format string");
         return LLBC_FAILED;

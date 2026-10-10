@@ -53,7 +53,7 @@ int pyllbc_PacketHandler::SetHandler(PyObject *handler)
 
     pyllbc_SetError(LLBC_String().format(
         "invalid packet handler (not callable or not exist handle() method): %s",
-        pyllbc_ObjUtil::GetObjStr(handler)));
+        pyllbc_ObjUtil::GetObjStr(handler).c_str()));
 
     return LLBC_FAILED;
 }

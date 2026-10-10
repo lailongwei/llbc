@@ -7,6 +7,10 @@ include("${CMAKE_SOURCE_DIR}/tools/cmake/config.cmake")
 # Set project.
 project(llbc VERSION ${LLBC_VERSION})
 
+# Enable CTest so automated test executables can be discovered and run in a
+# platform-independent way.
+include(CTest)
+
 # Add llbc lib directory.
 add_subdirectory(${LLBC_LIB_DIR})
 

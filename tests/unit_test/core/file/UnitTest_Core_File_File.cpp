@@ -361,7 +361,7 @@ TEST(FileTest, OpensReopensConfiguresBuffersAndExposesHandleMetadata)
     EXPECT_EQ(file.SetBufferMode(LLBC_FileBufferMode::FullBuf, 1), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_ARG);
     EXPECT_EQ(file.SetBufferMode(12345, 64), LLBC_FAILED);
-    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_ARG);
     EXPECT_EQ(file.SetBufferMode(LLBC_FileBufferMode::LineBuf, 64), LLBC_OK);
     EXPECT_EQ(file.SetBufferMode(LLBC_FileBufferMode::NoBuf, 0), LLBC_OK);
     EXPECT_EQ(file.Write("first"), LLBC_OK);
@@ -636,7 +636,11 @@ TEST(FileTest, HandlesTextLinesAndStaticFileOperations)
 
     EXPECT_EQ(LLBC_File::CopyFile(sourcePath, copyPath), LLBC_OK);
     EXPECT_EQ(LLBC_File::CopyFile(sourcePath, copyPath), LLBC_FAILED);
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_OSAPI);
+#else
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_EXIST);
+#endif
     EXPECT_EQ(LLBC_File::CopyFile(sourcePath, copyPath, true), LLBC_OK);
     EXPECT_EQ(LLBC_File::MoveFile(copyPath, movedPath), LLBC_OK);
     EXPECT_FALSE(LLBC_File::Exists(copyPath));
@@ -667,7 +671,11 @@ TEST(FileTest, UsesAutoNewlinePoliciesForTextAndBinaryFiles)
         EXPECT_EQ(textFile.WriteLn("text", LLBC_FileNewLineFormat::AutoMatch), LLBC_OK);
         EXPECT_EQ(textFile.WriteLns(LLBC_Strings(), LLBC_FileNewLineFormat::AutoMatch), LLBC_OK);
     }
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_EQ(LLBC_File::ReadToEnd(textPath), "text\r\n");
+#else
     EXPECT_EQ(LLBC_File::ReadToEnd(textPath), "text\n");
+#endif
 
     {
         LLBC_File binaryFile(binaryPath, LLBC_FileMode::BinaryWrite);
@@ -757,7 +765,11 @@ TEST(FileTest, WritesFormatsAppendsAndUsesInstanceCopyMoveOperations)
         ASSERT_EQ(destination.Write("to"), LLBC_OK);
     }
     EXPECT_EQ(LLBC_File::MoveFile(moveSourcePath, moveDestPath), LLBC_FAILED);
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_OSAPI);
+#else
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_EXIST);
+#endif
     EXPECT_EQ(LLBC_File::MoveFile(moveSourcePath, moveDestPath, true), LLBC_OK);
     EXPECT_EQ(LLBC_File::ReadToEnd(moveDestPath), "from");
 }
@@ -780,7 +792,11 @@ TEST(FileTest, ReportsAttributesAndUpdatesExistingFileTimestamps)
         ASSERT_EQ(hiddenFile.GetFileAttributes(attrs), LLBC_OK);
         EXPECT_TRUE(attrs.readable);
         EXPECT_TRUE(attrs.writable);
+#if LLBC_TARGET_PLATFORM_WIN32
+        EXPECT_FALSE(attrs.hidden);
+#else
         EXPECT_TRUE(attrs.hidden);
+#endif
         EXPECT_FALSE(attrs.isDirectory);
         EXPECT_EQ(attrs.fileSize, 6);
     }
@@ -795,7 +811,11 @@ TEST(FileTest, ReportsAttributesAndUpdatesExistingFileTimestamps)
 
     LLBC_FileAttributes missingAttrs {};
     EXPECT_EQ(LLBC_File::GetFileAttributes(paths.Path(".missing"), missingAttrs), LLBC_FAILED);
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_OSAPI);
+#else
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+#endif
 
     ASSERT_EQ(LLBC_File::TouchFile(touchPath), LLBC_OK);
     ASSERT_TRUE(LLBC_File::Exists(touchPath));
@@ -951,11 +971,23 @@ TEST(FileTest, ReportsDirectionalIoAndStaticFilesystemFailurePaths)
 
     const LLBC_String missingPath("/definitely/not/a/real/llbc-file");
     EXPECT_EQ(LLBC_File::CopyFile(sourcePath, missingPath), LLBC_FAILED);
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_OSAPI);
+#else
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+#endif
     EXPECT_EQ(LLBC_File::MoveFile(missingPath, paths.Path(".moved"), true), LLBC_FAILED);
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_OSAPI);
+#else
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+#endif
     EXPECT_EQ(LLBC_File::DeleteFile(missingPath), LLBC_FAILED);
+#if LLBC_TARGET_PLATFORM_WIN32
+    EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_OSAPI);
+#else
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
+#endif
     EXPECT_EQ(LLBC_File::TouchFile(missingPath), LLBC_FAILED);
     EXPECT_EQ(LLBC_GetLastError(), LLBC_ERROR_CLIB);
 }

@@ -21,7 +21,7 @@ add_executable(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE} ${LLBC_LIB_UNIT_TEST_SRC_FI
 target_include_directories(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE}
                            PRIVATE ${LLBC_LIB_UNIT_TEST_DIR})
 target_link_libraries(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE}
-                      PRIVATE llbc_build_settings ${LLBC_LIB_SHARED} GTest::gtest ${_llbc_fs_extra_lib})
+                      PRIVATE llbc_build_settings ${LLBC_LIB_STATIC} GTest::gtest ${_llbc_fs_extra_lib})
 llbc_apply_config_postfix(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE})
 set_target_properties(${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE} PROPERTIES
                       FOLDER "tests"
@@ -39,3 +39,14 @@ set_target_properties(${LLBC_LIB_UNIT_TEST_LINK_SHARED_EXE} PROPERTIES
                       FOLDER "tests"
                       OUTPUT_NAME "unit_test"
                       VS_DEBUGGER_WORKING_DIRECTORY "${LLBC_OUTPUT_DIR}")
+
+# Register both linkage variants as CI quality gates. Using target names in
+# COMMAND lets CMake resolve the correct path for single- and multi-config
+# generators (including Visual Studio).
+if (BUILD_TESTING)
+    add_test(NAME unit_test.static COMMAND ${LLBC_LIB_UNIT_TEST_LINK_STATIC_EXE})
+    add_test(NAME unit_test.shared COMMAND ${LLBC_LIB_UNIT_TEST_LINK_SHARED_EXE})
+    set_tests_properties(unit_test.static unit_test.shared PROPERTIES
+                         LABELS unit
+                         TIMEOUT 300)
+endif()

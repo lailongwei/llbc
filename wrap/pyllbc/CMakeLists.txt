@@ -55,7 +55,7 @@ target_include_directories(${LLBC_WRAP_LIB_PYLLBC}
                            PRIVATE "${LLBC_3RD_DIR_CPYTHON}/Include"
                            PRIVATE "$<IF:$<PLATFORM_ID:Windows>,${LLBC_3RD_DIR_CPYTHON}/PC,${LLBC_3RD_DIR_CPYTHON}>")
 target_compile_options(${LLBC_WRAP_LIB_PYLLBC}
-                      PRIVATE "$<$<NOT:$<PLATFORM_ID:Windows>>:-Wno-register>")
+                      PRIVATE "$<$<OR:$<NOT:$<PLATFORM_ID:Windows>>,$<CXX_COMPILER_ID:Clang>>:-Wno-register>")
 target_link_libraries(${LLBC_WRAP_LIB_PYLLBC}
                       PRIVATE llbc_build_settings_loose ${LLBC_LIB_SHARED})
 if (WIN32)
@@ -89,4 +89,3 @@ add_custom_command(TARGET ${LLBC_WRAP_LIB_PYLLBC}
                         ${LLBC_DISABLE_CXX11_ABI}
                         ${CMAKE_VS_DEVENV_COMMAND}
                    COMMENT "Pre-build ${LLBC_WRAP_LIB_PYLLBC}")
-

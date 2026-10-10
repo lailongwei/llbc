@@ -30,6 +30,9 @@
 
 #include "llbc/core/os/OS_Library.h"
 
+/** Library Dll attach/detach event handler function(s) encapsulation */
+#if LLBC_TARGET_PLATFORM_NON_WIN32
+
 __LLBC_INTERNAL_NS_BEGIN
 
 static void __LLBC_SelfLibAttach()
@@ -43,9 +46,6 @@ static void __LLBC_SelfLibDetach()
 }
 
 __LLBC_INTERNAL_NS_END
-
-/** Library Dll attach/detach event handler function(s) encapsulation */
-#if LLBC_TARGET_PLATFORM_NON_WIN32
 
 extern "C" __attribute__((constructor)) void LLBC_SelfLibAttach()
 {
