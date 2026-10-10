@@ -29,6 +29,14 @@
         <!-- 在以json格式输出Log时, 是否添加时间字戳到json log中, key:timestamp, 默认不添加 -->
         <addTimestampInJsonLog>true</addTimestampInJsonLog>
 
+        <!-- 日志输出控制项 (log control items), 仅 XML 配置支持 (.cfg 不支持因其无法承载嵌套结构).
+             schema 详见 doc/log_control.md 第 3 节, 以及下方的 logcontrol_full / logcontrol_robust 块.
+             match 内部各启用维度之间为 AND (all-of, 必须同时命中); 每条规则自身的取值集合
+             (file.lineRanges / func.values / threadId.values / level.values) 之内为 OR (one-of).
+             多控制项按声明顺序应用; setLevel 改写对后续控制项的 level 匹配可见;
+             解析失败的元素静默跳过, 不影响其它合法元素. -->
+        <logControls></logControls>
+
         <!-- 控制台输出器配置选项 -->
         <!-- 确定日志是否输出到控制台,可以的取值:true/false. -->
         <logToConsole>true</logToConsole>
@@ -232,6 +240,127 @@
         <fadviseDiscardSize>40MiB</fadviseDiscardSize>
         <fadviseDiscardRetainPercent>50</fadviseDiscardRetainPercent>
     </fadvise>
+
+    <color_test>
+        <requireColorLogTraces>uin:1086,1087|coroid:100001</requireColorLogTraces>
+        <fileLogLevel>WARN</fileLogLevel>
+        <consoleLogLevel>WARN</consoleLogLevel>
+    </color_test>
+
+    <logtrace_enable_level>
+        <filePattern>%T [%-5L][%f:%l]&lt;exec:%-20e&gt;&lt;tag:%g&gt;&lt;logger:%N&gt;&lt;realTime:%R&gt;&lt;%x{enablelevel:debug}&gt; - %m%n</filePattern>
+        <logToFile>true</logToFile>
+        <fileLogLevel>TRACE</fileLogLevel>
+    </logtrace_enable_level>
+
+    <!-- log output control 测试相关 logger 配置. 配置项 logControls 为嵌套 XML 子树,
+         schema 见 root.logControls 注释; .cfg 配置不支持 logControls (无法承载嵌套结构). -->
+
+    <!-- 全规则齐全 (含: 文件名+行号 / 文件名+行号范围 / 函数名 / 文件 setLevel / 单 appender 限定 / 多取值 OR) -->
+    <!-- 那些"应 pass"的样本会被 console 真打出来, 这是预期行为(同时充当反向断言). -->
+    <logcontrol_full>
+        <asynchronous>false</asynchronous>
+        <logToConsole>true</logToConsole>
+        <logToFile>false</logToFile>
+        <consoleLogLevel>TRACE</consoleLogLevel>
+        <fileLogLevel>TRACE</fileLogLevel>
+        <logControls>
+            <!-- file=mute_fileA.cpp 行 100 静音 (attr lines) -->
+            <logControl>
+                <match>
+                    <file name="mute_fileA.cpp" lines="100"/>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- file=mute_fileA.cpp 行 200 静音 (attr lines) -->
+            <logControl>
+                <match>
+                    <file name="mute_fileA.cpp" lines="200"/>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- file=mute_fileB.cpp 全文件静音 (省略 lines 即通配) -->
+            <logControl>
+                <match>
+                    <file name="mute_fileB.cpp"/>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- 函数 MutedFuncOne 静音 -->
+            <logControl>
+                <match>
+                    <func>MutedFuncOne</func>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- 函数 MutedFuncTwo 静音, 仅作用于 console appender -->
+            <logControl>
+                <match>
+                    <func>MutedFuncTwo</func>
+                </match>
+                <appenders><appender>console</appender></appenders>
+                <action type="mute"/>
+            </logControl>
+            <!-- file=mute_fileC.cpp 提级到 warn -->
+            <logControl>
+                <match>
+                    <file name="mute_fileC.cpp"/>
+                </match>
+                <action type="setLevel"><newLevel>warn</newLevel></action>
+            </logControl>
+            <!-- file=mute_fileD.cpp 提级到 error -->
+            <logControl>
+                <match>
+                    <file name="mute_fileD.cpp"/>
+                </match>
+                <action type="setLevel"><newLevel>error</newLevel></action>
+            </logControl>
+            <!-- file=mute_fileE.cpp 行号半开区间 [300,305) 静音 (attr lines) -->
+            <logControl>
+                <match>
+                    <file name="mute_fileE.cpp" lines="300-305"/>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- file=mute_fileF.cpp 行号半开区间 [400,410) 静音 (attr lines) -->
+            <logControl>
+                <match>
+                    <file name="mute_fileF.cpp" lines="400-410"/>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- file=mute_fileG.cpp 多段行号 "50, 60-65, 70" 静音 (attr lines) -->
+            <logControl>
+                <match>
+                    <file name="mute_fileG.cpp" lines="50, 60-65, 70"/>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- file=mute_fileH.cpp 多段行号 "100-103, 200" 静音 (attr lines) -->
+            <logControl>
+                <match>
+                    <file name="mute_fileH.cpp" lines="100-103, 200"/>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- func 多值 ["MutedFuncMA","MutedFuncMB"] (任一命中即静音) -->
+            <logControl>
+                <match>
+                    <func>MutedFuncMA</func>
+                    <func>MutedFuncMB</func>
+                </match>
+                <action type="mute"/>
+            </logControl>
+            <!-- threadId 多值 [1, 2147483640] (任一命中即静音) -->
+            <logControl>
+                <match>
+                    <threadId>1</threadId>
+                    <threadId>2147483640</threadId>
+                </match>
+                <action type="mute"/>
+            </logControl>
+        </logControls>
+    </logcontrol_full>
 
     <!-- 其它 logger(s) 配置 -->
 </Log>

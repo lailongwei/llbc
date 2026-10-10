@@ -27,6 +27,8 @@
 
 #include "llbc/core/log/LogLevel.h"
 #include "llbc/core/log/LogTrace.h"
+#include "llbc/core/log/LogControl.h"
+#include "llbc/core/log/LogControlMgr.h"
 
 __LLBC_NS_BEGIN
 
@@ -187,6 +189,49 @@ public:
      * @param[in] requireColorLogTraces - conf log traces.
      */
     void UpdateColorLogTraces(const LLBC_LogTraces &requireColorLogTraces);
+
+public:
+    /**
+     * Atomically replace the entire installed log control list with `items`.
+     *
+     * All-or-nothing: every item is validated first; on any invalid item
+     * nothing is changed. On success the new snapshot is published atomically
+     * — any in-flight log emit sees either the old list in full or the new
+     * list in full, never a transient state. Passing an empty vector
+     * publishes an empty snapshot. See LLBC_LogControlMgr for chain semantics
+     * and LLBC_LogControlItem for per-item invariants.
+     *
+     * The suppressed record count is preserved across calls; call
+     * ResetLogControlSuppressedCount() for a fresh baseline.
+     *
+     * @param[in] items - the new full list of control items.
+     * @return int - LLBC_OK on success, LLBC_FAILED on any invalid item
+     *               (LLBC_ERROR_INVALID).
+     */
+    int SetLogControls(const std::vector<LLBC_LogControlItem> &items);
+
+    /**
+     * @return size_t - number of installed log control items; 0 if not initialized.
+     */
+    size_t GetLogControlCount() const;
+
+    /**
+     * Snapshot all installed log control items in declaration order.
+     * @param[out] out - receives the items snapshot; cleared first.
+     */
+    void GetLogControls(std::vector<LLBC_LogControlItem> &out) const;
+
+    /**
+     * @return uint64 - total records dropped by Mute action since logger
+     *                  initialization or last ResetLogControlSuppressedCount();
+     *                  0 if not initialized.
+     */
+    uint64 GetLogControlSuppressedCount() const;
+
+    /**
+     * Reset the suppressed record count to zero.
+     */
+    void ResetLogControlSuppressedCount();
 
 public:
     /**
@@ -449,7 +494,7 @@ private:
     /**
      * Friend classs: LLBC_LogRunnable.
      * Asset method/data-members:
-     * - OutputLogData(const LLBC_LogData &data):int
+     * - OutputLogData(LLBC_LogData &data):int
      * - Flush(bool force, sint64 now):void
      */
     friend class LLBC_LogRunnable;
@@ -462,9 +507,16 @@ private:
 
     /**
      * Output log data.
-     * @param[in] data - log data.
+     * @param[in,out] data - log data. May be temporarily mutated (e.g. `level`
+     *                       rewritten by LLBC_LogControlMgr::SetLevel) per
+     *                       appender, but is always restored to the original
+     *                       state before this function returns. The caller
+     *                       (sole owner of `data` at this point: holding
+     *                       `_lock` in sync mode, or running on the unique
+     *                       LogRunnable thread in async mode) observes no
+     *                       net change.
      */
-    int OutputLogData(const LLBC_LogData &data);
+    int OutputLogData(LLBC_LogData &data);
 
     /**
     * Flush logger(for now, just only need flush all appenders).
@@ -500,6 +552,9 @@ private:
 
     // Log trace manager.
     LLBC_LogTraceMgr *_logTraceMgr;
+
+    // Log output control manager (Mute / SetLevel; per-appender, ordered).
+    LLBC_LogControlMgr *_logControlMgr;
 
     // Log runnable object.
     LLBC_LogRunnable *_logRunnable;
