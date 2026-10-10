@@ -80,7 +80,7 @@ LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const char (&spanStr)[_StrArrLen],
 inline LLBC_TimeSpan LLBC_TimeSpan::FromSpanStr(const char *spanStr,
                                                 const LLBC_TimeSep &timeSep)
 {
-    return LLBC_TimeSpan(spanStr, strlen(spanStr), timeSep);
+    return LLBC_TimeSpan(spanStr, spanStr ? strlen(spanStr) : 0, timeSep);
 }
 
 template <typename _StrType>
@@ -111,7 +111,7 @@ LLBC_TimeSpan::LLBC_TimeSpan(const char (&spanStr)[_StrArrLen],
 
 inline LLBC_TimeSpan::LLBC_TimeSpan(const char *spanStr,
                                     const LLBC_TimeSep &timeSep)
-: LLBC_TimeSpan(spanStr, strlen(spanStr), timeSep)
+: LLBC_TimeSpan(spanStr, spanStr ? strlen(spanStr) : 0, timeSep)
 {
 }
 
@@ -354,5 +354,4 @@ inline std::ostream &operator<<(std::ostream &stream, const LLBC_NS LLBC_TimeSpa
 {
     return stream <<span.ToString();
 }
-
 
