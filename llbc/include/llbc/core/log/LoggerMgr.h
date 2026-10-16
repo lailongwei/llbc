@@ -497,6 +497,24 @@ public:
 __LLBC_INTERNAL_NS_END
 
 /**
+ * Resolve the log level of condition-log macros:
+ * known level names map to LLBC_LogLevel, while other arguments stay unchanged.
+ * The parenthesized argument and identity expansion keep the comma-based lookup
+ * compatible with the traditional MSVC preprocessor.
+ */
+#define __LLBC_PickLogLv_Trace , LLBC_NS LLBC_LogLevel::Trace
+#define __LLBC_PickLogLv_Debug , LLBC_NS LLBC_LogLevel::Debug
+#define __LLBC_PickLogLv_Info  , LLBC_NS LLBC_LogLevel::Info
+#define __LLBC_PickLogLv_Warn  , LLBC_NS LLBC_LogLevel::Warn
+#define __LLBC_PickLogLv_Error , LLBC_NS LLBC_LogLevel::Error
+#define __LLBC_PickLogLv_Fatal , LLBC_NS LLBC_LogLevel::Fatal
+#define __LLBC_ResolveLogLvIdentity(value) value
+#define __LLBC_ResolveLogLvPick(lv) LLBC_Concat(__LLBC_PickLogLv_, lv)
+#define __LLBC_ResolveLogLv(lv) __LLBC_ResolveLogLv1((__LLBC_ResolveLogLvPick(lv), lv, 0))
+#define __LLBC_ResolveLogLv1(args) __LLBC_ResolveLogLvIdentity(__LLBC_ResolveLogLv2 args)
+#define __LLBC_ResolveLogLv2(ignored, resolved, ...) resolved
+
+/**
  * Condition LOG AND DO SOMETHING support macros.
  */
 #define LLBC_LogAndDoIf(cond, logLv, behav, ...) LLBC_LogAndDoIf4(cond, nullptr, nullptr, logLv, behav, ##__VA_ARGS__)
@@ -505,19 +523,20 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_LogAndDoIf4(cond, logger, logTag, logLv, behav, ...)                                    \
     {                                                                                                \
         if ((cond)) {                                                                                \
+            const int LLBC_Concat(__llbcDoIfLv, __LINE__) = __LLBC_ResolveLogLv(logLv);             \
             auto LLBC_Concat(doIfLoggerMgr, __LINE__) = LLBC_LoggerMgrSingleton;                     \
             if (LIKELY(LLBC_Concat(doIfLoggerMgr, __LINE__)->IsInited()))  {                         \
                 auto LLBC_Concat(doIfLogger, __LINE__) =                                             \
                     LLBC_Concat(doIfLoggerMgr, __LINE__)->GetLogger(logger);                         \
                 if (LIKELY(LLBC_Concat(doIfLogger, __LINE__)) &&                                     \
-                    LLBC_NS LLBC_LogLevel::logLv >=                                                  \
+                    LLBC_Concat(__llbcDoIfLv, __LINE__) >=                                           \
                         LLBC_Concat(doIfLogger, __LINE__)->GetLogLevel()) {                          \
                     LLBC_INL_NS __LLBC_ConditionLogOperator<                                         \
                             std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
                         LLBC_Concat(doIfLogger, __LINE__),                                           \
                         __FILE__, __LINE__, __FUNCTION__,                                            \
                         logTag,                                                                      \
-                        LLBC_NS LLBC_LogLevel::logLv,                                                \
+                        LLBC_Concat(__llbcDoIfLv, __LINE__),                                         \
                         "LLBC_DoIf:<\"%s\"> is true, do:%s. ",                                       \
                         #cond, #behav, ##__VA_ARGS__);                                               \
                 }                                                                                    \
@@ -536,19 +555,20 @@ __LLBC_INTERNAL_NS_END
     {                                                                                                \
         if ((cond))                                                                                  \
         {                                                                                            \
+            const int LLBC_Concat(__llbcContinueIfLv, __LINE__) = __LLBC_ResolveLogLv(logLv);       \
             auto LLBC_Concat(continueIfLoggerMgr, __LINE__) = LLBC_LoggerMgrSingleton;               \
             if (LIKELY(LLBC_Concat(continueIfLoggerMgr, __LINE__)->IsInited()))  {                   \
                 auto LLBC_Concat(continueIfLogger, __LINE__) =                                       \
                     LLBC_Concat(continueIfLoggerMgr, __LINE__)->GetLogger(logger);                   \
                 if (LIKELY(LLBC_Concat(continueIfLogger, __LINE__)) &&                               \
-                    LLBC_NS LLBC_LogLevel::logLv >=                                                  \
+                    LLBC_Concat(__llbcContinueIfLv, __LINE__) >=                                     \
                         LLBC_Concat(continueIfLogger, __LINE__)->GetLogLevel()) {                    \
                     LLBC_INL_NS __LLBC_ConditionLogOperator<                                         \
                             std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
                         LLBC_Concat(continueIfLogger, __LINE__),                                     \
                         __FILE__, __LINE__, __FUNCTION__,                                            \
                         logTag,                                                                      \
-                        LLBC_NS LLBC_LogLevel::logLv,                                                \
+                        LLBC_Concat(__llbcContinueIfLv, __LINE__),                                   \
                         "LLBC_ContinueIf:<\"%s\"> is true. %s",                                      \
                         #cond, "", ##__VA_ARGS__);                                                   \
                 }                                                                                    \
@@ -567,19 +587,20 @@ __LLBC_INTERNAL_NS_END
     {                                                                                                \
         if ((cond))                                                                                  \
         {                                                                                            \
+            const int LLBC_Concat(__llbcBreakIfLv, __LINE__) = __LLBC_ResolveLogLv(logLv);          \
             auto LLBC_Concat(breakIfLoggerMgr, __LINE__) = LLBC_LoggerMgrSingleton;                  \
             if (LIKELY(LLBC_Concat(breakIfLoggerMgr, __LINE__)->IsInited()))  {                      \
                 auto LLBC_Concat(breakIfLogger, __LINE__) =                                          \
                     LLBC_Concat(breakIfLoggerMgr, __LINE__)->GetLogger(logger);                      \
                 if (LIKELY(LLBC_Concat(breakIfLogger, __LINE__)) &&                                  \
-                    LLBC_NS LLBC_LogLevel::logLv >=                                                  \
+                    LLBC_Concat(__llbcBreakIfLv, __LINE__) >=                                        \
                         LLBC_Concat(breakIfLogger, __LINE__)->GetLogLevel()) {                       \
                     LLBC_INL_NS __LLBC_ConditionLogOperator<                                         \
                             std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
                         LLBC_Concat(breakIfLogger, __LINE__),                                        \
                         __FILE__, __LINE__, __FUNCTION__,                                            \
                         logTag,                                                                      \
-                        LLBC_NS LLBC_LogLevel::logLv,                                                \
+                        LLBC_Concat(__llbcBreakIfLv, __LINE__),                                      \
                         "LLBC_LogAndBreakIf:<\"%s\"> is true. %s",                                   \
                         #cond, "", ##__VA_ARGS__);                                                   \
                 }                                                                                    \
@@ -597,19 +618,20 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_LogAndReturnIf4(cond, logger, logTag, logLv, ret, ...)                                  \
     {                                                                                                \
         if ((cond)) {                                                                                \
+            const int LLBC_Concat(__llbcReturnIfLv, __LINE__) = __LLBC_ResolveLogLv(logLv);         \
             auto LLBC_Concat(returnIfLoggerMgr, __LINE__) = LLBC_LoggerMgrSingleton;                 \
             if (LIKELY(LLBC_Concat(returnIfLoggerMgr, __LINE__)->IsInited()))  {                     \
                 auto LLBC_Concat(returnIfLogger, __LINE__) =                                         \
                     LLBC_Concat(returnIfLoggerMgr, __LINE__)->GetLogger(logger);                     \
                 if (LIKELY(LLBC_Concat(returnIfLogger, __LINE__)) &&                                 \
-                    LLBC_NS LLBC_LogLevel::logLv >=                                                  \
+                    LLBC_Concat(__llbcReturnIfLv, __LINE__) >=                                       \
                         LLBC_Concat(returnIfLogger, __LINE__)->GetLogLevel()) {                      \
                     LLBC_INL_NS __LLBC_ConditionLogOperator<                                         \
                             std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
                         LLBC_Concat(returnIfLogger, __LINE__),                                       \
                         __FILE__, __LINE__, __FUNCTION__,                                            \
                         logTag,                                                                      \
-                        LLBC_NS LLBC_LogLevel::logLv,                                                \
+                        LLBC_Concat(__llbcReturnIfLv, __LINE__),                                     \
                         "LLBC_ReturnIf:<\"%s\"> is true, return:%s. ",                               \
                         #cond, #ret, ##__VA_ARGS__);                                                 \
                 }                                                                                    \
@@ -627,19 +649,20 @@ __LLBC_INTERNAL_NS_END
 #define LLBC_LogAndExitIf4(cond, logger, logTag, logLv, exitCode, ...)                               \
     {                                                                                                \
         if ((cond)) {                                                                                \
+            const int LLBC_Concat(__llbcExitIfLv, __LINE__) = __LLBC_ResolveLogLv(logLv);           \
             auto LLBC_Concat(exitIfLoggerMgr, __LINE__) = LLBC_LoggerMgrSingleton;                   \
             if (LIKELY(LLBC_Concat(exitIfLoggerMgr, __LINE__)->IsInited()))  {                       \
                 auto LLBC_Concat(exitIfLogger, __LINE__) =                                           \
                     LLBC_Concat(exitIfLoggerMgr, __LINE__)->GetLogger(logger);                       \
                 if (LIKELY(LLBC_Concat(exitIfLogger, __LINE__)) &&                                   \
-                    LLBC_NS LLBC_LogLevel::logLv >=                                                  \
+                    LLBC_Concat(__llbcExitIfLv, __LINE__) >=                                         \
                         LLBC_Concat(exitIfLogger, __LINE__)->GetLogLevel()) {                        \
                     LLBC_INL_NS __LLBC_ConditionLogOperator<                                         \
                             std::tuple_size<decltype(std::make_tuple(__VA_ARGS__))>::value>::Output( \
                         LLBC_Concat(exitIfLogger, __LINE__),                                         \
                         __FILE__, __LINE__, __FUNCTION__,                                            \
                         logTag,                                                                      \
-                        LLBC_NS LLBC_LogLevel::logLv,                                                \
+                        LLBC_Concat(__llbcExitIfLv, __LINE__),                                       \
                         "LLBC_ExitIf:<\"%s\"> is true, exitCode:%d. ",                               \
                         #cond, static_cast<int>(exitCode), ##__VA_ARGS__);                           \
                 }                                                                                    \

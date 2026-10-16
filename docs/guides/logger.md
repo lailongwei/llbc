@@ -119,8 +119,9 @@ LLBC_LogAndDoIf(err != 0, Error, cleanup(), "cleanup on err=%d", err);
 ```
 
 每个宏均提供 2/3/4 后缀变体，支持指定 logger 名称或 tag。
-通用形式为 `LLBC_LogAndReturnIf(cond, logLv, ret, ...)`，其中 `logLv` 直接写级别名
-（`Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal`）。
+`LLBC_LogAndDoIf`、`LLBC_LogAndContinueIf`、`LLBC_LogAndBreakIf` 和
+`LLBC_LogAndReturnIf`、`LLBC_LogAndExitIf` 的 `logLv` 可以写级别名
+（`Trace`/`Debug`/`Info`/`Warn`/`Error`/`Fatal`），也可以传 `int` 级别变量。
 
 ## 配置文件：控制台与文件 appender
 
