@@ -193,6 +193,27 @@ llbc/include/llbc/comm/ServiceInl.h   ← 模板/内联实现
 4. **包装层同步**：修改公开 C++ API 时，同步更新三个包装层绑定代码并验证能够编译。
 5. **文档更新**：新增公开 API 或行为变更时，在 `docs/` 对应页面补充说明，并在 `CHANGELOG` 顶部追加变更条目。
 
+## 使用 Codex 辅助开发
+
+仓库根目录的 `AGENTS.md` 是 Codex 的项目级工程约定；`tests/unit_test/AGENTS.md`
+会在修改单元测试时追加更具体的规则。两者都应随构建、测试或目录结构变化同步维护，
+避免把长期约定只留在个人提示词中。
+
+仓库还提供了可复用的 `$llbc-change-workflow` Skill（位于
+`.agents/skills/llbc-change-workflow/`），用于按改动范围选择验证路径。推荐流程为：
+
+1. 在功能分支中向 Codex 给出行为目标、边界和验收条件。
+2. 实现后运行 Skill 选择的本地编译、CTest、Wrapper 或覆盖率检查。
+3. 合并前使用 Codex `/review` 对比 `master`，重点检查内存生命周期、并发、跨平台、
+   ABI/API、Wrapper 和测试遗漏。
+4. 以现有 Linux、macOS、Windows 和覆盖率 CI 为合并门禁；AI Review 只提供补充意见，
+   不替代编译与测试。
+
+`.github/workflows/ai-pr-review.yml` 使用只读权限运行官方 Codex Action，并更新一条固定的
+PR 评论，避免每次推送产生重复评论。仓库维护者需要在 GitHub Actions Secrets 中配置
+`OPENAI_API_KEY`。GitHub 不会向来自 fork 的 PR 提供该 Secret，因此这类 PR 会安全地跳过
+AI Review，仍正常执行确定性 CI。
+
 <div class="callout warning" markdown="1">
 **v1.1.1 之后的陷阱**：若你在处理日志、组件生命周期、流、对象池、或时间
 相关代码，先查阅 `CHANGELOG` 顶部条目——这些模块在 v1.1.1 均有不向后兼容
@@ -203,7 +224,8 @@ llbc/include/llbc/comm/ServiceInl.h   ← 模板/内联实现
 
 ## 参照
 
-- 项目约定文档：`CLAUDE.md`（仓库根）
+- Codex 项目约定：`AGENTS.md`（仓库根）
+- Codex 变更工作流：`.agents/skills/llbc-change-workflow/SKILL.md`
 - 命名空间宏：`llbc/include/llbc/common/Macro.h`
 - 导出属性：`llbc/include/llbc/common/Export.h`
 - 错误码定义：`llbc/include/llbc/common/Errors.h`
