@@ -709,6 +709,85 @@ TEST(LogBasicsTest, ManagesLogTracesThroughConfiguredLogger)
     EXPECT_FALSE(manager.IsInited());
 }
 
+TEST(LogBasicsTest, ConditionLogMacrosAcceptLevelNamesAndVariables)
+{
+    ScopedTempDirectory directory;
+    ScopedLoggerConfig config;
+    const std::string configText =
+        "root.asynchronous=false\n"
+        "root.takeOver=true\n"
+        "root.notConfigUse=default\n"
+        "root.logToConsole=false\n"
+        "root.consoleLogLevel=FATAL\n"
+        "root.logToFile=true\n"
+        "root.fileLogLevel=TRACE\n"
+        "root.logFile=" + (directory.Path() / "condition_macro").generic_string() + "\n"
+        "root.logFileSuffix=.log\n"
+        "root.fileRollingMode=NoRolling\n"
+        "root.lazyCreateLogFile=true\n";
+    config.Write(configText.c_str());
+
+    struct SingletonLoggerGuard
+    {
+        ~SingletonLoggerGuard()
+        {
+            if (LLBC_LoggerMgrSingleton->IsInited())
+                LLBC_LoggerMgrSingleton->Finalize();
+        }
+    } guard;
+
+    ASSERT_FALSE(LLBC_LoggerMgrSingleton->IsInited());
+    ASSERT_EQ(LLBC_LoggerMgrSingleton->Initialize(config.Path()), LLBC_OK);
+    LLBC_Logger *root = LLBC_LoggerMgrSingleton->GetRootLogger();
+    ASSERT_NE(root, nullptr);
+    int logCount = 0;
+    int loggedLevel = LLBC_LogLevel::End;
+    std::string loggedMessage;
+    ASSERT_EQ(root->SetLogHook(LLBC_LogLevel::Warn, [&](const LLBC_LogData *data) {
+        ++logCount;
+        loggedLevel = data->level;
+        loggedMessage.assign(data->msg, data->msgLen);
+    }), LLBC_OK);
+
+    const int namedLevelResult = []() {
+        LLBC_ErrorAndReturnIf(true, 41, "named-level");
+        return 0;
+    }();
+    EXPECT_EQ(namedLevelResult, 41);
+
+    const int level = LLBC_LogLevel::Warn;
+
+    int did = 0;
+    LLBC_LogAndDoIf(true, level, did = 1, "do-variable");
+    EXPECT_EQ(did, 1);
+
+    int continued = 0;
+    for (int i = 0; i < 2; ++i)
+    {
+        LLBC_LogAndContinueIf(i == 0, level, "continue-variable");
+        ++continued;
+    }
+    EXPECT_EQ(continued, 1);
+
+    int broke = 0;
+    for (;;)
+    {
+        LLBC_LogAndBreakIf(true, level, "break-variable");
+        ++broke;
+    }
+    EXPECT_EQ(broke, 0);
+
+    const int result = [&]() {
+        LLBC_LogAndReturnIf(true, level, 42, "variable-level");
+        return 0;
+    }();
+
+    EXPECT_EQ(result, 42);
+    EXPECT_EQ(logCount, 4);
+    EXPECT_EQ(loggedLevel, level);
+    EXPECT_NE(loggedMessage.find("variable-level"), std::string::npos);
+}
+
 // Console patterns are configured through the public logger API. Exercise the
 // parser and every normally reachable token in one synchronous record, including
 // formatting modifiers, escaped percent signs, environment values, and traces.
