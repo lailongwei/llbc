@@ -643,13 +643,19 @@ __LLBC_INTERNAL_NS_END
 /**
  * Condition LOG AND EXIT support macros.
  */
-#define LLBC_LogAndExitIf(cond, logLv, exitCode, ...) LLBC_LogAndExitIf4(cond, nullptr, nullptr, logLv, exitCode, ...)
-#define LLBC_LogAndExitIf2(cond, logger, logLv, exitCode, ...) LLBC_LogAndExitIf4(cond, logger, nullptr, logLv, exitCode, ...)
-#define LLBC_LogAndExitIf3(cond, logTag, logLv, exitCode, ...) LLBC_LogAndExitIf4(cond, nullptr, logTag, logLv, exitCode, ...)
+#define LLBC_LogAndExitIf(cond, logLv, exitCode, ...) LLBC_LogAndExitIf4(cond, nullptr, nullptr, logLv, exitCode, ##__VA_ARGS__)
+#define LLBC_LogAndExitIf2(cond, logger, logLv, exitCode, ...) LLBC_LogAndExitIf4(cond, logger, nullptr, logLv, exitCode, ##__VA_ARGS__)
+#define LLBC_LogAndExitIf3(cond, logTag, logLv, exitCode, ...) LLBC_LogAndExitIf4(cond, nullptr, logTag, logLv, exitCode, ##__VA_ARGS__)
 #define LLBC_LogAndExitIf4(cond, logger, logTag, logLv, exitCode, ...)                               \
     {                                                                                                \
         if ((cond)) {                                                                                \
             const int LLBC_Concat(__llbcExitIfLv, __LINE__) = __LLBC_ResolveLogLv(logLv);           \
+            const int LLBC_Concat(__llbcExitIfCode, __LINE__) = static_cast<int>(exitCode);          \
+            char LLBC_Concat(__llbcExitIfCodeBuf, __LINE__)[16];                                     \
+            snprintf(LLBC_Concat(__llbcExitIfCodeBuf, __LINE__),                                     \
+                     sizeof(LLBC_Concat(__llbcExitIfCodeBuf, __LINE__)),                             \
+                     "%d",                                                                           \
+                     LLBC_Concat(__llbcExitIfCode, __LINE__));                                       \
             auto LLBC_Concat(exitIfLoggerMgr, __LINE__) = LLBC_LoggerMgrSingleton;                   \
             if (LIKELY(LLBC_Concat(exitIfLoggerMgr, __LINE__)->IsInited()))  {                       \
                 auto LLBC_Concat(exitIfLogger, __LINE__) =                                           \
@@ -663,14 +669,14 @@ __LLBC_INTERNAL_NS_END
                         __FILE__, __LINE__, __FUNCTION__,                                            \
                         logTag,                                                                      \
                         LLBC_Concat(__llbcExitIfLv, __LINE__),                                       \
-                        "LLBC_ExitIf:<\"%s\"> is true, exitCode:%d. ",                               \
-                        #cond, static_cast<int>(exitCode), ##__VA_ARGS__);                           \
+                        "LLBC_ExitIf:<\"%s\"> is true, exitCode:%s. ",                               \
+                        #cond, LLBC_Concat(__llbcExitIfCodeBuf, __LINE__), ##__VA_ARGS__);            \
                 }                                                                                    \
             }                                                                                        \
                                                                                                      \
             if (LLBC_LoggerMgrSingleton->IsInited())                                                 \
                 LLBC_LoggerMgrSingleton->Finalize();                                                 \
-            ::exit(static_cast<int>(exitCode));                                                      \
+            ::exit(LLBC_Concat(__llbcExitIfCode, __LINE__));                                         \
         }                                                                                            \
     }                                                                                                \
 
